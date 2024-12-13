@@ -327,7 +327,6 @@ variations:
         tags: _version.r4_0-dev
 
   r4.1-dev:
-    default: true
     env:
       CM_MLPERF_INFERENCE_VERSION: '4.1-dev'
       CM_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r4.1-dev_default
@@ -355,6 +354,7 @@ variations:
     group: benchmark-version
   
   r5.0-dev:
+    default: true
     env:
       CM_MLPERF_INFERENCE_VERSION: '5.0-dev'
       CM_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r5.0-dev_default
