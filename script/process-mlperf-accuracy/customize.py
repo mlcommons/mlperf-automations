@@ -175,12 +175,12 @@ def preprocess(i):
             extra_options = ""
             if env.get('CM_DLRM_V2_AGGREGATION_TRACE_FILE_PATH', '') != '':
                 extra_options += (
-                    f" --aggregation-trace-file '{
+                    f" - -aggregation - trace - file '{
                         env['CM_DLRM_V2_AGGREGATION_TRACE_FILE_PATH']}' "
                 )
             if env.get('CM_DLRM_V2_DAY23_FILE_PATH', '') != '':
                 extra_options += (
-                    f" --day-23-file '{
+                    f" - -day - 23 - file '{
                         env['CM_DLRM_V2_DAY23_FILE_PATH']}' "
                 )
             CMD = env['CM_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['CM_MLPERF_INFERENCE_DLRM_V2_PATH'], "pytorch", "tools",
