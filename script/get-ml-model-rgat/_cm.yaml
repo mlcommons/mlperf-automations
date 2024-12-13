@@ -63,4 +63,5 @@ variations:
     group: download-tool
   rclone,fp32:
     env:
+      CM_ML_MODEL_STARTING_WEIGHTS_FILENAME: https://github.com/mlcommons/inference/tree/master/graph/R-GAT#download-model-using-rclone
       CM_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/R-GAT/RGAT.pt
