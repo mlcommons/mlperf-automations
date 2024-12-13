@@ -118,11 +118,11 @@ def preprocess(i):
             extra_options = ""
 
             if env.get('CM_SDXL_STATISTICS_FILE_PATH', '') != '':
-                extra_options += f" --statistics-path '{
+                extra_options += f" - -statistics - path '{
                     env['CM_SDXL_STATISTICS_FILE_PATH']}' "
 
             if env.get('CM_SDXL_COMPLIANCE_IMAGES_PATH', '') != '':
-                extra_options += f" --compliance-images-path '{
+                extra_options += f" - -compliance - images - path '{
                     env['CM_SDXL_COMPLIANCE_IMAGES_PATH']}' "
             else:
                 extra_options += f""" --compliance-images-path '{
@@ -130,11 +130,11 @@ def preprocess(i):
                         result_dir, "images")}' """
 
             if env.get('CM_COCO2014_SAMPLE_ID_PATH', '') != '':
-                extra_options += f" --ids-path '{
+                extra_options += f" - -ids - path '{
                     env['CM_COCO2014_SAMPLE_ID_PATH']}' "
 
             if env.get('CM_SDXL_ACCURACY_RUN_DEVICE', '') != '':
-                extra_options += f" --device '{
+                extra_options += f" - -device '{
                     env['CM_SDXL_ACCURACY_RUN_DEVICE']}' "
 
             # env['DATASET_ANNOTATIONS_FILE_PATH'] = env['CM_DATASET_ANNOTATIONS_FILE_PATH']
@@ -168,10 +168,10 @@ def preprocess(i):
         elif dataset == "terabyte":
             extra_options = ""
             if env.get('CM_DLRM_V2_AGGREGATION_TRACE_FILE_PATH', '') != '':
-                extra_options += f" --aggregation-trace-file '{
+                extra_options += f" - -aggregation - trace - file '{
                     env['CM_DLRM_V2_AGGREGATION_TRACE_FILE_PATH']}' "
             if env.get('CM_DLRM_V2_DAY23_FILE_PATH', '') != '':
-                extra_options += f" --day-23-file '{
+                extra_options += f" - -day - 23 - file '{
                     env['CM_DLRM_V2_DAY23_FILE_PATH']}' "
             CMD = env['CM_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['CM_MLPERF_INFERENCE_DLRM_V2_PATH'], "pytorch", "tools",
                                                                        "accuracy-dlrm.py") + "' --mlperf-accuracy-file '" + os.path.join(result_dir,
