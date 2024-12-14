@@ -34,7 +34,7 @@ prehook_deps:
   - env:
       CM_PACKAGE_URL: https://igb-public.s3.us-east-2.amazonaws.com/IGBH/processed/paper/node_feat.npy
       CM_DOWNLOAD_CHECKSUM: 71058b9ac8011bafa1c5467504452d13
-      CM_DOWNLOAD_FILENAME: node_feet.npy
+      CM_DOWNLOAD_FILENAME: node_feat.npy
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/paper/
     extra_cache_tags: dataset,igbh,paper,node_feat
     force_cache: true
