@@ -1239,8 +1239,8 @@ variations:
       CM_MODEL: rgat
     add_deps_recursive:
       pytorch:
-        version_max: "2.4.1"
-        version_max_usable: "2.4.1"
+        version_max: "2.4.0"
+        version_max_usable: "2.4.0"
     deps:
       - tags: get,generic-python-lib,_package.colorama
       - tags: get,generic-python-lib,_package.tqdm
