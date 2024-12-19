@@ -145,11 +145,12 @@ class CustomInstallCommand(install):
                           'artifact': 'mlcommons@cm4mlops',
                           'force': True,
                           'all': True})
+        branch = os.environ.get('CM_MLOPS_REPO_BRANCH', 'dev')
         r = cmind.access({'action': 'pull',
                           'automation': 'repo',
                           'artifact': 'mlcommons@mlperf-automations',
-                          'checkout': commit_hash})
-        # r = cmind.access({'action':'pull', 'automation':'repo', 'artifact':'mlcommons@mlperf-automations', 'checkout': commit_hash})
+                          'checkout': commit_hash,
+                          'branch': branch})
         print(r)
         if r['return'] > 0:
             return r['return']
