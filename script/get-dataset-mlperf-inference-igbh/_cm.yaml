@@ -37,6 +37,8 @@ prehook_deps:
       CM_DOWNLOAD_FILENAME: node_feat.npy
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/paper/
     extra_cache_tags: dataset,igbh,paper,node_feat
+    force_env_keys:
+    - CM_OUTDIRNAME
     force_cache: true
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
@@ -54,6 +56,8 @@ prehook_deps:
       CM_DOWNLOAD_FILENAME: node_label_19.npy
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/paper/
     extra_cache_tags: dataset,igbh,paper,node_label_19
+    force_env_keys:
+    - CM_OUTDIRNAME
     force_cache: true
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
@@ -72,6 +76,8 @@ prehook_deps:
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/paper/
     extra_cache_tags: dataset,igbh,paper,node_label_2K
     force_cache: true
+    force_env_keys:
+    - CM_OUTDIRNAME
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
       - 'full'
@@ -89,6 +95,8 @@ prehook_deps:
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/paper/
     extra_cache_tags: dataset,igbh,paper,paper_id_index_mapping
     force_cache: true
+    force_env_keys:
+    - CM_OUTDIRNAME
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
       - 'full'
@@ -107,6 +115,8 @@ prehook_deps:
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/paper__cites__paper/
     extra_cache_tags: dataset,igbh,paper_cites_paper,edge_index
     force_cache: true
+    force_env_keys:
+    - CM_OUTDIRNAME
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
       - 'full'
@@ -125,6 +135,8 @@ prehook_deps:
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/author/
     extra_cache_tags: dataset,igbh,author,author_id_index_mapping
     force_cache: true
+    force_env_keys:
+    - CM_OUTDIRNAME
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
       - 'full'
@@ -142,6 +154,8 @@ prehook_deps:
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/author/
     extra_cache_tags: dataset,igbh,author,node_feat
     force_cache: true
+    force_env_keys:
+    - CM_OUTDIRNAME
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
       - 'full'
@@ -160,6 +174,8 @@ prehook_deps:
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/conference/
     extra_cache_tags: dataset,igbh,conference,conference_id_index_mapping
     force_cache: true
+    force_env_keys:
+    - CM_OUTDIRNAME
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
       - 'full'
@@ -177,6 +193,8 @@ prehook_deps:
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/conference/
     extra_cache_tags: dataset,igbh,conference,node_feat
     force_cache: true
+    force_env_keys:
+    - CM_OUTDIRNAME
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
       - 'full'
@@ -195,6 +213,8 @@ prehook_deps:
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/institute/
     extra_cache_tags: dataset,igbh,institute,institute_id_index_mapping
     force_cache: true
+    force_env_keys:
+    - CM_OUTDIRNAME
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
       - 'full'
@@ -212,6 +232,8 @@ prehook_deps:
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/institute/
     extra_cache_tags: dataset,igbh,institute,node_feat
     force_cache: true
+    force_env_keys:
+    - CM_OUTDIRNAME
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
       - 'full'
@@ -230,6 +252,8 @@ prehook_deps:
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/journal/
     extra_cache_tags: dataset,igbh,journal,journal_id_index_mapping
     force_cache: true
+    force_env_keys:
+    - CM_OUTDIRNAME
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
       - 'full'
@@ -247,6 +271,8 @@ prehook_deps:
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/journal/
     extra_cache_tags: dataset,igbh,journal,node_feat
     force_cache: true
+    force_env_keys:
+    - CM_OUTDIRNAME
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
       - 'full'
@@ -265,6 +291,8 @@ prehook_deps:
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/fos/
     extra_cache_tags: dataset,igbh,fos,fos_id_index_mapping
     force_cache: true
+    force_env_keys:
+    - CM_OUTDIRNAME
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
       - 'full'
@@ -282,6 +310,8 @@ prehook_deps:
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/fos/
     extra_cache_tags: dataset,igbh,fos,node_feat
     force_cache: true
+    force_env_keys:
+    - CM_OUTDIRNAME
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
       - 'full'
@@ -300,6 +330,8 @@ prehook_deps:
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/author__affiliated_to__institute/
     extra_cache_tags: dataset,igbh,author_affiliated_to_institute,edge_index
     force_cache: true
+    force_env_keys:
+    - CM_OUTDIRNAME
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
       - 'full'
@@ -318,6 +350,8 @@ prehook_deps:
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/paper__published__journal/
     extra_cache_tags: dataset,igbh,paper_published_journal,edge_index
     force_cache: true
+    force_env_keys:
+    - CM_OUTDIRNAME
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
       - 'full'
@@ -336,6 +370,8 @@ prehook_deps:
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/paper__topic__fos/
     extra_cache_tags: dataset,igbh,paper_topic_fos,edge_index
     force_cache: true
+    force_env_keys:
+    - CM_OUTDIRNAME
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
       - 'full'
@@ -354,6 +390,8 @@ prehook_deps:
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/paper__venue__conference/
     extra_cache_tags: dataset,igbh,paper_venue_conference,edge_index
     force_cache: true
+    force_env_keys:
+    - CM_OUTDIRNAME
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
       - 'full'
@@ -372,6 +410,8 @@ prehook_deps:
       CM_DOWNLOAD_PATH: <<<CM_DATASET_IGBH_DOWNLOAD_LOCATION>>>/full/processed/paper__written_by__author/
     extra_cache_tags: dataset,igbh,paper_written_by_author,edge_index
     force_cache: true
+    force_env_keys:
+    - CM_OUTDIRNAME
     enable_if_env:
       CM_DATASET_IGBH_TYPE: 
       - 'full'
