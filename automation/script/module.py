@@ -1798,9 +1798,16 @@ class CAutomation(Automation):
 
             tmp_curdir = os.getcwd()
             if env.get('CM_OUTDIRNAME', '') != '':
-                if not os.path.exists(env['CM_OUTDIRNAME']):
-                    os.makedirs(env['CM_OUTDIRNAME'])
-                os.chdir(env['CM_OUTDIRNAME'])
+                if os.path.isabs(env['CM_OUTDIRNAME']) or recursion:
+                    c_outdirname = env['CM_OUTDIRNAME']
+                else:
+                    c_outdirname = os.path.join(
+                        env['CM_TMP_CURRENT_PATH'], env['CM_OUTDIRNAME'])
+                    env['CM_OUTDIRNAME'] = c_outdirname
+
+                if not os.path.exists(c_outdirname):
+                    os.makedirs(c_outdirname)
+                os.chdir(c_outdirname)
 
             # Check if pre-process and detect
             if 'preprocess' in dir(customize_code) and not fake_run:
@@ -5860,7 +5867,10 @@ def convert_env_to_script(env, os_info, start_script=None):
                 key = key[1:]
 
             # Append the existing environment variable to the new value
-            env_value = f"{env_separator.join(env_value)}{env_separator}{os_info['env_var'].replace('env_var', key)}"
+            env_value = f"{
+                env_separator.join(env_value)}{env_separator}{
+                os_info['env_var'].replace(
+                    'env_var', key)}"
 
         # Replace placeholders in the platform-specific environment command
         env_command = os_info['set_env'].replace(
