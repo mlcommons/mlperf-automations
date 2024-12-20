@@ -87,13 +87,13 @@ def preprocess(i):
 
         if not os.path.exists(fp32_model_path):
             cmds.append(
-                f"ln -sf {env['CM_ML_MODEL_BERT_LARGE_FP32_PATH']} {fp32_model_path}")
+                f"cp -r {env['CM_ML_MODEL_BERT_LARGE_FP32_PATH']} {fp32_model_path}")
         if not os.path.exists(int8_model_path):
             cmds.append(
-                f"ln -sf {env['CM_ML_MODEL_BERT_LARGE_INT8_PATH']} {int8_model_path}")
+                f"cp -r {env['CM_ML_MODEL_BERT_LARGE_INT8_PATH']} {int8_model_path}")
         if not os.path.exists(vocab_path):
             cmds.append(
-                f"ln -sf {env['CM_ML_MODEL_BERT_VOCAB_FILE_WITH_PATH']} {vocab_path}")
+                f"cp -r {env['CM_ML_MODEL_BERT_VOCAB_FILE_WITH_PATH']} {vocab_path}")
         model_name = "bert"
         model_path = fp32_model_path
 
