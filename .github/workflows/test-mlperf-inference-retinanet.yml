@@ -46,11 +46,11 @@ jobs:
     - name: Test MLPerf Inference Retinanet using ${{ matrix.backend }} on ${{ matrix.os }}
       if: matrix.os == 'windows-latest'
       run: |
-        cm run script --tags=run,mlperf,inference,generate-run-cmds,_submission,_short --submitter="MLCommons" --hw_name=gh_${{ matrix.os }} --model=retinanet --adr.loadgen.tags=_from-pip --pip_loadgen=yes --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --scenario=Offline --test_query_count=5 --quiet  -v --target_qps=1
+        cm run script --tags=run,mlperf,inference,generate-run-cmds,_submission,_short --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name=gh_${{ matrix.os }} --model=retinanet --adr.loadgen.tags=_from-pip --pip_loadgen=yes --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --scenario=Offline --test_query_count=5 --quiet  -v --target_qps=1
     - name: Test MLPerf Inference Retinanet using ${{ matrix.backend }} on ${{ matrix.os }}
       if: matrix.os != 'windows-latest'
       run: |
-        cm run script --tags=run,mlperf,inference,generate-run-cmds,_submission,_short --submitter="MLCommons" --hw_name=gh_${{ matrix.os }}_x86 --model=retinanet --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --scenario=Offline --test_query_count=5 --adr.compiler.tags=gcc --quiet  -v --target_qps=1
+        cm run script --tags=run,mlperf,inference,generate-run-cmds,_submission,_short --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name=gh_${{ matrix.os }}_x86 --model=retinanet --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --scenario=Offline --test_query_count=5 --adr.compiler.tags=gcc --quiet  -v --target_qps=1
     - name: Push Results
       if: github.repository_owner == 'gateoverflow'
       env:
