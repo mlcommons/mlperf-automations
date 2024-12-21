@@ -5867,10 +5867,10 @@ def convert_env_to_script(env, os_info, start_script=None):
                 key = key[1:]
 
             # Append the existing environment variable to the new value
-            env_value = f"{
+            env_value = f"""{
                 env_separator.join(env_value)}{env_separator}{
                 os_info['env_var'].replace(
-                    'env_var', key)}"
+                    'env_var', key)}"""
 
         # Replace placeholders in the platform-specific environment command
         env_command = os_info['set_env'].replace(
