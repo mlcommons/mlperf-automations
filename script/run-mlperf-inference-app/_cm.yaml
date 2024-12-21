@@ -138,11 +138,11 @@ deps:
   - inference-src
   tags: get,mlcommons,inference,src
 - tags: pull,git,repo
-    env:
-      CM_GIT_CHECKOUT_PATH: '<<<CM_MLPERF_INFERENCE_SOURCE>>>'
-    enable_if_env:
-      CM_MLPERF_INFERENCE_PULL_SRC_CHANGES:
-      - 'yes'
+  env:
+    CM_GIT_CHECKOUT_PATH: '<<<CM_MLPERF_INFERENCE_SOURCE>>>'
+  enable_if_env:
+    CM_MLPERF_INFERENCE_PULL_SRC_CHANGES:
+    - 'yes'
 - tags: get,sut,description
   skip_if_env:
     CM_MLPERF_USE_DOCKER: [ on ]
