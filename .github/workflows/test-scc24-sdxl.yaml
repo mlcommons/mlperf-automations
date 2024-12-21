@@ -9,7 +9,8 @@ jobs:
     if: github.repository_owner == 'gateoverflow'
     runs-on: [ self-hosted, linux, x64, GO-spr ]
     env:
-      CM_DOCKER_REPO: mlperf-automations
+      CM_DOCKER_REPO: mlcommons@mlperf-automations
+      CM_DOCKER_REPO_BRANCH: dev
     strategy:
       fail-fast: false
       matrix:
@@ -27,8 +28,8 @@ jobs:
         pip install --upgrade cm4mlops
         pip install tabulate
         cm pull repo
-        cm run script --tags=run-mlperf,inference,_find-performance,_r4.1-dev,_short,_scc24-base --pull_changes=yes --pull_inference_changes=yes --model=sdxl --implementation=reference --backend=${{ matrix.backend }} --category=datacenter --scenario=Offline --execution_mode=test --device=${{ matrix.device }} --precision=${{ matrix.precision }} --docker --docker_it=no --docker_cm_repo=$CM_DOCKER_REPO --docker_dt=yes --quiet --results_dir=$HOME/scc_gh_action_results --submission_dir=$HOME/scc_gh_action_submissions --env.CM_MLPERF_MODEL_SDXL_DOWNLOAD_TO_HOST=yes --clean
-        cm run script --tags=run-mlperf,inference,_r4.1-dev,_short,_scc24-base --model=sdxl --implementation=reference --backend=${{ matrix.backend }} --category=datacenter --scenario=Offline --execution_mode=test --device=${{ matrix.device }} --precision=${{ matrix.precision }} --docker --docker_it=no --docker_cm_repo=$CM_DOCKER_REPO --docker_dt=yes --quiet --results_dir=$HOME/scc_gh_action_results --submission_dir=$HOME/scc_gh_action_submissions --env.CM_MLPERF_MODEL_SDXL_DOWNLOAD_TO_HOST=yes --clean
+        cm run script --tags=run-mlperf,inference,_find-performance,_r4.1-dev,_short,_scc24-base --pull_changes=yes --pull_inference_changes=yes --model=sdxl --implementation=reference --backend=${{ matrix.backend }} --category=datacenter --scenario=Offline --execution_mode=test --device=${{ matrix.device }} --precision=${{ matrix.precision }} --docker --docker_it=no --docker_cm_repo=$CM_DOCKER_REPO --docker_cm_repo_branch=$CM_DOCKER_REPO_BRANCH --docker_dt=yes --quiet --results_dir=$HOME/scc_gh_action_results --submission_dir=$HOME/scc_gh_action_submissions --env.CM_MLPERF_MODEL_SDXL_DOWNLOAD_TO_HOST=yes --clean
+        cm run script --tags=run-mlperf,inference,_r4.1-dev,_short,_scc24-base --model=sdxl --implementation=reference --backend=${{ matrix.backend }} --category=datacenter --scenario=Offline --execution_mode=test --device=${{ matrix.device }} --precision=${{ matrix.precision }} --docker --docker_it=no --docker_cm_repo=$CM_DOCKER_REPO --docker_cm_repo_branch=$CM_DOCKER_REPO_BRANCH --docker_dt=yes --quiet --results_dir=$HOME/scc_gh_action_results --submission_dir=$HOME/scc_gh_action_submissions --env.CM_MLPERF_MODEL_SDXL_DOWNLOAD_TO_HOST=yes --clean
         cm run script --tags=generate,inference,submission --clean  --run-checker --tar=yes --env.CM_TAR_OUTFILE=submission.tar.gz --division=open --category=datacenter --run_style=test --adr.submission-checker.tags=_short-run --quiet --submitter=MLCommons --submission_dir=$HOME/scc_gh_action_submissions --results_dir=$HOME/scc_gh_action_results/test_results
         cm run script --tags=push,github,mlperf,inference,submission --repo_url=https://github.com/gateoverflow/cm4mlperf-inference --repo_branch=mlperf-inference-results-scc24 --commit_message="Results from self hosted Github actions - NVIDIARTX4090" --quiet --submission_dir=$HOME/scc_gh_action_submissions
         
@@ -36,7 +37,8 @@ jobs:
       if: github.repository_owner == 'gateoverflow'
       runs-on: [ self-hosted, linux, x64, GO-spr]
       env:
-        CM_DOCKER_REPO: mlperf-automations
+        CM_DOCKER_REPO: mlcommons@mlperf-automations
+        CM_DOCKER_REPO_BRANCH: dev
       strategy:
         fail-fast: false
         matrix:
@@ -54,7 +56,7 @@ jobs:
           pip install --upgrade cm4mlops
           pip install tabulate
           cm pull repo
-          cm run script --tags=run-mlperf,inference,_find-performance,_r4.1-dev,_short,_scc24-base --pull_changes=yes --model=sdxl --implementation=nvidia --backend=${{ matrix.backend }} --category=datacenter --scenario=Offline --execution_mode=test --device=${{ matrix.device }} --precision=${{ matrix.precision }} --docker --docker_it=no --docker_cm_repo=$CM_DOCKER_REPO --docker_dt=yes --pull_changes --quiet --results_dir=$HOME/scc_gh_action_results --submission_dir=$HOME/scc_gh_action_submissions --env.CM_MLPERF_MODEL_SDXL_DOWNLOAD_TO_HOST=yes --hw_name=go-spr --custom_system_nvidia=yes --clean
-          cm run script --tags=run-mlperf,inference,_r4.1-dev,_short,_scc24-base --model=sdxl --implementation=nvidia --backend=${{ matrix.backend }} --category=datacenter --scenario=Offline --execution_mode=test --device=${{ matrix.device }} --precision=${{ matrix.precision }} --docker --docker_it=no --docker_cm_repo=$CM_DOCKER_REPO --docker_dt=yes --quiet --results_dir=$HOME/scc_gh_action_results --submission_dir=$HOME/scc_gh_action_submissions --env.CM_MLPERF_MODEL_SDXL_DOWNLOAD_TO_HOST=yes --clean
+          cm run script --tags=run-mlperf,inference,_find-performance,_r4.1-dev,_short,_scc24-base --pull_changes=yes --model=sdxl --implementation=nvidia --backend=${{ matrix.backend }} --category=datacenter --scenario=Offline --execution_mode=test --device=${{ matrix.device }} --precision=${{ matrix.precision }} --docker --docker_it=no --docker_cm_repo=$CM_DOCKER_REPO --docker_cm_repo_branch=$CM_DOCKER_REPO_BRANCH --docker_dt=yes --pull_changes --quiet --results_dir=$HOME/scc_gh_action_results --submission_dir=$HOME/scc_gh_action_submissions --env.CM_MLPERF_MODEL_SDXL_DOWNLOAD_TO_HOST=yes --hw_name=go-spr --custom_system_nvidia=yes --clean
+          cm run script --tags=run-mlperf,inference,_r4.1-dev,_short,_scc24-base --model=sdxl --implementation=nvidia --backend=${{ matrix.backend }} --category=datacenter --scenario=Offline --execution_mode=test --device=${{ matrix.device }} --precision=${{ matrix.precision }} --docker --docker_it=no --docker_cm_repo=$CM_DOCKER_REPO --docker_cm_repo_branch=$CM_DOCKER_REPO_BRANCH --docker_dt=yes --quiet --results_dir=$HOME/scc_gh_action_results --submission_dir=$HOME/scc_gh_action_submissions --env.CM_MLPERF_MODEL_SDXL_DOWNLOAD_TO_HOST=yes --clean
           cm run script --tags=generate,inference,submission --clean --run-checker --tar=yes --env.CM_TAR_OUTFILE=submission.tar.gz --division=open --category=datacenter --run_style=test --adr.submission-checker.tags=_short-run --quiet --submitter=MLCommons --submission_dir=$HOME/scc_gh_action_submissions --results_dir=$HOME/scc_gh_action_results/test_results
           cm run script --tags=push,github,mlperf,inference,submission --repo_url=https://github.com/gateoverflow/cm4mlperf-inference --repo_branch=mlperf-inference-results-scc24 --commit_message="Results from self hosted Github actions - NVIDIARTX4090" --quiet --submission_dir=$HOME/scc_gh_action_submissions
