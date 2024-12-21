@@ -17,6 +17,5 @@ deps:
     names:
       - python
       - python3
-  - tags: get,generic-sys-util,_libbz2-dev
   - tags: get,generic-python-lib,_package.networkx
   - tags: get,generic-python-lib,_package.matplotlib
