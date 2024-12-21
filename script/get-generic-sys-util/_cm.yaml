@@ -237,7 +237,6 @@ variations:
     state:
       libbz2_dev:
         apt: libbz2-dev
-        brew: bzip2
         dnf: libbzip2-devel
         yum: libbzip2-devel
   libev-dev:
