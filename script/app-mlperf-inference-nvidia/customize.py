@@ -687,7 +687,7 @@ def preprocess(i):
             '')  # will be ignored during build engine
 
         if "stable-diffusion" in env["CM_MODEL"]:
-            extra_build_engine_options_string += f" --model_path {
+            extra_build_engine_options_string += f" - -model_path {
                 os.path.join(
                     env['MLPERF_SCRATCH_PATH'],
                     'models',
