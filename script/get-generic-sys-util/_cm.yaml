@@ -212,10 +212,23 @@ variations:
         brew: ''
         dnf: boost-devel
         yum: boost-devel
+  bzip2:
+    env:
+      CM_SYS_UTIL_NAME: bzip2
+      CM_SYS_UTIL_VERSION_CMD_OVERRIDE: bzcat --version 2>&1 | grep bzip > tmp-ver.out
+      CM_SYS_UTIL_VERSION_RE: ([0-9]+(\.[0-9]+)+)
+      CM_TMP_VERSION_DETECT_GROUP_NUMBER: 1
+    new_env_keys:
+    - CM_BZIP2_VERSION
+    state:
+      bzip2:
+        apt: bzip2
+        brew: bzip2
+        dnf: bzip2
+        yum: bzip2
   libbz2-dev:
     env:
       CM_SYS_UTIL_NAME: libbz2_dev
-      CM_SYS_UTIL_VERSION_CMD_OVERRIDE_NOT_USED: bzcat --version 2>&1 | grep bzip > tmp-ver.out
       CM_SYS_UTIL_VERSION_CMD: dpkg -s libbz2-dev | grep 'Version'
       CM_SYS_UTIL_VERSION_RE: ([0-9]+(\.[0-9]+)+)
       CM_TMP_VERSION_DETECT_GROUP_NUMBER: 0
@@ -227,7 +240,6 @@ variations:
         brew: bzip2
         dnf: libbzip2-devel
         yum: libbzip2-devel
-        zlib-devel: libbz2-devel
   libev-dev:
     env:
       CM_SYS_UTIL_NAME: libev_dev
