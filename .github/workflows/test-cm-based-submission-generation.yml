@@ -80,7 +80,7 @@ jobs:
         fi
         # Dynamically set the log group to simulate a dynamic step name
         echo "::group::$description"
-        cm ${{ matrix.action }} script --tags=generate,inference,submission  --clean --preprocess_submission=yes --results_dir=$PWD/submission_generation_tests/${{ matrix.case }}/ --run-checker --submitter=MLCommons --tar=yes --env.CM_TAR_OUTFILE=submission.tar.gz --division=${{ matrix.division }} --env.CM_DETERMINE_MEMORY_CONFIGURATION=yes --quiet $extra_run_args
+        cm ${{ matrix.action }} script --tags=generate,inference,submission  --version=v4.1 --clean --preprocess_submission=yes --results_dir=$PWD/submission_generation_tests/${{ matrix.case }}/ --run-checker --submitter=MLCommons --tar=yes --env.CM_TAR_OUTFILE=submission.tar.gz --division=${{ matrix.division }} --env.CM_DETERMINE_MEMORY_CONFIGURATION=yes --quiet $extra_run_args
         exit_status=$?
         exit $? || echo "STEP_FAILED=true" >> $GITHUB_ENV
         echo "Exit status for the job ${description} ${exit_status}"
@@ -98,6 +98,7 @@ jobs:
         echo "::endgroup::"
     - name: Fail if Step Failed
       if: env.STEP_FAILED == 'true'
+      continue-on-error: false
       run: |
         echo "Manually failing the workflow because the step failed."
         exit 1
