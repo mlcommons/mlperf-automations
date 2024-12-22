@@ -7,6 +7,7 @@ default_env:
   CM_MLPERF_RUN_STYLE: valid
   CM_MLPERF_SUBMISSION_DIR_SHARED: 'yes'
   CM_RUN_MLPERF_ACCURACY: 'on'
+predeps: False
 deps:
 - names:
   - python
