@@ -10,6 +10,7 @@ on:
 jobs:
   build_reference:
     if: github.repository_owner == 'gateoverflow'
+    timeout-minutes: 1440
     runs-on: [ self-hosted, phoenix, linux, x64 ]
     strategy:
       fail-fast: false
