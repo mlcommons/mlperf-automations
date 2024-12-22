@@ -2,11 +2,12 @@ name: MLPerf Inference Nvidia implementations
 
 on:
   schedule:
-    - cron: "08 23 * * *" #to be adjusted
+    - cron: "08 01 * * *" #to be adjusted
 
 jobs:
   run_nvidia:
       if: github.repository_owner == 'gateoverflow'
+      timeout-minutes: 1440
       runs-on:
        - self-hosted
        - linux
