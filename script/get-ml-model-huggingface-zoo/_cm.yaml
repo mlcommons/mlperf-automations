@@ -38,6 +38,8 @@ variations:
     - env:
         CM_GIT_CHECKOUT_PATH_ENV_NAME: CM_ML_MODEL_PATH
       tags: get,git,repo,_lfs
+      force_env_keys:
+      - CM_OUTDIRNAME    
       update_tags_from_env_with_prefix:
         _repo.https://huggingface.co/:
         - CM_MODEL_ZOO_STUB
