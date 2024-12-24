@@ -161,6 +161,10 @@ variations:
       - python3
       tags: get,python3
     - tags: get,generic-python-lib,_package.safetensors
+    - tags: get,generic-python-lib,_torch
+      names:
+      - torch
+      - pytorch
   rclone:
     add_deps_recursive:
       dae:
