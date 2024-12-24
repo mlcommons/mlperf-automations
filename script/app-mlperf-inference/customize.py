@@ -356,7 +356,7 @@ def postprocess(i):
             host_info['system_name'] = env['CM_HOST_SYSTEM_NAME']
 
         # Check CM automation repository
-        repo_name = 'mlcommons@cm4mlops'
+        repo_name = 'mlcommons@mlperf-automations'
         repo_hash = ''
         r = cm.access({'action': 'find', 'automation': 'repo',
                       'artifact': 'mlcommons@cm4mlops,9e97bb72b0474657'})

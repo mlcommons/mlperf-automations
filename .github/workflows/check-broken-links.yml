@@ -1,9 +1,9 @@
 name: "Check .md README files for broken links"
 
 on:
-  push: 
+  pull_request: 
     branches: 
-    - master
+    - dev
 
 jobs:
   markdown-link-check:
@@ -18,3 +18,4 @@ jobs:
       with:
         use-quiet-mode: 'yes'
         check-modified-files-only: 'yes'
+        base-branch: dev

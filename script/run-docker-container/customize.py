@@ -314,6 +314,8 @@ def postprocess(i):
         print('')
         docker_out = os.system(CMD)
         if docker_out != 0:
+            if docker_out % 256 == 0:
+                docker_out = 1
             return {'return': docker_out, 'error': 'docker run failed'}
 
     return {'return': 0}

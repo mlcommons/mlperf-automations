@@ -388,7 +388,9 @@ def get_run_cmd_reference(
             env['CM_VLLM_SERVER_MODEL_NAME'] = env.get(
                 "CM_VLLM_SERVER_MODEL_NAME") or "NousResearch/Meta-Llama-3-8B-Instruct"
             # env['CM_MLPERF_INFERENCE_API_SERVER'] = "http://localhost:8000"
-            cmd += f" --api-server {env['CM_MLPERF_INFERENCE_API_SERVER']} --model-path {env['CM_VLLM_SERVER_MODEL_NAME']} --api-model-name {env['CM_VLLM_SERVER_MODEL_NAME']} --vllm "
+            cmd += f""" --api-server {env['CM_MLPERF_INFERENCE_API_SERVER']} \
+                    --model-path {env['CM_VLLM_SERVER_MODEL_NAME']} \
+                    --api-model-name {env['CM_VLLM_SERVER_MODEL_NAME']} --vllm """
         else:
             cmd += f" --model-path {env['LLAMA2_CHECKPOINT_PATH']}"
 
@@ -493,7 +495,7 @@ def get_run_cmd_reference(
             scenario_extra_options + mode_extra_options + \
             " --output " + env['CM_MLPERF_OUTPUT_DIR'] + \
             ' --dtype ' + dtype_rgat + \
-            " --model-path " + env['CM_ML_MODEL_RGAT_CHECKPOINT_PATH']
+            " --model-path " + env['RGAT_CHECKPOINT_PATH']
 
         if env.get('CM_ACTIVATE_RGAT_IN_MEMORY', '') == "yes":
             cmd += " --in-memory "

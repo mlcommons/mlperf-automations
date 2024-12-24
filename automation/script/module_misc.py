@@ -1634,12 +1634,12 @@ def dockerfile(i):
             'docker_cm_repo',
             docker_settings.get(
                 'cm_repo',
-                'mlcommons@cm4mlops'))
+                'mlcommons@mlperf-automations'))
         cm_repo_branch = i.get(
             'docker_cm_repo_branch',
             docker_settings.get(
                 'cm_repo_branch',
-                'mlperf-inference'))
+                'main'))
 
         cm_repo_flags = i.get(
             'docker_cm_repo_flags',
@@ -2295,7 +2295,7 @@ def docker(i):
             'docker_cm_repo',
             docker_settings.get(
                 'cm_repo',
-                'mlcommons@cm4mlops'))
+                'mlcommons@mlperf-automations'))
 
         docker_path = i.get('docker_path', '').strip()
         if docker_path == '':

@@ -8,9 +8,6 @@ category: Modular MLPerf inference benchmark pipeline
 
 developers: "[Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Grigori Fursin](https://cKnowledge.org/gfursin)"
 
-gui:
-  title: CM GUI to run MLPerf inference benchmarks and prepare submissions
-
 clean_output_files:
 - open.tar.gz
 - summary.csv
@@ -140,6 +137,12 @@ deps:
 - names:
   - inference-src
   tags: get,mlcommons,inference,src
+- tags: pull,git,repo
+  env:
+    CM_GIT_CHECKOUT_PATH: '<<<CM_MLPERF_INFERENCE_SOURCE>>>'
+  enable_if_env:
+    CM_MLPERF_INFERENCE_PULL_SRC_CHANGES:
+    - 'yes'
 - tags: get,sut,description
   skip_if_env:
     CM_MLPERF_USE_DOCKER: [ on ]
@@ -201,11 +204,6 @@ variations:
   compliance:
     env:
       CM_MLPERF_LOADGEN_COMPLIANCE: 'yes'
-
-  dashboard:
-    default_gui: false
-    env:
-      CM_MLPERF_DASHBOARD: 'on'
 
   find-performance:
     env:
@@ -335,7 +333,6 @@ variations:
         tags: _version.r4_0-dev
 
   r4.1-dev:
-    default: true
     env:
       CM_MLPERF_INFERENCE_VERSION: '4.1-dev'
       CM_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r4.1-dev_default
@@ -352,6 +349,7 @@ variations:
     env:
       CM_MLPERF_INFERENCE_VERSION: '4.1'
       CM_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r4.1_default
+      CM_MLPERF_SUBMISSION_CHECKER_VERSION: v4.1
     adr:
       get-mlperf-inference-results-dir:
         tags: _version.r4_1
@@ -362,9 +360,11 @@ variations:
     group: benchmark-version
   
   r5.0-dev:
+    default: true
     env:
       CM_MLPERF_INFERENCE_VERSION: '5.0-dev'
       CM_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r5.0-dev_default
+      CM_MLPERF_SUBMISSION_CHECKER_VERSION: v5.0
     group: benchmark-version
     adr:
       get-mlperf-inference-results-dir:
@@ -396,7 +396,6 @@ variations:
   submission:
     base:
     - all-modes
-    default_gui: true
     default_variations:
       submission-generation-style: full
     env:

@@ -22,6 +22,8 @@ prehook_deps:
   names:
   - hf-zoo
   tags: get,ml-model,huggingface,zoo,_clone-repo
+  force_env_keys:
+    - CM_OUTDIRNAME  
 print_env_at_the_end:
   MIXTRAL_CHECKPOINT_PATH: MIXTRAL checkpoint path
 tags:

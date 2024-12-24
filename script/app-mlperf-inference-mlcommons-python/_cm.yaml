@@ -222,6 +222,7 @@ deps:
       CM_MODEL:
         - dlrm-v2-99
         - dlrm-v2-99.9
+        - rgat
     enable_if_env:
       CM_MLPERF_BACKEND:
       - pytorch
@@ -234,6 +235,11 @@ deps:
     names:
     - ml-engine-torchvision
     - torchvision
+    skip_if_env:
+      CM_MODEL:
+        - dlrm-v2-99
+        - dlrm-v2-99.9
+        - rgat
     enable_if_env:
       CM_MLPERF_BACKEND:
       - pytorch
@@ -487,7 +493,7 @@ deps:
       CM_MODEL:
       - rgat
     skip_if_env:
-      CM_ML_MODEL_RGAT_CHECKPOINT_PATH:
+      RGAT_CHECKPOINT_PATH:
         - 'on'
 
   ########################################################################
@@ -619,9 +625,14 @@ deps:
     enable_if_env:
       CM_MODEL:
       - rgat
-    skip_if_env:
+    skip_if_any_env:
       CM_DATASET_IGBH_PATH:
       - "on"
+    skip_if_env:
+      CM_RUN_STATE_DOCKER:
+      - 'yes'
+      CM_USE_DATASET_FROM_HOST:
+      - 'yes'
 
   ########################################################################
   # Install MLPerf inference dependencies
@@ -1226,45 +1237,48 @@ variations:
     group: models
     env:
       CM_MODEL: rgat
-    adr:
+    add_deps_recursive:
       pytorch:
-        version: 2.1.0
+        version_max: "2.4.0"
+        version_max_usable: "2.4.0"
     deps:
       - tags: get,generic-python-lib,_package.colorama
       - tags: get,generic-python-lib,_package.tqdm
       - tags: get,generic-python-lib,_package.requests
       - tags: get,generic-python-lib,_package.torchdata
-        version: 0.7.0
-      - tags: get,generic-python-lib,_package.torchvision
-        version: 0.16.0
       - tags: get,generic-python-lib,_package.pybind11
       - tags: get,generic-python-lib,_package.PyYAML
       - tags: get,generic-python-lib,_package.numpy
-        version: 1.26.4
+        version_max: "1.26.4"
+        version_max_usable: "1.26.4"
       - tags: get,generic-python-lib,_package.pydantic 
       - tags: get,generic-python-lib,_package.igb,_url.git+https://github.com/IllinoisGraphBenchmark/IGB-Datasets.git
+      - tags: get,generic-python-lib,_package.torch-geometric
+        update_tags_from_env_with_prefix:
+          _find_links_url.: 
+            - CM_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL
+      - tags: get,generic-python-lib,_package.torch-scatter
+        update_tags_from_env_with_prefix:
+          _find_links_url.: 
+            - CM_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL
+      - tags: get,generic-python-lib,_package.torch-sparse
+        update_tags_from_env_with_prefix:
+          _find_links_url.: 
+            - CM_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL
+      - tags: get,generic-python-lib,_package.dgl
+        update_tags_from_env_with_prefix:
+          _find_links_url.: 
+            - CM_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL_DGL
       
   rgat,cuda:
-    deps:
-      - tags: get,generic-python-lib,_package.dgl,_find_links_url.https://data.dgl.ai/wheels/torch-2.1/cu121/repo.html
-      - tags: get,generic-python-lib,_package.torch-scatter
-      - tags: get,generic-python-lib,_package.torch-sparse
-      - tags: get,generic-python-lib,_package.torch-geometric
-        env:
-          CM_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: "https://data.pyg.org/whl/torch-<<<CM_TORCH_VERSION>>>.html"
+    env:
+      CM_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: "https://data.pyg.org/whl/torch-<<<CM_TORCH_VERSION>>>.html"
+      CM_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL_DGL: "https://data.dgl.ai/wheels/torch-<<<CM_TORCH_VERSION_MAJOR_MINOR>>>/cu121/repo.html"
           
   rgat,cpu:
-    deps:
-      - tags: get,generic-python-lib,_package.torch-geometric
-        env:
-          CM_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: "https://data.pyg.org/whl/torch-<<<CM_TORCH_VERSION>>>+cpu.html"
-      - tags: get,generic-python-lib,_package.torch-scatter
-        env:
-          CM_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: "https://data.pyg.org/whl/torch-<<<CM_TORCH_VERSION>>>+cpu.html"
-      - tags: get,generic-python-lib,_package.torch-sparse
-        env:
-          CM_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: "https://data.pyg.org/whl/torch-<<<CM_TORCH_VERSION>>>+cpu.html"
-      - tags: get,generic-python-lib,_package.dgl,_find_links_url.https://data.dgl.ai/wheels/torch-2.1/repo.html
+    env:
+      CM_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: "https://data.pyg.org/whl/torch-<<<CM_TORCH_VERSION>>>+cpu.html"
+      CM_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL_DGL: "https://data.dgl.ai/wheels/torch-<<<CM_TORCH_VERSION_MAJOR_MINOR>>>/repo.html"
 
   # Target devices
   cpu:

@@ -7,6 +7,7 @@ default_env:
   CM_MLPERF_RUN_STYLE: valid
   CM_MLPERF_SUBMISSION_DIR_SHARED: 'yes'
   CM_RUN_MLPERF_ACCURACY: 'on'
+predeps: False
 deps:
 - names:
   - python
@@ -31,8 +32,8 @@ deps:
     - 'on'
   tags: get,mlperf,submission,dir
 docker:
-  cm_repo: mlcommons@cm4mlops
-  cm_repo_branch: mlperf-inference
+  cm_repo: mlcommons@mlperf-automations
+  cm_repo_branch: dev
   deps:
   - names: get-mlperf-inference-results-dir
     skip_if_env:
@@ -84,6 +85,7 @@ input_mapping:
   sw_notes_extra: CM_MLPERF_SUT_SW_NOTES_EXTRA
   tar: CM_TAR_SUBMISSION_DIR
   get_platform_details: CM_GET_PLATFORM_DETAILS
+  version: CM_MLPERF_SUBMISSION_CHECKER_VERSION
 post_deps:
 - enable_if_env:
     CM_RUN_MLPERF_ACCURACY:

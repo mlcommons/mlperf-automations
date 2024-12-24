@@ -19,9 +19,9 @@ def preprocess(i):
     graph_folder = os.path.join(
         env['CM_MLPERF_INFERENCE_SOURCE'], 'graph', 'R-GAT')
 
-    download_loc = env.get('CM_IGBH_DATASET_OUT_PATH', os.getcwd())
+    download_loc = env.get('CM_DATASET_IGBH_OUT_PATH', os.getcwd())
 
-    env['CM_IGBH_DATASET_DOWNLOAD_LOCATION'] = download_loc
+    env['CM_DATASET_IGBH_DOWNLOAD_LOCATION'] = download_loc
 
     run_cmd += f"cd {graph_folder} "
     x_sep = " && "
@@ -33,7 +33,7 @@ def preprocess(i):
 
     # split seeds
     run_cmd += x_sep + \
-        f"{env['CM_PYTHON_BIN_WITH_PATH']} tools/split_seeds.py --path {download_loc} --dataset_size {env['CM_DATASET_IGBH_SIZE']}"
+        f"{env['CM_PYTHON_BIN_WITH_PATH']} tools/split_seeds.py --path {download_loc} --dataset_size {env['CM_DATASET_IGBH_SIZE']} "
 
     # compress graph(for glt implementation)
     if env.get('CM_IGBH_GRAPH_COMPRESS', '') == "yes":
@@ -50,7 +50,7 @@ def postprocess(i):
     env = i['env']
 
     env['CM_DATASET_IGBH_PATH'] = env.get(
-        'CM_IGBH_DATASET_OUT_PATH', os.getcwd())
+        'CM_DATASET_IGBH_OUT_PATH', os.getcwd())
 
     print(
         f"Path to the IGBH dataset: {os.path.join(env['CM_DATASET_IGBH_PATH'], env['CM_DATASET_IGBH_SIZE'])}")

@@ -131,7 +131,7 @@ def preprocess(i):
                 print(
                     f"Converted repo format from {env['CM_MLOPS_REPO']} to {cm_mlops_repo}")
         else:
-            cm_mlops_repo = "mlcommons@cm4mlops"
+            cm_mlops_repo = "mlcommons@mlperf-automations"
 
     cm_mlops_repo_branch_string = f" --branch={env['CM_MLOPS_REPO_BRANCH']}"
 
@@ -299,7 +299,7 @@ def preprocess(i):
     f.write(EOL + '# Download CM repo for scripts' + EOL)
 
     if use_copy_repo:
-        docker_repo_dest = "/home/cmuser/CM/repos/mlcommons@cm4mlops"
+        docker_repo_dest = "/home/cmuser/CM/repos/mlcommons@mlperf-automations"
         f.write(
             f'COPY --chown=cmuser:cm {relative_repo_path} {docker_repo_dest}' +
             EOL)
