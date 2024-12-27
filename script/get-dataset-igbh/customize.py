@@ -36,6 +36,9 @@ def preprocess(i):
         run_cmd += x_sep + env['CM_PYTHON_BIN_WITH_PATH'] + \
             f" tools/download_igbh_test.py --target-path {download_loc} "
 
+    else:
+        env['CM_DATASET_IGBH_FULL_DOWNLOAD'] = 'yes'
+
     # split seeds
     run_cmd += x_sep + \
         f"""{

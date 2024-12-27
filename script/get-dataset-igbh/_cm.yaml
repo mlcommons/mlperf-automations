@@ -41,8 +41,8 @@ prehook_deps:
     - CM_OUTDIRNAME
     force_cache: true
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - paper-node-feat
@@ -60,8 +60,8 @@ prehook_deps:
     - CM_OUTDIRNAME
     force_cache: true
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - paper-node-label19
@@ -79,8 +79,8 @@ prehook_deps:
     force_env_keys:
     - CM_OUTDIRNAME
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - paper-node-label2k
@@ -98,8 +98,8 @@ prehook_deps:
     force_env_keys:
     - CM_OUTDIRNAME
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - paper-id-index-mapping
@@ -118,8 +118,8 @@ prehook_deps:
     force_env_keys:
     - CM_OUTDIRNAME
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - edge-index
@@ -138,8 +138,8 @@ prehook_deps:
     force_env_keys:
     - CM_OUTDIRNAME
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - author-id-index-mapping
@@ -157,8 +157,8 @@ prehook_deps:
     force_env_keys:
     - CM_OUTDIRNAME
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - author-node-feat
@@ -177,8 +177,8 @@ prehook_deps:
     force_env_keys:
     - CM_OUTDIRNAME
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - conference-id-index-mapping
@@ -196,8 +196,8 @@ prehook_deps:
     force_env_keys:
     - CM_OUTDIRNAME
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - conference-node-feat
@@ -216,8 +216,8 @@ prehook_deps:
     force_env_keys:
     - CM_OUTDIRNAME
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - institute-id-index-mapping
@@ -235,8 +235,8 @@ prehook_deps:
     force_env_keys:
     - CM_OUTDIRNAME
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - institute-node-feat
@@ -255,8 +255,8 @@ prehook_deps:
     force_env_keys:
     - CM_OUTDIRNAME
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - journal-id-index-mapping
@@ -274,8 +274,8 @@ prehook_deps:
     force_env_keys:
     - CM_OUTDIRNAME
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - journal-node-feat
@@ -294,8 +294,8 @@ prehook_deps:
     force_env_keys:
     - CM_OUTDIRNAME
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - fos-id-index-mapping
@@ -313,8 +313,8 @@ prehook_deps:
     force_env_keys:
     - CM_OUTDIRNAME
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - fos-node-feat
@@ -333,8 +333,8 @@ prehook_deps:
     force_env_keys:
     - CM_OUTDIRNAME
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - author-to-institute-edge-index
@@ -353,8 +353,8 @@ prehook_deps:
     force_env_keys:
     - CM_OUTDIRNAME
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - paper-published-journal-edge-index
@@ -373,8 +373,8 @@ prehook_deps:
     force_env_keys:
     - CM_OUTDIRNAME
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - paper-topic-fos-edge-index
@@ -393,8 +393,8 @@ prehook_deps:
     force_env_keys:
     - CM_OUTDIRNAME
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - paper-venue-conference-edge-index
@@ -413,8 +413,8 @@ prehook_deps:
     force_env_keys:
     - CM_OUTDIRNAME
     enable_if_env:
-      CM_DATASET_IGBH_TYPE: 
-      - 'full'
+      CM_DATASET_IGBH_FULL_DOWNLOAD:
+        - 'yes'
     names:
     - dae
     - paper-written-by-author-edge-index
