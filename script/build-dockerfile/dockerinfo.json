@@ -22,7 +22,6 @@
   "USER": "cmuser",
   "GID": "",
   "GROUP": "cm",
-  "SHELL": "[\"/bin/bash\", \"-c\"]",
   "WORKDIR": "/home/cmuser",
   "distros": {
     "ubuntu": {
