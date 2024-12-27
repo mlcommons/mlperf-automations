@@ -44,8 +44,8 @@ def preprocess(i):
     if env.get('CM_IGBH_GRAPH_COMPRESS', '') == "yes":
         run_cmd += x_sep + \
             f"{
-                env['CM_PYTHON_BIN_WITH_PATH']} tools/compress_graph.py --path {download_loc} --dataset_size {
-                env['CM_DATASET_IGBH_SIZE']} --layout {
+                env['CM_PYTHON_BIN_WITH_PATH']} tools / compress_graph.py - -path {download_loc} - -dataset_size {
+                env['CM_DATASET_IGBH_SIZE']} - -layout {
                 env['CM_IGBH_GRAPH_COMPRESS_LAYOUT']}"
 
     env['CM_RUN_CMD'] = run_cmd
