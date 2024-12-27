@@ -2273,8 +2273,8 @@ class CAutomation(Automation):
 
         return rr
 
-        
     ##########################################################################
+
     def _update_env_from_input(self, env, i):
         # Check path/input/output in input and pass to env
         for key in self.input_flags_converted_to_tmp_env:

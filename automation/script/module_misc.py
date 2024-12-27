@@ -2417,7 +2417,8 @@ def docker(i):
         print(final_run_cmd)
         print('')
 
-        docker_recreate_image = 'yes' if str(norecreate_docker_image).lower() not in ["yes", "true", "1"]  else 'no'
+        docker_recreate_image = 'yes' if str(norecreate_docker_image).lower() not in [
+            "yes", "true", "1"] else 'no'
 
         if i.get('docker_push_image', '') in ['True', True, 'yes']:
             env['CM_DOCKER_PUSH_IMAGE'] = 'yes'

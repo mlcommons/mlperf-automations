@@ -12,8 +12,10 @@ def preprocess(i):
     path = env.get('RGAT_CHECKPOINT_PATH', '').strip()
 
     if path == '' or not os.path.exists(path):
-        if download_dir != '' and os.path.exists(os.path.join(download_dir, "RGAT", "RGAT.pt")):
-            env['RGAT_CHECKPOINT_PATH'] = os.path.join(download_dir, "RGAT", "RGAT.pt")
+        if download_dir != '' and os.path.exists(
+                os.path.join(download_dir, "RGAT", "RGAT.pt")):
+            env['RGAT_CHECKPOINT_PATH'] = os.path.join(
+                download_dir, "RGAT", "RGAT.pt")
         else:
             env['CM_TMP_REQUIRE_DOWNLOAD'] = 'yes'
 
