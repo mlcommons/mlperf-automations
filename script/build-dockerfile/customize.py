@@ -172,7 +172,7 @@ def preprocess(i):
 
     shell = get_value(env, config, 'SHELL', 'CM_DOCKER_IMAGE_SHELL')
     if shell:
-        f.write('SHELL ' + shell + EOL)
+        # f.write('SHELL ' + shell + EOL)
         f.write(EOL)
 
     for arg in config['ARGS_DEFAULT']:
