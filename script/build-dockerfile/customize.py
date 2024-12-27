@@ -379,6 +379,26 @@ def preprocess(i):
         if run_cmd_extra != '':
             x += ' ' + run_cmd_extra
 
+    if env.get('CM_DOCKER_RUN_SCRIPT_TAGS', '') != '' and str(env.get(
+            'CM_DOCKER_ADD_DEPENDENT_SCRIPTS_RUN_COMMANDS', '')).lower() in ["yes", "1", "true"]:
+        cm_input = {'action': 'run',
+                    'automation': 'script',
+                    'tags': f"""{env['CM_DOCKER_RUN_SCRIPT_TAGS']}""",
+                    'print_deps': True,
+                    'quiet': True,
+                    'silent': True,
+                    'fake_run': True,
+                    'fake_deps': True
+                    }
+        r = self_module.cmind.access(cm_input)
+        if r['return'] > 0:
+            return r
+        print_deps = r['new_state']['print_deps']
+        fake_run_str = " --fake_run" if env.get('CM_DOCKER_FAKE_DEPS') else ""
+        cmds = ["RUN " + dep for dep in print_deps]
+        for cmd in cmds:
+            f.write(cmd + fake_run_str + EOL)
+
     f.write(x + EOL)
 
     # fake_run to install the dependent scripts and caching them
