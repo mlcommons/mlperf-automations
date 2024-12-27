@@ -507,28 +507,7 @@ class CAutomation(Automation):
             if os.environ.get(key, '') != '' and env.get(key, '') == '':
                 env[key] = os.environ[key]
 
-        # Check path/input/output in input and pass to env
-        for key in self.input_flags_converted_to_tmp_env:
-            value = i.get(key, '').strip()
-            if value != '':
-                env['CM_TMP_' + key.upper()] = value
-
-        for key in self.input_flags_converted_to_env:
-            value = i.get(
-                key,
-                '').strip() if isinstance(
-                i.get(
-                    key,
-                    ''),
-                str) else i.get(
-                key,
-                '')
-            if value:
-                env[f"CM_{key.upper()}"] = value
-
-        r = update_env_with_values(env)
-        if r['return'] > 0:
-            return r
+        r = self._update_env_from_input(env, i)
 
         #######################################################################
         # Check if we want to skip cache (either by skip_cache or by fake_run)
@@ -2293,6 +2272,34 @@ class CAutomation(Automation):
             input('Press Enter to continue ...')
 
         return rr
+
+        
+    ##########################################################################
+    def _update_env_from_input(self, env, i):
+        # Check path/input/output in input and pass to env
+        for key in self.input_flags_converted_to_tmp_env:
+            value = i.get(key, '').strip()
+            if value != '':
+                env['CM_TMP_' + key.upper()] = value
+
+        for key in self.input_flags_converted_to_env:
+            value = i.get(
+                key,
+                '').strip() if isinstance(
+                i.get(
+                    key,
+                    ''),
+                str) else i.get(
+                key,
+                '')
+            if value:
+                env[f"CM_{key.upper()}"] = value
+
+        r = update_env_with_values(env)
+        if r['return'] > 0:
+            return r
+
+        return {'return': 0}
 
     ##########################################################################
     def _fix_cache_paths(self, env):

@@ -167,6 +167,9 @@ def postprocess(i):
     if env.get('CM_DOCKER_EXTRA_RUN_ARGS', '') != '':
         run_opts += env['CM_DOCKER_EXTRA_RUN_ARGS']
 
+    if env.get('CM_CONTAINER_TOOL', '') == 'podman' and env.get('CM_PODMAN_MAP_USER_ID','').lower() not in ["no", "0", "false"]:
+        run_opts += " --userns=keep-id"
+
     if env.get('CM_DOCKER_PORT_MAPS', []):
         for ports in env['CM_DOCKER_PORT_MAPS']:
             port_map_cmds.append(ports)
