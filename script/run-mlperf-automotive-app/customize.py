@@ -290,7 +290,7 @@ def preprocess(i):
             # Better to do this in a stand alone CM script with proper deps but
             # currently we manage this by modifying the sys path of the python
             # executing CM
-            import mlperf_utils #noqa
+            import mlperf_utils  # noqa
 
             print(sut)
             result_table, headers = mlperf_utils.get_result_table(
@@ -400,4 +400,3 @@ def get_url(url, path, path2, name, text):
     return {'return': 0, 'url_online': url_online}
 
 ##########################################################################
-
