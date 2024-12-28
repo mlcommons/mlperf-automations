@@ -12,16 +12,17 @@ from PIL import Image
 
 import numpy as np
 from pycocotools.cocoeval import COCOeval
-#import pycoco
+# import pycoco
 import dataset
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("cognata")
 
+
 class Cognata(dataset.Dataset):
     def __init__(self, data_path, image_list, name, use_cache=0, image_size=None,
                  image_format="NHWC", pre_process=None, count=None, cache_dir=None, preprocessed_dir=None, use_label_map=False, threads=os.cpu_count(),
-                 model_config=None, model_num_classes=None, model_image_size=None): # For ABTF
+                 model_config=None, model_num_classes=None, model_image_size=None):  # For ABTF
         super().__init__()
 
         self.image_size = image_size
@@ -33,7 +34,7 @@ class Cognata(dataset.Dataset):
         self.use_cache = use_cache
         self.data_path = data_path
         self.pre_process = pre_process
-        self.use_label_map=use_label_map
+        self.use_label_map = use_label_map
 
         self.model_config = model_config
         self.model_num_classes = model_num_classes
@@ -48,7 +49,7 @@ class Cognata(dataset.Dataset):
         self.encoder = None
         self.targets = []
 
-        #################################################################################
+        #######################################################################
         # From ABTF source
 
         import torch
@@ -60,7 +61,8 @@ class Cognata(dataset.Dataset):
         import ast
 
         self.dboxes = generate_dboxes(model_config.model, model="ssd")
-        self.transform = SSDTransformer(self.dboxes, self.model_image_size, val=True)
+        self.transform = SSDTransformer(
+            self.dboxes, self.model_image_size, val=True)
         self.encoder = Encoder(self.dboxes)
 
         folders = model_config.dataset['folders']
@@ -71,41 +73,48 @@ class Cognata(dataset.Dataset):
 
         # Grigori added for tests
         # Check if overridden by extrnal environment for tests
-        x = os.environ.get('CM_DATASET_MLCOMMONS_COGNATA_SERIAL_NUMBERS','').strip()
-        if x!='':
+        x = os.environ.get(
+            'CM_DATASET_MLCOMMONS_COGNATA_SERIAL_NUMBERS',
+            '').strip()
+        if x != '':
             folders = x.split(';') if ';' in x else [x]
 
-        x = os.environ.get('CM_DATASET_MLCOMMONS_COGNATA_GROUP_NAMES','').strip()
-        if x!='':
+        x = os.environ.get(
+            'CM_DATASET_MLCOMMONS_COGNATA_GROUP_NAMES',
+            '').strip()
+        if x != '':
             cameras = x.split(';') if ';' in x else [x]
 
-        print ('')
-        print ('Cognata folders: {}'.format(str(folders)))
-        print ('Cognata cameras: {}'.format(str(cameras)))
-        print ('')
-        
+        print('')
+        print('Cognata folders: {}'.format(str(folders)))
+        print('Cognata cameras: {}'.format(str(cameras)))
+        print('')
+
         # From ABTF source
-        print ('')
-        print ('Scanning Cognata dataset ...')
+        print('')
+        print('Scanning Cognata dataset ...')
         start = time.time()
-        files, label_map, label_info = prepare_cognata(data_path, folders, cameras, self.ignore_classes)
+        files, label_map, label_info = prepare_cognata(
+            data_path, folders, cameras, self.ignore_classes)
 
         self.files = files
 
-        print ('  Number of files found: {}'.format(len(files)))
-        print ('  Time: {:.2f} sec.'.format(time.time()-start))
+        print('  Number of files found: {}'.format(len(files)))
+        print('  Time: {:.2f} sec.'.format(time.time() - start))
 
-        if os.environ.get('CM_ABTF_ML_MODEL_TRAINING_FORCE_COGNATA_LABELS','')=='yes':
+        if os.environ.get(
+                'CM_ABTF_ML_MODEL_TRAINING_FORCE_COGNATA_LABELS', '') == 'yes':
             label_map = cognata_labels.label_map
             label_info = cognata_labels.label_info
 
         self.label_map = label_map
         self.label_info = label_info
 
-        if self.model_num_classes != None: self.model_num_classes = len(label_map.keys())
+        if self.model_num_classes is not None:
+            self.model_num_classes = len(label_map.keys())
 
-        print ('')
-        print ('Preloading and preprocessing Cognata dataset on the fly ...')
+        print('')
+        print('Preloading and preprocessing Cognata dataset on the fly ...')
 
         start = time.time()
 
@@ -134,30 +143,33 @@ class Cognata(dataset.Dataset):
                 for annotation in annotations:
                     bbox = annotation[bbox_index]
                     bbox = ast.literal_eval(bbox)
-                    object_width = bbox[2]-bbox[0]
-                    object_height = bbox[3]-bbox[1]
-                    object_area = object_width*object_height
+                    object_width = bbox[2] - bbox[0]
+                    object_height = bbox[3] - bbox[1]
+                    object_area = object_width * object_height
                     label = ast.literal_eval(annotation[class_index])
                     distance = ast.literal_eval(annotation[distance_index])
-                    if object_area < 50 or int(label) in self.ignore_classes or object_height < 8 or object_width < 8 or distance > 300:
+                    if object_area < 50 or int(
+                            label) in self.ignore_classes or object_height < 8 or object_width < 8 or distance > 300:
                         continue
                     label = self.label_map[label]
-                    boxes.append([bbox[0] / width, bbox[1] / height, bbox[2] / width, bbox[3] / height])
+                    boxes.append([bbox[0] / width, bbox[1] / height,
+                                 bbox[2] / width, bbox[3] / height])
                     boxes2.append([bbox[0], bbox[1], bbox[2], bbox[3]])
-                    gt_boxes.append([bbox[0], bbox[1], bbox[2], bbox[3], label, 0, 0])
+                    gt_boxes.append(
+                        [bbox[0], bbox[1], bbox[2], bbox[3], label, 0, 0])
                     labels.append(label)
-                
+
                 boxes = torch.tensor(boxes)
                 boxes2 = torch.tensor(boxes2)
                 labels = torch.tensor(labels)
                 gt_boxes = torch.tensor(gt_boxes)
 
-                targets.append({'boxes': boxes2.to(device='cpu'), 
-                                'labels': labels.to(device='cpu', 
-                                dtype=torch.int32) })
+                targets.append({'boxes': boxes2.to(device='cpu'),
+                                'labels': labels.to(device='cpu',
+                                                    dtype=torch.int32)})
 
-
-            img, (height, width), boxes, labels = self.transform(img, (height, width), boxes, labels, max_num=500)
+            img, (height, width), boxes, labels = self.transform(
+                img, (height, width), boxes, labels, max_num=500)
 
             _, height, width = img.shape
 
@@ -171,31 +183,26 @@ class Cognata(dataset.Dataset):
             self.targets.append(targets)
 
             # limit the dataset if requested
-            idx+=1
-            if self.count!=None and idx >= self.count:
+            idx += 1
+            if self.count is not None and idx >= self.count:
                 break
 
-        print ('  Time: {:.2f} sec.'.format(time.time()-start))
-        print ('')
+        print('  Time: {:.2f} sec.'.format(time.time() - start))
+        print('')
 
         return
-
-
-
-
 
     def get_item(self, nr):
         """Get image by number in the list."""
 
         return self.image_bin[nr], self.label_list[nr]
 
- 
     def get_item_loc(self, nr):
 
         return self.files[nr]['img']
 
-
     # Grigori added here to be able to return Torch tensor and not Numpy
+
     def get_samples(self, id_list):
 
         data = [self.image_list_inmemory[idx] for idx in id_list]
@@ -204,12 +211,11 @@ class Cognata(dataset.Dataset):
         return data, labels
 
 
-
-
 class PostProcessCognata:
     """
     Post processing for tensorflow ssd-mobilenet style models
     """
+
     def __init__(self):
         self.results = []
         self.good = 0
@@ -233,11 +239,13 @@ class PostProcessCognata:
 
     def finalize(self, result_dict, ds=None, output_dir=None):
 
-        #To be improved
+        # To be improved
 
         from torchmetrics.detection.mean_ap import MeanAveragePrecision
-        metric = MeanAveragePrecision(iou_type="bbox", class_metrics=True, backend='faster_coco_eval')
-
+        metric = MeanAveragePrecision(
+            iou_type="bbox",
+            class_metrics=True,
+            backend='faster_coco_eval')
 
         result_dict["good"] += self.good
         result_dict["total"] += self.total
@@ -253,14 +261,14 @@ class PostProcessCognata:
 
         metrics = metric.compute()
 
-        print ('=================================================')
+        print('=================================================')
         import pprint
         pp = pprint.PrettyPrinter(indent=4)
         pp.pprint(metrics)
-        print ('=================================================')
+        print('=================================================')
 
-        classes=metrics['classes'].tolist()
-        map_per_classes=metrics['map_per_class'].tolist()
+        classes = metrics['classes'].tolist()
+        map_per_classes = metrics['map_per_class'].tolist()
 
         final_map = {}
         for c in range(0, len(classes)):
@@ -270,13 +278,13 @@ class PostProcessCognata:
         result_dict["mAP_classes"] = final_map
 
 
-
-
 class PostProcessCognataPt(PostProcessCognata):
     """
     Post processing required by ssd-resnet34 / pytorch
     """
-    def __init__(self, nms_threshold, max_output, score_threshold, height, width):
+
+    def __init__(self, nms_threshold, max_output,
+                 score_threshold, height, width):
         super().__init__()
         self.nms_threshold = nms_threshold
         self.max_output = max_output
@@ -292,7 +300,8 @@ class PostProcessCognataPt(PostProcessCognata):
 
         processed_results = []
 
-        # For now 1 result (batch 1) - need to add support for batch size > 1 later
+        # For now 1 result (batch 1) - need to add support for batch size > 1
+        # later
         ploc = results[0]
         plabel = results[1]
 
@@ -306,31 +315,37 @@ class PostProcessCognataPt(PostProcessCognata):
             dts = []
             labels = []
             scores = []
-            
+
             ploc_i = ploc[i, :, :].unsqueeze(0)
             plabel_i = plabel[i, :, :].unsqueeze(0)
 
-            result = self.encoder.decode_batch(ploc_i, plabel_i, self.nms_threshold, self.max_output)[0]
+            result = self.encoder.decode_batch(
+                ploc_i, plabel_i, self.nms_threshold, self.max_output)[0]
 
             loc, label, prob = [r.cpu().numpy() for r in result]
             for loc_, label_, prob_ in zip(loc, label, prob):
                 if label_ in expected[i][0]:
                     self.good += 1
                 self.total += 1
-                dts.append([loc_[0]* self.width, loc_[1]* self.height, loc_[2]* self.width, loc_[3]* self.height,])
+                dts.append([loc_[0] *
+                            self.width, loc_[1] *
+                            self.height, loc_[2] *
+                            self.width, loc_[3] *
+                            self.height,])
                 labels.append(label_)
                 scores.append(prob_)
-            
+
             dts = torch.tensor(dts, device='cpu')
             labels = torch.tensor(labels, device='cpu', dtype=torch.int32)
             scores = torch.tensor(scores, device='cpu')
-            preds.append({'boxes': dts, 'labels': labels, 'scores': scores, 'id': ids[i]})
+            preds.append({'boxes': dts, 'labels': labels,
+                         'scores': scores, 'id': ids[i]})
 
         # Only batch size supported
-        idx=0
+        idx = 0
 
         processed_results.append(preds)
 
-        #self.total += 1
+        # self.total += 1
 
         return processed_results

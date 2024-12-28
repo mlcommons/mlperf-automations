@@ -15,6 +15,7 @@ import numpy as np
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("dataset")
 
+
 class Item():
     def __init__(self, label, img, idx):
         self.label = label
@@ -28,9 +29,16 @@ def usleep(sec):
         # on windows time.sleep() doesn't work to well
         import ctypes
         kernel32 = ctypes.windll.kernel32
-        timer = kernel32.CreateWaitableTimerA(ctypes.c_void_p(), True, ctypes.c_void_p())
+        timer = kernel32.CreateWaitableTimerA(
+            ctypes.c_void_p(), True, ctypes.c_void_p())
         delay = ctypes.c_longlong(int(-1 * (10 * 1000000 * sec)))
-        kernel32.SetWaitableTimer(timer, ctypes.byref(delay), 0, ctypes.c_void_p(), ctypes.c_void_p(), False)
+        kernel32.SetWaitableTimer(
+            timer,
+            ctypes.byref(delay),
+            0,
+            ctypes.c_void_p(),
+            ctypes.c_void_p(),
+            False)
         kernel32.WaitForSingleObject(timer, 0xffffffff)
     else:
         time.sleep(sec)
@@ -62,7 +70,7 @@ class Dataset():
     def unload_query_samples(self, sample_list):
         if sample_list:
             for sample in sample_list:
-                if sample in self.image_list_inmemory :
+                if sample in self.image_list_inmemory:
                     del self.image_list_inmemory[sample]
         else:
             self.image_list_inmemory = {}
@@ -102,7 +110,7 @@ class PostProcessCommon:
         self.good = 0
         self.total = 0
 
-    def finalize(self, results, ds=False,  output_dir=None):
+    def finalize(self, results, ds=False, output_dir=None):
         results["good"] = self.good
         results["total"] = self.total
 
@@ -151,7 +159,8 @@ def center_crop(img, out_height, out_width):
     return img
 
 
-def resize_with_aspectratio(img, out_height, out_width, scale=87.5, inter_pol=cv2.INTER_LINEAR):
+def resize_with_aspectratio(
+        img, out_height, out_width, scale=87.5, inter_pol=cv2.INTER_LINEAR):
     height, width, _ = img.shape
     new_height = int(100. * out_height / scale)
     new_width = int(100. * out_width / scale)
@@ -170,7 +179,11 @@ def pre_process_vgg(img, dims=None, need_transpose=False):
 
     output_height, output_width, _ = dims
     cv2_interpol = cv2.INTER_AREA
-    img = resize_with_aspectratio(img, output_height, output_width, inter_pol=cv2_interpol)
+    img = resize_with_aspectratio(
+        img,
+        output_height,
+        output_width,
+        inter_pol=cv2_interpol)
     img = center_crop(img, output_height, output_width)
     img = np.asarray(img, dtype='float32')
 
@@ -188,7 +201,11 @@ def pre_process_mobilenet(img, dims=None, need_transpose=False):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
     output_height, output_width, _ = dims
-    img = resize_with_aspectratio(img, output_height, output_width, inter_pol=cv2.INTER_LINEAR)
+    img = resize_with_aspectratio(
+        img,
+        output_height,
+        output_width,
+        inter_pol=cv2.INTER_LINEAR)
     img = center_crop(img, output_height, output_width)
     img = np.asarray(img, dtype='float32')
 
@@ -211,9 +228,12 @@ def pre_process_imagenet_pytorch(img, dims=None, need_transpose=False):
     img = F.resize(img, 256, Image.BILINEAR)
     img = F.center_crop(img, 224)
     img = F.to_tensor(img)
-    img = F.normalize(img, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], inplace=False)
+    img = F.normalize(
+        img, mean=[
+            0.485, 0.456, 0.406], std=[
+            0.229, 0.224, 0.225], inplace=False)
     if not need_transpose:
-        img = img.permute(1, 2, 0) # NHWC
+        img = img.permute(1, 2, 0)  # NHWC
     img = np.asarray(img, dtype='float32')
     return img
 
@@ -224,9 +244,10 @@ def maybe_resize(img, dims):
         # some images might be grayscale
         img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    if dims != None:
+    if dims is not None:
         im_height, im_width, _ = dims
-        img = cv2.resize(img, (im_width, im_height), interpolation=cv2.INTER_LINEAR)
+        img = cv2.resize(img, (im_width, im_height),
+                         interpolation=cv2.INTER_LINEAR)
     return img
 
 

@@ -1,5 +1,5 @@
 """
-Pytoch native backend 
+Pytoch native backend
 Extended by Grigori Fursin for the ABTF demo
 """
 # pylint: disable=unused-argument,missing-docstring
@@ -10,6 +10,7 @@ import backend
 import os
 import sys
 import importlib
+
 
 class BackendPytorchNative(backend.Backend):
     def __init__(self):
@@ -22,7 +23,6 @@ class BackendPytorchNative(backend.Backend):
         self.config = None
         self.num_classes = None
         self.image_size = None
-
 
     def version(self):
         return torch.__version__
@@ -45,14 +45,22 @@ class BackendPytorchNative(backend.Backend):
         abtf_model_config = os.environ.get('CM_ABTF_ML_MODEL_CONFIG', '')
 
         num_classes_str = os.environ.get('CM_ABTF_NUM_CLASSES', '').strip()
-        self.num_classes = int(num_classes_str) if num_classes_str!='' else 15
+        self.num_classes = int(
+            num_classes_str) if num_classes_str != '' else 15
 
         self.config = importlib.import_module('config.' + abtf_model_config)
         self.image_size = self.config.model['image_size']
 
-        self.model = SSD(self.config.model, backbone=ResNet(self.config.model), num_classes=self.num_classes)
+        self.model = SSD(
+            self.config.model,
+            backbone=ResNet(
+                self.config.model),
+            num_classes=self.num_classes)
 
-        checkpoint = torch.load(model_path, map_location=torch.device(self.device))
+        checkpoint = torch.load(
+            model_path,
+            map_location=torch.device(
+                self.device))
 
         self.model.load_state_dict(checkpoint["model_state_dict"])
 
@@ -66,9 +74,7 @@ class BackendPytorchNative(backend.Backend):
         self.inputs = inputs
         self.outputs = outputs
 
-
         return self
-
 
     def predict(self, feed):
         # For ABTF

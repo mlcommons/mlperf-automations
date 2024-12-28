@@ -25,9 +25,9 @@ import dataset
 import cognata
 import cognata_labels
 
-#import imagenet
-#import coco
-#import openimages
+# import imagenet
+# import coco
+# import openimages
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("main")
@@ -40,11 +40,11 @@ MILLI_SEC = 1000
 # the datasets we support
 SUPPORTED_DATASETS = {
     "cognata-4mp-pt":
-        (cognata.Cognata, None, cognata.PostProcessCognataPt(0.5, 200, 0.05, 1440, 2560), 
-        {"image_size": [1440, 2560, 3]}),
+        (cognata.Cognata, None, cognata.PostProcessCognataPt(0.5, 200, 0.05, 1440, 2560),
+         {"image_size": [1440, 2560, 3]}),
     "cognata-8mp-pt":
-        (cognata.Cognata, None, cognata.PostProcessCognataPt(0.5, 200, 0.05, 2160, 3840), 
-        {"image_size": [2160, 3840, 3]})
+        (cognata.Cognata, None, cognata.PostProcessCognataPt(0.5, 200, 0.05, 2160, 3840),
+         {"image_size": [2160, 3840, 3]})
 }
 
 # pre-defined command line options so simplify things. They are used as defaults and can be
@@ -58,7 +58,7 @@ SUPPORTED_PROFILES = {
         "max-batchsize": 32,
     },
 
-     # retinanet
+    # retinanet
     "retinanet-pytorch": {
         "inputs": "image",
         "outputs": "boxes,labels,scores",
@@ -81,43 +81,106 @@ last_timeing = []
 def get_args():
     """Parse commandline."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset", choices=SUPPORTED_DATASETS.keys(), help="dataset")
-    parser.add_argument("--dataset-path", required=True, help="path to the dataset")
+    parser.add_argument(
+        "--dataset",
+        choices=SUPPORTED_DATASETS.keys(),
+        help="dataset")
+    parser.add_argument(
+        "--dataset-path",
+        required=True,
+        help="path to the dataset")
     parser.add_argument("--dataset-list", help="path to the dataset list")
-    parser.add_argument("--data-format", choices=["NCHW", "NHWC"], help="data format")
-    parser.add_argument("--profile", choices=SUPPORTED_PROFILES.keys(), help="standard profiles")
+    parser.add_argument(
+        "--data-format",
+        choices=[
+            "NCHW",
+            "NHWC"],
+        help="data format")
+    parser.add_argument(
+        "--profile",
+        choices=SUPPORTED_PROFILES.keys(),
+        help="standard profiles")
     parser.add_argument("--scenario", default="SingleStream",
                         help="mlperf benchmark scenario, one of " + str(list(SCENARIO_MAP.keys())))
-    parser.add_argument("--max-batchsize", type=int, help="max batch size in a single inference")
+    parser.add_argument(
+        "--max-batchsize",
+        type=int,
+        help="max batch size in a single inference")
     parser.add_argument("--model", required=True, help="model file")
     parser.add_argument("--output", default="output", help="test results")
     parser.add_argument("--inputs", help="model inputs")
     parser.add_argument("--outputs", help="model outputs")
     parser.add_argument("--backend", help="runtime to use")
-    parser.add_argument("--model-name", help="name of the mlperf model, ie. resnet50")
-    parser.add_argument("--threads", default=os.cpu_count(), type=int, help="threads")
+    parser.add_argument(
+        "--model-name",
+        help="name of the mlperf model, ie. resnet50")
+    parser.add_argument(
+        "--threads",
+        default=os.cpu_count(),
+        type=int,
+        help="threads")
     parser.add_argument("--qps", type=int, help="target qps")
     parser.add_argument("--cache", type=int, default=0, help="use cache")
-    parser.add_argument("--cache_dir", type=str, default=None, help="dir path for caching")
-    parser.add_argument("--preprocessed_dir", type=str, default=None, help="dir path for storing preprocessed images (overrides cache_dir)")
-    parser.add_argument("--use_preprocessed_dataset", action="store_true", help="use preprocessed dataset instead of the original")
-    parser.add_argument("--accuracy", action="store_true", help="enable accuracy pass")
-    parser.add_argument("--find-peak-performance", action="store_true", help="enable finding peak performance pass")
-    parser.add_argument("--debug", action="store_true", help="debug, turn traces on")
+    parser.add_argument(
+        "--cache_dir",
+        type=str,
+        default=None,
+        help="dir path for caching")
+    parser.add_argument(
+        "--preprocessed_dir",
+        type=str,
+        default=None,
+        help="dir path for storing preprocessed images (overrides cache_dir)")
+    parser.add_argument(
+        "--use_preprocessed_dataset",
+        action="store_true",
+        help="use preprocessed dataset instead of the original")
+    parser.add_argument(
+        "--accuracy",
+        action="store_true",
+        help="enable accuracy pass")
+    parser.add_argument(
+        "--find-peak-performance",
+        action="store_true",
+        help="enable finding peak performance pass")
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="debug, turn traces on")
 
     # file to use mlperf rules compliant parameters
-    parser.add_argument("--mlperf_conf", default="../../mlperf.conf", help="mlperf rules config")
+    parser.add_argument(
+        "--mlperf_conf",
+        default="../../mlperf.conf",
+        help="mlperf rules config")
     # file for user LoadGen settings such as target QPS
-    parser.add_argument("--user_conf", default="user.conf", help="user config for user LoadGen settings such as target QPS")
+    parser.add_argument(
+        "--user_conf",
+        default="user.conf",
+        help="user config for user LoadGen settings such as target QPS")
     # file for LoadGen audit settings
-    parser.add_argument("--audit_conf", default="audit.config", help="config for LoadGen audit settings")
+    parser.add_argument(
+        "--audit_conf",
+        default="audit.config",
+        help="config for LoadGen audit settings")
 
-    # below will override mlperf rules compliant settings - don't use for official submission
+    # below will override mlperf rules compliant settings - don't use for
+    # official submission
     parser.add_argument("--time", type=int, help="time to scan in seconds")
     parser.add_argument("--count", type=int, help="dataset items to use")
-    parser.add_argument("--performance-sample-count", type=int, help="performance sample count")
-    parser.add_argument("--max-latency", type=float, help="mlperf max latency in pct tile")
-    parser.add_argument("--samples-per-query", default=8, type=int, help="mlperf multi-stream samples per query")
+    parser.add_argument(
+        "--performance-sample-count",
+        type=int,
+        help="performance sample count")
+    parser.add_argument(
+        "--max-latency",
+        type=float,
+        help="mlperf max latency in pct tile")
+    parser.add_argument(
+        "--samples-per-query",
+        default=8,
+        type=int,
+        help="mlperf multi-stream samples per query")
     args = parser.parse_args()
 
     # don't use defaults in argparser. Instead we default to a dict, override that with a profile
@@ -150,7 +213,7 @@ def get_backend(backend):
         backend = BackendPytorch()
     elif backend == "pytorch-native":
         from backend_pytorch_native import BackendPytorchNative
-        backend = BackendPytorchNative()      
+        backend = BackendPytorchNative()
     else:
         raise ValueError("unknown backend: " + backend)
     return backend
@@ -193,8 +256,9 @@ class RunnerBase:
         processed_results = []
         try:
             results = self.model.predict({self.model.inputs[0]: qitem.img})
-        
-            processed_results = self.post_process(results, qitem.content_id, qitem.label, self.result_dict)
+
+            processed_results = self.post_process(
+                results, qitem.content_id, qitem.label, self.result_dict)
             if self.take_accuracy:
                 self.post_process.add_results(processed_results)
 
@@ -211,10 +275,12 @@ class RunnerBase:
             for idx, query_id in enumerate(qitem.query_id):
 
                 # Temporal hack for Cognata to add only boxes - fix
-                processed_results2 = [x['boxes'].numpy() for x in processed_results[idx]]
-                self.proc_results.append([{'boxes': x['boxes'].tolist(), 'scores': x['scores'].tolist(), 'labels': x['labels'].tolist(), 'id': x['id']} 
-                        for x in processed_results[idx]])
-                response_array = array.array("B", np.array(processed_results2, np.float32).tobytes())
+                processed_results2 = [x['boxes'].numpy()
+                                      for x in processed_results[idx]]
+                self.proc_results.append([{'boxes': x['boxes'].tolist(), 'scores': x['scores'].tolist(), 'labels': x['labels'].tolist(), 'id': x['id']}
+                                          for x in processed_results[idx]])
+                response_array = array.array("B", np.array(
+                    processed_results2, np.float32).tobytes())
                 response_array_refs.append(response_array)
                 bi = response_array.buffer_info()
                 response.append(lg.QuerySampleResponse(query_id, bi[0], bi[1]))
@@ -229,8 +295,9 @@ class RunnerBase:
         else:
             bs = self.max_batchsize
             for i in range(0, len(idx), bs):
-                data, label = self.ds.get_samples(idx[i:i+bs])
-                self.run_one_item(Item(query_id[i:i+bs], idx[i:i+bs], data, label))
+                data, label = self.ds.get_samples(idx[i:i + bs])
+                self.run_one_item(
+                    Item(query_id[i:i + bs], idx[i:i + bs], data, label))
 
     def finish(self):
         pass
@@ -244,7 +311,9 @@ class QueueRunner(RunnerBase):
         self.result_dict = {}
 
         for _ in range(self.threads):
-            worker = threading.Thread(target=self.handle_tasks, args=(self.tasks,))
+            worker = threading.Thread(
+                target=self.handle_tasks, args=(
+                    self.tasks,))
             worker.daemon = True
             self.workers.append(worker)
             worker.start()
@@ -283,10 +352,12 @@ class QueueRunner(RunnerBase):
             worker.join()
 
 
-def add_results(final_results, name, result_dict, result_list, took, show_accuracy=False):
+def add_results(final_results, name, result_dict,
+                result_list, took, show_accuracy=False):
     percentiles = [50., 80., 90., 95., 99., 99.9]
     buckets = np.percentile(result_list, percentiles).tolist()
-    buckets_str = ",".join(["{}:{:.4f}".format(p, b) for p, b in zip(percentiles, buckets)])
+    buckets_str = ",".join(["{}:{:.4f}".format(p, b)
+                           for p, b in zip(percentiles, buckets)])
 
     if result_dict["total"] == 0:
         result_dict["total"] = len(result_list)
@@ -313,7 +384,7 @@ def add_results(final_results, name, result_dict, result_list, took, show_accura
                     f.write("{:.3f}%".format(result["mAP"]))
 
         if "mAP_classes" in result_dict:
-            result['mAP_per_classes']=result_dict["mAP_classes"]
+            result['mAP_per_classes'] = result_dict["mAP_classes"]
             acc_str += ", mAP_classes={}".format(result_dict["mAP_classes"])
 
     # add the result to the result dict
@@ -324,11 +395,13 @@ def add_results(final_results, name, result_dict, result_list, took, show_accura
         name, result["qps"], result["mean"], took, acc_str,
         len(result_list), buckets_str))
 
-    print ('======================================================================')
+    print('======================================================================')
 
 #########################################################################
+
+
 def main():
-    print ('======================================================================')
+    print('======================================================================')
 
     global last_timeing
     args = get_args()
@@ -341,9 +414,9 @@ def main():
     # Load model to backend (Grigori moved here before dataset
     #   since we get various info about pre-processing from the model)
 
-    print ('')
-    print ('Loading model ...')
-    print ('')
+    print('')
+    print('Loading model ...')
+    print('')
 
     model = backend.load(args.model, inputs=args.inputs, outputs=args.outputs)
 
@@ -362,11 +435,11 @@ def main():
 #    if args.use_preprocessed_dataset:
 #        pre_proc=None
 
-    print ('')
-    print ('Loading dataset and preprocessing if needed ...')
-    print ('* Dataset path: {}'.format(args.dataset_path))
-    print ('* Preprocessed cache path: {}'.format(args.cache_dir))
-    print ('')
+    print('')
+    print('Loading dataset and preprocessing if needed ...')
+    print('* Dataset path: {}'.format(args.dataset_path))
+    print('* Preprocessed cache path: {}'.format(args.cache_dir))
+    print('')
 
     ds = wanted_dataset(data_path=args.dataset_path,
                         image_list=args.dataset_list,
@@ -378,13 +451,12 @@ def main():
                         preprocessed_dir=args.preprocessed_dir,
                         threads=args.threads,
                         model_config=model.config,           # For ABTF
-                        model_num_classes=model.num_classes, # For ABTF
+                        model_num_classes=model.num_classes,  # For ABTF
                         model_image_size=model.image_size,   # For ABTF
                         **kwargs)
 
     # For ABTF - maybe find cleaner way
     post_proc.encoder = ds.encoder
-
 
     final_results = {
         "runtime": model.name(),
@@ -417,7 +489,8 @@ def main():
     count = ds.get_item_count()
 
     # warmup
-    if os.environ.get('CM_ABTF_ML_MODEL_SKIP_WARMUP','').strip().lower()!='yes':
+    if os.environ.get('CM_ABTF_ML_MODEL_SKIP_WARMUP',
+                      '').strip().lower() != 'yes':
         ds.load_query_samples([0])
         for _ in range(5):
             img, _ = ds.get_samples([0])
@@ -432,7 +505,12 @@ def main():
         lg.TestScenario.Offline: QueueRunner
     }
 
-    runner = runner_map[scenario](model, ds, args.threads, post_proc=post_proc, max_batchsize=args.max_batchsize)
+    runner = runner_map[scenario](
+        model,
+        ds,
+        args.threads,
+        post_proc=post_proc,
+        max_batchsize=args.max_batchsize)
 
     def issue_queries(query_samples):
         runner.enqueue(query_samples)
@@ -476,11 +554,17 @@ def main():
 
     if args.max_latency:
         settings.server_target_latency_ns = int(args.max_latency * NANO_SEC)
-        settings.multi_stream_expected_latency_ns = int(args.max_latency * NANO_SEC)
+        settings.multi_stream_expected_latency_ns = int(
+            args.max_latency * NANO_SEC)
 
-    performance_sample_count = args.performance_sample_count if args.performance_sample_count else min(count, 500)
+    performance_sample_count = args.performance_sample_count if args.performance_sample_count else min(
+        count, 500)
     sut = lg.ConstructSUT(issue_queries, flush_queries)
-    qsl = lg.ConstructQSL(count, performance_sample_count, ds.load_query_samples, ds.unload_query_samples)
+    qsl = lg.ConstructQSL(
+        count,
+        performance_sample_count,
+        ds.load_query_samples,
+        ds.unload_query_samples)
 
     log.info("starting {}".format(scenario))
     result_dict = {"good": 0, "total": 0, "scenario": str(scenario)}
@@ -507,14 +591,22 @@ def main():
             json.dump(final_results, f, sort_keys=True, indent=4)
         if args.accuracy:
             print('Saving model output examples ...')
-            files = glob.glob(os.path.join(args.dataset_path, '10002_Urban_Clear_Morning', 'Cognata_Camera_01_8M_png', '*.png'))
+            files = glob.glob(
+                os.path.join(
+                    args.dataset_path,
+                    '10002_Urban_Clear_Morning',
+                    'Cognata_Camera_01_8M_png',
+                    '*.png'))
             files = sorted(files)
             for pred_batch in runner.proc_results:
                 for pred in pred_batch:
                     f = files[pred['id']]
                     cls_threshold = 0.3
                     img = Image.open(f).convert("RGB")
-                    loc, label, prob = np.array(pred['boxes']), np.array(pred['labels']), np.array(pred['scores'])
+                    loc, label, prob = np.array(
+                        pred['boxes']), np.array(
+                        pred['labels']), np.array(
+                        pred['scores'])
                     best = np.argwhere(prob > cls_threshold).squeeze(axis=1)
 
                     loc = loc[best]
@@ -533,15 +625,21 @@ def main():
 
                             xmin, ymin, xmax, ymax = box
 
-                            cv2.rectangle(output_img, (xmin, ymin), (xmax, ymax), color, 2)
+                            cv2.rectangle(
+                                output_img, (xmin, ymin), (xmax, ymax), color, 2)
 
-                            text_size = cv2.getTextSize(category + " : %.2f" % pr, cv2.FONT_HERSHEY_PLAIN, 1, 1)[0]
+                            text_size = cv2.getTextSize(
+                                category + " : %.2f" %
+                                pr, cv2.FONT_HERSHEY_PLAIN, 1, 1)[0]
 
-                            cv2.rectangle(output_img, (xmin, ymin), (xmin + text_size[0] + 3, ymin + text_size[1] + 4), color, -1)
+                            cv2.rectangle(
+                                output_img, (xmin, ymin), (xmin + text_size[0] + 3, ymin + text_size[1] + 4), color, -1)
 
                             cv2.putText(
                                 output_img, category + " : %.2f" % pr,
-                                (xmin, ymin + text_size[1] + 4), cv2.FONT_HERSHEY_PLAIN, 1,
+                                (xmin, ymin +
+                                 text_size[1] +
+                                    4), cv2.FONT_HERSHEY_PLAIN, 1,
                                 (255, 255, 255), 1)
                         output = "{}_prediction.jpg".format(f[:-4])
 
@@ -550,7 +648,7 @@ def main():
                             os.makedirs(d1)
 
                         d2 = os.path.basename(output)
-                        
+
                         output = os.path.join(d1, d2)
                         cv2.imwrite(output, output_img)
             with open("preds.json", "w") as f:
