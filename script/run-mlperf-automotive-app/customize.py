@@ -237,9 +237,8 @@ def preprocess(i):
             env_copy = copy.deepcopy(env)
             env_copy['CM_MLPERF_LOADGEN_MODE'] = mode
             for key in env_copy:
-
-
-if isinstance(env_copy[key],                 if )                    del env_copy[key]
+                if isinstance(env_copy[key], str) and env_copy[key].startswith("CM_TMP_"):
+                    del env_copy[key]
 
             print(f"\nRunning loadgen scenario: {scenario} and mode: {mode}")
             ii = {'action': action, 'automation': 'script', 'tags': scenario_tags, 'quiet': 'true',
@@ -267,7 +266,8 @@ if isinstance(env_copy[key],                 if )                    del env_cop
             for test in test_list:
                 env_copy = copy.deepcopy(env)
                 for key in env_copy:
-if isinstance(env_copy[key],                     if )                        del env_copy[key]
+                    if isinstance(env_copy[key], str) and env_copy[key].startswith("CM_TMP_"):
+                        del env_copy[key]
                 env_copy['CM_MLPERF_LOADGEN_COMPLIANCE_TEST'] = test
                 env_copy['CM_MLPERF_LOADGEN_MODE'] = "compliance"
                 ii = {'action': action, 'automation':'script', 'tags': scenario_tags, 'quiet': 'true',
