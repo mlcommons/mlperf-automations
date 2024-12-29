@@ -250,10 +250,12 @@ def preprocess(i):
     docker_user = get_value(env, config, 'USER', 'CM_DOCKER_USER')
     docker_group = get_value(env, config, 'GROUP', 'CM_DOCKER_GROUP')
 
-    if env.get('CM_CONTAINER_TOOL', '') == 'podman' and env.get('CM_DOCKER_USE_DEFAULT_USER', '') == '':
+    if env.get('CM_CONTAINER_TOOL', '') == 'podman' and env.get(
+            'CM_DOCKER_USE_DEFAULT_USER', '') == '':
         env['CM_DOCKER_USE_DEFAULT_USER'] = 'yes'
 
-    if docker_user and str(env.get('CM_DOCKER_USE_DEFAULT_USER', '')).lower() not in ["yes", "1", "true"]:
+    if docker_user and str(env.get('CM_DOCKER_USE_DEFAULT_USER', '')).lower() not in [
+            "yes", "1", "true"]:
 
         f.write('RUN groupadd -g $GID -o ' + docker_group + EOL)
 
