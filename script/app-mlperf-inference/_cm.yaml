@@ -1830,7 +1830,7 @@ docker:
   skip_run_cmd: 'no'
   shm_size: '32gb'
   interactive: True
-  extra_run_args: ' --dns 8.8.8.8 --dns 8.8.4.4 --cap-add SYS_ADMIN --ulimit=host --cap-add SYS_TIME --security-opt apparmor=unconfined --security-opt seccomp=unconfined'
+  extra_run_args: ' --dns 8.8.8.8 --dns 8.8.4.4 --cap-add SYS_ADMIN  --cap-add SYS_TIME --security-opt apparmor=unconfined --security-opt seccomp=unconfined'
   os: ubuntu
   cm_repo: mlcommons@mlperf-automations
   cm_repo_branch: dev
