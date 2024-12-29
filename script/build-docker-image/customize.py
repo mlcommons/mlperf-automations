@@ -44,7 +44,8 @@ def preprocess(i):
         docker_image_name = "cm-script-" + \
             env.get('CM_DOCKER_RUN_SCRIPT_TAGS', '').replace(
                 ',', '-').replace('_', '-')
-        env['CM_DOCKER_IMAGE_NAME'] = docker_image_name
+
+    env['CM_DOCKER_IMAGE_NAME'] = docker_image_name.lower()
 
     if env.get("CM_DOCKER_IMAGE_TAG", "") == '':
         env['CM_DOCKER_IMAGE_TAG'] = "latest"
