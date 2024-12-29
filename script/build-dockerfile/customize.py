@@ -291,6 +291,7 @@ def preprocess(i):
         f.write('RUN {} -m venv $HOME/venv/cm'.format(python) + " " + EOL)
         f.write('ENV PATH="$HOME/venv/cm/bin:$PATH"' + EOL)
     # f.write('RUN . /opt/venv/cm/bin/activate' + EOL)
+
     f.write(
         'RUN {} -m pip install '.format(python) +
         " ".join(
