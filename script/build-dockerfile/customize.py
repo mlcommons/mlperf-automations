@@ -271,6 +271,10 @@ def preprocess(i):
             ' ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers' +
             EOL)
         f.write('USER ' + docker_user + ":" + docker_group + EOL)
+        f.write('ENV HOME=/home/cmuser' + EOL)
+
+    else:
+        f.write('ENV HOME=/root' + EOL)
 
     dockerfile_env = env.get('CM_DOCKERFILE_ENV', {})
     dockerfile_env_input_string = ""
