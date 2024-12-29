@@ -273,8 +273,10 @@ def preprocess(i):
     for docker_env_key in dockerfile_env:
         dockerfile_env_input_string = dockerfile_env_input_string + " --env." + \
             docker_env_key + "=" + str(dockerfile_env[docker_env_key])
+
     workdir = get_value(env, config, 'WORKDIR', 'CM_DOCKER_WORKDIR')
-    if workdir:
+    if workdir and ("/home/cmuser" not in workdir or str(env.get('CM_DOCKER_USE_DEFAULT_USER', '')).lower() not in [
+            "yes", "1", "true"]):
         f.write('WORKDIR ' + workdir + EOL)
 
     f.write(EOL + '# Install python packages' + EOL)

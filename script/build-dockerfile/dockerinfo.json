@@ -23,7 +23,7 @@
   "GID": "",
   "GROUP": "cm",
   "SHELL": "[\"/bin/bash\", \"-c\"]",
-  "WORKDIR": "$HOME",
+  "WORKDIR": "/home/cmuser",
   "distros": {
     "ubuntu": {
       "package-manager-update-cmd": "apt-get update -y",
