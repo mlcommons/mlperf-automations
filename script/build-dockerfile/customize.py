@@ -250,7 +250,7 @@ def preprocess(i):
     docker_user = get_value(env, config, 'USER', 'CM_DOCKER_USER')
     docker_group = get_value(env, config, 'GROUP', 'CM_DOCKER_GROUP')
 
-    if docker_user:
+    if docker_user and str(env.get('CM_DOCKER_USE_DEFAULT_USER', '')).lower() not in ["yes", "1", "true"]:
 
         f.write('RUN groupadd -g $GID -o ' + docker_group + EOL)
 
@@ -281,8 +281,8 @@ def preprocess(i):
 
     docker_use_virtual_python = env.get('CM_DOCKER_USE_VIRTUAL_PYTHON', "yes")
     if str(docker_use_virtual_python).lower() not in ["no", "0", "false"]:
-        f.write('RUN {} -m venv /home/cmuser/venv/cm'.format(python) + " " + EOL)
-        f.write('ENV PATH="/home/cmuser/venv/cm/bin:$PATH"' + EOL)
+        f.write('RUN {} -m venv $HOME/venv/cm'.format(python) + " " + EOL)
+        f.write('ENV PATH="$HOME/venv/cm/bin:$PATH"' + EOL)
     # f.write('RUN . /opt/venv/cm/bin/activate' + EOL)
     f.write(
         'RUN {} -m pip install '.format(python) +
@@ -299,7 +299,7 @@ def preprocess(i):
     f.write(EOL + '# Download CM repo for scripts' + EOL)
 
     if use_copy_repo:
-        docker_repo_dest = "/home/cmuser/CM/repos/mlcommons@mlperf-automations"
+        docker_repo_dest = "$HOME/CM/repos/mlcommons@mlperf-automations"
         f.write(
             f'COPY --chown=cmuser:cm {relative_repo_path} {docker_repo_dest}' +
             EOL)

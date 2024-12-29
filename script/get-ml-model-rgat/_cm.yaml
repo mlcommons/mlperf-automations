@@ -7,7 +7,6 @@ docker:
   fake_run_deps: True
 env:
   CM_ML_MODEL: RGAT
-  CM_ML_MODEL_DATASET: ICBH
 input_mapping:
   checkpoint: RGAT_CHECKPOINT_PATH
 new_env_keys:

@@ -17,6 +17,7 @@ default_env:
   CM_DOCKER_DETACHED_MODE: 'yes'
   CM_DOCKER_REUSE_EXISTING_CONTAINER: 'no'
   CM_DOCKER_PRIVILEGED_MODE: 'no'
+  CM_PODMAN_MAP_USER_ID: 'no'
 
 input_mapping:
   all_gpus: CM_DOCKER_ADD_ALL_GPUS

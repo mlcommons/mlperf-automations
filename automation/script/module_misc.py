@@ -1902,6 +1902,9 @@ def docker(i):
 
     noregenerate_docker_file = i.get('docker_noregenerate', False)
     norecreate_docker_image = i.get('docker_norecreate', True)
+    recreate_docker_image = i.get('docker_recreate', False)
+    if recreate_docker_image:#force recreate
+        norecreate_docker_image = False
 
     if i.get('docker_skip_build', False):
         noregenerate_docker_file = True
