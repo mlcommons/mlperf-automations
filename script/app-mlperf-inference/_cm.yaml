@@ -1793,7 +1793,12 @@ update_meta_if_env:
       use_host_group_id: True
       use_host_user_id: True
       pass_user_group: True #useful if docker is run by a different user from the one who built it and under the same group
-
+  - enable_if_env:
+      CM_HOST_OS_TYPE:
+        - linux
+      adr:
+        compiler:
+          tags: gcc
 
 docker:
   deps:
