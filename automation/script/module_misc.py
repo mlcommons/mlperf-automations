@@ -2172,7 +2172,7 @@ def docker(i):
 
         # env keys corresponding to container mounts are explicitly passed to
         # the container run cmd
-        container_env_string = ''
+        container_env = {}
         for index in range(len(mounts)):
             mount = mounts[index]
             # Since windows may have 2 :, we search from the right
@@ -2214,7 +2214,6 @@ def docker(i):
                         new_container_mount, new_container_mount_env = get_container_path(
                             env[tmp_value])
                         container_env_key = new_container_mount_env
-                        # container_env_string += " --env.{}={} ".format(tmp_value, new_container_mount_env)
                     else:  # we skip those mounts
                         mounts[index] = None
                         skip = True
@@ -2226,8 +2225,7 @@ def docker(i):
                 continue
             mounts[index] = new_host_mount + ":" + new_container_mount
             if host_env_key:
-                container_env_string += " --env.{}={} ".format(
-                    host_env_key, container_env_key)
+                container_env[host_env_key] = container_env_key
 
                 for v in docker_input_mapping:
                     if docker_input_mapping[v] == host_env_key:
@@ -2258,9 +2256,11 @@ def docker(i):
         for key in proxy_keys:
             if os.environ.get(key, '') != '':
                 value = os.environ[key]
-                container_env_string += " --env.{}={} ".format(key, value)
+                container_env[key] = value
                 env['+ CM_DOCKER_BUILD_ARGS'].append(
                     "{}={}".format(key, value))
+
+        i_run_cmd['env'] = i_run_cmd['env'].update(container_env)
 
         docker_use_host_group_id = i.get(
             'docker_use_host_group_id',
@@ -2403,8 +2403,7 @@ def docker(i):
                                    'docker_run_cmd_prefix': i.get('docker_run_cmd_prefix', '')})
         if r['return'] > 0:
             return r
-        run_cmd = r['run_cmd_string'] + ' ' + \
-            container_env_string + ' --docker_run_deps '
+        run_cmd = r['run_cmd_string'] + ' ' + ' --docker_run_deps '
 
         env['CM_RUN_STATE_DOCKER'] = True
 
