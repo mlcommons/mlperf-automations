@@ -118,6 +118,8 @@ def postprocess(i):
 
     if mode == "accuracy" or mode == "compliance" and env[
             'CM_MLPERF_LOADGEN_COMPLIANCE_TEST'] == "TEST01":
+        out_baseline_accuracy_string = f"""> {os.path.join(output_dir, "accuracy", "baseline_accuracy.txt")} """
+        out_compliance_accuracy_string = f"""> {os.path.join(output_dir, "accuracy", "compliance_accuracy.txt")} """
         if model == "resnet50":
             accuracy_filename = "accuracy-imagenet.py"
             accuracy_filepath = os.path.join(env['CM_MLPERF_INFERENCE_CLASSIFICATION_AND_DETECTION_PATH'], "tools",
@@ -146,6 +148,17 @@ def postprocess(i):
             accuracy_log_file_option_name = " --log_file "
             datatype_option = " --output_dtype " + \
                 env['CM_SQUAD_ACCURACY_DTYPE']
+
+        elif 'rgat' in model:
+            accuracy_filename = "accuracy_igbh.py"
+            accuracy_filepath = os.path.join(
+                env['CM_MLPERF_INFERENCE_RGAT_PATH'], "tools", accuracy_filename)
+            dataset_args = " --dataset-path '" + env['CM_DATASET_IGBH_PATH'] + "' --dataset-size '" + \
+                env['CM_DATASET_IGBH_SIZE'] + "'"
+            accuracy_log_file_option_name = " --mlperf-accuracy-file "
+            datatype_option = "" 
+            out_baseline_accuracy_string = f""" --output-file {os.path.join(output_dir, "accuracy", "baseline_accuracy.txt")} """
+            out_compliance_accuracy_string = f""" --output-file {os.path.join(output_dir, "accuracy", "compliance_accuracy.txt")} """
 
         elif 'stable-diffusion-xl' in model:
             pass  # No compliance check for now
@@ -502,6 +515,7 @@ def postprocess(i):
             cmd = "cd " + TEST01_DIR + " &&  bash " + SCRIPT_PATH + " " + os.path.join(ACCURACY_DIR, "mlperf_log_accuracy.json") + " " + \
                 os.path.join(COMPLIANCE_DIR, "mlperf_log_accuracy.json")
             env['CMD'] = cmd
+            print(cmd)
             r = automation.run_native_script(
                 {'run_script_input': run_script_input, 'env': env, 'script_name': 'verify_accuracy'})
             if r['return'] > 0:
@@ -516,9 +530,9 @@ def postprocess(i):
                 print("\nDeterministic TEST01 failed... Trying with non-determinism.\n")
             # #Normal test failed, trying the check with non-determinism
 
+                baseline_accuracy_file = os.path.join(TEST01_DIR, "mlperf_log_accuracy_baseline.json")
                 CMD = "cd " + ACCURACY_DIR + " && " + env['CM_PYTHON_BIN_WITH_PATH'] + ' ' + accuracy_filepath + accuracy_log_file_option_name + \
-                    os.path.join(TEST01_DIR, "mlperf_log_accuracy_baseline.json") + dataset_args + datatype_option + " > " + \
-                    os.path.join(OUTPUT_DIR, "baseline_accuracy.txt")
+                    baseline_accuracy_file + ' ' + dataset_args + datatype_option + out_baseline_accuracy_string
 
                 env['CMD'] = CMD
                 r = automation.run_native_script(
@@ -526,9 +540,11 @@ def postprocess(i):
                 if r['return'] > 0:
                     return r
 
+                if os.stat(baseline_accuracy_file).st_size == 0:
+                    return {'return': 1, 'error': f"{baseline_accuracy_file} is empty"}
+
                 CMD = "cd " + ACCURACY_DIR + " &&  " + env['CM_PYTHON_BIN_WITH_PATH'] + ' ' + accuracy_filepath + accuracy_log_file_option_name + \
-                    os.path.join(TEST01_DIR, "mlperf_log_accuracy.json") + dataset_args + datatype_option + " > " + \
-                    os.path.join(OUTPUT_DIR, "compliance_accuracy.txt")
+                    os.path.join(TEST01_DIR, "mlperf_log_accuracy.json") + dataset_args + datatype_option + out_compliance_accuracy_string
 
                 env['CMD'] = CMD
                 r = automation.run_native_script(

@@ -109,6 +109,8 @@ def postprocess(i):
         inference_root, 'recommendation', 'dlrm')
     env['CM_MLPERF_INFERENCE_DLRM_V2_PATH'] = os.path.join(
         inference_root, 'recommendation', 'dlrm_v2')
+    env['CM_MLPERF_INFERENCE_RGAT_PATH'] = os.path.join(
+        inference_root, 'graph', 'R-GAT')
     env['CM_MLPERF_INFERENCE_3DUNET_PATH'] = os.path.join(
         inference_root, 'vision', 'medical_imaging', '3d-unet-kits19')
 

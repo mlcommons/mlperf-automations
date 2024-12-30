@@ -582,8 +582,10 @@ def generate_submission(env, state, inp, submission_division):
                                     os.makedirs(target)
                                     for log_file in os.listdir(
                                             compliance_accuracy_run_path):
-                                        if log_file.startswith(
-                                                "mlperf_log_accuracy.json") or log_file.endswith("accuracy.txt"):
+                                        log_file_name = os.path.basename(log_file)
+                                        #print(os.path.join(compliance_accuracy_run_path, log_file))
+                                        if log_file_name in [
+                                                "mlperf_log_accuracy.json", "accuracy.txt", "baseline_accuracy.txt", "compliance_accuracy.txt"]:
                                             shutil.copy(
                                                 os.path.join(
                                                     compliance_accuracy_run_path, log_file), os.path.join(
@@ -732,6 +734,8 @@ def postprocess(i):
     # submission_generation function
     if env.get('CM_MLPERF_SUBMISSION_DIVISION', '') == '':
         r = generate_submission(env, state, inp, submission_division="")
+        if r['return'] > 0:
+            return r
     else:
         for submission_division in submission_divisions:
             r = generate_submission(env, state, inp, submission_division)
