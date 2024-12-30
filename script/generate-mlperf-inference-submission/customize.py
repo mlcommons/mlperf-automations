@@ -582,8 +582,9 @@ def generate_submission(env, state, inp, submission_division):
                                     os.makedirs(target)
                                     for log_file in os.listdir(
                                             compliance_accuracy_run_path):
-                                        log_file_name = os.path.basename(log_file)
-                                        #print(os.path.join(compliance_accuracy_run_path, log_file))
+                                        log_file_name = os.path.basename(
+                                            log_file)
+                                        # print(os.path.join(compliance_accuracy_run_path, log_file))
                                         if log_file_name in [
                                                 "mlperf_log_accuracy.json", "accuracy.txt", "baseline_accuracy.txt", "compliance_accuracy.txt"]:
                                             shutil.copy(

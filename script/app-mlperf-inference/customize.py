@@ -156,7 +156,7 @@ def postprocess(i):
             dataset_args = " --dataset-path '" + env['CM_DATASET_IGBH_PATH'] + "' --dataset-size '" + \
                 env['CM_DATASET_IGBH_SIZE'] + "'"
             accuracy_log_file_option_name = " --mlperf-accuracy-file "
-            datatype_option = "" 
+            datatype_option = ""
             out_baseline_accuracy_string = f""" --output-file {os.path.join(output_dir, "accuracy", "baseline_accuracy.txt")} """
             out_compliance_accuracy_string = f""" --output-file {os.path.join(output_dir, "accuracy", "compliance_accuracy.txt")} """
 
@@ -528,9 +528,11 @@ def postprocess(i):
                 print("\nDeterministic TEST01 failed... Trying with non-determinism.\n")
             # #Normal test failed, trying the check with non-determinism
 
-                baseline_accuracy_file = os.path.join(TEST01_DIR, "mlperf_log_accuracy_baseline.json")
+                baseline_accuracy_file = os.path.join(
+                    TEST01_DIR, "mlperf_log_accuracy_baseline.json")
                 CMD = "cd " + ACCURACY_DIR + " && " + env['CM_PYTHON_BIN_WITH_PATH'] + ' ' + accuracy_filepath + accuracy_log_file_option_name + \
-                    baseline_accuracy_file + ' ' + dataset_args + datatype_option + out_baseline_accuracy_string
+                    baseline_accuracy_file + ' ' + dataset_args + \
+                    datatype_option + out_baseline_accuracy_string
 
                 env['CMD'] = CMD
                 r = automation.run_native_script(
@@ -539,10 +541,12 @@ def postprocess(i):
                     return r
 
                 if os.stat(baseline_accuracy_file).st_size == 0:
-                    return {'return': 1, 'error': f"{baseline_accuracy_file} is empty"}
+                    return {'return': 1,
+                            'error': f"{baseline_accuracy_file} is empty"}
 
                 CMD = "cd " + ACCURACY_DIR + " &&  " + env['CM_PYTHON_BIN_WITH_PATH'] + ' ' + accuracy_filepath + accuracy_log_file_option_name + \
-                    os.path.join(TEST01_DIR, "mlperf_log_accuracy.json") + dataset_args + datatype_option + out_compliance_accuracy_string
+                    os.path.join(TEST01_DIR, "mlperf_log_accuracy.json") + \
+                    dataset_args + datatype_option + out_compliance_accuracy_string
 
                 env['CMD'] = CMD
                 r = automation.run_native_script(
