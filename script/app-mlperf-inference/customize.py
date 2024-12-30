@@ -403,8 +403,6 @@ def postprocess(i):
             cmd = ""
             xcmd = ""
 
-        readme_init = "This experiment is generated using the [MLCommons Collective Mind automation framework (CM)](https://github.com/mlcommons/cm4mlops).\n\n"
-
         readme_init += "*Check [CM MLPerf docs](https://docs.mlcommons.org/inference) for more details.*\n\n"
 
         readme_body = "## Host platform\n\n* OS version: {}\n* CPU version: {}\n* Python version: {}\n* MLCommons CM version: {}\n\n".format(platform.platform(),
