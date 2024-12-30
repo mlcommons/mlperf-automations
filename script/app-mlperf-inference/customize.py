@@ -403,7 +403,7 @@ def postprocess(i):
             cmd = ""
             xcmd = ""
 
-        readme_init += "*Check [CM MLPerf docs](https://docs.mlcommons.org/inference) for more details.*\n\n"
+        readme_init = "*Check [CM MLPerf docs](https://docs.mlcommons.org/inference) for more details.*\n\n"
 
         readme_body = "## Host platform\n\n* OS version: {}\n* CPU version: {}\n* Python version: {}\n* MLCommons CM version: {}\n\n".format(platform.platform(),
                                                                                                                                              platform.processor(), sys.version, cm.__version__)
