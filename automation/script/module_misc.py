@@ -2260,7 +2260,11 @@ def docker(i):
                 env['+ CM_DOCKER_BUILD_ARGS'].append(
                     "{}={}".format(key, value))
 
-        i_run_cmd['env'] = i_run_cmd['env'].update(container_env)
+        if container_env:
+            if not i_run_cmd.get('env'):
+                i_run_cmd['env'] = container_env
+            else:
+                i_run_cmd['env'] = {**i_run_cmd['env'], **container_env}
 
         docker_use_host_group_id = i.get(
             'docker_use_host_group_id',
