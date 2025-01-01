@@ -66,7 +66,7 @@ def preprocess(i):
 
     # Prepare CMD to build image
     XCMD = [
-        'docker build ' + env.get('CM_DOCKER_CACHE_ARG', ''),
+        f'{env["CM_CONTAINER_TOOL"]} build ' + env.get('CM_DOCKER_CACHE_ARG', ''),
         ' ' + build_args,
         ' -f "' + dockerfile_path + '"',
         ' -t "' + image_name,

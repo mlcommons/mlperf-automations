@@ -58,6 +58,9 @@ input_mapping:
 new_env_keys:
   - 'CM_DOCKER_CONTAINER_ID'
 
+deps:
+  - tags: get,docker
+
 prehook_deps:
 - names:
   - build-docker-image
@@ -69,4 +72,3 @@ prehook_deps:
     CM_DOCKER_CONTAINER_ID:
     - on
   tags: build,docker,image
-- tags: get,docker

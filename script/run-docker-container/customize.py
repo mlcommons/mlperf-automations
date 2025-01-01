@@ -51,7 +51,7 @@ def preprocess(i):
     print('')
     print('Checking existing Docker container:')
     print('')
-    CMD = f"""docker ps --filter "ancestor={DOCKER_CONTAINER}" """
+    CMD = f"""env['CM_CONTAINER_TOOL']} ps --filter "ancestor={DOCKER_CONTAINER}" """
     if os_info['platform'] == 'windows':
         CMD += " 2> nul"
     else:
@@ -78,7 +78,7 @@ def preprocess(i):
         if env.get('CM_DOCKER_CONTAINER_ID', '') != '':
             del (env['CM_DOCKER_CONTAINER_ID'])  # not valid ID
 
-        CMD = "docker images -q " + DOCKER_CONTAINER
+        CMD = f"""env['CM_CONTAINER_TOOL']} images -q """ + DOCKER_CONTAINER
 
         if os_info['platform'] == 'windows':
             CMD += " 2> nul"
@@ -240,14 +240,14 @@ def postprocess(i):
 
         existing_container_id = env.get('CM_DOCKER_CONTAINER_ID', '')
         if existing_container_id:
-            CMD = f"ID={existing_container_id} && docker exec $ID bash -c '" + run_cmd + "'"
+            CMD = f"""ID={existing_container_id} && env['CM_CONTAINER_TOOL']} exec $ID bash -c '""" + run_cmd + "'"
         else:
-            CONTAINER = f"docker run -dt {run_opts} --rm  {docker_image_repo}/{docker_image_name}:{docker_image_tag} bash"
-            CMD = f"ID=`{CONTAINER}` && docker exec $ID bash -c '{run_cmd}'"
+            CONTAINER = f"""env['CM_CONTAINER_TOOL']} run -dt {run_opts} --rm  {docker_image_repo}/{docker_image_name}:{docker_image_tag} bash"""
+            CMD = f"""ID=`{CONTAINER}` && env['CM_CONTAINER_TOOL']} exec $ID bash -c '{run_cmd}'"""
 
             if False and str(env.get('CM_KEEP_DETACHED_CONTAINER', '')).lower() not in [
                     'yes', "1", 'true']:
-                CMD += " && docker kill $ID >/dev/null"
+                CMD += f""" && env['CM_CONTAINER_TOOL']} kill $ID >/dev/null"""
 
         CMD += ' && echo "ID=$ID"'
 
@@ -256,7 +256,7 @@ def postprocess(i):
         print('')
         print(CMD)
         print('')
-        print("Running " + run_cmd + " inside docker container")
+        print("Running " + run_cmd + f""" inside env['CM_CONTAINER_TOOL']} container""")
 
         record_script({'cmd': CMD, 'env': env})
 
@@ -280,7 +280,7 @@ def postprocess(i):
 
         docker_out = result.stdout
         # if docker_out != 0:
-        #    return {'return': docker_out, 'error': 'docker run failed'}
+        #    return {'return': docker_out, 'error': f""env['CM_CONTAINER_TOOL']} run failed""}
 
         lines = docker_out.split("\n")
 
@@ -304,7 +304,7 @@ def postprocess(i):
             x1 = '-it'
             x2 = " && bash ) || bash"
 
-        CONTAINER = "docker run " + x1 + " --entrypoint " + x + x + " " + run_opts + \
+        CONTAINER = f"{env['CM_CONTAINER_TOOL']} run " + x1 + " --entrypoint " + x + x + " " + run_opts + \
             " " + docker_image_repo + "/" + docker_image_name + ":" + docker_image_tag
         CMD = CONTAINER + " bash -c " + x + run_cmd_prefix + run_cmd + x2 + x
 
@@ -320,7 +320,7 @@ def postprocess(i):
         if docker_out != 0:
             if docker_out % 256 == 0:
                 docker_out = 1
-            return {'return': docker_out, 'error': 'docker run failed'}
+            return {'return': docker_out, 'error': f"""env['CM_CONTAINER_TOOL']} run failed"""}
 
     return {'return': 0}
 
