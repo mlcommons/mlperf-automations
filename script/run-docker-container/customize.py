@@ -4,7 +4,6 @@ import os
 import subprocess
 from os.path import exists
 
-
 def preprocess(i):
 
     os_info = i['os_info']
