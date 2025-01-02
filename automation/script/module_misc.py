@@ -1977,8 +1977,6 @@ def docker(i):
             env['CM_DOCKER_CACHE'] = docker_cache
 
     image_repo = i.get('docker_image_repo', '')
-    if image_repo == '':
-        image_repo = 'local'
 
     # Host system needs to have docker
     r = self_module.cmind.access({'action': 'run',
@@ -2438,10 +2436,8 @@ def docker(i):
                            'docker_os_version': docker_os_version,
                            'cm_repo': cm_repo,
                            'env': env,
-                           'image_repo': image_repo,
                            'interactive': interactive,
                            'mounts': mounts,
-                           'image_name': image_name,
                            #                            'image_tag': script_alias,
                            'image_tag_extra': image_tag_extra,
                            'detached': detached,
@@ -2457,6 +2453,12 @@ def docker(i):
                                }
                            }
                            }
+
+        if image_repo:
+            cm_docker_input['image_repo'] = image_repo
+
+        if image_name:
+            cm_docker_input['image_name'] = image_name
 
         if all_gpus:
             cm_docker_input['all_gpus'] = True

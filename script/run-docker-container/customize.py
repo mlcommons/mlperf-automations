@@ -3,6 +3,7 @@ import cmind as cm
 import os
 import subprocess
 from os.path import exists
+import json
 
 
 def preprocess(i):
@@ -51,7 +52,7 @@ def preprocess(i):
     print('')
     print('Checking existing Docker container:')
     print('')
-    CMD = f"""{env['CM_CONTAINER_TOOL']} ps --filter "ancestor={DOCKER_CONTAINER}" """
+    CMD = f"""{env['CM_CONTAINER_TOOL']} ps --format=json  --filter "ancestor={DOCKER_CONTAINER}" """
     if os_info['platform'] == 'windows':
         CMD += " 2> nul"
     else:
@@ -60,17 +61,18 @@ def preprocess(i):
     print('')
 
     try:
-        docker_container = subprocess.check_output(
-            CMD, shell=True).decode("utf-8")
+        out = subprocess.check_output(
+            CMD, shell=True, text=True).strip()
     except Exception as e:
         return {
-            'return': 1, 'error': 'Docker is either not installed or not started:\n{}'.format(e)}
+            'return': 1,
+            'error': 'Unexpected error occurred with docker run:\n{}'.format(e)
+        }
 
-    output_split = docker_container.split("\n")
-    if len(output_split) > 1 and str(env.get('CM_DOCKER_REUSE_EXISTING_CONTAINER',
-                                             '')).lower() in ["1", "true", "yes"]:  # container exists
-        out = output_split[1].split(" ")
-        existing_container_id = out[0]
+    if len(out) > 0 and str(env.get('CM_DOCKER_REUSE_EXISTING_CONTAINER',
+                                    '')).lower() in ["1", "true", "yes"]:  # container exists
+        out_json = json.loads(out)
+        existing_container_id = out_json[0]['Id']
         print(f"Reusing existing container {existing_container_id}")
         env['CM_DOCKER_CONTAINER_ID'] = existing_container_id
 
@@ -355,7 +357,7 @@ def record_script(i):
 def update_docker_info(env):
 
     # Updating Docker info
-    docker_image_repo = env.get('CM_DOCKER_IMAGE_REPO', 'local')
+    docker_image_repo = env.get('CM_DOCKER_IMAGE_REPO', 'localhost/local')
     env['CM_DOCKER_IMAGE_REPO'] = docker_image_repo
 
     docker_image_base = env.get('CM_DOCKER_IMAGE_BASE')

@@ -37,7 +37,7 @@ def preprocess(i):
 #        env['CM_BUILD_DOCKERFILE'] = "no"
 #
     if env.get("CM_DOCKER_IMAGE_REPO", "") == '':
-        env['CM_DOCKER_IMAGE_REPO'] = "local"
+        env['CM_DOCKER_IMAGE_REPO'] = "localhost/local"
 
     docker_image_name = env.get('CM_DOCKER_IMAGE_NAME', '')
     if docker_image_name == '':
