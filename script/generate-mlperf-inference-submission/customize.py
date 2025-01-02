@@ -190,7 +190,7 @@ def generate_submission(env, state, inp, submission_division):
             result_path, 'system_meta.json')
         # checks for json file containing system meta
         sut_info = {
-            "hardware_name": None,
+            "system_name": None,
             "implementation": None,
             "device": None,
             "framework": None,
@@ -276,7 +276,7 @@ def generate_submission(env, state, inp, submission_division):
                             {model: returned_model_name})
 
         if check_dict_filled(sut_info.keys(), sut_info):
-            system = sut_info["hardware_name"]
+            system = env.get('CM_HW_NAME', sut_info["system_name"])
             implementation = sut_info["implementation"]
             device = sut_info["device"]
             framework = sut_info["framework"].replace(" ", "_")

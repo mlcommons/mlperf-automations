@@ -101,9 +101,9 @@ post_deps:
     - 'yes'
     - true
   tags: preprocess,mlperf,submission
-- enable_if_env:
+- skip_if_env:
     CM_RUN_SUBMISSION_CHECKER:
-    - 'yes'
+    - 'no'
   names:
   - mlperf-inference-submission-checker
   - submission-checker
