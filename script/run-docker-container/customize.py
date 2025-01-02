@@ -256,7 +256,10 @@ def postprocess(i):
         print('')
         print(CMD)
         print('')
-        print("Running " + run_cmd + f""" inside {env['CM_CONTAINER_TOOL']} container""")
+        print(
+            "Running " +
+            run_cmd +
+            f""" inside {env['CM_CONTAINER_TOOL']} container""")
 
         record_script({'cmd': CMD, 'env': env})
 
@@ -321,7 +324,8 @@ def postprocess(i):
         if docker_out != 0:
             if docker_out % 256 == 0:
                 docker_out = 1
-            return {'return': docker_out, 'error': f"""{env['CM_CONTAINER_TOOL']} run failed"""}
+            return {'return': docker_out,
+                    'error': f"""{env['CM_CONTAINER_TOOL']} run failed"""}
 
     return {'return': 0}
 
