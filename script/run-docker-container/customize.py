@@ -51,7 +51,7 @@ def preprocess(i):
     print('')
     print('Checking existing Docker container:')
     print('')
-    CMD = f"""env['CM_CONTAINER_TOOL']} ps --filter "ancestor={DOCKER_CONTAINER}" """
+    CMD = f"""{env['CM_CONTAINER_TOOL']} ps --filter "ancestor={DOCKER_CONTAINER}" """
     if os_info['platform'] == 'windows':
         CMD += " 2> nul"
     else:
@@ -78,7 +78,7 @@ def preprocess(i):
         if env.get('CM_DOCKER_CONTAINER_ID', '') != '':
             del (env['CM_DOCKER_CONTAINER_ID'])  # not valid ID
 
-        CMD = f"""env['CM_CONTAINER_TOOL']} images -q """ + DOCKER_CONTAINER
+        CMD = f"""{env['CM_CONTAINER_TOOL']} images -q """ + DOCKER_CONTAINER
 
         if os_info['platform'] == 'windows':
             CMD += " 2> nul"
