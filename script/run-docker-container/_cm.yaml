@@ -72,3 +72,4 @@ prehook_deps:
     CM_DOCKER_CONTAINER_ID:
     - on
   tags: build,docker,image
+- tags: get,docker
