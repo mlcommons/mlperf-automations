@@ -196,11 +196,6 @@ def postprocess(i):
                 return {'return': 1, 'error': 'Can\'t find separator : in a mount string: {}'.format(
                     mount_cmd)}
 
-#            mount_parts = mount_cmd.split(":")
-#            if len(mount_parts) != 2:
-# return {'return': 1, 'error': 'Invalid mount {}
-# specified'.format(mount_parts)}
-
             host_mount = mount_parts[0]
 
             if not os.path.exists(host_mount):
