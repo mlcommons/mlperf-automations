@@ -240,14 +240,14 @@ def postprocess(i):
 
         existing_container_id = env.get('CM_DOCKER_CONTAINER_ID', '')
         if existing_container_id:
-            CMD = f"""ID={existing_container_id} && env['CM_CONTAINER_TOOL']} exec $ID bash -c '""" + run_cmd + "'"
+            CMD = f"""ID={existing_container_id} && {env['CM_CONTAINER_TOOL']} exec $ID bash -c '""" + run_cmd + "'"
         else:
-            CONTAINER = f"""env['CM_CONTAINER_TOOL']} run -dt {run_opts} --rm  {docker_image_repo}/{docker_image_name}:{docker_image_tag} bash"""
-            CMD = f"""ID=`{CONTAINER}` && env['CM_CONTAINER_TOOL']} exec $ID bash -c '{run_cmd}'"""
+            CONTAINER = f"""{env['CM_CONTAINER_TOOL']} run -dt {run_opts} --rm  {docker_image_repo}/{docker_image_name}:{docker_image_tag} bash"""
+            CMD = f"""ID=`{CONTAINER}` && {env['CM_CONTAINER_TOOL']} exec $ID bash -c '{run_cmd}'"""
 
             if False and str(env.get('CM_KEEP_DETACHED_CONTAINER', '')).lower() not in [
                     'yes', "1", 'true']:
-                CMD += f""" && env['CM_CONTAINER_TOOL']} kill $ID >/dev/null"""
+                CMD += f""" && {env['CM_CONTAINER_TOOL']} kill $ID >/dev/null"""
 
         CMD += ' && echo "ID=$ID"'
 
@@ -256,7 +256,7 @@ def postprocess(i):
         print('')
         print(CMD)
         print('')
-        print("Running " + run_cmd + f""" inside env['CM_CONTAINER_TOOL']} container""")
+        print("Running " + run_cmd + f""" inside {env['CM_CONTAINER_TOOL']} container""")
 
         record_script({'cmd': CMD, 'env': env})
 
@@ -280,7 +280,7 @@ def postprocess(i):
 
         docker_out = result.stdout
         # if docker_out != 0:
-        # return {'return': docker_out, 'error': f""env['CM_CONTAINER_TOOL']}
+        # return {'return': docker_out, 'error': f""{env['CM_CONTAINER_TOOL']}
         # run failed""}
 
         lines = docker_out.split("\n")
@@ -321,7 +321,7 @@ def postprocess(i):
         if docker_out != 0:
             if docker_out % 256 == 0:
                 docker_out = 1
-            return {'return': docker_out, 'error': f"""env['CM_CONTAINER_TOOL']} run failed"""}
+            return {'return': docker_out, 'error': f"""{env['CM_CONTAINER_TOOL']} run failed"""}
 
     return {'return': 0}
 
