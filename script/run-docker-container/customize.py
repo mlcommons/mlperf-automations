@@ -107,7 +107,6 @@ def preprocess(i):
 
     #    elif recreate_image == "yes":
     #        env['CM_DOCKER_IMAGE_RECREATE'] = "no"
-    
 
     return {'return': 0}
 
