@@ -59,12 +59,10 @@ jobs:
     - name: Push Results
       if: github.repository_owner == 'mlcommons'
       env:
-          USER: "GitHub Action"
-          EMAIL: "admin@gateoverflow.com"
           GITHUB_TOKEN: ${{ env.PAT }}
       run: |
-        git config --global user.name "${{ env.USER }}"
-        git config --global user.email "${{ env.EMAIL }}"
+        git config --global user.name mlcommons-bot
+        git config --global user.email "mlcommons-bot@users.noreply.github.com"
         git config --global credential.https://github.com.helper ""
         git config --global credential.https://github.com.helper "!gh auth git-credential"
         git config --global credential.https://gist.github.com.helper ""
