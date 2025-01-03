@@ -146,14 +146,17 @@ class CustomInstallCommand(install):
                           'force': True,
                           'all': True})
         branch = os.environ.get('CM_MLOPS_REPO_BRANCH', 'dev')
-        r = cmind.access({'action': 'pull',
+        pull_default_mlops_repo = os.environ.get('CM_PULL_DEFAULT_MLOPS_REPO', 'true')
+
+        if str(pull_default_mlops_repo).lower() not in [ "no", "0", "false" ]:
+            r = cmind.access({'action': 'pull',
                           'automation': 'repo',
                           'artifact': 'mlcommons@mlperf-automations',
                           'checkout': commit_hash,
                           'branch': branch})
-        print(r)
-        if r['return'] > 0:
-            return r['return']
+            print(r)
+            if r['return'] > 0:
+                return r['return']
 
     def get_sys_platform(self):
         self.system = platform.system()
