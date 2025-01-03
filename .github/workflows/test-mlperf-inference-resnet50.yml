@@ -63,9 +63,9 @@ jobs:
       run: |
         git config --global user.name mlcommons-bot
         git config --global user.email "mlcommons-bot@users.noreply.github.com"
-        git config --global credential.https://github.com.helper ""
-        git config --global credential.https://github.com.helper "!gh auth git-credential"
-        git config --global credential.https://gist.github.com.helper ""
-        git config --global credential.https://gist.github.com.helper "!gh auth git-credential"
-        cm run script --tags=gh,auth,cli --with_token=${{ env.PAT }}
-        cm run script --tags=push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from R50 GH action on ${{ matrix.os }}" --quiet
+        # git config --global credential.https://github.com.helper ""
+        # git config --global credential.https://github.com.helper "!gh auth git-credential"
+        # git config --global credential.https://gist.github.com.helper ""
+        # git config --global credential.https://gist.github.com.helper "!gh auth git-credential"
+        # cm run script --tags=gh,auth,cli --with_token=${{ env.PAT }}
+        cm run script --tags=push,github,mlperf,inference,submission --env.CM_GH_TOKEN=${{ env.PAT }} --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from R50 GH action on ${{ matrix.os }}" --quiet
