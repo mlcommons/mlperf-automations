@@ -71,7 +71,19 @@ def preprocess(i):
 
     if len(out) > 0 and str(env.get('CM_DOCKER_REUSE_EXISTING_CONTAINER',
                                     '')).lower() in ["1", "true", "yes"]:  # container exists
-        out_json = json.loads(out)
+        #print(out)
+        out_split = out.splitlines()
+        if len(out_split) > 0:
+            try:
+                out_json = json.loads(out_split[0])
+                #print("JSON successfully loaded:", out_json)
+            except json.JSONDecodeError as e:
+                print(f"Error: First line of 'out' is not valid JSON: {e}")
+                return {'return': 1, 'error': f"Error: First line of 'out' is not valid JSON: {e}"}
+    else:
+        out_json = []
+ 
+    if isinstance(out_json, list) and len(out_json) > 0:
         existing_container_id = out_json[0]['Id']
         print(f"Reusing existing container {existing_container_id}")
         env['CM_DOCKER_CONTAINER_ID'] = existing_container_id
