@@ -49,7 +49,9 @@ jobs:
         CM_PULL_DEFAULT_MLOPS_REPO=no pip install cm4mlops
 
     - name: Pull MLOps repo
+      run: |
         cm pull repo --url=${{ github.event.pull_request.head.repo.html_url }} --checkout=${{ github.event.pull_request.head.ref }}
+
     - name: Test MLPerf Inference ResNet50 (Windows)
       if: matrix.os == 'windows-latest'
       run: |
