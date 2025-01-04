@@ -221,6 +221,8 @@ variations:
         tags: _int32
       cnndm-accuracy-script:
         tags: _int32
+      llama3_1-405b-accuracy-script:
+        tags: _int32
     env:
       CM_MLPERF_PYTHON: 'yes'
       CM_MLPERF_IMPLEMENTATION: mlcommons_python
@@ -271,6 +273,10 @@ variations:
   reference,llama2-70b_:
     default_variations:
       backend: pytorch
+  
+  reference,llama3_1-405b:
+     default_variations:
+       backend: pytorch
   
   reference,mixtral-8x7b:
     default_variations:
@@ -794,6 +800,31 @@ variations:
         names:
           - igbh-original
           - igbh-dataset
+
+  llama3_1-405b:
+    group:
+      model
+    add_deps_recursive:
+      mlperf-inference-implementation:
+        tags: _llama3_1-405b
+    env:
+      CM_MODEL:
+        llama3_1-405b
+    posthook_deps:
+    - enable_if_env:
+        CM_MLPERF_LOADGEN_MODE:
+        - accuracy
+        - all
+        CM_MLPERF_ACCURACY_RESULTS_DIR:
+        - 'on'
+      skip_if_env:
+        CM_MLPERF_IMPLEMENTATION:
+        - nvidia
+      names:
+      - mlperf-accuracy-script
+      - llama3_1-405b-accuracy-script
+      tags: run,accuracy,mlperf,_dataset_llama3
+
 
   sdxl:
     group:
@@ -1682,6 +1713,8 @@ variations:
         tags: _mlcommons
       intel-harness:
         tags: _v4.1
+      inference-src:
+         version: r5.0
     default_env:
       CM_SKIP_SYS_UTILS: 'yes'
       CM_REGENERATE_MEASURE_FILES: 'yes'

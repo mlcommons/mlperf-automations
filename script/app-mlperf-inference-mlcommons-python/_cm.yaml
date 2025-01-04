@@ -496,6 +496,20 @@ deps:
       RGAT_CHECKPOINT_PATH:
         - 'on'
 
+
+  ## LLAMA3_1-405B
+  - tags: get,ml-model,llama3
+    names:
+    - llama3-405b-model
+    - llama3-402b-model
+    enable_if_env:
+      CM_MODEL:
+      - llama3_1-405b
+      - llama3-402b
+    skip_if_env:
+      CM_ML_MODEL_LLAMA3_CHECKPOINT_PATH:
+        - 'on'
+
   ########################################################################
   # Install datasets
 
@@ -634,6 +648,20 @@ deps:
       - 'yes'
       CM_USE_DATASET_FROM_HOST:
       - 'yes'
+
+  ## llama3_1 dataset
+  - tags: get,dataset,mlperf,inference,llama3,_validation
+    names:
+    - llama3_1-dataset
+    - llama3-dataset
+    enable_if_env:
+      CM_MODEL:
+      - llama3_1-405b
+      - llama3-402b
+    skip_if_env:
+      CM_DATASET_LLAMA3_PATH:
+      - "on"
+
 
   ########################################################################
   # Install MLPerf inference dependencies
@@ -1280,6 +1308,36 @@ variations:
     env:
       CM_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: "https://data.pyg.org/whl/torch-<<<CM_TORCH_VERSION>>>+cpu.html"
       CM_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL_DGL: "https://data.dgl.ai/wheels/torch-<<<CM_TORCH_VERSION_MAJOR_MINOR>>>/repo.html"
+
+  llama3_1-405b:
+    group: models
+    env:
+      CM_MODEL: llama3_1-405b
+    adr:
+      pytorch:
+        version_max: 2.5.1
+      CM_MODEL: llama3-402b
+    deps:
+      - tags: get,generic-python-lib,_package.torchvision
+      - tags: get,generic-python-lib,_package.torchaudio
+      - tags: get,generic-python-lib,_package.torch-geometric
+      - tags: get,generic-python-lib,_package.transformers
+      - tags: get,generic-python-lib,_package.sentencepiece
+      - tags: get,generic-python-lib,_package.accelerate
+      - tags: get,generic-python-lib,_package.vllm
+        env:
+          CM_GENERIC_PYTHON_PIP_EXTRA: "--upgrade"
+      - tags: get,generic-python-lib,_package.pybind11
+      - tags: get,generic-python-lib,_package.pandas
+        version_max: 2.2.1
+
+  llama3_1-405b,cuda:
+    env:
+      CM_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: "https://data.pyg.org/whl/torch-<<<CM_TORCH_VERSION>>>.html"
+
+  llama3_1-405b,cpu:
+    env:
+      CM_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: "https://data.pyg.org/whl/torch-<<<CM_TORCH_VERSION>>>+cpu.html"
 
   # Target devices
   cpu:
