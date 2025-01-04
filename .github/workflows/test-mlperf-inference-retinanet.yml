@@ -4,7 +4,7 @@ name: MLPerf inference retinanet
 
 on:
   pull_request_target:
-    branches: [ "main", "dev", "mlperf-inference" ]
+    branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlperf-inference-retinanet.yml'
       - '**'
