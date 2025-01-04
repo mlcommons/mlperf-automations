@@ -16,5 +16,10 @@ fi
 test $? -eq 0 || exit $?
 
 git commit -a -m "${CM_MLPERF_RESULTS_REPO_COMMIT_MESSAGE}"
+
+if [[ -n ${CM_SET_REMOTE_URL_CMD} ]]; then
+  ${CM_SET_REMOTE_URL_CMD}
+fi
+
 git push
 test $? -eq 0 || exit $?

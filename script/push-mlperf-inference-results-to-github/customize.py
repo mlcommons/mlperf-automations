@@ -1,6 +1,7 @@
 from cmind import utils
 import cmind as cm
 import os
+from giturlparse import parse
 
 
 def preprocess(i):
@@ -31,6 +32,11 @@ def preprocess(i):
         return r
     env['CM_MLPERF_RESULTS_REPO_COMMIT_MESSAGE'] = env.get(
         'CM_MLPERF_RESULTS_REPO_COMMIT_MESSAGE', 'Added new results')
+
+    p = parse(repo)
+    if env.get('CM_GITHUB_PAT', '') != '':
+        token = env['CM_GITHUB_PAT']
+        env['CM_SET_REMOTE_URL_CMD'] = f"""git remote set-url origin https://git:{token}@{p.host}/{p.owner}/{p.repo}"""
 
     return {'return': 0}
 
