@@ -12,8 +12,7 @@ uid: c3bc69599cbc4db7
 new_env_keys:
   - CM_DATASET_LLAMA3_PATH
 input_mapping:
-  download_path: CM_DATASET_LLAMA3_DOWNLOAD_PATH
-  path_to_dataset: CM_DATASET_LLAMA3_PATH
+  outdirname: CM_OUTDIRNAME
 prehook_deps:
   - env:
       CM_DOWNLOAD_FINAL_ENV_NAME: CM_DATASET_LLAMA3_PATH

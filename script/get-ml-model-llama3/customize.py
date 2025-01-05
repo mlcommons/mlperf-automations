@@ -12,7 +12,7 @@ def preprocess(i):
         env['LLAMA3_CHECKPOINT_PATH'] = env['CM_ML_MODEL_LLAMA3_CHECKPOINT_PATH']
         return {'return': 0}
 
-    path = env.get('CM_ML_MODEL_LLAMA3_DOWNLOAD_PATH', '').strip()
+    path = env.get('CM_OUTDIRNAME', '').strip()
 
     if path != "":
         os.makedirs(path, exist_ok=True)

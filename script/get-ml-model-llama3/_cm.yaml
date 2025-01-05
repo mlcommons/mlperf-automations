@@ -4,7 +4,7 @@ automation_uid: 5b4e0237da074764
 cache: true
 category: AI/ML models
 input_mapping:
-  path: CM_ML_MODEL_LLAMA3_DOWNLOAD_PATH
+  outdirname: CM_OUTDIRNAME
 new_env_keys:
 - CM_ML_MODEL_*
 - LLAMA3_CHECKPOINT_PATH
@@ -66,25 +66,3 @@ variations:
     env:
       CM_MODEL_ZOO_ENV_KEY: LLAMA3
     group: huggingface-stub
-docker:
-  use_host_group_id: True
-  use_host_user_id: True
-  real_run: false
-  pass_user_group: True #useful if docker is run by a different user fromt he one who built it and under the same group
-  pre_run_cmds:
-    #- cm pull repo && cm run script --tags=get,git,repo,_repo.https://github.com/GATEOverflow/inference_results_v4.0.git --update
-    - cm pull repo
-  mounts:
-   - "${{ CM_OUTDIRNAME }}:${{ CM_OUTDIRNAME }}"
-   - "${{ CM_ML_MODEL_LLAMA3_DOWNLOAD_PATH }}:${{ CM_ML_MODEL_LLAMA3_DOWNLOAD_PATH }}"
-  skip_run_cmd: 'no'
-  shm_size: '32gb'
-  interactive: True
-  extra_run_args: ' --dns 8.8.8.8 --dns 8.8.4.4 --cap-add SYS_ADMIN --cap-add SYS_TIME --security-opt apparmor=unconfined --security-opt seccomp=unconfined'
-  os: ubuntu
-  cm_repo: mlcommons@mlperf-automations
-  cm_repo_branch: dev
-  os_version: '22.04'
-  docker_input_mapping:
-    outdirname: CM_OUTDIRNAME
-    path: CM_ML_MODEL_LLAMA3_DOWNLOAD_PATH
