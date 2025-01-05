@@ -25,6 +25,7 @@ def postprocess(i):
     env = i['env']
 
     if env.get('CM_TMP_REQUIRE_DOWNLOAD', '') == "yes":
-        env['CM_DATASET_LLAMA3_PATH'] = os.path.join(env['CM_DATASET_LLAMA3_PATH'], env['CM_DATASET_FILE_NAME'])
+        env['CM_DATASET_LLAMA3_PATH'] = os.path.join(
+            env['CM_DATASET_LLAMA3_PATH'], env['CM_DATASET_FILE_NAME'])
 
     return {'return': 0}
