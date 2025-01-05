@@ -824,6 +824,15 @@ variations:
       - mlperf-accuracy-script
       - llama3_1-405b-accuracy-script
       tags: run,accuracy,mlperf,_dataset_llama3
+    docker:
+      deps:
+      - tags: get,ml-model,llama3
+        enable_if_env:
+          CM_USE_DATASET_FROM_HOST:
+          - 'yes'
+        names:
+          - llama3_1-405b
+          - llama3-405b
 
 
   sdxl:

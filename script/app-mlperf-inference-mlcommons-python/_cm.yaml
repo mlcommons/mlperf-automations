@@ -505,10 +505,14 @@ deps:
     enable_if_env:
       CM_MODEL:
       - llama3_1-405b
-      - llama3-402b
+      - llama3-405b
     skip_if_env:
       CM_ML_MODEL_LLAMA3_CHECKPOINT_PATH:
         - 'on'
+      CM_USE_MODEL_FROM_HOST:
+        - 'yes'
+      CM_RUN_STATE_DOCKER:
+        - 'yes'
 
   ########################################################################
   # Install datasets
@@ -661,6 +665,10 @@ deps:
     skip_if_env:
       CM_DATASET_LLAMA3_PATH:
       - "on"
+      CM_USE_DATASET_FROM_HOST:
+      - 'yes'
+      CM_RUN_STATE_DOCKER:
+      - 'yes'
 
 
   ########################################################################

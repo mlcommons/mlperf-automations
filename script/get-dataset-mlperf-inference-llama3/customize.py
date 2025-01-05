@@ -13,6 +13,9 @@ def preprocess(i):
 
     if env.get('CM_DATASET_LLAMA3_PATH', '') == '':
         env['CM_TMP_REQUIRE_DOWNLOAD'] = "yes"
+    
+    if env.get('CM_DATASET_LLAMA3_DOWNLOAD_PATH', '') != '':
+        env['CM_DOWNLOAD_PATH'] = env['CM_DATASET_LLAMA3_DOWNLOAD_PATH']
 
     return {'return': 0}
 
