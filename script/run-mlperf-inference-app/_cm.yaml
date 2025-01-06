@@ -35,6 +35,7 @@ default_env:
   CM_MLPERF_SKIP_SUBMISSION_GENERATION: no
   CM_DOCKER_PRIVILEGED_MODE: yes
   CM_MLPERF_SUBMISSION_DIVISION: open
+  CM_MLPERF_INFERENCE_TP_SIZE: 1
 
 input_mapping:
   api_server: CM_MLPERF_INFERENCE_API_SERVER
@@ -109,6 +110,7 @@ input_mapping:
   sut: CM_MLPERF_INFERENCE_SUT_VARIATION
   nvidia_llama2_dataset_file_path: CM_NVIDIA_LLAMA_DATASET_FILE_PATH
   tp_size: CM_NVIDIA_TP_SIZE
+  vllm_tp_size: CM_MLPERF_INFERENCE_TP_SIZE
   vllm_model_name: CM_VLLM_SERVER_MODEL_NAME
   num_workers: CM_MLPERF_INFERENCE_NUM_WORKERS
   max_test_duration: CM_MLPERF_MAX_DURATION_TEST
@@ -463,6 +465,7 @@ input_description:
     - mobilenet
     - efficientnet
     - rgat
+    - llama3_1-405b
     default: resnet50
     desc: MLPerf model
     sort: 200

@@ -199,6 +199,10 @@ def preprocess(i):
             CMD = env['CM_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['CM_MLPERF_INFERENCE_SOURCE'], "graph", "R-GAT", "tools", "accuracy_igbh.py") + "' --mlperf-accuracy-file '" + os.path.join(
                 result_dir, "mlperf_log_accuracy.json") + "' --dataset-path '" + env['CM_DATASET_IGBH_PATH'] + "' --dataset-size '" + env['CM_DATASET_IGBH_SIZE'] + "' --output-file '" + out_file + "'"
 
+        elif dataset == "dataset_llama3":
+            CMD = env['CM_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['CM_MLPERF_INFERENCE_SOURCE'], "language", "llama3.1-405b", "evaluate-accuracy.py") + "' --checkpoint-path '" + env['CM_ML_MODEL_LLAMA3_CHECKPOINT_PATH'] + "' --mlperf-accuracy-file '" + os.path.join(
+                result_dir, "mlperf_log_accuracy.json") + "' --dtype '" + env['CM_ACCURACY_DTYPE'] + "' --dataset-file '" + env['CM_DATASET_LLAMA3_PATH'] + "' > '" + out_file + "'"
+
         else:
             return {'return': 1, 'error': 'Unsupported dataset'}
 
