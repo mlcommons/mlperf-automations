@@ -3,11 +3,11 @@ import os
 
 
 def preprocess(i):
-    env= i['env']
+    env = i['env']
     if env.get('CM_HF_TOKEN', '') != '':
         env['CM_HF_LOGIN_CMD'] = f"""git config --global credential.helper store && huggingface-cli login --token {env['CM_HF_TOKEN']} --add-to-git-credential
 """
-    elif str(env.get('CM_HF_DO_LOGIN')).lower() in [ "yes", "1", "true"]:
+    elif str(env.get('CM_HF_DO_LOGIN')).lower() in ["yes", "1", "true"]:
         env['CM_HF_LOGIN_CMD'] = f"""git config --global credential.helper store && huggingface-cli login
 """
     return {'return': 0}
