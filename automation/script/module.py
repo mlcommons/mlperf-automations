@@ -828,6 +828,7 @@ class CAutomation(Automation):
             'alias', '')
         run_state['script_repo_git'] = script_artifact.repo_meta.get(
             'git', False)
+        run_state['cache'] = meta.get('cache', False)
 
         if not recursion:
             run_state['script_entry_repo_to_report_errors'] = meta.get(
