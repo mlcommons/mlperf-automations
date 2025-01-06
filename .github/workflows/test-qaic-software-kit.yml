@@ -29,10 +29,9 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+    - name: Pull MLOps repository
       run: |
-        python3 -m pip install "cmind @ git+https://git@github.com/mlcommons/ck.git@mlperf-inference#subdirectory=cm"
-        cm pull repo mlcommons@ck
+        pip install cm4mlops
         cm run script --tags=get,sys-utils-cm --quiet
   
     - name: Test Software Kit for compilation on Ubuntu 20.04

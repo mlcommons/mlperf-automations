@@ -35,9 +35,16 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+    - name: Install cm4mlops on Windows
+      if: matrix.os == 'windows-latest'
       run: |
-        python3 -m pip install "cmind @ git+https://git@github.com/mlcommons/ck.git@mlperf-inference#subdirectory=cm"
+        $env:CM_PULL_DEFAULT_MLOPS_REPO = "no"; pip install cm4mlops
+    - name: Install dependencies on Unix Platforms
+      if: matrix.os != 'windows-latest'
+      run: |
+        CM_PULL_DEFAULT_MLOPS_REPO=no pip install cm4mlops
+    - name: Pull MLOps repository
+      run: |
         cm pull repo --url=${{ github.event.pull_request.head.repo.html_url }} --checkout=${{ github.event.pull_request.head.ref }}
     - name: Test MLPerf Inference Bert ${{ matrix.backend }} on ${{ matrix.os }}
       if: matrix.os == 'windows-latest'

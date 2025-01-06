@@ -69,7 +69,7 @@ jobs:
           ubwkjh-Ii8UJDpG2EoU6GQ/field/Access Token > env:PAT  # Fetch PAT and store in environment variable
 
     - name: Push Results
-      if: github.repository_owner == 'mlcommons'
+      if: github.repository_owner == 'mlcommons_off'
       env:
           GITHUB_TOKEN: ${{ env.PAT }}
       run: |
