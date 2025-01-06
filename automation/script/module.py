@@ -75,7 +75,8 @@ class CAutomation(Automation):
                                              'accept_license',
                                              'skip_system_deps',
                                              'git_ssh',
-                                             'gh_token']
+                                             'gh_token',
+                                             'hf_token']
 
     ############################################################
 
