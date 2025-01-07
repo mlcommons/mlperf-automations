@@ -41,7 +41,8 @@ def preprocess(i):
     # if not try to assign the values specified in version parameters,
     # if version parameters does not have the value to a parameter, set the
     # default one
-    if env.get('CM_GIT_CHECKOUT', '') == '' and env.get('CM_GIT_CHECKOUT_TAG', '') == '':
+    if env.get('CM_GIT_CHECKOUT', '') == '' and env.get(
+            'CM_GIT_CHECKOUT_TAG', '') == '':
         if env.get('CM_TMP_GIT_CHECKOUT', '') != '':
             env["CM_GIT_CHECKOUT"] = env["CM_TMP_GIT_CHECKOUT"]
         else:
