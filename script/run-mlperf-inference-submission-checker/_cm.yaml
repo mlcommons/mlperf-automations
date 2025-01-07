@@ -50,6 +50,7 @@ input_mapping:
   src_version: CM_MLPERF_SUBMISSION_CHECKER_VERSION
   submission_dir: CM_MLPERF_INFERENCE_SUBMISSION_DIR
   submitter: CM_MLPERF_SUBMITTER
+  submitter_id: CM_MLPERF_SUBMITTER_ID
   tar: CM_TAR_SUBMISSION_DIR
 post_deps:
 - enable_if_env:
@@ -66,6 +67,12 @@ post_deps:
     CM_TAR_SUBMISSION_DIR:
     - 'yes'
   tags: run,tar
+- enable_if_env:
+    CM_SUBMITTER_ID:
+    - 'yes'
+  tags: submit,mlperf,results,_inference
+  env:
+    CM_MLPERF_SUBMISSION_FILE: <<<MLPERF_INFERENCE_SUBMISSION_TAR_FILE>>>
 tags:
 - run
 - mlc
