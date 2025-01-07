@@ -36,6 +36,7 @@ deps:
   tags: preprocess,mlperf,inference,submission
 input_mapping:
   extra_args: CM_MLPERF_SUBMISSION_CHECKER_EXTRA_ARGS
+  extra_checker_args: CM_MLPERF_SUBMISSION_CHECKER_EXTRA_ARGS
   extra_model_benchmark_map: CM_MLPERF_EXTRA_MODEL_MAPPING
   input: CM_MLPERF_INFERENCE_SUBMISSION_DIR
   power: CM_MLPERF_POWER
