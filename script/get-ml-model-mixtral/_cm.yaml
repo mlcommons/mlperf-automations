@@ -6,6 +6,8 @@ category: AI/ML models
 env:
   CM_ML_MODEL_DATASET: ''
   CM_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'no'
+docker:
+  real_run: False
 input_mapping:
   checkpoint: MIXTRAL_CHECKPOINT_PATH
 new_env_keys:
