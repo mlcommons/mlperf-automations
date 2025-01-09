@@ -2183,7 +2183,6 @@ class CAutomation(Automation):
         if print_readme or repro_prefix != '':
             readme = self._get_readme(cmd, run_state)
 
-
         if print_readme:
             with open('README-cm.md', 'w') as f:
                 f.write(readme)
@@ -3803,7 +3802,8 @@ with more details about installing CM and dependencies across different platform
 """
 
         current_cm_repo = run_state['script_repo_alias']
-        if current_cm_repo not in ['mlcommons@mlperf-automations', 'mlcommons@cm4mlops']:
+        if current_cm_repo not in [
+                'mlcommons@mlperf-automations', 'mlcommons@cm4mlops']:
             content += '\ncm pull repo ' + \
                 run_state['script_repo_alias'] + '\n'
 
@@ -3842,7 +3842,6 @@ with more details about installing CM and dependencies across different platform
             content += "```\n\n"
 
         return content
-
 
     ##########################################################################
 
@@ -4696,7 +4695,6 @@ with more details about installing CM and dependencies across different platform
 
         return utils.call_internal_module(
             self, __file__, 'module_misc', 'doc', i)
-
 
     ############################################################
 
