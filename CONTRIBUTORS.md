@@ -8,7 +8,7 @@ Thank you for your interest in contributing to **MLPerf Automations**! We welcom
 
 We value all contributions, whether they are code, documentation, bug reports, or feature suggestions. If you contribute **more than 50 lines of code** (including tests and documentation), you will be officially recognized as a project contributor.  
 
-**Note:** Trivial contributions, such as minor typo fixes or small formatting changes, will not count toward the 50-line threshold.  
+**Note:** Trivial contributions, such as minor typo fixes or small formatting changes, and documentation changes will not count toward the 50-line threshold.  
 
 To contribute:  
 1. **Fork** the repository.  
@@ -29,7 +29,7 @@ Once your contribution exceeds 50 lines of code (in total), we will:
 
 ## Current Contributors
 
-- **Grigori Fursin** - *Initial Development, CLI workflow support via CMind, Added core automation features*
+- **Grigori Fursin** - *Initial Development, CMind development to drive the automations, Added core automation features*
 - **Arjun Suresh** - *Initial Development, Added core automation features* 
 - **Anandhu Sooraj** - *Added multiple CM scripts for MLPerf Inference*
 - **Thomaz Zhu** - *Added CPP implementation for MLPerf Inference Onnxruntime*
