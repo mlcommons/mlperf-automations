@@ -17,8 +17,8 @@ jobs:
       strategy:
         fail-fast: false
         matrix:
-          # system: [ "GO-spr", "phoenix-Amd-Am5", "GO-i9", "mlc-server" ]
-          system: [ "mlc-server" ] 
+          system: [ "GO-spr", "phoenix-Amd-Am5", "GO-i9"]
+          # system: [ "mlc-server" ] 
           python-version: [ "3.12" ]
           model: [ "resnet50",  "retinanet",  "bert-99", "bert-99.9", "gptj-99.9", "3d-unet-99.9", "sdxl" ]
           exclude:
