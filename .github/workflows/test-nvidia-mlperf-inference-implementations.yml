@@ -33,7 +33,7 @@ jobs:
           if [ "${{ matrix.system }}" = "GO-spr" ]; then
             hw_name="RTX4090x2"
             gpu_name=rtx_4090
-            docker_string=" --docker"
+            docker_string=" --docker --docker_recreate=yes"
           elif [ "${{ matrix.system }}" = "mlc-server" ]; then
             hw_name="H100x8"
             gpu_name=h100
