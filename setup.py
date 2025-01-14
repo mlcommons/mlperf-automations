@@ -143,16 +143,17 @@ class CustomInstallCommand(install):
         clean_mlops_repo = os.environ.get('CM_MLOPS_CLEAN_REPO', 'false')
         if str(clean_mlops_repo).lower() not in ["no", "0", "false", "off"]:
             r = cmind.access({'action': 'rm',
-                          'automation': 'repo',
-                          'artifact': 'mlcommons@cm4mlops',
-                          'force': True,
-                          'all': True})
+                              'automation': 'repo',
+                              'artifact': 'mlcommons@cm4mlops',
+                              'force': True,
+                              'all': True})
 
         branch = os.environ.get('CM_MLOPS_REPO_BRANCH', 'dev')
         pull_default_mlops_repo = os.environ.get(
             'CM_PULL_DEFAULT_MLOPS_REPO', 'true')
 
-        if str(pull_default_mlops_repo).lower() not in ["no", "0", "false", "off"]:
+        if str(pull_default_mlops_repo).lower() not in [
+                "no", "0", "false", "off"]:
             r = cmind.access({'action': 'pull',
                               'automation': 'repo',
                               'artifact': 'mlcommons@mlperf-automations',
