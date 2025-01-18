@@ -1,4 +1,4 @@
-cmind>=2.0.1
+cmind @ git+https://github.com/gateoverflow/cm.git@mlperf-inference#egg=cmind&subdirectory=cm
 pyyaml
 requests
 setuptools
