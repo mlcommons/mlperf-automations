@@ -197,7 +197,7 @@ setup(
     install_requires=[
         "setuptools>=60",
         "wheel",
-        "cmind",
+        "cmind @ git+https://github.com/gateoverflow/cm.git@mlperf-inference#egg=cmind&subdirectory=cm",
         "giturlparse",
         "requests",
         "tabulate",
