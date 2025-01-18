@@ -9,6 +9,7 @@ Welcome to the **MLPerf Automations and Scripts** repository! This repository pr
 
 The automations build upon and extend the powerful [Collective Mind (CM) script automations](https://github.com/mlcommons/cm4mlops/tree/main/automation/script) to streamline benchmarking and workflow processes.
 
+
 ---
 
 ## 🚀 Key Features
@@ -28,6 +29,7 @@ The **Collective Mind (CM)** framework is a Python-based package offering both C
 - **Cache Management** – Manages reusable cached results to accelerate workflow processes.
 
 Learn more about CM in the [CM4MLOps documentation](https://github.com/mlcommons/cm4mlops).
+
 
 ---
 

@@ -40,6 +40,7 @@ def preprocess(i):
     else:
         env['CM_GIT_PUSH_CMD'] = "git push"
 
+
     return {'return': 0}
 
 

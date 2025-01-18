@@ -54,7 +54,7 @@ jobs:
     - name: Install cm4mlops on Windows
       if: matrix.os == 'windows-latest'
       run: |
-        $env:CM_PULL_DEFAULT_MLOPS_REPO = "no"; pip install cm4mlops
+        $env:CM_PULL_DEFAULT_MLOPS_REPO = "no"; $env:PYTHONUTF8 = "1"; pip install cm4mlops
     - name: Install dependencies on Unix Platforms
       if: matrix.os != 'windows-latest'
       run: |
