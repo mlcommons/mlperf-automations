@@ -3,7 +3,7 @@ import os
 import json
 import shutil
 import subprocess
-import mlc
+#import mlc
 import copy
 import mlperf_utils
 
@@ -276,6 +276,10 @@ def preprocess(i):
                 for k in docker_extra_input:
                     ii[k] = docker_extra_input[k]
 
+            mlc = i['automation'].action_object
+
+            #print(ii)
+            #return {'return': 1}
             r = mlc.access(ii)
             if r['return'] > 0:
                 return r

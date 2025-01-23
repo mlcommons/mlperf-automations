@@ -30,12 +30,12 @@ def preprocess(i):
     if env.get('MLC_DOCKER_RUN_SCRIPT_TAGS', '') != '':
         script_tags = env['MLC_DOCKER_RUN_SCRIPT_TAGS']
         found_scripts = automation.action_object.access(
-            {'action': 'search', 'automation': 'script', 'tags': script_tags})
+            {'action': 'search', 'target': 'script', 'tags': script_tags})
         scripts_list = found_scripts['list']
 
         if not scripts_list:
             return {'return': 1,
-                    'error': 'No CM script found for tags ' + script_tags}
+                    'error': 'No automation script found for tags=' + script_tags}
 
         if len(scripts_list) > 1:
             return {

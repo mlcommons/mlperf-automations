@@ -22,7 +22,7 @@ def dockerfile(self_module, input_params):
     is_console_output = input_params.get('out') == 'con'
 
     # Step 2: Search for scripts
-    search_result = self_module.search(input_params)
+    search_result = self_module.search(input_params.copy())
     if search_result['return'] > 0:
         return search_result
 
@@ -190,7 +190,10 @@ def dockerfile(self_module, input_params):
         }
         mlc_docker_input.update(dockerfile_inputs)
 
+        #print(mlc_docker_input)
+        #return {'return': 1}
         dockerfile_result = self_module.action_object.access(mlc_docker_input)
+        #dockerfile_result = dockerfile(self_module,mlc_docker_input)
         if dockerfile_result['return'] > 0:
             return dockerfile_result
 
@@ -241,7 +244,7 @@ def docker_run(self_module, i):
 
     # Save current directory and prepare to search for scripts
     cur_dir = os.getcwd()
-    r = self_module.search(i)
+    r = self_module.search(i.copy())
     if r['return'] > 0:
         return r
 
