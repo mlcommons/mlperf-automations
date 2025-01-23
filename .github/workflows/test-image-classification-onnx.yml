@@ -9,7 +9,7 @@ on:
       - '!**.md'
 
 jobs:
-  build:
+  mlc-run:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

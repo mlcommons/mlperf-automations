@@ -10,7 +10,7 @@ on:
       - '**'
       - '!**.md'
 jobs:
-  mlperf-inference-r50:
+  mlc-run-with-results-upload:
     runs-on: ${{ matrix.os }}
     env:
       MLC_INDEX: "on"
