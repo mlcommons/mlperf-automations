@@ -113,7 +113,7 @@ def update_docker_paths(path, mounts=None, force_target_path=''):
     # directory.
     if os.path.isfile(host_path) or not os.path.isdir(host_path):
         mount_entry = f"{
-            os.path.dirname(host_path)}:{
+            os.path.dirname(host_path)}: {
             os.path.dirname(container_path)}"
     else:
         mount_entry = f"{host_path}:{container_path}"
