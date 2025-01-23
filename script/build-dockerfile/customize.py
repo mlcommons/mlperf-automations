@@ -343,7 +343,7 @@ def preprocess(i):
     if str(env.get('MLC_DOCKER_SKIP_MLC_SYS_UPGRADE', False)
            ).lower() not in ["true", "1", "yes"]:
         f.write(EOL + '# Install all system dependencies' + EOL)
-        f.write('RUN mlc run script --tags=get,sys-utils-cm --quiet' + EOL)
+        f.write('RUN mlc run script --tags=get,sys-utils-mlc --quiet' + EOL)
 
     if 'MLC_DOCKER_PRE_RUN_COMMANDS' in env:
         for pre_run_cmd in env['MLC_DOCKER_PRE_RUN_COMMANDS']:

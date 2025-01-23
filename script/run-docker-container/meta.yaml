@@ -29,9 +29,12 @@ input_mapping:
   device: MLC_DOCKER_ADD_DEVICE
   docker_image_base: MLC_DOCKER_IMAGE_BASE
   docker_base_image: MLC_DOCKER_IMAGE_BASE
+  base_image: MLC_DOCKER_IMAGE_BASE
   keep_detached: MLC_KEEP_DETACHED_CONTAINER
   docker_os: MLC_DOCKER_OS
   docker_os_version: MLC_DOCKER_OS_VERSION
+  os: MLC_DOCKER_OS
+  os_version: MLC_DOCKER_OS_VERSION
   extra_run_args: MLC_DOCKER_EXTRA_RUN_ARGS
   fake_run_option: MLC_DOCKER_FAKE_RUN_OPTION
   gh_token: MLC_GH_TOKEN

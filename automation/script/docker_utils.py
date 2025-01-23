@@ -37,7 +37,7 @@ def process_mounts(mounts, env, i, docker_settings):
         return None
 
 
-def prepare_docker_inputs(i, docker_settings, script_path):
+def prepare_docker_inputs(input_params, docker_settings, script_path):
     """
     Prepares Docker-specific inputs such as Dockerfile path and runtime options.
 
@@ -49,23 +49,34 @@ def prepare_docker_inputs(i, docker_settings, script_path):
     Returns:
         Tuple with Docker inputs dictionary and Dockerfile path or None in case of an error.
     """
-    try:
-        dockerfile_path = os.path.join(
-            script_path, docker_settings.get(
-                'dockerfile', 'Dockerfile'))
-        docker_args = docker_settings.get('args', {})
-        docker_image = i.get('docker_image', docker_settings.get('image', ''))
+    # Collect Dockerfile inputs
+    docker_inputs = {
+        key: input_params.get(
+            f"docker_{key}", docker_settings.get(
+                key, get_docker_default(key)))
+        for key in [
+            "mlc_repo", "mlc_repo_branch", "base_image", "os", "os_version",
+                        "mlc_repos", "skip_mlc_sys_upgrade", "extra_sys_deps",
+                        "gh_token", "fake_run_deps", "run_final_cmds", "real_run", "copy_files", "path"
+        ]
+        if (value := input_params.get(f"docker_{key}", docker_settings.get(key, get_docker_default(key)))) is not None
+    }
 
-        docker_inputs = {
-            'dockerfile': dockerfile_path,
-            'docker_image': docker_image,
-            'docker_args': docker_args
-        }
+    # Determine Dockerfile suffix and path
+    docker_base_image = docker_inputs.get('base_image')
+    docker_path = docker_inputs.get('path')
+    if not docker_path:
+        docker_path = script_path
+    docker_filename_suffix = (
+        docker_base_image.replace('/', '-').replace(':', '-')
+        if docker_base_image else f"{docker_inputs['os']}_{docker_inputs['os_version']}"
+    )
+    dockerfile_path = os.path.join(
+        docker_path,
+        'dockerfiles',
+        f"{docker_filename_suffix}.Dockerfile")
 
-        return docker_inputs, dockerfile_path
-    except Exception as e:
-        logging.error(f"Error preparing Docker inputs: {e}")
-        return None, None
+    return docker_inputs, dockerfile_path
 
 
 def update_docker_paths(path, mounts=None, force_target_path=''):
@@ -101,7 +112,9 @@ def update_docker_paths(path, mounts=None, force_target_path=''):
     # Determine the mount string based on whether the path is a file or
     # directory.
     if os.path.isfile(host_path) or not os.path.isdir(host_path):
-        mount_entry = f"{os.path.dirname(host_path)}:{os.path.dirname(container_path)}"
+        mount_entry = f"{
+            os.path.dirname(host_path)}:{
+            os.path.dirname(container_path)}"
     else:
         mount_entry = f"{host_path}:{container_path}"
 
@@ -157,7 +170,7 @@ def regenerate_script_cmd(i):
     docker_run_cmd_prefix = i.get('docker_run_cmd_prefix', '')
 
     # Regenerate command from dictionary input
-    run_cmd = 'mlc run script'
+    run_cmd = 'mlcr'
 
     skip_input_for_fake_run = docker_settings.get(
         'skip_input_for_fake_run', [])

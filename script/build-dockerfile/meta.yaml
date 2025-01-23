@@ -30,6 +30,9 @@ input_mapping:
   mlc_repo_branch: MLC_MLOPS_REPO_BRANCH
   comments: MLC_DOCKER_RUN_COMMENTS
   copy_files: MLC_DOCKER_COPY_FILES
+  base_image: MLC_DOCKER_IMAGE_BASE
+  os: MLC_DOCKER_OS
+  os_version: MLC_DOCKER_OS_VERSION
   docker_base_image: MLC_DOCKER_IMAGE_BASE
   docker_os: MLC_DOCKER_OS
   docker_os_version: MLC_DOCKER_OS_VERSION

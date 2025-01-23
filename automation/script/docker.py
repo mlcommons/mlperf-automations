@@ -133,32 +133,9 @@ def dockerfile(self_module, input_params):
 
         run_command_string = regenerate_result['run_cmd_string']
 
-        # Collect Dockerfile inputs
-        dockerfile_inputs = {
-            key: input_params.get(
-                f"docker_{key}", docker_settings.get(
-                    key, get_docker_default(key)))
-            for key in [
-                "mlc_repo", "mlc_repo_branch", "base_image", "os", "os_version",
-                "mlc_repos", "skip_mlc_sys_upgrade", "extra_sys_deps",
-                "gh_token", "fake_run_deps", "run_final_cmds", "real_run", "copy_files", "path"
-            ]
-            if (value := input_params.get(f"docker_{key}", docker_settings.get(key, get_docker_default(key)))) is not None
-        }
-
-        # Determine Dockerfile suffix and path
-        docker_base_image = dockerfile_inputs.get('base_image')
-        docker_path = dockerfile_inputs.get('path')
-        if not docker_path:
-            docker_path = script_directory
-        docker_filename_suffix = (
-            docker_base_image.replace('/', '-').replace(':', '-')
-            if docker_base_image else f"{dockerfile_inputs['os']}_{dockerfile_inputs['os_version']}"
-        )
-        dockerfile_path = os.path.join(
-            docker_path,
-            'dockerfiles',
-            f"{docker_filename_suffix}.Dockerfile")
+        # Prepare Docker-specific inputs
+        docker_inputs, dockerfile_path = prepare_docker_inputs(
+            input_params, docker_settings, script_directory)
 
         # Handle optional dependencies and comments
         if input_params.get('print_deps'):
@@ -182,18 +159,15 @@ def dockerfile(self_module, input_params):
         # Generate Dockerfile
         mlc_docker_input = {
             'action': 'run', 'automation': 'script', 'tags': 'build,dockerfile',
-            'fake_run_option': " " if dockerfile_inputs.get('real_run') else " --fake_run",
+            'fake_run_option': " " if docker_inputs.get('real_run') else " --fake_run",
             'comments': comments, 'run_cmd': f"{run_command_string} --quiet",
             'script_tags': input_params.get('tags'), 'env': environment_vars,
             'dockerfile_env': dockerfile_environment_vars,
             'quiet': True, 'v': input_params.get('v', False), 'real_run': True
         }
-        mlc_docker_input.update(dockerfile_inputs)
+        mlc_docker_input.update(docker_inputs)
 
-        #print(mlc_docker_input)
-        #return {'return': 1}
         dockerfile_result = self_module.action_object.access(mlc_docker_input)
-        #dockerfile_result = dockerfile(self_module,mlc_docker_input)
         if dockerfile_result['return'] > 0:
             return dockerfile_result
 
@@ -256,7 +230,7 @@ def docker_run(self_module, i):
     state, const, const_state = i.get(
         'state', {}), i.get(
         'const', {}), i.get(
-            'const_state', {})
+        'const_state', {})
     variation_tags = [t[1:]
                       for t in i.get('tags', '').split(",") if t.startswith("_")]
 
@@ -313,6 +287,29 @@ def docker_run(self_module, i):
         if r['return'] > 0:
             return r
 
+        docker_settings = state['docker']
+
+        deps = docker_settings.get('deps', [])
+        if deps:
+            r = self_module._run_deps(
+                deps, [], env, {}, {}, {}, {}, '', [], '', False, '', verbose,
+                show_time, ' ', run_state)
+            if r['return'] > 0:
+                return r
+
+        # For updating meta from update_meta_if_env
+        r = self_module.update_state_from_meta(
+            meta, env, state, const, const_state, deps=[],
+            post_deps=[],
+            prehook_deps=[],
+            posthook_deps=[],
+            new_env_keys=[],
+            new_state_keys=[],
+            run_state=run_state,
+            i=i)
+        if r['return'] > 0:
+            return r
+
         # Skip scripts marked as non-runnable
         if not docker_settings.get('run', True) and not i.get(
                 'docker_run_override', False):
@@ -331,6 +328,7 @@ def docker_run(self_module, i):
         # Prepare Docker-specific inputs
         docker_inputs, dockerfile_path = prepare_docker_inputs(
             i, docker_settings, script_path)
+
         if docker_inputs is None:
             return {'return': 1, 'error': 'Error preparing Docker inputs'}
 
