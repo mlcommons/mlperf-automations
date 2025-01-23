@@ -14,7 +14,6 @@ import logging
 from mlc.main import Automation
 import mlc.utils as utils
 from utils import *
-from importlib.metadata import version
 
 
 class ScriptAutomation(Automation):
@@ -776,12 +775,16 @@ class ScriptAutomation(Automation):
         # Check min CM version requirement
         min_mlc_version = meta.get('min_mlc_version', '').strip()
         if min_mlc_version != '':
-            current_mlc_version = version(mlc)
-            comparison = utils.compare_versions(
-                current_mlc_version, min_mlc_version)
-            if comparison < 0:
-                return {'return': 1, 'error': 'This script requires MLC version >= {} while current MLC version is {} - please update using "pip install mlcflow -U"'.format(
-                    min_mlc_version, current_mlc_version)}
+            try:
+                import importlib.metadata
+                current_mlc_version = importlib.metadata.version("mlc")
+                comparison = utils.compare_versions(
+                    current_mlc_version, min_mlc_version)
+                if comparison < 0:
+                    return {'return': 1, 'error': 'This script requires MLC version >= {} while current MLC version is {} - please update using "pip install mlcflow -U"'.format(
+                        min_mlc_version, current_mlc_version)}
+            except Exception as e:
+                error = format(e)
 
         # Check path to repo
         script_repo_path = script_artifact.repo.path
