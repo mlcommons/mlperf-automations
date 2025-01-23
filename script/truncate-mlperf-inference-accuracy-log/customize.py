@@ -19,7 +19,7 @@ def preprocess(i):
     os.system("rm -rf " + submission_dir + "_logs")
 
     CMD = env['MLC_PYTHON_BIN'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission",
-                                                     "truncate_accuracy_log.py") + "' --input '" + submission_dir + "' --submitter '" + submitter + "' --backup '" + submission_dir + "_logs'"
+                                                      "truncate_accuracy_log.py") + "' --input '" + submission_dir + "' --submitter '" + submitter + "' --backup '" + submission_dir + "_logs'"
     env['MLC_RUN_CMD'] = CMD
 
     return {'return': 0}

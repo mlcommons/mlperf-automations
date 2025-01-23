@@ -113,7 +113,8 @@ def preprocess():
     given_channel_stds = os.getenv('MLC_DATASET_GIVEN_CHANNEL_STDS', '')
     quant_scale = float(os.environ['MLC_DATASET_QUANT_SCALE'])
     quant_offset = float(os.environ['MLC_DATASET_QUANT_OFFSET'])
-    quantize = int(os.environ['MLC_DATASET_QUANTIZE'])  # 1 for quantize to int8
+    # 1 for quantize to int8
+    quantize = int(os.environ['MLC_DATASET_QUANTIZE'])
     convert_to_unsigned = int(
         os.environ['MLC_DATASET_CONVERT_TO_UNSIGNED'])  # 1 for int8 to uint8
 

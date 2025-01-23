@@ -85,7 +85,8 @@ def preprocess(i):
                                    env['MLC_MLPERF_BACKEND_LIB_NAMESPEC'])
     # e.g. -lcudart
     if 'MLC_MLPERF_DEVICE_LIB_NAMESPEC' in env:
-        env['+ LDCXXFLAGS'].append('-l' + env['MLC_MLPERF_DEVICE_LIB_NAMESPEC'])
+        env['+ LDCXXFLAGS'].append('-l' +
+                                   env['MLC_MLPERF_DEVICE_LIB_NAMESPEC'])
 
     env['MLC_LINKER_LANG'] = 'CXX'
     env['MLC_RUN_DIR'] = os.getcwd()

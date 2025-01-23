@@ -40,7 +40,7 @@ def preprocess(i):
     if 'MLC_NUM_THREADS' not in env:
         if 'MLC_MINIMIZE_THREADS' in env:
             env['MLC_NUM_THREADS'] = str(int(env['MLC_HOST_CPU_TOTAL_CORES']) //
-                                        (int(env.get('MLC_HOST_CPU_SOCKETS', '1')) * int(env.get('MLC_HOST_CPU_TOTAL_CORES', '1'))))
+                                         (int(env.get('MLC_HOST_CPU_SOCKETS', '1')) * int(env.get('MLC_HOST_CPU_TOTAL_CORES', '1'))))
         else:
             env['MLC_NUM_THREADS'] = env.get('MLC_HOST_CPU_TOTAL_CORES', '1')
 
@@ -68,12 +68,12 @@ def preprocess(i):
         i['state']['MLC_SUT_CONFIG'][env['MLC_SUT_NAME']][model_full_name] = {}
 
     if scenario not in i['state']['MLC_SUT_CONFIG'][env['MLC_SUT_NAME']
-                                                   ][model_full_name]:
+                                                    ][model_full_name]:
         i['state']['MLC_SUT_CONFIG'][env['MLC_SUT_NAME']
-                                    ][model_full_name][scenario] = {}
+                                     ][model_full_name][scenario] = {}
 
     conf = i['state']['MLC_SUT_CONFIG'][env['MLC_SUT_NAME']
-                                       ][model_full_name][scenario]
+                                        ][model_full_name][scenario]
 
     mode = env['MLC_MLPERF_LOADGEN_MODE']
 

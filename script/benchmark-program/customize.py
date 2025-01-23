@@ -34,7 +34,7 @@ def preprocess(i):
                 env['MLC_REDIRECT_OUT'] +
                 ' ') if 'MLC_REDIRECT_OUT' in env else ''
             MLC_RUN_SUFFIX += (env['MLC_REDIRECT_ERR'] +
-                              ' ') if 'MLC_REDIRECT_ERR' in env else ''
+                               ' ') if 'MLC_REDIRECT_ERR' in env else ''
 
             env['MLC_RUN_SUFFIX'] = env['MLC_RUN_SUFFIX'] + \
                 MLC_RUN_SUFFIX if 'MLC_RUN_SUFFIX' in env else MLC_RUN_SUFFIX

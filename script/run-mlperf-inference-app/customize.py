@@ -147,7 +147,8 @@ def preprocess(i):
         "MLC_MLPERF_ALL_MODELS", "") == "yes" else ""
 
     if env.get("MLC_MLPERF_MODEL_PRECISION", '') != '':
-        variation_quantization_string = ",_" + env["MLC_MLPERF_MODEL_PRECISION"]
+        variation_quantization_string = ",_" + \
+            env["MLC_MLPERF_MODEL_PRECISION"]
     else:
         variation_quantization_string = ""
 
@@ -279,7 +280,8 @@ def preprocess(i):
             if r['return'] > 0:
                 return r
 
-            if env_copy.get('MLC_MLPERF_INFERENCE_FINAL_RESULTS_DIR', '') != '':
+            if env_copy.get(
+                    'MLC_MLPERF_INFERENCE_FINAL_RESULTS_DIR', '') != '':
                 env['MLC_MLPERF_INFERENCE_RESULTS_DIR_'] = env_copy['MLC_MLPERF_INFERENCE_FINAL_RESULTS_DIR']
             else:
                 env['MLC_MLPERF_INFERENCE_RESULTS_DIR_'] = os.path.join(

@@ -16,7 +16,8 @@ def postprocess(i):
 
     env['MLC_DATASET_SQUAD_PATH'] = os.path.dirname(
         env['MLC_DATASET_SQUAD_VAL_PATH'])
-    env['MLC_DATASET_PATH'] = os.path.dirname(env['MLC_DATASET_SQUAD_VAL_PATH'])
+    env['MLC_DATASET_PATH'] = os.path.dirname(
+        env['MLC_DATASET_SQUAD_VAL_PATH'])
     # env['MLC_DATASET_SQUAD_VAL_PATH'] = os.path.join(os.getcwd(), env['MLC_VAL_FILENAME'])
 
     return {'return': 0}

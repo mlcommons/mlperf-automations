@@ -128,7 +128,8 @@ def preprocess(i):
         "MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS", "") != "" else ""
 
     if env.get("MLC_MLPERF_MODEL_PRECISION", '') != '':
-        variation_quantization_string = ",_" + env["MLC_MLPERF_MODEL_PRECISION"]
+        variation_quantization_string = ",_" + \
+            env["MLC_MLPERF_MODEL_PRECISION"]
     else:
         variation_quantization_string = ""
 

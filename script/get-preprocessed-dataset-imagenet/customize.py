@@ -28,7 +28,7 @@ def preprocess(i):
         if env['MLC_DATASET_TYPE'] == "validation" and not exists(
                 os.path.join(env['MLC_DATASET_PATH'], "val_map.txt")):
             shutil.copy(os.path.join(env['MLC_DATASET_AUX_PATH'], "val.txt"), os.path.join(env['MLC_DATASET_PATH'],
-                                                                                          "val_map.txt"))
+                                                                                           "val_map.txt"))
 
     preprocessed_path = env['MLC_DATASET_PREPROCESSED_PATH']
 

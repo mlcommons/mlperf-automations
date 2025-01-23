@@ -154,7 +154,8 @@ def postprocess(i):
     else:
         env['MLC_JAVA_BIN'] = 'java'
 
-    env['MLC_JAVA_BIN_WITH_PATH'] = os.path.join(file_path, env['MLC_JAVA_BIN'])
+    env['MLC_JAVA_BIN_WITH_PATH'] = os.path.join(
+        file_path, env['MLC_JAVA_BIN'])
 
     found_path = os.path.dirname(found_file_path)
     javac_home_path = os.path.dirname(found_path)

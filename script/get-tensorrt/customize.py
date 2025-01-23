@@ -97,7 +97,9 @@ def preprocess(i):
     print('Untaring file - can take some time ...')
 
     file_name = "trtexec"
-    my_tar = tarfile.open(os.path.expanduser(env['MLC_TENSORRT_TAR_FILE_PATH']))
+    my_tar = tarfile.open(
+        os.path.expanduser(
+            env['MLC_TENSORRT_TAR_FILE_PATH']))
     folder_name = my_tar.getnames()[0]
     if not os.path.exists(os.path.join(os.getcwd(), folder_name)):
         my_tar.extractall()
@@ -111,7 +113,8 @@ def preprocess(i):
 
     env['MLC_TENSORRT_VERSION'] = version
     env['MLC_TENSORRT_INSTALL_PATH'] = os.path.join(os.getcwd(), folder_name)
-    env['MLC_TENSORRT_LIB_PATH'] = os.path.join(os.getcwd(), folder_name, "lib")
+    env['MLC_TENSORRT_LIB_PATH'] = os.path.join(
+        os.getcwd(), folder_name, "lib")
     env['MLC_TMP_PATH'] = os.path.join(os.getcwd(), folder_name, "bin")
     env['+CPLUS_INCLUDE_PATH'] = [
         os.path.join(

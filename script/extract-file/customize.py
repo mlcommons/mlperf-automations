@@ -121,7 +121,8 @@ def preprocess(i):
             env['MLC_EXTRACT_EXTRACTED_FILENAME'] = extract_to_folder
 
         elif 'unzip' in env['MLC_EXTRACT_TOOL']:
-            env['MLC_EXTRACT_TOOL_OPTIONS'] = ' -d ' + q + extract_to_folder + q
+            env['MLC_EXTRACT_TOOL_OPTIONS'] = ' -d ' + \
+                q + extract_to_folder + q
             env['MLC_EXTRACT_EXTRACTED_FILENAME'] = extract_to_folder
 
     x = '"' if ' ' in filename else ''

@@ -16,7 +16,9 @@ def preprocess(i):
     r = None
     file_name = 'conda.exe' if os_info['platform'] == 'windows' else 'conda'
     if conda_prefix_name == '':
-        tmp_path = env.get('MLC_CONDA_INSTALL_PATH', env.get('MLC_TMP_PATH', ''))
+        tmp_path = env.get(
+            'MLC_CONDA_INSTALL_PATH', env.get(
+                'MLC_TMP_PATH', ''))
         if tmp_path:
             x = ';' if os_info['platform'] == 'windows' else ':'
             tmp_path += x

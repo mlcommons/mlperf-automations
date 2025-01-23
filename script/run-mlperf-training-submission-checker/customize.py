@@ -37,6 +37,7 @@ def postprocess(i):
 
     env = i['env']
     if env.get('MLC_TAR_SUBMISSION_DIR'):
-        env['MLC_TAR_INPUT_DIR'] = env.get('MLC_MLPERF_SUBMISSION_DIR', '$HOME')
+        env['MLC_TAR_INPUT_DIR'] = env.get(
+            'MLC_MLPERF_SUBMISSION_DIR', '$HOME')
 
     return {'return': 0}

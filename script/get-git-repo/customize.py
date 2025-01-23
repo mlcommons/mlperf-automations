@@ -66,7 +66,11 @@ def postprocess(i):
     update_env(env, 'MLC_GIT_REPO{}_CHECKOUT_PATH',
                env_key, env['MLC_GIT_CHECKOUT_PATH'])
     update_env(env, 'MLC_GIT_REPO{}_URL', env_key, env['MLC_GIT_URL'])
-    update_env(env, 'MLC_GIT_REPO{}_CHECKOUT', env_key, env['MLC_GIT_CHECKOUT'])
+    update_env(
+        env,
+        'MLC_GIT_REPO{}_CHECKOUT',
+        env_key,
+        env['MLC_GIT_CHECKOUT'])
     update_env(env, 'MLC_GIT_REPO{}_DEPTH', env_key, env['MLC_GIT_DEPTH'])
     update_env(env, 'MLC_GIT_REPO{}_CHECKOUT_FOLDER',
                env_key, env['MLC_GIT_CHECKOUT_FOLDER'])
