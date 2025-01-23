@@ -80,7 +80,8 @@ def postprocess(i):
         env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_DATASET_MLCOMMONS_COGNATA_PATH']
         return {'return': 0}
 
-    mlc_cache_dataset_cfg_file = os.path.join(mlc_cache_dataset_path, 'cfg.json')
+    mlc_cache_dataset_cfg_file = os.path.join(
+        mlc_cache_dataset_path, 'cfg.json')
     env['MLC_DATASET_MLCOMMONS_COGNATA_CFG_FILE'] = mlc_cache_dataset_cfg_file
 
     res = utils.load_json(mlc_cache_dataset_cfg_file)

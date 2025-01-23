@@ -189,7 +189,7 @@ for batch_idx in range(batch_count):
 
             mlc_status['classifications'].append({'class_idx': int(class_idx),
                                                  'softmax': float(softmax_vector[class_idx]),
-                                                 'label': labels[class_idx]})
+                                                  'label': labels[class_idx]})
 
     print('')
     print('Top classification: {}'.format(top_classification))
