@@ -776,7 +776,7 @@ class ScriptAutomation(Automation):
         # Check min CM version requirement
         min_mlc_version = meta.get('min_mlc_version', '').strip()
         if min_mlc_version != '':
-            comparison = compare_versions(
+            comparison = utils.compare_versions(
                 current_mlc_version, min_mlc_version)
             if comparison < 0:
                 return {'return': 1, 'error': 'This script requires MLC version >= {} while current MLC version is {} - please update using "pip install mlcflow -U"'.format(
