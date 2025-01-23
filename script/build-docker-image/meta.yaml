@@ -21,7 +21,7 @@ default_env:
 
 input_mapping:
   cache: MLC_DOCKER_CACHE
-  cm_repo: MLC_MLOPS_REPO
+  mlc_repo: MLC_MLOPS_REPO
   docker_os: MLC_DOCKER_OS
   docker_os_version: MLC_DOCKER_OS_VERSION
   dockerfile: MLC_DOCKERFILE_WITH_PATH

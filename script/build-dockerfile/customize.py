@@ -62,7 +62,7 @@ def preprocess(i):
         return {
             'return': 1, 'error': f"Version \"{env['MLC_DOCKER_OS_VERSION']}\" is not supported yet for \"{env['MLC_DOCKER_OS']}\" "}
 
-    # Handle cm_mlops Repository
+    # Handle mlc_mlops Repository
     if env.get("MLC_REPO_PATH", "") != "":
         use_copy_repo = True
         mlc_repo_path = os.path.abspath(env["MLC_REPO_PATH"])
@@ -119,23 +119,23 @@ def preprocess(i):
         use_copy_repo = False
 
         if env.get("MLC_MLOPS_REPO", "") != "":
-            cm_mlops_repo = env["MLC_MLOPS_REPO"]
+            mlc_mlops_repo = env["MLC_MLOPS_REPO"]
             # the below pattern matches both the HTTPS and SSH git link formats
             git_link_pattern = r'^(https?://github\.com/([^/]+)/([^/]+)(?:\.git)?|git@github\.com:([^/]+)/([^/]+)(?:\.git)?)$'
-            if match := re.match(git_link_pattern, cm_mlops_repo):
+            if match := re.match(git_link_pattern, mlc_mlops_repo):
                 if match.group(2) and match.group(3):
                     repo_owner = match.group(2)
                     repo_name = match.group(3)
                 elif match.group(4) and match.group(5):
                     repo_owner = match.group(4)
                     repo_name = match.group(5)
-                cm_mlops_repo = f"{repo_owner}@{repo_name}"
+                mlc_mlops_repo = f"{repo_owner}@{repo_name}"
                 print(
-                    f"Converted repo format from {env['MLC_MLOPS_REPO']} to {cm_mlops_repo}")
+                    f"Converted repo format from {env['MLC_MLOPS_REPO']} to {mlc_mlops_repo}")
         else:
-            cm_mlops_repo = "mlcommons@mlperf-automations"
+            mlc_mlops_repo = "mlcommons@mlperf-automations"
 
-    cm_mlops_repo_branch_string = f" --branch={env['MLC_MLOPS_REPO_BRANCH']}"
+    mlc_mlops_repo_branch_string = f" --branch={env['MLC_MLOPS_REPO_BRANCH']}"
 
     if env.get('MLC_DOCKERFILE_WITH_PATH', '') == '':
         env['MLC_DOCKERFILE_WITH_PATH'] = os.path.join(
@@ -329,8 +329,8 @@ def preprocess(i):
 
         f.write(
             'RUN mlc pull repo ' +
-            cm_mlops_repo +
-            cm_mlops_repo_branch_string +
+            mlc_mlops_repo +
+            mlc_mlops_repo_branch_string +
             x +
             EOL)
 

@@ -16,7 +16,7 @@ def preprocess(i):
 
     env_key = get_env_key(env)
 
-    cm_git_url = env['MLC_GIT_URL']
+    mlc_git_url = env['MLC_GIT_URL']
 
     if 'MLC_GIT_REPO_NAME' not in env:
         update_env(

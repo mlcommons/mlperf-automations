@@ -90,7 +90,7 @@ new_env_keys:
 
 
 new_state_keys:
-  - cm_app_image_classification_onnx_py
+  - mlc_app_image_classification_onnx_py
 
 
 input_description:
@@ -104,8 +104,8 @@ input_description:
 
 docker:
   skip_run_cmd: 'no'
-  skip_cm_sys_upgrade: 'yes'
-  cm_repo_flags: '--branch=dev'
+  skip_mlc_sys_upgrade: 'yes'
+  mlc_repo_flags: '--branch=dev'
   use_host_group_id: 'yes'
   image_tag_extra: '-mlc-dev'
   input_paths:

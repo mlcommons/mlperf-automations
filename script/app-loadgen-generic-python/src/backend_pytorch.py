@@ -87,15 +87,15 @@ class XModelFactory(ModelFactory):
             self.input_sample = pickle.load(handle)
 
         # Check if has CM connector
-        cm_model_module = os.path.join(self.model_code, 'cmc.py')
-        if not os.path.isfile(cm_model_module):
+        mlc_model_module = os.path.join(self.model_code, 'cmc.py')
+        if not os.path.isfile(mlc_model_module):
             raise Exception(
                 'cm.py interface for a PyTorch model was not found in {}'.format(
                     self.model_code))
 
         print('')
         print('Collective Mind Connector for the model found: {}'.format(
-            cm_model_module))
+            mlc_model_module))
 
         # Load CM interface for the model
         import sys

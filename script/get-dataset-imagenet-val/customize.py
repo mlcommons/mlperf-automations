@@ -41,7 +41,7 @@ def preprocess(i):
                 return {'return': 0}
                 # return {'return':1, 'error':'Please rerun the last CM command
                 # with --env.IMAGENET_PATH={path the folder containing full
-                # ImageNet images} or envoke cm run script "get val dataset
+                # ImageNet images} or envoke mlcr "get val dataset
                 # imagenet" --input={path to the folder containing ImageNet
                 # images}'}
 

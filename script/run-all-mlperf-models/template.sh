@@ -40,26 +40,26 @@ function run_test() {
 power=${POWER_STRING}
 
 #Add your run commands here...
-find_performance_cmd='cm run script --tags=generate-run-cmds,inference,_find-performance \
+find_performance_cmd='mlcr --tags=generate-run-cmds,inference,_find-performance \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=edge --division=open --scenario=Offline  --quiet --test_query_count=$test_query_count $rerun'
 
-submission_cmd='cm run script --tags=generate-run-cmds,inference,_submission,_all-scenarios \
+submission_cmd='mlcr --tags=generate-run-cmds,inference,_submission,_all-scenarios \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=$category --division=$division  --quiet --results_dir=$HOME/results_dir \
 --skip_submission_generation=yes --execution-mode=valid $power'
 
-submission_cmd_scenario='cm run script --tags=generate-run-cmds,inference,_submission  --scenario=$scenario \
+submission_cmd_scenario='mlcr --tags=generate-run-cmds,inference,_submission  --scenario=$scenario \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=$category --division=$division  --quiet --results_dir=$HOME/results_dir \
 --skip_submission_generation=yes --execution-mode=valid $power'
 
-readme_cmd_single='cm run script --tags=generate-run-cmds,inference,_populate-readme \
+readme_cmd_single='mlcr --tags=generate-run-cmds,inference,_populate-readme \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=$category --division=$division  --quiet --results_dir=$HOME/results_dir \
 --skip_submission_generation=yes --execution-mode=valid $power'
 
-readme_cmd='cm run script --tags=generate-run-cmds,inference,_populate-readme,_all-scenarios \
+readme_cmd='mlcr --tags=generate-run-cmds,inference,_populate-readme,_all-scenarios \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=$category --division=$division  --quiet --results_dir=$HOME/results_dir \
 --skip_submission_generation=yes --execution-mode=valid $power'

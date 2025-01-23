@@ -286,10 +286,10 @@ class ScriptAutomation(Automation):
             if r['return'] > 0:
                 return r
 
-            cm_input = r['cm_input']
+            mlc_input = r['mlc_input']
 
             utils.merge_dicts({'dict1': i,
-                               'dict2': cm_input,
+                               'dict2': mlc_input,
                                'append_lists': True,
                                'append_unique': True})
 
@@ -2275,11 +2275,11 @@ class ScriptAutomation(Automation):
     ##########################################################################
     def _fix_cache_paths(self, env):
         '''
-        cm_repos_path = os.environ.get(
+        mlc_repos_path = os.environ.get(
             'MLC_REPOS', os.path.join(
                 os.path.expanduser("~"), "CM", "repos"))
         current_cache_path = os.path.realpath(
-            os.path.join(cm_repos_path, "local", "cache"))
+            os.path.join(mlc_repos_path, "local", "cache"))
         '''
         current_cache_path = self.action_object.local_cache_path
 
@@ -3008,7 +3008,7 @@ class ScriptAutomation(Automation):
                                 # run the test without any variations
                                 run_variations = [""]
                         use_docker = run_input.get('docker', False)
-                        for key in run_input:  # override meta with any user inputs like for docker_cm_repo
+                        for key in run_input:  # override meta with any user inputs like for docker_mlc_repo
                             if i.get(key):
                                 if isinstance(run_input[key], dict):
                                     utils.merge_dicts({
@@ -6355,16 +6355,16 @@ def dump_repro_start(repro_prefix, ii):
         pass
 
     # For experiment
-    cm_output = {}
+    mlc_output = {}
 
-    cm_output['tmp_test_value'] = 10.0
+    mlc_output['tmp_test_value'] = 10.0
 
-    cm_output['info'] = info
-    cm_output['input'] = ii
+    mlc_output['info'] = info
+    mlc_output['input'] = ii
 
     try:
         with open('mlc-output.json', 'w', encoding='utf-8') as f:
-            json.dump(cm_output, f, ensure_ascii=False, indent=2)
+            json.dump(mlc_output, f, ensure_ascii=False, indent=2)
     except BaseException:
         pass
 
@@ -6390,27 +6390,27 @@ def dump_repro(repro_prefix, rr, run_state):
         pass
 
     # For experiment
-    cm_output = {}
+    mlc_output = {}
 
     # Attempt to read
     try:
         r = utils.load_json('mlc-output.json')
         if r['return'] == 0:
-            cm_output = r['meta']
+            mlc_output = r['meta']
     except BaseException:
         pass
 
-    cm_output['output'] = rr
-    cm_output['state'] = copy.deepcopy(run_state)
+    mlc_output['output'] = rr
+    mlc_output['state'] = copy.deepcopy(run_state)
 
     # Try to load version_info.json
     version_info = {}
 
     version_info_orig = {}
 
-    if 'version_info' in cm_output['state']:
-        version_info_orig = cm_output['state']['version_info']
-        del (cm_output['state']['version_info'])
+    if 'version_info' in mlc_output['state']:
+        version_info_orig = mlc_output['state']['version_info']
+        del (mlc_output['state']['version_info'])
 
     try:
         r = utils.load_json('version_info.json')
@@ -6426,17 +6426,17 @@ def dump_repro(repro_prefix, rr, run_state):
         pass
 
     if len(version_info) > 0:
-        cm_output['version_info'] = version_info
+        mlc_output['version_info'] = version_info
 
     if rr['return'] == 0:
         # See https://cTuning.org/ae
-        cm_output['acm_ctuning_repro_badge_available'] = True
-        cm_output['acm_ctuning_repro_badge_functional'] = True
+        mlc_output['amlc_ctuning_repro_badge_available'] = True
+        mlc_output['amlc_ctuning_repro_badge_functional'] = True
 
     try:
         with open('mlc-output.json', 'w', encoding='utf-8') as f:
             json.dump(
-                cm_output,
+                mlc_output,
                 f,
                 ensure_ascii=False,
                 indent=2,

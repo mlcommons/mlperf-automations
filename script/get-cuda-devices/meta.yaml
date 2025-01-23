@@ -26,8 +26,8 @@ docker:
   run: false
   all_gpus: 'yes'
   skip_run_cmd: 'no'
-  skip_cm_sys_upgrade: 'yes'
-  cm_repo_flags: '--checkout=dev'
+  skip_mlc_sys_upgrade: 'yes'
+  mlc_repo_flags: '--checkout=dev'
   use_host_group_id: 'yes'
   image_tag_extra: '-mlc-dev'
 
@@ -40,9 +40,9 @@ new_env_keys:
 - MLC_CUDA_VERSION
 
 new_state_keys:
-- cm_cuda_device_prop
-- cm_cuda_devices_prop
-- cm_cuda_num_devices
+- mlc_cuda_device_prop
+- mlc_cuda_devices_prop
+- mlc_cuda_num_devices
 
 print_files_if_script_error:
 - tmp-run.out

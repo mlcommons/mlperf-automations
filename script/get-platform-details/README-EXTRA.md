@@ -1,7 +1,7 @@
 Please execute the following CM command to obtain the platform details of the System Under Test (SUT):
 
 ```
-cm run script --tags=get,platform-details --platform_details_dir=<DIRECTORY_TO_SAVE_THE_TXT_FILE>
+mlcr --tags=get,platform-details --platform_details_dir=<DIRECTORY_TO_SAVE_THE_TXT_FILE>
 ```
 
 

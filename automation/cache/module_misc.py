@@ -34,11 +34,11 @@ def copy_to_remote(i):
     if not remote_host:
         return {'return': 1,
             'error': 'Please input remote host_name/IP via --remote_host'}
-    remote_cm_repos_location = i.get(
-    'remote_cm_repos_location', os.path.join(
+    remote_mlc_repos_location = i.get(
+    'remote_mlc_repos_location', os.path.join(
         "/home", os.getlogin(), "CM", "repos"))
-    remote_cm_cache_location = os.path.join(
-    remote_cm_repos_location, "local", "cache")
+    remote_mlc_cache_location = os.path.join(
+    remote_mlc_repos_location, "local", "cache")
 
     remote_port = i.get('remote_port', '22')
     remote_user = i.get('remote_user', os.getlogin())
@@ -46,12 +46,12 @@ def copy_to_remote(i):
     tag_string = i['tags']
     tag_string += ",-tmp"
 
-    cm_input = {'action': 'show',
+    mlc_input = {'action': 'show',
                 'automation': 'cache',
                 'tags': f'{tag_string}',
                 'quiet': True
                 }
-    r = self_module.cmind.access(cm_input)
+    r = self_module.cmind.access(mlc_input)
     if r['return'] > 0:
         return r
 
@@ -71,37 +71,37 @@ def copy_to_remote(i):
         path = k.path
         cacheid = os.path.basename(path)
 
-        copy_cmd = f"rsync -avz --exclude cm-cached-state.json -e 'ssh -p {remote_port}' {path} {remote_user}@{remote_host}:{remote_cm_cache_location}"
+        copy_cmd = f"rsync -avz --exclude cm-cached-state.json -e 'ssh -p {remote_port}' {path} {remote_user}@{remote_host}:{remote_mlc_cache_location}"
         print(copy_cmd)
         os.system(copy_cmd)
 
-        cm_cached_state_json_file = os.path.join(path, "cm-cached-state.json")
-        if not os.path.exists(cm_cached_state_json_file):
+        mlc_cached_state_json_file = os.path.join(path, "cm-cached-state.json")
+        if not os.path.exists(mlc_cached_state_json_file):
             return {'return': 1,
                 'error': f'cm-cached-state.json file missing in {path}'}
 
-        with open(cm_cached_state_json_file, "r") as f:
-            cm_cached_state = json.load(f)
+        with open(mlc_cached_state_json_file, "r") as f:
+            mlc_cached_state = json.load(f)
 
-        new_env = cm_cached_state['new_env']
-        new_state = cm_cached_state['new_state']  # Todo fix new state
-        cm_repos_path = os.environ.get(
+        new_env = mlc_cached_state['new_env']
+        new_state = mlc_cached_state['new_state']  # Todo fix new state
+        mlc_repos_path = os.environ.get(
     'MLC_REPOS', os.path.join(
         os.path.expanduser("~"), "CM", "repos"))
-        cm_cache_path = os.path.realpath(
-            os.path.join(cm_repos_path, "local", "cache"))
+        mlc_cache_path = os.path.realpath(
+            os.path.join(mlc_repos_path, "local", "cache"))
 
         for key, val in new_env.items():
 
 
 if isinstance(val,             if )                new_env[key] = val.replace(
-    cm_cache_path, remote_cm_cache_location)
+    mlc_cache_path, remote_mlc_cache_location)
 
         with open("tmp_remote_cached_state.json", "w") as f:
-            json.dump(cm_cached_state, f, indent=2)
+            json.dump(mlc_cached_state, f, indent=2)
 
         remote_cached_state_file_location = os.path.join(
-    remote_cm_cache_location, cacheid, "cm-cached-state.json")
+    remote_mlc_cache_location, cacheid, "cm-cached-state.json")
         copy_cmd = f"rsync -avz -e 'ssh -p {remote_port}' tmp_remote_cached_state.json {remote_user}@{remote_host}:{remote_cached_state_file_location}"
         print(copy_cmd)
         os.system(copy_cmd)

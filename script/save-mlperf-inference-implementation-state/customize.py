@@ -40,7 +40,7 @@ def preprocess(i):
                          'fake_run': True
                          }
 
-            r = mlc.access(cm_input)
+            r = mlc.access(mlc_input)
             if r['return'] > 0:
                 return r
 

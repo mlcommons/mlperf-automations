@@ -65,12 +65,12 @@ def preprocess(i):
                 # paths to cuda are not always in PATH - add a few typical locations to search for
                 # (unless forced by a user)
 
-                cm_tmp_path = env.get('MLC_TMP_PATH', '').strip()
-                if cm_tmp_path != '':
-                    cm_tmp_path += ':'
-                cm_tmp_path += '/usr/local/cuda/lib64:/usr/cuda/lib64:/usr/local/cuda/lib:/usr/cuda/lib:/usr/local/cuda-11/lib64:/usr/cuda-11/lib:/usr/local/cuda-12/lib:/usr/cuda-12/lib:/usr/local/packages/cuda/lib'
-                cm_tmp_path += os.path.expandvars(':$CUDNN_ROOT/lib')
-                env['MLC_TMP_PATH'] = cm_tmp_path
+                mlc_tmp_path = env.get('MLC_TMP_PATH', '').strip()
+                if mlc_tmp_path != '':
+                    mlc_tmp_path += ':'
+                mlc_tmp_path += '/usr/local/cuda/lib64:/usr/cuda/lib64:/usr/local/cuda/lib:/usr/cuda/lib:/usr/local/cuda-11/lib64:/usr/cuda-11/lib:/usr/local/cuda-12/lib:/usr/cuda-12/lib:/usr/local/packages/cuda/lib'
+                mlc_tmp_path += os.path.expandvars(':$CUDNN_ROOT/lib')
+                env['MLC_TMP_PATH'] = mlc_tmp_path
                 env['MLC_TMP_PATH_IGNORE_NON_EXISTANT'] = 'yes'
 
                 for lib_path in env.get(
@@ -103,7 +103,7 @@ def preprocess(i):
             return {'return': 0}
 
     if env.get('MLC_CUDNN_TAR_FILE_PATH', '') == '':
-        return {'return': 1, 'error': 'Please envoke cm run script "get cudnn" --tar_file={full path to the cuDNN tar file}'}
+        return {'return': 1, 'error': 'Please envoke mlcr "get cudnn" --tar_file={full path to the cuDNN tar file}'}
 
     print('Untaring file - can take some time ...')
 

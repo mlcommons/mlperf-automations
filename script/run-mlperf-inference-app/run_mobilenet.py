@@ -97,7 +97,7 @@ for model in variation_strings:
                 }
             }
             print(mlc_input)
-            r = mlc.access(cm_input)
+            r = mlc.access(mlc_input)
             if r['return'] > 0:
                 print(r)
                 # exit(1)

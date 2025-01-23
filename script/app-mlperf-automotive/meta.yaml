@@ -94,12 +94,12 @@ deps:
 
 
 docker:
-  cm_repo: gateoverflow@cm4mlops
+  mlc_repo: gateoverflow@cm4mlops
   use_host_group_id: True
   use_host_user_id: True
   real_run: false
   interactive: True
-  cm_repos: 'cm pull repo mlcommons@cm4abtf --checkout=poc'
+  mlc_repos: 'cm pull repo mlcommons@cm4abtf --checkout=poc'
   deps:
     - tags: get,abtf,scratch,space
   mounts:

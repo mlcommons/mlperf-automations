@@ -27,7 +27,7 @@ def preprocess(i):
             return {'return': 0}
 
         else:
-            return {'return': 1, 'error': 'Please rerun the last CM command with --env.IMAGENET_TRAIN_PATH={path the folder containing full ImageNet training images} or envoke cm run script "get train dataset imagenet" --input={path to the folder containing ImageNet training images}'}
+            return {'return': 1, 'error': 'Please rerun the last CM command with --env.IMAGENET_TRAIN_PATH={path the folder containing full ImageNet training images} or envoke mlcr "get train dataset imagenet" --input={path to the folder containing ImageNet training images}'}
 
     elif not os.path.isdir(path):
         if path.endswith(".tar"):

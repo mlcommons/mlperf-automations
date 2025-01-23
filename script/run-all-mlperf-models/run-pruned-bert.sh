@@ -45,7 +45,7 @@ scenario="Offline"
 
 if [[ $scenario == "Offline" ]]; then
 for stub in ${zoo_stub_list[@]}; do
-cmd="cm run script --tags=run,mlperf,inference,generate-run-cmds,_find-performance  \
+cmd="mlcr --tags=run,mlperf,inference,generate-run-cmds,_find-performance  \
    --adr.python.version_min=3.8 \
    --implementation=reference \
    --model=bert-99 \
@@ -64,7 +64,7 @@ done
 fi
 
 for stub in ${zoo_stub_list[@]}; do
- cmd="cm run script --tags=run,mlperf,inference,generate-run-cmds  \
+ cmd="mlcr --tags=run,mlperf,inference,generate-run-cmds  \
    --adr.python.version_min=3.8 \
    --adr.compiler.tags=gcc \
    --implementation=reference \

@@ -57,10 +57,10 @@ def postprocess(i):
             key_env = 'MLC_ROMLC_DEVICE_PROP_' + key.upper().replace(' ', '_')
             env[key_env] = val
 
-    state['cm_rocm_num_devices'] = gpu_id + 1
+    state['mlc_romlc_num_devices'] = gpu_id + 1
     env['MLC_ROMLC_NUM_DEVICES'] = gpu_id + 1
 
-    state['cm_rocm_device_prop'] = p
-    state['cm_rocm_devices_prop'] = gpu
+    state['mlc_romlc_device_prop'] = p
+    state['mlc_romlc_devices_prop'] = gpu
 
     return {'return': 0}

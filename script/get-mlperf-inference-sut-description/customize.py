@@ -114,11 +114,11 @@ def preprocess(i):
                 cuda_version = " , CUDA " + env['MLC_CUDA_VERSION']
                 state['MLC_SUT_META']['other_software_stack'] += cuda_version
 
-        if 'cm_cuda_device_prop' in state:
-            state['MLC_SUT_META']['accelerator_frequency'] = state['cm_cuda_device_prop']['Max clock rate']
+        if 'mlc_cuda_device_prop' in state:
+            state['MLC_SUT_META']['accelerator_frequency'] = state['mlc_cuda_device_prop']['Max clock rate']
             state['MLC_SUT_META']['accelerator_memory_capacity'] = str(int(
-                state['cm_cuda_device_prop']['Global memory']) / (1024 * 1024.0 * 1024)) + " GB"
-            state['MLC_SUT_META']['accelerator_model_name'] = state['cm_cuda_device_prop']['GPU Name']
+                state['mlc_cuda_device_prop']['Global memory']) / (1024 * 1024.0 * 1024)) + " GB"
+            state['MLC_SUT_META']['accelerator_model_name'] = state['mlc_cuda_device_prop']['GPU Name']
             num_accelerators = env.get('MLC_CUDA_NUM_DEVICES', "1")
             state['MLC_SUT_META']['accelerators_per_node'] = num_accelerators
 

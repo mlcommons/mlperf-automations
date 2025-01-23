@@ -24,7 +24,7 @@ input_mapping:
   num_gpus: MLC_DOCKER_ADD_NUM_GPUS
   base: MLC_DOCKER_IMAGE_BASE
   cache: MLC_DOCKER_CACHE
-  cm_repo: MLC_MLOPS_REPO
+  mlc_repo: MLC_MLOPS_REPO
   detached: MLC_DOCKER_DETACHED_MODE
   device: MLC_DOCKER_ADD_DEVICE
   docker_image_base: MLC_DOCKER_IMAGE_BASE

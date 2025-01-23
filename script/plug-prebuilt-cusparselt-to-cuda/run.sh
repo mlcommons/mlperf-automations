@@ -31,7 +31,7 @@ ${MLC_SUDO} chmod a+r ${MLC_CUDA_PATH_LIB}/libcusparseLt*
 echo "Adding file that CUSPARSELT is installed ..."
 echo ""
 if [ "${MLC_SUDO}" == "sudo" ]; then
-  ${MLC_SUDO} sh -c "echo '${MLC_VERSION}' > ${CUDA_HOME}/cm_installed_cusparselt.txt"
+  ${MLC_SUDO} sh -c "echo '${MLC_VERSION}' > ${CUDA_HOME}/mlc_installed_cusparselt.txt"
 else
-  echo "${MLC_VERSION}" > ${CUDA_HOME}/cm_installed_cusparselt.txt
+  echo "${MLC_VERSION}" > ${CUDA_HOME}/mlc_installed_cusparselt.txt
 fi

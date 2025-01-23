@@ -15,7 +15,7 @@ def preprocess(i):
     script_path = i['run_script_input']['path']
 
     if 'cmd' in i['input']:
-        state['mlperf_inference_run_cmd'] = "cm run script " + \
+        state['mlperf_inference_run_cmd'] = "mlcr " + \
             " ".join(i['input']['cmd'])
 
     state['mlperf-inference-implementation'] = {}

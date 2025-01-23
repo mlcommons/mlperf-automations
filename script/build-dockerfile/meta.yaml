@@ -24,10 +24,10 @@ default_env:
 input_mapping:
   build: MLC_BUILD_DOCKER_IMAGE
   cache: MLC_DOCKER_CACHE
-  cm_repo: MLC_MLOPS_REPO
-  cm_repo_flags: MLC_DOCKER_ADD_FLAG_TO_MLC_MLOPS_REPO
-  cm_repos: MLC_DOCKER_EXTRA_MLC_REPOS
-  cm_repo_branch: MLC_MLOPS_REPO_BRANCH
+  mlc_repo: MLC_MLOPS_REPO
+  mlc_repo_flags: MLC_DOCKER_ADD_FLAG_TO_MLC_MLOPS_REPO
+  mlc_repos: MLC_DOCKER_EXTRA_MLC_REPOS
+  mlc_repo_branch: MLC_MLOPS_REPO_BRANCH
   comments: MLC_DOCKER_RUN_COMMENTS
   copy_files: MLC_DOCKER_COPY_FILES
   docker_base_image: MLC_DOCKER_IMAGE_BASE
@@ -50,7 +50,7 @@ input_mapping:
   run_cmd: MLC_DOCKER_RUN_CMD
   run_cmd_extra: MLC_DOCKER_RUN_CMD_EXTRA
   script_tags: MLC_DOCKER_RUN_SCRIPT_TAGS
-  skip_cm_sys_upgrade: MLC_DOCKER_SKIP_MLC_SYS_UPGRADE
+  skip_mlc_sys_upgrade: MLC_DOCKER_SKIP_MLC_SYS_UPGRADE
   push_image: MLC_DOCKER_PUSH_IMAGE
   docker_not_pull_update: MLC_DOCKER_NOT_PULL_UPDATE
 

@@ -1,2 +1,2 @@
-cmr "get loadgen _download"
+mlcr "get loadgen _download"
 

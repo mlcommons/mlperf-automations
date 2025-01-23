@@ -357,7 +357,7 @@ docker:
   shm_size: '32gb'
   extra_run_args: ' --ulimit memlock=-1 --cap-add SYS_ADMIN --cap-add SYS_TIME --security-opt apparmor=unconfined --security-opt seccomp=unconfined'
   os: ubuntu
-  cm_repo_flags1: ' --branch=mlperf-inference'
+  mlc_repo_flags1: ' --branch=mlperf-inference'
   real_run: False
   interactive: True
   os_version: '20.04'

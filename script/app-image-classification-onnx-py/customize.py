@@ -27,7 +27,7 @@ def postprocess(i):
     # Saving predictions to JSON file to current directory
     # Should work with "cm docker script" ?
 
-    data = state.get('cm_app_image_classification_onnx_py', {})
+    data = state.get('mlc_app_image_classification_onnx_py', {})
 
     fjson = 'mlc-image-classification-onnx-py.json'
     fyaml = 'mlc-image-classification-onnx-py.yaml'

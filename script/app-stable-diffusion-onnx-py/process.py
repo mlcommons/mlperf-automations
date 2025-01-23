@@ -11,15 +11,15 @@ f = os.path.join(output, 'output.png')
 if os.path.isfile(f):
     os.remove(f)
 
-cm_model_path = os.environ.get('MLC_ML_MODEL_PATH', '')
-if cm_model_path == '':
+mlc_model_path = os.environ.get('MLC_ML_MODEL_PATH', '')
+if mlc_model_path == '':
     print('Error: MLC_ML_MODEL_PATH env is not defined')
     exit(1)
 
 device = os.environ.get('MLC_DEVICE', '')
 
 pipeline = ORTStableDiffusionPipeline.from_pretrained(
-    cm_model_path, local_files_only=True).to(device)
+    mlc_model_path, local_files_only=True).to(device)
 
 text = os.environ.get('MLC_APP_STABLE_DIFFUSION_ONNX_PY_TEXT', '')
 if text == '':

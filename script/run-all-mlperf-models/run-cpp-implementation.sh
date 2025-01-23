@@ -29,21 +29,21 @@ division="closed"
 POWER=" --power=yes --adr.mlperf-power-client.power_server=192.168.0.15 --adr.mlperf-power-client.port=4950 "
 POWER=""
 
-run "cm run script --tags=set,system,performance,mode"
+run "mlcr --tags=set,system,performance,mode"
 
 #cpp
-run "cm run script --tags=generate-run-cmds,inference,_find-performance \
+run "mlcr --tags=generate-run-cmds,inference,_find-performance \
 --model=resnet50 --implementation=cpp --device=cpu --backend=onnxruntime \
 --adr.compiler.tags=gcc \
 --category=edge --division=open --scenario=Offline  --quiet --test_query_count=2000 "
 
-run "cm run script --tags=generate-run-cmds,inference,_find-performance \
+run "mlcr --tags=generate-run-cmds,inference,_find-performance \
 --model=retinanet --implementation=cpp --device=cpu --backend=onnxruntime \
 --adr.compiler.tags=gcc \
 --category=edge --division=open --scenario=Offline  --quiet"
 
 
-run "cm run script --tags=generate-run-cmds,inference,_submission \
+run "mlcr --tags=generate-run-cmds,inference,_submission \
 --model=resnet50 --implementation=cpp --device=cpu --backend=onnxruntime \
 --scenario=Offline \
 --category=edge --division=$division  --quiet \
@@ -53,7 +53,7 @@ run "cm run script --tags=generate-run-cmds,inference,_submission \
 ${POWER} \
 --results_dir=$HOME/results_dir"
 
-run "cm run script --tags=generate-run-cmds,inference,_submission \
+run "mlcr --tags=generate-run-cmds,inference,_submission \
 --model=retinanet --implementation=cpp --device=cpu --backend=onnxruntime \
 --scenario=Offline \
 --category=edge --division=$division  --quiet \
@@ -63,7 +63,7 @@ run "cm run script --tags=generate-run-cmds,inference,_submission \
 ${POWER} \
 --results_dir=$HOME/results_dir"
 
-run "cm run script --tags=generate-run-cmds,inference,_submission \
+run "mlcr --tags=generate-run-cmds,inference,_submission \
 --model=resnet50 --implementation=cpp --device=cpu --backend=onnxruntime \
 --scenario=SingleStream \
 --category=edge --division=$division  --quiet \
@@ -73,7 +73,7 @@ run "cm run script --tags=generate-run-cmds,inference,_submission \
 ${POWER} \
 --results_dir=$HOME/results_dir"
 
-run "cm run script --tags=generate-run-cmds,inference,_submission \
+run "mlcr --tags=generate-run-cmds,inference,_submission \
 --model=retinanet --implementation=cpp --device=cpu --backend=onnxruntime \
 --scenario=SingleStream \
 --category=edge --division=$division  --quiet \
@@ -85,20 +85,20 @@ ${POWER} \
 
 # GPU
 
-run "cm run script --tags=generate-run-cmds,inference,_find-performance \
+run "mlcr --tags=generate-run-cmds,inference,_find-performance \
 --model=resnet50 --implementation=cpp --device=cuda --backend=onnxruntime \
 --adr.compiler.tags=gcc \
 --test_query_count=20000 \
 --category=edge --division=open --scenario=Offline  --quiet"
 
-run "cm run script --tags=generate-run-cmds,inference,_find-performance \
+run "mlcr --tags=generate-run-cmds,inference,_find-performance \
 --model=retinanet --implementation=cpp --device=cuda --backend=onnxruntime \
 --adr.compiler.tags=gcc \
 --test_query_count=2000   \
 --category=edge --division=open --scenario=Offline  --quiet"
 
 
-run "cm run script --tags=generate-run-cmds,inference,_submission \
+run "mlcr --tags=generate-run-cmds,inference,_submission \
 --scenario=Offline \
 --model=resnet50 --implementation=cpp --device=cuda --backend=onnxruntime \
 --category=edge --division=$division  --quiet \
@@ -108,7 +108,7 @@ run "cm run script --tags=generate-run-cmds,inference,_submission \
 ${POWER} \
 --results_dir=$HOME/results_dir"
 
-run "cm run script --tags=generate-run-cmds,inference,_submission \
+run "mlcr --tags=generate-run-cmds,inference,_submission \
 --model=retinanet --implementation=cpp --device=cuda --backend=onnxruntime \
 --scenario=Offline \
 --category=edge --division=$division  --quiet \
@@ -119,7 +119,7 @@ ${POWER} \
 --results_dir=$HOME/results_dir"
 
 
-run "cm run script --tags=generate-run-cmds,inference,_submission \
+run "mlcr --tags=generate-run-cmds,inference,_submission \
 --scenario=Offline \
 --model=resnet50 --implementation=cpp --device=cuda --backend=onnxruntime \
 --scenario=SingleStream \
@@ -130,7 +130,7 @@ run "cm run script --tags=generate-run-cmds,inference,_submission \
 ${POWER} \
 --results_dir=$HOME/results_dir"
 
-run "cm run script --tags=generate-run-cmds,inference,_submission \
+run "mlcr --tags=generate-run-cmds,inference,_submission \
 --model=retinanet --implementation=cpp --device=cuda --backend=onnxruntime \
 --scenario=SingleStream \
 --category=edge --division=$division  --quiet \
@@ -141,7 +141,7 @@ ${POWER} \
 --results_dir=$HOME/results_dir"
 
 #multistream
-run "cm run script --tags=generate-run-cmds,inference,_submission \
+run "mlcr --tags=generate-run-cmds,inference,_submission \
 --scenario=Offline \
 --model=resnet50 --implementation=cpp --device=cuda --backend=onnxruntime \
 --scenario=MultiStream \
@@ -152,7 +152,7 @@ run "cm run script --tags=generate-run-cmds,inference,_submission \
 ${POWER} \
 --results_dir=$HOME/results_dir"
 
-run "cm run script --tags=generate-run-cmds,inference,_submission \
+run "mlcr --tags=generate-run-cmds,inference,_submission \
 --model=retinanet --implementation=cpp --device=cuda --backend=onnxruntime \
 --scenario=MultiStream \
 --category=edge --division=$division  --quiet \

@@ -2,7 +2,6 @@
   "alias": "script",
   "automation_alias": "automation",
   "automation_uid": "bbeb15d8f0a944a4",
-  "min_cm_version": "2.2.0",
   "deps": {
     "cache": "cache,541d6f712a6b464e"
   },

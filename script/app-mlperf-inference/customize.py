@@ -26,14 +26,14 @@ def preprocess(i):
             env['MLC_NVIDIA_GPU_MEMORY'] = ''
         else:
             gpu_memory = i['state'].get(
-                'cm_cuda_device_prop', '').get('Global memory')
+                'mlc_cuda_device_prop', '').get('Global memory')
             gpu_memory_size = str(
                 int((float(gpu_memory) / (1024 * 1024 * 1024) + 7) / 8) * 8)
             env['MLC_NVIDIA_GPU_MEMORY'] = gpu_memory_size
             env['MLC_NVIDIA_HARNESS_GPU_VARIATION'] = ''
 
     if 'cmd' in i['input']:
-        state['mlperf_inference_run_cmd'] = "cm run script " + \
+        state['mlperf_inference_run_cmd'] = "mlcr " + \
             " ".join(i['input']['cmd'])
 
     state['mlperf-inference-implementation'] = {}
@@ -287,14 +287,14 @@ def postprocess(i):
         with open("measurements.json", "w") as fp:
             json.dump(measurements, fp, indent=2)
 
-        cm_sut_info = {}
-        cm_sut_info['system_name'] = state['MLC_SUT_META']['system_name']
-        cm_sut_info['implementation'] = env['MLC_MLPERF_IMPLEMENTATION']
-        cm_sut_info['device'] = env['MLC_MLPERF_DEVICE']
-        cm_sut_info['framework'] = state['MLC_SUT_META']['framework']
-        cm_sut_info['run_config'] = env['MLC_MLPERF_INFERENCE_SUT_RUN_CONFIG']
+        mlc_sut_info = {}
+        mlc_sut_info['system_name'] = state['MLC_SUT_META']['system_name']
+        mlc_sut_info['implementation'] = env['MLC_MLPERF_IMPLEMENTATION']
+        mlc_sut_info['device'] = env['MLC_MLPERF_DEVICE']
+        mlc_sut_info['framework'] = state['MLC_SUT_META']['framework']
+        mlc_sut_info['run_config'] = env['MLC_MLPERF_INFERENCE_SUT_RUN_CONFIG']
         with open(os.path.join(result_sut_folder_path, "mlc-sut-info.json"), "w") as fp:
-            json.dump(cm_sut_info, fp, indent=2)
+            json.dump(mlc_sut_info, fp, indent=2)
 
         system_meta = state['MLC_SUT_META']
         with open("system_meta.json", "w") as fp:

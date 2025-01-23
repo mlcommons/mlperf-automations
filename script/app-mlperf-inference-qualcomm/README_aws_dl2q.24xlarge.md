@@ -13,14 +13,14 @@ image from the Community AMIs is the recommended OS image as it comes with the Q
 sudo yum install -y python38-devel git
 python3.8 -m pip install cmind
 cm pull repo mlcommons@cm4mlops
-cm run script --tags=get,python --version_min=3.8.1
+mlcr --tags=get,python --version_min=3.8.1
 ```
 
 ## Bert-99
 
 ### Quick performance run
 ```
-cm run script --tags=generate-run-cmds,inference,_performance-only --device=qaic \
+mlcr --tags=generate-run-cmds,inference,_performance-only --device=qaic \
 --backend=glow --scenario=Offline  --implementation=kilt --model=bert-99 \
 --test_query_count=40000 --precision=uint8 --rerun --quiet \
 --adr.mlperf-inference-implementation.tags=_loadgen-batch-size.4096,_dl2q.24xlarge \
@@ -29,7 +29,7 @@ cm run script --tags=generate-run-cmds,inference,_performance-only --device=qaic
 
 ### Full valid run
 ```
-cm run script --tags=generate-run-cmds,inference,_submission --device=qaic \
+mlcr --tags=generate-run-cmds,inference,_submission --device=qaic \
 --backend=glow --scenario=Offline --implementation=kilt --model=bert-99 --precision=uint8 \
 --adr.mlperf-inference-implementation.tags=_loadgen-batch-size.4096,_dl2q.24xlarge \
 --rerun --quiet --execution-mode=valid
@@ -45,13 +45,13 @@ The expected accuracy is ~90
 (Optional)
 If you have Imagenet 2012 validation dataset downloaded, you can register it in CM as follows. This step is optional and can avoid the download from the public URL which can be slow at times.
 ```
-cm run script --tags=get,dataset,imagenet,original,_full --env.IMAGENET_PATH=`pwd`/imagenet-2012-val
+mlcr --tags=get,dataset,imagenet,original,_full --env.IMAGENET_PATH=`pwd`/imagenet-2012-val
 ```
 
 ### Quick performance run
 
 ```
-cm run script --tags=generate-run-cmds,inference,_performance-only --device=qaic --backend=glow \
+mlcr --tags=generate-run-cmds,inference,_performance-only --device=qaic --backend=glow \
 --scenario=Offline  --implementation=kilt --model=resnet50 \
 --test_query_count=400000 --precision=uint8 --rerun --adr.compiler.tags=gcc \
 --adr.mlperf-inference-implementation.tags=_bs.8,_dl2q.24xlarge --execution-mode=test --quiet
@@ -60,7 +60,7 @@ cm run script --tags=generate-run-cmds,inference,_performance-only --device=qaic
 ### Full valid run
 
 ```
-cm run script --tags=generate-run-cmds,inference,_submission --device=qaic --backend=glow \
+mlcr --tags=generate-run-cmds,inference,_submission --device=qaic --backend=glow \
 --scenario=Offline  --implementation=kilt --model=resnet50 \
 --precision=uint8 --rerun --adr.compiler.tags=gcc \
 --adr.mlperf-inference-implementation.tags=_bs.8,_dl2q.24xlarge --execution-mode=valid --quiet
@@ -76,7 +76,7 @@ Expected accuracy is 75.936%
 ### Quick performance run
 
 ```
-cm run script --tags=generate-run-cmds,inference,_performance-only --device=qaic --backend=glow \
+mlcr --tags=generate-run-cmds,inference,_performance-only --device=qaic --backend=glow \
 --scenario=Offline  --implementation=kilt --model=retinanet --test_query_count=40000 --precision=uint8 \
 --rerun --quiet --adr.mlperf-inference-implementation.tags=_loadgen-batch-size.1,_dl2q.24xlarge,_bs.1 \
 --adr.compiler.tags=gcc --execution-mode=test 
@@ -85,7 +85,7 @@ cm run script --tags=generate-run-cmds,inference,_performance-only --device=qaic
 ### Full valid run
 
 ```
-cm run script --tags=generate-run-cmds,inference,_submission --device=qaic --backend=glow \
+mlcr --tags=generate-run-cmds,inference,_submission --device=qaic --backend=glow \
 --scenario=Offline  --implementation=kilt --model=retinanet \
 --precision=uint8 --rerun --adr.compiler.tags=gcc --adr.dataset-preprocessed.tags=_custom-annotations \
 --adr.mlperf-inference-implementation.tags=_bs.1,_dl2q.24xlarge --execution-mode=valid --quiet

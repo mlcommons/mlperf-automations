@@ -17,7 +17,7 @@ tags:
 - ml-task--object-detection
 - ml-task--image-segmentation
 
-min_cm_version: '2.2.0'
+min_mlc_version: '2.2.0'
 
 private: true
 

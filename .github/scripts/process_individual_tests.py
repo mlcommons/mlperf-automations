@@ -26,9 +26,9 @@ for file in files:
         'action': 'test', 'target': 'script', 'item': uid, 'quiet': 'yes', 'out': 'con'
     }
     if os.environ.get('DOCKER_MLC_REPO', '') != '':
-        ii['docker_cm_repo'] = os.environ['DOCKER_MLC_REPO']
+        ii['docker_mlc_repo'] = os.environ['DOCKER_MLC_REPO']
     if os.environ.get('DOCKER_MLC_REPO_BRANCH', '') != '':
-        ii['docker_cm_repo_branch'] = os.environ['DOCKER_MLC_REPO_BRANCH']
+        ii['docker_mlc_repo_branch'] = os.environ['DOCKER_MLC_REPO_BRANCH']
     if os.environ.get('TEST_INPUT_INDEX', '') != '':
         ii['test_input_index'] = os.environ['TEST_INPUT_INDEX']
     print(ii)

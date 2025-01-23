@@ -43,47 +43,47 @@ function run_test() {
 results_dir=$HOME/results_dir
 
 #Add your run commands here...
-find_performance_cmd='cm run script --tags=generate-run-cmds,inference,_find-performance \
+find_performance_cmd='mlcr --tags=generate-run-cmds,inference,_find-performance \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=edge --division=open --scenario=Offline  --quiet --test_query_count=$test_query_count $rerun ${EXTRA_ARGS}'
 
-find_ss_performance_cmd='cm run script --tags=generate-run-cmds,inference,_find-performance \
+find_ss_performance_cmd='mlcr --tags=generate-run-cmds,inference,_find-performance \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=edge --division=open --scenario=SingleStream  --quiet --test_query_count=$test_query_count $rerun ${EXTRA_RUN_ARGS}  ${EXTRA_ARGS}'
 
-submission_cmd='cm run script --tags=generate-run-cmds,inference,_submission,_all-scenarios \
+submission_cmd='mlcr --tags=generate-run-cmds,inference,_submission,_all-scenarios \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=$category --division=$division  --quiet  \
 --skip_submission_generation=yes --execution-mode=valid ${POWER_STRING} ${EXTRA_RUN_ARGS} ${EXTRA_ARGS}'
 
-submission_cmd_scenario='cm run script --tags=generate-run-cmds,inference,_submission  --scenario=$scenario \
+submission_cmd_scenario='mlcr --tags=generate-run-cmds,inference,_submission  --scenario=$scenario \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=$category --division=$division  --quiet  \
 --skip_submission_generation=yes --execution-mode=valid ${POWER_STRING} ${EXTRA_RUN_ARGS} ${EXTRA_ARGS}'
 
-readme_cmd_single='cm run script --tags=generate-run-cmds,inference,_populate-readme --scenario=$scenario \
+readme_cmd_single='mlcr --tags=generate-run-cmds,inference,_populate-readme --scenario=$scenario \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=$category --division=$division  --quiet  \
 --skip_submission_generation=yes --execution-mode=valid ${POWER_STRING} ${EXTRA_RUN_ARGS} ${EXTRA_ARGS}'
 
-readme_cmd='cm run script --tags=generate-run-cmds,inference,_populate-readme,_all-scenarios \
+readme_cmd='mlcr --tags=generate-run-cmds,inference,_populate-readme,_all-scenarios \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=$category --division=$division  --quiet  \
 --skip_submission_generation=yes --execution-mode=valid ${POWER_STRING} ${EXTRA_RUN_ARGS} ${EXTRA_ARGS}'
 
 
-tflite_accuracy_cmd='cm run script --tags=run,mobilenet-models,_tflite,_accuracy-only$extra_tags \
+tflite_accuracy_cmd='mlcr --tags=run,mobilenet-models,_tflite,_accuracy-only$extra_tags \
 --adr.compiler.tags=gcc \
 ${extra_option} \
  ${EXTRA_ARGS}'
 
-tflite_performance_cmd='cm run script --tags=run,mobilenet-models,_tflite,_performance-only$extra_tags \
+tflite_performance_cmd='mlcr --tags=run,mobilenet-models,_tflite,_performance-only$extra_tags \
 ${POWER_STRING} \
 --adr.compiler.tags=gcc \
 ${extra_option} \
  ${EXTRA_ARGS}'
 
-tflite_readme_cmd='cm run script --tags=run,mobilenet-models,_tflite,_populate-readme$extra_tags \
+tflite_readme_cmd='mlcr --tags=run,mobilenet-models,_tflite,_populate-readme$extra_tags \
 ${POWER_STRING} \
 --adr.compiler.tags=gcc \
 ${extra_option} \

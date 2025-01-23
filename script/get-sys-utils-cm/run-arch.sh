@@ -32,7 +32,7 @@ ${MLC_SUDO} ${MLC_PACKAGE_TOOL} -Syu && \
            zip 
 
 # Install Python deps though preference is to install them 
-# via cmr "get generic-python-lib _package.{Python PIP package name}"
+# via mlcr "get generic-python-lib _package.{Python PIP package name}"
 if [[ "${MLC_SKIP_PYTHON_DEPS}" != "yes" ]]; then
  . ${MLC_TMP_CURRENT_SCRIPT_PATH}/do_pip_installs.sh
  test $? -eq 0 || exit $?

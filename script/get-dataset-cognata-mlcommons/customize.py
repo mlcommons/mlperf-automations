@@ -7,12 +7,12 @@ def preprocess(i):
 
     env = i['env']
 
-    cm_cache_dataset_path = env.get(
+    mlc_cache_dataset_path = env.get(
         'MLC_CUSTOM_CACHE_ENTRY_DATASET_MLCOMMONS_COGNATA_PATH', '').strip()
 
     res = utils.load_json(
         os.path.join(
-            cm_cache_dataset_path,
+            mlc_cache_dataset_path,
             'cfg.json'))
     cfg = res.get('meta', {})
     if cfg.get('imported', False):
@@ -67,12 +67,12 @@ def postprocess(i):
 
     quiet = (env.get('MLC_QUIET', False) == 'yes')
 
-    cm_cache_dataset_path = env.get(
+    mlc_cache_dataset_path = env.get(
         'MLC_CUSTOM_CACHE_ENTRY_DATASET_MLCOMMONS_COGNATA_PATH', '').strip()
 
-    if not os.path.isdir(cm_cache_dataset_path):
+    if not os.path.isdir(mlc_cache_dataset_path):
         return {
-            'return': 1, 'error': 'Dataset corrupted - CM cache path not found: {}'.format(cm_cache_dataset_path)}
+            'return': 1, 'error': 'Dataset corrupted - CM cache path not found: {}'.format(mlc_cache_dataset_path)}
 
     if env.get('MLC_DATASET_MLCOMMONS_COGNATA_FILE_NAMES', '') == '':
         env['MLC_DATASET_MLCOMMONS_COGNATA_PATH'] = os.path.dirname(
@@ -80,10 +80,10 @@ def postprocess(i):
         env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_DATASET_MLCOMMONS_COGNATA_PATH']
         return {'return': 0}
 
-    cm_cache_dataset_cfg_file = os.path.join(cm_cache_dataset_path, 'cfg.json')
-    env['MLC_DATASET_MLCOMMONS_COGNATA_CFG_FILE'] = cm_cache_dataset_cfg_file
+    mlc_cache_dataset_cfg_file = os.path.join(mlc_cache_dataset_path, 'cfg.json')
+    env['MLC_DATASET_MLCOMMONS_COGNATA_CFG_FILE'] = mlc_cache_dataset_cfg_file
 
-    res = utils.load_json(cm_cache_dataset_cfg_file)
+    res = utils.load_json(mlc_cache_dataset_cfg_file)
     cfg = res.get('meta', {})
 
     dataset_path = cfg.get('real_path', '')
@@ -92,7 +92,7 @@ def postprocess(i):
         if dataset_path_requested != '':
             dataset_path = dataset_path_requested
         else:
-            dataset_path = os.path.join(cm_cache_dataset_path, 'cognata')
+            dataset_path = os.path.join(mlc_cache_dataset_path, 'cognata')
     else:
         if dataset_path_requested != '':
             dataset_path = dataset_path_requested
@@ -110,7 +110,7 @@ def postprocess(i):
     else:
         cfg['imported'] = False
 
-    utils.save_json(cm_cache_dataset_cfg_file, cfg)
+    utils.save_json(mlc_cache_dataset_cfg_file, cfg)
 
     if cfg.get('imported', False):
         return {'return': 0}
@@ -392,7 +392,7 @@ def postprocess(i):
 
     # Mark that processed this dataset once correctly
     cfg['processed'] = True
-    utils.save_json(cm_cache_dataset_cfg_file, cfg)
+    utils.save_json(mlc_cache_dataset_cfg_file, cfg)
 
     env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_DATASET_MLCOMMONS_COGNATA_PATH']
 
