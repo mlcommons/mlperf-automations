@@ -182,10 +182,10 @@ def postprocess(i):
     if env.get('MLC_HOST_CPU_TOTAL_LOGICAL_CORES', '') != '' and env.get(
             'MLC_HOST_CPU_TOTAL_PHYSICAL_CORES', '') != '' and env.get('MLC_HOST_CPU_THREADS_PER_CORE', '') == '':
         env['MLC_HOST_CPU_THREADS_PER_CORE'] = str(int(int(env['MLC_HOST_CPU_TOTAL_LOGICAL_CORES']) //
-                                                      int(env['MLC_HOST_CPU_TOTAL_PHYSICAL_CORES'])))
+                                                       int(env['MLC_HOST_CPU_TOTAL_PHYSICAL_CORES'])))
 
     if env.get('MLC_HOST_CPU_SOCKETS', '') != '' and env.get('MLC_HOST_CPU_TOTAL_PHYSICAL_CORES',
-                                                            '') != '' and env.get('MLC_HOST_CPU_PHYSICAL_CORES_PER_SOCKET', '') == '':
+                                                             '') != '' and env.get('MLC_HOST_CPU_PHYSICAL_CORES_PER_SOCKET', '') == '':
         env['MLC_HOST_CPU_PHYSICAL_CORES_PER_SOCKET'] = str(
             int(env['MLC_HOST_CPU_TOTAL_PHYSICAL_CORES']) // int(env['MLC_HOST_CPU_SOCKETS']))
 

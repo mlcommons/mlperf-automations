@@ -9,7 +9,11 @@ def postprocess(i):
     state = i['state']
 
     if env.get('MLC_HW_NAME', '') == '':
-        host_name = env.get('MLC_HOST_SYSTEM_NAME', 'default').replace("-", "_")
+        host_name = env.get(
+            'MLC_HOST_SYSTEM_NAME',
+            'default').replace(
+            "-",
+            "_")
         env['MLC_HW_NAME'] = host_name
 
     device = env.get('MLC_MLPERF_DEVICE', 'cpu')

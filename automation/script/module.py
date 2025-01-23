@@ -5149,7 +5149,8 @@ def update_env_with_values(env, fail_on_not_found=False, extra_env=None):
         if not placeholders:
             # Special handling for MLC_GIT_URL
             if key == 'MLC_GIT_URL' and env.get('MLC_GIT_AUTH', "no") == "yes":
-                if env.get('MLC_GH_TOKEN', '') and '@' not in env['MLC_GIT_URL']:
+                if env.get('MLC_GH_TOKEN',
+                           '') and '@' not in env['MLC_GIT_URL']:
                     params = {"token": env['MLC_GH_TOKEN']}
                     value = get_git_url("token", value, params)
                 elif 'MLC_GIT_SSH' in env:

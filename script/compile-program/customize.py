@@ -14,13 +14,13 @@ def preprocess(i):
 
     CPATH = env.get('+CPATH', [])
     env['MLC_C_INCLUDE_PATH'] = " -I".join([" "] +
-                                          env.get('+C_INCLUDE_PATH', []) +
-                                          CPATH)
+                                           env.get('+C_INCLUDE_PATH', []) +
+                                           CPATH)
     env['MLC_CPLUS_INCLUDE_PATH'] = " -I".join(
         [" "] + env.get('+CPLUS_INCLUDE_PATH', []) + CPATH)
     env['MLC_F_INCLUDE_PATH'] = " -I".join([" "] +
-                                          env.get('+F_INCLUDE_PATH', []) +
-                                          CPATH)
+                                           env.get('+F_INCLUDE_PATH', []) +
+                                           CPATH)
 
     # If windows, need to extend it more ...
     if os_info['platform'] == 'windows' and env.get(
@@ -54,7 +54,7 @@ def preprocess(i):
         env['MLC_LINKER_FLAGS'] = env['MLC_F_LINKER_FLAGS']
 
     env['MLC_LD_LIBRARY_PATH'] = " -L".join([" "] +
-                                           env.get('+LD_LIBRARY_PATH', []))
+                                            env.get('+LD_LIBRARY_PATH', []))
     env['MLC_SOURCE_FOLDER_PATH'] = env['MLC_SOURCE_FOLDER_PATH'] if 'MLC_SOURCE_FOLDER_PATH' in env else env[
         'MLC_TMP_CURRENT_SCRIPT_PATH'] if 'MLC_TMP_CURRENT_SCRIPT_PATH' in env else ''
 

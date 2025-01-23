@@ -47,19 +47,19 @@ def preprocess(i):
                 env['DATASET_ANNOTATIONS_FILE_PATH'] = env['MLC_DATASET_ANNOTATIONS_FILE_PATH']
                 dataset_dir = os.getcwd()  # not used, just to keep the script happy
             CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " " + "'" + os.path.join(env['MLC_MLPERF_INFERENCE_CLASSIFICATION_AND_DETECTION_PATH'], "tools",
-                                                                            "accuracy-openimages.py") + "'" + " --mlperf-accuracy-file " + "'" + os.path.join(result_dir,
-                                                                                                                                                              "mlperf_log_accuracy.json") + "'" + " --openimages-dir " + "'" + dataset_dir + "'" + " --verbose > " + "'" + \
+                                                                             "accuracy-openimages.py") + "'" + " --mlperf-accuracy-file " + "'" + os.path.join(result_dir,
+                                                                                                                                                               "mlperf_log_accuracy.json") + "'" + " --openimages-dir " + "'" + dataset_dir + "'" + " --verbose > " + "'" + \
                 out_file + "'"
 
         elif dataset == "imagenet":
             CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_CLASSIFICATION_AND_DETECTION_PATH'], "tools",
-                                                                       "accuracy-imagenet.py") + "' --mlperf-accuracy-file '" + os.path.join(result_dir,
-                                                                                                                                             "mlperf_log_accuracy.json") + "' --imagenet-val-file '" + os.path.join(env['MLC_DATASET_AUX_PATH'],
-                                                                                                                                                                                                                    "val.txt") + "' --dtype " + env.get('MLC_ACCURACY_DTYPE', "float32") + " > '" + out_file + "'"
+                                                                        "accuracy-imagenet.py") + "' --mlperf-accuracy-file '" + os.path.join(result_dir,
+                                                                                                                                              "mlperf_log_accuracy.json") + "' --imagenet-val-file '" + os.path.join(env['MLC_DATASET_AUX_PATH'],
+                                                                                                                                                                                                                     "val.txt") + "' --dtype " + env.get('MLC_ACCURACY_DTYPE', "float32") + " > '" + out_file + "'"
 
         elif dataset == "squad":
             CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_BERT_PATH'],
-                                                                       "accuracy-squad.py") + "' --val_data '" + env['MLC_DATASET_SQUAD_VAL_PATH'] + \
+                                                                        "accuracy-squad.py") + "' --val_data '" + env['MLC_DATASET_SQUAD_VAL_PATH'] + \
                 "' --log_file '" + os.path.join(result_dir, "mlperf_log_accuracy.json") + \
                 "' --vocab_file '" + env['MLC_ML_MODEL_BERT_VOCAB_FILE_WITH_PATH'] + \
                 "' --out_file '" + os.path.join(result_dir, 'predictions.json') + \
@@ -144,7 +144,7 @@ def preprocess(i):
 
             # env['DATASET_ANNOTATIONS_FILE_PATH'] = env['MLC_DATASET_ANNOTATIONS_FILE_PATH']
             CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "text_to_image", "tools",
-                                                                       "accuracy_coco.py") + "' --mlperf-accuracy-file '" + os.path.join(result_dir, "mlperf_log_accuracy.json") + \
+                                                                        "accuracy_coco.py") + "' --mlperf-accuracy-file '" + os.path.join(result_dir, "mlperf_log_accuracy.json") + \
                 "' --caption-path '" + os.path.join(
                 env['MLC_MLPERF_INFERENCE_SOURCE'],
                 "text_to_image",
@@ -154,7 +154,7 @@ def preprocess(i):
 
         elif dataset == "kits19":
             CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_3DUNET_PATH'],
-                                                                       "accuracy_kits.py") + \
+                                                                        "accuracy_kits.py") + \
                 "' --preprocessed_data_dir '" + env['MLC_DATASET_PREPROCESSED_PATH'] +\
                 "' --postprocessed_data_dir '" + result_dir +\
                 "' --log_file '" + os.path.join(result_dir, "mlperf_log_accuracy.json") + \
@@ -163,7 +163,7 @@ def preprocess(i):
 
         elif dataset == "librispeech":
             CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_RNNT_PATH'],
-                                                                       "accuracy_eval.py") + \
+                                                                        "accuracy_eval.py") + \
                 "' --dataset_dir '" + os.path.join(env['MLC_DATASET_PREPROCESSED_PATH'], "..") +\
                 "' --manifest '" + env['MLC_DATASET_PREPROCESSED_JSON'] +\
                 "' --log_dir '" + result_dir + \
@@ -183,8 +183,8 @@ def preprocess(i):
                         env['MLC_DLRM_V2_DAY23_FILE_PATH']}' """
                 )
             CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_DLRM_V2_PATH'], "pytorch", "tools",
-                                                                       "accuracy-dlrm.py") + "' --mlperf-accuracy-file '" + os.path.join(result_dir,
-                                                                                                                                         "mlperf_log_accuracy.json") + "'" + extra_options + \
+                                                                        "accuracy-dlrm.py") + "' --mlperf-accuracy-file '" + os.path.join(result_dir,
+                                                                                                                                          "mlperf_log_accuracy.json") + "'" + extra_options + \
                 " --dtype " + env.get('MLC_ACCURACY_DTYPE',
                                       "float32") + " > '" + out_file + "'"
 

@@ -61,7 +61,8 @@ def preprocess(i):
 
         os.chdir(new_path)
 
-        cmdline_tools_version = env.get('MLC_ANDROID_CMDLINE_TOOLS_VERSION', '')
+        cmdline_tools_version = env.get(
+            'MLC_ANDROID_CMDLINE_TOOLS_VERSION', '')
 
         env['MLC_ANDROID_CMDLINE_TOOLS_VERSION'] = cmdline_tools_version
 

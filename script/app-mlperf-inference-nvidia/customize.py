@@ -11,7 +11,8 @@ def preprocess(i):
         return {'return': 1, 'error': 'Windows is not supported in this script yet'}
     env = i['env']
 
-    if str(env.get('MLC_RUN_STATE_DOCKER', '')).lower() in ['1', 'true', 'yes']:
+    if str(env.get('MLC_RUN_STATE_DOCKER', '')
+           ).lower() in ['1', 'true', 'yes']:
         return {'return': 0}
 
     if env.get('MLC_MODEL', '') == '':
@@ -497,7 +498,8 @@ def preprocess(i):
         if power_setting and env['MLC_MLPERF_NVIDIA_HARNESS_RUN_MODE'] == "run_harness":
             run_config += f" --power_setting={power_setting}"
 
-        gpu_copy_streams = env.get('MLC_MLPERF_NVIDIA_HARNESS_GPU_COPY_STREAMS')
+        gpu_copy_streams = env.get(
+            'MLC_MLPERF_NVIDIA_HARNESS_GPU_COPY_STREAMS')
         if gpu_copy_streams:
             run_config += f" --gpu_copy_streams={gpu_copy_streams}"
 
@@ -506,7 +508,8 @@ def preprocess(i):
         if gpu_inference_streams:
             run_config += f" --gpu_inference_streams={gpu_inference_streams}"
 
-        dla_copy_streams = env.get('MLC_MLPERF_NVIDIA_HARNESS_DLA_COPY_STREAMS')
+        dla_copy_streams = env.get(
+            'MLC_MLPERF_NVIDIA_HARNESS_DLA_COPY_STREAMS')
         if dla_copy_streams:
             run_config += f" --dla_copy_streams={dla_copy_streams}"
 
@@ -536,7 +539,8 @@ def preprocess(i):
         if devices:
             run_config += f" --devices={devices}"
 
-        audio_batch_size = env.get('MLC_MLPERF_NVIDIA_HARNESS_AUDIO_BATCH_SIZE')
+        audio_batch_size = env.get(
+            'MLC_MLPERF_NVIDIA_HARNESS_AUDIO_BATCH_SIZE')
         if audio_batch_size:
             run_config += f" --audio_batch_size={audio_batch_size}"
 

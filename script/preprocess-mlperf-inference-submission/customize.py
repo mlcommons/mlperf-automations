@@ -32,7 +32,7 @@ def preprocess(i):
     x_version = ' --version ' + version + ' ' if version != '' else ''
 
     CMD = env['MLC_PYTHON_BIN'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission",
-                                                     "preprocess_submission.py") + "' --input '" + submission_dir + "' --submitter '" + submitter + "' --output '" + submission_processed + "'" + x_version
+                                                      "preprocess_submission.py") + "' --input '" + submission_dir + "' --submitter '" + submitter + "' --output '" + submission_processed + "'" + x_version
     env['MLC_RUN_CMD'] = CMD
 
     return {'return': 0}

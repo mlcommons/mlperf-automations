@@ -54,7 +54,7 @@ def preprocess(i):
     if 'MLC_NUM_THREADS' not in env:
         if 'MLC_MINIMIZE_THREADS' in env:
             env['MLC_NUM_THREADS'] = str(int(env['MLC_HOST_CPU_TOTAL_CORES']) //
-                                        (int(env.get('MLC_HOST_CPU_SOCKETS', '1')) * int(env.get('MLC_HOST_CPU_TOTAL_CORES', '1'))))
+                                         (int(env.get('MLC_HOST_CPU_SOCKETS', '1')) * int(env.get('MLC_HOST_CPU_TOTAL_CORES', '1'))))
         else:
             env['MLC_NUM_THREADS'] = env.get('MLC_HOST_CPU_TOTAL_CORES', '1')
 
@@ -120,7 +120,7 @@ def preprocess(i):
         NUM_THREADS = "2"  # Don't use more than 2 threads when run on GPU
 
     if env['MLC_MODEL'] in ['resnet50', 'retinanet',
-                           'stable-diffusion-xl', 'rgat']:
+                            'stable-diffusion-xl', 'rgat']:
         scenario_extra_options += " --threads " + NUM_THREADS
 
     ml_model_name = env['MLC_MODEL']

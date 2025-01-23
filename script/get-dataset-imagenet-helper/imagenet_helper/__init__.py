@@ -34,7 +34,10 @@ MODEL_USE_DLA = os.getenv(
         'ON',
         'on',
     '1')
-MODEL_MAX_BATCH_SIZE = int(os.getenv('MLC_ML_MODEL_MAX_BATCH_SIZE', BATCH_SIZE))
+MODEL_MAX_BATCH_SIZE = int(
+    os.getenv(
+        'MLC_ML_MODEL_MAX_BATCH_SIZE',
+        BATCH_SIZE))
 
 
 # Internal processing:

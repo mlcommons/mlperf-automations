@@ -194,7 +194,8 @@ def preprocess(i):
                                    env['MLC_MLPERF_BACKEND_LIB_NAMESPEC'])
     # e.g. -lcudart
     if 'MLC_MLPERF_DEVICE_LIB_NAMESPEC' in env:
-        env['+ LDCXXFLAGS'].append('-l' + env['MLC_MLPERF_DEVICE_LIB_NAMESPEC'])
+        env['+ LDCXXFLAGS'].append('-l' +
+                                   env['MLC_MLPERF_DEVICE_LIB_NAMESPEC'])
 
     if '-DPRINT_NETWORK_DESCRIPTOR' in env['+ CXXFLAGS']:
         env['+ LDCXXFLAGS'].append('-lprotobuf')

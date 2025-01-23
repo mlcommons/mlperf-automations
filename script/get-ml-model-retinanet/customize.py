@@ -23,7 +23,8 @@ def postprocess(i):
     env['MLC_ML_MODEL_FILE'] = os.path.basename(
         env['MLC_ML_MODEL_FILE_WITH_PATH'])
     if env.get('MLC_ENV_NAME_ML_MODEL_FILE', '') != '':
-        env[env['MLC_ENV_NAME_ML_MODEL_FILE']] = env['MLC_ML_MODEL_FILE_WITH_PATH']
+        env[env['MLC_ENV_NAME_ML_MODEL_FILE']
+            ] = env['MLC_ML_MODEL_FILE_WITH_PATH']
 
     if env.get("MLC_QAIC_PRINT_NODE_PRECISION_INFO", '') == 'yes':
         env['MLC_ML_MODEL_RETINANET_QAIC_NODE_PRECISION_INFO_FILE_PATH'] = os.path.join(
