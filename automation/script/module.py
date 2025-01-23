@@ -13,8 +13,8 @@ import logging
 
 from mlc.main import Automation
 import mlc.utils as utils
-from mlc.main import __version__ as current_mlc_version
 from utils import *
+from importlib.metadata import version
 
 
 class ScriptAutomation(Automation):
@@ -776,6 +776,7 @@ class ScriptAutomation(Automation):
         # Check min CM version requirement
         min_mlc_version = meta.get('min_mlc_version', '').strip()
         if min_mlc_version != '':
+            current_mlc_version = version(mlc)
             comparison = utils.compare_versions(
                 current_mlc_version, min_mlc_version)
             if comparison < 0:
