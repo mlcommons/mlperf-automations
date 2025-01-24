@@ -3,7 +3,6 @@ import os
 import json
 import shutil
 import subprocess
-import mlc
 import copy
 from tabulate import tabulate
 
@@ -20,6 +19,7 @@ def preprocess(i):
     inp = i['input']
     state = i['state']
     script_path = i['run_script_input']['path']
+    mlc = i['automation'].action_object
 
     if env.get('MLC_RUN_DOCKER_CONTAINER', '') == "yes":
         return {'return': 0}
