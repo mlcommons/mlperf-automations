@@ -64,12 +64,12 @@ echo "------------------------------------------------------------" >> $OUTPUT_F
 
 echo "11. Systemd service manager version" >> $OUTPUT_FILE
 eval "systemctl --version | head -n 1" >> $OUTPUT_FILE
-test $? -eq 0 || exit $?
+#test $? -eq 0 || exit $?
 echo "------------------------------------------------------------" >> $OUTPUT_FILE
 
 echo "12. Services, from systemctl list-unit-files" >> $OUTPUT_FILE
 eval "systemctl list-unit-files" >> $OUTPUT_FILE
-test $? -eq 0 || exit $?
+#test $? -eq 0 || exit $?
 echo "------------------------------------------------------------" >> $OUTPUT_FILE
 
 echo "13. Linux kernel boot-time arguments, from /proc/cmdline" >> $OUTPUT_FILE
