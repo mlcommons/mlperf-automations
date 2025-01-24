@@ -19,7 +19,7 @@ default_env:
     '
   MLC_DOCKER_OS: ubuntu
   MLC_DOCKER_NOT_PULL_UPDATE: False
-  MLC_MLOPS_REPO_BRANCH: mlc
+  MLC_MLOPS_REPO_BRANCH: dev
 
 input_mapping:
   build: MLC_BUILD_DOCKER_IMAGE
