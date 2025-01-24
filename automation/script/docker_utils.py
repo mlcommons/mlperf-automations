@@ -128,11 +128,9 @@ def update_docker_paths(path, mounts=None, force_target_path=''):
     # Determine the mount string based on whether the path is a file or
     # directory.
     if os.path.isfile(host_path) or not os.path.isdir(host_path):
-        mount_entry = f"{
-            os.path.dirname(host_path)}: {
-            os.path.dirname(container_path)}"
+        mount_entry = f"""{os.path.dirname(host_path)}: {os.path.dirname(container_path)}"""
     else:
-        mount_entry = f"{host_path}:{container_path}"
+        mount_entry = f"""{host_path}:{container_path}"""
 
     # Add the mount entry to the mounts list if it's not already present.
     if mounts is not None:
