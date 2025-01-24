@@ -72,7 +72,7 @@ jobs:
       run: |
         git config --global user.name mlcommons-bot
         git config --global user.email "mlcommons-bot@users.noreply.github.com"
-        git clone -b auto-update https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 tmp
+        git clone -b auto-update https://git:${PAT}@github.com/mlcommons/mlperf_inference_test_submissions_v5.0 tmp
         cd tmp
         echo "hello" >> README.md
         git commit -a -m "Test commit"
