@@ -18,7 +18,7 @@ jobs:
         python-version: [ "3.8", "3.12" ]
         backend: [ "pytorch" ]
         implementation: [ "python" ]
-        docker: [ "", " --docker --docker_os=ubuntu --docker_os_version=22.04 --docker_mlc_repo=mlcommons@mlperf-automations --docker_mlc_repo_branch=dev --docker_dt=yes" ]
+        docker: [ "", " --docker --docker_mlc_repo=mlcommons@mlperf-automations --docker_mlc_repo_branch=dev --docker_dt" ]
         extra-args: [ "--adr.compiler.tags=gcc", "--env.MLC_MLPERF_LOADGEN_BUILD_FROM_SRC=off" ]
         exclude:
         - os: ubuntu-24.04
@@ -28,16 +28,16 @@ jobs:
         - os: windows-latest
           extra-args: "--adr.compiler.tags=gcc"
         - os: windows-latest 
-          docker: " --docker --docker_it=no --docker_mlc_repo=mlcommons@mlperf-automations --docker_mlc_repo_branch=dev --docker_dt=yes"
+          docker: " --docker --docker_mlc_repo=mlcommons@mlperf-automations --docker_mlc_repo_branch=dev --docker_dt"
           # windows docker image is not supported in CM yet
         - os: macos-latest
           python-version: "3.8"
         - os: macos-13
           python-version: "3.8"
         - os: macos-latest
-          docker: " --docker --docker_it=no --docker_mlc_repo=mlcommons@mlperf-automations --docker_mlc_repo_branch=dev --docker_dt=yes"
+          docker: " --docker --docker_mlc_repo=mlcommons@mlperf-automations --docker_mlc_repo_branch=dev --docker_dt"
         - os: macos-13
-          docker: " --docker --docker_it=no --docker_mlc_repo=mlcommons@mlperf-automations --docker_mlc_repo_branch=dev --docker_dt=yes"
+          docker: " --docker --docker_mlc_repo=mlcommons@mlperf-automations --docker_mlc_repo_branch=dev --docker_dt"
 
     steps:
     - uses: actions/checkout@v3

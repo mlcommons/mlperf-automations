@@ -100,7 +100,7 @@ docker:
   use_host_user_id: True
   real_run: false
   interactive: True
-  mlc_repos: 'mlc pull repo mlcommons@cm4abtf --branch=poc'
+  mlc_repos_off: 'mlc pull repo mlcommons@cm4abtf --branch=poc'
   deps:
     - tags: get,abtf,scratch,space
   mounts:
