@@ -37,7 +37,8 @@ def process_mounts(mounts, env, i, docker_settings):
         return None
 
 
-def prepare_docker_inputs(input_params, docker_settings, script_path, run_stage=False):
+def prepare_docker_inputs(input_params, docker_settings,
+                          script_path, run_stage=False):
     """
     Prepares Docker-specific inputs such as Dockerfile path and runtime options.
 
@@ -51,17 +52,17 @@ def prepare_docker_inputs(input_params, docker_settings, script_path, run_stage=
     """
 
     keys = [
-            "mlc_repo", "mlc_repo_branch", "base_image", "os", "os_version",
-                        "mlc_repos", "skip_mlc_sys_upgrade", "extra_sys_deps",
-                        "gh_token", "fake_run_deps", "run_final_cmds", "real_run", "copy_files", "path"
-        ]
+        "mlc_repo", "mlc_repo_branch", "base_image", "os", "os_version",
+        "mlc_repos", "skip_mlc_sys_upgrade", "extra_sys_deps",
+        "gh_token", "fake_run_deps", "run_final_cmds", "real_run", "copy_files", "path"
+    ]
 
     if run_stage:
         keys += [
-                "skip_run_cmd", "pre_run_cmds", "run_cmd_prefix", "all_gpus", "num_gpus", "device", "gh_token", 
-                "port_maps", "shm_size", "pass_user_id", "pass_user_group", "extra_run_args", "detached", "interactive",
-                "dt", "it"
-                ]
+            "skip_run_cmd", "pre_run_cmds", "run_cmd_prefix", "all_gpus", "num_gpus", "device", "gh_token",
+            "port_maps", "shm_size", "pass_user_id", "pass_user_group", "extra_run_args", "detached", "interactive",
+            "dt", "it"
+        ]
     # Collect Dockerfile inputs
     docker_inputs = {
         key: input_params.get(
@@ -267,10 +268,10 @@ def get_docker_default(key):
         "skip_run_cmd": False,
         "image_tag_extra": "-latest",
         "skip_run_cmd": False,
-        "pre_run_cmds":  [],
+        "pre_run_cmds": [],
         "run_cmd_prefix": '',
         "port_maps": [],
-        "detached": False, 
+        "detached": False,
         "interactive": True
     }
     if key in defaults:

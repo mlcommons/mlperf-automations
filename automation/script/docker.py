@@ -196,7 +196,7 @@ def docker_run(self_module, i):
     show_time = i.get('show_time', False)
 
     env = i.get('env', {})
-    
+
     regenerate_docker_file = not i.get('docker_noregenerate', False)
     recreate_docker_image = i.get('docker_recreate', False)
 
