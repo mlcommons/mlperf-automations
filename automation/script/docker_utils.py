@@ -72,7 +72,8 @@ def prepare_docker_inputs(input_params, docker_settings,
         if (value := input_params.get(f"docker_{key}", docker_settings.get(key, get_docker_default(key)))) is not None
     }
 
-    if str(docker_inputs.get('detached', docker_inputs.get('dt', ''))).lower() in ["yes", "true", "on", "1"]:
+    if str(docker_inputs.get('detached', docker_inputs.get('dt', ''))
+           ).lower() in ["yes", "true", "on", "1"]:
         docker_inputs['interactive'] = False
         docker_inputs['detached'] = True
     elif str(docker_inputs.get('interactive', docker_inputs.get('it', ''))).lower() in ["yes", "true", "on", "1"]:
@@ -81,8 +82,7 @@ def prepare_docker_inputs(input_params, docker_settings,
 
     for key in ["dt", "it"]:
         if docker_inputs.get(key):
-            del(docker_inputs[key])
-
+            del (docker_inputs[key])
 
     # Determine Dockerfile suffix and path
     docker_base_image = docker_inputs.get('base_image')
