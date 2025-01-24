@@ -11,7 +11,6 @@ on:
       - VERSION
       - setup.py
 
-
 jobs:
   build_wheels:
     if: github.repository_owner == 'mlcommons'
