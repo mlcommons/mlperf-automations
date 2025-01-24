@@ -74,10 +74,10 @@ jobs:
       run: |
         git config --global user.name mlcommons-bot
         git config --global user.email "mlcommons-bot@users.noreply.github.com"
-        git clone -b auto-update https://git:${PAT1}@github.com/mlcommons/mlperf_inference_test_submissions_v5.0 tmp
+        git clone -b auto-update https://github.com/gateoverflow/mlperf_inference_test_submissions_v5.0 tmp
         cd tmp
         echo "hello" >> README.md
         git commit -a -m "Test commit"
-        git remote set-url origin https://${PAT1}@github.com/mlcommons/mlperf_inference_test_submissions_v5.0
+        git remote set-url origin https://${PAT1}@github.com/gateoverflow/mlperf_inference_test_submissions_v5.0
         git push
-        mlcr --tags=push,github,mlperf,inference,submission --env.MLC_GITHUB_TOKEN=$PAT1 --env.MLC_GIT_AUTH=yes --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from R50 GH action on ${{ matrix.os }}" --quiet
+        mlcr --tags=push,github,mlperf,inference,submission --env.MLC_GITHUB_TOKEN=$PAT1 --env.MLC_GIT_AUTH=yes --repo_url=https://github.com/gateoverflow/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from R50 GH action on ${{ matrix.os }}" --quiet
