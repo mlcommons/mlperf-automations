@@ -94,7 +94,7 @@ deps:
 
 
 docker:
-  mlc_repo: mlcommons@mlperf-automations
+  mlc_repo: gateoverflow@mlperf-automations
   mlc_repo_branch: dev
   use_host_group_id: True
   use_host_user_id: True
