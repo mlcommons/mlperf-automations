@@ -1,12 +1,11 @@
-#
+# This file is originally created for CM Script automations and is now modified to make it work for MLC automation.
+
 # CM "script" automation helps users to encode their MLOps, DevOps and other knowledge
 # as portable and reusable automation recipes with simple tags, native scripts
 # and a unified CLI, Python API and JSON/YAML meta descriptions.
 #
-# This is a stable prototype of the CM script automation being developed by Grigori Fursin and Arjun Suresh
+# This is a stable prototype of the MLC script automation being developed by Grigori Fursin and Arjun Suresh
 #
-# TBD: when we have bandwidth and resources, we should refactor it
-# and make it cleaner and simpler while keeping full backwards compatibility.
 #
 import os
 import logging
@@ -19,15 +18,13 @@ from utils import *
 class ScriptAutomation(Automation):
 
     """
-    CM "script" automation actions
+    MLC "script" automation actions
     (making native scripts more portable, deterministic, reusable and reproducible)
     """
 
     ############################################################
     def __init__(self, action_object, automation_file):
-        # super().__init__(cmind, __file__)
         super().__init__(action_object, "script", automation_file)
-        # print("Base init over")
         logging.basicConfig(level=logging.INFO)
         self.os_info = {}
         self.run_state = {}
@@ -84,16 +81,16 @@ class ScriptAutomation(Automation):
 
     def run(self, i):
         """
-        Run CM script
+        Run MLC script
 
         Args:
-          (CM input dict):
+          (MLC input dict):
 
           (out) (str): if 'con', output to console
 
-          (artifact) (str): specify CM script (CM artifact) explicitly
+          (artifact) (str): specify MLC script (MLC artifact) explicitly
 
-          (tags) (str): tags to find an CM script (CM artifact)
+          (tags) (str): tags to find an MLC script (MLC artifact)
 
           (env) (dict): global environment variables (can/will be updated by a given script and dependencies)
           (const) (dict): constant environment variable (will be preserved and persistent for a given script and dependencies)
@@ -170,7 +167,7 @@ class ScriptAutomation(Automation):
           (space) (bool): if True, print used disk space for this script (or if verbose == True)
 
           (ignore_script_error) (bool): if True, ignore error code in native tools and scripts
-                                        and finish a given CM script. Useful to test/debug partial installations
+                                        and finish a given MLC script. Useful to test/debug partial installations
 
           (json) (bool): if True, print output as JSON
           (j) (bool): if True, print output as JSON
@@ -186,14 +183,14 @@ class ScriptAutomation(Automation):
 
           (dump_version_info) (bool): dump info about resolved versions of tools in dependencies
 
-          (print_deps) (bool): if True, will print the CM run commands of the direct dependent scripts
+          (print_deps) (bool): if True, will print the MLC run commands of the direct dependent scripts
 
-          (print_readme) (bool): if True, will print README with all CM steps (deps) to run a given script
+          (print_readme) (bool): if True, will print README with all MLC steps (deps) to run a given script
 
           (script_call_prefix) (str): how to call script in logs and READMEs (mlc run script)
 
           (skip_sys_utils) (bool): if True, set env['MLC_SKIP_SYS_UTILS']='yes'
-                                   to skip CM sys installation
+                                   to skip MLC sys installation
           (skip_sudo) (bool): if True, set env['MLC_TMP_SKIP_SUDO']='yes'
                               to let scripts deal with that
 
@@ -203,7 +200,7 @@ class ScriptAutomation(Automation):
           ...
 
         Returns:
-          (CM return dict):
+          (MLC return dict):
 
           * return (int): return code == 0 if no error and >0 if error
           * (error) (str): error string if return>0
@@ -513,7 +510,7 @@ class ScriptAutomation(Automation):
         force_skip_cache = True if fake_run else force_skip_cache
 
         #######################################################################
-        # Find CM script(s) based on their tags and variations to get their meta and customize this workflow.
+        # Find MLC script(s) based on their tags and variations to get their meta and customize this workflow.
         # We will need to decide how to select if more than 1 (such as "get compiler")
         #
         # Note: this local search function will separate tags and variations
@@ -631,7 +628,7 @@ class ScriptAutomation(Automation):
         # STEP 200 Output: potentially pruned list_of_found_scripts if
         # selection of multple scripts was remembered
 
-        # STEP 300: If more than one CM script found (example: "get compiler"),
+        # STEP 300: If more than one MLC script found (example: "get compiler"),
         # first, check if selection was already remembered!
         # second, check in cache to prune scripts
 
@@ -669,7 +666,7 @@ class ScriptAutomation(Automation):
             if variation_tags:
                 cache_tags_without_tmp_string += ',_' + \
                     ",_".join(variation_tags)
-            # variation_tags are prefixed with "_" but the CM search function knows only tags and so we need to change "_-" to "-_" for excluding any variations
+            # variation_tags are prefixed with "_" but the MLC search function knows only tags and so we need to change "_-" to "-_" for excluding any variations
             # This change can later be moved to a search function specific to
             # cache
             cache_tags_without_tmp_string = cache_tags_without_tmp_string.replace(
@@ -702,7 +699,7 @@ class ScriptAutomation(Automation):
         if len(list_of_found_scripts) > 0:
             # If only tags are used, check if there are no cached scripts with tags - then we will reuse them
             # The use case: mlc run script --tags=get,compiler
-            # CM script will always ask to select gcc,llvm,etc even if any of
+            # MLC script will always ask to select gcc,llvm,etc even if any of
             # them will be already cached
             if len(cache_list) > 0:
                 new_list_of_found_scripts = []
@@ -714,7 +711,7 @@ class ScriptAutomation(Automation):
 
                     x = associated_script_artifact.find(',')
                     if x < 0:
-                        return {'return': 1, 'error': 'CM artifact format is wrong "{}" - no comma found'.format(
+                        return {'return': 1, 'error': 'MLC artifact format is wrong "{}" - no comma found'.format(
                             associated_script_artifact)}
 
                     associated_script_artifact_uid = associated_script_artifact[x + 1:]
@@ -772,7 +769,7 @@ class ScriptAutomation(Automation):
         # print(meta)
         path = script_artifact.path
 
-        # Check min CM version requirement
+        # Check min MLC version requirement
         min_mlc_version = meta.get('min_mlc_version', '').strip()
         if min_mlc_version != '':
             try:
@@ -1249,11 +1246,11 @@ class ScriptAutomation(Automation):
                 if num_found_cached_scripts > 0:
                     found_cached = True
 
-                    # Check chain of dynamic dependencies on other CM scripts
+                    # Check chain of dynamic dependencies on other MLC scripts
                     if len(deps) > 0:
                         logging.debug(
                             recursion_spaces +
-                            '  - Checking dynamic dependencies on other CM scripts:')
+                            '  - Checking dynamic dependencies on other MLC scripts:')
 
                         r = self._call_run_deps(deps, self.local_env_keys, local_env_keys_from_meta, env, state, const, const_state, add_deps_recursive,
                                                 recursion_spaces + extra_recursion_spaces,
@@ -1269,11 +1266,11 @@ class ScriptAutomation(Automation):
                         if r['return'] > 0:
                             return r
 
-                    # Check chain of prehook dependencies on other CM scripts.
+                    # Check chain of prehook dependencies on other MLC scripts.
                     # (No execution of customize.py for cached scripts)
                     logging.debug(
                         recursion_spaces +
-                        '    - Checking prehook dependencies on other CM scripts:')
+                        '    - Checking prehook dependencies on other MLC scripts:')
 
                     r = self._call_run_deps(prehook_deps, self.local_env_keys, local_env_keys_from_meta, env, state, const, const_state, add_deps_recursive,
                                             recursion_spaces + extra_recursion_spaces,
@@ -1330,11 +1327,11 @@ class ScriptAutomation(Automation):
                                        'append_unique': True})
 
                     if not fake_run:
-                        # Check chain of posthook dependencies on other CM scripts. We consider them same as postdeps when
+                        # Check chain of posthook dependencies on other MLC scripts. We consider them same as postdeps when
                         # script is in cache
                         logging.debug(
                             recursion_spaces +
-                            '    - Checking posthook dependencies on other CM scripts:')
+                            '    - Checking posthook dependencies on other MLC scripts:')
 
                         clean_env_keys_post_deps = meta.get(
                             'clean_env_keys_post_deps', [])
@@ -1347,9 +1344,9 @@ class ScriptAutomation(Automation):
 
                         logging.debug(
                             recursion_spaces +
-                            '    - Checking post dependencies on other CM scripts:')
+                            '    - Checking post dependencies on other MLC scripts:')
 
-                        # Check chain of post dependencies on other CM scripts
+                        # Check chain of post dependencies on other MLC scripts
                         r = self._call_run_deps(post_deps, self.local_env_keys, clean_env_keys_post_deps, env, state, const, const_state, add_deps_recursive,
                                                 recursion_spaces + extra_recursion_spaces,
                                                 remembered_selections, variation_tags_string, True, debug_script_tags, verbose, show_time, extra_recursion_spaces, run_state)
@@ -1363,7 +1360,7 @@ class ScriptAutomation(Automation):
                 if x not in cached_tags:
                     cached_tags.append(x)
 
-                # Add all tags from the original CM script
+                # Add all tags from the original MLC script
                 for x in meta.get('tags', []):
                     if x not in cached_tags:
                         cached_tags.append(x)
@@ -1394,7 +1391,7 @@ class ScriptAutomation(Automation):
                 # Use update to update the tmp one if already exists
                 logging.debug(
                     recursion_spaces +
-                    '  - Creating new "cache" script artifact in the CM local repository ...')
+                    '  - Creating new "cache" script artifact in the MLC local repository ...')
                 logging.debug(recursion_spaces +
                               '    - Tags: {}'.format(','.join(tmp_tags)))
 
@@ -1422,7 +1419,7 @@ class ScriptAutomation(Automation):
 
                 cached_uid = cached_meta['uid']
 
-                # Changing path to CM script artifact for cached output
+                # Changing path to MLC script artifact for cached output
                 # to record data and files there
                 logging.debug(
                     recursion_spaces +
@@ -1437,7 +1434,7 @@ class ScriptAutomation(Automation):
 
                 cached_uid = cached_meta['uid']
 
-                # Changing path to CM script artifact for cached output
+                # Changing path to MLC script artifact for cached output
                 # to record data and files there
                 logging.debug(
                     recursion_spaces +
@@ -1555,7 +1552,7 @@ class ScriptAutomation(Automation):
 
                     logging.debug(
                         recursion_spaces +
-                        '  - Checking docker run dependencies on other CM scripts:')
+                        '  - Checking docker run dependencies on other MLC scripts:')
 
                     r = self._call_run_deps(docker_deps, self.local_env_keys, local_env_keys_from_meta, env, state, const, const_state, add_deps_recursive,
                                             recursion_spaces + extra_recursion_spaces,
@@ -1647,12 +1644,12 @@ class ScriptAutomation(Automation):
                     if r['return'] > 0:
                         return r
 
-            # Check chain of dependencies on other CM scripts
+            # Check chain of dependencies on other MLC scripts
             # print(f"before deps: ")
             # utils.print_env(env)
             if len(deps) > 0:
                 logging.debug(recursion_spaces +
-                              '  - Checking dependencies on other CM scripts:')
+                              '  - Checking dependencies on other MLC scripts:')
 
                 r = self._call_run_deps(deps, self.local_env_keys, local_env_keys_from_meta, env, state, const, const_state, add_deps_recursive,
                                         recursion_spaces + extra_recursion_spaces,
@@ -1856,11 +1853,11 @@ class ScriptAutomation(Automation):
                 import json
                 logging.debug(json.dumps(env, indent=2, sort_keys=True))
 
-            # Check chain of pre hook dependencies on other CM scripts
+            # Check chain of pre hook dependencies on other MLC scripts
             if len(prehook_deps) > 0:
                 logging.debug(
                     recursion_spaces +
-                    '  - Checking prehook dependencies on other CM scripts:')
+                    '  - Checking prehook dependencies on other MLC scripts:')
 
                 r = self._call_run_deps(prehook_deps, self.local_env_keys, local_env_keys_from_meta, env, state, const, const_state, add_deps_recursive,
                                         recursion_spaces + extra_recursion_spaces,
@@ -1896,7 +1893,7 @@ class ScriptAutomation(Automation):
                         if t not in cached_tags:
                             cached_tags.append(t)
 
-                # Check chain of post dependencies on other CM scripts
+                # Check chain of post dependencies on other MLC scripts
                 clean_env_keys_post_deps = meta.get(
                     'clean_env_keys_post_deps', [])
 
@@ -2035,7 +2032,7 @@ class ScriptAutomation(Automation):
                     x = found_script_artifact.find(',')
                     if x < 0:
                         return {
-                            'return': 1, 'error': 'CM artifact format is wrong "{}" - no comma found'.format(found_script_artifact)}
+                            'return': 1, 'error': 'MLC artifact format is wrong "{}" - no comma found'.format(found_script_artifact)}
 
                     cached_meta['associated_script_artifact_uid'] = found_script_artifact[x + 1:]
 
@@ -2126,7 +2123,7 @@ class ScriptAutomation(Automation):
         if not version and detected_version:
             version = detected_version
 
-        # Add detected or forced version to the CM script run time state
+        # Add detected or forced version to the MLC script run time state
         # to aggregate all resolved versions and dump them at the end
         # if requested (for better reproducibility/replicability)
 
@@ -2744,12 +2741,12 @@ class ScriptAutomation(Automation):
         Print version
 
         Args:
-            (CM input dict):
+            (MLC input dict):
 
             (out) (str): if 'con', output to console
 
         Returns:
-            (CM return dict):
+            (MLC return dict):
 
             * return (int): return code == 0 if no error and >0 if error
             * (error) (str): error string if return>0
@@ -2814,7 +2811,7 @@ class ScriptAutomation(Automation):
                 'return': 1, 'error': 'There is common variation tags {} in the included and excluded lists'.format(common)}
 
         #######################################################################
-        # Find CM script(s) based on thier tags to get their meta (can be more than 1)
+        # Find MLC script(s) based on thier tags to get their meta (can be more than 1)
         # Then check if variations exists inside meta
 
         i['tags'] = ','.join(script_tags)
@@ -2891,26 +2888,26 @@ class ScriptAutomation(Automation):
         Test automation (TBD)
 
         Args:
-          (CM input dict):
+          (MLC input dict):
 
           (out) (str): if 'con', output to console
 
-          automation (str): automation as CM string object
+          automation (str): automation as MLC string object
 
-          parsed_automation (list): prepared in CM CLI or CM access function
+          parsed_automation (list): prepared in MLC CLI or MLC access function
                                     [ (automation alias, automation UID) ] or
                                     [ (automation alias, automation UID), (automation repo alias, automation repo UID) ]
 
-          (artifact) (str): artifact as CM string object
+          (artifact) (str): artifact as MLC string object
 
-          (parsed_artifact) (list): prepared in CM CLI or CM access function
+          (parsed_artifact) (list): prepared in MLC CLI or MLC access function
                                     [ (artifact alias, artifact UID) ] or
                                     [ (artifact alias, artifact UID), (artifact repo alias, artifact repo UID) ]
 
           ...
 
         Returns:
-          (CM return dict):
+          (MLC return dict):
 
           * return (int): return code == 0 if no error and >0 if error
           * (error) (str): error string if return>0
@@ -3052,17 +3049,17 @@ class ScriptAutomation(Automation):
 
     def native_run(self, i):
         """
-        Add CM script
+        Add MLC script
 
         Args:
-          (CM input dict):
+          (MLC input dict):
 
           env (dict): environment
           command (str): string
           ...
 
         Returns:
-          (CM return dict):
+          (MLC return dict):
 
           * return (int): return code == 0 if no error and >0 if error
           * (error) (str): error string if return>0
@@ -3127,18 +3124,18 @@ class ScriptAutomation(Automation):
     ############################################################
     def add(self, i):
         """
-        Add CM script
+        Add MLC script
 
         Args:
-          (CM input dict):
+          (MLC input dict):
 
           (out) (str): if 'con', output to console
 
-          parsed_artifact (list): prepared in CM CLI or CM access function
+          parsed_artifact (list): prepared in MLC CLI or MLC access function
                                     [ (artifact alias, artifact UID) ] or
                                     [ (artifact alias, artifact UID), (artifact repo alias, artifact repo UID) ]
 
-          (tags) (str): tags to find an CM script (CM artifact)
+          (tags) (str): tags to find an MLC script (MLC artifact)
 
           (script_name) (str): name of script (it will be copied to the new entry and added to the meta)
 
@@ -3156,7 +3153,7 @@ class ScriptAutomation(Automation):
           ...
 
         Returns:
-          (CM return dict):
+          (MLC return dict):
 
           * return (int): return code == 0 if no error and >0 if error
           * (error) (str): error string if return>0
@@ -3215,7 +3212,7 @@ class ScriptAutomation(Automation):
 
         # Add placeholder (use common action)
         ii['out'] = 'con'
-        # Avoid recursion - use internal CM add function to add the script
+        # Avoid recursion - use internal MLC add function to add the script
         # artifact
         ii['common'] = True
 
@@ -3541,7 +3538,7 @@ class ScriptAutomation(Automation):
         if len(deps) == 0:
             return {'return': 0}
 
-        # Check chain of post hook dependencies on other CM scripts
+        # Check chain of post hook dependencies on other MLC scripts
         import copy
 
         # Get local env keys
@@ -3687,7 +3684,7 @@ class ScriptAutomation(Automation):
                             run_state_copy['parent'] += " ( " + ',_'.join(
                                 run_state['script_variation_tags']) + " )"
 
-                    # Run collective script via CM API:
+                    # Run collective script via MLC API:
                     # Not very efficient but allows logging - can be optimized
                     # later
 
@@ -3776,7 +3773,7 @@ class ScriptAutomation(Automation):
     ##########################################################################
     def _get_readme(self, cmd_parts, run_state):
         """
-        Outputs a Markdown README file listing the CM run commands for the dependencies
+        Outputs a Markdown README file listing the MLC run commands for the dependencies
         """
 
         deps = run_state['deps']
@@ -3800,7 +3797,7 @@ pip install mlcflow
 ```
 
 Check [this readme](https://github.com/mlcommons/ck/blob/master/docs/installation.md)
-with more details about installing CM and dependencies across different platforms
+with more details about installing MLC and dependencies across different platforms
 (Ubuntu, MacOS, Windows, RHEL, ...).
 
 """
@@ -3874,7 +3871,7 @@ with more details about installing CM and dependencies across different platform
     ##########################################################################
     def _markdown_cmd(self, cmd):
         """
-        Returns a CM command in markdown format
+        Returns a MLC command in markdown format
         """
 
         return '```bash\n ' + cmd + ' \n ```'
@@ -3883,7 +3880,7 @@ with more details about installing CM and dependencies across different platform
 
     def _print_deps(self, deps):
         """
-        Prints the CM run commands for the list of CM script dependencies
+        Prints the MLC run commands for the list of MLC script dependencies
         """
 
         print_deps_data = []
@@ -3898,7 +3895,7 @@ with more details about installing CM and dependencies across different platform
 
     def _get_deps_run_cmds(self, deps):
         """
-        Returns the CM run commands for the list of CM script dependencies
+        Returns the MLC run commands for the list of MLC script dependencies
         """
 
         run_cmds = []
@@ -3912,7 +3909,7 @@ with more details about installing CM and dependencies across different platform
 
     def run_native_script(self, i):
         """
-        Run native script in a CM script entry
+        Run native script in a MLC script entry
         (wrapper around "prepare_and_run_script_with_postprocessing" function)
 
         Args:
@@ -3967,7 +3964,7 @@ with more details about installing CM and dependencies across different platform
         Find file name in a list of paths
 
         Args:
-          (CM input dict):
+          (MLC input dict):
 
           paths (list): list of paths
           file_name (str): filename pattern to find
@@ -3984,7 +3981,7 @@ with more details about installing CM and dependencies across different platform
           (hook) (func): call this func to skip some artifacts
 
         Returns:
-           (CM return dict):
+           (MLC return dict):
 
            * return (int): return code == 0 if no error and >0 if error
            * (error) (str): error string if return>0
@@ -4207,7 +4204,7 @@ with more details about installing CM and dependencies across different platform
         Detect version using script
 
         Args:
-          (CM input dict):
+          (MLC input dict):
 
           (recursion_spaces) (str): add space to print
 
@@ -4215,7 +4212,7 @@ with more details about installing CM and dependencies across different platform
           (env) (dict): env to check/force version
 
         Returns:
-           (CM return dict):
+           (MLC return dict):
 
            * return (int): return code == 0 if no error and >0 if error
                                              16 if not detected
@@ -4287,7 +4284,7 @@ with more details about installing CM and dependencies across different platform
         Find some artifact (file) by name
 
         Args:
-          (CM input dict):
+          (MLC input dict):
 
           file_name (str): filename to find
 
@@ -4306,7 +4303,7 @@ with more details about installing CM and dependencies across different platform
           (hook) (func): call this func to skip some artifacts
 
         Returns:
-           (CM return dict):
+           (MLC return dict):
 
            * return (int): return code == 0 if no error and >0 if error
            * (error) (str): error string if return>0
@@ -4455,14 +4452,14 @@ with more details about installing CM and dependencies across different platform
         Find file name in a list of paths
 
         Args:
-          (CM input dict):
+          (MLC input dict):
 
             paths (list): list of paths
             file_name (str): filename pattern to find
             (restrict_paths) (list): restrict found paths to these combinations
 
         Returns:
-           (CM return dict):
+           (MLC return dict):
 
            * return (int): return code == 0 if no error and >0 if error
            * (error) (str): error string if return>0
@@ -4515,13 +4512,13 @@ with more details about installing CM and dependencies across different platform
         Find file name backwards
 
         Args:
-          (CM input dict):
+          (MLC input dict):
 
             path (str): path to start with
             file_name (str): filename or directory to find
 
         Returns:
-           (CM return dict):
+           (MLC return dict):
 
            * return (int): return code == 0 if no error and >0 if error
            * (error) (str): error string if return>0
@@ -4556,7 +4553,7 @@ with more details about installing CM and dependencies across different platform
         Parse version (used in post processing functions)
 
         Args:
-          (CM input dict):
+          (MLC input dict):
 
             (file_name) (str): filename to get version from (tmp-ver.out by default)
             match_text (str): RE match text string
@@ -4566,7 +4563,7 @@ with more details about installing CM and dependencies across different platform
             (debug) (boolean): if True, print some debug info
 
         Returns:
-           (CM return dict):
+           (MLC return dict):
 
            * return (int): return code == 0 if no error and >0 if error
            * (error) (str): error string if return>0
@@ -4615,11 +4612,11 @@ with more details about installing CM and dependencies across different platform
         """
         Update deps from pre/post processing
         Args:
-          (CM input dict):
+          (MLC input dict):
           deps (dict): deps dict
           update_deps (dict): key matches "names" in deps
         Returns:
-           (CM return dict):
+           (MLC return dict):
            * return (int): return code == 0 if no error and >0 if error
            * (error) (str): error string if return>0
         """
@@ -4674,14 +4671,14 @@ with more details about installing CM and dependencies across different platform
 
     def doc(self, i):
         """
-        Document CM script.
+        Document MLC script.
 
         Args:
-          (CM input dict):
+          (MLC input dict):
 
           (out) (str): if 'con', output to console
 
-          parsed_artifact (list): prepared in CM CLI or CM access function
+          parsed_artifact (list): prepared in MLC CLI or MLC access function
                                     [ (artifact alias, artifact UID) ] or
                                     [ (artifact alias, artifact UID), (artifact repo alias, artifact repo UID) ]
 
@@ -4690,7 +4687,7 @@ with more details about installing CM and dependencies across different platform
           (output_dir) (str): output directory (../docs by default)
 
         Returns:
-          (CM return dict):
+          (MLC return dict):
 
           * return (int): return code == 0 if no error and >0 if error
           * (error) (str): error string if return>0
@@ -4718,12 +4715,12 @@ with more details about installing CM and dependencies across different platform
         return error with available variations
 
         Args:
-          (CM input dict):
+          (MLC input dict):
 
           meta (dict): meta of the script
 
         Returns:
-           (CM return dict):
+           (MLC return dict):
 
            * return (int): return code == 0 if no error and >0 if error
                                              16 if not detected
@@ -4742,7 +4739,7 @@ with more details about installing CM and dependencies across different platform
     ############################################################
     def prepare(self, i):
         """
-        Run CM script with --fake_run only to resolve deps
+        Run MLC script with --fake_run only to resolve deps
         """
 
         i['fake_run'] = True
@@ -4774,13 +4771,13 @@ def find_cached_script(i):
     Internal automation function: find cached script
 
     Args:
-      (CM input dict):
+      (MLC input dict):
 
       deps (dict): deps dict
       update_deps (dict): key matches "names" in deps
 
     Returns:
-       (CM return dict):
+       (MLC return dict):
        * return (int): return code == 0 if no error and >0 if error
        * (error) (str): error string if return>0
     """
@@ -5407,7 +5404,7 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
             logging.info(
                 '================================================================================')
             logging.info(
-                'Debug script to run without CM was recorded: {}'.format(run_script_without_cm))
+                'Debug script to run without MLC was recorded: {}'.format(run_script_without_cm))
             logging.info(
                 '================================================================================')
 
@@ -5449,13 +5446,13 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
 
             note = '''
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Please file an issue at {} along with the full CM command being run and the relevant
+Please file an issue at {} along with the full MLC command being run and the relevant
 or full console log.
 '''.format(repo_to_report)
 
             rr = {
                 'return': 2,
-                'error': 'Portable CM script failed (name = {}, return code = {})\n\n{}'.format(
+                'error': 'MLC script failed (name = {}, return code = {})\n\n{}'.format(
                     meta['alias'],
                     rc,
                     note)}
