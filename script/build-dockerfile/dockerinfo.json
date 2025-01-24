@@ -11,8 +11,7 @@
   },
   "ENTRYPOINT": "[\"/bin/bash\", \"-c\"]",
   "ENV": {
-    "TZ": "US/Pacific",
-    "PATH": "${PATH}:/home/mlcuser/.local/bin"
+    "TZ": "US/Pacific"
   },
   "RUN_CMDS": [
     "ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone"
