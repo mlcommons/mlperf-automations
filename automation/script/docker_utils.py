@@ -83,7 +83,6 @@ def prepare_docker_inputs(input_params, docker_settings,
         if docker_inputs.get(key):
             del (docker_inputs[key])
 
-
     # Determine Dockerfile suffix and path
     docker_base_image = docker_inputs.get('base_image')
     docker_path = docker_inputs.get('path')
