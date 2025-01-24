@@ -46,6 +46,7 @@ def preprocess(i):
 
     # Clean MLPerf inference submission summary files
     x = env.get('MLPERF_INFERENCE_SUBMISSION_SUMMARY', '')
+
     if x != '':
         for y in summary_ext:
             z = x + y
