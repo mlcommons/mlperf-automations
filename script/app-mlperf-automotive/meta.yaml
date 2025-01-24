@@ -87,19 +87,20 @@ deps:
     - python
     - python3
 
-  # Use cmind inside CM scripts
-  - tags: get,generic-python-lib,_package.cmind
+  # Use mlc inside scripts
+  - tags: get,generic-python-lib,_package.mlc
 
   - tags: get,mlperf,inference,utils
 
 
 docker:
-  mlc_repo: gateoverflow@cm4mlops
+  mlc_repo: mlcommons@mlperf-automations
+  mlc_repo_branch: dev
   use_host_group_id: True
   use_host_user_id: True
   real_run: false
   interactive: True
-  mlc_repos: 'cm pull repo mlcommons@cm4abtf --checkout=poc'
+  mlc_repos: 'mlc pull repo mlcommons@cm4abtf --checkout=poc'
   deps:
     - tags: get,abtf,scratch,space
   mounts:
