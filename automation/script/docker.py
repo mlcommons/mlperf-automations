@@ -93,7 +93,7 @@ def dockerfile(self_module, input_params):
             return update_variations_result
 
         # Set Docker-specific configurations
-        docker_settings = state_data.get('docker', {})
+        docker_settings = state_data['docker']
         docker_settings['dockerfile_env'] = dockerfile_env
         dockerfile_env['MLC_RUN_STATE_DOCKER'] = True
 
@@ -104,13 +104,28 @@ def dockerfile(self_module, input_params):
 
         # Handle build dependencies
         show_time = input_params.get('show_time', False)
-        deps = docker_settings.get('deps', [])
+        deps = docker_settings.get('build_deps', [])
         if deps:
             r = self_module._run_deps(
                 deps, [], env, {}, {}, {}, {}, '', [], '', False, '', verbose,
                 show_time, ' ', run_state)
             if r['return'] > 0:
                 return r
+
+        update_state_result = self_module.update_state_from_meta(
+            metadata, env, state_data, constant_vars, constant_state,
+            deps=[],
+            post_deps=[],
+            prehook_deps=[],
+            posthook_deps=[],
+            new_env_keys=[],
+            new_state_keys=[],
+            run_state=run_state,
+            i=input_params
+        )
+        if update_state_result['return'] > 0:
+            return update_state_result
+        docker_settings = state_data['docker']
 
         # Prune temporary environment variables
         run_command = copy.deepcopy(run_command_arc)
