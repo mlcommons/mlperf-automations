@@ -88,7 +88,7 @@ deps:
     - python3
 
   # Use mlc inside scripts
-  - tags: get,generic-python-lib,_package.mlc
+  #- tags: get,generic-python-lib,_package.mlcflow
 
   - tags: get,mlperf,inference,utils
 
@@ -100,7 +100,7 @@ docker:
   use_host_user_id: True
   real_run: false
   interactive: True
-  mlc_repos: 'mlc pull repo mlcommons@cm4abtf --checkout=poc'
+  mlc_repos: 'mlc pull repo mlcommons@cm4abtf --branch=poc'
   deps:
     - tags: get,abtf,scratch,space
   mounts:
