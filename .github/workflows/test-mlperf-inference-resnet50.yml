@@ -12,6 +12,8 @@ on:
 jobs:
   mlc-run-with-results-upload:
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     env:
       MLC_INDEX: "on"
     strategy:
