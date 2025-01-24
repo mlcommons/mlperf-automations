@@ -32,6 +32,7 @@ class CAutomation(Automation):
         self.run_state['fake_deps'] = False
         self.run_state['parent'] = None
         self.run_state['version_info'] = []
+        self.run_state['cache'] = False
 
         self.file_with_cached_state = 'cm-cached-state.json'
 
@@ -74,7 +75,8 @@ class CAutomation(Automation):
                                              'accept_license',
                                              'skip_system_deps',
                                              'git_ssh',
-                                             'gh_token']
+                                             'gh_token',
+                                             'hf_token']
 
     ############################################################
 
@@ -507,28 +509,7 @@ class CAutomation(Automation):
             if os.environ.get(key, '') != '' and env.get(key, '') == '':
                 env[key] = os.environ[key]
 
-        # Check path/input/output in input and pass to env
-        for key in self.input_flags_converted_to_tmp_env:
-            value = i.get(key, '').strip()
-            if value != '':
-                env['CM_TMP_' + key.upper()] = value
-
-        for key in self.input_flags_converted_to_env:
-            value = i.get(
-                key,
-                '').strip() if isinstance(
-                i.get(
-                    key,
-                    ''),
-                str) else i.get(
-                key,
-                '')
-            if value:
-                env[f"CM_{key.upper()}"] = value
-
-        r = update_env_with_values(env)
-        if r['return'] > 0:
-            return r
+        r = self._update_env_from_input(env, i)
 
         #######################################################################
         # Check if we want to skip cache (either by skip_cache or by fake_run)
@@ -847,6 +828,7 @@ class CAutomation(Automation):
             'alias', '')
         run_state['script_repo_git'] = script_artifact.repo_meta.get(
             'git', False)
+        run_state['cache'] = meta.get('cache', False)
 
         if not recursion:
             run_state['script_entry_repo_to_report_errors'] = meta.get(
@@ -1146,7 +1128,7 @@ class CAutomation(Automation):
         # Check if the output of a selected script should be cached
         cache = False if i.get(
             'skip_cache',
-            False) else meta.get(
+            False) else run_state.get(
             'cache',
             False)
         cache = cache or (
@@ -1635,7 +1617,7 @@ class CAutomation(Automation):
                 'self': self
             }
 
-            # Check if pre-process and detect
+            # Check and run predeps in customize.py
             if str(meta.get('predeps', 'True')).lower() not in ["0", "false", "no"] and os.path.isfile(
                     path_to_customize_py):  # possible duplicate execution - needs fix
                 r = utils.load_python_module(
@@ -1798,9 +1780,16 @@ class CAutomation(Automation):
 
             tmp_curdir = os.getcwd()
             if env.get('CM_OUTDIRNAME', '') != '':
-                if not os.path.exists(env['CM_OUTDIRNAME']):
-                    os.makedirs(env['CM_OUTDIRNAME'])
-                os.chdir(env['CM_OUTDIRNAME'])
+                if os.path.isabs(env['CM_OUTDIRNAME']) or recursion:
+                    c_outdirname = env['CM_OUTDIRNAME']
+                else:
+                    c_outdirname = os.path.join(
+                        env['CM_TMP_CURRENT_PATH'], env['CM_OUTDIRNAME'])
+                    env['CM_OUTDIRNAME'] = c_outdirname
+
+                if not os.path.exists(c_outdirname):
+                    os.makedirs(c_outdirname)
+                os.chdir(c_outdirname)
 
             # Check if pre-process and detect
             if 'preprocess' in dir(customize_code) and not fake_run:
@@ -2194,27 +2183,6 @@ class CAutomation(Automation):
         if print_readme or repro_prefix != '':
             readme = self._get_readme(cmd, run_state)
 
-        # Copy Docker sample
-        if repro_prefix != '' and repro_dir != '':
-            docker_template_path = os.path.join(
-                self.path, 'docker_repro_example')
-            if os.path.isdir(docker_template_path):
-                try:
-                    shutil.copytree(
-                        docker_template_path,
-                        repro_dir,
-                        dirs_exist_ok=True)
-                except Exception as e:
-                    pass
-
-            docker_container = self._get_docker_container(cmd, run_state)
-
-            try:
-                with open(os.path.join(repro_dir, 'ubuntu-23.04.Dockerfile'), 'a+') as f:
-                    f.write(docker_container)
-            except BaseException:
-                pass
-
         if print_readme:
             with open('README-cm.md', 'w') as f:
                 f.write(readme)
@@ -2286,6 +2254,34 @@ class CAutomation(Automation):
             input('Press Enter to continue ...')
 
         return rr
+
+    ##########################################################################
+
+    def _update_env_from_input(self, env, i):
+        # Check path/input/output in input and pass to env
+        for key in self.input_flags_converted_to_tmp_env:
+            value = i.get(key, '').strip()
+            if value != '':
+                env['CM_TMP_' + key.upper()] = value
+
+        for key in self.input_flags_converted_to_env:
+            value = i.get(
+                key,
+                '').strip() if isinstance(
+                i.get(
+                    key,
+                    ''),
+                str) else i.get(
+                key,
+                '')
+            if value:
+                env[f"CM_{key.upper()}"] = value
+
+        r = update_env_with_values(env)
+        if r['return'] > 0:
+            return r
+
+        return {'return': 0}
 
     ##########################################################################
     def _fix_cache_paths(self, env):
@@ -3791,26 +3787,23 @@ class CAutomation(Automation):
         content = ''
 
         content += """
-*This README was automatically generated by the [CM framework](https://github.com/mlcommons/ck).*
+*This README was automatically generated.*
 
 ## Install CM
 
 ```bash
-pip install cmind -U
+pip install cm4mlops
 ```
 
 Check [this readme](https://github.com/mlcommons/ck/blob/master/docs/installation.md)
 with more details about installing CM and dependencies across different platforms
 (Ubuntu, MacOS, Windows, RHEL, ...).
 
-## Install CM automation repositories
-
-```bash
-cm pull repo mlcommons@cm4mlops --checkout=dev
 """
 
         current_cm_repo = run_state['script_repo_alias']
-        if current_cm_repo not in ['mlcommons@ck', 'mlcommons@cm4mlops']:
+        if current_cm_repo not in [
+                'mlcommons@mlperf-automations', 'mlcommons@cm4mlops']:
             content += '\ncm pull repo ' + \
                 run_state['script_repo_alias'] + '\n'
 
@@ -3847,57 +3840,6 @@ cm pull repo mlcommons@cm4mlops --checkout=dev
             content += "cm run script --tags=" + \
                 dep_tags + "{}\n".format(xversion)
             content += "```\n\n"
-
-        return content
-
-    ##########################################################################
-    def _get_docker_container(self, cmd_parts, run_state):
-        """
-        Outputs a Markdown README file listing the CM run commands for the dependencies
-        """
-
-        deps = run_state['deps']
-
-        version_info = run_state.get('version_info', [])
-        version_info_dict = {}
-
-        for v in version_info:
-            k = list(v.keys())[0]
-            version_info_dict[k] = v[k]
-
-        content = ''
-
-        content += """
-
-# The following CM commands were automatically generated (prototype)
-
-cm pull repo mlcommons@cm4mlops --checkout=dev
-
-"""
-        current_cm_repo = run_state['script_repo_alias']
-        if current_cm_repo not in ['mlcommons@ck', 'mlcommons@cm4mlops']:
-            content += '\ncm pull repo ' + \
-                run_state['script_repo_alias'] + '\n\n'
-
-        deps_ = ''
-
-        for dep_tags in deps:
-
-            xversion = ''
-            version = version_info_dict.get(dep_tags, {}).get('version', '')
-            if version != '':
-                xversion = ' --version={}\n'.format(version)
-
-            content += "# cm run script --tags=" + \
-                dep_tags + "{}\n\n".format(xversion)
-
-        cmd = "cm run script "
-
-        for cmd_part in cmd_parts:
-            x = '"' if ' ' in cmd_part and not cmd_part.startswith('-') else ''
-            cmd = cmd + " " + x + cmd_part + x
-
-        content += cmd + '\n'
 
         return content
 
@@ -4755,41 +4697,6 @@ cm pull repo mlcommons@cm4mlops --checkout=dev
             self, __file__, 'module_misc', 'doc', i)
 
     ############################################################
-    def gui(self, i):
-        """
-        Run GUI for CM script.
-
-        Args:
-          (CM input dict):
-
-        Returns:
-          (CM return dict):
-
-          * return (int): return code == 0 if no error and >0 if error
-          * (error) (str): error string if return>0
-
-        """
-
-        artifact = i.get('artifact', '')
-        tags = ''
-        if artifact != '':
-            if ' ' in artifact:
-                tags = artifact.replace(' ', ',')
-
-        if tags == '':
-            tags = i.get('tags', '')
-
-        if 'tags' in i:
-            del (i['tags'])
-
-        i['action'] = 'run'
-        i['artifact'] = 'gui'
-        i['parsed_artifact'] = [('gui', '605cac42514a4c69')]
-        i['script'] = tags.replace(',', ' ')
-
-        return self.cmind.access(i)
-
-    ############################################################
 
     def dockerfile(self, i):
         """
@@ -4856,7 +4763,7 @@ cm pull repo mlcommons@cm4mlops --checkout=dev
           (docker_os_version) (str): force docker OS version (default: 22.04)
           (docker_image_tag_extra) (str): add extra tag (default:-latest)
 
-          (docker_cm_repo) (str): force CM automation repository when building Docker (default: cm4mlops)
+          (docker_cm_repo) (str): force CM automation repository when building Docker (default: mlperf-automations)
           (docker_cm_repos)
           (docker_cm_repo_flags)
 
@@ -5627,20 +5534,13 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
                         script_repo_alias.replace('@', '/') + '/issues'
 
             if repo_to_report == '':
-                repo_to_report = 'https://github.com/mlcommons/cm4mlops/issues'
+                repo_to_report = 'https://github.com/mlcommons/mlperf-automations/issues'
 
             note = '''
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Note that it is often a portability issue of a third-party tool or a native script
-wrapped and unified by this CM script (automation recipe). Please re-run
-this script with --repro flag and report this issue with the original
-command line, cm-repro directory and full log here:
-
-{}
-
-The CM concept is to collaboratively fix such issues inside portable CM scripts
-to make existing tools and native scripts more portable, interoperable
-and deterministic. Thank you'''.format(repo_to_report)
+Please file an issue at {} along with the full CM command being run and the relevant
+or full console log.
+'''.format(repo_to_report)
 
             rr = {
                 'return': 2,
@@ -5860,7 +5760,10 @@ def convert_env_to_script(env, os_info, start_script=None):
                 key = key[1:]
 
             # Append the existing environment variable to the new value
-            env_value = f"{env_separator.join(env_value)}{env_separator}{os_info['env_var'].replace('env_var', key)}"
+            env_value = f"""{
+                env_separator.join(env_value)}{env_separator}{
+                os_info['env_var'].replace(
+                    'env_var', key)}"""
 
         # Replace placeholders in the platform-specific environment command
         env_command = os_info['set_env'].replace(
@@ -6145,6 +6048,9 @@ def update_state_from_meta(meta, env, state, const, const_state, deps, post_deps
     """
     Internal: update env and state from meta
     """
+
+    if meta.get('cache', '') != '':
+        run_state['cache'] = meta['cache']
 
     default_env = meta.get('default_env', {})
     for key in default_env:

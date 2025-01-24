@@ -48,13 +48,21 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+    - name: Install cm4mlops on Windows
+      if: matrix.os == 'windows-latest'
       run: |
-        python3 -m pip install "cmind @ git+https://git@github.com/mlcommons/ck.git@mlperf-inference#subdirectory=cm"
+        $env:CM_PULL_DEFAULT_MLOPS_REPO = "no"; pip install cm4mlops
+    - name: Install dependencies on Unix Platforms
+      if: matrix.os != 'windows-latest'
+      run: |
+        CM_PULL_DEFAULT_MLOPS_REPO=no pip install cm4mlops
+    - name: Pull MLOps repository
+      run: |
         cm pull repo --url=${{ github.event.pull_request.head.repo.html_url }} --checkout=${{ github.event.pull_request.head.ref }}
     - name: Pull repo where test cases are uploaded
       run: |
         git clone -b submission-generation-tests https://github.com/mlcommons/inference.git submission_generation_tests
+    
     - name: Run Submission Generation - ${{ matrix.case }} ${{ matrix.action }} ${{ matrix.category }} ${{ matrix.division }} 
       continue-on-error: true
       run: |
@@ -80,19 +88,29 @@ jobs:
         fi
         # Dynamically set the log group to simulate a dynamic step name
         echo "::group::$description"
-        cm ${{ matrix.action }} script --tags=generate,inference,submission --adr.submission-checker-src.tags=_branch.dev --clean --preprocess_submission=yes --results_dir=$PWD/submission_generation_tests/${{ matrix.case }}/ --run-checker --submitter=MLCommons --tar=yes --env.CM_TAR_OUTFILE=submission.tar.gz --division=${{ matrix.division }} --env.CM_DETERMINE_MEMORY_CONFIGURATION=yes --quiet $extra_run_args
+        cm ${{ matrix.action }} script --tags=generate,inference,submission  --version=v4.1 --clean --preprocess_submission=yes --results_dir=$PWD/submission_generation_tests/${{ matrix.case }}/ --run-checker --submitter=MLCommons --tar=yes --env.CM_TAR_OUTFILE=submission.tar.gz --division=${{ matrix.division }} --env.CM_DETERMINE_MEMORY_CONFIGURATION=yes --quiet $extra_run_args
         exit_status=$?
         echo "Exit status for the job ${description} ${exit_status}"
         if [[ "${{ matrix.case }}" == "case-5" || "${{ matrix.case }}" == "case-6" ]]; then
           # For cases 5 and 6, exit status should be 0 if cm command fails, 1 if it succeeds
           if [[ ${exit_status} -ne 0 ]]; then
-            exit 0
+            echo "STEP_FAILED=false" >> $GITHUB_ENV
           else
-            exit ${exit_status}
+            echo "STEP_FAILED=true" >> $GITHUB_ENV
           fi
         else
           # For other cases, exit with the original status
-          test ${exit_status} -eq 0 || exit ${exit_status}
+          if [[ ${exit_status} -eq 0 ]]; then
+            echo "STEP_FAILED=false" >> $GITHUB_ENV
+          else
+            echo "STEP_FAILED=true" >> $GITHUB_ENV
+          fi
         fi
         echo "::endgroup::"
+    - name: Fail if Step Failed
+      if: env.STEP_FAILED == 'true'
+      continue-on-error: false
+      run: |
+        echo "Manually failing the workflow because the step failed."
+        exit 1
   

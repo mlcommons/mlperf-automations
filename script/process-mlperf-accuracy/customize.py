@@ -118,18 +118,30 @@ def preprocess(i):
             extra_options = ""
 
             if env.get('CM_SDXL_STATISTICS_FILE_PATH', '') != '':
-                extra_options += f" --statistics-path '{env['CM_SDXL_STATISTICS_FILE_PATH']}' "
+                extra_options += (
+                    f""" --statistics-path '{
+                        env['CM_SDXL_STATISTICS_FILE_PATH']}'"""
+                )
 
             if env.get('CM_SDXL_COMPLIANCE_IMAGES_PATH', '') != '':
-                extra_options += f" --compliance-images-path '{env['CM_SDXL_COMPLIANCE_IMAGES_PATH']}' "
+                extra_options += (
+                    f""" --compliance-images-path '{
+                        env['CM_SDXL_COMPLIANCE_IMAGES_PATH']}' """
+                )
             else:
-                extra_options += f""" --compliance-images-path '{os.path.join(result_dir, "images")}' """
+                extra_options += f""" --compliance-images-path '{
+                    os.path.join(
+                        result_dir, "images")}' """
 
             if env.get('CM_COCO2014_SAMPLE_ID_PATH', '') != '':
-                extra_options += f" --ids-path '{env['CM_COCO2014_SAMPLE_ID_PATH']}' "
+                extra_options += (
+                    f" --ids-path '{env['CM_COCO2014_SAMPLE_ID_PATH']}' "
+                )
 
             if env.get('CM_SDXL_ACCURACY_RUN_DEVICE', '') != '':
-                extra_options += f" --device '{env['CM_SDXL_ACCURACY_RUN_DEVICE']}' "
+                extra_options += (
+                    f" --device '{env['CM_SDXL_ACCURACY_RUN_DEVICE']}' "
+                )
 
             # env['DATASET_ANNOTATIONS_FILE_PATH'] = env['CM_DATASET_ANNOTATIONS_FILE_PATH']
             CMD = env['CM_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['CM_MLPERF_INFERENCE_SOURCE'], "text_to_image", "tools",
@@ -162,9 +174,15 @@ def preprocess(i):
         elif dataset == "terabyte":
             extra_options = ""
             if env.get('CM_DLRM_V2_AGGREGATION_TRACE_FILE_PATH', '') != '':
-                extra_options += f" --aggregation-trace-file '{env['CM_DLRM_V2_AGGREGATION_TRACE_FILE_PATH']}' "
+                extra_options += (
+                    f""" --aggregation-trace-file '{
+                        env['CM_DLRM_V2_AGGREGATION_TRACE_FILE_PATH']}' """
+                )
             if env.get('CM_DLRM_V2_DAY23_FILE_PATH', '') != '':
-                extra_options += f" --day-23-file '{env['CM_DLRM_V2_DAY23_FILE_PATH']}' "
+                extra_options += (
+                    f""" --day-23-file '{
+                        env['CM_DLRM_V2_DAY23_FILE_PATH']}' """
+                )
             CMD = env['CM_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['CM_MLPERF_INFERENCE_DLRM_V2_PATH'], "pytorch", "tools",
                                                                        "accuracy-dlrm.py") + "' --mlperf-accuracy-file '" + os.path.join(result_dir,
                                                                                                                                          "mlperf_log_accuracy.json") + "'" + extra_options + \
@@ -179,7 +197,11 @@ def preprocess(i):
                 else:
                     env['CM_DATASET_IGBH_SIZE'] = "tiny"
             CMD = env['CM_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['CM_MLPERF_INFERENCE_SOURCE'], "graph", "R-GAT", "tools", "accuracy_igbh.py") + "' --mlperf-accuracy-file '" + os.path.join(
-                result_dir, "mlperf_log_accuracy.json") + "' --dataset-path '" + env['CM_DATASET_IGBH_PATH'] + "' --dataset-size '" + env['CM_DATASET_IGBH_SIZE'] + "' > '" + out_file + "'"
+                result_dir, "mlperf_log_accuracy.json") + "' --dataset-path '" + env['CM_DATASET_IGBH_PATH'] + "' --dataset-size '" + env['CM_DATASET_IGBH_SIZE'] + "' --output-file '" + out_file + "'"
+
+        elif dataset == "dataset_llama3":
+            CMD = env['CM_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['CM_MLPERF_INFERENCE_SOURCE'], "language", "llama3.1-405b", "evaluate-accuracy.py") + "' --checkpoint-path '" + env['CM_ML_MODEL_LLAMA3_CHECKPOINT_PATH'] + "' --mlperf-accuracy-file '" + os.path.join(
+                result_dir, "mlperf_log_accuracy.json") + "' --dtype '" + env['CM_ACCURACY_DTYPE'] + "' --dataset-file '" + env['CM_DATASET_LLAMA3_PATH'] + "' > '" + out_file + "'"
 
         else:
             return {'return': 1, 'error': 'Unsupported dataset'}

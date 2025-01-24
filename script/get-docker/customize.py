@@ -47,8 +47,13 @@ def detect_version(i):
 
     version = r['version']
 
+    tool = "docker"
+
+    if "podman" in r['string'].lower():
+        tool = "podman"
+
     print(i['recursion_spaces'] + '    Detected version: {}'.format(version))
-    return {'return': 0, 'version': version}
+    return {'return': 0, 'version': version, "tool": tool}
 
 
 def postprocess(i):
@@ -60,6 +65,7 @@ def postprocess(i):
         return r
 
     version = r['version']
+    tool = r['tool']
     found_file_path = env['CM_DOCKER_BIN_WITH_PATH']
 
     found_path = os.path.dirname(found_file_path)
@@ -69,5 +75,7 @@ def postprocess(i):
     env['CM_DOCKER_CACHE_TAGS'] = 'version-' + version
 
     env['CM_DOCKER_VERSION'] = version
+
+    env['CM_CONTAINER_TOOL'] = tool
 
     return {'return': 0, 'version': version}

@@ -68,7 +68,7 @@ def preprocess(i):
             str(env['CM_MLPERF_LOADGEN_BATCH_SIZE'])
 
     if env.get('CM_MLPERF_LOADGEN_QUERY_COUNT', '') != '' and not env.get('CM_TMP_IGNORE_MLPERF_QUERY_COUNT', False) and (
-            env['CM_MLPERF_LOADGEN_MODE'] == 'accuracy' or 'gptj' in env['CM_MODEL'] or 'llama2' in env['CM_MODEL'] or 'mixtral' in env['CM_MODEL']) and env.get('CM_MLPERF_RUN_STYLE', '') != "valid":
+            env['CM_MLPERF_LOADGEN_MODE'] == 'accuracy' or 'gptj' in env['CM_MODEL'] or 'llama2' in env['CM_MODEL'] or 'mixtral' in env['CM_MODEL'] or 'llama3' in env['CM_MODEL']) and env.get('CM_MLPERF_RUN_STYLE', '') != "valid":
         env['CM_MLPERF_LOADGEN_EXTRA_OPTIONS'] += " --count " + \
             env['CM_MLPERF_LOADGEN_QUERY_COUNT']
 
@@ -127,7 +127,7 @@ def preprocess(i):
     if 'CM_MLPERF_USER_CONF' in env:
         user_conf_path = env['CM_MLPERF_USER_CONF']
         x = "" if os_info['platform'] == 'windows' else "'"
-        if 'llama2-70b' in env['CM_MODEL'] or "mixtral-8x7b" in env["CM_MODEL"]:
+        if 'llama2-70b' in env['CM_MODEL'] or "mixtral-8x7b" in env["CM_MODEL"] or "llama3" in env["CM_MODEL"]:
             scenario_extra_options += " --user-conf " + x + user_conf_path + x
         else:
             scenario_extra_options += " --user_conf " + x + user_conf_path + x
@@ -388,7 +388,9 @@ def get_run_cmd_reference(
             env['CM_VLLM_SERVER_MODEL_NAME'] = env.get(
                 "CM_VLLM_SERVER_MODEL_NAME") or "NousResearch/Meta-Llama-3-8B-Instruct"
             # env['CM_MLPERF_INFERENCE_API_SERVER'] = "http://localhost:8000"
-            cmd += f" --api-server {env['CM_MLPERF_INFERENCE_API_SERVER']} --model-path {env['CM_VLLM_SERVER_MODEL_NAME']} --api-model-name {env['CM_VLLM_SERVER_MODEL_NAME']} --vllm "
+            cmd += f""" --api-server {env['CM_MLPERF_INFERENCE_API_SERVER']} \
+                    --model-path {env['CM_VLLM_SERVER_MODEL_NAME']} \
+                    --api-model-name {env['CM_VLLM_SERVER_MODEL_NAME']} --vllm """
         else:
             cmd += f" --model-path {env['LLAMA2_CHECKPOINT_PATH']}"
 
@@ -493,10 +495,34 @@ def get_run_cmd_reference(
             scenario_extra_options + mode_extra_options + \
             " --output " + env['CM_MLPERF_OUTPUT_DIR'] + \
             ' --dtype ' + dtype_rgat + \
-            " --model-path " + env['CM_ML_MODEL_RGAT_CHECKPOINT_PATH']
+            " --model-path " + env['RGAT_CHECKPOINT_PATH']
 
         if env.get('CM_ACTIVATE_RGAT_IN_MEMORY', '') == "yes":
             cmd += " --in-memory "
+
+    elif "llama3" in env['CM_MODEL']:
+        env['RUN_DIR'] = os.path.join(
+            env['CM_MLPERF_INFERENCE_SOURCE'],
+            "language",
+            "llama3.1-405b")
+
+        if int(env.get('CM_MLPERF_INFERENCE_TP_SIZE', '')) > 1:
+            env['VLLM_WORKER_MULTIPROC_METHOD'] = "spawn"
+
+        cmd = env['CM_PYTHON_BIN_WITH_PATH'] + " main.py " \
+            " --scenario " + env['CM_MLPERF_LOADGEN_SCENARIO'] + \
+            " --dataset-path " + env['CM_DATASET_LLAMA3_PATH'] + \
+            " --output-log-dir " + env['CM_MLPERF_OUTPUT_DIR'] + \
+            ' --dtype ' + env['CM_MLPERF_MODEL_PRECISION'] + \
+            " --model-path " + env['CM_ML_MODEL_LLAMA3_CHECKPOINT_PATH'] + \
+            " --tensor-parallel-size " + env['CM_MLPERF_INFERENCE_TP_SIZE'] + \
+            " --vllm "
+
+        if env.get('CM_MLPERF_INFERENCE_NUM_WORKERS', '') != '':
+            cmd += f" --num-workers {env['CM_MLPERF_INFERENCE_NUM_WORKERS']}"
+
+        cmd = cmd.replace("--count", "--total-sample-count")
+        cmd = cmd.replace("--max-batchsize", "--batch-size")
 
     if env.get('CM_NETWORK_LOADGEN', '') in ["lon", "sut"]:
         cmd = cmd + " " + "--network " + env['CM_NETWORK_LOADGEN']
