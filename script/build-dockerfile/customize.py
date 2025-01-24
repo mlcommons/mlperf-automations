@@ -296,7 +296,7 @@ def preprocess(i):
         f.write('RUN {} -m venv $HOME/venv/mlc'.format(python) + " " + EOL)
         f.write('ENV PATH="$HOME/venv/mlc/bin:$PATH"' + EOL)
     # f.write('RUN . /opt/venv/mlc/bin/activate' + EOL)
-    
+
     f.write('ENV PATH="$PATH:$HOME/.local/bin"' + EOL)
 
     f.write(
