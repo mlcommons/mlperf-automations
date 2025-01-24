@@ -1,5 +1,3 @@
-# Run MLPerf inference ResNet50
-
 name: MLPerf inference ResNet50
 
 on:
@@ -66,7 +64,7 @@ jobs:
         secrets: |-
           ubwkjh-Ii8UJDpG2EoU6GQ/field/Access Token > env:PAT  # Fetch PAT and store in environment variable
     - name: Push Results
-       env:
+      env:
         PAT: ${{ env.PAT }}
       if: github.repository_owner == 'mlcommons'
       run: |
