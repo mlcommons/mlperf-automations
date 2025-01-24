@@ -383,7 +383,7 @@ docker:
           - yes
 
   pre_run_cmds:
-    - cm pull repo
+    - mlc pull repo
   run_cmd_prefix: sudo apt remove -y cmake
   mounts:
    - "${{ IMAGENET_PATH }}:/data/imagenet-val"

@@ -192,8 +192,6 @@ def docker_run(self_module, i):
 
     # Extract and handle basic inputs
     quiet = i.get('quiet', False)
-    detached = i.get('docker_detached', i.get('docker_dt', 'no'))
-    interactive = i.get('docker_interactive', i.get('docker_it', ''))
     verbose = i.get('v', False)
     show_time = i.get('show_time', False)
 
@@ -329,7 +327,7 @@ def docker_run(self_module, i):
 
         # Prepare Docker-specific inputs
         docker_inputs, dockerfile_path = prepare_docker_inputs(
-            i, docker_settings, script_path)
+            i, docker_settings, script_path, True)
 
         if docker_inputs is None:
             return {'return': 1, 'error': 'Error preparing Docker inputs'}
@@ -347,7 +345,7 @@ def docker_run(self_module, i):
         mlc_docker_input = {
             'action': 'run', 'automation': 'script', 'tags': 'run,docker,container',
             'recreate': recreate_docker_image,
-            'env': env, 'interactive': interactive, 'mounts': mounts, 'detached': detached,
+            'env': env, 'mounts': mounts,
             'script_tags': i.get('tags'), 'run_cmd': final_run_cmd, 'v': verbose,
             'quiet': True, 'real_run': True, 'add_deps_recursive': {'build-docker-image': {'dockerfile': dockerfile_path}},
             **docker_inputs

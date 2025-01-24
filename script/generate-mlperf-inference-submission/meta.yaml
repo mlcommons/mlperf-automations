@@ -56,7 +56,7 @@ docker:
   os: ubuntu
   os_version: '22.04'
   pre_run_cmds:
-  - cm pull repo
+  - mlc pull repo
   real_run: false
   use_host_group_id: true
   use_host_user_id: true

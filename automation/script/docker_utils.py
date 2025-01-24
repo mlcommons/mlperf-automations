@@ -37,7 +37,7 @@ def process_mounts(mounts, env, i, docker_settings):
         return None
 
 
-def prepare_docker_inputs(input_params, docker_settings, script_path):
+def prepare_docker_inputs(input_params, docker_settings, script_path, run_stage=False):
     """
     Prepares Docker-specific inputs such as Dockerfile path and runtime options.
 
@@ -49,18 +49,31 @@ def prepare_docker_inputs(input_params, docker_settings, script_path):
     Returns:
         Tuple with Docker inputs dictionary and Dockerfile path or None in case of an error.
     """
+
+    keys = [
+            "mlc_repo", "mlc_repo_branch", "base_image", "os", "os_version",
+                        "mlc_repos", "skip_mlc_sys_upgrade", "extra_sys_deps",
+                        "gh_token", "fake_run_deps", "run_final_cmds", "real_run", "copy_files", "path"
+        ]
+
+    if run_stage:
+        keys += [
+                "skip_run_cmd", "pre_run_cmds", "run_cmd_prefix", "all_gpus", "num_gpus", "device", "gh_token", 
+                "port_maps", "shm_size", "pass_user_id", "pass_user_group", "extra_run_args", "detached", "interactive",
+                "dt", "it"
+                ]
     # Collect Dockerfile inputs
     docker_inputs = {
         key: input_params.get(
             f"docker_{key}", docker_settings.get(
                 key, get_docker_default(key)))
-        for key in [
-            "mlc_repo", "mlc_repo_branch", "base_image", "os", "os_version",
-                        "mlc_repos", "skip_mlc_sys_upgrade", "extra_sys_deps",
-                        "gh_token", "fake_run_deps", "run_final_cmds", "real_run", "copy_files", "path"
-        ]
+        for key in keys
         if (value := input_params.get(f"docker_{key}", docker_settings.get(key, get_docker_default(key)))) is not None
     }
+
+    if docker_inputs.get('detached', docker_inputs.get('dt')):
+        docker_inputs['interactive'] = False
+        docker_inputs['detached'] = True
 
     # Determine Dockerfile suffix and path
     docker_base_image = docker_inputs.get('base_image')
@@ -246,13 +259,19 @@ def regenerate_script_cmd(i):
 def get_docker_default(key):
     defaults = {
         "mlc_repo": "mlcommons@mlperf-automations",
-        "mlc_repo_branch": "mlc",
+        "mlc_repo_branch": "dev",
         "os": "ubuntu",
         "os_version": "24.04",
         "fake_run_deps": False,
         "run_final_cmds": [],
         "skip_run_cmd": False,
-        "image_tag_extra": "-latest"
+        "image_tag_extra": "-latest",
+        "skip_run_cmd": False,
+        "pre_run_cmds":  [],
+        "run_cmd_prefix": '',
+        "port_maps": [],
+        "detached": False, 
+        "interactive": True
     }
     if key in defaults:
         return defaults[key]

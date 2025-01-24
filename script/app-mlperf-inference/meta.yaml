@@ -1856,8 +1856,8 @@ docker:
         MLC_MLPERF_INFERENCE_SUBMISSION_DIR: [ on ]
 
   pre_run_cmds:
-    #- cm pull repo && mlcr --tags=get,git,repo,_repo.https://github.com/GATEOverflow/inference_results_v4.0.git --update
-    - cm pull repo
+    #- mlc pull repo && mlcr --tags=get,git,repo,_repo.https://github.com/GATEOverflow/inference_results_v4.0.git --update
+    - mlc pull repo
   mounts:
    - "${{ MLC_DATASET_IMAGENET_PATH }}:${{ MLC_DATASET_IMAGENET_PATH }}"
    - "${{ MLC_DATASET_OPENIMAGES_PATH }}:${{ MLC_DATASET_OPENIMAGES_PATH }}"
