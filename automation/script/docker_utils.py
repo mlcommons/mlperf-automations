@@ -76,6 +76,8 @@ def prepare_docker_inputs(input_params, docker_settings, script_path):
         'dockerfiles',
         f"{docker_filename_suffix}.Dockerfile")
 
+    docker_inputs['file_path'] = dockerfile_path
+
     return docker_inputs, dockerfile_path
 
 

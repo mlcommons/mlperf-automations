@@ -198,20 +198,22 @@ def docker_run(self_module, i):
     show_time = i.get('show_time', False)
 
     env = i.get('env', {})
-    noregenerate_docker_file = i.get('docker_noregenerate', False)
-    norecreate_docker_image = not i.get('docker_recreate', False)
+    
+    regenerate_docker_file = not i.get('docker_noregenerate', False)
+    recreate_docker_image = i.get('docker_recreate', False)
 
     if i.get('docker_skip_build', False):
-        noregenerate_docker_file = True
-        norecreate_docker_image = True
+        regenerate_docker_file = False
+        recreate_docker_image = False
         env['MLC_DOCKER_SKIP_BUILD'] = 'yes'
 
     # Prune unnecessary Docker-related input keys
     r = prune_input({'input': i, 'extra_keys_starts_with': ['docker_']})
     f_run_cmd = r['new_input']
 
+    print(f"regenerate_docker_file = {regenerate_docker_file}")
     # Regenerate Dockerfile if required
-    if not noregenerate_docker_file:
+    if regenerate_docker_file:
         r = dockerfile(self_module, i)
         if r['return'] > 0:
             return r
@@ -344,7 +346,7 @@ def docker_run(self_module, i):
         # Execute the Docker container
         mlc_docker_input = {
             'action': 'run', 'automation': 'script', 'tags': 'run,docker,container',
-            'recreate': 'yes' if not norecreate_docker_image else 'no',
+            'recreate': recreate_docker_image,
             'env': env, 'interactive': interactive, 'mounts': mounts, 'detached': detached,
             'script_tags': i.get('tags'), 'run_cmd': final_run_cmd, 'v': verbose,
             'quiet': True, 'real_run': True, 'add_deps_recursive': {'build-docker-image': {'dockerfile': dockerfile_path}},
