@@ -50,7 +50,6 @@ ${MLC_SUDO} ${MLC_APT_TOOL} update && \
            python-is-python3 \
            sudo \
            libgl1 \
-           libncurses5 \
            libjpeg9-dev \
            unzip \
            libgl1 \

@@ -27,6 +27,7 @@
   "distros": {
     "ubuntu": {
       "USER": "ubuntu",
+      "WORKDIR": "/home/ubuntu",
       "package-manager-update-cmd": "apt-get update -y",
       "package-manager-get-cmd": "apt-get install -y", 
       "packages": [
