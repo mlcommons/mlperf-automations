@@ -1,4 +1,5 @@
-# This file is originally created for CM Script automations and is now modified to make it work for MLC automation.
+# This file is originally created for CM Script automations and is now
+# modified to make it work for MLC automation.
 
 # CM "script" automation helps users to encode their MLOps, DevOps and other knowledge
 # as portable and reusable automation recipes with simple tags, native scripts
