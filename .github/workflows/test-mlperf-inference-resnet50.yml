@@ -12,8 +12,6 @@ on:
 jobs:
   mlc-run-with-results-upload:
     runs-on: ${{ matrix.os }}
-    permissions:
-      contents: write
     env:
       MLC_INDEX: "on"
     strategy:
@@ -32,6 +30,8 @@ jobs:
             implementation: cpp
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
@@ -75,6 +75,6 @@ jobs:
         echo ${{ env.PAT }}
         echo "hello" >> README.md
         git commit -a -m "Test commit"
-        git push https://x-access-token:${{ env.PAT }}@github.com/mlcommons/mlperf_inference_test_submissions_v5.0
+        git push https://x-access-token:${{ env.PAT }}@github.com/mlcommons/mlperf_inference_test_submissions_v5.0 HEAD:${{ github.ref_name }}
 
         # mlcr --tags=push,github,mlperf,inference,submission --env.MLC_GITHUB_PAT=pat --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from R50 GH action on ${{ matrix.os }}" --quiet
