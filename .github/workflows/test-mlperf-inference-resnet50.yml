@@ -7,6 +7,7 @@ on:
       - '.github/workflows/test-mlperf-inference-resnet50.yml'
       - '**'
       - '!**.md'
+
 jobs:
   mlc-run-with-results-upload:
     runs-on: ${{ matrix.os }}
@@ -63,6 +64,7 @@ jobs:
         keeper-secret-config: ${{ secrets.KSM_CONFIG }}
         secrets: |-
           ubwkjh-Ii8UJDpG2EoU6GQ/field/Access Token > env:PAT  # Fetch PAT and store in environment variable
+    
     - name: Push Results
       env:
         PAT: ${{ env.PAT }}
@@ -76,4 +78,4 @@ jobs:
         git commit -a -m "Test commit"
         git push https://git:${PAT}@github.com/mlcommons/mlperf_inference_test_submissions_v5.0 HEAD:${{ github.ref_name }}
 
-        # mlcr --tags=push,github,mlperf,inference,submission --env.MLC_GITHUB_PAT=pat --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from R50 GH action on ${{ matrix.os }}" --quiet
+        mlcr --tags=push,github,mlperf,inference,submission --env.MLC_GITHUB_TOKEN=$PAT --env.MLC_GIT_AUTH=yes --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from R50 GH action on ${{ matrix.os }}" --quiet
