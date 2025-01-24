@@ -3797,10 +3797,6 @@ class ScriptAutomation(Automation):
 pip install mlcflow
 ```
 
-Check [this readme](https://github.com/mlcommons/ck/blob/master/docs/installation.md)
-with more details about installing MLC and dependencies across different platforms
-(Ubuntu, MacOS, Windows, RHEL, ...).
-
 """
 
         current_mlc_repo = run_state['script_repo_alias']
