@@ -77,6 +77,6 @@ jobs:
         cd tmp
         echo "hello" >> README.md
         git commit -a -m "Test commit"
-        git remote add origin https://$PAT@github.com/mlcommons/mlperf_inference_test_submissions_v5.0
+        git remote set-url origin https://${PAT}@github.com/mlcommons/mlperf_inference_test_submissions_v5.0
         git push
         mlcr --tags=push,github,mlperf,inference,submission --env.MLC_GITHUB_TOKEN=$PAT --env.MLC_GIT_AUTH=yes --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from R50 GH action on ${{ matrix.os }}" --quiet
