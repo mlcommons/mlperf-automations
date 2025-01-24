@@ -31,11 +31,11 @@ def dockerfile(self_module, input_params):
         return {'return': 1, 'error': 'No scripts were found'}
 
     # Step 3: Process Dockerfile-related configurations
-    environment_vars = input_params.get('env', {})
+    env = input_params.get('env', {})
     state_data = input_params.get('state', {})
     constant_vars = input_params.get('const', {})
     constant_state = input_params.get('const_state', {})
-    dockerfile_environment_vars = input_params.get('dockerfile_env', {})
+    dockerfile_env = input_params.get('dockerfile_env', {})
     tag_values = input_params.get('tags', '').split(",")
     variation_tags = [tag[1:] for tag in tag_values if tag.startswith("_")]
 
@@ -55,13 +55,13 @@ def dockerfile(self_module, input_params):
             'script_variation_tags': variation_tags
         }
         docker_settings = metadata.get('docker', {})
-        docker_settings['dockerfile_env'] = dockerfile_environment_vars
+        docker_settings['dockerfile_env'] = dockerfile_env
         state_data['docker'] = docker_settings
         add_deps_recursive = input_params.get('add_deps_recursive', {})
 
         # Update state with metadata and variations
         update_state_result = self_module.update_state_from_meta(
-            metadata, environment_vars, state_data, constant_vars, constant_state,
+            metadata, env, state_data, constant_vars, constant_state,
             deps=[],
             post_deps=[],
             prehook_deps=[],
@@ -77,7 +77,7 @@ def dockerfile(self_module, input_params):
         update_variations_result = self_module._update_state_from_variations(
             input_params, metadata, variation_tags, metadata.get(
                 'variations', {}),
-            environment_vars, state_data, constant_vars, constant_state,
+            env, state_data, constant_vars, constant_state,
             deps=[],  # Add your dependencies if needed
             post_deps=[],  # Add post dependencies if needed
             prehook_deps=[],  # Add prehook dependencies if needed
@@ -94,8 +94,8 @@ def dockerfile(self_module, input_params):
 
         # Set Docker-specific configurations
         docker_settings = state_data.get('docker', {})
-        docker_settings['dockerfile_env'] = dockerfile_environment_vars
-        dockerfile_environment_vars['MLC_RUN_STATE_DOCKER'] = True
+        docker_settings['dockerfile_env'] = dockerfile_env
+        dockerfile_env['MLC_RUN_STATE_DOCKER'] = True
 
         if not docker_settings.get('run', True) and not input_params.get(
                 'docker_run_override', False):
@@ -103,14 +103,14 @@ def dockerfile(self_module, input_params):
             continue
 
         # Handle build dependencies
-        build_dependencies = docker_settings.get('build_deps', [])
-        if build_dependencies:
-            deps_result = self_module._run_deps(
-                build_dependencies, run_state=run_state, verbose=input_params.get(
-                    'v', False)
-            )
-            if deps_result['return'] > 0:
-                return deps_result
+        show_time = input_params.get('show_time', False)
+        deps = docker_settings.get('deps', [])
+        if deps:
+            r = self_module._run_deps(
+                deps, [], env, {}, {}, {}, {}, '', [], '', False, '', verbose,
+                show_time, ' ', run_state)
+            if r['return'] > 0:
+                return r
 
         # Prune temporary environment variables
         run_command = copy.deepcopy(run_command_arc)
@@ -154,15 +154,15 @@ def dockerfile(self_module, input_params):
 
         # Push Docker image if specified
         if input_params.get('docker_push_image') in [True, 'True', 'yes']:
-            environment_vars['MLC_DOCKER_PUSH_IMAGE'] = 'yes'
+            env['MLC_DOCKER_PUSH_IMAGE'] = 'yes'
 
         # Generate Dockerfile
         mlc_docker_input = {
             'action': 'run', 'automation': 'script', 'tags': 'build,dockerfile',
             'fake_run_option': " " if docker_inputs.get('real_run') else " --fake_run",
             'comments': comments, 'run_cmd': f"{run_command_string} --quiet",
-            'script_tags': input_params.get('tags'), 'env': environment_vars,
-            'dockerfile_env': dockerfile_environment_vars,
+            'script_tags': input_params.get('tags'), 'env': env,
+            'dockerfile_env': dockerfile_env,
             'quiet': True, 'v': input_params.get('v', False), 'real_run': True
         }
         mlc_docker_input.update(docker_inputs)
