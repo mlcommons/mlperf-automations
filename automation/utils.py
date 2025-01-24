@@ -1,5 +1,10 @@
 from mlc.utils import *
 
+def is_true(val):
+    return str(val).lower() in ["1", "true", "on", "yes"]
+
+def is_false(val):
+    return str(val).lower() in ["0", "false", "off", "no"]
 
 def get_host_os_info(i={}):
     """

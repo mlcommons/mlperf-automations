@@ -14,7 +14,7 @@ fi
 MLC_APT_TOOL=${MLC_APT_TOOL:-apt-get}
 
 ${MLC_SUDO} ${MLC_APT_TOOL} update && \
-    ${MLC_SUDO} DEBIAN_FRONTEND=noninteractive ${MLC_APT_TOOL} install -y --no-install-recommends \
+    ${MLC_SUDO} DEBIAN_FRONTEND=noninteractive ${MLC_APT_TOOL} install -y --no-install-recommends --ignore-missing \
            apt-utils \
            git \
            wget \

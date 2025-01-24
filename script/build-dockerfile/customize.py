@@ -264,7 +264,7 @@ def preprocess(i):
         DOCKER_GROUP = "-g $GID -o"
 
         user_shell = json.loads(shell)
-        f.write('RUN useradd ' + DOCKER_USER_ID + DOCKER_GROUP + ' --create-home --shell ' + user_shell[0] + ' '
+        f.write(f"""RUN id -u {docker_user} > /dev/null 2>&1 || useradd """ + DOCKER_USER_ID + DOCKER_GROUP + ' --create-home --shell ' + user_shell[0] + ' '
                 + docker_user + EOL)
         f.write(
             'RUN echo "' +
@@ -272,7 +272,7 @@ def preprocess(i):
             ' ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers' +
             EOL)
         f.write('USER ' + docker_user + ":" + docker_group + EOL)
-        f.write('ENV HOME=/home/mlcuser' + EOL)
+        f.write(f"""ENV HOME=/home/{docker_user}""" + EOL)
 
     else:
         f.write('ENV HOME=/root' + EOL)
@@ -284,7 +284,7 @@ def preprocess(i):
             docker_env_key + "=" + str(dockerfile_env[docker_env_key])
 
     workdir = get_value(env, config, 'WORKDIR', 'MLC_DOCKER_WORKDIR')
-    if workdir and ("/home/mlcuser" not in workdir or str(env.get('MLC_DOCKER_USE_DEFAULT_USER', '')).lower() not in [
+    if workdir and (f"""/home/{docker_user}""" not in workdir or str(env.get('MLC_DOCKER_USE_DEFAULT_USER', '')).lower() not in [
             "yes", "1", "true"]):
         f.write('WORKDIR ' + workdir + EOL)
 

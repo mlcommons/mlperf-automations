@@ -200,7 +200,7 @@ def docker_run(self_module, i):
     regenerate_docker_file = not i.get('docker_noregenerate', False)
     recreate_docker_image = i.get('docker_recreate', False)
 
-    if i.get('docker_skip_build', False):
+    if is_true(i.get('docker_skip_build', False)):
         regenerate_docker_file = False
         recreate_docker_image = False
         env['MLC_DOCKER_SKIP_BUILD'] = 'yes'
@@ -209,7 +209,6 @@ def docker_run(self_module, i):
     r = prune_input({'input': i, 'extra_keys_starts_with': ['docker_']})
     f_run_cmd = r['new_input']
 
-    print(f"regenerate_docker_file = {regenerate_docker_file}")
     # Regenerate Dockerfile if required
     if regenerate_docker_file:
         r = dockerfile(self_module, i)

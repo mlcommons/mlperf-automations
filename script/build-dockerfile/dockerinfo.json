@@ -26,6 +26,7 @@
   "WORKDIR": "/home/mlcuser",
   "distros": {
     "ubuntu": {
+      "USER": "ubuntu",
       "package-manager-update-cmd": "apt-get update -y",
       "package-manager-get-cmd": "apt-get install -y", 
       "packages": [
