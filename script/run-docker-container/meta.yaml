@@ -52,6 +52,7 @@ input_mapping:
   pre_run_cmds: MLC_DOCKER_PRE_RUN_COMMANDS
   real_run: MLC_REAL_RUN
   recreate: MLC_DOCKER_IMAGE_RECREATE
+  rebuild: MLC_DOCKER_IMAGE_RECREATE
   run_cmd: MLC_DOCKER_RUN_CMD
   run_cmd_extra: MLC_DOCKER_RUN_CMD_EXTRA
   save_script: MLC_DOCKER_SAVE_SCRIPT

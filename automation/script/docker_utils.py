@@ -20,8 +20,6 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd):
     Returns:
         Updated mounts list or None in case of an error.
     """
-    utils.print_env(env)
-    utils.print_env(docker_settings)
     if 'mounts' in docker_settings:
         mounts.extend(docker_settings['mounts'])
 
@@ -113,7 +111,7 @@ def prepare_docker_inputs(input_params, docker_settings,
         keys += [
             "skip_run_cmd", "pre_run_cmds", "run_cmd_prefix", "all_gpus", "num_gpus", "device", "gh_token",
             "port_maps", "shm_size", "pass_user_id", "pass_user_group", "extra_run_args", "detached", "interactive",
-            "dt", "it"
+            "dt", "it", "use_host_group_id", "use_host_user_id"
         ]
     # Collect Dockerfile inputs
     docker_inputs = {
@@ -152,6 +150,55 @@ def prepare_docker_inputs(input_params, docker_settings,
     docker_inputs['file_path'] = dockerfile_path
 
     return docker_inputs, dockerfile_path
+
+
+def update_docker_environment(docker_settings, env, container_env_string):
+    """
+    Updates the Docker environment variables and build arguments.
+
+    Args:
+        docker_settings (dict): Docker configuration settings.
+        env (dict): The environment dictionary to update.
+        container_env_string (str): A string to store Docker container environment variable options.
+
+    Returns:
+        dict: A dictionary with a return code indicating success or failure.
+    """
+    # Define proxy-related environment variable keys to propagate
+    proxy_keys = [
+        "ftp_proxy", "FTP_PROXY", 
+        "http_proxy", "HTTP_PROXY", 
+        "https_proxy", "HTTPS_PROXY", 
+        "no_proxy", "NO_PROXY", 
+        "socks_proxy", "SOCKS_PROXY", 
+        "GH_TOKEN"
+    ]
+
+    # Ensure the '+ CM_DOCKER_BUILD_ARGS' key exists in the environment
+    if '+ MLC_DOCKER_BUILD_ARGS' not in env:
+        env['+ MLC_DOCKER_BUILD_ARGS'] = []
+
+    # Add proxy environment variables to Docker build arguments and container environment string
+    for proxy_key in proxy_keys:
+        proxy_value = os.environ.get(proxy_key)
+        if proxy_value:
+            container_env_string += f" --env.{proxy_key}={proxy_value} "
+            env['+ MLC_DOCKER_BUILD_ARGS'].append(f"{proxy_key}={proxy_value}")
+
+    # Add host group ID if specified in the Docker settings and not on Windows
+    if not is_false(docker_settings.get('pass_group_id')) and os.name != 'nt':
+        env['+ MLC_DOCKER_BUILD_ARGS'].append(
+            f"GID=\\\" $(id -g $USER) \\\""
+        )
+
+    # Add host user ID if specified in the Docker settings and not on Windows
+    if not is_false(docker_settings.get('use_host_user_id')) and os.name != 'nt':
+        env['+ MLC_DOCKER_BUILD_ARGS'].append(
+            f"UID=\\\" $(id -u $USER) \\\""
+        )
+
+    return {'return': 0}
+
 
 
 def update_container_paths(path, mounts=None, force_target_path=''):
@@ -327,7 +374,9 @@ def get_docker_default(key):
         "skip_run_cmd": False,
         "pre_run_cmds": [],
         "run_cmd_prefix": '',
-        "port_maps": []
+        "port_maps": [],
+        "use_host_user_id": True,
+        "use_host_group_id": True,
     }
     if key in defaults:
         return defaults[key]

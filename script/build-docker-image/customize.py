@@ -50,7 +50,7 @@ def preprocess(i):
     if env.get("MLC_DOCKER_IMAGE_TAG", "") == '':
         env['MLC_DOCKER_IMAGE_TAG'] = "latest"
 
-    if is_false(env.get("MLC_DOCKER_CACHE", "True"))
+    if is_false(env.get("MLC_DOCKER_CACHE", "True")):
         env["MLC_DOCKER_CACHE_ARG"] = " --no-cache"
 
     CMD = ''

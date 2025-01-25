@@ -213,12 +213,7 @@ def docker_run(self_module, i):
     env = i.get('env', {})
 
     regenerate_docker_file = not i.get('docker_noregenerate', False)
-    recreate_docker_image = i.get('docker_recreate', False)
-
-    if is_true(i.get('docker_skip_build', False)):
-        regenerate_docker_file = False
-        recreate_docker_image = False
-        env['MLC_DOCKER_SKIP_BUILD'] = 'yes'
+    rebuild_docker_image = i.get('docker_rebuild', False)
 
     # Prune unnecessary Docker-related input keys
     r = prune_input({'input': i, 'extra_keys_starts_with': ['docker_']})
@@ -358,6 +353,10 @@ def docker_run(self_module, i):
         docker_inputs['mounts'] = res['mounts']
         container_env_string = res['container_env_string']
 
+        res = update_docker_environment(docker_settings, env, container_env_string)
+        if res['return'] > 0:
+            return res
+
         # Generate the run command
         r = regenerate_script_cmd({'script_uid': script_uid,
                                    'script_alias': script_alias,
@@ -370,7 +369,7 @@ def docker_run(self_module, i):
         # Execute the Docker container
         mlc_docker_input = {
             'action': 'run', 'automation': 'script', 'tags': 'run,docker,container',
-            'recreate': recreate_docker_image,
+            'rebuild': rebuild_docker_image,
             'env': env, 'mounts': mounts,
             'script_tags': i.get('tags'), 'run_cmd': final_run_cmd, 'v': verbose,
             'quiet': True, 'real_run': True, 'add_deps_recursive': {'build-docker-image': {'dockerfile': dockerfile_path}},
