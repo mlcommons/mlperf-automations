@@ -37,27 +37,27 @@ versions:
     add_deps_recursive:
       mlperf-inference-results:
         version: v2.1
-        tags: _code_only
+        tags: _code-only
   r3.0:
     add_deps_recursive:
       mlperf-inference-results:
         version: v3.0
-        tags: _code_only
+        tags: _code-only
   r3.1:
     add_deps_recursive:
       mlperf-inference-results:
         version: v3.1
-        tags: _code_only
+        tags: _code-only
   r4.0:
     add_deps_recursive:
       mlperf-inference-results:
         version: v4.0
-        tags: _code_only
+        tags: _code-only
   r4.1:
     add_deps_recursive:
       mlperf-inference-results:
         version: v4.1
-        tags: _code_only
+        tags: _code-only
   r4.1-dev:
     add_deps_recursive:
       mlperf-inference-results:
