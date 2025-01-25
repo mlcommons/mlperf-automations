@@ -264,7 +264,7 @@ def preprocess(i):
         DOCKER_GROUP = "-g $GID -o"
 
         user_shell = json.loads(shell)
-        f.write(f"""RUN id -u {docker_user} > /dev/null 2>&1 || useradd """ + DOCKER_USER_ID + DOCKER_GROUP + ' --create-home --shell ' + user_shell[0] + ' '
+        f.write(f"""RUN (id -u {docker_user} > /dev/null 2>&1 && usermod -u {DOCKER_USER_ID} {docker_user}) || useradd """ + DOCKER_USER_ID + DOCKER_GROUP + ' --create-home --shell ' + user_shell[0] + ' '
                 + docker_user + EOL)
         f.write(
             'RUN echo "' +
