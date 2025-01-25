@@ -1,7 +1,7 @@
 name: MLC tutorial tvm
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlc-tutorial-tvm.yml'
@@ -36,3 +36,21 @@ jobs:
     - name: Test MLC Tutorial TVM
       run: |
         mlcr --tags=run-mlperf,inference,_submission,_short --adr.python.name=mlperf --adr.python.version_min=3.8 --submitter=Community --implementation=python --hw_name=default --model=resnet50 --backend=tvm-onnx --device=cpu --scenario=Offline --mode=accuracy --test_query_count=5 --clean --quiet ${{ matrix.extra-options }}
+    - name: Retrieve secrets from Keeper
+      id: ksecrets
+      uses: Keeper-Security/ksm-action@master
+      with:
+        keeper-secret-config: ${{ secrets.KSM_CONFIG }}
+        secrets: |-
+          ubwkjh-Ii8UJDpG2EoU6GQ/field/Access Token > env:PAT
+    - name: Push Results
+      env:
+        GITHUB_TOKEN: ${{ env.PAT }}
+      run: |
+        git config --global user.name "mlcommons-bot"
+        git config --global user.email "mlcommons-bot@users.noreply.github.com"
+        git config --global credential.https://github.com.helper ""
+        git config --global credential.https://github.com.helper "!gh auth git-credential"
+        git config --global credential.https://gist.github.com.helper ""
+        git config --global credential.https://gist.github.com.helper "!gh auth git-credential"
+        mlcr --tags=push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from R50 GH action on ${{ matrix.os }}" --quiet
