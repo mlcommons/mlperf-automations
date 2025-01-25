@@ -9,7 +9,7 @@ deps:
 - inherit_variation_tags: true
   names:
   - mlperf-inference-results
-  tags: get,mlperf,inference,results,official,_code-only
+  tags: get,mlperf,inference,results,official
 new_env_keys:
 - +PYTHONPATH
 - MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH
@@ -37,19 +37,29 @@ versions:
     add_deps_recursive:
       mlperf-inference-results:
         version: v2.1
+      tags: _code_only
   r3.0:
     add_deps_recursive:
       mlperf-inference-results:
         version: v3.0
+      tags: _code_only
   r3.1:
     add_deps_recursive:
       mlperf-inference-results:
         version: v3.1
+      tags: _code_only
   r4.0:
     add_deps_recursive:
       mlperf-inference-results:
         version: v4.0
+      tags: _code_only
   r4.1:
     add_deps_recursive:
       mlperf-inference-results:
         version: v4.1
+      tags: _code_only
+  r4.1-dev:
+    add_deps_recursive:
+      mlperf-inference-results:
+        version: v4.0
+      tags: _code-only-for-v5.0

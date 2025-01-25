@@ -1716,10 +1716,10 @@ variations:
       reproducibility
     add_deps_recursive:
       nvidia-inference-common-code:
-        version: r4.1
+        version: r4.1-dev
         tags: _mlcommons
       nvidia-inference-server:
-        version: r4.1
+        version: r4.0
         tags: _mlcommons
       intel-harness:
         tags: _v4.1

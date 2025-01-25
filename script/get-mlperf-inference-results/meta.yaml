@@ -38,6 +38,11 @@ variations:
       inference-results-repo:
         tags: _branch.mlc-code-only
     group: repo-branch
+  code-only-for-v5.0:
+    adr:
+      inference-results-repo:
+        tags: _branch.mlc-code-only-for-v5.0
+    group: repo-branch
   ctuning:
     env:
       GITHUB_REPO_OWNER: ctuning
