@@ -8,6 +8,7 @@ on:
 jobs:
   markdown-link-check:
     runs-on: ubuntu-latest
+
     # check out the latest version of the code
     steps:
     - uses: actions/checkout@v4
