@@ -1,16 +1,15 @@
-name: MLC tutorial tvm
+name: MLPerf Inference TVM ResNet50
 
 on:
   pull_request_target:
     branches: [ "main", "dev" ]
     paths:
-      - '.github/workflows/test-mlc-tutorial-tvm.yml'
+      - '.github/workflows/test-mlperf-inference-tvm-resnet50.yml'
       - '**'
       - '!**.md'
 
 jobs:
-  build:
-
+  tvm-run:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
