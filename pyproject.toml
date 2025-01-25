@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel", "toml", "mlcflow"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mlperf"
+name = "mlc-scripts"
 version = "0.0.1"
 description = "Automation scripts for running ML applications using MLC interface"
 authors = [
@@ -12,7 +12,7 @@ authors = [
 license = { file = "LICENSE.md" }
 readme = "README.md"
 requires-python = ">=3.7"
-keywords = ["mlc", "mlcflow", "pypi", "package", "automation", "mlperf", "mlcr"]
+keywords = ["mlc", "mlcscripts", "mlcflow", "pypi", "package", "automation", "mlperf", "mlcr"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: Apache Software License",
