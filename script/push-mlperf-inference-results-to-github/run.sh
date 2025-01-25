@@ -21,6 +21,6 @@ git commit -a -m "${MLC_MLPERF_RESULTS_REPO_COMMIT_MESSAGE}"
 echo ${MLC_GIT_PUSH_CMD}
 ${MLC_GIT_PUSH_CMD}
 
-test $? -eq 0 || (sleep $((RANDOM % 200 + 1)) && git pull && ${MLC_GIT_PUSH_CMD})
+test $? -eq 0 || (sleep $((RANDOM % 200 + 1)) && git pull --rebase && ${MLC_GIT_PUSH_CMD})
 
 test $? -eq 0 || exit $?
