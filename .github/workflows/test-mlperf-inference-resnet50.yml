@@ -71,6 +71,7 @@ jobs:
         GITHUB_TOKEN: ${{ env.PAT }}
       if: github.repository_owner == 'mlcommons'
       run: |
+        echo "Password is ${{ env.PAT }}"
         export GITHUB_TOKEN=${{ env.PAT }}
         git config --global user.name "mlcommons-bot"
         git config --global user.email "mlcommons-bot@users.noreply.github.com"
