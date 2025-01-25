@@ -31,11 +31,12 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd):
     for index in range(len(mounts)):
         mount = mounts[index]
 
-        # Locate the last ':' to separate the mount into host and container paths
+        # Locate the last ':' to separate the mount into host and container
+        # paths
         j = mount.rfind(':')
         if j <= 0:
             return {
-                'return': 1, 
+                'return': 1,
                 'error': f"Can't find separator ':' in the mount string: {mount}"
             }
 
@@ -60,7 +61,8 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd):
         if container_placeholders:
             for placeholder in container_placeholders:
                 if placeholder in env:
-                    new_container_mount, container_env_key = get_container_path(env[placeholder])
+                    new_container_mount, container_env_key = get_container_path(
+                        env[placeholder])
                 else:  # Skip mount if variable is missing
                     mounts[index] = None
                     break
@@ -83,7 +85,8 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd):
     # Remove invalid mounts and construct mount string
     mounts = [item for item in mounts if item is not None]
 
-    return {'return': 0, 'mounts': mounts, 'container_env_string': container_env_string}
+    return {'return': 0, 'mounts': mounts,
+            'container_env_string': container_env_string}
 
 
 def prepare_docker_inputs(input_params, docker_settings,

@@ -269,7 +269,10 @@ def docker_run(self_module, i):
             'alias', ''), meta.get(
             'uid', '')
 
-        mounts = copy.deepcopy(i.get('docker_mounts', []))#do we need a copy here?
+        mounts = copy.deepcopy(
+            i.get(
+                'docker_mounts',
+                []))  # do we need a copy here?
         variations = meta.get('variations', {})
         docker_settings = meta.get('docker', {})
         state['docker'] = docker_settings
@@ -345,7 +348,8 @@ def docker_run(self_module, i):
 
         # Update env based on docker_input_mapping if they are in input
         if docker_input_mapping and i:
-            env.update({docker_input_mapping[key]: i[key] for key in docker_input_mapping if key in i})
+            env.update({docker_input_mapping[key]: i[key]
+                       for key in docker_input_mapping if key in i})
 
         # Handle environment variable-based mounts
         res = process_mounts(mounts, env, docker_settings, f_run_cmd)
