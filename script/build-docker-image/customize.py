@@ -1,7 +1,7 @@
 from mlc import utils
 import os
 from os.path import exists
-
+from utils import *
 
 def preprocess(i):
 
@@ -50,7 +50,7 @@ def preprocess(i):
     if env.get("MLC_DOCKER_IMAGE_TAG", "") == '':
         env['MLC_DOCKER_IMAGE_TAG'] = "latest"
 
-    if str(env.get("MLC_DOCKER_CACHE", "yes")).lower() in ["no", "false", "0"]:
+    if is_false(env.get("MLC_DOCKER_CACHE", "True"))
         env["MLC_DOCKER_CACHE_ARG"] = " --no-cache"
 
     CMD = ''
@@ -82,12 +82,8 @@ def preprocess(i):
 
     CMD = ''.join(XCMD)
 
-    print('================================================')
-    print('CM generated the following Docker build command:')
-    print('')
     print(CMD)
 
-    print('')
 
     env['MLC_DOCKER_BUILD_CMD'] = CMD
 
@@ -108,7 +104,7 @@ def postprocess(i):
     env = i['env']
 
     # Check if need to push docker image to the Docker Hub
-    if env.get('MLC_DOCKER_PUSH_IMAGE', '') in ['True', True, 'yes']:
+    if is_true(env.get('MLC_DOCKER_PUSH_IMAGE', '')):
         image_name = get_image_name(env)
 
         # Prepare CMD to build image
@@ -122,9 +118,6 @@ def postprocess(i):
             with open(dockerfile_path + '.build.bat', 'w') as f:
                 f.write(PCMD + '\n')
 
-        print('================================================')
-        print('CM generated the following Docker push command:')
-        print('')
         print(PCMD)
 
         print('')
