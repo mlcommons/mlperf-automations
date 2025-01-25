@@ -60,16 +60,17 @@ jobs:
       run: |
         mlcr --tags=run-mlperf,inference,_submission,_short --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name=gh_${{ matrix.os }}_x86 --model=resnet50 --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --scenario=Offline --test_query_count=500 --target_qps=1 -v --quiet     
     - name: Retrieve secrets from Keeper
-      if: github.repository_owner == 'mlcommons1'
+      if: github.repository_owner == 'mlcommons'
       id: ksecrets
       uses: Keeper-Security/ksm-action@master
       with:
         keeper-secret-config: ${{ secrets.KSM_CONFIG }}
         secrets: |-
-          ubwkjh-Ii8UJDpG2EoU6GQ/field/Access Token > env:PAT  # Fetch PAT and store in environment variable
+          ubwkjh-Ii8UJDpG2EoU6GQ/field/Access Token > env:PAT
     - name: Push Results
       env:
         GITHUB_TOKEN: ${{ env.PAT }}
+      if: github.repository_owner == 'mlcommons'
       run: |
         echo "Password is ${{ env.PAT }}"
         export GITHUB_TOKEN=${{ env.PAT }}
