@@ -281,15 +281,14 @@ deps:
     enable_if_env:
       MLC_RUN_STATE_DOCKER:
         - 'yes'
-        - True
-        - 'True'
 
   - tags: get,nvidia,mitten
     skip_if_env:
       MLC_RUN_STATE_DOCKER:
         - 'yes'
-        - True
-        - 'True'
+    enable_if_env:
+      MLC_NVIDIA_MITTEN_FROM_SRC:
+        - 'yes'
 
 prehook_deps:
   ########################################################################
@@ -446,7 +445,7 @@ variations:
     group: model
     env:
       MLC_MODEL: stable-diffusion-xl
-      MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: "https://github.com/mlcommons/cm4mlops/blob/main/script/get-ml-model-stable-diffusion/_cm.json#L174"
+      MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: "https://github.com/mlcommons/mlperf-automations/blob/main/script/get-ml-model-stable-diffusion/meta.yaml"
       MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: "quantization, affine fusion"
       MLC_ML_MODEL_INPUTS_DATA_TYPE: int32
       MLC_ML_MODEL_WEIGHTS_DATA_TYPE: int8
