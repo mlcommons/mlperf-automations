@@ -823,10 +823,6 @@ class ScriptAutomation(Automation):
         posthook_deps = meta.get('posthook_deps', [])
         input_mapping = meta.get('input_mapping', {})
         docker_settings = meta.get('docker')
-        docker_input_mapping = {}
-        if docker_settings:
-            docker_input_mapping = docker_settings.get(
-                'docker_input_mapping', {})
         new_env_keys_from_meta = meta.get('new_env_keys', [])
         new_state_keys_from_meta = meta.get('new_state_keys', [])
 
@@ -6058,11 +6054,6 @@ def update_state_from_meta(meta, env, state, const, const_state, deps, post_deps
     new_docker_settings = meta.get('docker')
     if new_docker_settings:
         docker_settings = state.get('docker', {})
-        # docker_input_mapping = docker_settings.get('docker_input_mapping', {})
-        # new_docker_input_mapping = new_docker_settings.get('docker_input_mapping', {})
-        # if new_docker_input_mapping:
-        #    #    update_env_from_input_mapping(env, i['input'], docker_input_mapping)
-        #    utils.merge_dicts({'dict1':docker_input_mapping, 'dict2':new_docker_input_mapping, 'append_lists':True, 'append_unique':True})
         utils.merge_dicts({'dict1': docker_settings,
                            'dict2': new_docker_settings,
                            'append_lists': True,

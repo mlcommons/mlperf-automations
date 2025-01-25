@@ -7,7 +7,7 @@ from script.docker_utils import *
 import copy
 
 
-def process_mounts(mounts, env, i, docker_settings):
+def process_mounts(mounts, env, docker_settings, f_run_cmd):
     """
     Processes and updates the Docker mounts based on the provided inputs and environment variables.
 
@@ -20,21 +20,70 @@ def process_mounts(mounts, env, i, docker_settings):
     Returns:
         Updated mounts list or None in case of an error.
     """
-    try:
-        # Add mounts specified via `env` variables
-        for mount_key in docker_settings.get('env_mounts', []):
-            mount_path = env.get(mount_key, '')
-            if mount_path:
-                mounts.append(mount_path)
+    utils.print_env(env)
+    utils.print_env(docker_settings)
+    if 'mounts' in docker_settings:
+        mounts.extend(docker_settings['mounts'])
 
-        # Include user-specified additional mounts
-        if 'docker_additional_mounts' in i:
-            mounts.extend(i['docker_additional_mounts'])
+    docker_input_mapping = docker_settings.get("input_mapping", {})
+    container_env_string = ""
 
-        return mounts
-    except Exception as e:
-        logging.error(f"Error processing mounts: {e}")
-        return None
+    for index in range(len(mounts)):
+        mount = mounts[index]
+
+        # Locate the last ':' to separate the mount into host and container paths
+        j = mount.rfind(':')
+        if j <= 0:
+            return {
+                'return': 1, 
+                'error': f"Can't find separator ':' in the mount string: {mount}"
+            }
+
+        host_mount, container_mount = mount[:j], mount[j + 1:]
+        new_host_mount = host_mount
+        new_container_mount = container_mount
+        host_env_key, container_env_key = None, str(container_mount)
+
+        # Process host mount for environment variables
+        host_placeholders = re.findall(r'\${{ (.*?) }}', host_mount)
+        if host_placeholders:
+            for placeholder in host_placeholders:
+                if placeholder in env:
+                    host_env_key = placeholder
+                    new_host_mount = get_host_path(env[placeholder])
+                else:  # Skip mount if variable is missing
+                    mounts[index] = None
+                    break
+
+        # Process container mount for environment variables
+        container_placeholders = re.findall(r'\${{ (.*?) }}', container_mount)
+        if container_placeholders:
+            for placeholder in container_placeholders:
+                if placeholder in env:
+                    new_container_mount, container_env_key = get_container_path(env[placeholder])
+                else:  # Skip mount if variable is missing
+                    mounts[index] = None
+                    break
+
+        # Skip further processing if the mount was invalid
+        if mounts[index] is None:
+            continue
+
+        # Update mount entry
+        mounts[index] = f"{new_host_mount}:{new_container_mount}"
+
+        # Update container environment string and mappings
+        if host_env_key:
+            container_env_string += f" --env.{host_env_key}={container_env_key} "
+            for key, value in docker_input_mapping.items():
+                if value == host_env_key:
+                    i[key] = container_env_key
+                    f_run_cmd[key] = container_env_key
+
+    # Remove invalid mounts and construct mount string
+    mounts = [item for item in mounts if item is not None]
+
+    return {'return': 0, 'mounts': mounts}
 
 
 def prepare_docker_inputs(input_params, docker_settings,
@@ -102,7 +151,7 @@ def prepare_docker_inputs(input_params, docker_settings,
     return docker_inputs, dockerfile_path
 
 
-def update_docker_paths(path, mounts=None, force_target_path=''):
+def update_container_paths(path, mounts=None, force_target_path=''):
     """
     Update and return the absolute paths for a given host path and its container equivalent.
     Optionally updates a mounts list with the mapping of host and container paths.
@@ -317,5 +366,5 @@ def get_container_path(value):
             new_path_split2 = new_path_split + path_split[repo_entry_index:]
             return "/".join(new_path_split1), "/".join(new_path_split2)
     else:
-        orig_path, target_path = update_path_for_docker(path=value)
+        orig_path, target_path = update_container_paths(path=value)
         return target_path, target_path

@@ -6,7 +6,6 @@ category: DevOps automation
 deps:
 - tags: detect-os
 - tags: detect-cpu
-docker_input_mapping: {}
 input_description: {}
 input_mapping: {}
 new_env_keys:

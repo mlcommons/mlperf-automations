@@ -14,7 +14,6 @@ deps:
 - names:
   - tabulate
   tags: get,generic-python-lib,_package.tabulate
-docker_input_mapping: {}
 input_description: {}
 input_mapping:
   csv_file: MLC_CSV_FILE

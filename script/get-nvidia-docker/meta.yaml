@@ -6,7 +6,6 @@ category: Detection or installation of tools and artifacts
 deps:
 - tags: detect,os
 - tags: get,docker
-docker_input_mapping: {}
 input_description: {}
 input_mapping: {}
 new_env_keys: []

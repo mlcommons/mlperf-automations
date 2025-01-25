@@ -8,7 +8,6 @@ default_env:
 deps:
 - tags: detect-os
 - tags: get,qaic,platform,sdk
-docker_input_mapping: {}
 input_description: {}
 input_mapping: {}
 new_env_keys:

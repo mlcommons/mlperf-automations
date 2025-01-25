@@ -45,7 +45,7 @@ docker:
       MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR:
       - 'on'
     tags: get,mlperf,inference,submission,dir,local
-  docker_input_mapping:
+  input_mapping:
     results_dir: MLC_MLPERF_INFERENCE_RESULTS_DIR_
     submission_base_dir: MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR
   extra_run_args: ' --cap-add SYS_ADMIN'

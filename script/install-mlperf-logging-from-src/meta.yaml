@@ -12,8 +12,6 @@ deps:
     extra_cache_tags: mlperf_logging
     env:
       MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_MLPERF_LOGGING_REPO_PATH
-docker_input_mapping:
-input_description:
 new_env_keys:
   - MLC_MLPERF_LOGGING_REPO_PATH
 new_state_keys: []

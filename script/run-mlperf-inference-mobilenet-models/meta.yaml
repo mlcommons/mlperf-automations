@@ -11,7 +11,7 @@ default_env:
 deps:
 - tags: get,sys-utils-cm
 docker:
-  docker_input_mapping:
+  input_mapping:
     imagenet_path: IMAGENET_PATH
     results_dir: RESULTS_DIR
     submission_dir: SUBMISSION_DIR

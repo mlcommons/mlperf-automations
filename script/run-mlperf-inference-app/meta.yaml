@@ -174,7 +174,7 @@ docker_off:
   real_run: false
   run: true
   interactive: true
-  docker_input_mapping:
+  input_mapping:
     imagenet_path: IMAGENET_PATH
     gptj_checkpoint_path: GPTJ_CHECKPOINT_PATH
     criteo_preprocessed_path: CRITEO_PREPROCESSED_PATH
