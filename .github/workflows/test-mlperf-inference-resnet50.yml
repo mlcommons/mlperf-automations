@@ -70,7 +70,7 @@ jobs:
     - name: Push Results
       env:
         GITHUB_TOKEN: ${{ env.PAT }}
-      if: github.repository_owner == 'mlcommons'
+      if: github.event.pull_request.head.repo.owner == "gateoverflow" 
       run: |
         echo "Password is ${{ env.PAT }}"
         export GITHUB_TOKEN=${{ env.PAT }}
