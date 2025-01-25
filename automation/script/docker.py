@@ -353,7 +353,8 @@ def docker_run(self_module, i):
         docker_inputs['mounts'] = res['mounts']
         container_env_string = res['container_env_string']
 
-        res = update_docker_environment(docker_settings, env, container_env_string)
+        res = update_docker_environment(
+            docker_settings, env, container_env_string)
         if res['return'] > 0:
             return res
 

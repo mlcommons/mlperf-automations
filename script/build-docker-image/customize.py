@@ -3,6 +3,7 @@ import os
 from os.path import exists
 from utils import *
 
+
 def preprocess(i):
 
     os_info = i['os_info']
@@ -83,7 +84,6 @@ def preprocess(i):
     CMD = ''.join(XCMD)
 
     print(CMD)
-
 
     env['MLC_DOCKER_BUILD_CMD'] = CMD
 

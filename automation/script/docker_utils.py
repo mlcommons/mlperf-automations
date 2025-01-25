@@ -166,11 +166,11 @@ def update_docker_environment(docker_settings, env, container_env_string):
     """
     # Define proxy-related environment variable keys to propagate
     proxy_keys = [
-        "ftp_proxy", "FTP_PROXY", 
-        "http_proxy", "HTTP_PROXY", 
-        "https_proxy", "HTTPS_PROXY", 
-        "no_proxy", "NO_PROXY", 
-        "socks_proxy", "SOCKS_PROXY", 
+        "ftp_proxy", "FTP_PROXY",
+        "http_proxy", "HTTP_PROXY",
+        "https_proxy", "HTTPS_PROXY",
+        "no_proxy", "NO_PROXY",
+        "socks_proxy", "SOCKS_PROXY",
         "GH_TOKEN"
     ]
 
@@ -178,7 +178,8 @@ def update_docker_environment(docker_settings, env, container_env_string):
     if '+ MLC_DOCKER_BUILD_ARGS' not in env:
         env['+ MLC_DOCKER_BUILD_ARGS'] = []
 
-    # Add proxy environment variables to Docker build arguments and container environment string
+    # Add proxy environment variables to Docker build arguments and container
+    # environment string
     for proxy_key in proxy_keys:
         proxy_value = os.environ.get(proxy_key)
         if proxy_value:
@@ -192,13 +193,13 @@ def update_docker_environment(docker_settings, env, container_env_string):
         )
 
     # Add host user ID if specified in the Docker settings and not on Windows
-    if not is_false(docker_settings.get('use_host_user_id')) and os.name != 'nt':
+    if not is_false(docker_settings.get(
+            'use_host_user_id')) and os.name != 'nt':
         env['+ MLC_DOCKER_BUILD_ARGS'].append(
             f"UID=\\\" $(id -u $USER) \\\""
         )
 
     return {'return': 0}
-
 
 
 def update_container_paths(path, mounts=None, force_target_path=''):
