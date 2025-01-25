@@ -83,7 +83,7 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd):
     # Remove invalid mounts and construct mount string
     mounts = [item for item in mounts if item is not None]
 
-    return {'return': 0, 'mounts': mounts}
+    return {'return': 0, 'mounts': mounts, 'container_env_string': container_env_string}
 
 
 def prepare_docker_inputs(input_params, docker_settings,

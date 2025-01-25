@@ -352,6 +352,7 @@ def docker_run(self_module, i):
         if res['return'] > 0:
             return res
         docker_inputs['mounts'] = res['mounts']
+        container_env_string = res['container_env_string']
 
         # Generate the run command
         r = regenerate_script_cmd({'script_uid': script_uid,
@@ -360,7 +361,7 @@ def docker_run(self_module, i):
                                    'run_cmd': f_run_cmd})
         if r['return'] > 0:
             return r
-        final_run_cmd = r['run_cmd_string']
+        final_run_cmd = f"""{r['run_cmd_string']} {container_env_string} --docker_run_deps """
 
         # Execute the Docker container
         mlc_docker_input = {
