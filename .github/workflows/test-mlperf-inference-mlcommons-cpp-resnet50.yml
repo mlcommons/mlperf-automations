@@ -1,11 +1,8 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
 name: MLPerf inference MLCommons C++ ResNet50
 
 on:
-  pull_request:
-    branches: [ "main", "dev", "mlperf-inference" ]
+  pull_request_target:
+    branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlperf-inference-mlcommons-cpp-resnet50.yml'
       - '**'
