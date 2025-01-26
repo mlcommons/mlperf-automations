@@ -24,8 +24,8 @@ jobs:
         source gh_action/bin/deactivate || python3 -m venv gh_action
         source gh_action/bin/activate
         export MLC_REPOS=$HOME/GH_MLC
-        python3 -m pip install cm4mlops
-        cm pull repo
+        python3 -m pip install --upgrade mlc-scripts
+        mlc pull repo
         mlcr --tags=run-mlperf,inference,_submission,_short --submitter="MLCommons" --docker --pull_changes=yes --pull_inference_changes=yes --model=gptj-99 --backend=${{ matrix.backend }} --device=cuda --scenario=Offline --test_query_count=1 --precision=${{ matrix.precision }} --target_qps=1 --quiet --docker_it=no --docker_mlc_repo=gateoverflow@mlperf-automations --docker_mlc_repo_branch=dev --adr.compiler.tags=gcc --beam_size=1 --hw_name=gh_action --docker_dt=yes  --results_dir=$HOME/gh_action_results --submission_dir=$HOME/gh_action_submissions --get_platform_details=yes --implementation=reference --clean
         mlcr --tags=push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from self hosted Github actions - NVIDIARTX4090" --quiet --submission_dir=$HOME/gh_action_submissions
 

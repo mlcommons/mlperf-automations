@@ -25,9 +25,9 @@ jobs:
         source gh_action/bin/deactivate || python3 -m venv gh_action
         source gh_action/bin/activate
         export MLC_REPOS=$HOME/GH_MLC
-        pip install cm4mlops
+        pip install mlc-scripts
         pip install tabulate 
-        cm pull repo
+        mlc pull repo
         pip install "huggingface_hub[cli]"
         git config --global credential.helper store
         huggingface-cli login --token ${{ secrets.HF_TOKEN }} --add-to-git-credential

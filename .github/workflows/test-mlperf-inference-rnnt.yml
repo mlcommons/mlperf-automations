@@ -30,10 +30,10 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies on Unix Platforms
       run: |
-        MLC_PULL_DEFAULT_MLOPS_REPO=no pip install cm4mlops
+        pip install mlcflow
     - name: Pull MLOps repository
       run: |
-        cm pull repo --url=${{ github.event.pull_request.head.repo.html_url }} --checkout=${{ github.event.pull_request.head.ref }}
+        mlc pull repo --url=${{ github.event.pull_request.head.repo.html_url }} --checkout=${{ github.event.pull_request.head.ref }}
         mlcr --quiet --tags=get,sys-utils-cm
     - name: Test MLPerf Inference RNNT
       run: |
