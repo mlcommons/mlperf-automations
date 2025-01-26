@@ -77,7 +77,6 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd):
             container_env_string += f" --env.{host_env_key}={container_env_key} "
             for key, value in docker_input_mapping.items():
                 if value == host_env_key:
-                    i[key] = container_env_key
                     f_run_cmd[key] = container_env_key
 
     # Remove invalid mounts and construct mount string
