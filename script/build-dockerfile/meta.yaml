@@ -56,6 +56,7 @@ input_mapping:
   skip_mlc_sys_upgrade: MLC_DOCKER_SKIP_MLC_SYS_UPGRADE
   push_image: MLC_DOCKER_PUSH_IMAGE
   docker_not_pull_update: MLC_DOCKER_NOT_PULL_UPDATE
+  user: MLC_DOCKER_USER
 
 new_env_keys:
 - MLC_DOCKERFILE_*

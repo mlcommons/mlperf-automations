@@ -1909,6 +1909,7 @@ docker:
   interactive: True
   extra_run_args: ' --dns 8.8.8.8 --dns 8.8.4.4 --cap-add SYS_ADMIN  --cap-add SYS_TIME --security-opt apparmor=unconfined --security-opt seccomp=unconfined'
   os: ubuntu
+  user: mlcuser
   mlc_repo: mlcommons@mlperf-automations
   mlc_repo_branch: dev
   real_run: False
