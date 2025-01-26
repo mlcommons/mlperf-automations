@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mlc-scripts"
-version = "0.0.1"
+version = "0.0.4"
 description = "Automation scripts for running ML applications using MLC interface"
 authors = [
     { name = "MLCommons", email = "systems@mlcommons.org" }

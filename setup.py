@@ -69,11 +69,11 @@ class CustomInstallCommand(install):
             print("Running custom post-install command...")
             commit_hash = get_commit_hash()
             import mlc
-            branch = os.environ.get('MLC_REPO_BRANCH', 'mlc')
+            branch = os.environ.get('MLC_REPO_BRANCH', 'dev')
 
             res = mlc.access({'action': 'pull',
-                              'automation': 'repo',
-                              'url': 'mlcommons@mlperf-automations',
+                              'target': 'repo',
+                              'repo': 'mlcommons@mlperf-automations',
                               'branch': branch,
                               'checkout': commit_hash
                               })
@@ -111,7 +111,7 @@ project_meta = get_project_meta()
 setup(
 
     name=project_meta.get("name", "mlperf"),
-    version=project_meta.get("version", "0.0.1"),
+    version=project_meta.get("version", "0.0.2"),
     description=project_meta.get("description", "MLPerf Automations."),
     author=", ".join(a.get("name", "")
                      for a in project_meta.get("authors", [])),
