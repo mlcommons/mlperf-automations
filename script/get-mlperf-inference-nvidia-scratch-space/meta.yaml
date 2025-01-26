@@ -39,8 +39,12 @@ variations:
       MLC_NVIDIA_SCRATCH_SPACE_VERSION: '4_1'
     group: version
   version.4_1-dev:
-    default: true
     env:
       MLC_NVIDIA_SCRATCH_SPACE_VERSION: 4_1-dev
+    group: version
+  version.5_0-dev:
+    default: true
+    env:
+      MLC_NVIDIA_SCRATCH_SPACE_VERSION: 5_0-dev
     group: version
 versions: {}

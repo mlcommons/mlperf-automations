@@ -191,8 +191,6 @@ variations:
     add_deps_recursive:
       nvidia-inference-common-code:
         version: r4.0
-      nvidia-scratch-space:
-        tags: _version.4_1
     deps:
       - tags: get,generic,sys-util,_git-lfs
       - tags: install,pytorch,from.src,_for-nvidia-mlperf-inference-v4.0
@@ -344,6 +342,8 @@ docker:
     scratch_path: MLPERF_SCRATCH_PATH
   deps:
     - tags: get,mlperf,inference,nvidia,scratch,space
+      names:
+        - nvidia-scratch-space
     - tags: get,mlperf,inference,results,dir,local
     - tags: get,mlperf,inference,submission,dir,local
     - tags: get,nvidia-docker

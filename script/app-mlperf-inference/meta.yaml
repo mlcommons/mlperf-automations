@@ -1671,6 +1671,8 @@ variations:
         tags: _ctuning
       intel-harness:
         tags: _v3.1
+      nvidia-scratch-space:
+        tags: _version.4_0-dev
     default_env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
@@ -1709,6 +1711,8 @@ variations:
         tags: _mlcommons
       intel-harness:
         tags: _v4.0
+      nvidia-scratch-space:
+        tags: _version.4_1-dev
     default_env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
@@ -1725,6 +1729,8 @@ variations:
         tags: _go
       intel-harness:
         tags: _v4.1
+      nvidia-scratch-space:
+        tags: _version.4_1
     default_env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
@@ -1746,6 +1752,8 @@ variations:
         tags: _v4.1
       inference-src:
          version: r5.0
+      nvidia-scratch-space:
+        tags: _version.5.0-dev
     default_env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
