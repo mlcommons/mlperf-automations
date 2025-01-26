@@ -6,6 +6,7 @@ import re
 import shutil
 from utils import *
 
+
 def preprocess(i):
 
     os_info = i['os_info']
@@ -286,7 +287,8 @@ def preprocess(i):
     if workdir == '':
         workdir = f"""/home/{docker_user}"""
 
-    if f"""/home/{docker_user}""" not in workdir or not is_true(env.get('MLC_DOCKER_USE_DEFAULT_USER', '')):
+    if f"""/home/{docker_user}""" not in workdir or not is_true(
+            env.get('MLC_DOCKER_USE_DEFAULT_USER', '')):
         f.write('WORKDIR ' + workdir + EOL)
 
     f.write(EOL + '# Install python packages' + EOL)
