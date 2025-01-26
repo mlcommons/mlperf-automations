@@ -1,4 +1,4 @@
-name: Build Python Wheel
+name: Build mlc-scripts Wheel
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
       - main
       - dev
     paths:
-      - '.github/workflows/test-mlperf-wheel.yml'
+      - '.github/workflows/test-mlcscripts-wheel.yml'
       - 'setup.py'
 
 jobs:
@@ -16,6 +16,9 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
         python-version: [ '3.8', '3.13']
+        exclude:
+        - os: windows-latest
+          python-version: "3.8"
 
     runs-on: ${{ matrix.os }}
 

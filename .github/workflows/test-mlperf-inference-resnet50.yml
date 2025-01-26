@@ -61,6 +61,15 @@ jobs:
     - name: Randomly Execute Step
       id: random-check
       run: |
+        if [[ "$RUNNER_OS" == "Windows" ]]; then
+          $RANDOM_NUMBER = Get-Random -Maximum 10
+          Write-Host "Random number is $RANDOM_NUMBER"
+          if ($RANDOM_NUMBER -eq 0) {
+            Write-Host "run_step=true" | Out-File -FilePath $Env:GITHUB_ENV -Append
+          } else {
+            Write-Host "run_step=false" | Out-File -FilePath $Env:GITHUB_ENV -Append
+          }
+        else
           RANDOM_NUMBER=$((RANDOM % 10))
           echo "Random number is $RANDOM_NUMBER"
           if [ "$RANDOM_NUMBER" -eq 0 ]; then
@@ -68,6 +77,8 @@ jobs:
           else
             echo "run_step=false" >> $GITHUB_ENV
           fi
+        fi
+
     - name: Retrieve secrets from Keeper
       if: github.repository_owner == 'mlcommons' && env.run_step == 'true'
       id: ksecrets
