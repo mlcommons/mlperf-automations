@@ -2,7 +2,7 @@ name: MLPerf Inference Nvidia implementations
 
 on:
   schedule:
-    - cron: "26 17 * * *" #to be adjusted
+    - cron: "45 17 * * *" #to be adjusted
 
 jobs:
   run_nvidia:
@@ -48,7 +48,8 @@ jobs:
           python3 -m venv gh_action
           source gh_action/bin/activate
           export MLC_REPOS=$HOME/GH_MLC
-          pip install --upgrade mlc-scripts
+          pip install --upgrade mlcflow
+          mlc pull repo mlcommons@mlperf-automations --branch=dev
           
           mlcr --tags=run-mlperf,inference,_all-scenarios,_submission,_full,_r5.0-dev --preprocess_submission=yes --pull_changes=yes --pull_inference_changes=yes --execution_mode=valid --gpu_name=$gpu_name --pull_changes=yes --pull_inference_changes=yes --model=${{ matrix.model }} --submitter="MLCommons" --hw_name=$hw_name --implementation=nvidia --backend=tensorrt --category=datacenter,edge --division=closed  --docker_dt --docker_mlc_repo=mlcommons@mlperf-automations --docker_mlc_repo_branch=dev --adr.compiler.tags=gcc --device=cuda --use_model_from_host=yes --use_dataset_from_host=yes --results_dir=$HOME/gh_action_results --submission_dir=$HOME/gh_action_submissions --clean  $docker_string --quiet
 
