@@ -28,8 +28,12 @@ git commit -a -m "%MLC_MLPERF_RESULTS_REPO_COMMIT_MESSAGE%"
 
 if defined MLC_MLPERF_INFERENCE_SUBMISSION_DIR call %MLC_SET_REMOTE_URL_CMD%
 
-echo "%MLC_GIT_PUSH_CMD%"
-%MLC_GIT_PUSH_CMD%
+@if errorlevel 1 (
+    timeout /t %random:~0,3% /nobreak > nul
+    git pull --rebase
+    %MLC_GIT_PUSH_CMD%
+)
+
 
 REM Check if the previous command was successful
 if %errorlevel% neq 0 exit /b %errorlevel%
