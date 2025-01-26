@@ -111,7 +111,8 @@ variations:
     env:
       MLC_DOWNLOAD_CHECKSUM: 45f88ffb2915362242703c85c38ec2d4
       MLC_ML_MODEL_F1: '90.067'
-      MLC_PACKAGE_URL: https://zenodo.org/record/3750364/files/bert_large_v1_1_fake_quant.onnx
+      MLC_PACKAGE_URL: https://armi.in/files/bert_large_v1_1_fake_quant.onnx
+      MLC_PACKAGE_URL1: https://zenodo.org/record/3750364/files/bert_large_v1_1_fake_quant.onnx
   onnx,int8,amazon-s3:
     env:
       MLC_PACKAGE_URL: https://mlperf-public.s3.us-west-2.amazonaws.com/bert_large_v1_1_fake_quant.onnx

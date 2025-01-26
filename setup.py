@@ -108,10 +108,13 @@ check_prerequisites()
 # Get project metadata from pyproject.toml
 project_meta = get_project_meta()
 
+# Read version from the VERSION file
+version = read_file("VERSION", default="0.0.1")
+
 setup(
 
     name=project_meta.get("name", "mlperf"),
-    version=project_meta.get("version", "0.0.2"),
+    version=version,
     description=project_meta.get("description", "MLPerf Automations."),
     author=", ".join(a.get("name", "")
                      for a in project_meta.get("authors", [])),
