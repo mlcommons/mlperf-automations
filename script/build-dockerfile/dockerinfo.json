@@ -22,11 +22,9 @@
   "GID": "",
   "GROUP": "mlc",
   "SHELL": "[\"/bin/bash\", \"-c\"]",
-  "WORKDIR": "/home/mlcuser",
   "distros": {
     "ubuntu": {
       "USER": "ubuntu",
-      "WORKDIR": "/home/ubuntu",
       "package-manager-update-cmd": "apt-get update -y",
       "package-manager-get-cmd": "apt-get install -y", 
       "packages": [

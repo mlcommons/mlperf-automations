@@ -4,7 +4,7 @@ import mlc
 import json
 import re
 import shutil
-
+from utils import *
 
 def preprocess(i):
 
@@ -255,8 +255,7 @@ def preprocess(i):
             'MLC_DOCKER_USE_DEFAULT_USER', '') == '':
         env['MLC_DOCKER_USE_DEFAULT_USER'] = 'yes'
 
-    if docker_user and str(env.get('MLC_DOCKER_USE_DEFAULT_USER', '')).lower() not in [
-            "yes", "1", "true"]:
+    if docker_user and not is_true(env.get('MLC_DOCKER_USE_DEFAULT_USER', '')):
 
         f.write('RUN groupadd -g $GID -o ' + docker_group + EOL)
 
@@ -283,16 +282,18 @@ def preprocess(i):
         dockerfile_env_input_string = dockerfile_env_input_string + " --env." + \
             docker_env_key + "=" + str(dockerfile_env[docker_env_key])
 
-    workdir = get_value(env, config, 'WORKDIR', 'MLC_DOCKER_WORKDIR')
-    if workdir and (f"""/home/{docker_user}""" not in workdir or str(env.get('MLC_DOCKER_USE_DEFAULT_USER', '')).lower() not in [
-            "yes", "1", "true"]):
+    workdir = env.get('WORKDIR', '')
+    if workdir == '':
+        workdir = f"""/home/{docker_user}"""
+
+    if f"""/home/{docker_user}""" not in workdir or not is_true(env.get('MLC_DOCKER_USE_DEFAULT_USER', '')):
         f.write('WORKDIR ' + workdir + EOL)
 
     f.write(EOL + '# Install python packages' + EOL)
     python = get_value(env, config, 'PYTHON', 'MLC_DOCKERFILE_PYTHON')
 
     docker_use_virtual_python = env.get('MLC_DOCKER_USE_VIRTUAL_PYTHON', "yes")
-    if str(docker_use_virtual_python).lower() not in ["no", "0", "false"]:
+    if not is_false(docker_use_virtual_python):
         f.write('RUN {} -m venv $HOME/venv/mlc'.format(python) + " " + EOL)
         f.write('ENV PATH="$HOME/venv/mlc/bin:$PATH"' + EOL)
     # f.write('RUN . /opt/venv/mlc/bin/activate' + EOL)
@@ -342,8 +343,7 @@ def preprocess(i):
         for y in x.split(','):
             f.write('RUN ' + y + EOL)
 
-    if str(env.get('MLC_DOCKER_SKIP_MLC_SYS_UPGRADE', False)
-           ).lower() not in ["true", "1", "yes"]:
+    if not is_true('MLC_DOCKER_SKIP_MLC_SYS_UPGRADE', False):
         f.write(EOL + '# Install all system dependencies' + EOL)
         f.write('RUN mlc run script --tags=get,sys-utils-mlc --quiet' + EOL)
 
@@ -368,14 +368,12 @@ def preprocess(i):
             env['MLC_DOCKER_RUN_CMD'] += "mlc version"
             skip_extra = True
         else:
-            if str(env.get('MLC_DOCKER_NOT_PULL_UPDATE', 'False')
-                   ).lower() not in ["yes", "1", "true"]:
+            if not is_true(env.get('MLC_DOCKER_NOT_PULL_UPDATE', 'False')):
                 env['MLC_DOCKER_RUN_CMD'] += "mlc pull repo && "
             env['MLC_DOCKER_RUN_CMD'] += "mlc run script --tags=" + \
                 env['MLC_DOCKER_RUN_SCRIPT_TAGS'] + ' --quiet'
     else:
-        if str(env.get('MLC_DOCKER_NOT_PULL_UPDATE', 'False')
-               ).lower() not in ["yes", "1", "true"]:
+        if not is_true(env.get('MLC_DOCKER_NOT_PULL_UPDATE', 'False')):
             env['MLC_DOCKER_RUN_CMD'] = "mlc pull repo && " + \
                 env['MLC_DOCKER_RUN_CMD']
 
@@ -394,8 +392,8 @@ def preprocess(i):
         if run_cmd_extra != '':
             x += ' ' + run_cmd_extra
 
-    if env.get('MLC_DOCKER_RUN_SCRIPT_TAGS', '') != '' and str(env.get(
-            'MLC_DOCKER_ADD_DEPENDENT_SCRIPTS_RUN_COMMANDS', '')).lower() in ["yes", "1", "true"]:
+    if env.get('MLC_DOCKER_RUN_SCRIPT_TAGS', '') != '' and is_true(env.get(
+            'MLC_DOCKER_ADD_DEPENDENT_SCRIPTS_RUN_COMMANDS', '')):
         mlc_input = {'action': 'run',
                      'automation': 'script',
                      'tags': f"""{env['MLC_DOCKER_RUN_SCRIPT_TAGS']}""",
@@ -417,8 +415,8 @@ def preprocess(i):
     f.write(x + EOL)
 
     # fake_run to install the dependent scripts and caching them
-    if not "run" in env['MLC_DOCKER_RUN_CMD'] and str(
-            env.get('MLC_REAL_RUN', False)).lower() in ["false", "0", "no"]:
+    if not "run" in env['MLC_DOCKER_RUN_CMD'] and is_false(
+            env.get('MLC_REAL_RUN', False)):
         fake_run = dockerfile_env_input_string
 
         x = 'RUN ' + env['MLC_DOCKER_RUN_CMD'] + fake_run + run_cmd_extra
