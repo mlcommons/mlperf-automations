@@ -1,6 +1,7 @@
 from mlc import utils
 import os
 
+
 def preprocess(i):
 
     os_info = i['os_info']
@@ -25,7 +26,7 @@ def preprocess(i):
         run_cmd = f"cd {env['MLC_GH_ACTIONS_RUNNER_CODE_PATH']} && sudo ./svc.sh uninstall"
         cache_rm_tags = "gh,runner,_install"
         r = mlc.access({'action': 'rm', 'automation': 'cache',
-                      'tags': cache_rm_tags, 'f': True})
+                        'tags': cache_rm_tags, 'f': True})
         print(r)
         if r['return'] != 0 and r['return'] != 16:  # ignore missing ones
             return r
