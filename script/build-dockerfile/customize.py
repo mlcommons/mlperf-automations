@@ -343,7 +343,7 @@ def preprocess(i):
         for y in x.split(','):
             f.write('RUN ' + y + EOL)
 
-    if not is_true('MLC_DOCKER_SKIP_MLC_SYS_UPGRADE', False):
+    if not is_true(env.get('MLC_DOCKER_SKIP_MLC_SYS_UPGRADE', False)):
         f.write(EOL + '# Install all system dependencies' + EOL)
         f.write('RUN mlc run script --tags=get,sys-utils-mlc --quiet' + EOL)
 
