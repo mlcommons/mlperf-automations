@@ -60,7 +60,7 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd):
             for placeholder in container_placeholders:
                 if placeholder in env:
                     new_container_mount, container_env_key = get_container_path(
-                        env[placeholder])
+                        env[placeholder], docker_settings.get('user', 'mlcuser'))
                 else:  # Skip mount if variable is missing
                     mounts[index] = None
                     break
@@ -400,18 +400,18 @@ def get_host_path(value):
 
 def get_container_path_script(i):
     tmp_dep_cached_path = i['tmp_dep_cached_path']
-    value_mnt, value_env = get_container_path(tmp_dep_cached_path)
+    value_mnt, value_env = get_container_path(tmp_dep_cached_path, os.getlogin())
     return {'return': 0, 'value_mnt': value_mnt, 'value_env': value_env}
 
 
-def get_container_path(value):
+def get_container_path(value, username="mlcuser"):
     path_split = value.split(os.sep)
     if len(path_split) == 1:
         return value
 
     new_value = ''
     if "cache" in path_split and "local" in path_split:
-        new_path_split = ["", "home", "mlcuser", "MLC", "repos"]
+        new_path_split = ["", "home", username, "MLC", "repos"]
         repo_entry_index = path_split.index("local")
         if len(path_split) >= repo_entry_index + 3:
             new_path_split1 = new_path_split + \
