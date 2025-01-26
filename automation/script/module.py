@@ -4950,7 +4950,7 @@ def find_cached_script(i):
                     # TODO Need to restrict the below check to within container
                     # env
                     i['tmp_dep_cached_path'] = dependent_cached_path
-                    import script.docker_utils
+                    from script import docker_utils
                     r = docker_utils.utils.get_container_path_script(i)
                     if not os.path.exists(r['value_env']):
                         # Need to rm this cache entry
