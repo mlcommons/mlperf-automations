@@ -4951,7 +4951,7 @@ def find_cached_script(i):
                     # env
                     i['tmp_dep_cached_path'] = dependent_cached_path
                     from script import docker_utils
-                    r = docker_utils.utils.get_container_path_script(i)
+                    r = docker_utils.get_container_path_script(i)
                     if not os.path.exists(r['value_env']):
                         # Need to rm this cache entry
                         skip_cached_script = True
