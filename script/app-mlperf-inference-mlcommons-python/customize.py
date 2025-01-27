@@ -523,7 +523,7 @@ def get_run_cmd_reference(
 
         cmd = cmd.replace("--count", "--total-sample-count")
         cmd = cmd.replace("--max-batchsize", "--batch-size")
-    
+
     elif "pointpainting" in env['MLC_MODEL']:
         env['RUN_DIR'] = os.path.join(
             env['MLC_MLPERF_INFERENCE_SOURCE'],
@@ -539,9 +539,9 @@ def get_run_cmd_reference(
             " --output " + env['MLC_MLPERF_OUTPUT_DIR'] + \
             " --dtype " + env['MLC_MLPERF_MODEL_PRECISION'].replace("float", "fp") + \
             scenario_extra_options
-        
+
         print(cmd)
-        
+
     if env.get('MLC_NETWORK_LOADGEN', '') in ["lon", "sut"]:
         cmd = cmd + " " + "--network " + env['MLC_NETWORK_LOADGEN']
         if env.get('MLC_NETWORK_LOADGEN_SUT_SERVERS', []):
