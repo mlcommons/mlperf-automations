@@ -663,7 +663,7 @@ class ScriptAutomation(Automation):
                 '  - Searching for cached script outputs with the following tags: {}'.format(cache_tags_without_tmp_string))
 
             search_cache = {'action': 'search',
-                            'automation': self.meta['deps']['cache'],
+                            'target_name': 'cache',
                             'tags': cache_tags_without_tmp_string}
             rc = self.action_object.access(search_cache)
             if rc['return'] > 0:
@@ -4891,7 +4891,7 @@ def find_cached_script(i):
             '    - Searching for cached script outputs with the following tags: {}'.format(search_tags))
 
         r = self_obj.action_object.access({'action': 'search',
-                                           'automation': self_obj.meta['deps']['cache'],
+                                           'target_name': 'cache',
                                            'tags': search_tags})
         if r['return'] > 0:
             return r
