@@ -321,7 +321,7 @@ def preprocess(i):
                     del (state['docker'])
 
     if env.get('MLC_DOCKER_CONTAINER_ID', '') != '' and not is_true(env.get(
-        'MLC_DOCKER_CONTAINER_KEEP_ALIVE', '')): 
+            'MLC_DOCKER_CONTAINER_KEEP_ALIVE', '')):
         container_id = env['MLC_DOCKER_CONTAINER_ID']
         CMD = f"docker kill {container_id}"
         docker_out = subprocess.check_output(CMD, shell=True).decode("utf-8")

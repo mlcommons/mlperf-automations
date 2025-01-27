@@ -54,8 +54,9 @@ def preprocess(i):
     print('')
     print('Checking existing Docker container:')
     print('')
-    #CMD = f"""{env['MLC_CONTAINER_TOOL']} ps --format=json  --filter "ancestor={DOCKER_CONTAINER}" """
-    CMD = f"""{env['MLC_CONTAINER_TOOL']} ps --format """+ "'{{ .ID }},'" + f"""  --filter "ancestor={DOCKER_CONTAINER}" """
+    # CMD = f"""{env['MLC_CONTAINER_TOOL']} ps --format=json  --filter "ancestor={DOCKER_CONTAINER}" """
+    CMD = f"""{env['MLC_CONTAINER_TOOL']} ps --format """ + \
+        "'{{ .ID }},'" + f"""  --filter "ancestor={DOCKER_CONTAINER}" """
     if os_info['platform'] == 'windows':
         CMD += " 2> nul"
     else:
@@ -78,13 +79,15 @@ def preprocess(i):
         if len(out_split) > 0:
             existing_container_id = out_split[0].strip()
 
-    if existing_container_id and is_true(env.get('MLC_DOCKER_REUSE_EXISTING_CONTAINER','')):
+    if existing_container_id and is_true(
+            env.get('MLC_DOCKER_REUSE_EXISTING_CONTAINER', '')):
         print(f"Reusing existing container {existing_container_id}")
         env['MLC_DOCKER_CONTAINER_ID'] = existing_container_id
 
     else:
         if existing_container_id:
-            print(f"""Not using existing container {existing_container_id} as env['MLC_DOCKER_REUSE_EXISTING_CONTAINER'] is not set""")
+            print(
+                f"""Not using existing container {existing_container_id} as env['MLC_DOCKER_REUSE_EXISTING_CONTAINER'] is not set""")
         if env.get('MLC_DOCKER_CONTAINER_ID', '') != '':
             del (env['MLC_DOCKER_CONTAINER_ID'])  # not valid ID
 
@@ -230,7 +233,7 @@ def postprocess(i):
     run_opts += port_map_cmd_string
 
     # Currently have problem running Docker in detached mode on Windows:
-    detached = is_true(env.get('MLC_DOCKER_DETACHED_MODE',''))
+    detached = is_true(env.get('MLC_DOCKER_DETACHED_MODE', ''))
 
 #    if detached and os_info['platform'] != 'windows':
     if detached:
