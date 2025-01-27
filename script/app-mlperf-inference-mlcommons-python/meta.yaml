@@ -512,8 +512,6 @@ deps:
       MLC_MODEL:
         - pointpainting
     skip_if_env:
-      MLC_USE_MODEL_FROM_HOST:
-        - "yes"
       MLC_RUN_STATE_DOCKER:
         - "yes"
   - tags: get,ml-model,resnet50-deeplab
@@ -521,8 +519,6 @@ deps:
       MLC_MODEL:
         - pointpainting
     skip_if_env:
-      MLC_USE_MODEL_FROM_HOST:
-        - "yes"
       MLC_RUN_STATE_DOCKER:
         - "yes"
     names:
@@ -674,8 +670,6 @@ deps:
         - pointpainting
     skip_if_env:
       MLC_RUN_STATE_DOCKER:
-        - "yes"
-      MLC_USE_DATASET_FROM_HOST:
         - "yes"
     names:
       - waymo-dataset
