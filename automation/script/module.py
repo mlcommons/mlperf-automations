@@ -4890,7 +4890,7 @@ def find_cached_script(i):
             recursion_spaces +
             '    - Searching for cached script outputs with the following tags: {}'.format(search_tags))
 
-        r = self_obj.action_object.access({'action': 'find',
+        r = self_obj.action_object.access({'action': 'search',
                                            'automation': self_obj.meta['deps']['cache'],
                                            'tags': search_tags})
         if r['return'] > 0:
