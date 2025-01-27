@@ -119,6 +119,9 @@ input_mapping:
   use_dataset_from_host: MLC_USE_DATASET_FROM_HOST
   use_model_from_host: MLC_USE_MODEL_FROM_HOST
   rgat_checkpoint_path: RGAT_CHECKPOINT_PATH
+  pointpillars_checkpoint_path: MLC_ML_MODEL_POINT_PILLARS_PATH
+  deeplab_resnet50_path: MLC_ML_MODEL_DPLAB_RESNET50_PATH
+  waymo_path: MLC_DATASET_WAYMO_PATH
 
 new_state_keys:
 - app_mlperf_inference_*
@@ -466,6 +469,7 @@ input_description:
     - efficientnet
     - rgat
     - llama3_1-405b
+    - pointpillars
     default: resnet50
     desc: MLPerf model
     sort: 200

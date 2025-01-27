@@ -66,6 +66,9 @@ input_mapping:
   multistream_target_latency: MLC_MLPERF_LOADGEN_MULTISTREAM_TARGET_LATENCY
   network: MLC_NETWORK_LOADGEN
   sut_servers: MLC_NETWORK_LOADGEN_SUT_SERVERS
+  pointpillars_checkpoint_path: MLC_ML_MODEL_POINT_PILLARS_PATH
+  deeplab_resnet50_path: MLC_ML_MODEL_DPLAB_RESNET50_PATH
+  waymo_path: MLC_DATASET_WAYMO_PATH
 
 # Duplicate CM environment variables to the ones used in native apps
 env_key_mappings:
@@ -491,7 +494,6 @@ deps:
   - tags: get,ml-model,llama3
     names:
       - llama3-405b-model
-      - llama3-402b-model
     enable_if_env:
       MLC_MODEL:
         - llama3_1-405b
@@ -501,6 +503,30 @@ deps:
         - "yes"
       MLC_RUN_STATE_DOCKER:
         - "yes"
+
+  ## pointpillars
+  - tags: get,ml-model,pointpillars
+    names:
+      - pointpillars-model
+    enable_if_env:
+      MLC_MODEL:
+        - pointpillars
+    skip_if_env:
+      MLC_USE_MODEL_FROM_HOST:
+        - "yes"
+      MLC_RUN_STATE_DOCKER:
+        - "yes"
+  - tags: get,ml-model,resnet50-deeplab
+    enable_if_env:
+      MLC_MODEL:
+        - pointpillars
+    skip_if_env:
+      MLC_USE_MODEL_FROM_HOST:
+        - "yes"
+      MLC_RUN_STATE_DOCKER:
+        - "yes"
+    names:
+      - resnet50-deeplab-model
 
   ########################################################################
   # Install datasets
@@ -640,6 +666,19 @@ deps:
         - "yes"
       MLC_USE_DATASET_FROM_HOST:
         - "yes"
+
+  ## waymo for pointpillats
+  - tags: get,dataset,waymo
+    enable_if_env:
+      MLC_MODEL:
+        - pointpillars
+    skip_if_env:
+      MLC_RUN_STATE_DOCKER:
+        - "yes"
+      MLC_USE_DATASET_FROM_HOST:
+        - "yes"
+    names:
+      - waymo-dataset
 
   ## llama3_1 dataset
   - tags: get,dataset,mlperf,inference,llama3,_validation
@@ -1299,6 +1338,11 @@ variations:
       MLC_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: "https://data.pyg.org/whl/torch-<<<MLC_TORCH_VERSION>>>+cpu.html"
       MLC_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL_DGL: "https://data.dgl.ai/wheels/torch-<<<MLC_TORCH_VERSION_MAJOR_MINOR>>>/repo.html"
 
+  pointpillars:
+    group: models
+    env:
+      MLC_MODEL: pointpillars
+      
   llama3_1-405b:
     group: models
     env:

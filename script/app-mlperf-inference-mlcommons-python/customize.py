@@ -523,7 +523,25 @@ def get_run_cmd_reference(
 
         cmd = cmd.replace("--count", "--total-sample-count")
         cmd = cmd.replace("--max-batchsize", "--batch-size")
+    
+    elif "pointpillars" in env['MLC_MODEL']:
+        env['RUN_DIR'] = os.path.join(
+            env['MLC_MLPERF_INFERENCE_SOURCE'],
+            "automotive",
+            "3d-object-detection")
 
+        cmd = env['MLC_PYTHON_BIN_WITH_PATH'] + " main.py " \
+            " --dataset waymo" + \
+            " --dataset-path " + env['MLC_DATASET_WAYMO_PATH'] + \
+            " --lidar-path " + env['MLC_ML_MODEL_POINT_PILLARS_PATH'] + \
+            " --segmentor-path " + env['MLC_ML_MODEL_DPLAB_RESNET50_PATH'] + \
+            " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \
+            " --output " + env['MLC_MLPERF_OUTPUT_DIR'] + \
+            " --dtype " + env['MLC_MLPERF_MODEL_PRECISION'].replace("float", "fp") + \
+            scenario_extra_options
+        
+        print(cmd)
+        
     if env.get('MLC_NETWORK_LOADGEN', '') in ["lon", "sut"]:
         cmd = cmd + " " + "--network " + env['MLC_NETWORK_LOADGEN']
         if env.get('MLC_NETWORK_LOADGEN_SUT_SERVERS', []):

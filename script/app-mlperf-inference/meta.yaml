@@ -823,6 +823,51 @@ variations:
           - igbh-original
           - igbh-dataset
 
+  pointpillars:
+    group:
+      model
+    add_deps_recursive:
+      mlperf-inference-implementation:
+        tags: _pointpillars
+    env:
+      MLC_MODEL:
+        pointpillars
+    docker:
+      deps:
+      - tags: get,dataset,waymo
+        enable_if_env:
+          MLC_USE_DATASET_FROM_HOST:
+          - 'yes'
+        names:
+          - waymo-dataset
+      - tags: get,ml-model,pointpillars
+        enable_if_env:
+          MLC_USE_DATASET_FROM_HOST:
+          - 'yes'
+        names:
+          - pointpillars-model
+      - tags: get,ml-model,resnet50-deeplab
+        enable_if_env:
+          MLC_USE_DATASET_FROM_HOST:
+          - 'yes'
+        names:
+          - resnet50-deeplab-model
+    # posthook_deps:
+    # - enable_if_env:
+    #     MLC_MLPERF_LOADGEN_MODE:
+    #     - accuracy
+    #     - all
+    #     MLC_MLPERF_ACCURACY_RESULTS_DIR:
+    #     - 'on'
+    #   skip_if_env:
+    #     MLC_MLPERF_IMPLEMENTATION:
+    #     - nvidia
+    #   names:
+    #   - mlperf-accuracy-script
+    #   - 3d-unet-accuracy-script
+    #   tags: run,accuracy,mlperf,_igbh
+    
+
   llama3_1-405b:
     group:
       model
@@ -1904,6 +1949,9 @@ docker:
    - "${{ MLC_DATASET_KITS19_PREPROCESSED_PATH }}:${{ MLC_DATASET_KITS19_PREPROCESSED_PATH }}"
    - "${{ MLC_DATASET_IGBH_PATH }}:${{ MLC_DATASET_IGBH_PATH }}"
    - "${{ MLC_ML_MODEL_RGAT_CHECKPOINT_PATH }}:${{ MLC_ML_MODEL_RGAT_CHECKPOINT_PATH }}"
+   - "${{ MLC_DATASET_WAYMO_PATH }}:${{ MLC_DATASET_WAYMO_PATH }}"
+   - "${{ MLC_ML_MODEL_POINT_PILLARS_PATH }}:${{ MLC_ML_MODEL_POINT_PILLARS_PATH }}"
+   - "${{ MLC_ML_MODEL_DPLAB_RESNET50_PATH }}:${{ MLC_ML_MODEL_DPLAB_RESNET50_PATH }}" 
   skip_run_cmd: 'no'
   shm_size: '32gb'
   interactive: True
