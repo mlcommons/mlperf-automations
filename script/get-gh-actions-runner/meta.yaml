@@ -31,7 +31,6 @@ deps:
 variations:
   config:
     group: command
-    default: true
     env:
       MLC_GH_ACTIONS_RUNNER_COMMAND: config
   remove:
@@ -51,6 +50,7 @@ variations:
       MLC_GH_ACTIONS_RUNNER_COMMAND: uninstall
   start:
     group: command
+    default: true
     deps:
       - tags: get,gh,actions-runner,_install
         force_cache: yes

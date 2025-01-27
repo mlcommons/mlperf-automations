@@ -11,7 +11,7 @@ def preprocess(i):
     meta = i['meta']
 
     automation = i['automation']
-    mlc = automation.action_runner
+    mlc = automation.action_object
 
     quiet = (env.get('MLC_QUIET', False) == 'yes')
 

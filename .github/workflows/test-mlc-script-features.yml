@@ -1,7 +1,7 @@
 name: MLC script automation features test
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlc-script-features.yml'
@@ -61,18 +61,51 @@ jobs:
         mlcr --tags=python,src,install,_shared --version=3.9.10 --quiet
         mlc search cache --tags=python,src,install,_shared,version-3.9.10
 
+  test_docker:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.8"]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Pull MLOps repository
+      run: |
+        pip install mlcflow
+        mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
+  
     - name: Run docker container from dockerhub on linux
-      if: runner.os == 'linux'
       run: |
         mlcr --tags=run,docker,container --adr.compiler.tags=gcc --docker_mlc_repo=mlcommons@mlperf-automations --docker_mlc_repo_branch=dev --image_name=cm-script-app-image-classification-onnx-py --env.MLC_DOCKER_RUN_SCRIPT_TAGS=app,image-classification,onnx,python --env.MLC_DOCKER_IMAGE_BASE=ubuntu:22.04 --env.MLC_DOCKER_IMAGE_REPO=cknowledge --quiet
      
     - name: Run docker container locally on linux
-      if: runner.os == 'linux'
       run: |
         mlcr --tags=run,docker,container --adr.compiler.tags=gcc --docker_mlc_repo=mlcommons@mlperf-automations --docker_mlc_repo_branch=dev --image_name=mlc-script-app-image-classification-onnx-py --env.MLC_DOCKER_RUN_SCRIPT_TAGS=app,image-classification,onnx,python --env.MLC_DOCKER_IMAGE_BASE=ubuntu:22.04 --env.MLC_DOCKER_IMAGE_REPO=local --quiet
 
+  test_mlperf_retinanet_cpp_venv:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.8"]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Pull MLOps repository
+      run: |
+        pip install mlcflow
+        mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
+  
     - name: Run MLPerf Inference Retinanet with native and virtual Python
-      if: runner.os == 'linux'
       run: |
         mlcr --tags=app,mlperf,inference,generic,_cpp,_retinanet,_onnxruntime,_cpu  --adr.python.version_min=3.8 --adr.compiler.tags=gcc --adr.openimages-preprocessed.tags=_50 --scenario=Offline --mode=accuracy --test_query_count=10 --rerun --quiet
         
@@ -80,4 +113,49 @@ jobs:
 
         mlcr --tags=install,python-venv --version=3.10.8 --name=mlperf --quiet
 
-        mlcr --tags=run,mlperf,inference,generate-run-cmds,_submission,_short --adr.python.name=mlperf --adr.python.version_min=3.8 --adr.compiler.tags=gcc --adr.openimages-preprocessed.tags=_50 --submitter=Community --implementation=cpp --hw_name=default --model=retinanet --backend=onnxruntime --device=cpu --scenario=Offline --quiet
+        mlcr --tags=run,mlperf,inference,_submission,_short --adr.python.name=mlperf --adr.python.version_min=3.8 --adr.compiler.tags=gcc --adr.openimages-preprocessed.tags=_50 --submitter=MLCommons --implementation=cpp --hw_name=default --model=retinanet --backend=onnxruntime --device=cpu --scenario=Offline --quiet
+
+     # Step for Linux/MacOS
+    - name: Randomly Execute Step (Linux/MacOS)
+      if: runner.os != 'Windows'
+      run: |
+        RANDOM_NUMBER=$((RANDOM % 10))
+        echo "Random number is $RANDOM_NUMBER"
+        if [ "$RANDOM_NUMBER" -eq 0 ]; then
+          echo "run_step=true" >> $GITHUB_ENV
+        else
+          echo "run_step=false" >> $GITHUB_ENV
+        fi
+
+    # Step for Windows
+    - name: Randomly Execute Step (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        $RANDOM_NUMBER = Get-Random -Maximum 10
+        Write-Host "Random number is $RANDOM_NUMBER"
+        if ($RANDOM_NUMBER -eq 0) {
+          Write-Host "run_step=true" | Out-File -FilePath $Env:GITHUB_ENV -Append
+        } else {
+          Write-Host "run_step=false" | Out-File -FilePath $Env:GITHUB_ENV -Append
+        }
+
+    - name: Retrieve secrets from Keeper
+      if: github.repository_owner == 'mlcommons' && env.run_step == 'true'
+      id: ksecrets
+      uses: Keeper-Security/ksm-action@master
+      with:
+        keeper-secret-config: ${{ secrets.KSM_CONFIG }}
+        secrets: |-
+          ubwkjh-Ii8UJDpG2EoU6GQ/field/Access Token > env:PAT
+    - name: Push Results
+      env:
+        GITHUB_TOKEN: ${{ env.PAT }}
+      if: github.repository_owner == 'mlcommons' && env.run_step == 'true'
+      run: |
+        git config --global user.name "mlcommons-bot"
+        git config --global user.email "mlcommons-bot@users.noreply.github.com"
+        git config --global credential.https://github.com.helper ""
+        git config --global credential.https://github.com.helper "!gh auth git-credential"
+        git config --global credential.https://gist.github.com.helper ""
+        git config --global credential.https://gist.github.com.helper "!gh auth git-credential"
+        mlcr --tags=push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from R50 GH action on ${{ matrix.os }}" --quiet

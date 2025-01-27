@@ -708,21 +708,21 @@ class ScriptAutomation(Automation):
                 for cache_entry in cache_list:
                     # Find associated script and add to the
                     # list_of_found_scripts
-                    associated_script_artifact = cache_entry.meta['associated_script_artifact']
+                    associated_script_item = cache_entry.meta['associated_script_item']
 
-                    x = associated_script_artifact.find(',')
+                    x = associated_script_item.find(',')
                     if x < 0:
                         return {'return': 1, 'error': 'MLC artifact format is wrong "{}" - no comma found'.format(
-                            associated_script_artifact)}
+                            associated_script_item)}
 
-                    associated_script_artifact_uid = associated_script_artifact[x + 1:]
+                    associated_script_item_uid = associated_script_item[x + 1:]
 
-                    cache_entry.meta['associated_script_artifact_uid'] = associated_script_artifact_uid
+                    cache_entry.meta['associated_script_item_uid'] = associated_script_item_uid
 
                     for script in list_of_found_scripts:
                         script_uid = script.meta['uid']
 
-                        if associated_script_artifact_uid == script_uid:
+                        if associated_script_item_uid == script_uid:
                             if script not in new_list_of_found_scripts:
                                 new_list_of_found_scripts.append(script)
 
@@ -733,7 +733,7 @@ class ScriptAutomation(Automation):
 
             # Select scripts
             if len(list_of_found_scripts) > 1:
-                select_script = select_script_artifact(
+                select_script = select_script_item(
                     list_of_found_scripts,
                     'script',
                     recursion_spaces,
@@ -752,23 +752,23 @@ class ScriptAutomation(Automation):
 
             # Prune cache list with the selected script
             if len(list_of_found_scripts) > 0:
-                script_artifact_uid = list_of_found_scripts[select_script].meta['uid']
+                script_item_uid = list_of_found_scripts[select_script].meta['uid']
 
                 new_cache_list = []
                 for cache_entry in cache_list:
-                    if cache_entry.meta['associated_script_artifact_uid'] == script_artifact_uid:
+                    if cache_entry.meta['associated_script_item_uid'] == script_item_uid:
                         new_cache_list.append(cache_entry)
 
                 cache_list = new_cache_list
 
         # Here a specific script is found and meta obtained
         # Set some useful local variables
-        script_artifact = list_of_found_scripts[select_script]
+        script_item = list_of_found_scripts[select_script]
 
         # print(list_of_found_scripts)
-        meta = script_artifact.meta
+        meta = script_item.meta
         # print(meta)
-        path = script_artifact.path
+        path = script_item.path
 
         # Check min MLC version requirement
         min_mlc_version = meta.get('min_mlc_version', '').strip()
@@ -785,12 +785,12 @@ class ScriptAutomation(Automation):
                 error = format(e)
 
         # Check path to repo
-        script_repo_path = script_artifact.repo.path
+        script_repo_path = script_item.repo.path
 
-        script_repo_path_with_prefix = script_artifact.repo.path
-        if script_artifact.repo.meta.get('prefix', '') != '':
+        script_repo_path_with_prefix = script_item.repo.path
+        if script_item.repo.meta.get('prefix', '') != '':
             script_repo_path_with_prefix = os.path.join(
-                script_repo_path, script_artifact.repo.meta['prefix'])
+                script_repo_path, script_item.repo.meta['prefix'])
 
         env['MLC_TMP_CURRENT_SCRIPT_REPO_PATH'] = script_repo_path
         env['MLC_TMP_CURRENT_SCRIPT_REPO_PATH_WITH_PREFIX'] = script_repo_path_with_prefix
@@ -803,18 +803,18 @@ class ScriptAutomation(Automation):
         run_state['script_id'] = meta['alias'] + "," + meta['uid']
         run_state['script_tags'] = script_tags
         run_state['script_variation_tags'] = variation_tags
-        run_state['script_repo_alias'] = script_artifact.repo.meta.get(
+        run_state['script_repo_alias'] = script_item.repo.meta.get(
             'alias', '')
-        run_state['script_repo_git'] = script_artifact.repo.meta.get(
+        run_state['script_repo_git'] = script_item.repo.meta.get(
             'git', False)
         run_state['cache'] = meta.get('cache', False)
 
         if not recursion:
             run_state['script_entry_repo_to_report_errors'] = meta.get(
                 'repo_to_report_errors', '')
-            run_state['script_entry_repo_alias'] = script_artifact.repo.meta.get(
+            run_state['script_entry_repo_alias'] = script_item.repo.meta.get(
                 'alias', '')
-            run_state['script_entry_repo_git'] = script_artifact.repo.meta.get(
+            run_state['script_entry_repo_git'] = script_item.repo.meta.get(
                 'git', False)
 
         deps = meta.get('deps', [])
@@ -826,7 +826,7 @@ class ScriptAutomation(Automation):
         new_env_keys_from_meta = meta.get('new_env_keys', [])
         new_state_keys_from_meta = meta.get('new_state_keys', [])
 
-        found_script_artifact = utils.assemble_object(
+        found_script_item = utils.assemble_object(
             meta['alias'], meta['uid'])
 
         found_script_tags = meta.get('tags', [])
@@ -835,9 +835,9 @@ class ScriptAutomation(Automation):
             debug_script_tags = ','.join(found_script_tags)
 
         logging.debug(recursion_spaces +
-                      '  - Found script::{} in {}'.format(found_script_artifact, path))
+                      '  - Found script::{} in {}'.format(found_script_item, path))
 
-        # STEP 500 output: script_artifact - unique selected script artifact
+        # STEP 500 output: script_item - unique selected script artifact
         #                  (cache_list) pruned for the unique script if cache is used
         #                  meta - script meta
         #                  path - script path
@@ -848,21 +848,21 @@ class ScriptAutomation(Automation):
         # STEP 600: Continue updating env
         # Add default env from meta to new env if not empty
         # (env NO OVERWRITE)
-        script_artifact_default_env = meta.get('default_env', {})
-        for key in script_artifact_default_env:
-            env.setdefault(key, script_artifact_default_env[key])
+        script_item_default_env = meta.get('default_env', {})
+        for key in script_item_default_env:
+            env.setdefault(key, script_item_default_env[key])
 
         # Force env from meta['env'] as a CONST
         # (env OVERWRITE)
-        script_artifact_env = meta.get('env', {})
-        # print(f"script meta env= {script_artifact_env}")
+        script_item_env = meta.get('env', {})
+        # print(f"script meta env= {script_item_env}")
 
-        env.update(script_artifact_env)
+        env.update(script_item_env)
         # print(f"env = {env}")
 
-        script_artifact_state = meta.get('state', {})
+        script_item_state = meta.get('state', {})
         utils.merge_dicts({'dict1': state,
-                           'dict2': script_artifact_state,
+                           'dict2': script_item_state,
                            'append_lists': True,
                            'append_unique': True})
 
@@ -901,7 +901,7 @@ class ScriptAutomation(Automation):
         # VARIATIONS OVERWRITE current ENV but not input keys (they become
         # const)
 
-        variations = script_artifact.meta.get('variations', {})
+        variations = script_item.meta.get('variations', {})
         state['docker'] = meta.get('docker', {})
 
         r = self._update_state_from_variations(
@@ -998,7 +998,7 @@ class ScriptAutomation(Automation):
 
         # STEP 1000: Update version only if in "versions" (not obligatory)
         # can be useful when handling complex Git revisions
-        versions = script_artifact.meta.get('versions', {})
+        versions = script_item.meta.get('versions', {})
 
         if version != '' and version in versions:
             versions_meta = versions[version]
@@ -1048,7 +1048,7 @@ class ScriptAutomation(Automation):
                        ).lower() in ['false', '0', 'no']:
                     logging.info(
                         recursion_spaces +
-                        '  - Skipping script::{} run as we are inside docker'.format(found_script_artifact))
+                        '  - Skipping script::{} run as we are inside docker'.format(found_script_item))
 
                     # restore env and state
                     for k in list(env.keys()):
@@ -1071,7 +1071,7 @@ class ScriptAutomation(Automation):
                 elif str(state['docker'].get('real_run', True)).lower() in ['false', '0', 'no']:
                     logging.info(
                         recursion_spaces +
-                        '  - Doing fake run for script::{} as we are inside docker'.format(found_script_artifact))
+                        '  - Doing fake run for script::{} as we are inside docker'.format(found_script_item))
                     fake_run = True
                     env['MLC_TMP_FAKE_RUN'] = 'yes'
 
@@ -1146,8 +1146,8 @@ class ScriptAutomation(Automation):
             customize_common_input = {
                 'input': i,
                 'automation': self,
-                'artifact': script_artifact,
-                'customize': script_artifact.meta.get('customize', {}),
+                'artifact': script_item,
+                'customize': script_item.meta.get('customize', {}),
                 'os_info': os_info,
                 'recursion_spaces': recursion_spaces,
                 'script_tags': script_tags,
@@ -1216,7 +1216,7 @@ class ScriptAutomation(Automation):
                         num_found_cached_scripts = 1
 
                 if num_found_cached_scripts > 1:
-                    selection = select_script_artifact(
+                    selection = select_script_item(
                         found_cached_scripts,
                         'cached script output',
                         recursion_spaces,
@@ -1353,7 +1353,7 @@ class ScriptAutomation(Automation):
             if renew or (not found_cached and num_found_cached_scripts == 0):
                 # Add more tags to cached tags
                 # based on meta information of the found script
-                x = 'script-artifact-' + meta['uid']
+                x = 'script-item-' + meta['uid']
                 if x not in cached_tags:
                     cached_tags.append(x)
 
@@ -1608,8 +1608,8 @@ class ScriptAutomation(Automation):
                 customize_common_input = {
                     'input': i,
                     'automation': self,
-                    'artifact': script_artifact,
-                    'customize': script_artifact.meta.get('customize', {}),
+                    'artifact': script_item,
+                    'customize': script_item.meta.get('customize', {}),
                     'os_info': os_info,
                     'recursion_spaces': recursion_spaces,
                     'script_tags': script_tags,
@@ -1710,8 +1710,8 @@ class ScriptAutomation(Automation):
                 customize_common_input = {
                     'input': i,
                     'automation': self,
-                    'artifact': script_artifact,
-                    'customize': script_artifact.meta.get('customize', {}),
+                    'artifact': script_item,
+                    'customize': script_item.meta.get('customize', {}),
                     'os_info': os_info,
                     'recursion_spaces': recursion_spaces,
                     'script_tags': script_tags,
@@ -2023,15 +2023,15 @@ class ScriptAutomation(Automation):
                 if detected_version != '':
                     cached_meta['version'] = detected_version
 
-                if found_script_artifact != '':
-                    cached_meta['associated_script_artifact'] = found_script_artifact
+                if found_script_item != '':
+                    cached_meta['associated_script_item'] = found_script_item
 
-                    x = found_script_artifact.find(',')
+                    x = found_script_item.find(',')
                     if x < 0:
                         return {
-                            'return': 1, 'error': 'MLC artifact format is wrong "{}" - no comma found'.format(found_script_artifact)}
+                            'return': 1, 'error': 'MLC artifact format is wrong "{}" - no comma found'.format(found_script_item)}
 
-                    cached_meta['associated_script_artifact_uid'] = found_script_artifact[x + 1:]
+                    cached_meta['associated_script_item_uid'] = found_script_item[x + 1:]
 
                 # Check if the cached entry is dependent on any path
                 if dependent_cached_path != '':
@@ -2124,11 +2124,11 @@ class ScriptAutomation(Automation):
         # to aggregate all resolved versions and dump them at the end
         # if requested (for better reproducibility/replicability)
 
-        script_uid = script_artifact.meta.get('uid')
-        script_alias = script_artifact.meta.get('alias')
+        script_uid = script_item.meta.get('uid')
+        script_alias = script_item.meta.get('alias')
 
         # we should use user-friendly tags here
-        # script_tags = script_artifact.meta.get('tags')
+        # script_tags = script_item.meta.get('tags')
 
         version_info_tags = ",".join(script_tags)
 
@@ -2830,8 +2830,8 @@ class ScriptAutomation(Automation):
         if found_scripts and len(variation_tags) > 0:
             filtered = []
 
-            for script_artifact in lst:
-                meta = script_artifact.meta
+            for script_item in lst:
+                meta = script_item.meta
                 variations = meta.get('variations', {})
 
                 matched = True
@@ -2851,7 +2851,7 @@ class ScriptAutomation(Automation):
                 if not matched:
                     continue
 
-                filtered.append(script_artifact)
+                filtered.append(script_item)
 
             if len(lst) > 0 and not filtered:
                 warning = [""]
@@ -2925,10 +2925,10 @@ class ScriptAutomation(Automation):
             return r
 
         lst = r['list']
-        for script_artifact in lst:
-            path = script_artifact.path
-            meta = script_artifact.meta
-            original_meta = script_artifact.original_meta
+        for script_item in lst:
+            path = script_item.path
+            meta = script_item.meta
+            original_meta = script_item.original_meta
 
             alias = meta.get('alias', '')
             uid = meta.get('uid', '')
@@ -6153,8 +6153,8 @@ def detect_state_diff(env, saved_env, new_env_keys,
 ##############################################################################
 
 
-def select_script_artifact(lst, text, recursion_spaces,
-                           can_skip, script_tags_string, quiet, verbose):
+def select_script_item(lst, text, recursion_spaces,
+                       can_skip, script_tags_string, quiet, verbose):
     """
     Internal: select script
     """
