@@ -469,7 +469,7 @@ input_description:
     - efficientnet
     - rgat
     - llama3_1-405b
-    - pointpillars
+    - pointpainting
     default: resnet50
     desc: MLPerf model
     sort: 200

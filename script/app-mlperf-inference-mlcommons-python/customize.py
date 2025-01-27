@@ -524,7 +524,7 @@ def get_run_cmd_reference(
         cmd = cmd.replace("--count", "--total-sample-count")
         cmd = cmd.replace("--max-batchsize", "--batch-size")
     
-    elif "pointpillars" in env['MLC_MODEL']:
+    elif "pointpainting" in env['MLC_MODEL']:
         env['RUN_DIR'] = os.path.join(
             env['MLC_MLPERF_INFERENCE_SOURCE'],
             "automotive",

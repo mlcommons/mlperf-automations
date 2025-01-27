@@ -504,13 +504,13 @@ deps:
       MLC_RUN_STATE_DOCKER:
         - "yes"
 
-  ## pointpillars
+  ## pointpainting
   - tags: get,ml-model,pointpillars
     names:
       - pointpillars-model
     enable_if_env:
       MLC_MODEL:
-        - pointpillars
+        - pointpainting
     skip_if_env:
       MLC_USE_MODEL_FROM_HOST:
         - "yes"
@@ -519,7 +519,7 @@ deps:
   - tags: get,ml-model,resnet50-deeplab
     enable_if_env:
       MLC_MODEL:
-        - pointpillars
+        - pointpainting
     skip_if_env:
       MLC_USE_MODEL_FROM_HOST:
         - "yes"
@@ -671,7 +671,7 @@ deps:
   - tags: get,dataset,waymo
     enable_if_env:
       MLC_MODEL:
-        - pointpillars
+        - pointpainting
     skip_if_env:
       MLC_RUN_STATE_DOCKER:
         - "yes"
@@ -1338,10 +1338,24 @@ variations:
       MLC_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: "https://data.pyg.org/whl/torch-<<<MLC_TORCH_VERSION>>>+cpu.html"
       MLC_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL_DGL: "https://data.dgl.ai/wheels/torch-<<<MLC_TORCH_VERSION_MAJOR_MINOR>>>/repo.html"
 
-  pointpillars:
+  pointpainting:
     group: models
     env:
-      MLC_MODEL: pointpillars
+      MLC_MODEL: pointpainting
+    adr:
+      pytorch:
+        version_max: "2.2"
+      torchvision:
+        version_max: "0.17"
+    deps:
+      - tags: get,generic-python-lib,_package.shapely
+      - tags: get,generic-python-lib,_package.numba
+      - tags: get,generic-python-lib,_package.open3d
+      - tags: get,generic-python-lib,_package.numpy
+        version_max: 1.26.4
+      - tags: get,generic-python-lib,_package.tensorboard
+      - tags: get,generic-python-lib,_package.onnxruntime
+
       
   llama3_1-405b:
     group: models

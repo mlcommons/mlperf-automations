@@ -261,6 +261,10 @@ variations:
   reference,rgat:
     default_variations:
       backend: pytorch
+  
+  reference,pointpainting:
+    default_variations:
+      backend: pytorch
 
   reference,sdxl_:
     default_variations:
@@ -823,15 +827,15 @@ variations:
           - igbh-original
           - igbh-dataset
 
-  pointpillars:
+  pointpainting:
     group:
       model
     add_deps_recursive:
       mlperf-inference-implementation:
-        tags: _pointpillars
+        tags: _pointpainting
     env:
       MLC_MODEL:
-        pointpillars
+        pointpainting
     docker:
       deps:
       - tags: get,dataset,waymo
