@@ -1355,6 +1355,8 @@ variations:
         version_max: 1.26.4
       - tags: get,generic-python-lib,_package.tensorboard
       - tags: get,generic-python-lib,_package.onnxruntime
+      - tags: get,generic-python-lib,_package.scipy
+        version_max: 1.11
 
       
   llama3_1-405b:
