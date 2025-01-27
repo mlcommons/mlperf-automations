@@ -54,7 +54,8 @@ def preprocess(i):
     print('')
     print('Checking existing Docker container:')
     print('')
-    CMD = f"""{env['MLC_CONTAINER_TOOL']} ps --format=json  --filter "ancestor={DOCKER_CONTAINER}" """
+    #CMD = f"""{env['MLC_CONTAINER_TOOL']} ps --format=json  --filter "ancestor={DOCKER_CONTAINER}" """
+    CMD = f"""{env['MLC_CONTAINER_TOOL']} ps --format """+ "'{{ .ID }},'" + f"""  --filter "ancestor={DOCKER_CONTAINER}" """
     if os_info['platform'] == 'windows':
         CMD += " 2> nul"
     else:
@@ -71,26 +72,19 @@ def preprocess(i):
             'error': 'Unexpected error occurred with docker run:\n{}'.format(e)
         }
 
-    if len(out) > 0 and is_true(env.get('MLC_DOCKER_REUSE_EXISTING_CONTAINER','')):
-        # print(out)
-        out_split = out.splitlines()
+    existing_container_id = None
+    if len(out) > 0:
+        out_split = out.split(",")
         if len(out_split) > 0:
-            try:
-                out_json = json.loads(out_split[0])
-                # print("JSON successfully loaded:", out_json)
-            except json.JSONDecodeError as e:
-                print(f"Error: First line of 'out' is not valid JSON: {e}")
-                return {
-                    'return': 1, 'error': f"Error: First line of 'out' is not valid JSON: {e}"}
-    else:
-        out_json = []
+            existing_container_id = out_split[0].strip()
 
-    if isinstance(out_json, list) and len(out_json) > 0:
-        existing_container_id = out_json[0]['Id']
+    if existing_container_id and is_true(env.get('MLC_DOCKER_REUSE_EXISTING_CONTAINER','')):
         print(f"Reusing existing container {existing_container_id}")
         env['MLC_DOCKER_CONTAINER_ID'] = existing_container_id
 
     else:
+        if existing_container_id:
+            print(f"""Not using existing container {existing_container_id} as env['MLC_DOCKER_REUSE_EXISTING_CONTAINER'] is not set""")
         if env.get('MLC_DOCKER_CONTAINER_ID', '') != '':
             del (env['MLC_DOCKER_CONTAINER_ID'])  # not valid ID
 

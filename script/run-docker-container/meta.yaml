@@ -14,7 +14,6 @@ cache: false
 category: Docker automation
 
 default_env:
-  MLC_DOCKER_DETACHED_MODE: 'yes'
   MLC_DOCKER_REUSE_EXISTING_CONTAINER: 'no'
   MLC_DOCKER_PRIVILEGED_MODE: 'no'
   MLC_PODMAN_MAP_USER_ID: 'no'
@@ -31,6 +30,7 @@ input_mapping:
   docker_base_image: MLC_DOCKER_IMAGE_BASE
   base_image: MLC_DOCKER_IMAGE_BASE
   keep_detached: MLC_KEEP_DETACHED_CONTAINER
+  reuse_existing: MLC_DOCKER_REUSE_EXISTING_CONTAINER
   docker_os: MLC_DOCKER_OS
   docker_os_version: MLC_DOCKER_OS_VERSION
   os: MLC_DOCKER_OS
