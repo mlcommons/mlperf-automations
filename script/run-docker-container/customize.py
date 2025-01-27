@@ -16,7 +16,7 @@ def preprocess(i):
 
     interactive = env.get('MLC_DOCKER_INTERACTIVE_MODE', '')
 
-    if str(interactive).lower() in ['yes', 'true', '1']:
+    if is_true(interactive):
         env['MLC_DOCKER_DETACHED_MODE'] = 'no'
 
     if 'MLC_DOCKER_RUN_SCRIPT_TAGS' not in env:
@@ -71,8 +71,7 @@ def preprocess(i):
             'error': 'Unexpected error occurred with docker run:\n{}'.format(e)
         }
 
-    if len(out) > 0 and str(env.get('MLC_DOCKER_REUSE_EXISTING_CONTAINER',
-                                    '')).lower() in ["1", "true", "yes"]:  # container exists
+    if len(out) > 0 and is_true(env.get('MLC_DOCKER_REUSE_EXISTING_CONTAINER','')):
         # print(out)
         out_split = out.splitlines()
         if len(out_split) > 0:
@@ -237,13 +236,8 @@ def postprocess(i):
     run_opts += port_map_cmd_string
 
     # Currently have problem running Docker in detached mode on Windows:
-    detached = str(
-        env.get(
-            'MLC_DOCKER_DETACHED_MODE',
-            '')).lower() in [
-        'yes',
-        'true',
-        "1"]
+    detached = is_true(env.get('MLC_DOCKER_DETACHED_MODE',''))
+
 #    if detached and os_info['platform'] != 'windows':
     if detached:
         if os_info['platform'] == 'windows':
@@ -257,8 +251,7 @@ def postprocess(i):
             CONTAINER = f"""{env['MLC_CONTAINER_TOOL']} run -dt {run_opts} --rm  {docker_image_repo}/{docker_image_name}:{docker_image_tag} bash"""
             CMD = f"""ID=`{CONTAINER}` && {env['MLC_CONTAINER_TOOL']} exec $ID bash -c '{run_cmd}'"""
 
-            if False and str(env.get('MLC_KEEP_DETACHED_CONTAINER', '')).lower() not in [
-                    'yes', "1", 'true']:
+            if not is_true(env.get('MLC_KEEP_DETACHED_CONTAINER', '')):
                 CMD += f""" && {env['MLC_CONTAINER_TOOL']} kill $ID >/dev/null"""
 
         CMD += ' && echo "ID=$ID"'

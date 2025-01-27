@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import copy
 import mlperf_utils
+from utils import *
 
 summary_ext = ['.csv', '.json', '.xlsx']
 
@@ -218,8 +219,7 @@ def preprocess(i):
 
         print('=========================================================')
 
-    if str(env.get('MLC_MLPERF_USE_DOCKER', '')
-           ).lower() in ["1", "true", "yes"]:
+    if is_true(env.get('MLC_MLPERF_USE_DOCKER', '')):
         action = "docker"
         # del(env['OUTPUT_BASE_DIR'])
         state = {}
@@ -232,7 +232,7 @@ def preprocess(i):
             if k.startswith("docker_"):
                 docker_extra_input[k] = inp[k]
         inp = {}
-        if str(docker_dt).lower() in ["yes", "true", "1"]:
+        if is_true(docker_dt):
             # turning it off for the first run and after that we turn it on
             if env.get('MLC_DOCKER_REUSE_EXISTING_CONTAINER', '') == '':
                 env['MLC_DOCKER_REUSE_EXISTING_CONTAINER'] = 'no'
@@ -292,7 +292,7 @@ def preprocess(i):
                     env['OUTPUT_BASE_DIR'], f"{env['MLC_MLPERF_RUN_STYLE']}_results")
 
             if action == "docker":
-                if str(docker_dt).lower() not in ["yes", "true", "1"]:
+                if not is_true(docker_dt):
                     print(
                         f"\nStop Running loadgen scenario: {scenario} and mode: {mode}")
                     # We run commands interactively inside the docker container
@@ -320,8 +320,8 @@ def preprocess(i):
                 if state.get('docker', {}):
                     del (state['docker'])
 
-    if env.get('MLC_DOCKER_CONTAINER_ID', '') != '' and str(env.get(
-            'MLC_DOCKER_CONTAINER_KEEP_ALIVE', '')).lower() not in ["yes", "1", "true"]:
+    if env.get('MLC_DOCKER_CONTAINER_ID', '') != '' and not is_true(env.get(
+        'MLC_DOCKER_CONTAINER_KEEP_ALIVE', '')): 
         container_id = env['MLC_DOCKER_CONTAINER_ID']
         CMD = f"docker kill {container_id}"
         docker_out = subprocess.check_output(CMD, shell=True).decode("utf-8")
