@@ -398,9 +398,14 @@ def get_host_path(value):
 
 
 def get_container_path_script(i):
+    import getpass
+    cur_user = getpass.getuser()
+    if not cur_user or cur_user == '':
+        cur_user = os.environ.get('USER', 'mlcuser')
+
     tmp_dep_cached_path = i['tmp_dep_cached_path']
     value_mnt, value_env = get_container_path(
-        tmp_dep_cached_path, os.getlogin())
+        tmp_dep_cached_path, cur_user)
     return {'return': 0, 'value_mnt': value_mnt, 'value_env': value_env}
 
 
