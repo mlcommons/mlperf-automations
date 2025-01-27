@@ -6154,7 +6154,7 @@ def detect_state_diff(env, saved_env, new_env_keys,
 
 
 def select_script_item(lst, text, recursion_spaces,
-                           can_skip, script_tags_string, quiet, verbose):
+                       can_skip, script_tags_string, quiet, verbose):
     """
     Internal: select script
     """
