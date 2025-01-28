@@ -26,7 +26,7 @@ class ScriptAutomation(Automation):
     ############################################################
     def __init__(self, action_object, automation_file):
         super().__init__(action_object, "script", automation_file)
-        logging.basicConfig(level=logging.INFO)
+        #logger.basicConfig(level=logger.INFO)
         self.os_info = {}
         self.run_state = {}
         self.run_state['deps'] = []
@@ -233,6 +233,8 @@ class ScriptAutomation(Automation):
         repro = i.get('repro', False)
         repro_prefix = ''
 
+        logger = self.action_object.logger
+
         if repro:
             repro_prefix = i.get('repro_prefix', '')
             if repro_prefix == '':
@@ -404,7 +406,7 @@ class ScriptAutomation(Automation):
         if verbose:
             env['MLC_VERBOSE'] = 'yes'
             run_state['tmp_verbose'] = True
-            logging.getLogger().setLevel(logging.DEBUG)
+            logger.setLevel(logging.DEBUG)
 
         print_deps = i.get('print_deps', False)
         print_versions = i.get('print_versions', False)
@@ -561,10 +563,10 @@ class ScriptAutomation(Automation):
                 mlc_script_info += y.join(x_variation_tags)
 
 #        if verbose:
-#            logging.info('')
+#            logger.info('')
 
         if not run_state.get('tmp_silent', False):
-            logging.info(recursion_spaces + '* ' + mlc_script_info)
+            logger.info(recursion_spaces + '* ' + mlc_script_info)
 
         #######################################################################
         # Report if scripts were not found or there is an ambiguity with UIDs
@@ -596,7 +598,7 @@ class ScriptAutomation(Automation):
         # Sort scripts for better determinism
         list_of_found_scripts = sorted(list_of_found_scripts, key=lambda a: (a.meta.get('sort', 0),
                                                                              a.path))
-        logging.debug(recursion_spaces +
+        logger.debug(recursion_spaces +
                       '  - Number of scripts found: {}'.format(len(list_of_found_scripts)))
 
         # Check if script selection is remembered
@@ -606,7 +608,7 @@ class ScriptAutomation(Automation):
                         selection['tags'].split(',')) == set(script_tags_string.split(',')):
                     # Leave 1 entry in the found list
                     list_of_found_scripts = [selection['cached_script']]
-                    logging.debug(
+                    logger.debug(
                         recursion_spaces +
                         '  - Found remembered selection with tags: {}'.format(script_tags_string))
                     break
@@ -658,7 +660,7 @@ class ScriptAutomation(Automation):
             cache_tags_without_tmp_string = cache_tags_without_tmp_string.replace(
                 ",_-", ",-_")
 
-            logging.debug(
+            logger.debug(
                 recursion_spaces +
                 '  - Searching for cached script outputs with the following tags: {}'.format(cache_tags_without_tmp_string))
 
@@ -671,7 +673,7 @@ class ScriptAutomation(Automation):
 
             cache_list = rc['list']
 
-            logging.debug(
+            logger.debug(
                 recursion_spaces +
                 '    - Number of cached script outputs found: {}'.format(
                     len(cache_list)))
@@ -819,7 +821,7 @@ class ScriptAutomation(Automation):
         if i.get('debug_script', False):
             debug_script_tags = ','.join(found_script_tags)
 
-        logging.debug(recursion_spaces +
+        logger.debug(recursion_spaces +
                       '  - Found script::{} in {}'.format(found_script_item, path))
 
         # STEP 500 output: script_item - unique selected script artifact
@@ -973,7 +975,7 @@ class ScriptAutomation(Automation):
 #                del(env[key])
 
         if len(notes) > 0:
-            logging.debug(
+            logger.debug(
                 recursion_spaces +
                 '    - Requested version: ' +
                 '  '.join(notes))
@@ -1031,7 +1033,7 @@ class ScriptAutomation(Automation):
             if state.get('docker'):
                 if str(state['docker'].get('run', True)
                        ).lower() in ['false', '0', 'no']:
-                    logging.info(
+                    logger.info(
                         recursion_spaces +
                         '  - Skipping script::{} run as we are inside docker'.format(found_script_item))
 
@@ -1054,7 +1056,7 @@ class ScriptAutomation(Automation):
                     return rr
 
                 elif str(state['docker'].get('real_run', True)).lower() in ['false', '0', 'no']:
-                    logging.info(
+                    logger.info(
                         recursion_spaces +
                         '  - Doing fake run for script::{} as we are inside docker'.format(found_script_item))
                     fake_run = True
@@ -1220,7 +1222,7 @@ class ScriptAutomation(Automation):
                         num_found_cached_scripts = 0
 
                 elif num_found_cached_scripts == 1:
-                    logging.debug(
+                    logger.debug(
                         recursion_spaces +
                         '    - Found cached script output: {}'.format(
                             found_cached_scripts[0].path))
@@ -1230,7 +1232,7 @@ class ScriptAutomation(Automation):
 
                     # Check chain of dynamic dependencies on other MLC scripts
                     if len(deps) > 0:
-                        logging.debug(
+                        logger.debug(
                             recursion_spaces +
                             '  - Checking dynamic dependencies on other MLC scripts:')
 
@@ -1240,7 +1242,7 @@ class ScriptAutomation(Automation):
                         if r['return'] > 0:
                             return r
 
-                        logging.debug(
+                        logger.debug(
                             recursion_spaces +
                             '  - Processing env after dependencies ...')
 
@@ -1250,7 +1252,7 @@ class ScriptAutomation(Automation):
 
                     # Check chain of prehook dependencies on other MLC scripts.
                     # (No execution of customize.py for cached scripts)
-                    logging.debug(
+                    logger.debug(
                         recursion_spaces +
                         '    - Checking prehook dependencies on other MLC scripts:')
 
@@ -1263,7 +1265,7 @@ class ScriptAutomation(Automation):
                     # Continue with the selected cached script
                     cached_script = found_cached_scripts[selection]
 
-                    logging.debug(
+                    logger.debug(
                         recursion_spaces +
                         '      - Loading state from cached entry ...')
 
@@ -1276,7 +1278,7 @@ class ScriptAutomation(Automation):
                     version = r['meta'].get('version')
 
                     if not run_state.get('tmp_silent', False):
-                        logging.info(
+                        logger.info(
                             recursion_spaces +
                             '     ! load {}'.format(path_to_cached_state_file))
 
@@ -1311,7 +1313,7 @@ class ScriptAutomation(Automation):
                     if not fake_run:
                         # Check chain of posthook dependencies on other MLC scripts. We consider them same as postdeps when
                         # script is in cache
-                        logging.debug(
+                        logger.debug(
                             recursion_spaces +
                             '    - Checking posthook dependencies on other MLC scripts:')
 
@@ -1324,7 +1326,7 @@ class ScriptAutomation(Automation):
                         if r['return'] > 0:
                             return r
 
-                        logging.debug(
+                        logger.debug(
                             recursion_spaces +
                             '    - Checking post dependencies on other MLC scripts:')
 
@@ -1371,10 +1373,10 @@ class ScriptAutomation(Automation):
                         tmp_tags.append(x)
 
                 # Use update to update the tmp one if already exists
-                logging.debug(
+                logger.debug(
                     recursion_spaces +
                     '  - Creating new "cache" script artifact in the MLC local repository ...')
-                logging.debug(recursion_spaces +
+                logger.debug(recursion_spaces +
                               '    - Tags: {}'.format(','.join(tmp_tags)))
 
                 if version != '':
@@ -1403,7 +1405,7 @@ class ScriptAutomation(Automation):
 
                 # Changing path to MLC script artifact for cached output
                 # to record data and files there
-                logging.debug(
+                logger.debug(
                     recursion_spaces +
                     '  - Changing to {}'.format(cached_path))
 
@@ -1418,7 +1420,7 @@ class ScriptAutomation(Automation):
 
                 # Changing path to MLC script artifact for cached output
                 # to record data and files there
-                logging.debug(
+                logger.debug(
                     recursion_spaces +
                     '  - Changing to {}'.format(cached_path))
 
@@ -1445,12 +1447,12 @@ class ScriptAutomation(Automation):
         ################################
         if not found_cached:
             if len(warnings) > 0:
-                logging.warn(
+                logger.warn(
                     '=================================================')
-                logging.warn('WARNINGS:')
+                logger.warn('WARNINGS:')
                 for w in warnings:
-                    logging.warn('  ' + w)
-                logging.warn(
+                    logger.warn('  ' + w)
+                logger.warn(
                     '=================================================')
 
             # Update default version meta if version is not set
@@ -1480,7 +1482,7 @@ class ScriptAutomation(Automation):
                             else:
                                 version = version_max
 
-                    logging.debug(
+                    logger.debug(
                         recursion_spaces +
                         '  - Version is not specified - use either default_version from meta or min/max/usable: {}'.format(version))
 
@@ -1532,7 +1534,7 @@ class ScriptAutomation(Automation):
 
                 if len(docker_deps) > 0:
 
-                    logging.debug(
+                    logger.debug(
                         recursion_spaces +
                         '  - Checking docker run dependencies on other MLC scripts:')
 
@@ -1542,7 +1544,7 @@ class ScriptAutomation(Automation):
                     if r['return'] > 0:
                         return r
 
-                    logging.debug(
+                    logger.debug(
                         recursion_spaces +
                         '  - Processing env after docker run dependencies ...')
 
@@ -1609,7 +1611,7 @@ class ScriptAutomation(Automation):
                     run_script_input['ignore_script_error'] = True
                 if 'predeps' in dir(customize_code) and not fake_run:
 
-                    logging.debug(
+                    logger.debug(
                         recursion_spaces +
                         '  - Running preprocess ...')
 
@@ -1630,7 +1632,7 @@ class ScriptAutomation(Automation):
             # print(f"before deps: ")
             # utils.print_env(env)
             if len(deps) > 0:
-                logging.debug(recursion_spaces +
+                logger.debug(recursion_spaces +
                               '  - Checking dependencies on other MLC scripts:')
 
                 r = self._call_run_deps(deps, self.local_env_keys, local_env_keys_from_meta, env, state, const, const_state, add_deps_recursive,
@@ -1639,7 +1641,7 @@ class ScriptAutomation(Automation):
                 if r['return'] > 0:
                     return r
 
-                logging.debug(recursion_spaces +
+                logger.debug(recursion_spaces +
                               '  - Processing env after dependencies ...')
 
                 r = update_env_with_values(env)
@@ -1740,7 +1742,7 @@ class ScriptAutomation(Automation):
                 return r
 
             if pip_version_string != '':
-                logging.debug(
+                logger.debug(
                     recursion_spaces +
                     '    # potential PIP version string (if needed): ' +
                     pip_version_string)
@@ -1761,7 +1763,7 @@ class ScriptAutomation(Automation):
             # Check if pre-process and detect
             if 'preprocess' in dir(customize_code) and not fake_run:
 
-                logging.debug(recursion_spaces + '  - Running preprocess ...')
+                logger.debug(recursion_spaces + '  - Running preprocess ...')
                 # print(f"preprocess_env:")
                 # utils.print_env(env)
 
@@ -1782,7 +1784,7 @@ class ScriptAutomation(Automation):
                 skip = r.get('skip', False)
 
                 if skip:
-                    logging.debug(
+                    logger.debug(
                         recursion_spaces +
                         '  - this script is skipped!')
 
@@ -1793,7 +1795,7 @@ class ScriptAutomation(Automation):
                     if len(another_script) == 0:
                         return {'return': 0, 'skipped': True}
 
-                    logging.debug(
+                    logger.debug(
                         recursion_spaces +
                         '  - another script is executed instead!')
 
@@ -1833,11 +1835,11 @@ class ScriptAutomation(Automation):
 
             if print_env:
                 import json
-                logging.debug(json.dumps(env, indent=2, sort_keys=True))
+                logger.debug(json.dumps(env, indent=2, sort_keys=True))
 
             # Check chain of pre hook dependencies on other MLC scripts
             if len(prehook_deps) > 0:
-                logging.debug(
+                logger.debug(
                     recursion_spaces +
                     '  - Checking prehook dependencies on other MLC scripts:')
 
@@ -2000,7 +2002,7 @@ class ScriptAutomation(Automation):
                     return r
 
                 # Remove tmp tag from the "cached" arifact to finalize caching
-                logging.debug(
+                logger.debug(
                     recursion_spaces +
                     '  - Removing tmp tag in the script cached output {} ...'.format(cached_uid))
 
@@ -2144,7 +2146,7 @@ class ScriptAutomation(Automation):
         elapsed_time = time.time() - start_time
 
         if verbose and cached_uid != '':
-            logging.info(
+            logger.info(
                 recursion_spaces +
                 '  - cache UID: {}'.format(cached_uid))
 
@@ -2175,7 +2177,7 @@ class ScriptAutomation(Automation):
         # Print output as json to console
         if i.get('json', False) or i.get('j', False):
             import json
-            logging.info(json.dumps(rr, indent=2))
+            logger.info(json.dumps(rr, indent=2))
 
         # Check if save json to file
         if repro_prefix != '':
@@ -2186,7 +2188,7 @@ class ScriptAutomation(Automation):
             dump_repro(repro_prefix, rr, run_state)
 
         if verbose or show_time:
-            logging.info(
+            logger.info(
                 recursion_spaces +
                 '  - running time of script "{}": {:.2f} sec.'.format(
                     ','.join(found_script_tags),
@@ -2199,7 +2201,7 @@ class ScriptAutomation(Automation):
                 (start_disk_stats.free - stop_disk_stats.free) / (1024 * 1024))
 
             if used_disk_space_in_mb > 0:
-                logging.info(
+                logger.info(
                     recursion_spaces +
                     '  - used disk space: {} MB'.format(used_disk_space_in_mb))
 
@@ -2214,7 +2216,7 @@ class ScriptAutomation(Automation):
 
                     v = new_env.get(p, None)
 
-                    logging.info('{}: {}'.format(t, str(v)))
+                    logger.info('{}: {}'.format(t, str(v)))
 
         # Check if print nice versions
         if print_versions:
@@ -2309,7 +2311,7 @@ class ScriptAutomation(Automation):
             pass
         for f in ['mlc-run-script-versions.json', 'version_info.json']:
             if not quiet and not silent:
-                logging.info('Dumping versions to {}'.format(f))
+                logger.info('Dumping versions to {}'.format(f))
             r = utils.save_json(f, self.run_state.get('version_info', []))
             if r['return'] > 0:
                 return r
@@ -2405,7 +2407,7 @@ class ScriptAutomation(Automation):
                 x = '_' + t
                 variation_tags_string += x
 
-            logging.debug(
+            logger.debug(
                 recursion_spaces +
                 '    Prepared variations: {}'.format(variation_tags_string))
 
@@ -2740,7 +2742,7 @@ class ScriptAutomation(Automation):
         version = self.__version__
 
         if console:
-            logging.info(version)
+            logger.info(version)
 
         return {'return': 0, 'version': version}
 
@@ -2853,8 +2855,8 @@ class ScriptAutomation(Automation):
         # Print filtered paths if console
         if console:
             for script in r['list']:
-                #                This should not be logging since the output can be consumed by other external tools and scripts
-                #                logging.info(script.path)
+                #                This should not be logger since the output can be consumed by other external tools and scripts
+                #                logger.info(script.path)
                 print(script.path)
 
         # Finalize output
@@ -2918,10 +2920,10 @@ class ScriptAutomation(Automation):
             alias = meta.get('alias', '')
             uid = meta.get('uid', '')
             if console:
-                logging.info(path)
+                logger.info(path)
                 test_config = meta.get('tests', '')
                 if test_config:
-                    logging.info(test_config)
+                    logger.info(test_config)
                     variations = meta.get("variations")
                     tags_string = ",".join(meta.get("tags"))
                     test_input_index = i.get('test_input_index')
@@ -3020,7 +3022,7 @@ class ScriptAutomation(Automation):
                             if i_env:
                                 import copy
                                 ii['env'] = copy.deepcopy(i_env)
-                            logging.info(ii)
+                            logger.info(ii)
                             r = self.action_object.access(ii)
                             if r['return'] > 0:
                                 return r
@@ -3293,7 +3295,7 @@ class ScriptAutomation(Automation):
         new_script_path = r_obj['path']
 
         if console:
-            logging.info('Created script in {}'.format(new_script_path))
+            logger.info('Created script in {}'.format(new_script_path))
 
         # Copy files from template (only if exist)
         files = [
@@ -3339,7 +3341,7 @@ class ScriptAutomation(Automation):
                 f2 = os.path.join(new_script_path, f2)
 
                 if console:
-                    logging.info('  * Copying {} to {}'.format(f1, f2))
+                    logger.info('  * Copying {} to {}'.format(f1, f2))
 
                 shutil.copyfile(f1, f2)
 
@@ -3667,7 +3669,7 @@ class ScriptAutomation(Automation):
                                 run_state['script_variation_tags']) + " )"
 
                     # Run collective script via MLC API:
-                    # Not very efficient but allows logging - can be optimized
+                    # Not very efficient but allows logger - can be optimized
                     # later
 
                     # print(f"env about to call deps {d}= {env}")
@@ -3831,8 +3833,8 @@ pip install mlcflow
 
         version_info = run_state.get('version_info', [])
 
-        logging.info('=========================')
-        logging.info('Versions of dependencies:')
+        logger.info('=========================')
+        logger.info('Versions of dependencies:')
         for v in version_info:
             k = list(v.keys())[0]
             version_info_dict = v[k]
@@ -3840,9 +3842,9 @@ pip install mlcflow
             version = version_info_dict.get('version', '')
 
             if version != '':
-                logging.info('* {}: {}'.format(k, version))
+                logger.info('* {}: {}'.format(k, version))
 
-        logging.info('=========================')
+        logger.info('=========================')
 
         return {}
 
@@ -3865,7 +3867,7 @@ pip install mlcflow
         run_cmds = self._get_deps_run_cmds(deps)
         for cmd in run_cmds:
             print_deps_data.append(cmd)
-            logging.info(cmd)
+            logger.info(cmd)
 
         return print_deps_data
 
@@ -4090,14 +4092,14 @@ pip install mlcflow
                     x += ' <= {}'.format(version_max)
 
                 if x != '':
-                    logging.info(
+                    logger.info(
                         recursion_spaces +
                         '  - Searching for versions: {}'.format(x))
 
                 new_recursion_spaces = recursion_spaces + '    '
 
                 for path_to_file in found_files:
-                    logging.info(recursion_spaces + '    * ' + path_to_file)
+                    logger.info(recursion_spaces + '    * ' + path_to_file)
 
                     run_script_input['env'] = env
                     run_script_input['env'][env_path_key] = path_to_file
@@ -4117,7 +4119,7 @@ pip install mlcflow
 
                         if detected_version != '':
                             if detected_version == -1:
-                                logging.info(
+                                logger.info(
                                     recursion_spaces + '    SKIPPED due to incompatibility ...')
                             else:
                                 ry = check_version_constraints({'detected_version': detected_version,
@@ -4132,7 +4134,7 @@ pip install mlcflow
                                     found_files_with_good_version.append(
                                         path_to_file)
                                 else:
-                                    logging.info(
+                                    logger.info(
                                         recursion_spaces + '    SKIPPED due to version constraints ...')
 
                 found_files = found_files_with_good_version
@@ -4143,13 +4145,13 @@ pip install mlcflow
                     selection = 0
                 else:
                     # Select 1 and proceed
-                    logging.info(
+                    logger.info(
                         recursion_spaces +
                         '  - More than 1 path found:')
                     num = 0
 
                     for file in found_files:
-                        logging.info(
+                        logger.info(
                             recursion_spaces +
                             '  {}) {}'.format(
                                 num,
@@ -4166,7 +4168,7 @@ pip install mlcflow
 
                     if selection < 0 or selection >= num:
                         selection = 0
-                logging.info(
+                logger.info(
                     recursion_spaces +
                     '  Selected {}: {}'.format(
                         selection,
@@ -4223,7 +4225,7 @@ pip install mlcflow
             x += ' <= {}'.format(version_max)
 
         if x != '':
-            logging.info(
+            logger.info(
                 recursion_spaces +
                 '  - Searching for versions: {}'.format(x))
 
@@ -4347,7 +4349,7 @@ pip install mlcflow
         if path == '':
             path_list_tmp = default_path_list
         else:
-            logging.info(
+            logger.info(
                 recursion_spaces +
                 '    # Requested paths: {}'.format(path))
             path_list_tmp = path.split(os_info['env_separator'])
@@ -4412,7 +4414,7 @@ pip install mlcflow
                     if extra_paths[extra_path] not in env:
                         env[extra_paths[extra_path]] = []
                     env[extra_paths[extra_path]].append(epath)
-        logging.info(
+        logger.info(
             recursion_spaces +
             '    # Found artifact in {}'.format(file_path))
 
@@ -4796,7 +4798,7 @@ def find_cached_script(i):
 
     found_cached_scripts = []
 
-    logging.debug(
+    logger.debug(
         recursion_spaces +
         '  - Checking if script execution is already cached ...')
 
@@ -4829,7 +4831,7 @@ def find_cached_script(i):
             if x not in explicit_cached_tags:
                 explicit_cached_tags.append(x)
 
-        logging.debug(
+        logger.debug(
             recursion_spaces +
             '    - Prepared explicit variations: {}'.format(explicit_variation_tags_string))
 
@@ -4848,7 +4850,7 @@ def find_cached_script(i):
             if x not in cached_tags:
                 cached_tags.append(x)
 
-        logging.debug(
+        logger.debug(
             recursion_spaces +
             '    - Prepared variations: {}'.format(variation_tags_string))
 
@@ -4886,7 +4888,7 @@ def find_cached_script(i):
         if len(cached_tags) > 0:
             search_tags += ',' + ','.join(explicit_cached_tags)
 
-        logging.debug(
+        logger.debug(
             recursion_spaces +
             '    - Searching for cached script outputs with the following tags: {}'.format(search_tags))
 
@@ -4915,7 +4917,7 @@ def find_cached_script(i):
                             tmp_version_in_cached_script)}
                     else:
                         found_cached_scripts = [selection['cached_script']]
-                        logging.debug(
+                        logger.debug(
                             recursion_spaces +
                             '  - Found remembered selection with tags "{}"!'.format(search_tags))
                         break
@@ -4974,7 +4976,7 @@ def find_cached_script(i):
                 # Check if pre-process and detect
                 # if 'preprocess' in dir(customize_code):
 
-                    # logging.debug(recursion_spaces + '  - Running preprocess ...')
+                    # logger.debug(recursion_spaces + '  - Running preprocess ...')
 
                 #    ii = copy.deepcopy(customize_common_input)
                 #    ii['env'] = env
@@ -5025,7 +5027,7 @@ def enable_or_skip_script(meta, env):
     """
 
     if not isinstance(meta, dict):
-        logging.info(
+        logger.info(
             "The meta entry is not a dictionary for skip/enable if_env: %s",
             meta)
 
@@ -5227,6 +5229,7 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
         verbose = i.get('v', False)
 
     show_time = i.get('time', False)
+    logger = i['self'].action_object.logger
 
     recursion = i.get('recursion', False)
     found_script_tags = i.get('found_script_tags', [])
@@ -5319,15 +5322,15 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
         run_script = tmp_file_run + bat_ext
         run_script_without_cm = tmp_file_run + '-without-cm' + bat_ext
 
-        logging.debug(
+        logger.debug(
             recursion_spaces +
             '  - Running native script "{}" from temporal script "{}" in "{}" ...'.format(
                 path_to_run_script,
                 run_script,
                 cur_dir))
         if not run_state.get('tmp_silent', False):
-            logging.info(recursion_spaces + '       ! cd {}'.format(cur_dir))
-            logging.info(
+            logger.info(recursion_spaces + '       ! cd {}'.format(cur_dir))
+            logger.info(
                 recursion_spaces +
                 '       ! call {} from {}'.format(
                     path_to_run_script,
@@ -5379,11 +5382,11 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
             import shutil
             shutil.copy(run_script, run_script_without_cm)
 
-            logging.info(
+            logger.info(
                 '================================================================================')
-            logging.info(
+            logger.info(
                 'Debug script to run without MLC was recorded: {}'.format(run_script_without_cm))
-            logging.info(
+            logger.info(
                 '================================================================================')
 
         # Run final command
@@ -5400,12 +5403,12 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
                     if os.path.isfile(pr):
                         r = utils.load_txt(file_name=pr)
                         if r['return'] == 0:
-                            logging.info(
+                            logger.info(
                                 "========================================================")
-                            logging.info("Print file {}:".format(pr))
-                            logging.info("")
-                            logging.info(r['string'])
-                            logging.info("")
+                            logger.info("Print file {}:".format(pr))
+                            logger.info("")
+                            logger.info(r['string'])
+                            logger.info("")
 
             # Check where to report errors and failures
             repo_to_report = run_state.get(
@@ -5473,7 +5476,7 @@ or full console log.
     if postprocess != '' and customize_code is not None and postprocess in dir(
             customize_code):
         if not run_state.get('tmp_silent', False):
-            logging.info(
+            logger.info(
                 recursion_spaces +
                 '       ! call "{}" from {}'.format(
                     postprocess,
@@ -5504,7 +5507,7 @@ def run_detect_version(customize_code, customize_common_input,
     if customize_code is not None and 'detect_version' in dir(customize_code):
         import copy
 
-        logging.debug(recursion_spaces + '  - Running detect_version ...')
+        logger.debug(recursion_spaces + '  - Running detect_version ...')
 
         # Update env and state with const
         utils.merge_dicts({'dict1': env, 'dict2': const,
@@ -5532,8 +5535,9 @@ def run_postprocess(customize_code, customize_common_input, recursion_spaces,
 
     if customize_code is not None and 'postprocess' in dir(customize_code):
         import copy
-
-        logging.debug(recursion_spaces + '  - Running postprocess ...')
+        if run_script_input:
+            logger = run_script_input['self'].action_object.logger
+            logger.debug(recursion_spaces + '  - Running postprocess ...')
 
         # Update env and state with const
         utils.merge_dicts({'dict1': env, 'dict2': const,
@@ -5690,8 +5694,8 @@ def clean_tmp_files(clean_files, recursion_spaces):
     Internal: clean tmp files
     """
 
-#    logging.info('')
-#    logging.info(recursion_spaces+'  - cleaning files {} ...'.format(clean_files))
+#    logger.info('')
+#    logger.info(recursion_spaces+'  - cleaning files {} ...'.format(clean_files))
 
     for tmp_file in clean_files:
         if os.path.isfile(tmp_file):
@@ -6149,13 +6153,13 @@ def select_script_item(lst, text, recursion_spaces,
 
     # If quiet, select 0 (can be sorted for determinism)
     if quiet:
-        logging.debug(string1)
-        logging.debug('Selected default due to "quiet" mode')
+        logger.debug(string1)
+        logger.debug('Selected default due to "quiet" mode')
 
         return 0
 
     # Select 1 and proceed
-    logging.info(string1)
+    logger.info(string1)
     num = 0
 
     for a in lst:
@@ -6174,7 +6178,7 @@ def select_script_item(lst, text, recursion_spaces,
         if version != '':
             x += ' (Version {})'.format(version)
 
-        logging.info(x)
+        logger.info(x)
         num += 1
 
     s = 'Make your selection or press Enter for 0'
@@ -6192,11 +6196,11 @@ def select_script_item(lst, text, recursion_spaces,
         selection = 0
 
     if selection < 0:
-        logging.info(recursion_spaces + '      Skipped')
+        logger.info(recursion_spaces + '      Skipped')
     else:
         if selection >= num:
             selection = 0
-        logging.info(
+        logger.info(
             recursion_spaces +
             '      Selected {}: {}'.format(
                 selection,
@@ -6430,4 +6434,4 @@ if __name__ == "__main__":
 
     r = auto.test({'x': 'y'})
 
-    logging.info(r)
+    logger.info(r)
