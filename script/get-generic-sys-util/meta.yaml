@@ -98,7 +98,7 @@ variations:
   ffmpeg:
     env:
       MLC_SYS_UTIL_NAME: ffmpeg
-      MLC_SYS_UTIL_VERSION_CMD: ffmpeg --version # tbd: regular expression for version
+      MLC_SYS_UTIL_VERSION_CMD: ffmpeg -version # tbd: regular expression for version
       MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
     new_env_keys:
     - MLC_FFMPEG_VERSION
