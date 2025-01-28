@@ -538,7 +538,7 @@ def get_run_cmd_reference(
             " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \
             " --output " + env['MLC_MLPERF_OUTPUT_DIR'] + \
             " --dtype " + env['MLC_MLPERF_MODEL_PRECISION'].replace("float", "fp") + \
-            scenario_extra_options
+            scenario_extra_options + env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] 
 
         print(cmd)
 
