@@ -1352,6 +1352,11 @@ variations:
       - tags: get,generic-python-lib,_package.scipy
         version_max: "1.11"
       - tags: get,generic-python-lib,_package.opencv-python
+      - tags: get,generic-python-lib,_package.scikit-image
+      - tags: get,generic-python-lib,_package.ninja
+      - tags: get,generic-sys-util,_ffmpeg
+      - tags: get,generic-sys-util,_libsm6
+      - tags: get,generic-sys-util,_libxext6
       
   llama3_1-405b:
     group: models

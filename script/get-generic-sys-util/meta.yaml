@@ -95,6 +95,45 @@ variations:
         brew: ''
         dnf: dmidecode
         yum: dmidecode
+  ffmpeg:
+    env:
+      MLC_SYS_UTIL_NAME: ffmpeg
+      MLC_SYS_UTIL_VERSION_CMD: ffmpeg --version # tbd: regular expression for version
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+    - MLC_FFMPEG_VERSION
+    state:
+      ffmpeg: # tbd: complete for other flavours of linux
+        apt: ffmpeg
+        brew: ''
+        dnf: ''   
+        yum: ''
+  libsm6:
+    env:
+      MLC_SYS_UTIL_NAME: libsm6
+      MLC_SYS_UTIL_VERSION_CMD: libsm6 --version # tbd: regular expression for version
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+    - MLC_LIBSM6_VERSION
+    state:
+      libsm6: # tbd: complete for other flavours of linux
+        apt: libsm6
+        brew: ''
+        dnf: ''   
+        yum: ''
+  libxext6:
+    env:
+      MLC_SYS_UTIL_NAME: libxext6
+      MLC_SYS_UTIL_VERSION_CMD: libxext6 --version # tbd: regular expression for version
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+    - MLC_LIBEXT6_VERSION
+    state:
+      libxext6: # tbd: complete for other flavours of linux
+        apt: libxext6
+        brew: ''
+        dnf: ''   
+        yum: ''
   g++-11:
     env:
       MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE: 'yes'
