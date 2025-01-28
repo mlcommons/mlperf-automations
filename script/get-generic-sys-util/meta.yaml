@@ -110,8 +110,7 @@ variations:
         yum: ''
   libsm6:
     env:
-      MLC_SYS_UTIL_NAME: libsm6
-      MLC_SYS_UTIL_VERSION_CMD: libsm6 --version # tbd: regular expression for version
+      MLC_SYS_UTIL_NAME: libsm6 # tbd: regular expression for version as well as whether its installed?
       MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
     new_env_keys:
     - MLC_LIBSM6_VERSION
@@ -123,8 +122,7 @@ variations:
         yum: ''
   libxext6:
     env:
-      MLC_SYS_UTIL_NAME: libxext6
-      MLC_SYS_UTIL_VERSION_CMD: libxext6 --version # tbd: regular expression for version
+      MLC_SYS_UTIL_NAME: libxext6 # tbd: regular expression for version as well as whether its installed?
       MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
     new_env_keys:
     - MLC_LIBEXT6_VERSION
