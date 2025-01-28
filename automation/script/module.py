@@ -727,7 +727,8 @@ class ScriptAutomation(Automation):
                     False,
                     script_tags_string,
                     quiet,
-                    verbose)
+                    verbose,
+                    logger)
 
                 # Remember selection
                 if not skip_remembered_selections:
@@ -1210,7 +1211,8 @@ class ScriptAutomation(Automation):
                         True,
                         script_tags_string,
                         quiet,
-                        verbose)
+                        verbose,
+                        logger)
 
                     if selection >= 0:
                         if not skip_remembered_selections:
@@ -2322,6 +2324,7 @@ class ScriptAutomation(Automation):
     def _update_state_from_variations(self, i, meta, variation_tags, variations, env, state, const, const_state, deps, post_deps, prehook_deps,
                                       posthook_deps, new_env_keys_from_meta, new_state_keys_from_meta, add_deps_recursive, run_state, recursion_spaces, verbose):
 
+        logger = self.action_object.logger
         # Save current explicit variations
         import copy
         explicit_variation_tags = copy.deepcopy(variation_tags)
@@ -2742,7 +2745,7 @@ class ScriptAutomation(Automation):
         version = self.__version__
 
         if console:
-            logger.info(version)
+            self.action_object.logger.info(version)
 
         return {'return': 0, 'version': version}
 
@@ -2911,6 +2914,7 @@ class ScriptAutomation(Automation):
         if r['return'] > 0:
             return r
 
+        logger = self.action_object.logger
         lst = r['list']
         for script_item in lst:
             path = script_item.path
@@ -3147,6 +3151,7 @@ class ScriptAutomation(Automation):
         import shutil
 
         console = i.get('out') == 'con'
+        logger = self.action_object.logger
 
         # Try to find script artifact by alias and/or tags
         # ii = utils.sub_input(i, self.cmind.cfg['artifact_keys'])
@@ -3830,7 +3835,7 @@ pip install mlcflow
         """
         Print versions in the nice format
         """
-
+        logger = self.action_object.logger
         version_info = run_state.get('version_info', [])
 
         logger.info('=========================')
@@ -3863,6 +3868,7 @@ pip install mlcflow
         Prints the MLC run commands for the list of MLC script dependencies
         """
 
+        logger = self.action_object.logger
         print_deps_data = []
         run_cmds = self._get_deps_run_cmds(deps)
         for cmd in run_cmds:
@@ -3975,7 +3981,7 @@ pip install mlcflow
         select = i.get('select', False)
         select_default = i.get('select_default', False)
         recursion_spaces = i.get('recursion_spaces', '')
-
+        logger = self.action_object.logger
         hook = i.get('hook', None)
 
         verbose = i.get('verbose', False)
@@ -4206,6 +4212,7 @@ pip install mlcflow
         import copy
 
         detected = False
+        logger = self.action_object.logger
 
         env = i.get('env', {})
 
@@ -4300,11 +4307,11 @@ pip install mlcflow
         file_name = i['file_name']
 
         os_info = i['os_info']
-
+        logger = self.action_object.logger
         env = i['env']
 
         env_path_key = i.get('env_path_key', '')
-
+        logger = self.action_object.logger
         run_script_input = i.get('run_script_input', {})
         extra_paths = i.get('extra_paths', {})
 
@@ -4450,6 +4457,8 @@ pip install mlcflow
 
         paths = i['paths']
         file_name = i['file_name']
+
+        logger = self.action_object.logger
 
         restrict_paths = i.get('restrict_paths', [])
 
@@ -4795,6 +4804,7 @@ def find_cached_script(i):
     verbose = i.get('verbose', False)
     if not verbose:
         verbose = i.get('v', False)
+    logger = self_obj.action_object.logger
 
     found_cached_scripts = []
 
@@ -5507,7 +5517,9 @@ def run_detect_version(customize_code, customize_common_input,
     if customize_code is not None and 'detect_version' in dir(customize_code):
         import copy
 
-        logger.debug(recursion_spaces + '  - Running detect_version ...')
+        if "self" in customize_common_input:
+            logger = customize_common_input["self"].action_object.logger
+            logger.debug(recursion_spaces + '  - Running detect_version ...')
 
         # Update env and state with const
         utils.merge_dicts({'dict1': env, 'dict2': const,
@@ -6143,7 +6155,7 @@ def detect_state_diff(env, saved_env, new_env_keys,
 
 
 def select_script_item(lst, text, recursion_spaces,
-                       can_skip, script_tags_string, quiet, verbose):
+                       can_skip, script_tags_string, quiet, verbose, logger=None):
     """
     Internal: select script
     """
@@ -6151,6 +6163,8 @@ def select_script_item(lst, text, recursion_spaces,
     string1 = recursion_spaces + \
         '    - More than 1 {} found for "{}":'.format(text, script_tags_string)
 
+    if not logger:
+        logger = logging.getLoger()
     # If quiet, select 0 (can be sorted for determinism)
     if quiet:
         logger.debug(string1)
@@ -6434,4 +6448,4 @@ if __name__ == "__main__":
 
     r = auto.test({'x': 'y'})
 
-    logger.info(r)
+    auto.action_object.logger.info(r)
