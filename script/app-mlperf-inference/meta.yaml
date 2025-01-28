@@ -856,20 +856,20 @@ variations:
           - 'yes'
         names:
           - resnet50-deeplab-model
-    # posthook_deps:
-    # - enable_if_env:
-    #     MLC_MLPERF_LOADGEN_MODE:
-    #     - accuracy
-    #     - all
-    #     MLC_MLPERF_ACCURACY_RESULTS_DIR:
-    #     - 'on'
-    #   skip_if_env:
-    #     MLC_MLPERF_IMPLEMENTATION:
-    #     - nvidia
-    #   names:
-    #   - mlperf-accuracy-script
-    #   - 3d-unet-accuracy-script
-    #   tags: run,accuracy,mlperf,_igbh
+    posthook_deps:
+    - enable_if_env:
+        MLC_MLPERF_LOADGEN_MODE:
+        - accuracy
+        - all
+        MLC_MLPERF_ACCURACY_RESULTS_DIR:
+        - 'on'
+      skip_if_env:
+        MLC_MLPERF_IMPLEMENTATION:
+        - nvidia
+      names:
+      - mlperf-accuracy-script
+      - waymo-accuracy-script
+      tags: run,accuracy,mlperf,_waymo
     
 
   llama3_1-405b:

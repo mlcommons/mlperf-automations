@@ -269,3 +269,7 @@ variations:
     env:
       MLC_DATASET: dataset_llama3
     group: dataset
+  waymo:
+    env:
+      MLC_DATASET: waymo
+    group: dataset

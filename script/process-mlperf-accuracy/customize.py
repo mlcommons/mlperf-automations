@@ -202,6 +202,10 @@ def preprocess(i):
             CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "language", "llama3.1-405b", "evaluate-accuracy.py") + "' --checkpoint-path '" + env['MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH'] + "' --mlperf-accuracy-file '" + os.path.join(
                 result_dir, "mlperf_log_accuracy.json") + "' --dtype '" + env['MLC_ACCURACY_DTYPE'] + "' --dataset-file '" + env['MLC_DATASET_LLAMA3_PATH'] + "' > '" + out_file + "'"
 
+        elif dataset == "waymo":
+            CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "automotive", "3d-object-detection", "accuracy_waymo.py") + "' --mlperf-accuracy-file '" + os.path.join(
+                result_dir, "mlperf_log_accuracy.json") + "' --waymo-dir '" + env['MLC_DATASET_WAYMO_PATH'] + "' > '" + out_file + "'"
+
         else:
             return {'return': 1, 'error': 'Unsupported dataset'}
 
