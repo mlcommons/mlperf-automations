@@ -75,7 +75,7 @@ class CustomInstallCommand(install):
                               'target': 'repo',
                               'repo': 'mlcommons@mlperf-automations',
                               'branch': branch,
-                              #'checkout': commit_hash
+                              # 'checkout': commit_hash
                               })
             print(res)
             if res['return'] > 0:

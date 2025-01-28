@@ -360,8 +360,7 @@ def postprocess(i):
             host_info["mlc_version"] = mlc_version
         except Exception as e:
             error = format(e)
-            mlc_version="unknown"
-
+            mlc_version = "unknown"
 
         x = ''
         if env.get('MLC_HOST_OS_FLAVOR', '') != '':

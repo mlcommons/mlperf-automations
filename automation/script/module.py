@@ -34,8 +34,8 @@ class ScriptAutomation(Automation):
         self.run_state['version_info'] = []
         self.run_state['cache'] = False
         self.file_with_cached_state = 'mlc-cached-state.json'
-        #self.logger = logging.getLogger()
-        #logging.basicConfig(level=logging.INFO)
+        # self.logger = logging.getLogger()
+        # logging.basicConfig(level=logging.INFO)
         self.logger = self.action_object.logger
         self.logger.propagate = False
 
@@ -237,7 +237,6 @@ class ScriptAutomation(Automation):
         repro_prefix = ''
 
         logger = self.logger
-
 
         if repro:
             repro_prefix = i.get('repro_prefix', '')
