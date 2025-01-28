@@ -26,7 +26,7 @@ class ScriptAutomation(Automation):
     ############################################################
     def __init__(self, action_object, automation_file):
         super().__init__(action_object, "script", automation_file)
-        #logger.basicConfig(level=logger.INFO)
+        # logger.basicConfig(level=logger.INFO)
         self.os_info = {}
         self.run_state = {}
         self.run_state['deps'] = []
@@ -599,7 +599,7 @@ class ScriptAutomation(Automation):
         list_of_found_scripts = sorted(list_of_found_scripts, key=lambda a: (a.meta.get('sort', 0),
                                                                              a.path))
         logger.debug(recursion_spaces +
-                      '  - Number of scripts found: {}'.format(len(list_of_found_scripts)))
+                     '  - Number of scripts found: {}'.format(len(list_of_found_scripts)))
 
         # Check if script selection is remembered
         if not skip_remembered_selections and len(list_of_found_scripts) > 1:
@@ -822,7 +822,7 @@ class ScriptAutomation(Automation):
             debug_script_tags = ','.join(found_script_tags)
 
         logger.debug(recursion_spaces +
-                      '  - Found script::{} in {}'.format(found_script_item, path))
+                     '  - Found script::{} in {}'.format(found_script_item, path))
 
         # STEP 500 output: script_item - unique selected script artifact
         #                  (cache_list) pruned for the unique script if cache is used
@@ -1377,7 +1377,7 @@ class ScriptAutomation(Automation):
                     recursion_spaces +
                     '  - Creating new "cache" script artifact in the MLC local repository ...')
                 logger.debug(recursion_spaces +
-                              '    - Tags: {}'.format(','.join(tmp_tags)))
+                             '    - Tags: {}'.format(','.join(tmp_tags)))
 
                 if version != '':
                     cached_meta['version'] = version
@@ -1633,7 +1633,7 @@ class ScriptAutomation(Automation):
             # utils.print_env(env)
             if len(deps) > 0:
                 logger.debug(recursion_spaces +
-                              '  - Checking dependencies on other MLC scripts:')
+                             '  - Checking dependencies on other MLC scripts:')
 
                 r = self._call_run_deps(deps, self.local_env_keys, local_env_keys_from_meta, env, state, const, const_state, add_deps_recursive,
                                         recursion_spaces + extra_recursion_spaces,
@@ -1642,7 +1642,7 @@ class ScriptAutomation(Automation):
                     return r
 
                 logger.debug(recursion_spaces +
-                              '  - Processing env after dependencies ...')
+                             '  - Processing env after dependencies ...')
 
                 r = update_env_with_values(env)
                 if r['return'] > 0:
