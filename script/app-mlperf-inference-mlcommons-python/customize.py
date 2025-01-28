@@ -538,7 +538,10 @@ def get_run_cmd_reference(
             " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \
             " --output " + env['MLC_MLPERF_OUTPUT_DIR'] + \
             " --dtype " + env['MLC_MLPERF_MODEL_PRECISION'].replace("float", "fp") + \
-            scenario_extra_options + env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] 
+            scenario_extra_options + env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + mode_extra_options
+
+        if env.get('MLC_MLPERF_POINTPAINTING_TIME', '') != '':
+            cmd += f" --time {env['MLC_MLPERF_POINTPAINTING_TIME']}"
 
         print(cmd)
 
