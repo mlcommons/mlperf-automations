@@ -1338,9 +1338,9 @@ variations:
       MLC_MODEL: pointpainting
     adr:
       pytorch:
-        version_max: "2.2"
+        version_max: "2.2.2"
       torchvision:
-        version_max: "0.17"
+        version_max: "0.17.2"
     deps:
       - tags: get,generic-python-lib,_package.shapely
       - tags: get,generic-python-lib,_package.numba
@@ -1352,7 +1352,7 @@ variations:
       - tags: get,generic-python-lib,_package.opencv-python
       - tags: get,generic-python-lib,_package.scikit-image
       - tags: get,generic-python-lib,_package.scipy
-        version_max: "1.11"
+        version_max: "1.11.2"
       - tags: get,generic-python-lib,_package.ninja
       - tags: get,generic-sys-util,_ffmpeg
       - tags: get,generic-sys-util,_libsm6
