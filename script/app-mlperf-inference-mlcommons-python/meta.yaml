@@ -1351,6 +1351,7 @@ variations:
       - tags: get,generic-python-lib,_package.onnxruntime
       - tags: get,generic-python-lib,_package.scipy
         version_max: "1.11"
+      - tags: get,generic-python-lib,_package.opencv-python
       
   llama3_1-405b:
     group: models
