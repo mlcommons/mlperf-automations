@@ -1,5 +1,4 @@
 from mlc import utils
-import mlc
 import os
 import shutil
 import json
@@ -72,6 +71,7 @@ def postprocess(i):
                     cmd = cmd.replace(":", "=")
                     cmd = cmd.replace(";;", ",")
                     run_input['run_cmds'].append(cmd)
+            mlc = i['automation'].action_object
             r = mlc.access(run_input)
             if r['return'] > 0:
                 return r

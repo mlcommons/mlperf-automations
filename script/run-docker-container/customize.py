@@ -248,7 +248,7 @@ def postprocess(i):
             CONTAINER = f"""{env['MLC_CONTAINER_TOOL']} run -dt {run_opts} --rm  {docker_image_repo}/{docker_image_name}:{docker_image_tag} bash"""
             CMD = f"""ID=`{CONTAINER}` && {env['MLC_CONTAINER_TOOL']} exec $ID bash -c '{run_cmd}'"""
 
-            if not is_true(env.get('MLC_KEEP_DETACHED_CONTAINER', '')):
+            if is_true(env.get('MLC_KILL_DETACHED_CONTAINER', False)):
                 CMD += f""" && {env['MLC_CONTAINER_TOOL']} kill $ID >/dev/null"""
 
         CMD += ' && echo "ID=$ID"'

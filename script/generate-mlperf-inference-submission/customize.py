@@ -2,7 +2,6 @@ from mlc import utils
 import os
 import json
 import shutil
-import mlc
 import sys
 from tabulate import tabulate
 import mlperf_utils
@@ -700,6 +699,7 @@ def generate_submission(env, state, inp, submission_division):
                              'env': {'MLC_PLATFORM_DETAILS_FILE_PATH': os.path.join(measurement_path, "system_info.txt")},
                              'quiet': True
                              }
+                mlc = i['automation'].action_object
                 r = mlc.access(mlc_input)
                 if r['return'] > 0:
                     return r

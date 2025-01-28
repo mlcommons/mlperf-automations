@@ -26,7 +26,6 @@ class ScriptAutomation(Automation):
     ############################################################
     def __init__(self, action_object, automation_file):
         super().__init__(action_object, "script", automation_file)
-        # logger.basicConfig(level=logger.INFO)
         self.os_info = {}
         self.run_state = {}
         self.run_state['deps'] = []
@@ -35,6 +34,10 @@ class ScriptAutomation(Automation):
         self.run_state['version_info'] = []
         self.run_state['cache'] = False
         self.file_with_cached_state = 'mlc-cached-state.json'
+        #self.logger = logging.getLogger()
+        #logging.basicConfig(level=logging.INFO)
+        self.logger = self.action_object.logger
+        self.logger.propagate = False
 
         self.tmp_file_env = 'tmp-env'
         self.tmp_file_env_all = 'tmp-env-all'
@@ -188,7 +191,7 @@ class ScriptAutomation(Automation):
 
           (print_readme) (bool): if True, will print README with all MLC steps (deps) to run a given script
 
-          (script_call_prefix) (str): how to call script in logs and READMEs (mlc run script)
+          (script_call_prefix) (str): how to call script in logs and READMEs (mlcr)
 
           (skip_sys_utils) (bool): if True, set env['MLC_SKIP_SYS_UTILS']='yes'
                                    to skip MLC sys installation
@@ -233,7 +236,8 @@ class ScriptAutomation(Automation):
         repro = i.get('repro', False)
         repro_prefix = ''
 
-        logger = self.action_object.logger
+        logger = self.logger
+
 
         if repro:
             repro_prefix = i.get('repro_prefix', '')
@@ -539,15 +543,15 @@ class ScriptAutomation(Automation):
 
         mlc_script_info = i.get('script_call_prefix', '').strip()
         if mlc_script_info == '':
-            mlc_script_info = 'mlc run script'
+            mlc_script_info = 'mlcr '
         if not mlc_script_info.endswith(' '):
             mlc_script_info += ' '
 
-        x = '--tags='
+        x = ''
         y = ','
         if parsed_script_alias != '':
             mlc_script_info += parsed_script_alias
-            x = '--tags="'
+            x = '"'
 
         if len(script_tags) > 0 or len(variation_tags) > 0:
             mlc_script_info += x
@@ -3800,7 +3804,7 @@ pip install mlcflow
 ```bash
 """
 
-        cmd = "mlc run script "
+        cmd = "mlcr "
 
         for cmd_part in cmd_parts:
             x = '"' if ' ' in cmd_part and not cmd_part.startswith('-') else ''
@@ -3823,7 +3827,7 @@ pip install mlcflow
                 xversion = ' --version={}\n'.format(version)
 
             content += "```bash\n"
-            content += "mlc run script --tags=" + \
+            content += "mlcr " + \
                 dep_tags + "{}\n".format(xversion)
             content += "```\n\n"
 
@@ -3887,7 +3891,7 @@ pip install mlcflow
         run_cmds = []
 
         for dep_tags in deps:
-            run_cmds.append("mlc run script --tags=" + dep_tags)
+            run_cmds.append("mlcr " + dep_tags)
 
         return run_cmds
 
@@ -6164,7 +6168,8 @@ def select_script_item(lst, text, recursion_spaces,
         '    - More than 1 {} found for "{}":'.format(text, script_tags_string)
 
     if not logger:
-        logger = logging.getLoger()
+        return {'return': 1, 'error': 'No logger provided'}
+
     # If quiet, select 0 (can be sorted for determinism)
     if quiet:
         logger.debug(string1)
