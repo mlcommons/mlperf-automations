@@ -102,7 +102,7 @@ def prepare_docker_inputs(input_params, docker_settings,
 
     keys = [
         "mlc_repo", "mlc_repo_branch", "base_image", "os", "os_version",
-        "mlc_repos", "skip_mlc_sys_upgrade", "extra_sys_deps",
+        "mlc_repos", "skip_mlc_sys_upgrade", "extra_sys_deps", "image_name",
         "gh_token", "fake_run_deps", "run_final_cmds", "real_run", "copy_files", "path", "user"
     ]
 
