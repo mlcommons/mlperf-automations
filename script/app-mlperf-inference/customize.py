@@ -59,6 +59,7 @@ def postprocess(i):
     inp = i['input']
     env['CMD'] = ''
     state = i['state']
+    mlc = i['automation'].action_object
 
     # if env.get('MLC_MLPERF_USER_CONF', '') == '':
     #    return {'return': 0}
@@ -376,7 +377,6 @@ def postprocess(i):
         # Check CM automation repository
         repo_name = 'mlcommons@mlperf-automations'
         repo_hash = ''
-        mlc = i['automation'].action_object
         r = mlc.access({'action': 'find', 'automation': 'repo',
                        'item': 'mlcommons@mlperf-automations,9e97bb72b0474657'})
         if r['return'] == 0 and len(r['list']) == 1:
