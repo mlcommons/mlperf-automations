@@ -30,7 +30,7 @@ def preprocess(i):
             cache_rm_tags = "nvidia-harness,_download_model,_sdxl"
 
     cache_rm_tags = cache_rm_tags + extra_cache_rm_tags
-    mlc = i['automation'].action_target
+    mlc = i['automation'].action_object
 
     if cache_rm_tags:
         r = mlc.access({'action': 'rm', 'automation': 'cache',
