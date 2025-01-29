@@ -1336,6 +1336,7 @@ variations:
     group: models
     env:
       MLC_MODEL: pointpainting
+      MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: "https://github.com/mlcommons/mlperf-automations/tree/dev/script/get-ml-model-pointpainting,https://github.com/mlcommons/mlperf-automations/tree/dev/script/get-ml-model-resnet50-deeplab"
     adr:
       pytorch:
         version_max: "2.2.2"
