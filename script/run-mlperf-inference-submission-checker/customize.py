@@ -11,7 +11,7 @@ def preprocess(i):
 
     submission_dir = env.get("MLC_MLPERF_INFERENCE_SUBMISSION_DIR", "")
 
-    version = env.get('MLC_MLPERF_SUBMISSION_CHECKER_VERSION', '5.0')
+    version = env.get('MLC_MLPERF_SUBMISSION_CHECKER_VERSION', 'v5.0')
 
     if submission_dir == "":
         return {'return': 1,
