@@ -12,6 +12,7 @@ import os
 import logging
 
 from mlc.main import Automation
+from mlc.main import CacheAction
 import mlc.utils as utils
 from utils import *
 
@@ -39,6 +40,7 @@ class ScriptAutomation(Automation):
         self.logger = self.action_object.logger
         self.logger.propagate = False
 
+        self.cache_action = CacheAction(self.action_object.parent) #Create CacheAction using the same parent as the Script
         self.tmp_file_env = 'tmp-env'
         self.tmp_file_env_all = 'tmp-env-all'
         self.tmp_file_run = 'tmp-run'
@@ -351,7 +353,6 @@ class ScriptAutomation(Automation):
         skip_cache = i.get('skip_cache', False)
         force_cache = i.get('force_cache', False)
 
-        fake_run = i.get('fake_run', False)
         fake_run = i.get(
             'fake_run',
             False) if 'fake_run' in i else i.get(
@@ -670,7 +671,7 @@ class ScriptAutomation(Automation):
             search_cache = {'action': 'search',
                             'target_name': 'cache',
                             'tags': cache_tags_without_tmp_string}
-            rc = self.action_object.access(search_cache)
+            rc = self.cache_action.access(search_cache)
             if rc['return'] > 0:
                 return rc
 
@@ -1383,19 +1384,18 @@ class ScriptAutomation(Automation):
                     '  - Creating new "cache" script artifact in the MLC local repository ...')
                 logger.debug(recursion_spaces +
                              '    - Tags: {}'.format(','.join(tmp_tags)))
-
                 if version != '':
                     cached_meta['version'] = version
 
                 ii = {'action': 'update',
-                      'automation': self.meta['deps']['cache'],
+                      'target': 'cache',
                       'search_tags': tmp_tags,
                       'script_alias': meta['alias'],
                       'tags': ','.join(tmp_tags),
                       'meta': cached_meta,
                       'force': True}
 
-                r = self.action_object.access(ii)
+                r = self.cache_action.access(ii)
                 if r['return'] > 0:
                     return r
 
@@ -1495,8 +1495,9 @@ class ScriptAutomation(Automation):
                     if r['return'] > 0:
                         return r
 
-                    if 'version-' + version not in cached_tags:
-                        cached_tags.append('version-' + version)
+                    r = get_version_tag_from_version(version, cached_tags)
+                    if r['return'] > 0:
+                        return r
 
                     if default_version in versions:
                         versions_meta = versions[default_version]
@@ -1828,10 +1829,13 @@ class ScriptAutomation(Automation):
 
                 # If return version
                 if cache:
-                    if r.get('version', '') != '':
+                    version = r.get('version', '')
+                    if version != '':
                         cached_tags = [
                             x for x in cached_tags if not x.startswith('version-')]
-                        cached_tags.append('version-' + r['version'])
+                        r = get_version_tag_from_version(version, cached_tags)
+                        if r['return'] > 0:
+                            return r
 
                     if len(r.get('add_extra_cache_tags', [])) > 0:
                         for t in r['add_extra_cache_tags']:
@@ -1873,9 +1877,13 @@ class ScriptAutomation(Automation):
                 if r.get('version', '') != '':
                     version = r.get('version')
                     if cache:
-                        cached_tags = [
-                            x for x in cached_tags if not x.startswith('version-')]
-                        cached_tags.append('version-' + r['version'])
+                        version = r.get('version', '')
+                        if version != '':
+                            cached_tags = [
+                                x for x in cached_tags if not x.startswith('version-')]
+                            r = get_version_tag_from_version(version, cached_tags)
+                            if r['return'] > 0:
+                                return r
 
                 if len(r.get('add_extra_cache_tags', [])) > 0 and cache:
                     for t in r['add_extra_cache_tags']:
@@ -2034,14 +2042,14 @@ class ScriptAutomation(Automation):
                             cached_meta['dependent_cached_path'] = dependent_cached_path
 
                 ii = {'action': 'update',
-                      'automation': self.meta['deps']['cache'],
+                      'target': 'cache',
                       'uid': cached_uid,
                       'meta': cached_meta,
                       'script_alias': meta['alias'],
                       'replace_lists': True,  # To replace tags
                       'tags': ','.join(cached_tags)}
 
-                r = self.action_object.access(ii)
+                r = self.cache_action.access(ii)
                 if r['return'] > 0:
                     return r
 
@@ -4756,6 +4764,16 @@ pip install mlcflow
 
         return {'return': 0}
 
+def get_version_tag_from_version(version, cached_tags):
+    tags_to_add = []
+    if version != '':
+        if 'version-' + version not in cached_tags:
+            cached_tags.append('version-' + version)
+        if '-git-' in version:
+            version_without_git_commit = version.split("-git-")[0]
+            if 'version-' + version_without_git_commit not in cached_tags:
+                cached_tags.append('version-' + version_without_git_commit)
+    return {'return': 0}
 
 ##############################################################################
 def find_cached_script(i):
@@ -4867,11 +4885,12 @@ def find_cached_script(i):
             recursion_spaces +
             '    - Prepared variations: {}'.format(variation_tags_string))
 
-    # Add version
-    if version != '':
-        if 'version-' + version not in cached_tags:
-            cached_tags.append('version-' + version)
-            explicit_cached_tags.append('version-' + version)
+    r = get_version_tag_from_version(version, cached_tags)
+    if r['return'] > 0:
+        return r
+    get_version_tag_from_version(version, explicit_cached_tags)
+    if r['return'] > 0:
+        return r
 
     # Add extra cache tags (such as "virtual" for python)
     if len(extra_cache_tags) > 0:
@@ -4905,7 +4924,7 @@ def find_cached_script(i):
             recursion_spaces +
             '    - Searching for cached script outputs with the following tags: {}'.format(search_tags))
 
-        r = self_obj.action_object.access({'action': 'search',
+        r = self_obj.cache_action.access({'action': 'search',
                                            'target_name': 'cache',
                                            'tags': search_tags})
         if r['return'] > 0:
@@ -4986,20 +5005,6 @@ def find_cached_script(i):
                     if r['return'] > 0:
                         return r
 
-                # Check if pre-process and detect
-                # if 'preprocess' in dir(customize_code):
-
-                    # logger.debug(recursion_spaces + '  - Running preprocess ...')
-
-                #    ii = copy.deepcopy(customize_common_input)
-                #    ii['env'] = env
-                #    ii['meta'] = meta
-                #    # may need to detect versions in multiple paths
-                #    ii['run_script_input'] = run_script_input
-
-                    # r = customize_code.preprocess(ii)
-                    # if r['return'] > 0:
-                    #    return r
 
                 ii = {
                     'run_script_input': run_script_input,

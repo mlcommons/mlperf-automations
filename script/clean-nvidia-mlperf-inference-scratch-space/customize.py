@@ -30,10 +30,10 @@ def preprocess(i):
             cache_rm_tags = "nvidia-harness,_download_model,_sdxl"
 
     cache_rm_tags = cache_rm_tags + extra_cache_rm_tags
-    mlc = i['automation'].action_object
+    mlc_cache = i['automation'].cache_action
 
     if cache_rm_tags:
-        r = mlc.access({'action': 'rm', 'automation': 'cache',
+        r = mlc_cache.access({'action': 'rm', 'target': 'cache',
                         'tags': cache_rm_tags, 'f': True})
         print(r)
         if r['return'] != 0 and r['return'] != 16:  # ignore missing ones
