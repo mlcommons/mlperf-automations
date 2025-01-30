@@ -34,7 +34,7 @@ def preprocess(i):
 
     if cache_rm_tags:
         r = mlc_cache.access({'action': 'rm', 'target': 'cache',
-                        'tags': cache_rm_tags, 'f': True})
+                              'tags': cache_rm_tags, 'f': True})
         print(r)
         if r['return'] != 0 and r['return'] != 16:  # ignore missing ones
             return r

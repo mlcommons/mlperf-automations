@@ -40,7 +40,8 @@ class ScriptAutomation(Automation):
         self.logger = self.action_object.logger
         self.logger.propagate = False
 
-        self.cache_action = CacheAction(self.action_object.parent) #Create CacheAction using the same parent as the Script
+        # Create CacheAction using the same parent as the Script
+        self.cache_action = CacheAction(self.action_object.parent)
         self.tmp_file_env = 'tmp-env'
         self.tmp_file_env_all = 'tmp-env-all'
         self.tmp_file_run = 'tmp-run'
@@ -1881,7 +1882,8 @@ class ScriptAutomation(Automation):
                         if version != '':
                             cached_tags = [
                                 x for x in cached_tags if not x.startswith('version-')]
-                            r = get_version_tag_from_version(version, cached_tags)
+                            r = get_version_tag_from_version(
+                                version, cached_tags)
                             if r['return'] > 0:
                                 return r
 
@@ -4764,6 +4766,7 @@ pip install mlcflow
 
         return {'return': 0}
 
+
 def get_version_tag_from_version(version, cached_tags):
     tags_to_add = []
     if version != '':
@@ -4776,6 +4779,8 @@ def get_version_tag_from_version(version, cached_tags):
     return {'return': 0}
 
 ##############################################################################
+
+
 def find_cached_script(i):
     """
     Internal automation function: find cached script
@@ -4925,8 +4930,8 @@ def find_cached_script(i):
             '    - Searching for cached script outputs with the following tags: {}'.format(search_tags))
 
         r = self_obj.cache_action.access({'action': 'search',
-                                           'target_name': 'cache',
-                                           'tags': search_tags})
+                                          'target_name': 'cache',
+                                          'tags': search_tags})
         if r['return'] > 0:
             return r
 
@@ -5004,7 +5009,6 @@ def find_cached_script(i):
                                                 remembered_selections, variation_tags_string, True, '', False, show_time, extra_recursion_spaces, {})
                     if r['return'] > 0:
                         return r
-
 
                 ii = {
                     'run_script_input': run_script_input,
