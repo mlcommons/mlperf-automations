@@ -1348,6 +1348,13 @@ variations:
       - tags: get,generic-python-lib,_package.open3d
       - tags: get,generic-python-lib,_package.numpy
         version_max: "1.26.4"
+        name: numpy
+      - tags: get,generic-python-lib,_package.numpy
+        version_max: "2.0.2"
+        name: numpy-upgrade
+      - tags: get,generic-python-lib,_package.numpy
+        version_max: "1.26.4"
+        name: numpy-downgrade
       - tags: get,generic-python-lib,_package.tensorboard
       - tags: get,generic-python-lib,_package.onnxruntime
       - tags: get,generic-python-lib,_package.opencv-python
