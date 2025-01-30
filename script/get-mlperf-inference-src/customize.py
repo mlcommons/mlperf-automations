@@ -114,6 +114,8 @@ def postprocess(i):
         inference_root, 'graph', 'R-GAT')
     env['MLC_MLPERF_INFERENCE_3DUNET_PATH'] = os.path.join(
         inference_root, 'vision', 'medical_imaging', '3d-unet-kits19')
+    env['MLC_MLPERF_INFERENCE_POINTPAINTING_PATH'] = os.path.join(
+        inference_root, 'automotive', '3d-object-detection')
 
     env['MLC_GET_DEPENDENT_CACHED_PATH'] = inference_root
 
