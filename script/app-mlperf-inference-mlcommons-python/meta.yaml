@@ -1361,6 +1361,7 @@ variations:
       - tags: get,generic-python-lib,_package.scikit-image
       - tags: get,generic-python-lib,_package.scipy
         version_max: "1.11.2"
+        name: scipy
       - tags: get,generic-python-lib,_package.ninja
       - tags: get,generic-sys-util,_ffmpeg
       - tags: get,generic-sys-util,_libsm6
