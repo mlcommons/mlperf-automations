@@ -127,6 +127,9 @@ def preprocess(i):
         test_list.remove("TEST01")
         # test_list.remove("TEST05")
 
+    if "pointpainting" in env["MLC_MODEL"].lower():
+        test_list.append("TEST04")
+
     if "llama2" in env['MLC_MODEL'].lower(
     ) or "mixtral-8x7b" in env['MLC_MODEL']:
         test_list.append("TEST06")
