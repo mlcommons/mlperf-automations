@@ -5,7 +5,6 @@ import json
 import shutil
 import subprocess
 import copy
-import mlc
 import platform
 import sys
 import mlperf_utils
@@ -60,6 +59,7 @@ def postprocess(i):
     inp = i['input']
     env['CMD'] = ''
     state = i['state']
+    mlc = i['automation'].action_object
 
     # if env.get('MLC_MLPERF_USER_CONF', '') == '':
     #    return {'return': 0}
@@ -361,8 +361,14 @@ def postprocess(i):
             "os_version": platform.platform(),
             "cpu_version": platform.processor(),
             "python_version": sys.version,
-            "mlc_version": mlc.__version__
         }
+        try:
+            import importlib.metadata
+            mlc_version = importlib.metadata.version("mlc")
+            host_info["mlc_version"] = mlc_version
+        except Exception as e:
+            error = format(e)
+            mlc_version = "unknown"
 
         x = ''
         if env.get('MLC_HOST_OS_FLAVOR', '') != '':
@@ -412,7 +418,7 @@ def postprocess(i):
         readme_init = "*Check [CM MLPerf docs](https://docs.mlcommons.org/inference) for more details.*\n\n"
 
         readme_body = "## Host platform\n\n* OS version: {}\n* CPU version: {}\n* Python version: {}\n* MLC version: {}\n\n".format(platform.platform(),
-                                                                                                                                    platform.processor(), sys.version, mlc.__version__)
+                                                                                                                                    platform.processor(), sys.version, mlc_version)
 
         x = repo_name
         if repo_hash != '':
@@ -636,7 +642,7 @@ def postprocess(i):
             'new_env',
             os.path.join(
                 output_dir,
-                "os_info.json"))
+                "os_info.json"), mlc)
         dump_script_output(
             "detect,cpu",
             env,
@@ -644,7 +650,7 @@ def postprocess(i):
             'new_env',
             os.path.join(
                 output_dir,
-                "cpu_info.json"))
+                "cpu_info.json"), mlc)
         env['MLC_DUMP_RAW_PIP_FREEZE_FILE_PATH'] = os.path.join(
             env['MLC_MLPERF_OUTPUT_DIR'], "pip_freeze.raw")
         dump_script_output(
@@ -654,12 +660,12 @@ def postprocess(i):
             'new_state',
             os.path.join(
                 output_dir,
-                "pip_freeze.json"))
+                "pip_freeze.json"), mlc)
 
     return {'return': 0}
 
 
-def dump_script_output(script_tags, env, state, output_key, dump_file):
+def dump_script_output(script_tags, env, state, output_key, dump_file, mlc):
 
     mlc_input = {'action': 'run',
                  'automation': 'script',

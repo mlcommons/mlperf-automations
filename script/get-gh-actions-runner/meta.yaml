@@ -22,7 +22,7 @@ new_env_keys:
 
 deps:
   - tags: detect-os
-  - tags: download-and-extract,_extract,_url.https://github.com/actions/runner/releases/download/v2.320.0/actions-runner-linux-x64-2.320.0.tar.gz
+  - tags: download-and-extract,_extract,_url.https://github.com/actions/runner/releases/download/v2.321.0/actions-runner-linux-x64-2.321.0.tar.gz
     force_cache: yes
     extra_cache_tags: gh-actions-runner-code,gh-actions,code
     env:

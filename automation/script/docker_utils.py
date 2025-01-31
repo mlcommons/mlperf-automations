@@ -1,7 +1,6 @@
 import os
 from mlc import utils
 from utils import *
-import logging
 from pathlib import PureWindowsPath, PurePosixPath
 from script.docker_utils import *
 import copy
@@ -102,7 +101,7 @@ def prepare_docker_inputs(input_params, docker_settings,
 
     keys = [
         "mlc_repo", "mlc_repo_branch", "base_image", "os", "os_version",
-        "mlc_repos", "skip_mlc_sys_upgrade", "extra_sys_deps",
+        "mlc_repos", "skip_mlc_sys_upgrade", "extra_sys_deps", "image_name",
         "gh_token", "fake_run_deps", "run_final_cmds", "real_run", "copy_files", "path", "user"
     ]
 
@@ -110,7 +109,7 @@ def prepare_docker_inputs(input_params, docker_settings,
         keys += [
             "skip_run_cmd", "pre_run_cmds", "run_cmd_prefix", "all_gpus", "num_gpus", "device", "gh_token",
             "port_maps", "shm_size", "pass_user_id", "pass_user_group", "extra_run_args", "detached", "interactive",
-            "dt", "it", "use_host_group_id", "use_host_user_id"
+            "dt", "it", "use_host_group_id", "use_host_user_id", "keep_detached", "reuse_existing"
         ]
     # Collect Dockerfile inputs
     docker_inputs = {
@@ -377,6 +376,8 @@ def get_docker_default(key):
         "port_maps": [],
         "use_host_user_id": True,
         "use_host_group_id": True,
+        "keep_detached": False,
+        "reuse_existing": True
     }
     if key in defaults:
         return defaults[key]

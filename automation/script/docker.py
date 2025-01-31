@@ -15,6 +15,8 @@ def dockerfile(self_module, input_params):
     if prune_result['return'] > 0:
         return prune_result
 
+    logger = self_module.logger
+
     run_command_arc = prune_result['new_input']
     current_directory = os.getcwd()
     is_quiet_mode = input_params.get('quiet', False)
@@ -99,7 +101,7 @@ def dockerfile(self_module, input_params):
 
         if not docker_settings.get('run', True) and not input_params.get(
                 'docker_run_override', False):
-            logging.info("Docker 'run' is set to False in meta.json")
+            logger.info("Docker 'run' is set to False in meta.json")
             continue
 
         # Handle build dependencies
@@ -186,7 +188,7 @@ def dockerfile(self_module, input_params):
         if dockerfile_result['return'] > 0:
             return dockerfile_result
 
-        logging.info(f"Dockerfile generated at {dockerfile_path}")
+        logger.info(f"Dockerfile generated at {dockerfile_path}")
 
     return {'return': 0}
 
@@ -209,7 +211,7 @@ def docker_run(self_module, i):
     quiet = i.get('quiet', False)
     verbose = i.get('v', False)
     show_time = i.get('show_time', False)
-
+    logger = self_module.logger
     env = i.get('env', {})
 
     regenerate_docker_file = not i.get('docker_noregenerate', False)
@@ -325,7 +327,7 @@ def docker_run(self_module, i):
         # Skip scripts marked as non-runnable
         if not docker_settings.get('run', True) and not i.get(
                 'docker_run_override', False):
-            logging.info("docker.run set to False in meta.yaml")
+            logger.info("docker.run set to False in meta.yaml")
             continue
 
         r = self_module._update_env_from_input(env, i)
