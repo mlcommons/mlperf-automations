@@ -16,6 +16,12 @@ deps:
   - inference-src
   - submission-checker-src
   tags: get,mlcommons,inference,src
+- tags: pull,git,repo
+  env:
+    MLC_GIT_CHECKOUT_PATH: '<<<MLC_MLPERF_INFERENCE_SOURCE>>>'
+  enable_if_env:
+    MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES:
+    - 'yes'
 - tags: get,generic-python-lib,_xlsxwriter
 - names:
   - pyarrow
@@ -43,6 +49,8 @@ input_mapping:
   preprocess: MLC_TMP_MLPERF_INFERENCE_PREPROCESS_SUBMISSION
   preprocess_submission: MLC_TMP_MLPERF_INFERENCE_PREPROCESS_SUBMISSION
   push_to_github: MLC_MLPERF_RESULT_PUSH_TO_GITHUB
+  pull_changes: MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES
+  pull_inference_changes: MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES
   repo_branch: MLC_MLPERF_RESULTS_GIT_REPO_BRANCH
   repo_name: MLC_MLPERF_RESULTS_GIT_REPO_NAME
   repo_owner: MLC_MLPERF_RESULTS_GIT_REPO_OWNER
