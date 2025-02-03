@@ -1,6 +1,6 @@
 from mlc import utils
 import os
-
+from utils import download_file,unzip_file 
 
 def preprocess(i):
 
@@ -39,7 +39,8 @@ def preprocess(i):
             print('')
             print('Downloading from {}'.format(url))
             r = download_file({
-                'url': package_url})
+                'url': url,
+                'verify': False})
             if r['return'] > 0:
                 return r
 
@@ -48,7 +49,6 @@ def preprocess(i):
             print('Unzipping file {}'.format(filename))
 
             r = unzip_file({
-                'strip_folders': 1,
                 'filename': filename})
             if r['return'] > 0:
                 return r
