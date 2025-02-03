@@ -14,7 +14,6 @@ def preprocess(i):
     # If windows, download here otherwise use run.sh
     if os_info['platform'] == 'windows':
 
-
         path = os.getcwd()
 
         clean_dirs = env.get('MLC_CLEAN_DIRS', '').strip()
