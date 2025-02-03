@@ -71,8 +71,6 @@ def preprocess(i):
     print('')
     print('Downloading from {} ...'.format(package_url))
 
-    cm = automation.action_object
-
     r = download_file({
         'url': package_url})
     if r['return'] > 0:

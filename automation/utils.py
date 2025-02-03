@@ -259,7 +259,6 @@ def unzip_file(i):
 
     console = i.get('out') == 'con'
 
-    # Attempt to read cmr.json
     file_name_handle = open(file_name, 'rb')
     file_name_zip = zipfile.ZipFile(file_name_handle)
 
