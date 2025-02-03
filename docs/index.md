@@ -10,7 +10,18 @@ See the [automatically generated catalog](scripts/index.md) of all the MLC scrip
 * Further each MLC script can have multiple variations and they are identified by variation tags which are treated in the same way as tags and identified by a `_` prefix.
 
 ### MLC script execution flow
-<img src="https://github.com/mlcommons/cm4mlops/raw/mlperf-inference/automation/script/assets/scripts-workflow.png" width="248">
+```mermaid
+graph TD
+    MLC -->|env = incoming env + env_from_meta| B[Script]
+    B -->|env - local_env_keys| C[List of Dependencies]
+    C --> D[Preprocess]
+    D -->|env - local_env_keys| E[Prehook dependencies]
+    E -->F[Run script]
+    F -->|env - clean_env_keys_post_deps| G[Posthook dependencies]
+    G --> H[Postprocess]
+    H -->|env - clean_env_keys_post_deps| I[Post dependencies]
+    I -->|"env(new_env_keys)"| J[Script return]
+```
 
 * When an MLC script is invoked (either by tags or by unique ID), its `meta.yaml` is processed first which will check for any `deps` script and if there are, then they are executed in order.
 * Once all the `deps` scripts are executed, `customize.py` file is checked and if existing `preprocess` function inside it is executed if present. 
@@ -75,5 +86,5 @@ Please see [here](getting-started.md) for trying MLC scripts.
 
 
 
-&copy; 2022-24 [MLCommons](https://mlcommons.org)<br>
+&copy; 2022-25 [MLCommons](https://mlcommons.org)<br>
 
