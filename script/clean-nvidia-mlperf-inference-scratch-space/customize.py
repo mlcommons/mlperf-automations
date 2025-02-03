@@ -16,8 +16,9 @@ def preprocess(i):
 
     clean_cmd = ''
     cache_rm_tags = ''
-    extra_cache_rm_tags = env.get('MLC_CLEAN_EXTRA_CACHE_RM_TAGS', '')
+    extra_cache_rm_tags = env.get('MLC_CLEAN_EXTRA_CACHE_RM_TAGS', '').strip()
 
+    extra_tags = "," + extra_cache_rm_tags if extra_cache_rm_tags != '' else ''
     if env.get('MLC_MODEL', '') == 'sdxl':
         if env.get('MLC_CLEAN_ARTIFACT_NAME', '') == 'downloaded_data':
             clean_cmd = f"""rm -rf {os.path.join(env['MLC_NVIDIA_MLPERF_SCRATCH_PATH'], "data", "coco", "SDXL")} """
@@ -29,7 +30,7 @@ def preprocess(i):
             clean_cmd = f"""rm -rf {os.path.join(env['MLC_NVIDIA_MLPERF_SCRATCH_PATH'], "models", "SDXL")} """
             cache_rm_tags = "nvidia-harness,_download_model,_sdxl"
 
-    cache_rm_tags = cache_rm_tags + extra_cache_rm_tags
+    cache_rm_tags = cache_rm_tags + extra_tags
     mlc_cache = i['automation'].cache_action
 
     if cache_rm_tags:
