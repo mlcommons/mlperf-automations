@@ -14,6 +14,7 @@ def preprocess(i):
     # If windows, download here otherwise use run.sh
     if os_info['platform'] == 'windows':
 
+
         path = os.getcwd()
 
         clean_dirs = env.get('MLC_CLEAN_DIRS', '').strip()
@@ -22,7 +23,7 @@ def preprocess(i):
             for cd in clean_dirs.split(','):
                 if cd != '':
                     if os.path.isdir(cd):
-                        print('Clearning directory {}'.format(cd))
+                        print('Cleaning directory {}'.format(cd))
                         shutil.rmtree(cd)
 
         url = env['MLC_PACKAGE_WIN_URL']
@@ -38,15 +39,24 @@ def preprocess(i):
 
             print('')
             print('Downloading from {}'.format(url))
-            env['MLC_DAE_FINAL_ENV_NAME'] = 'FILENAME'
-            env['MLC_OUTDIRNAME'] = os.getcwd()
-            r = cm.access({'action': 'run',
-                           'target': 'script',
-                           'env': env,
-                           'tags': 'download-and-extract,_extract',
-                           'url': url})
+            r = download_file({
+                'url': package_url})
             if r['return'] > 0:
                 return r
+
+            filename = r['filename']
+
+            print('Unzipping file {}'.format(filename))
+
+            r = unzip_file({
+                'strip_folders': 1,
+                'filename': filename})
+            if r['return'] > 0:
+                return r
+
+            if os.path.isfile(filename):
+                print('Removing file {}'.format(filename))
+                os.remove(filename)
 
         print('')
 
