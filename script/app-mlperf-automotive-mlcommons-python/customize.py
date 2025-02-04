@@ -5,12 +5,10 @@ import shutil
 import subprocess
 import logging
 
-# Configure the logger
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 def preprocess(i):
 
+    logger = i['automation'].logger
     os_info = i['os_info']
     env = i['env']
     state = i['state']
