@@ -284,7 +284,6 @@ class ScriptAutomation(Automation):
                                'append_lists': True,
                                'append_unique': True})
 
-
         # Recursion spaces needed to format log and print
         recursion_spaces = i.get('recursion_spaces', '')
         # Caching selections to avoid asking users again

@@ -197,7 +197,7 @@ def postprocess(i):
                                               ][model][scenario] = {}
 
     # if env.get("MLC_MLPERF_FIND_PERFORMANCE_MODE", '') == "yes" and mode ==
-    # "performance" and scenario != "Server": 
+    # "performance" and scenario != "Server":
     if mode == "performance" and scenario != "Server":
         os.chdir(output_dir)
         if not os.path.exists("mlperf_log_summary.txt"):
