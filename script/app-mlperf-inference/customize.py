@@ -197,7 +197,7 @@ def postprocess(i):
                                               ][model][scenario] = {}
 
     # if env.get("MLC_MLPERF_FIND_PERFORMANCE_MODE", '') == "yes" and mode ==
-    # "performance" and scenario != "Server":
+    # "performance" and scenario != "Server": 
     if mode == "performance" and scenario != "Server":
         os.chdir(output_dir)
         if not os.path.exists("mlperf_log_summary.txt"):
@@ -239,7 +239,7 @@ def postprocess(i):
         sut_config[model_full_name][scenario][metric] = value
 
         print(
-            f"SUT: {sut_name}, model: {model_full_name}, scenario: {scenario}, {metric} updated as {value}")
+            f"SUT: {sut_name}, model: {model_full_name}, scenario: {scenario}, {metric} (mean value) updated as {value}")
         print(f"New config stored in {sut_config_path}")
         with open(sut_config_path, "w") as f:
             yaml.dump(sut_config, f)
