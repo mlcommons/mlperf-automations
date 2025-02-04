@@ -72,16 +72,20 @@ post_deps:
   names:
   - push-to-github
   tags: publish-results,github
-- enable_if_env:
+- enable_if_any_env:
     MLC_TAR_SUBMISSION_DIR:
     - 'yes'
+    MLC_MLPERF_SUBMITTER_ID:
+    - 'yes'
   tags: run,tar
+  env:
+    MLC_TAR_INPUT_DIR: <<<MLC_MLPERF_INFERENCE_SUBMISSION_DIR>>>
 - enable_if_env:
-    MLC_SUBMITTER_ID:
+    MLC_MLPERF_SUBMITTER_ID:
     - 'yes'
   tags: submit,mlperf,results,_inference
   env:
-    MLC_MLPERF_SUBMISSION_FILE: <<<MLPERF_INFERENCE_SUBMISSION_TAR_FILE>>>
+    MLC_MLPERF_SUBMISSION_FILE: <<<MLC_TAR_OUTFILE>>>
 tags:
 - run
 - mlc
