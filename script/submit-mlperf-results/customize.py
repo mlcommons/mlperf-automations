@@ -17,7 +17,12 @@ def preprocess(i):
     file_path = env['MLC_MLPERF_SUBMISSION_FILE']
     submitter_name = env.get('MLC_MLPERF_SUBMITTER', '')
 
-    r = get_signed_url(server, benchmark, submitter_id, submitter_name, file_path)
+    r = get_signed_url(
+        server,
+        benchmark,
+        submitter_id,
+        submitter_name,
+        file_path)
     if r['return'] > 0:
         return r
 
