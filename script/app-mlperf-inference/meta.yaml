@@ -1959,7 +1959,8 @@ docker:
   skip_run_cmd: 'no'
   shm_size: '32gb'
   interactive: True
-  extra_run_args: ' --dns 8.8.8.8 --dns 8.8.4.4 --cap-add SYS_ADMIN  --cap-add SYS_TIME --security-opt apparmor=unconfined --security-opt seccomp=unconfined'
+  extra_run_args: ' --cap-add SYS_ADMIN  --cap-add SYS_TIME --security-opt apparmor=unconfined --security-opt seccomp=unconfined'
+  use_google_dns: yes
   os: ubuntu
   user: mlcuser
   mlc_repo: mlcommons@mlperf-automations

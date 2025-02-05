@@ -181,6 +181,9 @@ def postprocess(i):
     if env.get('MLC_DOCKER_EXTRA_RUN_ARGS', '') != '':
         run_opts += env['MLC_DOCKER_EXTRA_RUN_ARGS']
 
+    if is_true(env.get('MLC_DOCKER_USE_GOOGLE_DNS', '')):
+        run_opts += ' --dns 8.8.8.8 --dns 8.8.4.4 '
+
     if env.get('MLC_CONTAINER_TOOL', '') == 'podman' and env.get(
             'MLC_PODMAN_MAP_USER_ID', '').lower() not in ["no", "0", "false"]:
         run_opts += " --userns=keep-id"

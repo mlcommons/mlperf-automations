@@ -58,6 +58,7 @@ input_mapping:
   save_script: MLC_DOCKER_SAVE_SCRIPT
   script_tags: MLC_DOCKER_RUN_SCRIPT_TAGS
   shm_size: MLC_DOCKER_SHM_SIZE
+  use_google_dns: MLC_DOCKER_USE_GOOGLE_DNS
 
 new_env_keys:
   - 'MLC_DOCKER_CONTAINER_ID'
