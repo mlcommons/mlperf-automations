@@ -2,9 +2,10 @@ from mlc import utils
 import os
 import shutil
 
+
 def preprocess(i):
-    os_info = i['os_info']
     
+    os_info = i['os_info']
     env = i['env']
 
 #    print ('')
