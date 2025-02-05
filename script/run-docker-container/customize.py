@@ -160,7 +160,8 @@ def postprocess(i):
         for mounts in env['MLC_DOCKER_VOLUME_MOUNTS']:
             mount_cmds.append(mounts)
 
-    if env.get('MLC_DOCKER_PASS_USER_GROUP', '') != '' and os_info['platform'] != 'windows':
+    if env.get('MLC_DOCKER_PASS_USER_GROUP',
+               '') != '' and os_info['platform'] != 'windows':
         run_opts += " --group-add $(id -g $USER) "
 
     if env.get('MLC_DOCKER_ADD_DEVICE', '') != '':
