@@ -1,6 +1,5 @@
 from mlc import utils
 import os
-import logging
 
 
 def preprocess(i):
@@ -40,6 +39,6 @@ def preprocess(i):
 def postprocess(i):
 
     env = i['env']
-    logger.info(env['MLC_OUTPUT'] + " generated in " + env['MLC_RUN_DIR'])
+    print(env['MLC_OUTPUT'] + " generated in " + env['MLC_RUN_DIR'])
 
     return {'return': 0}

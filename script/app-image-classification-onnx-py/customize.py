@@ -1,7 +1,6 @@
 from mlc import utils
 import os
 import shutil
-import logging
 
 
 def preprocess(i):
@@ -47,14 +46,14 @@ def postprocess(i):
         with open(fjson, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
     except Exception as e:
-        logger.warning('CM warning: {}'.format(e))
+        print('CM warning: {}'.format(e))
 
     try:
         import yaml
         with open(fyaml, 'w', encoding='utf-8') as f:
             yaml.dump(data, f)
     except Exception as e:
-        logger.warning('CM warning: {}'.format(e))
+        print('CM warning: {}'.format(e))
 
     top_classification = data.get('top_classification', '')
 

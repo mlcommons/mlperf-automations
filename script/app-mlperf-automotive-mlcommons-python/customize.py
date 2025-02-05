@@ -3,7 +3,6 @@ import os
 import json
 import shutil
 import subprocess
-import logging
 
 
 def preprocess(i):
@@ -74,7 +73,7 @@ def preprocess(i):
         env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] += " --count " + \
             env['MLC_MLPERF_LOADGEN_QUERY_COUNT']
 
-    logger.info("Using MLCommons Inference source from '" +
+    print("Using MLCommons Inference source from '" +
           env['MLC_MLPERF_INFERENCE_SOURCE'] + "'")
 
     if 'MLC_MLPERF_CONF' not in env:
