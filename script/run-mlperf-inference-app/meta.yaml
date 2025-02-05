@@ -156,11 +156,9 @@ deps:
 - tags: get,mlperf,inference,results,dir
   names:
     - get-mlperf-inference-results-dir
-  enable_if_env:
-    MLC_MLPERF_USE_DOCKER: [ off ]
   skip_if_env:
     OUTPUT_BASE_DIR: [ on ]
-- tags: install,pip-package,for-cmind-python,_package.tabulate
+- tags: install,pip-package,for-mlc-python,_package.tabulate
 - tags: get,mlperf,inference,utils
 
 #We use this script as a command generator to run docker via app-mlperf-inference script

@@ -113,7 +113,7 @@ deps:
       - 'yes'
   - tags: get,mlperf,inference,utils
 
-  - tags: install,pip-package,for-cmind-python,_package.pandas
+  - tags: install,pip-package,for-mlc-python,_package.pandas
     enable_if_env:
       MLC_PROFILE_NVIDIA_POWER:
         - on

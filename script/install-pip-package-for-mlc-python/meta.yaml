@@ -1,4 +1,4 @@
-alias: install-pip-package-for-cmind-python
+alias: install-pip-package-for-mlc-python
 automation_alias: script
 automation_uid: 5b4e0237da074764
 cache: true
@@ -7,8 +7,8 @@ tags:
 - pip
 - package
 - pip-package
-- for-cmind-python
-- for.cmind-python
+- for-mlc-python
+- for.mlc-python
 uid: b16ed087abab459c
 
 variations:
