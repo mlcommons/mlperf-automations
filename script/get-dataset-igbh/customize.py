@@ -43,7 +43,7 @@ def preprocess(i):
     run_cmd += x_sep + \
         f"""{
             env['MLC_PYTHON_BIN_WITH_PATH']} tools/split_seeds.py --path {download_loc} --dataset_size {
-            env['MLC_DATASET_IGBH_SIZE']} """
+            env['MLC_DATASET_IGBH_SIZE']} {env.get('MLC_IGBH_CALIBRATION_FLAG', '')} """
 
     # compress graph(for glt implementation)
     if env.get('MLC_IGBH_GRAPH_COMPRESS', '') == "yes":
