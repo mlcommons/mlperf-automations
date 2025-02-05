@@ -7,7 +7,6 @@ import subprocess
 
 def preprocess(i):
 
-    logger = i['automation'].logger
     os_info = i['os_info']
     env = i['env']
     state = i['state']

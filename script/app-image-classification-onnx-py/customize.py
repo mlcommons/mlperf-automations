@@ -2,11 +2,9 @@ from mlc import utils
 import os
 import shutil
 
-
 def preprocess(i):
-    
-    logger = i['automation'].logger
     os_info = i['os_info']
+    
     env = i['env']
 
 #    print ('')
