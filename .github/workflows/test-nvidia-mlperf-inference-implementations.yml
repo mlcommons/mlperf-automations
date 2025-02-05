@@ -17,12 +17,14 @@ jobs:
       strategy:
         fail-fast: false
         matrix:
-          system: [ "GO-spr", "phoenix"]
+          system: [ "GO-spr", "phoenix", "GO-i9" ]
           # system: [ "mlc-server" ] 
           python-version: [ "3.12" ]
           model: [ "resnet50",  "retinanet",  "bert-99", "bert-99.9", "gptj-99.9", "3d-unet-99.9", "sdxl" ]
           exclude:
            - model: gptj-99.9
+           - system: GO-spr
+           - system: GO-i9
           
       steps:
       - name: Test MLPerf Inference NVIDIA ${{ matrix.model }}
@@ -43,12 +45,7 @@ jobs:
             gpu_name=rtx_4090
             docker_string=" --docker"
           fi
-          if [ "${{ matrix.model }}" = "bert-99" ] || [ "${{ matrix.model }}" = "bert-99.9" ]; then
-            category="edge"
-          else
-            category="datacenter,edge"
-          fi
-
+          category="datacenter,edge"
           if [ -f "gh_action/bin/deactivate" ]; then source gh_action/bin/deactivate; fi
           python3 -m venv gh_action
           source gh_action/bin/activate

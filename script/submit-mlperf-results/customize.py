@@ -15,8 +15,14 @@ def preprocess(i):
     benchmark = env['MLC_MLPERF_BENCHMARK']
     submitter_id = env['MLC_MLPERF_SUBMITTER_ID']
     file_path = env['MLC_MLPERF_SUBMISSION_FILE']
+    submitter_name = env.get('MLC_MLPERF_SUBMITTER', '')
 
-    r = get_signed_url(server, benchmark, submitter_id, file_path)
+    r = get_signed_url(
+        server,
+        benchmark,
+        submitter_id,
+        submitter_name,
+        file_path)
     if r['return'] > 0:
         return r
 
@@ -37,7 +43,7 @@ def preprocess(i):
     return {'return': 0}
 
 
-def get_signed_url(server, benchmark, submitter_id, file_path):
+def get_signed_url(server, benchmark, submitter_id, submitter_name, file_path):
     # Define the URL
     url = f"{server}/index/url"
 
@@ -72,14 +78,18 @@ def get_signed_url(server, benchmark, submitter_id, file_path):
                 "error": f"An error occurred in connecting to the server: {e}"}
 
     response_json = response.json()
-    # print(response_json)
     # response = json.loads(response_json)
     try:
         signed_url = response_json['signed_url']
         submission_id = response_json['submission_id']
+        submitter_name_from_id = response_json['submitter_name']
     except Exception as e:
         return {
             "return": 1, "error": f"An error occurred while processing the response: {e}"}
+
+    if submitter_name != '':
+        if submitter_name != submitter_name_from_id:
+            return {'return': 1, 'error': f"""Submitter name mismatch, given = {submitter_name}, name mapped to ID = {submitter_name_from_id}"""}
 
     return {'return': 0, 'signed_url': signed_url,
             'submission_id': submission_id}

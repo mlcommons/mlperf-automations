@@ -56,7 +56,7 @@ def preprocess(i):
     print('')
     # CMD = f"""{env['MLC_CONTAINER_TOOL']} ps --format=json  --filter "ancestor={DOCKER_CONTAINER}" """
     CMD = f"""{env['MLC_CONTAINER_TOOL']} ps --format """ + \
-        "'{{ .ID }},'" + f"""  --filter "ancestor={DOCKER_CONTAINER}" """
+        '"{{ .ID }},"' + f"""  --filter "ancestor={DOCKER_CONTAINER}" """
     if os_info['platform'] == 'windows':
         CMD += " 2> nul"
     else:

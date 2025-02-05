@@ -96,8 +96,6 @@ def preprocess(i):
 def postprocess(i):
 
     env = i['env']
-    if env.get('MLC_TAR_SUBMISSION_DIR', ''):
-        env['MLC_TAR_INPUT_DIR'] = env['MLC_MLPERF_INFERENCE_SUBMISSION_DIR']
 
     x = env.get('MLPERF_INFERENCE_SUBMISSION_TAR_FILE', '')
     if x != '':

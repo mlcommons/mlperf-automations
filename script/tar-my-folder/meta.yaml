@@ -9,6 +9,8 @@ input_mapping:
   input_dir: MLC_TAR_INPUT_DIR
   outfile: MLC_TAR_OUTFILE
   output_dir: MLC_TAR_OUTPUT_DIR
+new_env_keys:
+  - MLC_TAR_OUTFILE
 tags:
 - run
 - tar

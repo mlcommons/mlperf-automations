@@ -690,6 +690,20 @@ variations:
         brew: transmission
         dnf: transmission-daemon
         yum: transmission-daemon
+  unzip:
+    env:
+      MLC_SYS_UTIL_NAME: unzip
+      MLC_SYS_UTIL_VERSION_CMD: unzip --version
+    new_env_keys:
+    - MLC_UNZIP_VERSION
+    state:
+      unzip:
+        apt: unzip
+        brew: unzip
+        dnf: unzip
+        yum: unzip
+        choco: unzip
+
   vim-common:
     env:
       MLC_SYS_UTIL_NAME: vim_common

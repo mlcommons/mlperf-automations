@@ -273,30 +273,16 @@ class ScriptAutomation(Automation):
         # Useful to set up default flags such as the name of virtual enviroment
         extra_cli = os.environ.get('MLC_SCRIPT_EXTRA_CMD', '').strip()
         if extra_cli != '':
-            from cmind import cli
-            r = cli.parse(extra_cli)
+            r = convert_args_to_dictionary(extra_cli)
             if r['return'] > 0:
                 return r
 
-            mlc_input = r['mlc_input']
+            mlc_input = r['args_dict']
 
             utils.merge_dicts({'dict1': i,
                                'dict2': mlc_input,
                                'append_lists': True,
                                'append_unique': True})
-
-        # Check if has extra tags as a second artifact
-        # Example: cmr . "_python _tiny"
-
-        parsed_artifacts = i.get('parsed_artifacts', [])
-        if len(parsed_artifacts) > 0:
-            extra_tags = parsed_artifacts[0][0][0]
-            if ' ' in extra_tags or ',' in extra_tags:
-                # Add tags
-                x = i.get('tags', '')
-                if x != '':
-                    x += ','
-                i['tags'] = x + extra_tags.replace(' ', ',')
 
         # Recursion spaces needed to format log and print
         recursion_spaces = i.get('recursion_spaces', '')
