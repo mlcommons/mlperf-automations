@@ -437,6 +437,9 @@ variations:
   glt:
     env:
       MLC_IGBH_GRAPH_COMPRESS: yes
+  calibration:
+    env:
+      MLC_IGBH_IGBH_CALIBRATION_FLAG: --calibration
   csc:
     group: compressed-layout
     default: true
