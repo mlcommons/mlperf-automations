@@ -54,6 +54,7 @@ prehook_deps:
     MLC_SUDO_USER:
     - 'no'
   tags: get,sys-util,generic,_linux-tools
+  ignore_missing: True
 tags:
 - get
 - platform
