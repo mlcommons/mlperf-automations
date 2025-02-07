@@ -10,6 +10,7 @@ on:
 
 jobs:
   build:
+    name: Test MLPerf Inference ABTF POC
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

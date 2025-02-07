@@ -10,6 +10,7 @@ on:
 
 jobs:
   tvm-run:
+    name: TVM ResNet50
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
