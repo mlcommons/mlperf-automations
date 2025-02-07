@@ -14,9 +14,7 @@ jobs:
     if: github.repository_owner == 'mlcommons'
     name: Build wheel
     runs-on: ubuntu-latest
-    # Set environment variables
-    env:
-      RELEASE_ENV: release
+    environment: release
 
     permissions:
       id-token: write
