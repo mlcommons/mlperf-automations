@@ -7,7 +7,7 @@ flowchart TD
     B[Script Automation] --> C{Cache Action}
     A[MLC interface] --> E{Docker Action}
     B[Script Automation] --> E{Docker Action}
-    A[MLC interface] --> E{Test Action}
-    B[Script Automation] --> E{Test Action}
+    A[MLC interface] --> F{Test Action}
+    B[Script Automation] --> F{Test Action}
     B[Script Automation] --> D{MLPerf Scripts}
 ```
