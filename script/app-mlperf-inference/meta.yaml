@@ -676,6 +676,8 @@ variations:
       model
     default:
       true
+    default_env:
+      MLC_USE_DATASET_FROM_HOST: yes
     env:
       MLC_MODEL:
         resnet50
