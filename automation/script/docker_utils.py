@@ -413,7 +413,7 @@ def get_container_path_script(i):
 def get_container_path(value, username="mlcuser"):
     path_split = value.split(os.sep)
     if len(path_split) == 1:
-        return value
+        return value, value
 
     new_value = ''
     if "cache" in path_split and "local" in path_split:
