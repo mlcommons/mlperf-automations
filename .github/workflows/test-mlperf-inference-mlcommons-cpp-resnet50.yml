@@ -10,6 +10,7 @@ on:
 
 jobs:
   build:
+    name: MLPerf inference MLCommons C++ ResNet50
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

@@ -1,0 +1,24 @@
+alias: template-script
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+category: MLC Script Template
+
+# ENV keys matching the regular expression in new_env_keys will be exported by this script to the caller script, similar for new_state_keys too
+new_env_keys: []
+new_state_keys: []
+
+# Deps are executed first before the preprocess function inside customize.py
+deps: []
+# Prehook deps are executed after the preprocess function inside customize.py but before the run script
+prehook_deps: []
+# Posthook deps are executed after the run script but before the postprocess function inside customize.py
+posthook_deps: []
+# Post deps are executed after the postprocess function inside customize.py
+post_deps: []
+
+tags:
+- generic
+- template
+
+uid: fc3e6915a29342d8

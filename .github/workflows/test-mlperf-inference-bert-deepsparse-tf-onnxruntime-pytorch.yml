@@ -10,6 +10,7 @@ on:
 
 jobs:
   build:
+    name: MLPerf Inference Bert ${{ matrix.backend }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

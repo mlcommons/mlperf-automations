@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-
+    name: Test MLPerf loadgen with HuggingFace bert onnx fp32 squad model on Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

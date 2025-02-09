@@ -9,7 +9,8 @@ on:
       - '!**.md'
 
 jobs:
-  build:
+  rgat-inference-run:
+    name:  ${{ matrix.os }} - ${{ matrix.backend }} - ${{ matrix.implementation }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
