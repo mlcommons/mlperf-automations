@@ -1279,7 +1279,7 @@ class ScriptAutomation(Automation):
                     # IF REUSE FROM CACHE - update env and state from cache!
                     cached_state = r['meta']
 
-                    r = self._che_paths(cached_state['new_env'])
+                    r = self._fix_cache_paths(cached_state['new_env'])
                     if r['return'] > 0:
                         return r
                     new_env = r['new_env']
