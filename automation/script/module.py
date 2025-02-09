@@ -2260,7 +2260,7 @@ class ScriptAutomation(Automation):
 
     ##########################################################################
     def _fix_cache_paths(self, env):
-       
+
         current_cache_path = self.action_object.local_cache_path
 
         new_env = env  # just a reference
