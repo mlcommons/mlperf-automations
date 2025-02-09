@@ -1279,7 +1279,7 @@ class ScriptAutomation(Automation):
                     # IF REUSE FROM CACHE - update env and state from cache!
                     cached_state = r['meta']
 
-                    r = self._fix_cache_paths(cached_state['new_env'])
+                    r = self._che_paths(cached_state['new_env'])
                     if r['return'] > 0:
                         return r
                     new_env = r['new_env']
@@ -2260,13 +2260,7 @@ class ScriptAutomation(Automation):
 
     ##########################################################################
     def _fix_cache_paths(self, env):
-        '''
-        mlc_repos_path = os.environ.get(
-            'MLC_REPOS', os.path.join(
-                os.path.expanduser("~"), "CM", "repos"))
-        current_cache_path = os.path.realpath(
-            os.path.join(mlc_repos_path, "local", "cache"))
-        '''
+       
         current_cache_path = self.action_object.local_cache_path
 
         new_env = env  # just a reference
@@ -2285,7 +2279,7 @@ class ScriptAutomation(Automation):
                 if loaded_cache_path != current_cache_path and os.path.exists(
                         current_cache_path):
                     new_env[key] = val.replace(
-                        loaded_cache_path, current_cache_path)
+                        loaded_cache_path, current_cache_path).replace(sep, "/")
 
             elif isinstance(val, list):
                 for i, val2 in enumerate(val):
@@ -2300,7 +2294,7 @@ class ScriptAutomation(Automation):
                         if loaded_cache_path != current_cache_path and os.path.exists(
                                 current_cache_path):
                             new_env[key][i] = val2.replace(
-                                loaded_cache_path, current_cache_path)
+                                loaded_cache_path, current_cache_path).replace(sep, "/")
 
         return {'return': 0, 'new_env': new_env}
 
