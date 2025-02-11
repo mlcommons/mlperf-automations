@@ -538,13 +538,16 @@ def generate_submission(env, state, inp, submission_division):
 
                         # Convert paths to Path objects
                         measurements_json_path = Path(measurements_json_path)
-                        target_measurement_json_path = Path(target_measurement_json_path)
+                        target_measurement_json_path = Path(
+                            target_measurement_json_path)
 
-                        destination = Path(target_measurement_json_path) / f"{sub_res}.json"
+                        destination = Path(
+                            target_measurement_json_path) / f"{sub_res}.json"
                         shutil.copy(measurements_json_path, destination)
-                        destination = Path(target_measurement_json_path) / "model-info.json"
+                        destination = Path(
+                            target_measurement_json_path) / "model-info.json"
                         shutil.copy(measurements_json_path, destination)
-                        
+
                     else:
                         if mode.lower() == "performance":
                             return {
