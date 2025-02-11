@@ -538,7 +538,8 @@ def generate_submission(env, state, inp, submission_division):
 
                         # Convert paths to Path objects
                         measurements_json_path = Path(measurements_json_path)
-                        target_measurement_json_path = Path(target_measurement_json_path)
+                        target_measurement_json_path = Path(
+                            target_measurement_json_path)
 
                         destination = Path(
                             target_measurement_json_path) / f"{sub_res}.json"
