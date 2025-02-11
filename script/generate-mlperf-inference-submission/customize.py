@@ -275,7 +275,11 @@ def generate_submission(env, state, inp, submission_division):
                             {model: returned_model_name})
 
         if check_dict_filled(sut_info.keys(), sut_info):
-            system = env.get('MLC_HW_NAME', sut_info["system_name"]).replace(" ", "_")
+            system = env.get(
+                'MLC_HW_NAME',
+                sut_info["system_name"]).replace(
+                " ",
+                "_")
             implementation = sut_info["implementation"]
             device = sut_info["device"]
             framework = sut_info["framework"].replace(" ", "_")
