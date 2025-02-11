@@ -13,7 +13,7 @@ def postprocess(i):
             'MLC_HOST_SYSTEM_NAME',
             'default').replace(
             "-",
-            "_")
+            "_").replace(" ", "_")
         env['MLC_HW_NAME'] = host_name
 
     device = env.get('MLC_MLPERF_DEVICE', 'cpu')

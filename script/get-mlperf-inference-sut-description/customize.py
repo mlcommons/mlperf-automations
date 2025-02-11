@@ -17,7 +17,7 @@ def preprocess(i):
             'MLC_HOST_SYSTEM_NAME',
             'default').replace(
             "-",
-            "_")
+            "_").replace(" ", "_")
         env['MLC_HW_NAME'] = host_name
         auto_detected_hw_name = True
 

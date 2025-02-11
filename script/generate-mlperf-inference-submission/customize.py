@@ -275,7 +275,7 @@ def generate_submission(env, state, inp, submission_division):
                             {model: returned_model_name})
 
         if check_dict_filled(sut_info.keys(), sut_info):
-            system = env.get('MLC_HW_NAME', sut_info["system_name"])
+            system = env.get('MLC_HW_NAME', sut_info["system_name"]).replace(" ", "_")
             implementation = sut_info["implementation"]
             device = sut_info["device"]
             framework = sut_info["framework"].replace(" ", "_")
@@ -283,7 +283,7 @@ def generate_submission(env, state, inp, submission_division):
             run_config = sut_info["run_config"]
             new_res = f"{system}-{implementation}-{device}-{framework}-{run_config}"
         else:
-            new_res = res
+            new_res = res.replace(" ", "_")
 
         print(f"The SUT folder name for submission generation is: {new_res}")
 
