@@ -1,6 +1,5 @@
-from mlc import utils
 import os
-
+from utils import *
 
 def preprocess(i):
 
@@ -19,9 +18,7 @@ def preprocess(i):
 
     print('Downloading from {}'.format(url))
 
-    r = cm.access({'action': 'download_file',
-                   'automation': 'utils,dc2743f8450541e3',
-                   'url': url})
+    r = download_file({'url': url})
     if r['return'] > 0:
         return r
 
