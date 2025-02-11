@@ -72,7 +72,6 @@ def generate_submission(env, state, inp, submission_division):
     sys.path.append(submission_checker_dir)
 
     if env.get('MLC_MLPERF_INFERENCE_SUBMISSION_DIR', '') == '':
-        from pathlib import Path
         user_home = str(Path.home())
         env['MLC_MLPERF_INFERENCE_SUBMISSION_DIR'] = os.path.join(
             user_home, "mlperf_submission")
