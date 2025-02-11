@@ -521,24 +521,26 @@ def generate_submission(env, state, inp, submission_division):
                                 return {
                                     "return": 1, "error": f"user.conf missing in both paths: {user_conf_path} and {os.path.join(result_scenario_path, 'user.conf')}"}
 
+                    # First check for measurements directory in scenario folder
                     measurements_json_path = os.path.join(
                         result_scenario_path, "measurements.json")
                     target_measurement_json_path = measurement_scenario_path
+
                     if not os.path.exists(measurements_json_path):
                         measurements_json_path = os.path.join(
                             result_mode_path, "measurements.json")
-                        target_measurement_json_path = submission_measurement_path
 
                     if os.path.exists(measurements_json_path):
                         with open(measurements_json_path, "r") as f:
                             measurements_json = json.load(f)
                             model_precision = measurements_json.get(
                                 "weight_data_types", "fp32")
-                        shutil.copy(
+                        '''shutil.copy(
                             measurements_json_path,
                             os.path.join(
                                 target_measurement_json_path,
                                 sub_res + '.json'))
+                        '''
                         shutil.copy(
                             measurements_json_path,
                             os.path.join(

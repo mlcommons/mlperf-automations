@@ -1301,8 +1301,13 @@ variations:
       - tags: get,generic-python-lib,_package.pybind11
       - tags: get,generic-python-lib,_package.PyYAML
       - tags: get,generic-python-lib,_package.numpy
+        version_min: "2.0.2"
+        names: 
+          - numpy-upgrade
+      - tags: get,generic-python-lib,_package.numpy
         version_max: "1.26.4"
-        version_max_usable: "1.26.4"
+        names: 
+          - numpy-downgrade
       - tags: get,generic-python-lib,_package.pydantic
       - tags: get,generic-python-lib,_package.igb,_url.git+https://github.com/IllinoisGraphBenchmark/IGB-Datasets.git
       - tags: get,generic-python-lib,_package.torch-geometric
@@ -1347,11 +1352,7 @@ variations:
       - tags: get,generic-python-lib,_package.numba
       - tags: get,generic-python-lib,_package.open3d
       - tags: get,generic-python-lib,_package.numpy
-        version_max: "1.26.4"
-        names: 
-          - numpy
-      - tags: get,generic-python-lib,_package.numpy
-        version_max: "2.0.2"
+        version_min: "2.0.2"
         names: 
           - numpy-upgrade
       - tags: get,generic-python-lib,_package.numpy
@@ -1363,7 +1364,6 @@ variations:
       - tags: get,generic-python-lib,_package.opencv-python
       - tags: get,generic-python-lib,_package.scikit-image
       - tags: get,generic-python-lib,_package.scipy
-        version_max: "1.11.2"
         names: 
           - scipy
       - tags: get,generic-python-lib,_package.ninja
