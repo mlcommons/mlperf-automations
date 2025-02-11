@@ -30,11 +30,13 @@ Once your contribution exceeds 50 lines of code (in total), we will:
 ## Current Contributors
 
 - **Grigori Fursin** - *Initial Development, CMind development to drive the automations, Added core automation features*
-- **Arjun Suresh** - *Initial Development, Added core automation features* 
-- **Anandhu Sooraj** - *Added multiple CM scripts for MLPerf Inference*
+- **Arjun Suresh** - *Initial Development, Added core automation features, MLCFlow development to drive the automations* 
+- **Anandhu Sooraj** - *Added multiple automation scripts for MLPerf Inference, MLCFlow development to drive the automations*
 - **Thomaz Zhu** - *Added CPP implementation for MLPerf Inference Onnxruntime*
 - **Sahil Avaran** - *Adding logging support in MLPerf script automation* 
-- **[Your Name Here]** - This could be you! 🎉  
+- **[Your Name Here]** - This could be you! 🎉
+
+* CMind is now replaced by MLCFlow in the MLPerf Automations
 
 ---
 
