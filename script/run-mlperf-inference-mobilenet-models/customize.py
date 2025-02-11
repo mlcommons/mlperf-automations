@@ -179,7 +179,7 @@ def preprocess(i):
                 if env.get('MLC_MLPERF_ACCURACY_MODE', '') == "yes":
                     mlc_input['mode'] = 'accuracy'
                     print(mlc_input)
-                    r = cmind.access(mlc_input)
+                    r = mlc.access(mlc_input)
                     if r['return'] > 0:
                         return r
 

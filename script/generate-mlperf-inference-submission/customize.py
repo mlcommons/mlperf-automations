@@ -535,12 +535,12 @@ def generate_submission(env, state, inp, submission_division):
                             measurements_json = json.load(f)
                             model_precision = measurements_json.get(
                                 "weight_data_types", "fp32")
-                        '''shutil.copy(
+                        shutil.copy(
                             measurements_json_path,
                             os.path.join(
                                 target_measurement_json_path,
                                 sub_res + '.json'))
-                        '''
+                        
                         shutil.copy(
                             measurements_json_path,
                             os.path.join(
