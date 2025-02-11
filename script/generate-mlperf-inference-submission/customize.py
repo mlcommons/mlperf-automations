@@ -5,6 +5,7 @@ import shutil
 import sys
 from tabulate import tabulate
 import mlperf_utils
+from pathlib import Path
 
 
 def preprocess(i):
