@@ -131,7 +131,7 @@ variations:
   onnx,opset-11:
     env:
       MLC_DOWNLOAD_CHECKSUM: f6a4da60cd5f084d97efc2c1ddb10beb
-      MLC_PACKAGE_URL: https://armi.in/files/resnet50_v1_op11.onnx
+      MLC_PACKAGE_URL: https://armi.in/files/resnet50_v1_op11/resnet50_v1.onnx
       MLC_PACKAGE_URL1: https://zenodo.org/record/4735647/files/resnet50_v1.onnx
   onnx,opset-8:
     env:
