@@ -2,7 +2,7 @@ from mlc import utils
 import os
 from os.path import exists
 import shutil
-
+from utils import *
 
 def preprocess(i):
 
@@ -31,8 +31,20 @@ def preprocess(i):
     version = env.get('MLC_MLPERF_SUBMISSION_CHECKER_VERSION', '')
     x_version = ' --version ' + version + ' ' if version != '' else ''
 
+    extra_args = []
+    if is_true(env.get('MLC_MLPERF_NOINFER_LOW_ACCURACY_RESULTS')):
+        extra_args.append("--noinfer-low-accuracy-results")
+    if is_true(env.get('MLC_MLPERF_NODELETE_EMPTY_DIRS')):
+        extra_args.append("--nodelete-empty-dirs")
+    if is_true(env.get('MLC_MLPERF_NOMOVE_FAILED_TO_OPEN')):
+        extra_args.append("--nomove-failed-to-open")
+    if is_true(env.get('MLC_MLPERF_NODELETE_FAILED')):
+        extra_args.append("--nodelete-failed")
+    if env.get('MLC_MLPERF_PREPROCESS_SUBMISSION_EXTRA_ARGS', '') != '':
+        extra_args.append(env['MLC_MLPERF_PREPROCESS_SUBMISSION_EXTRA_ARGS'])
+
     CMD = env['MLC_PYTHON_BIN'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission",
-                                                      "preprocess_submission.py") + "' --input '" + submission_dir + "' --submitter '" + submitter + "' --output '" + submission_processed + "'" + x_version
+                                                      "preprocess_submission.py") + "' --input '" + submission_dir + "' --submitter '" + submitter + "' --output '" + submission_processed + "'" + x_version + " " + " ".join(extra_args)
     env['MLC_RUN_CMD'] = CMD
 
     return {'return': 0}

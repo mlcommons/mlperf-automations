@@ -85,6 +85,7 @@ input_mapping:
   sw_notes_extra: MLC_MLPERF_SUT_SW_NOTES_EXTRA
   tar: MLC_TAR_SUBMISSION_DIR
   get_platform_details: MLC_GET_PLATFORM_DETAILS
+  submission_preprocessor_args: MLC_MLPERF_PREPROCESS_SUBMISSION_EXTRA_ARGS
   version: MLC_MLPERF_SUBMISSION_CHECKER_VERSION
 post_deps:
 - enable_if_env:

@@ -24,6 +24,7 @@ input_mapping:
   submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
   version: MLC_MLPERF_SUBMISSION_CHECKER_VERSION
   submitter: MLC_MLPERF_SUBMITTER
+  submission_preprocessor_args: MLC_MLPERF_PREPROCESS_SUBMISSION_EXTRA_ARGS
 tags:
 - run
 - mlc

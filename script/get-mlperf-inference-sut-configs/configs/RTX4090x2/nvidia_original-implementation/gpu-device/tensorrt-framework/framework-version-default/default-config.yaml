@@ -39,4 +39,4 @@
     Offline:
       target_qps: 1.3
     Server:
-      target_qps: 0.4
+      target_qps: 0.25
