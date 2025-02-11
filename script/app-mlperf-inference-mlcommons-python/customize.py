@@ -250,9 +250,9 @@ def get_run_cmd_reference(
                 'MLC_MLPERF_DEVICE') != "tpu":
             if os_info['platform'] == 'windows':
                 cmd = "python python/main.py --profile " + env['MLC_MODEL'] + "-" + env['MLC_MLPERF_BACKEND'] + \
-                    " --model=" + env['MLC_ML_MODEL_FILE_WITH_PATH'] + ' --dataset-path=' + env['MLC_DATASET_PREPROCESSED_PATH'] + \
-                    " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + " " + \
-                    " --output " + env['OUTPUT_DIR'] + " " + \
+                    " --model=\"" + env['MLC_ML_MODEL_FILE_WITH_PATH'] + '" --dataset-path="' + env['MLC_DATASET_PREPROCESSED_PATH'] + \
+                    "\" --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + " " + \
+                    " --output \"" + env['OUTPUT_DIR'] + "\" " + \
                     env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + \
                     scenario_extra_options + mode_extra_options + dataset_options
             else:
