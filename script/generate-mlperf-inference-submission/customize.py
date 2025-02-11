@@ -540,7 +540,7 @@ def generate_submission(env, state, inp, submission_division):
                             os.path.join(
                                 target_measurement_json_path,
                                 sub_res + '.json'))
-                        
+
                         shutil.copy(
                             measurements_json_path,
                             os.path.join(
