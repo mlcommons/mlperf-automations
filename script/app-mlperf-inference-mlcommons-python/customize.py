@@ -53,7 +53,7 @@ def preprocess(i):
     env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] += env['MLC_MLPERF_LOADGEN_QPS_OPT']
 
     if env.get('MLC_NUM_THREADS', '') == '':
-        if not is_false(env.get('MLC_MINIMIZE_THREADS', '')):
+        if not is_false(env.get('MLC_MINIMIZE_THREADS', '')) and env.get('MLC_HOST_CPU_TOTAL_CORES', '') != '':
             env['MLC_NUM_THREADS'] = str(int(env['MLC_HOST_CPU_TOTAL_CORES']) //
                                          (int(env.get('MLC_HOST_CPU_SOCKETS', '1')) * int(env.get('MLC_HOST_CPU_TOTAL_CORES', '1'))))
         else:
