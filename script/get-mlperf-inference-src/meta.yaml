@@ -77,7 +77,7 @@ variations:
   deepsparse:
     base:
     - _branch.deepsparse
-    - _repo.https://github.com/neuralmagic/inference
+    - _repo.https://github.com/gateoverflow/nm-inference
   full-history:
     env:
       MLC_GIT_DEPTH: ''
