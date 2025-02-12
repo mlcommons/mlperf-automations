@@ -24,7 +24,7 @@ jobs:
           exclude:
            - model: gptj-99.9
            - system: phoenix1
-           - system: GO-i9
+           - system: GO-i91
           
       steps:
       - name: Test MLPerf Inference NVIDIA ${{ matrix.model }}
