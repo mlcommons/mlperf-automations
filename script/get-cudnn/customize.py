@@ -103,7 +103,7 @@ def preprocess(i):
             return {'return': 0}
 
     if env.get('MLC_CUDNN_TAR_FILE_PATH', '') == '':
-        return {'return': 1, 'error': 'Please envoke mlcr "get cudnn" --tar_file={full path to the cuDNN tar file}'}
+        return {'return': 1, 'error': 'Please envoke mlcr get,cudnn --tar_file={full path to the cuDNN tar file}'}
 
     print('Untaring file - can take some time ...')
 
