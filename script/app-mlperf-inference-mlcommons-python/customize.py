@@ -273,6 +273,7 @@ def get_run_cmd_reference(
             env['MODEL_FILE'] = env.get(
                 'MLC_MLPERF_CUSTOM_MODEL_PATH',
                 env.get('MLC_ML_MODEL_FILE_WITH_PATH'))
+
         if not env['MODEL_FILE']:
             return {'return': 1, 'error': 'No valid model file found!'}
 
