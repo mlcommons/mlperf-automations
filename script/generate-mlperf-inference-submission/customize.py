@@ -553,8 +553,9 @@ def generate_submission(env, state, inp, submission_division):
                         shutil.copy(measurements_json_path, destination)
 
                     else:
-                        print(f"Warning: measurements.json file not present, creating a dummy measurements.json in path {measurements_json_path}")
-                        dummy_measurements-data = {
+                        print(
+                            f"Warning: measurements.json file not present, creating a dummy measurements.json in path {measurements_json_path}")
+                        dummy_measurements - data = {
                             "input_data_types": env['MLC_ML_MODEL_INPUTS_DATA_TYPE'] if env.get('MLC_ML_MODEL_INPUTS_DATA_TYPE') else None,
                             "retraining": env['MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME'] if env.get('MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME') else None,
                             "starting_weights_filename": env['MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME'] if env.get('MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME') else None,
@@ -563,7 +564,7 @@ def generate_submission(env, state, inp, submission_division):
                         }
                         with open(measurements_json_path, 'w') as json_file:
                             json.dump(data, json_file, indent=4)
-                            
+
                     files = []
                     readme = False
 
