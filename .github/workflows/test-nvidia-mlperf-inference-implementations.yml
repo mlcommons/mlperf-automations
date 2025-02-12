@@ -2,7 +2,7 @@ name: MLPerf Inference Nvidia implementations
 
 on:
   schedule:
-    - cron: "35 01 * * *"
+    - cron: "05 01 * * *"
 
 jobs:
   run_nvidia:
@@ -23,7 +23,7 @@ jobs:
           model: [ "resnet50",  "retinanet",  "bert-99", "bert-99.9", "gptj-99.9", "3d-unet-99.9", "sdxl" ]
           exclude:
            - model: gptj-99.9
-           - system: phoenix
+           - system: phoenix1
            - system: GO-i9
           
       steps:
@@ -59,5 +59,6 @@ jobs:
           mlc pull repo mlcommons@mlperf-automations --branch=dev
           
           mlcr --tags=run-mlperf,inference,_all-scenarios,_submission,_full,_r5.0-dev --preprocess_submission=yes --pull_changes=yes --pull_inference_changes=yes --execution_mode=valid --gpu_name=$gpu_name --pull_changes=yes --pull_inference_changes=yes --model=${{ matrix.model }} --submitter="MLCommons" --hw_name=$hw_name --implementation=nvidia --backend=tensorrt --category=$category --division=closed  --docker_dt --docker_mlc_repo=mlcommons@mlperf-automations --docker_mlc_repo_branch=dev --adr.compiler.tags=gcc --device=cuda --use_model_from_host=yes --use_dataset_from_host=yes --results_dir=$HOME/gh_action_results --submission_dir=$HOME/gh_action_submissions --clean  $docker_string $submission_preprocessor_args --quiet
+          #mlcr --tags=push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_unofficial_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from GH action on NVIDIA_$hw_name" --quiet --submission_dir=$HOME/gh_action_submissions --hw_name=$hw_name
+          mlcr --tags=push,github,mlperf,inference,submission --repo_url=https://github.com/GATEOverflow/mlperf_inference_submissions_v5.0 --repo_branch=main --commit_message="Results from GH action on NVIDIA_$hw_name" --quiet --submission_dir=$HOME/gh_action_submissions --hw_name=$hw_name
 
-          mlcr --tags=push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_unofficial_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from GH action on NVIDIA_$hw_name" --quiet --submission_dir=$HOME/gh_action_submissions --hw_name=$hw_name
