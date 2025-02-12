@@ -101,6 +101,7 @@ def is_user_in_sudo_group():
         print(f"Error checking sudo group: {str(e)}")
         return False
 
+
 def timeout_input(prompt, timeout=15, default=""):
     """Prompt user for input with a timeout (cross-platform)."""
     result = [default]  # Store the input result
@@ -125,13 +126,15 @@ def prompt_sudo():
         # Prompt for the password
         import getpass
 
-
         if not os.isatty(sys.stdin.fileno()):
             print("Skipping password prompt - non-interactive terminal detected!")
             password = None
         else:
-            #password = getpass.getpass("Enter password (-1 to skip): ")
-            password = timeout_input("Enter password (-1 to skip): ", timeout=15, default=None)
+            # password = getpass.getpass("Enter password (-1 to skip): ")
+            password = timeout_input(
+                "Enter password (-1 to skip): ",
+                timeout=15,
+                default=None)
 
         # Check if the input is -1
         if password == "-1":
