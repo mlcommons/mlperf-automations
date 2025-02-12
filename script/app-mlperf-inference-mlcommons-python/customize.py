@@ -53,10 +53,10 @@ def preprocess(i):
     env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] += env['MLC_MLPERF_LOADGEN_QPS_OPT']
 
     if env.get('MLC_NUM_THREADS', '') == '':
-        if not is_false(env.get('MLC_MINIMIZE_THREADS', '')) and env.get(
+        if is_true(env.get('MLC_MINIMIZE_THREADS', '')) and env.get(
                 'MLC_HOST_CPU_TOTAL_CORES', '') != '':
             env['MLC_NUM_THREADS'] = str(int(env['MLC_HOST_CPU_TOTAL_CORES']) //
-                                         (int(env.get('MLC_HOST_CPU_SOCKETS', '1')) * int(env.get('MLC_HOST_CPU_TOTAL_CORES', '1'))))
+                                         (int(env.get('MLC_HOST_CPU_SOCKETS', '1'))))
         else:
             env['MLC_NUM_THREADS'] = env.get('MLC_HOST_CPU_TOTAL_CORES', '1')
     env['CM_NUM_THREADS'] = env['MLC_NUM_THREADS']  # For inference code
@@ -279,7 +279,7 @@ def get_run_cmd_reference(
 
         env['LOG_PATH'] = env['MLC_MLPERF_OUTPUT_DIR']
 
-        extra_options = " --output " + env['MLC_MLPERF_OUTPUT_DIR'] + " --model-name resnet50  --dataset " + env['MLC_MLPERF_VISION_DATASET_OPTION'] + ' --max-batchsize ' + env.get('MLC_MLPERF_LOADGEN_MAX_BATCHSIZE', '1') + \
+        extra_options = " --output " + env['MLC_MLPERF_OUTPUT_DIR'] + " --model-name resnet50  --dataset " + env['MLC_MLPERF_VISION_DATASET_OPTION'] + f""" --max-batchsize {env.get('MLC_MLPERF_LOADGEN_MAX_BATCHSIZE', '1')}""" + \
             " --dataset-path " + env['MLC_DATASET_PREPROCESSED_PATH'] + " --model " + env['MODEL_FILE'] + \
             " --preprocessed_dir " + env['MLC_DATASET_PREPROCESSED_PATH']
 
