@@ -557,7 +557,7 @@ def generate_submission(env, state, inp, submission_division):
                             f"Warning: measurements.json file not present, creating a dummy measurements.json in path {measurements_json_path}")
                         dummy_measurements - data = {
                             "input_data_types": env['MLC_ML_MODEL_INPUTS_DATA_TYPE'] if env.get('MLC_ML_MODEL_INPUTS_DATA_TYPE') else None,
-                            "retraining": env['MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME'] if env.get('MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME') else None,
+                            "retraining": env['MLC_ML_MODEL_RETRAINING'] if env.get('MLC_ML_MODEL_RETRAINING') else None,
                             "starting_weights_filename": env['MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME'] if env.get('MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME') else None,
                             "weight_data_types": env['MLC_ML_MODEL_WEIGHTS_DATA_TYPE'] if env.get('MLC_ML_MODEL_WEIGHTS_DATA_TYPE') else None,
                             "weight_transformations": env['MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS'] if env.get('MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS') else None
