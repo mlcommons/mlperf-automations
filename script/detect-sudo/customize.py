@@ -5,6 +5,7 @@ import select
 import sys
 import grp
 import threading
+import getpass
 
 
 def preprocess(i):
@@ -125,7 +126,6 @@ def prompt_sudo():
     if os.geteuid() != 0 and not is_user_in_sudo_group():  # No sudo required for root user
 
         # Prompt for the password
-        import getpass
 
         if not os.isatty(sys.stdin.fileno()):
             print("Skipping password prompt - non-interactive terminal detected!")
