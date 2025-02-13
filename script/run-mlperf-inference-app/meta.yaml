@@ -122,6 +122,7 @@ input_mapping:
   pointpillars_checkpoint_path: MLC_ML_MODEL_POINT_PILLARS_PATH
   deeplab_resnet50_path: MLC_ML_MODEL_DPLAB_RESNET50_PATH
   waymo_path: MLC_DATASET_WAYMO_PATH
+  nm_model_zoo_stub: MLC_MLPERF_NEURALMAGIC_MODEL_ZOO_STUB
 
 new_state_keys:
 - app_mlperf_inference_*

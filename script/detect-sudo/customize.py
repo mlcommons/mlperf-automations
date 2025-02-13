@@ -4,6 +4,8 @@ import subprocess
 import select
 import sys
 import grp
+import threading
+import getpass
 
 
 def preprocess(i):
@@ -102,17 +104,38 @@ def is_user_in_sudo_group():
         return False
 
 
+def timeout_input(prompt, timeout=15, default=""):
+    """Prompt user for input with a timeout (cross-platform)."""
+    result = [default]  # Store the input result
+
+    def get_input():
+        try:
+            result[0] = getpass.getpass(prompt)
+        except EOFError:  # Handle Ctrl+D or unexpected EOF
+            result[0] = default
+
+    input_thread = threading.Thread(target=get_input)
+    input_thread.daemon = True  # Daemonize thread
+    input_thread.start()
+    input_thread.join(timeout)  # Wait for input with timeout
+
+    return result[0]  # Return user input or default
+
+
 def prompt_sudo():
     if os.geteuid() != 0 and not is_user_in_sudo_group():  # No sudo required for root user
 
         # Prompt for the password
-        import getpass
 
         if not os.isatty(sys.stdin.fileno()):
             print("Skipping password prompt - non-interactive terminal detected!")
             password = None
         else:
-            password = getpass.getpass("Enter password (-1 to skip): ")
+            # password = getpass.getpass("Enter password (-1 to skip): ")
+            password = timeout_input(
+                "Enter password (-1 to skip): ",
+                timeout=15,
+                default=None)
 
         # Check if the input is -1
         if password == "-1":

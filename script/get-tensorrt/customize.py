@@ -92,7 +92,7 @@ def preprocess(i):
         if env.get('MLC_TENSORRT_REQUIRE_DEV', '') != 'yes':
             tags.append("_dev")
         return {'return': 1, 'error': 'Please envoke mlcr "' +
-                " ".join(tags) + '" --tar_file={full path to the TensorRT tar file}'}
+                ",".join(tags) + '" --tar_file={full path to the TensorRT tar file}'}
 
     print('Untaring file - can take some time ...')
 

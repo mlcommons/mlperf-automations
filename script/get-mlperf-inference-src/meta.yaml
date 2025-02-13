@@ -77,7 +77,7 @@ variations:
   deepsparse:
     base:
     - _branch.deepsparse
-    - _repo.https://github.com/neuralmagic/inference
+    - _repo.https://github.com/gateoverflow/nm-inference
   full-history:
     env:
       MLC_GIT_DEPTH: ''
@@ -139,7 +139,7 @@ versions:
     env:
       MLC_MLPERF_LAST_RELEASE: v5.0
       MLC_TMP_GIT_CHECKOUT: deepsparse
-      MLC_TMP_GIT_URL: https://github.com/neuralmagic/inference
+      MLC_TMP_GIT_URL: https://github.com/gateoverflow/nm-inference
   main:
     env:
       MLC_MLPERF_LAST_RELEASE: v5.0

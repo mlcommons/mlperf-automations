@@ -2,6 +2,10 @@
 
 © 2024-2025 MLCommons. All Rights Reserved.
 
+Grigori Fursin, the cTuning foundation and OctoML donated the CK and CM projects to MLCommons to benefit everyone and continue development as a community effort.
+
+Copyright (c) 2014-2021 cTuning foundation
+
 This file is licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License can be obtained at:
 
 [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
