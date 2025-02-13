@@ -29,6 +29,12 @@ def preprocess(i):
         else:
             if path == '' or not os.path.exists(path):
                 env['MLC_TMP_REQUIRE_DOWNLOAD'] = 'yes'
+                if env['MLC_DOWNLOAD_SRC'] == "mlcommons":
+                    i['run_script_input']['script_name'] = 'run-rclone'
+                    if env.get('MLC_OUTDIRNAME', '') != '':
+                        env['LLAMA2_CHECKPOINT_PATH'] = env['MLC_OUTDIRNAME']
+                    else:
+                        env['LLAMA2_CHECKPOINT_PATH'] = os.getcwd()
 
     return {'return': 0}
 

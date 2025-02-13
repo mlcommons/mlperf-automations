@@ -19,6 +19,8 @@ prehook_deps:
 - enable_if_env:
     MLC_TMP_REQUIRE_DOWNLOAD:
     - 'yes'
+    MLC_DOWNLOAD_SRC:
+    - 'huggingface'
   env: {}
   extra_cache_tags: llama2,llama-2
   force_env_keys:
@@ -82,6 +84,15 @@ variations:
       MLC_ML_MODEL_PRECISION: int8
       MLC_ML_MODEL_WEIGHT_DATA_TYPES: int8
     group: precision
+  mlc:
+    group: download-source
+    default: true
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+  hf:
+    group: download-source
+    env:
+      MLC_DOWNLOAD_SRC: huggingface
   meta-llama/Llama-2-70b-chat-hf:
     adr:
       hf-zoo:
