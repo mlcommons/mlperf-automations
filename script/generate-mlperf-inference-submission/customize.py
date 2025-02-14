@@ -150,7 +150,7 @@ def generate_submission(env, state, inp, submission_division):
 
     # Check submitter
     if env.get('MLC_MLPERF_SUBMITTER'):
-        submitter = env['MLC_MLPERF_SUBMITTER']
+        submitter = env['MLC_MLPERF_SUBMITTER'].strip()
         system_meta_tmp['submitter'] = submitter
     else:
         submitter = system_meta_default['submitter']
