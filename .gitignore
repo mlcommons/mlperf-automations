@@ -15,6 +15,10 @@ wheels/
 .coverage
 htmlcov
 *tmp/
-*tmp-ck-*/
+tmp-*
 local/cache/
-
+mlc-log.txt
+repos.json
+index_script.json
+index_cache.json
+index_experiment.json

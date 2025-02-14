@@ -89,6 +89,9 @@ variations:
     default: true
     env:
       MLC_DOWNLOAD_SRC: mlcommons
+    prehook_deps:
+      - tags: get,rclone-config,_mlperf-llama2
+        force_cache: yes
   hf:
     group: download-source
     env:

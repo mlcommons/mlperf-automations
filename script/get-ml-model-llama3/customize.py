@@ -20,6 +20,12 @@ def preprocess(i):
         env['MLC_GIT_CHECKOUT_FOLDER'] = os.path.join(
             path, env['MLC_ML_MODEL_NAME'])
 
+    if env['MLC_DOWNLOAD_SRC'] == "mlcommons":
+        i['run_script_input']['script_name'] = 'run-rclone'
+        if env.get('MLC_OUTDIRNAME', '') != '':
+            env['LLAMA3_CHECKPOINT_PATH'] = env['MLC_OUTDIRNAME']
+        else:
+            env['LLAMA3_CHECKPOINT_PATH'] = os.getcwd()
     env['MLC_TMP_REQUIRE_DOWNLOAD'] = 'yes'
 
     return {'return': 0}

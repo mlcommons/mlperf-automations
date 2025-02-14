@@ -12,6 +12,8 @@ prehook_deps:
 - enable_if_env:
     MLC_TMP_REQUIRE_DOWNLOAD:
     - 'yes'
+    MLC_DOWNLOAD_SRC:
+    - huggingface
   env: {}
   extra_cache_tags: llama3,llama-3
   force_env_keys:
@@ -37,21 +39,48 @@ variations:
       MLC_ML_MODEL_PRECISION: fp16
       MLC_ML_MODEL_WEIGHT_DATA_TYPES: fp16
     group: precision
+  405b:
+    group: model-size
+    default: true
+    env:
+      MLC_ML_MODEL_NAME: Llama-3.1-405B-Instruct
+  8b:
+    group: model-size
+    env:
+      MLC_ML_MODEL_NAME: Llama-3.1-8b-Instruct
+  mlc:
+    group: download-src
+    default: true
+    prehook_deps:
+      - tags: get,rclone-config,_mlperf-llama3-1
+        force_cache: true
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+  hf:
+    group: download-src
+    default_variations:
+      huggingface-stub: meta-llama/Llama-3.1-405B-Instruct
+    env:
+      MLC_DOWNLOAD_SRC: huggingface
+
   meta-llama/Llama-3.1-405B-Instruct:
+    base:
+      - 405b
     adr:
       hf-zoo:
         tags: _model-stub.meta-llama/Llama-3.1-405B-Instruct
-    default: true
     env:
-      MLC_ML_MODEL_NAME: Llama-3-405b-instruct
+      MLC_ML_MODEL_NAME: Llama-3.1-405B-Instruct
       MLC_MODEL_ZOO_ENV_KEY: LLAMA3
     group: huggingface-stub
   meta-llama/Llama-3.1-8B-Instruct:
+    base:
+      - 8b
     adr:
       hf-zoo:
         tags: _model-stub.meta-llama/Llama-3.1-8B-Instruct
     env:
-      MLC_ML_MODEL_NAME: Llama-3-8b-instruct
+      MLC_ML_MODEL_NAME: Llama-3.1-8b-Instruct
       MLC_MODEL_ZOO_ENV_KEY: LLAMA3
     group: huggingface-stub
   vllm:

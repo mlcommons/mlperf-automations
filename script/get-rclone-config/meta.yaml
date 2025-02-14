@@ -11,3 +11,11 @@ variations:
   mlc-inference:
     env:
       MLC_RCLONE_CONFIG_CMD: 'rclone config create mlc-inference s3 provider=Cloudflare access_key_id=f65ba5eef400db161ea49967de89f47b secret_access_key=fbea333914c292b854f14d3fe232bad6c5407bf0ab1bebf78833c2b359bdfd2b endpoint=https://c2686074cb2caf5cbaf6d134bdba8b47.r2.cloudflarestorage.com'
+  mlperf-llama2:
+    env:
+      MLC_RCLONE_CONFIG_CMD: 'rclone config create mlc-llama2 drive config_is_local=false scope=drive.readonly root_folder_id=11tBZvvrh0FCm3XuR5E849K42TqftYdUF'
+      MLC_RCLONE_CONNECT_CMD: 'rclone config reconnect mlc-llama2:'
+  mlperf-llama3-1:
+    env:
+      MLC_RCLONE_CONFIG_CMD: 'rclone config create mlc-llama3-1 drive config_is_local=false scope=drive.readonly root_folder_id=12K-2yvmr1ZSZ7SLrhidCbWc0BriN98am'
+      MLC_RCLONE_CONNECT_CMD: 'rclone config reconnect mlc-llama3-1:'
