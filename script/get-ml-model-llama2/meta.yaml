@@ -93,23 +93,46 @@ variations:
     group: download-source
     env:
       MLC_DOWNLOAD_SRC: huggingface
+  70b:
+    env:
+      MLC_GIT_CHECKOUT_FOLDER: Llama-2-70b-chat-hf
+    group: model-size
+    default: true
+    default_variations:
+      huggingface-stub: meta-llama/Llama-2-70b-chat-hf
+  7b:
+    env:
+      MLC_GIT_CHECKOUT_FOLDER: Llama-2-7b-chat-hf
+    group: model-size    
+    default_variations:
+      huggingface-stub: meta-llama/Llama-2-7b-chat-hf
+
+  70b-fused-qkv:
+    env:
+      MLC_GIT_CHECKOUT_FOLDER: Llama-2-70b-fused-qkv-mlperf
+    group: model-size
+
   meta-llama/Llama-2-70b-chat-hf:
+    base:
+      - 70b
     adr:
       hf-zoo:
         tags: _model-stub.meta-llama/Llama-2-70b-chat-hf
-    default: true
     env:
-      MLC_GIT_CHECKOUT_FOLDER: Llama-2-70b-chat-hf
       MLC_MODEL_ZOO_ENV_KEY: LLAMA2
     group: huggingface-stub
+
   meta-llama/Llama-2-7b-chat-hf:
+    base:
+      - 7b
     adr:
       hf-zoo:
         tags: _model-stub.meta-llama/Llama-2-7b-chat-hf
     env:
-      MLC_GIT_CHECKOUT_FOLDER: Llama-2-7b-chat-hf
       MLC_MODEL_ZOO_ENV_KEY: LLAMA2
     group: huggingface-stub
+  
+
   nvidia:
     default_variations:
       framework: pytorch
