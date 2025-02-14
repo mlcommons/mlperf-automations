@@ -8,7 +8,7 @@
 
 Welcome to the **MLPerf Automations and Scripts** repository! This repository is your go-to resource for tools, automations, and scripts designed to streamline the execution of **MLPerf benchmarks**—with a strong emphasis on **MLPerf Inference benchmarks**.
 
-Starting **January 2025**, MLPerf automation scripts are built on the powerful [MLCFlow](https://github.com/mlcommons/mlcflow) automation interface. This modern interface replaces the earlier [Collective Mind (CM)](https://github.com/mlcommons/ck/tree/master/cm), offering a more robust and efficient framework for benchmarking workflows.
+Starting **January 2025**, MLPerf automation scripts will be powered by the advanced [MLCFlow](https://github.com/mlcommons/mlcflow) automation interface. This modern framework replaces the previous [Collective Mind (CM)](https://github.com/mlcommons/ck/tree/master/cm), providing a more robust, efficient, and self-contained solution for benchmarking workflows, making MLPerf automations independent of any external projects. 
 
 
 ---
