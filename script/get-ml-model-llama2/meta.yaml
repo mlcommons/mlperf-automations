@@ -92,6 +92,13 @@ variations:
     prehook_deps:
       - tags: get,rclone-config,_mlperf-llama2
         force_cache: yes
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+      - tags: get,rclone
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
   hf:
     group: download-source
     env:

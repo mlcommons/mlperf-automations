@@ -121,7 +121,7 @@ deps:
 posthook_deps:
   - tags: get,mlperf,sut,description #populate system meta information like framework
   - tags: get,platform,details
-    enable_if_any_env:
+    enable_if_env:
       MLC_GET_PLATFORM_DETAILS:
         - yes
     skip_if_env:
