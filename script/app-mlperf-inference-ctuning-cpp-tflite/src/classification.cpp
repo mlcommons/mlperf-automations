@@ -336,7 +336,6 @@ void TestSingleStream(Program *prg) {
   SystemUnderTestSingleStream sut(prg);
   QuerySampleLibrarySingleStream qsl(prg);
 
-  const std::string mlperf_conf_path = getenv_s("MLC_MLPERF_CONF");
   const std::string user_conf_path = getenv_s("MLC_MLPERF_USER_CONF");
   const std::string audit_conf_path =
       getenv_opt_s("MLC_MLPERF_INFERENCE_AUDIT_PATH", "");
@@ -347,7 +346,6 @@ void TestSingleStream(Program *prg) {
   const std::string scenario_string = getenv_s("MLC_MLPERF_LOADGEN_SCENARIO");
   const std::string mode_string = getenv_s("MLC_MLPERF_LOADGEN_MODE");
 
-  std::cout << "Path to mlperf.conf : " << mlperf_conf_path << std::endl;
   std::cout << "Path to user.conf : " << user_conf_path << std::endl;
   std::cout << "Model Name: " << model_name << std::endl;
   std::cout << "LoadGen Scenario: " << scenario_string << std::endl;
@@ -374,11 +372,6 @@ void TestSingleStream(Program *prg) {
                   ? mlperf::TestMode::FindPeakPerformance
                   : mlperf::TestMode::SubmissionRun;
 
-  if (ts.FromConfig(mlperf_conf_path, model_name, scenario_string)) {
-    std::cout << "Issue with mlperf.conf file at " << mlperf_conf_path
-              << std::endl;
-    exit(1);
-  }
 
   if (ts.FromConfig(user_conf_path, model_name, scenario_string)) {
     std::cout << "Issue with user.conf file at " << user_conf_path << std::endl;

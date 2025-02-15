@@ -86,9 +86,6 @@ def preprocess(i):
     env['MLC_LINKER_LANG'] = 'CXX'
     env['MLC_RUN_DIR'] = os.getcwd()
 
-    if 'MLC_MLPERF_CONF' not in env:
-        env['MLC_MLPERF_CONF'] = os.path.join(
-            env['MLC_MLPERF_INFERENCE_SOURCE'], "mlperf.conf")
     if 'MLC_MLPERF_USER_CONF' not in env:
         env['MLC_MLPERF_USER_CONF'] = os.path.join(
             env['MLC_MLPERF_INFERENCE_CLASSIFICATION_AND_DETECTION_PATH'], "user.conf")

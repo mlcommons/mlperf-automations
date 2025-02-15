@@ -23,7 +23,6 @@ class InputSettings {
 
 public:
   InputSettings() {
-    mlperf_conf_path = getenv("MLC_MLPERF_CONF", "../inference/mlperf.conf");
     user_conf_path =
         getenv("MLC_MLPERF_USER_CONF",
                "../inference/vision/classification_and_detection/user.conf");
@@ -49,7 +48,6 @@ public:
     performance_sample_count =
         std::stol(getenv("MLC_MLPERF_LOADGEN_PERFORMANCE_SAMPLE_COUNT", "0"));
     batch_size = std::stol(getenv("MLC_MLPERF_LOADGEN_MAX_BATCHSIZE", "32"));
-    std::cout << "MLPerf Conf path: " << mlperf_conf_path << std::endl;
     std::cout << "User Conf path: " << user_conf_path << std::endl;
     std::cout << "Dataset Preprocessed path: " << dataset_preprocessed_path
               << std::endl;
@@ -62,7 +60,6 @@ public:
               << performance_sample_count << std::endl;
   }
 
-  std::string mlperf_conf_path;
   std::string user_conf_path;
   std::string audit_conf_path;
   std::string output_dir;
@@ -104,14 +101,6 @@ int main(int argc, const char *argv[]) {
                            ? mlperf::TestMode::FindPeakPerformance
                            : mlperf::TestMode::SubmissionRun;
 
-  // read test settings from mlperf.conf and user.conf
-  if (test_settings.FromConfig(input_settings.mlperf_conf_path,
-                               input_settings.model_name,
-                               input_settings.scenario_name)) {
-    std::cerr << "Could not read mlperf.conf at "
-              << input_settings.mlperf_conf_path << std::endl;
-    return 1;
-  }
   if (test_settings.FromConfig(input_settings.user_conf_path,
                                input_settings.model_name,
                                input_settings.scenario_name)) {

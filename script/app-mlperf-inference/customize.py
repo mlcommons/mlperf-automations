@@ -311,6 +311,8 @@ def postprocess(i):
         # if custom model name is not set, the official model name will be
         # mapped to itself
         official_model_name = model
+        if "efficientnet" in official_model_name or "mobilenet" in official_modfel_name:
+            official_model_name = "resnet"
         model_mapping = {model_full_name: official_model_name}
         with open("model_mapping.json", "w") as fp:
             json.dump(model_mapping, fp, indent=2)
