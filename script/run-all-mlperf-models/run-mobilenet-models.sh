@@ -34,34 +34,20 @@ extra_tags=""
 # run "$MLC_RUN_CMD"
 run "mlcr run,mobilenet-models,_tflite,_accuracy-only$extra_tags \
 --adr.compiler.tags=gcc \
-${extra_option} \
---results_dir=$HOME/results_dir"
+${extra_option} "
 
 run "mlcr run,mobilenet-models,_tflite,_performance-only$extra_tags \
 ${POWER} \
 --adr.compiler.tags=gcc \
-${extra_option} \
---results_dir=$HOME/results_dir"
+${extra_option}"
 
-run "mlcr run,mobilenet-models,_tflite,_populate-readme$extra_tags \
-${POWER} \
---adr.compiler.tags=gcc \
-${extra_option} \
---results_dir=$HOME/results_dir"
 
 run "mlcr run,mobilenet-models,_tflite,_armnn,_neon,_accuracy-only$extra_tags \
 --adr.compiler.tags=gcc \
-${extra_option} \
---results_dir=$HOME/results_dir"
+${extra_option} "
 
 run "mlcr run,mobilenet-models,_tflite,_armnn,_neon,_performance-only$extra_tags \
 ${POWER} \
 ${extra_option} \
---adr.compiler.tags=gcc \
---results_dir=$HOME/results_dir"
+--adr.compiler.tags=gcc"
 
-run "mlcr run,mobilenet-models,_tflite,_armnn,_neon,_populate-readme$extra_tags \
-${POWER} \
-${extra_option} \
---adr.compiler.tags=gcc \
---results_dir=$HOME/results_dir"
