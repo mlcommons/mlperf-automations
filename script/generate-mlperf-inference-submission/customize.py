@@ -160,15 +160,11 @@ def generate_submission(env, state, inp, submission_division):
     print('* MLPerf inference submitter: {}'.format(submitter))
 
     if env.get('MLC_MLPERF_SUT_SW_NOTES_EXTRA', '') != '':
-        sw_notes = f"""{
-            system_meta_tmp['sw_notes']} {
-            env['MLC_MLPERF_SUT_SW_NOTES_EXTRA']}"""
+        sw_notes = f"""{system_meta_tmp.get('sw_notes','')} {env['MLC_MLPERF_SUT_SW_NOTES_EXTRA']}"""
         system_meta_tmp['sw_notes'] = sw_notes
 
     if env.get('MLC_MLPERF_SUT_HW_NOTES_EXTRA', '') != '':
-        hw_notes = f"""{
-            system_meta_tmp['hw_notes']} {
-            env['MLC_MLPERF_SUT_HW_NOTES_EXTRA']}"""
+        hw_notes = f"""{system_meta_tmp.get('hw_notes', '')} {env['MLC_MLPERF_SUT_HW_NOTES_EXTRA']}"""
         system_meta_tmp['hw_notes'] = hw_notes
 
     path_submission = os.path.join(path_submission_division, submitter)
