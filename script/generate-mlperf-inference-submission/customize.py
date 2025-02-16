@@ -131,12 +131,13 @@ def generate_submission(env, state, inp, submission_division):
         system_meta_tmp['system_type'] = env['MLC_MLPERF_SUBMISSION_CATEGORY'].replace(
             "-", ",")
 
-    duplicate = (
+    '''duplicate = (
         env.get(
             'MLC_MLPERF_DUPLICATE_SCENARIO_RESULTS',
             'no') in [
             "yes",
             "True"])
+    '''
 
     if division not in ['open', 'closed']:
         return {'return': 1, 'error': '"division" must be "open" or "closed"'}
@@ -361,6 +362,7 @@ def generate_submission(env, state, inp, submission_division):
                 compliance_scenario_path = os.path.join(
                     compliance_model_path, scenario)
 
+                '''
                 if duplicate and scenario == 'singlestream':
                     if not os.path.exists(os.path.join(
                             result_model_path, "offline")):
@@ -378,6 +380,7 @@ def generate_submission(env, state, inp, submission_division):
                             result_scenario_path, os.path.join(
                                 result_model_path, "multistream"))
                         scenarios.append("multistream")
+                '''
 
                 modes = [
                     f for f in os.listdir(result_scenario_path) if not os.path.isfile(
