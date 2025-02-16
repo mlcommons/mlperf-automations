@@ -42,6 +42,7 @@ ${POWER} \
 ${extra_option}"
 
 
+
 run "mlcr run,mobilenet-models,_tflite,_armnn,_neon,_accuracy-only$extra_tags \
 --adr.compiler.tags=gcc \
 ${extra_option} "
@@ -50,4 +51,5 @@ run "mlcr run,mobilenet-models,_tflite,_armnn,_neon,_performance-only$extra_tags
 ${POWER} \
 ${extra_option} \
 --adr.compiler.tags=gcc"
+
 
