@@ -27,8 +27,8 @@ jobs:
     - name: Install dependencies
       run: |
         pip install mlc-scripts
-        mlcr --tags=get,sys-utils-cm --quiet
+        mlcr get,sys-utils-cm --quiet
   
     - name: Test QAIC Compute SDK for compilation
       run: |
-        mlcr --tags=get,qaic,compute,sdk --adr.llvm.version=${{ matrix.llvm-version }} --quiet
+        mlcr get,qaic,compute,sdk --adr.llvm.version=${{ matrix.llvm-version }} --quiet

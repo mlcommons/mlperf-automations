@@ -35,7 +35,7 @@ category="edge,datacenter"
 
 #Add your run commands here...
 # run "$MLC_RUN_CMD"
-find_performance_cmd='mlcr --tags=generate-run-cmds,inference,_find-performance \
+find_performance_cmd='mlcr generate-run-cmds,inference,_find-performance \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=edge --division=open --scenario=Offline  --quiet --test_query_count=$test_query_count'
 
@@ -47,7 +47,7 @@ run "bert-99.9" "5000" "${find_performance_cmd}"
 run "3d-unet" "10" "${find_performance_cmd}"
 
 
-submission_cmd='mlcr --tags=generate-run-cmds,inference,_submission,_all-scenarios \
+submission_cmd='mlcr generate-run-cmds,inference,_submission,_all-scenarios \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=$category --division=$division  --quiet'
 

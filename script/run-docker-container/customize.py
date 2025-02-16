@@ -23,7 +23,7 @@ def preprocess(i):
         env['MLC_DOCKER_RUN_SCRIPT_TAGS'] = "run,docker,container"
         MLC_RUN_CMD = "mlc version"
     else:
-        MLC_RUN_CMD = "mlcr --tags=" + \
+        MLC_RUN_CMD = "mlcr " + \
             env['MLC_DOCKER_RUN_SCRIPT_TAGS'] + ' --quiet'
 
     r = mlc.access({'action': 'search',

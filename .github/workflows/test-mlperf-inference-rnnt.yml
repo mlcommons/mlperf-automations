@@ -37,4 +37,4 @@ jobs:
         mlcr --quiet --tags=get,sys-utils-cm
     - name: Test MLPerf Inference RNNT
       run: |
-        mlcr --tags=run,mlperf,inference,generate-run-cmds,_performance-only --submitter="cTuning" --model=rnnt --backend=${{ matrix.backend }} --device=cpu --scenario=Offline --test_query_count=5 --precision=${{ matrix.precision }} --target_qps=5  -v --quiet
+        mlcr run,mlperf,inference,generate-run-cmds,_performance-only --submitter="cTuning" --model=rnnt --backend=${{ matrix.backend }} --device=cpu --scenario=Offline --test_query_count=5 --precision=${{ matrix.precision }} --target_qps=5  -v --quiet

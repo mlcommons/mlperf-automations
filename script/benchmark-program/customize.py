@@ -84,7 +84,7 @@ def preprocess(i):
             pre_run_cmd += ' && '
 
         # running the script as a process in background
-        pre_run_cmd = pre_run_cmd + 'mlcr --tags=runtime,system,utilisation' + \
+        pre_run_cmd = pre_run_cmd + 'mlcr runtime,system,utilisation' + \
             env['MLC_SYS_UTILISATION_SCRIPT_TAGS'] + ' --quiet  & '
         # obtain the command if of the background process
         pre_run_cmd += r" cmd_pid=\$!  && echo CMD_PID=\$cmd_pid"

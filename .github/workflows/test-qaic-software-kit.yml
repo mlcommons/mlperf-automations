@@ -32,8 +32,8 @@ jobs:
     - name: Pull MLOps repository
       run: |
         pip install mlc-scripts
-        mlcr --tags=get,sys-utils-mlc --quiet
+        mlcr get,sys-utils-mlc --quiet
   
     - name: Test Software Kit for compilation on Ubuntu 20.04
       run: |
-        mlcr --tags=get,qaic,software,kit --adr.compiler.tags=${{ matrix.compiler }} --adr.compiler.version=${{ matrix.llvm-version }} --quiet
+        mlcr get,qaic,software,kit --adr.compiler.tags=${{ matrix.compiler }} --adr.compiler.version=${{ matrix.llvm-version }} --quiet

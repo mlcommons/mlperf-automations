@@ -24,7 +24,7 @@ jobs:
         source gh_action/bin/activate
         export MLC_REPOS=$HOME/GH_MLC
         python3 -m pip install mlperf
-        mlcr --tags=run-mlperf,inference,_performance-only --pull_changes=yes --pull_inference_changes=yes  --submitter="MLCommons" --model=dlrm-v2-99 --implementation=reference --backend=pytorch --category=datacenter --scenario=Offline --execution_mode=test --device=${{ matrix.device }} --docker --quiet --test_query_count=1 --target_qps=1 --docker_it=no  --adr.compiler.tags=gcc --hw_name=gh_action --docker_dt=yes  --results_dir=$HOME/gh_action_results --clean
+        mlcr run-mlperf,inference,_performance-only --pull_changes=yes --pull_inference_changes=yes  --submitter="MLCommons" --model=dlrm-v2-99 --implementation=reference --backend=pytorch --category=datacenter --scenario=Offline --execution_mode=test --device=${{ matrix.device }} --docker --quiet --test_query_count=1 --target_qps=1 --docker_it=no  --adr.compiler.tags=gcc --hw_name=gh_action --docker_dt=yes  --results_dir=$HOME/gh_action_results --clean
 
   build_intel:
     if: github.repository_owner == 'gateoverflow_off'
@@ -44,4 +44,4 @@ jobs:
         export MLC_REPOS=$HOME/GH_MLC
         python3 -m pip install mlperf
         mlc pull repo
-        mlcr --tags=run-mlperf,inference,_submission,_short --submitter="MLCommons" --model=dlrm-v2-99 --implementation=intel --batch_size=1 --backend=${{ matrix.backend }} --category=datacenter --scenario=Offline --execution_mode=test --device=${{ matrix.device }}  --docker --quiet --test_query_count=1 --target_qps=1 --docker_it=no --docker_mlc_repo=gateoverflow@mlperf-automations --adr.compiler.tags=gcc --hw_name=gh_action --docker_dt=yes  --results_dir=$HOME/gh_action_results --submission_dir=$HOME/gh_action_submissions --clean
+        mlcr run-mlperf,inference,_submission,_short --submitter="MLCommons" --model=dlrm-v2-99 --implementation=intel --batch_size=1 --backend=${{ matrix.backend }} --category=datacenter --scenario=Offline --execution_mode=test --device=${{ matrix.device }}  --docker --quiet --test_query_count=1 --target_qps=1 --docker_it=no --docker_mlc_repo=gateoverflow@mlperf-automations --adr.compiler.tags=gcc --hw_name=gh_action --docker_dt=yes  --results_dir=$HOME/gh_action_results --submission_dir=$HOME/gh_action_submissions --clean
