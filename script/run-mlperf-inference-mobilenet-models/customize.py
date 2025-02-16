@@ -134,8 +134,8 @@ def preprocess(i):
 
                 mlc_input = {
                     'action': 'run',
-                    'automation': 'script',
-                    'tags': f'generate-run-cmds,mlperf,inference,{var}',
+                    'target': 'script',
+                    'tags': f'run-mlperf,mlperf,inference,{var}',
                     'quiet': True,
                     'env': env,
                     'input': inp,
@@ -200,7 +200,7 @@ def preprocess(i):
             'tags': 'get,preprocessed,dataset,_for.mobilenet',
                     'quiet': True,
                     'v': verbose,
-                    'f': 'True'
+                    'f': True
         }
         r = mlc.access(clean_input)
         # if r['return'] > 0:
