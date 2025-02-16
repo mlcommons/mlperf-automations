@@ -48,7 +48,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --scenario=Offline \
 --category=edge --division=$division  --quiet \
 --adr.compiler.tags=gcc \
---execution-mode=valid \
+--execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
 --results_dir=$HOME/results_dir"
@@ -58,7 +58,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --scenario=Offline \
 --category=edge --division=$division  --quiet \
 --adr.compiler.tags=gcc \
---execution-mode=valid \
+--execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
 --results_dir=$HOME/results_dir"
@@ -68,7 +68,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --scenario=SingleStream \
 --category=edge --division=$division  --quiet \
 --adr.compiler.tags=gcc \
---execution-mode=valid \
+--execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
 --results_dir=$HOME/results_dir"
@@ -78,7 +78,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --scenario=SingleStream \
 --category=edge --division=$division  --quiet \
 --adr.compiler.tags=gcc \
---execution-mode=valid \
+--execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
 --results_dir=$HOME/results_dir"
@@ -103,7 +103,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --model=resnet50 --implementation=cpp --device=cuda --backend=onnxruntime \
 --category=edge --division=$division  --quiet \
 --adr.compiler.tags=gcc \
---execution-mode=valid \
+--execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
 --results_dir=$HOME/results_dir"
@@ -113,7 +113,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --scenario=Offline \
 --category=edge --division=$division  --quiet \
 --adr.compiler.tags=gcc \
---execution-mode=valid \
+--execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
 --results_dir=$HOME/results_dir"
@@ -125,7 +125,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --scenario=SingleStream \
 --category=edge --division=$division  --quiet \
 --adr.compiler.tags=gcc \
---execution-mode=valid \
+--execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
 --results_dir=$HOME/results_dir"
@@ -135,7 +135,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --scenario=SingleStream \
 --category=edge --division=$division  --quiet \
 --adr.compiler.tags=gcc \
---execution-mode=valid \
+--execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
 --results_dir=$HOME/results_dir"
@@ -147,7 +147,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --scenario=MultiStream \
 --category=edge --division=$division  --quiet \
 --adr.compiler.tags=gcc \
---execution-mode=valid \
+--execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
 --results_dir=$HOME/results_dir"
@@ -157,7 +157,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --scenario=MultiStream \
 --category=edge --division=$division  --quiet \
 --adr.compiler.tags=gcc \
---execution-mode=valid \
+--execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
 --results_dir=$HOME/results_dir"

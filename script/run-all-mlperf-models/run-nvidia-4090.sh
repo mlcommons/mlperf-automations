@@ -50,7 +50,7 @@ find_performance_cmd='mlcr generate-run-cmds,inference,_find-performance \
 
 
 submission_cmd='mlcr generate-run-cmds,inference,_submission,_all-scenarios \
---model=$model --execution-mode=valid --implementation=$implementation --device=$device --backend=$backend --results_dir=$HOME/results_dir \
+--model=$model --execution_mode=valid --implementation=$implementation --device=$device --backend=$backend --results_dir=$HOME/results_dir \
 --category=$category --division=$division --skip_submission_generation=yes --quiet $power'
 
 #run_model "bert-99.9" "10" "${submission_cmd} --offline_target_qps=1680 --server_target_qps=1520"

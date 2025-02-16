@@ -47,20 +47,20 @@ find_performance_cmd='mlcr generate-run-cmds,inference,_find-performance \
 submission_cmd='mlcr generate-run-cmds,inference,_submission,_all-scenarios \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=$category --division=$division  --quiet --results_dir=$HOME/results_dir \
---skip_submission_generation=yes --execution-mode=valid $power'
+--skip_submission_generation=yes --execution_mode=valid $power'
 
 submission_cmd_scenario='mlcr generate-run-cmds,inference,_submission  --scenario=$scenario \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=$category --division=$division  --quiet --results_dir=$HOME/results_dir \
---skip_submission_generation=yes --execution-mode=valid $power'
+--skip_submission_generation=yes --execution_mode=valid $power'
 
 readme_cmd_single='mlcr generate-run-cmds,inference,_populate-readme \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=$category --division=$division  --quiet --results_dir=$HOME/results_dir \
---skip_submission_generation=yes --execution-mode=valid $power'
+--skip_submission_generation=yes --execution_mode=valid $power'
 
 readme_cmd='mlcr generate-run-cmds,inference,_populate-readme,_all-scenarios \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=$category --division=$division  --quiet --results_dir=$HOME/results_dir \
---skip_submission_generation=yes --execution-mode=valid $power'
+--skip_submission_generation=yes --execution_mode=valid $power'
 

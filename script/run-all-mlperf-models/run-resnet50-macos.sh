@@ -18,6 +18,7 @@ function run() {
   echo "$1"
   echo ""
   if [[ ${MLC_FAKE_RUN} != 'yes' ]]; then
+    exit 1
     eval "$1"
     exit_if_error
   fi
@@ -44,12 +45,12 @@ find_performance_cmd='mlcr generate-run-cmds,inference,_find-performance \
 submission_cmd='mlcr generate-run-cmds,inference,_submission,_all-scenarios \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=$category --division=$division  --quiet \
---skip_submission_generation=yes --execution-mode=valid $power'
+--skip_submission_generation=yes --execution_mode=valid $power'
 
 submission_cmd_scenario='mlcr generate-run-cmds,inference,_submission  --scenario=$scenario \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=$category --division=$division  --quiet  \
---skip_submission_generation=yes --execution-mode=valid $power'
+--skip_submission_generation=yes --execution_mode=valid $power'
 
 
 # run "$MLC_RUN_CMD"
@@ -57,5 +58,6 @@ submission_cmd_scenario='mlcr generate-run-cmds,inference,_submission  --scenari
 #run_test "tf" "6000" "reference" "cpu" "$find_performance_cmd --rerun"
 
 run_test "onnxruntime" "100" "reference" "cpu" "$submission_cmd"
+
 run_test "tf" "100" "reference" "cpu" "$submission_cmd"
 
