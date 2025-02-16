@@ -5,7 +5,7 @@ name: MLPerf inference LLAMA2-70B
 
 on:
   schedule:
-    - cron: "59 04 * * *"
+    - cron: "59 04 1 * *"
 
 jobs:
   build_reference:
