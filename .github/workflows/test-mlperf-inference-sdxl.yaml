@@ -1,7 +1,7 @@
 name: MLPerf inference SDXL
 on:
   schedule:
-    - cron: "19 17 * * *"
+    - cron: "19 17 1 * *"
 
 jobs:
   build_reference:
