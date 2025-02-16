@@ -18,7 +18,6 @@ function run() {
   echo "$1"
   echo ""
   if [[ ${MLC_FAKE_RUN} != 'yes' ]]; then
-    exit 1
     eval "$1"
     exit_if_error
   fi
