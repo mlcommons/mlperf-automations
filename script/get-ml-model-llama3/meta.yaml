@@ -52,12 +52,12 @@ variations:
     group: download-src
     default: true
     prehook_deps:
-      - tags: get,rclone-config,_mlperf-llama3-1
-        force_cache: true
+      - tags: get,rclone
         enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - yes
-      - tags: get,rclone
+      - tags: get,rclone-config,_mlperf-llama3-1
+        force_cache: true
         enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - yes
