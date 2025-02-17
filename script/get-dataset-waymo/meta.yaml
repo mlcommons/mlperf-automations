@@ -17,3 +17,18 @@ variations:
     group: dataset-format
     env:
       MLC_DATASET_WAYMO_FORMAT: kitti
+  mlc:
+    group: download-src
+    default: true
+    prehook_deps:
+      - tags: get,rclone
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+      - tags: get,rclone-config,_waymo
+        force_cache: true
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
