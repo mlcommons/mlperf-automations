@@ -537,7 +537,7 @@ def get_run_cmd_reference(
         cmd = env['MLC_PYTHON_BIN_WITH_PATH'] + " main.py " \
             " --dataset waymo" + \
             " --dataset-path " + env['MLC_DATASET_WAYMO_PATH'] + \
-            " --lidar-path " + env['MLC_ML_MODEL_POINT_PILLARS_PATH'] + \
+            " --lidar-path " + env['MLC_ML_MODEL_POINT_PAINTING_PATH'] + \
             " --segmentor-path " + env['MLC_ML_MODEL_DPLAB_RESNET50_PATH'] + \
             " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \
             " --output " + env['MLC_MLPERF_OUTPUT_DIR'] + \

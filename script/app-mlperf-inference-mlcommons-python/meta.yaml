@@ -66,7 +66,7 @@ input_mapping:
   multistream_target_latency: MLC_MLPERF_LOADGEN_MULTISTREAM_TARGET_LATENCY
   network: MLC_NETWORK_LOADGEN
   sut_servers: MLC_NETWORK_LOADGEN_SUT_SERVERS
-  pointpillars_checkpoint_path: MLC_ML_MODEL_POINT_PILLARS_PATH
+  pointpainting_checkpoint_path: MLC_ML_MODEL_POINT_PAINTING_PATH
   deeplab_resnet50_path: MLC_ML_MODEL_DPLAB_RESNET50_PATH
   waymo_path: MLC_DATASET_WAYMO_PATH
 
@@ -505,7 +505,7 @@ deps:
         - "yes"
 
   ## pointpainting
-  - tags: get,ml-model,pointpillars
+  - tags: get,ml-model,pointpainting
     names:
       - pointpillars-model
     enable_if_env:
@@ -514,15 +514,6 @@ deps:
     skip_if_env:
       MLC_RUN_STATE_DOCKER:
         - "yes"
-  - tags: get,ml-model,resnet50-deeplab
-    enable_if_env:
-      MLC_MODEL:
-        - pointpainting
-    skip_if_env:
-      MLC_RUN_STATE_DOCKER:
-        - "yes"
-    names:
-      - resnet50-deeplab-model
 
   ########################################################################
   # Install datasets
