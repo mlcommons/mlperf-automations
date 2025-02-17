@@ -11,6 +11,7 @@ def predeps(i):
 
     return {'return': 0}
 
+
 def preprocess(i):
 
     os_info = i['os_info']
@@ -18,12 +19,15 @@ def preprocess(i):
     env = i['env']
 
     exe_c = 'clang.exe' if os_info['platform'] == 'windows' else 'clang'
-    
-    if env.get('MLC_AOCC_DIR_PATH', '') != '' and env.get('MLC_AOCC_BIN_WITH_PATH','') == '':
+
+    if env.get('MLC_AOCC_DIR_PATH', '') != '' and env.get(
+            'MLC_AOCC_BIN_WITH_PATH', '') == '':
         for f in os.listdir(env['MLC_AOCC_DIR_PATH']):
-            if os.path.exists(os.path.join(env['MLC_AOCC_DIR_PATH'], f, "bin", exe_c)):
-                env['MLC_AOCC_BIN_WITH_PATH'] = os.path.join(env['MLC_AOCC_DIR_PATH'], f, "bin", exe_c)
-        
+            if os.path.exists(os.path.join(
+                    env['MLC_AOCC_DIR_PATH'], f, "bin", exe_c)):
+                env['MLC_AOCC_BIN_WITH_PATH'] = os.path.join(
+                    env['MLC_AOCC_DIR_PATH'], f, "bin", exe_c)
+
     if env.get('MLC_HOST_OS_FLAVOR', '') == 'rhel':
         if "12" in env.get('MLC_VERSION', '') or "12" in env.get(
                 'MLC_VERSION_MIN', ''):
