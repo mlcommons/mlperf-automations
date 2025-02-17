@@ -22,7 +22,8 @@ def preprocess(i):
             if env.get('MLC_OUTDIRNAME', '') != '':
                 env['MLC_DATASET_WAYMO_PATH'] = env['MLC_OUTDIRNAME']
             else:
-                env['MLC_DATASET_WAYMO_PATH'] = os.path.join(os.getcwd(), "kitti_format")
+                env['MLC_DATASET_WAYMO_PATH'] = os.path.join(
+                    os.getcwd(), "kitti_format")
 
     return {'return': 0}
 
