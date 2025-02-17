@@ -13,13 +13,16 @@ def preprocess(i):
 
     if env.get('MLC_ML_MODEL_POINT_PAINTING_PATH', '') != '':
         if not os.path.exists(env['MLC_ML_MODEL_POINT_PAINTING']):
-            return {'return': 1, 'error': f"Provided model path {env['MLC_ML_MODEL_POINT_PAINTING']} does not exist."}
-    
+            return {
+                'return': 1, 'error': f"Provided model path {env['MLC_ML_MODEL_POINT_PAINTING']} does not exist."}
+
     if env.get('MLC_ML_MODEL_DPLAB_RESNET50_PATH', '') != '':
         if not os.path.exists(env['MLC_ML_MODEL_DPLAB_RESNET50_PATH']):
-            return {'return': 1, 'error': f"Provided model path {env['MLC_ML_MODEL_DPLAB_RESNET50_PATH']} does not exist."}
-        
-    if env.get('MLC_ML_MODEL_POINT_PAINTING_PATH', '') == '' or env.get('MLC_ML_MODEL_DPLAB_RESNET50_PATH', '') == '':
+            return {
+                'return': 1, 'error': f"Provided model path {env['MLC_ML_MODEL_DPLAB_RESNET50_PATH']} does not exist."}
+
+    if env.get('MLC_ML_MODEL_POINT_PAINTING_PATH', '') == '' or env.get(
+            'MLC_ML_MODEL_DPLAB_RESNET50_PATH', '') == '':
         env['MLC_TMP_REQUIRE_DOWNLOAD'] = "yes"
         if env['MLC_DOWNLOAD_SRC'] == "mlcommons":
             i['run_script_input']['script_name'] = 'run-rclone'
@@ -43,7 +46,7 @@ def postprocess(i):
         else:
             env['MLC_ML_MODEL_POINT_PAINTING_PATH'] = os.path.join(
                 env['MLC_ML_MODEL_POINT_PAINTING_TMP_PATH'], "pp_ep36.pth")
-            
+
     if env.get('MLC_ML_MODEL_DPLAB_RESNET50_PATH', '') == '':
         if env['MLC_ML_MODEL_DPLAB_RESNET50_FORMAT'] == "onnx":
             env['MLC_ML_MODEL_DPLAB_RESNET50_PATH'] = os.path.join(
