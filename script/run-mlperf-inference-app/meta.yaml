@@ -383,6 +383,8 @@ variations:
     add_deps_recursive:
       submission-checker:
         tags: _short-run
+      openimages-preprocessed:
+        tags: _50
     default: 'true'
     env:
       MLC_MLPERF_SUBMISSION_DIVISION: open
