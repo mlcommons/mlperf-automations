@@ -31,13 +31,6 @@ POWER=" --env.MLC_GET_PLATFORM_DETAILS=no"
 
 #run "mlcr set,system,performance,mode"
 
-run "mlcr generate-run-cmds,inference,_find-performance \
---model=resnet50 --implementation=cpp --device=cuda --backend=onnxruntime \
---adr.compiler.tags=gcc \
---test_query_count=20000 \
---category=edge --division=open --scenario=Offline  --quiet"
-
-
 #cpp
 run "mlcr generate-run-cmds,inference,_find-performance \
 --model=resnet50 --implementation=cpp --device=cpu --backend=onnxruntime \
@@ -58,7 +51,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
---results_dir=$HOME/results_dir"
+"
 
 run "mlcr generate-run-cmds,inference,_submission \
 --model=retinanet --implementation=cpp --device=cpu --backend=onnxruntime \
@@ -68,7 +61,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
---results_dir=$HOME/results_dir"
+"
 
 run "mlcr generate-run-cmds,inference,_submission \
 --model=resnet50 --implementation=cpp --device=cpu --backend=onnxruntime \
@@ -78,7 +71,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
---results_dir=$HOME/results_dir"
+"
 
 run "mlcr generate-run-cmds,inference,_submission \
 --model=retinanet --implementation=cpp --device=cpu --backend=onnxruntime \
@@ -88,7 +81,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
---results_dir=$HOME/results_dir"
+"
 
 # GPU
 
@@ -113,7 +106,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
---results_dir=$HOME/results_dir"
+"
 
 run "mlcr generate-run-cmds,inference,_submission \
 --model=retinanet --implementation=cpp --device=cuda --backend=onnxruntime \
@@ -123,7 +116,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
---results_dir=$HOME/results_dir"
+"
 
 
 run "mlcr generate-run-cmds,inference,_submission \
@@ -135,7 +128,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
---results_dir=$HOME/results_dir"
+"
 
 run "mlcr generate-run-cmds,inference,_submission \
 --model=retinanet --implementation=cpp --device=cuda --backend=onnxruntime \
@@ -145,7 +138,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
---results_dir=$HOME/results_dir"
+"
 
 #multistream
 run "mlcr generate-run-cmds,inference,_submission \
@@ -157,7 +150,7 @@ run "mlcr generate-run-cmds,inference,_submission \
 --execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
---results_dir=$HOME/results_dir"
+"
 
 run "mlcr generate-run-cmds,inference,_submission \
 --model=retinanet --implementation=cpp --device=cuda --backend=onnxruntime \
@@ -167,4 +160,4 @@ run "mlcr generate-run-cmds,inference,_submission \
 --execution_mode=valid \
 --skip_submission_generation=yes \
 ${POWER} \
---results_dir=$HOME/results_dir"
+"
