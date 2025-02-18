@@ -47,11 +47,11 @@ jobs:
     - name: Test MLPerf Inference Retinanet using ${{ matrix.backend }} on ${{ matrix.os }}
       if: matrix.os == 'windows-latest'
       run: |
-        mlcr run,mlperf,inference,generate-run-cmds,_submission,_short --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name=gh_${{ matrix.os }} --model=retinanet --adr.loadgen.tags=_from-pip --pip_loadgen=yes --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --scenario=Offline --test_query_count=5 --quiet  -v --target_qps=1
+        mlcr run,mlperf,inference,generate-run-cmds,_submission,_short --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name=gh_${{ matrix.os }} --model=retinanet --adr.loadgen.tags=_from-pip --pip_loadgen=yes --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --scenario=Offline --test_query_count=5 --quiet  -v --target_qps=1 --adr.openimages-preprocessed.tags=_50
     - name: Test MLPerf Inference Retinanet using ${{ matrix.backend }} on ${{ matrix.os }}
       if: matrix.os != 'windows-latest'
       run: |
-        mlcr run,mlperf,inference,generate-run-cmds,_submission,_short --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name=gh_${{ matrix.os }}_x86 --model=retinanet --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --scenario=Offline --test_query_count=5  --quiet  -v --target_qps=1
+        mlcr run,mlperf,inference,generate-run-cmds,_submission,_short --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name=gh_${{ matrix.os }}_x86 --model=retinanet --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --scenario=Offline --test_query_count=5  --quiet  -v --target_qps=1 --adr.openimages-preprocessed.tags=_50
 
     # Step for Linux/MacOS
     - name: Randomly Execute Step (Linux/MacOS)
