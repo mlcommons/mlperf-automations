@@ -254,7 +254,7 @@ def postprocess(i):
         measurements['starting_weights_filename'] = env.get(
             'MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME', env.get(
                 'MLC_ML_MODEL_FILE', measurements.get(
-                    'starting_weights_filename', '')))
+                    'starting_weights_filename', 'TBD')))
         measurements['retraining'] = env.get(
             'MLC_ML_MODEL_RETRAINING', measurements.get(
                 'retraining', 'no'))
