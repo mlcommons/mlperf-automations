@@ -27,9 +27,16 @@ division="closed"
 # run "$MLC_RUN_CMD"
 
 POWER=" --power=yes --adr.mlperf-power-client.power_server=192.168.0.15 --adr.mlperf-power-client.port=4950 "
-POWER=""
+POWER=" --env.MLC_GET_PLATFORM_DETAILS=no"
 
-run "mlcr set,system,performance,mode"
+#run "mlcr set,system,performance,mode"
+
+run "mlcr generate-run-cmds,inference,_find-performance \
+--model=resnet50 --implementation=cpp --device=cuda --backend=onnxruntime \
+--adr.compiler.tags=gcc \
+--test_query_count=20000 \
+--category=edge --division=open --scenario=Offline  --quiet"
+
 
 #cpp
 run "mlcr generate-run-cmds,inference,_find-performance \
