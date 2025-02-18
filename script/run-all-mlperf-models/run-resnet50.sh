@@ -35,6 +35,7 @@ function run_test() {
   run "$5"
 }
 power=' --power=yes --adr.mlperf-power-client.power_server=192.168.0.15 --adr.mlperf-power-client.port=4950 '
+power=''
 
 #Add your run commands here...
 find_performance_cmd='mlcr generate-run-cmds,inference,_find-performance \
@@ -51,37 +52,20 @@ submission_cmd_scenario='mlcr generate-run-cmds,inference,_submission  --scenari
 --category=$category --division=$division  --quiet --results_dir=$HOME/results_dir \
 --skip_submission_generation=yes --execution_mode=valid $power'
 
-readme_cmd_single='mlcr generate-run-cmds,inference,_populate-readme \
---model=$model --implementation=$implementation --device=$device --backend=$backend \
---category=$category --division=$division  --quiet --results_dir=$HOME/results_dir \
---skip_submission_generation=yes --execution_mode=valid $power'
-
-readme_cmd='mlcr generate-run-cmds,inference,_populate-readme,_all-scenarios \
---model=$model --implementation=$implementation --device=$device --backend=$backend \
---category=$category --division=$division  --quiet --results_dir=$HOME/results_dir \
---skip_submission_generation=yes --execution_mode=valid $power'
 
 # run "$MLC_RUN_CMD"
 run_test "onnxruntime" "200" "reference" "cpu" "$find_performance_cmd"
 run_test "tf" "200" "reference" "cpu" "$find_performance_cmd"
-run_test "onnxruntime" "10000" "reference" "cuda" "$find_performance_cmd"
-run_test "tf" "20000" "reference" "cuda" "$find_performance_cmd"
 
 run_test "onnxruntime" "100" "reference" "cpu" "$submission_cmd"
 run_test "tf" "100" "reference" "cpu" "$submission_cmd"
 scenario="SingleStream"
 run_test "tflite" "100" "tflite-cpp" "cpu" "$submission_cmd_scenario --adr.compiler.tags=gcc"
 run_test "tflite" "100" "tflite-cpp" "cpu" "$submission_cmd_scenario --adr.compiler.tags=gcc --adr.mlperf-inference-implementation.compressed_dataset=on"
-run_test "onnxruntime" "100" "reference" "cuda" "$submission_cmd "
-scenario="Offline"
-run_test "tf" "100" "reference" "cuda" "$submission_cmd_scenario"
-scenario="SingleStream"
-run_test "tf" "100" "reference" "cuda" "$submission_cmd_scenario"
 
-run_test "onnxruntime" "100" "reference" "cpu" "$readme_cmd"
-run_test "tf" "100" "reference" "cpu" "$readme_cmd"
-run_test "tflite" "100" "tflite-cpp" "cpu" "$readme_cmd_single --adr.compiler.tags=gcc --scenario=SingleStream"
-run_test "tflite" "100" "tflite-cpp" "cpu" "$readme_cmd_single --adr.compiler.tags=gcc --scenario=SingleStream  --adr.mlperf-inference-implementation.compressed_dataset=on"
-run_test "onnxruntime" "100" "reference" "cuda" "$readme_cmd --scenario=SingleStream"
-run_test "tf" "100" "reference" "cuda" "$readme_cmd_single --scenario=SingleStream"
-run_test "tf" "100" "reference" "cuda" "$readme_cmd_single --scenario=Offline"
+
+run_test "onnxruntime" "10000" "reference" "cuda" "$find_performance_cmd"
+run_test "tf" "20000" "reference" "cuda" "$find_performance_cmd"
+run_test "onnxruntime" "100" "reference" "cuda" "$submission_cmd "
+run_test "tf" "100" "reference" "cuda" "$submission_cmd"
+
