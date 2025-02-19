@@ -1,6 +1,6 @@
 from mlc import utils
 import os
-from automation.utils import *
+from utils import *
 
 
 def preprocess(i):
