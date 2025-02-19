@@ -3,6 +3,7 @@ import os
 import shutil
 from utils import *
 
+
 def preprocess(i):
 
     os_info = i['os_info']
@@ -590,7 +591,8 @@ def preprocess(i):
 
         run_infer_on_copy_streams = str(
             env.get('MLC_MLPERF_NVIDIA_HARNESS_RUN_INFER_ON_COPY_STREAMS', ''))
-        if run_infer_on_copy_streams and not is_false(run_infer_on_copy_streams):
+        if run_infer_on_copy_streams and not is_false(
+                run_infer_on_copy_streams):
             run_config += " --run_infer_on_copy_streams"
 
         start_from_device = str(
