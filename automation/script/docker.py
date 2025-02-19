@@ -246,7 +246,7 @@ def docker_run(self_module, i):
                       for t in i.get('tags', '').split(",") if t.startswith("_")]
 
     docker_cache = i.get('docker_cache', "yes")
-    if docker_cache.lower() in ["no", "false"]:
+    if is_false(docker_cache):
         env.setdefault('MLC_DOCKER_CACHE', docker_cache)
 
     image_repo = i.get('docker_image_repo', '')
