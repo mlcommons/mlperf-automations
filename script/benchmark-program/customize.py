@@ -50,7 +50,8 @@ def preprocess(i):
     if x != '':
         env['MLC_RUN_CMD'] = x + ' ' + env.get('MLC_RUN_CMD', '')
 
-    if os_info['platform'] != 'windows' and not is_false(env.get('MLC_SAVE_CONSOLE_LOG', True)):
+    if os_info['platform'] != 'windows' and not is_false(
+            env.get('MLC_SAVE_CONSOLE_LOG', True)):
         logs_dir = env.get('MLC_LOGS_DIR', env['MLC_RUN_DIR'])
         env['MLC_RUN_CMD'] += r" 2>&1 | tee " + q + os.path.join(
             logs_dir, "console.out") + q + r"; echo \${PIPESTATUS[0]} > exitstatus"
