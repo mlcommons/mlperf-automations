@@ -358,9 +358,9 @@ class ScriptAutomation(Automation):
         if fake_deps:
             env['MLC_TMP_FAKE_DEPS'] = 'yes'
 
-        if str(i.get('skip_sys_utils', '')).lower() in ['true', 'yes']:
+        if is_true(i.get('skip_sys_utils', '')):
             env['MLC_SKIP_SYS_UTILS'] = 'yes'
-        if str(i.get('skip_sudo', '')).lower() in ['true', 'yes']:
+        if is_true(i.get('skip_sudo', '')):
             env['MLC_TMP_SKIP_SUDO'] = 'yes'
 
         run_state = i.get('run_state', self.run_state)
@@ -374,12 +374,10 @@ class ScriptAutomation(Automation):
         # Check verbose and silent
         verbose = False
 
-        silent = True if str(i.get('silent', '')).lower() in [
-            'true', 'yes', 'on'] else False
+        silent = True if is_true(i.get('silent', '')) else False
 
         if not silent:
-            silent = True if str(i.get('s', '')).lower() in [
-                'true', 'yes', 'on'] else False
+            silent = True if is_true(i.get('s', '')) else False
 
         if silent:
             if 'verbose' in i:
@@ -1020,11 +1018,9 @@ class ScriptAutomation(Automation):
         if r['return'] > 0:
             return r
 
-        if str(env.get('MLC_RUN_STATE_DOCKER', False)
-               ).lower() in ['true', '1', 'yes']:
+        if is_true(env.get('MLC_RUN_STATE_DOCKER', False)):
             if state.get('docker'):
-                if str(state['docker'].get('run', True)
-                       ).lower() in ['false', '0', 'no']:
+                if is_false(state['docker'].get('run', True)):
                     logger.info(
                         recursion_spaces +
                         '  - Skipping script::{} run as we are inside docker'.format(found_script_item))
@@ -1047,7 +1043,7 @@ class ScriptAutomation(Automation):
                         'deps': []}
                     return rr
 
-                elif str(state['docker'].get('real_run', True)).lower() in ['false', '0', 'no']:
+                elif is_false(state['docker'].get('real_run', True)):
                     logger.info(
                         recursion_spaces +
                         '  - Doing fake run for script::{} as we are inside docker'.format(found_script_item))
@@ -1576,7 +1572,7 @@ class ScriptAutomation(Automation):
             }
 
             # Check and run predeps in customize.py
-            if str(meta.get('predeps', 'True')).lower() not in ["0", "false", "no"] and os.path.isfile(
+            if not is_false(meta.get('predeps', 'True')) and os.path.isfile(
                     path_to_customize_py):  # possible duplicate execution - needs fix
                 r = utils.load_python_module(
                     {'path': path, 'name': 'customize'})
@@ -2962,13 +2958,10 @@ class ScriptAutomation(Automation):
                             run_variations = [
                                 f"_{v}" for v in variations if variations[v].get(
                                     'group',
-                                    '') == '' and str(
+                                    '') == '' and not is_true(
                                     variations[v].get(
                                         'exclude-in-test',
-                                        '')).lower() not in [
-                                    "1",
-                                    "true",
-                                    "yes"]]
+                                        ''))]
                         else:
                             given_variations = run_input.get(
                                 'variations_list', [])
@@ -5042,7 +5035,7 @@ def enable_or_skip_script(meta, env):
                 if value != '' or not is_false(value):
                     continue
             elif set(meta_key) & set(["no", "off", "false", "0"]):
-                if value in ["no", "off", "false", "0", ""]:
+                if value == "" or is_false(value):
                     continue
             elif value in meta_key:
                 continue
@@ -5075,7 +5068,7 @@ def any_enable_or_skip_script(meta, env):
                 if value != '' or not is_false(value):
                     found = True
             elif set(meta_key) & set(["no", "off", "false", "0", ""]):
-                if value in ["no", "off", "false", "0", ""]:
+                if value == "" or is_false(value):
                     found = True
             elif value in meta_key:
                 found = True
