@@ -5029,7 +5029,7 @@ def enable_or_skip_script(meta, env):
     """
 
     if not isinstance(meta, dict):
-        logger.info(
+        logger.warn(
             "The meta entry is not a dictionary for skip/enable if_env: %s",
             meta)
 
@@ -5039,7 +5039,7 @@ def enable_or_skip_script(meta, env):
             value = str(env[key]).lower().strip()
             if set(meta_key) & set(["yes", "on", "true", "1"]):
                 # Any set value other than false is taken as set
-                if not is_false(value):
+                if value != '' or not is_false(value):
                     continue
             elif set(meta_key) & set(["no", "off", "false", "0"]):
                 if value in ["no", "off", "false", "0", ""]:
