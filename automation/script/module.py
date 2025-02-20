@@ -5032,10 +5032,10 @@ def enable_or_skip_script(meta, env):
             value = str(env[key]).lower().strip()
             if set(meta_key) & set(["yes", "on", "true", "1"]):
                 # Any set value other than false is taken as set
-                if value != '' or not is_false(value):
+                if not is_false(value) and value != '':
                     continue
             elif set(meta_key) & set(["no", "off", "false", "0"]):
-                if value == "" or is_false(value):
+                if is_false(value) or value == "":
                     continue
             elif value in meta_key:
                 continue
@@ -5065,10 +5065,10 @@ def any_enable_or_skip_script(meta, env):
             meta_key = [str(v).lower() for v in meta[key]]
 
             if set(meta_key) & set(["yes", "on", "true", "1"]):
-                if value != '' or not is_false(value):
+                if not is_false(value) and value != "":
                     found = True
             elif set(meta_key) & set(["no", "off", "false", "0", ""]):
-                if value == "" or is_false(value):
+                if is_false(value) or value == "":
                     found = True
             elif value in meta_key:
                 found = True
