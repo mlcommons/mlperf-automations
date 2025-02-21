@@ -218,10 +218,10 @@ def get_run_cmd(os_info, env, scenario_extra_options,
 
 def get_run_cmd_reference(
         os_info, env, scenario_extra_options, mode_extra_options, dataset_options):
-            
+
     device = env['MLC_MLPERF_DEVICE'] if env['MLC_MLPERF_DEVICE'] not in [
-            "gpu", "rocm"] else "cuda"
-            
+        "gpu", "rocm"] else "cuda"
+
     if env['MLC_MODEL'] in ["gptj-99", "gptj-99.9"]:
 
         env['RUN_DIR'] = os.path.join(
@@ -487,7 +487,7 @@ def get_run_cmd_reference(
             mode_extra_options += " --dataset igbh-dgl --profile rgat-dgl-full "
         else:
             mode_extra_options += " --dataset igbh-dgl-tiny --profile debug-dgl "
-            
+
         # have to add the condition for running in debug mode or real run mode
         cmd = env['MLC_PYTHON_BIN_WITH_PATH'] + " main.py " \
             " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \
