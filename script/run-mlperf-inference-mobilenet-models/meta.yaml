@@ -8,22 +8,42 @@ default_env:
   MLC_MLPERF_RUN_FP32: 'yes'
   MLC_MLPERF_RUN_INT8: 'yes'
   MLC_MLPERF_RUN_MOBILENETS: 'no'
+  MLC_USE_DATASET_FROM_HOST: 'yes'
 deps:
 - tags: get,sys-utils-mlc
 docker:
+  deps:
+    - tags: get,mlperf,inference,results,dir,local
+      names:
+      - get-mlperf-inference-results-dir
+      skip_if_env:
+        OUTPUT_BASE_DIR: [ on ]
+    - tags: get,mlperf,inference,submission,dir,local
+      names:
+      - get-mlperf-inference-submission-dir
+      skip_if_env:
+        MLC_MLPERF_INFERENCE_SUBMISSION_DIR: [ on ]
+    - tags: get,dataset,imagenet,validation,original,_full
+      enable_if_env:
+        MLC_USE_DATASET_FROM_HOST:
+        - 'yes'
+      names:
+        - imagenet-original
+        - dataset-original
   input_mapping:
-    imagenet_path: IMAGENET_PATH
-    results_dir: RESULTS_DIR
-    submission_dir: SUBMISSION_DIR
+    imagenet_path: MLC_DATASET_IMAGENET_PATH
+    results_dir: MLC_MLPERF_INFERENCE_RESULTS_DIR
+    submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
   docker_run_final_cmds:
-  - mlcr run,mlperf,inference,mobilenet-models,_find-performance --adr.mlperf-inference-implementation.fake_run=True
-    --adr.compiler.tags=gcc
+  - mlcr run,mlperf,inference,mobilenet-models,_find-performance --adr.mlperf-inference-implementation.fake_run=True --adr.compiler.tags=gcc
   fake_run_deps: false
   mounts:
-  - ${{ IMAGENET_PATH }}:${{ IMAGENET_PATH }}
-  - ${{ RESULTS_DIR }}:${{ RESULTS_DIR }}
-  - ${{ SUBMISSION_DIR }}:${{ SUBMISSION_DIR }}
+   - "${{ MLC_DATASET_IMAGENET_PATH }}:${{ MLC_DATASET_IMAGENET_PATH }}"
+   - "${{ MLC_MLPERF_INFERENCE_RESULTS_DIR }}:${{ MLC_MLPERF_INFERENCE_RESULTS_DIR }}"
+   - "${{ OUTPUT_BASE_DIR }}:${{ OUTPUT_BASE_DIR }}"
+   - "${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}:${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}"
   run: true
+  docker_it: true
 input_mapping:
   find-performance: MLC_MLPERF_FIND_PERFORMANCE_MODE
   imagenet_path: IMAGENET_PATH
