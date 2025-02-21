@@ -24,7 +24,7 @@ deps:
   - tags: get,python
     names:
       - get-python
-  - tags: get,generic-python-lib,_package.igb
+  - tags: get,generic-python-lib,_package.igb,_url.git+https://github.com/IllinoisGraphBenchmark/IGB-Datasets
   - tags: get,generic-python-lib,_package.colorama
   - tags: get,generic-python-lib,_package.tqdm
   - tags: get,generic-python-lib,_package.torch
