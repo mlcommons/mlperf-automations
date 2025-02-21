@@ -4,6 +4,7 @@ import json
 import shutil
 import subprocess
 import sys
+from utils import *
 
 
 def preprocess(i):
@@ -112,8 +113,8 @@ def preprocess(i):
                 env['MLC_MLPERF_USE_MAX_DURATION'] = 'no'
             elif scenario == "MultiStream" and (1000 / float(value) * 660 < 662):
                 env['MLC_MLPERF_USE_MAX_DURATION'] = 'no'
-        if env.get('MLC_MLPERF_MODEL_EQUAL_ISSUE_MODE', 'no').lower() not in ["yes", "1", "true"] and env.get(
-                'MLC_MLPERF_USE_MAX_DURATION', "yes").lower() not in ["no", "false", "0"]:
+        if not is_true(env.get('MLC_MLPERF_MODEL_EQUAL_ISSUE_MODE', 'no')) and not is_false(env.get(
+                'MLC_MLPERF_USE_MAX_DURATION', "yes")):
             tolerance = 0.4  # much lower because we have max_duration
         else:
             tolerance = 0.9

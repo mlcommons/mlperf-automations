@@ -219,6 +219,9 @@ def get_run_cmd(os_info, env, scenario_extra_options,
 def get_run_cmd_reference(
         os_info, env, scenario_extra_options, mode_extra_options, dataset_options):
 
+    device = env['MLC_MLPERF_DEVICE'] if env['MLC_MLPERF_DEVICE'] not in [
+        "gpu", "rocm"] else "cuda"
+
     if env['MLC_MODEL'] in ["gptj-99", "gptj-99.9"]:
 
         env['RUN_DIR'] = os.path.join(
@@ -352,8 +355,6 @@ def get_run_cmd_reference(
                 "fid"))
 
         backend = env['MLC_MLPERF_BACKEND']
-        device = env['MLC_MLPERF_DEVICE'] if env['MLC_MLPERF_DEVICE'] not in [
-            "gpu", "rocm"] else "cuda"
         max_batchsize = env.get('MLC_MLPERF_LOADGEN_MAX_BATCHSIZE', '1')
         cmd = env['MLC_PYTHON_BIN_WITH_PATH'] + " main.py " \
             " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \
@@ -377,7 +378,6 @@ def get_run_cmd_reference(
             "language",
             "llama2-70b")
         backend = env['MLC_MLPERF_BACKEND']
-        device = env['MLC_MLPERF_DEVICE'] if env['MLC_MLPERF_DEVICE'] != "gpu" else "cuda"
 
         cmd = env['MLC_PYTHON_BIN_WITH_PATH'] + " main.py " \
             " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \
@@ -410,7 +410,6 @@ def get_run_cmd_reference(
             "language",
             "mixtral-8x7b")
         backend = env['MLC_MLPERF_BACKEND']
-        device = env['MLC_MLPERF_DEVICE'] if env['MLC_MLPERF_DEVICE'] != "gpu" else "cuda"
         cmd = env['MLC_PYTHON_BIN_WITH_PATH'] + " main.py " \
             " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \
             " --dataset-path " + env['MLC_DATASET_MIXTRAL_PREPROCESSED_PATH'] + \
@@ -489,7 +488,6 @@ def get_run_cmd_reference(
         else:
             mode_extra_options += " --dataset igbh-dgl-tiny --profile debug-dgl "
 
-        device = env['MLC_MLPERF_DEVICE'] if env['MLC_MLPERF_DEVICE'] != "gpu" else "cuda"
         # have to add the condition for running in debug mode or real run mode
         cmd = env['MLC_PYTHON_BIN_WITH_PATH'] + " main.py " \
             " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \

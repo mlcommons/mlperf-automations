@@ -10,6 +10,7 @@ import sys
 import mlperf_utils
 import re
 from datetime import datetime, timezone
+from utils import *
 
 
 def preprocess(i):
@@ -286,8 +287,7 @@ def postprocess(i):
                     state['app_mlperf_inference_log_summary'][y[0].strip().lower()
                                                               ] = y[1].strip()
 
-        if env.get("MLC_MLPERF_PRINT_SUMMARY", "").lower() not in [
-                "no", "0", "false"]:
+        if not is_false(env.get("MLC_MLPERF_PRINT_SUMMARY", "")):
             print("\n")
             print(mlperf_log_summary)
 
