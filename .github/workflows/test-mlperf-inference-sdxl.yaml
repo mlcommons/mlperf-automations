@@ -1,7 +1,7 @@
 name: MLPerf inference SDXL
 on:
   schedule:
-    - cron: "19 17 * * *"
+    - cron: "19 17 1 * *"
 
 jobs:
   build_reference:
@@ -21,5 +21,5 @@ jobs:
         export MLC_REPOS=$HOME/GH_MLC
         python3 -m pip install mlc-scripts
         mlc pull repo
-        mlcr --tags=run-mlperf,inference,_submission,_short --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --docker --model=sdxl --backend=${{ matrix.backend }} --device=cuda --scenario=Offline --test_query_count=1 --precision=${{ matrix.precision }}  --quiet --docker_it=no --docker_mlc_repo=gateoverflow@mlperf-automations --adr.compiler.tags=gcc --hw_name=gh_action --docker_dt=yes  --results_dir=$HOME/gh_action_results --submission_dir=$HOME/gh_action_submissions  --env.MLC_MLPERF_MODEL_SDXL_DOWNLOAD_TO_HOST=yes --clean
-        mlcr --tags=push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from self hosted Github actions - NVIDIARTX4090" --quiet --submission_dir=$HOME/gh_action_submissions
+        mlcr run-mlperf,inference,_submission,_short --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --docker --model=sdxl --backend=${{ matrix.backend }} --device=cuda --scenario=Offline --test_query_count=1 --precision=${{ matrix.precision }}  --quiet --docker_it=no --docker_mlc_repo=gateoverflow@mlperf-automations --adr.compiler.tags=gcc --hw_name=gh_action --docker_dt=yes  --results_dir=$HOME/gh_action_results --submission_dir=$HOME/gh_action_submissions  --env.MLC_MLPERF_MODEL_SDXL_DOWNLOAD_TO_HOST=yes --clean
+        mlcr push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from self hosted Github actions - NVIDIARTX4090" --quiet --submission_dir=$HOME/gh_action_submissions

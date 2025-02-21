@@ -12,7 +12,8 @@ deps:
 - names:
   - inference-src
   - submission-checker-src
-  tags: get,mlcommons,inference,src
+  tags: get,mlcommons,inference,src,_branch.dev
+  version: custom
 - names:
   - get-mlperf-submission-dir
   skip_if_env:
@@ -25,6 +26,9 @@ input_mapping:
   version: MLC_MLPERF_SUBMISSION_CHECKER_VERSION
   submitter: MLC_MLPERF_SUBMITTER
   submission_preprocessor_args: MLC_MLPERF_PREPROCESS_SUBMISSION_EXTRA_ARGS
+default_env:
+  MLC_MLPERF_NOINFER_LOW_ACCURACY_RESULTS: True
+  MLC_MLPERF_NOINFER_SCENARIO_RESULTS: True
 tags:
 - run
 - mlc

@@ -1,0 +1,44 @@
+alias: get-aocc
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+category: Compiler automation
+clean_files: []
+deps:
+- tags: detect,os
+- tags: extract,file
+  update_tags_from_env_with_prefix:
+    _path.:
+      - MLC_AOCC_TAR_FILE_PATH
+  force_cache: true
+  env:
+    MLC_EXTRACT_FINAL_ENV_NAME: MLC_AOCC_DIR_PATH
+    MLC_EXTRACT_TO_FOLDER: aocc_install
+  enable_if_env:
+    MLC_AOCC_NEEDS_TAR:
+      - yes
+
+input_mapping:
+  tar_file_path: MLC_AOCC_TAR_FILE_PATH
+
+name: Detect or install AOCC compiler
+new_env_keys:
+- MLC_AOCC_*
+- MLC_C_COMPILER_*
+- MLC_CXX_COMPILER_*
+- MLC_COMPILER_*
+- MLC_LINKER_*
+- + CFLAGS
+- + CXXFLAGS
+- + FFLAGS
+- + LDFLAGS
+- +MLC_HOST_OS_DEFAULT_INCLUDE_PATH
+- +PATH
+post_depsq:
+- tags: get,compiler-flags
+sort: 500
+tags:
+- compiler
+- get
+- aocc
+uid: 1ceb0656e99a44ec

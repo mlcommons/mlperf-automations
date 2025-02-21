@@ -2,7 +2,7 @@ name: MLPerf inference MIXTRAL-8x7B
 
 on:
   schedule:
-    - cron: "59 23 * * */5"   # 30th minute and 20th hour => 20:30 UTC => 2 AM IST 
+    - cron: "59 23 1 * */5"   # 30th minute and 20th hour => 20:30 UTC => 2 AM IST 
 
 jobs:
   build_reference:
@@ -28,5 +28,5 @@ jobs:
         git config --global credential.helper store
         huggingface-cli login --token ${{ secrets.HF_TOKEN }} --add-to-git-credential
         mlc pull repo
-        mlcr --tags=run-mlperf,inference,_submission,_short --adr.inference-src.tags=_branch.dev --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --model=mixtral-8x7b --implementation=reference --batch_size=1 --precision=${{ matrix.precision }} --backend=${{ matrix.backend }} --category=datacenter --scenario=Offline --execution_mode=test --device=${{ matrix.device }} --docker_it=no --docker_mlc_repo=gateoverflow@mlperf-automations --adr.compiler.tags=gcc --hw_name=gh_action --docker_dt=yes  --results_dir=$HOME/gh_action_results --submission_dir=$HOME/gh_action_submissions --docker --quiet --test_query_count=3 --target_qps=0.001 --clean --env.MLC_MLPERF_MODEL_MIXTRAL_8X7B_DOWNLOAD_TO_HOST=yes --env.MLC_MLPERF_DATASET_MIXTRAL_8X7B_DOWNLOAD_TO_HOST=yes --adr.openorca-mbxp-gsm8k-combined-preprocessed.tags=_size.1
-        mlcr --tags=push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from self hosted Github actions - GO-phoenix" --quiet --submission_dir=$HOME/gh_action_submissions
+        mlcr run-mlperf,inference,_submission,_short --adr.inference-src.tags=_branch.dev --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --model=mixtral-8x7b --implementation=reference --batch_size=1 --precision=${{ matrix.precision }} --backend=${{ matrix.backend }} --category=datacenter --scenario=Offline --execution_mode=test --device=${{ matrix.device }} --docker_it=no --docker_mlc_repo=gateoverflow@mlperf-automations --adr.compiler.tags=gcc --hw_name=gh_action --docker_dt=yes  --results_dir=$HOME/gh_action_results --submission_dir=$HOME/gh_action_submissions --docker --quiet --test_query_count=3 --target_qps=0.001 --clean --env.MLC_MLPERF_MODEL_MIXTRAL_8X7B_DOWNLOAD_TO_HOST=yes --env.MLC_MLPERF_DATASET_MIXTRAL_8X7B_DOWNLOAD_TO_HOST=yes --adr.openorca-mbxp-gsm8k-combined-preprocessed.tags=_size.1
+        mlcr push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from self hosted Github actions - GO-phoenix" --quiet --submission_dir=$HOME/gh_action_submissions

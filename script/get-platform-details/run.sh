@@ -46,7 +46,7 @@ echo "8. numactl --hardware" >> "${OUTPUT_FILE}"
 if [[ ${MLC_SUDO_USER} == "yes" ]]; then
     echo "${MLC_SUDO} numactl --hardware"
     eval "${MLC_SUDO} numactl --hardware" >> "${OUTPUT_FILE}"
-    test $? -eq 0 || exit $?
+    #test $? -eq 0 || exit $?
 else
     echo "Requires SUDO permission" >> "${OUTPUT_FILE}"
 fi
@@ -86,7 +86,7 @@ echo "15. sysctl" >> "${OUTPUT_FILE}"
 if [[ ${MLC_SUDO_USER} == "yes" ]]; then
     echo "${MLC_SUDO} sysctl -a"
     eval "${MLC_SUDO} sysctl -a" >> "${OUTPUT_FILE}"
-    test $? -eq 0 || exit $?
+    #test $? -eq 0 || exit $?
 else
     echo "Requires SUDO permission" >> "${OUTPUT_FILE}"
 fi
@@ -94,12 +94,12 @@ echo "------------------------------------------------------------" >> "${OUTPUT
 
 echo "16. /sys/kernel/mm/transparent_hugepage" >> "${OUTPUT_FILE}"
 eval "cat /sys/kernel/mm/transparent_hugepage/enabled" >> "${OUTPUT_FILE}"
-test $? -eq 0 || exit $?
+#test $? -eq 0 || exit $?
 echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
 
 echo "17. /sys/kernel/mm/transparent_hugepage/khugepaged" >> "${OUTPUT_FILE}"
 eval "cat /sys/kernel/mm/transparent_hugepage/khugepaged/defrag" >> "${OUTPUT_FILE}"
-test $? -eq 0 || exit $?
+#test $? -eq 0 || exit $?
 echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
 
 echo "18. OS release" >> "${OUTPUT_FILE}"
@@ -114,7 +114,7 @@ echo "------------------------------------------------------------" >> "${OUTPUT
 
 echo "20. /sys/devices/virtual/dmi/id" >> "${OUTPUT_FILE}"
 eval "ls /sys/devices/virtual/dmi/id" >> "${OUTPUT_FILE}"
-test $? -eq 0 || exit $?
+#test $? -eq 0 || exit $?
 echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
 
 echo "21. dmidecode" >> "${OUTPUT_FILE}"

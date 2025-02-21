@@ -37,34 +37,26 @@ function run_test() {
 power=' --power=yes --adr.mlperf-power-client.power_server=192.168.0.15 --adr.mlperf-power-client.port=4950 '
 power=""
 #Add your run commands here...
-find_performance_cmd='mlcr --tags=generate-run-cmds,inference,_find-performance \
+find_performance_cmd='mlcr generate-run-cmds,inference,_find-performance \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
 --category=edge --division=open --scenario=Offline  --quiet --test_query_count=$test_query_count $rerun'
 
-submission_cmd='mlcr --tags=generate-run-cmds,inference,_submission,_all-scenarios \
+submission_cmd='mlcr generate-run-cmds,inference,_submission,_all-scenarios \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
---category=$category --division=$division  --quiet --results_dir=$HOME/results_dir \
---skip_submission_generation=yes --execution-mode=valid $power'
+--category=$category --division=$division  --quiet \
+--skip_submission_generation=yes --execution_mode=valid $power'
 
-submission_cmd_scenario='mlcr --tags=generate-run-cmds,inference,_submission  --scenario=$scenario \
+submission_cmd_scenario='mlcr generate-run-cmds,inference,_submission  --scenario=$scenario \
 --model=$model --implementation=$implementation --device=$device --backend=$backend \
---category=$category --division=$division  --quiet --results_dir=$HOME/results_dir \
---skip_submission_generation=yes --execution-mode=valid $power'
+--category=$category --division=$division  --quiet  \
+--skip_submission_generation=yes --execution_mode=valid $power'
 
-readme_cmd_single='mlcr --tags=generate-run-cmds,inference,_populate-readme \
---model=$model --implementation=$implementation --device=$device --backend=$backend \
---category=$category --division=$division  --quiet --results_dir=$HOME/results_dir \
---skip_submission_generation=yes --execution-mode=valid $power'
-
-readme_cmd='mlcr --tags=generate-run-cmds,inference,_populate-readme,_all-scenarios \
---model=$model --implementation=$implementation --device=$device --backend=$backend \
---category=$category --division=$division  --quiet --results_dir=$HOME/results_dir \
---skip_submission_generation=yes --execution-mode=valid $power'
 
 # run "$MLC_RUN_CMD"
-run_test "onnxruntime" "6000" "reference" "cpu" "$find_performance_cmd --rerun"
-run_test "tf" "6000" "reference" "cpu" "$find_performance_cmd --rerun"
+#run_test "onnxruntime" "6000" "reference" "cpu" "$find_performance_cmd --rerun"
+#run_test "tf" "6000" "reference" "cpu" "$find_performance_cmd --rerun"
 
 run_test "onnxruntime" "100" "reference" "cpu" "$submission_cmd"
+
 run_test "tf" "100" "reference" "cpu" "$submission_cmd"
 

@@ -85,8 +85,7 @@ def preprocess(i):
         extra_download_options = env.get('MLC_DOWNLOAD_EXTRA_OPTIONS', '')
 
         verify_ssl = env.get('MLC_VERIFY_SSL', "True")
-        if str(verify_ssl).lower() in [
-                "no", "false"] or os_info['platform'] == 'windows':
+        if is_false(verify_ssl) or os_info['platform'] == 'windows':
             verify_ssl = False
         else:
             verify_ssl = True

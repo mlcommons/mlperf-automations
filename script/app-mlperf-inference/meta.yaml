@@ -27,7 +27,7 @@ default_env:
   MLC_MLPERF_RUN_STYLE: test
   MLC_TEST_QUERY_COUNT: '10'
   MLC_MLPERF_QUANTIZATION: off
-  MLC_GET_PLATFORM_DETAILS: yes
+  MLC_GET_PLATFORM_DETAILS: no
 
 env:
   MLC_MLPERF_PRINT_SUMMARY: "no"
@@ -121,7 +121,7 @@ deps:
 posthook_deps:
   - tags: get,mlperf,sut,description #populate system meta information like framework
   - tags: get,platform,details
-    enable_if_any_env:
+    enable_if_env:
       MLC_GET_PLATFORM_DETAILS:
         - yes
     skip_if_env:
@@ -846,18 +846,12 @@ variations:
           - 'yes'
         names:
           - waymo-dataset
-      - tags: get,ml-model,pointpillars
+      - tags: get,ml-model,pointpainting
         enable_if_env:
           MLC_USE_DATASET_FROM_HOST:
           - 'yes'
         names:
-          - pointpillars-model
-      - tags: get,ml-model,resnet50-deeplab
-        enable_if_env:
-          MLC_USE_DATASET_FROM_HOST:
-          - 'yes'
-        names:
-          - resnet50-deeplab-model
+          - pointpainting-model
     posthook_deps:
     - enable_if_env:
         MLC_MLPERF_LOADGEN_MODE:
@@ -1937,7 +1931,7 @@ docker:
         MLC_MLPERF_INFERENCE_SUBMISSION_DIR: [ on ]
 
   pre_run_cmds:
-    #- mlc pull repo && mlcr --tags=get,git,repo,_repo.https://github.com/GATEOverflow/inference_results_v4.0.git --update
+    #- mlc pull repo && mlcr get,git,repo,_repo.https://github.com/GATEOverflow/inference_results_v4.0.git --update
     - mlc pull repo
   mounts:
    - "${{ MLC_DATASET_IMAGENET_PATH }}:${{ MLC_DATASET_IMAGENET_PATH }}"
@@ -1956,7 +1950,7 @@ docker:
    - "${{ MLC_DATASET_IGBH_PATH }}:${{ MLC_DATASET_IGBH_PATH }}"
    - "${{ MLC_ML_MODEL_RGAT_CHECKPOINT_PATH }}:${{ MLC_ML_MODEL_RGAT_CHECKPOINT_PATH }}"
    - "${{ MLC_DATASET_WAYMO_PATH }}:${{ MLC_DATASET_WAYMO_PATH }}"
-   - "${{ MLC_ML_MODEL_POINT_PILLARS_PATH }}:${{ MLC_ML_MODEL_POINT_PILLARS_PATH }}"
+   - "${{ MLC_ML_MODEL_POINT_PAINTING_PATH }}:${{ MLC_ML_MODEL_POINT_PAINTING_PATH }}"
    - "${{ MLC_ML_MODEL_DPLAB_RESNET50_PATH }}:${{ MLC_ML_MODEL_DPLAB_RESNET50_PATH }}" 
   skip_run_cmd: 'no'
   shm_size: '32gb'

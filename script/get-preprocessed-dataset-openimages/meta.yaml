@@ -52,7 +52,6 @@ variations:
     ad:
       original-dataset:
         tags: _50
-    default: true
     env:
       MLC_DATASET_SIZE: '50'
     group: dataset-count
@@ -139,6 +138,7 @@ variations:
     group: dataset-precision
   full:
     group: dataset-count
+    default: true
   full,validation:
     ad:
       original-dataset:

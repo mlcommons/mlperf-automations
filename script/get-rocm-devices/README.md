@@ -1,4 +1,4 @@
 Run this script
 ```
-mlcr --tags=get,rocm-devices 
+mlcr get,rocm-devices 
 ```

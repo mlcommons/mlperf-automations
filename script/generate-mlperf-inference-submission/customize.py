@@ -131,12 +131,13 @@ def generate_submission(env, state, inp, submission_division):
         system_meta_tmp['system_type'] = env['MLC_MLPERF_SUBMISSION_CATEGORY'].replace(
             "-", ",")
 
-    duplicate = (
+    '''duplicate = (
         env.get(
             'MLC_MLPERF_DUPLICATE_SCENARIO_RESULTS',
             'no') in [
             "yes",
             "True"])
+    '''
 
     if division not in ['open', 'closed']:
         return {'return': 1, 'error': '"division" must be "open" or "closed"'}
@@ -159,15 +160,11 @@ def generate_submission(env, state, inp, submission_division):
     print('* MLPerf inference submitter: {}'.format(submitter))
 
     if env.get('MLC_MLPERF_SUT_SW_NOTES_EXTRA', '') != '':
-        sw_notes = f"""{
-            system_meta_tmp['sw_notes']} {
-            env['MLC_MLPERF_SUT_SW_NOTES_EXTRA']}"""
+        sw_notes = f"""{system_meta_tmp.get('sw_notes','')} {env['MLC_MLPERF_SUT_SW_NOTES_EXTRA']}"""
         system_meta_tmp['sw_notes'] = sw_notes
 
     if env.get('MLC_MLPERF_SUT_HW_NOTES_EXTRA', '') != '':
-        hw_notes = f"""{
-            system_meta_tmp['hw_notes']} {
-            env['MLC_MLPERF_SUT_HW_NOTES_EXTRA']}"""
+        hw_notes = f"""{system_meta_tmp.get('hw_notes', '')} {env['MLC_MLPERF_SUT_HW_NOTES_EXTRA']}"""
         system_meta_tmp['hw_notes'] = hw_notes
 
     path_submission = os.path.join(path_submission_division, submitter)
@@ -361,6 +358,7 @@ def generate_submission(env, state, inp, submission_division):
                 compliance_scenario_path = os.path.join(
                     compliance_model_path, scenario)
 
+                '''
                 if duplicate and scenario == 'singlestream':
                     if not os.path.exists(os.path.join(
                             result_model_path, "offline")):
@@ -378,6 +376,7 @@ def generate_submission(env, state, inp, submission_division):
                             result_scenario_path, os.path.join(
                                 result_model_path, "multistream"))
                         scenarios.append("multistream")
+                '''
 
                 modes = [
                     f for f in os.listdir(result_scenario_path) if not os.path.isfile(
@@ -552,9 +551,9 @@ def generate_submission(env, state, inp, submission_division):
                             target_measurement_json_path) / "model-info.json"
                         shutil.copy(measurements_json_path, destination)
 
-                    else:
+                    elif mode == 'performance':
                         print(
-                            f"Warning: measurements.json file not present, creating a dummy measurements.json in path {measurements_json_path}")
+                            f"Warning: measurements.json file not present from perf run, creating a dummy measurements.json in path {measurements_json_path}. Please update it later.")
                         dummy_measurements_data = {
                             "input_data_types": env['MLC_ML_MODEL_INPUTS_DATA_TYPE'] if env.get('MLC_ML_MODEL_INPUTS_DATA_TYPE') else "TBD",
                             "retraining": env['MLC_ML_MODEL_RETRAINING'] if env.get('MLC_ML_MODEL_RETRAINING') else "TBD",
@@ -563,7 +562,8 @@ def generate_submission(env, state, inp, submission_division):
                             "weight_transformations": env['MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS'] if env.get('MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS') else "TBD"
                         }
                         with open(measurements_json_path, 'w') as json_file:
-                            json.dump(data, json_file, indent=4)
+                            json.dump(
+                                dummy_measurements_data, json_file, indent=4)
 
                     files = []
                     readme = False

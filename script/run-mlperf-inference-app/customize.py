@@ -281,8 +281,6 @@ def preprocess(i):
 
             mlc = i['automation'].action_object
 
-            # print(ii)
-            # return {'return': 1}
             r = mlc.access(ii)
             if r['return'] > 0:
                 return r

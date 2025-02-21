@@ -377,7 +377,6 @@ def get_docker_default(key):
         "use_host_user_id": True,
         "use_host_group_id": True,
         "keep_detached": False,
-        "reuse_existing": True
     }
     if key in defaults:
         return defaults[key]

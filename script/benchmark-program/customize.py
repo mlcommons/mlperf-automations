@@ -1,5 +1,6 @@
 from mlc import utils
 import os
+from utils import *
 
 
 def preprocess(i):
@@ -20,7 +21,7 @@ def preprocess(i):
                 env['MLC_RUN_CMD'] += ' ' + env['MLC_RUN_SUFFIX']
 
         else:
-            if env['MLC_ENABLE_NUMACTL'].lower() in ["on", "1", "true", "yes"]:
+            if is_true(env['MLC_ENABLE_NUMACTL']):
                 env['MLC_ENABLE_NUMACTL'] = "1"
                 MLC_RUN_PREFIX = "numactl " + env['MLC_NUMACTL_MEMBIND'] + ' '
             else:
@@ -49,8 +50,8 @@ def preprocess(i):
     if x != '':
         env['MLC_RUN_CMD'] = x + ' ' + env.get('MLC_RUN_CMD', '')
 
-    if os_info['platform'] != 'windows' and str(
-            env.get('MLC_SAVE_CONSOLE_LOG', True)).lower() not in ["no", "false", "0"]:
+    if os_info['platform'] != 'windows' and not is_false(
+            env.get('MLC_SAVE_CONSOLE_LOG', True)):
         logs_dir = env.get('MLC_LOGS_DIR', env['MLC_RUN_DIR'])
         env['MLC_RUN_CMD'] += r" 2>&1 | tee " + q + os.path.join(
             logs_dir, "console.out") + q + r"; echo \${PIPESTATUS[0]} > exitstatus"
@@ -84,7 +85,7 @@ def preprocess(i):
             pre_run_cmd += ' && '
 
         # running the script as a process in background
-        pre_run_cmd = pre_run_cmd + 'mlcr --tags=runtime,system,utilisation' + \
+        pre_run_cmd = pre_run_cmd + 'mlcr runtime,system,utilisation' + \
             env['MLC_SYS_UTILISATION_SCRIPT_TAGS'] + ' --quiet  & '
         # obtain the command if of the background process
         pre_run_cmd += r" cmd_pid=\$!  && echo CMD_PID=\$cmd_pid"

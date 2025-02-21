@@ -17,6 +17,7 @@ fi
 test $? -eq 0 || exit $?
 
 git commit -a -m "${MLC_MLPERF_RESULTS_REPO_COMMIT_MESSAGE}"
+test $? -eq 0 || exit $?
 
 echo ${MLC_GIT_PUSH_CMD}
 ${MLC_GIT_PUSH_CMD}

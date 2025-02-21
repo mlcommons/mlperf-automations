@@ -246,7 +246,7 @@ def docker_run(self_module, i):
                       for t in i.get('tags', '').split(",") if t.startswith("_")]
 
     docker_cache = i.get('docker_cache', "yes")
-    if docker_cache.lower() in ["no", "false"]:
+    if is_false(docker_cache):
         env.setdefault('MLC_DOCKER_CACHE', docker_cache)
 
     image_repo = i.get('docker_image_repo', '')
@@ -371,7 +371,7 @@ def docker_run(self_module, i):
 
         # Execute the Docker container
         mlc_docker_input = {
-            'action': 'run', 'automation': 'script', 'tags': 'run,docker,container',
+            'action': 'run', 'target': 'script', 'tags': 'run,docker,container',
             'rebuild': rebuild_docker_image,
             'env': env, 'mounts': mounts,
             'script_tags': i.get('tags'), 'run_cmd': final_run_cmd, 'v': verbose,

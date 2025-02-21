@@ -41,11 +41,11 @@ jobs:
     - name: Test MLPerf Inference MLCommons C++ ResNet50 on ${{ matrix.os }}
       if: matrix.os == 'windows-latest'
       run: |
-        mlcr --tags=app,mlperf,inference,mlcommons,cpp --submitter="MLCommons" --hw_name=gh_${{ matrix.os }} --adr.loadgen.tags=_from-pip --pip_loadgen=yes -v --quiet
+        mlcr app,mlperf,inference,mlcommons,cpp --submitter="MLCommons" --hw_name=gh_${{ matrix.os }} --adr.loadgen.tags=_from-pip --pip_loadgen=yes -v --quiet
     - name: Test MLPerf Inference MLCommons C++ ResNet50 on ${{ matrix.os }}
       if: matrix.os != 'windows-latest'
       run: |
-        mlcr --tags=app,mlperf,inference,mlcommons,cpp --submitter="MLCommons" --hw_name=gh_${{ matrix.os }} -v --quiet
+        mlcr app,mlperf,inference,mlcommons,cpp --submitter="MLCommons" --hw_name=gh_${{ matrix.os }} -v --quiet
     - name: Randomly Execute Step
       id: random-check
       run: |
@@ -77,4 +77,4 @@ jobs:
         git config --global credential.https://github.com.helper "!gh auth git-credential"
         git config --global credential.https://gist.github.com.helper ""
         git config --global credential.https://gist.github.com.helper "!gh auth git-credential"
-        mlcr --tags=push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=dev --commit_message="Results from MLCommons C++ ResNet50 GH action on ${{ matrix.os }}" --quiet
+        mlcr push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=dev --commit_message="Results from MLCommons C++ ResNet50 GH action on ${{ matrix.os }}" --quiet

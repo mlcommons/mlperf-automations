@@ -16,7 +16,7 @@ docker:
     results_dir: RESULTS_DIR
     submission_dir: SUBMISSION_DIR
   docker_run_final_cmds:
-  - mlcr --tags=run,mlperf,inference,mobilenet-models,_find-performance --adr.mlperf-inference-implementation.fake_run=True
+  - mlcr run,mlperf,inference,mobilenet-models,_find-performance --adr.mlperf-inference-implementation.fake_run=True
     --adr.compiler.tags=gcc
   fake_run_deps: false
   mounts:

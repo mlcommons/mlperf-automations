@@ -125,7 +125,7 @@ def preprocess(i):
                 q + extract_to_folder + q
             env['MLC_EXTRACT_EXTRACTED_FILENAME'] = extract_to_folder
 
-    x = '"' if ' ' in filename else ''
+    x = q if ' ' in filename else ''
     env['MLC_EXTRACT_CMD'] = env['MLC_EXTRACT_PRE_CMD'] + env['MLC_EXTRACT_TOOL'] + ' ' + \
         env.get('MLC_EXTRACT_TOOL_EXTRA_OPTIONS', '') + \
         ' ' + env.get('MLC_EXTRACT_TOOL_OPTIONS', '') + ' ' + x + filename + x

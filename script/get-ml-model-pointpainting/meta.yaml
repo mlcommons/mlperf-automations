@@ -1,22 +1,32 @@
-alias: get-dataset-waymo
+alias: get-ml-model-pointpillars
 automation_alias: script
 automation_uid: 5b4e0237da074764
 cache: true
 tags:
 - get
-- dataset
-- waymo
-uid: 21b269c753b64437
+- ml-model
+- ml
+- model
+- pointpainting
+uid: 3562621a8994411d
 new_env_keys:
-  - MLC_DATASET_WAYMO_PATH
+  - MLC_ML_MODEL_POINT_PAINTING_PATH
+  - MLC_ML_MODEL_DPLAB_RESNET50_PATH
 input_mapping:
-  waymo_path: MLC_DATASET_WAYMO_PATH
+  pp_path: MLC_ML_MODEL_POINT_PAINTING_PATH  
+  dp_resnet50_path: MLC_ML_MODEL_DPLAB_RESNET50_PATH
 variations:
-  kitti_format:
+  gpu:
     default: true
-    group: dataset-format
+    group: device
     env:
-      MLC_DATASET_WAYMO_FORMAT: kitti
+      MLC_ML_MODEL_PP_FORMAT: pth
+      MLC_ML_MODEL_DPLAB_RESNET50_FORMAT: pth
+  cpu:
+    group: device
+    env:
+      MLC_ML_MODEL_PP_FORMAT: onnx
+      MLC_ML_MODEL_DPLAB_RESNET50_FORMAT: onnx
   mlc:
     group: download-src
     default: true
@@ -32,3 +42,4 @@ variations:
           - yes
     env:
       MLC_DOWNLOAD_SRC: mlcommons
+  

@@ -35,6 +35,8 @@ def preprocess(i):
     extra_args = []
     if is_true(env.get('MLC_MLPERF_NOINFER_LOW_ACCURACY_RESULTS')):
         extra_args.append("--noinfer-low-accuracy-results")
+    if is_true(env.get('MLC_MLPERF_NOINFER_SCENARIO_RESULTS')):
+        extra_args.append("--noinfer-scenario-results")
     if is_true(env.get('MLC_MLPERF_NODELETE_EMPTY_DIRS')):
         extra_args.append("--nodelete-empty-dirs")
     if is_true(env.get('MLC_MLPERF_NOMOVE_FAILED_TO_OPEN')):

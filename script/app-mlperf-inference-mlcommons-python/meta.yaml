@@ -66,7 +66,7 @@ input_mapping:
   multistream_target_latency: MLC_MLPERF_LOADGEN_MULTISTREAM_TARGET_LATENCY
   network: MLC_NETWORK_LOADGEN
   sut_servers: MLC_NETWORK_LOADGEN_SUT_SERVERS
-  pointpillars_checkpoint_path: MLC_ML_MODEL_POINT_PILLARS_PATH
+  pointpainting_checkpoint_path: MLC_ML_MODEL_POINT_PAINTING_PATH
   deeplab_resnet50_path: MLC_ML_MODEL_DPLAB_RESNET50_PATH
   waymo_path: MLC_DATASET_WAYMO_PATH
 
@@ -505,7 +505,7 @@ deps:
         - "yes"
 
   ## pointpainting
-  - tags: get,ml-model,pointpillars
+  - tags: get,ml-model,pointpainting
     names:
       - pointpillars-model
     enable_if_env:
@@ -514,21 +514,12 @@ deps:
     skip_if_env:
       MLC_RUN_STATE_DOCKER:
         - "yes"
-  - tags: get,ml-model,resnet50-deeplab
-    enable_if_env:
-      MLC_MODEL:
-        - pointpainting
-    skip_if_env:
-      MLC_RUN_STATE_DOCKER:
-        - "yes"
-    names:
-      - resnet50-deeplab-model
 
   ########################################################################
   # Install datasets
 
   ## ImageNet (small for tests)
-  - tags: get,dataset,image-classification,imagenet,preprocessed
+  - tags: get,dataset,image-classification,imagenet,preprocessed,-_for.mobilenet
     names:
       - imagenet-preprocessed
     enable_if_env:
@@ -894,6 +885,7 @@ variations:
       ENQUEUE_NUM_THREADS: 2
       MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 16
       MLC_MLPERF_VISION_DATASET_OPTION: imagenet_pytorch
+      MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: <<<MLC_MLPERF_CUSTOM_MODEL_PATH>>>
 
 
   tvm-onnx:
@@ -1288,6 +1280,7 @@ variations:
           - protobuf
         version_max: "4.23.4"
         version_max_usable: "4.23.4"
+        version_min: "3.20.3"
         enable_if_env:
           MLC_MLPERF_BACKEND:
             - tf

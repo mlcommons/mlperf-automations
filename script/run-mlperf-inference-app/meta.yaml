@@ -119,7 +119,7 @@ input_mapping:
   use_dataset_from_host: MLC_USE_DATASET_FROM_HOST
   use_model_from_host: MLC_USE_MODEL_FROM_HOST
   rgat_checkpoint_path: RGAT_CHECKPOINT_PATH
-  pointpillars_checkpoint_path: MLC_ML_MODEL_POINT_PILLARS_PATH
+  pointpainting_checkpoint_path: MLC_ML_MODEL_POINT_PILLARS_PATH
   deeplab_resnet50_path: MLC_ML_MODEL_DPLAB_RESNET50_PATH
   waymo_path: MLC_DATASET_WAYMO_PATH
   nm_model_zoo_stub: MLC_MLPERF_NEURALMAGIC_MODEL_ZOO_STUB
@@ -383,6 +383,8 @@ variations:
     add_deps_recursive:
       submission-checker:
         tags: _short-run
+      openimages-preprocessed:
+        tags: _50
     default: 'true'
     env:
       MLC_MLPERF_SUBMISSION_DIVISION: open
