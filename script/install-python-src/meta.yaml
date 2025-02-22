@@ -27,7 +27,10 @@ deps:
     MLC_HOST_OS_FLAVOR:
     - ubuntu
   tags: get,generic-sys-util,_liblzma-dev
-- tags: get,generic-sys-util,_libncurses-dev
+- enable_if_env:
+    MLC_HOST_OS_FLAVOR:
+    - ubuntu
+  tags: get,generic-sys-util,_libncurses-dev
 - enable_if_env:
     MLC_HOST_OS_FLAVOR:
     - ubuntu
