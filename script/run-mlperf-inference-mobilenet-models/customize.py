@@ -17,6 +17,7 @@ def preprocess(i):
     adr = i['input'].get('adr')
 
     automation = i['automation']
+    mlc = i['automation'].action_object
 
     quiet = (env.get('MLC_QUIET', False) == 'yes')
     verbose = (env.get('MLC_VERBOSE', False) == 'yes')
@@ -202,7 +203,7 @@ def preprocess(i):
                     'v': verbose,
                     'f': True
         }
-        r = mlc.access(clean_input)
+        #r = mlc.access(clean_input)
         # if r['return'] > 0:
         #    return r
     return {'return': 0}
