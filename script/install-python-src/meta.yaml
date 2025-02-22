@@ -20,14 +20,14 @@ deps:
     MLC_HOST_OS_FLAVOR:
     - ubuntu
 - tags: get,generic-sys-util,_libssl-dev
+  enable_if_env:
+    MLC_ENABLE_SSL: 
+    - 'yes'
 - enable_if_env:
     MLC_HOST_OS_FLAVOR:
     - ubuntu
   tags: get,generic-sys-util,_liblzma-dev
-- enable_if_env:
-    MLC_HOST_OS_FLAVOR:
-    - ubuntu
-  tags: get,generic-sys-util,_libncurses-dev
+- tags: get,generic-sys-util,_libncurses-dev
 - enable_if_env:
     MLC_HOST_OS_FLAVOR:
     - ubuntu
@@ -84,3 +84,4 @@ variations:
       MLC_ENABLE_SSL: 'yes'
       MLC_PYTHON_INSTALL_CACHE_TAGS: with-ssl
     group: ssl
+    default: true
