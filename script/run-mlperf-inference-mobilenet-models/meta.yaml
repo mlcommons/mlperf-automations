@@ -155,11 +155,10 @@ variations:
 tests:
   run_inputs:
   - env:
-      MLC_TMP_FAIL_SAFE: 'yes'
-    ignore_missing: 'yes'
-    test-all-variations: 'yes'
-
-
-
-  run,mobilenet-models,_tflite,_accuracy-only$extra_tags \
---adr.compiler.tags=gcc
+      MLC_TEST_ONE_RUN: 'yes'
+    variations_list: 
+    - tflite
+    - accuracy_only
+    adr:
+      compiler:
+        tags: gcc
