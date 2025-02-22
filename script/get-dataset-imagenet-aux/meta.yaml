@@ -30,10 +30,19 @@ variations:
   '2012':
     env:
       MLC_DATASET_AUX_VER: '2012'
-  from.berkeleyvision:
+  from.go:
     base:
     - '2012'
     default: true
+    env:
+      MLC_DOWNLOAD_CHECKSUM: ee346d67141e476df9c1a3f813552503
+      MLC_DOWNLOAD_CHECKSUM1: ee346d67141e476df9c1a3f813552503
+      MLC_PACKAGE_URL: https://armi.in/files/caffe_ilsvrc12.tar.gz
+      MLC_PACKAGE_URL1: https://www.dropbox.com/s/92n2fyej3lzy3s3/caffe_ilsvrc12.tar.gz
+    group: download-source
+  from.berkeleyvision:
+    base:
+    - '2012'
     env:
       MLC_DOWNLOAD_CHECKSUM: f963098ea0e785a968ca1eb634003a90
       MLC_DOWNLOAD_CHECKSUM1: ee346d67141e476df9c1a3f813552503
