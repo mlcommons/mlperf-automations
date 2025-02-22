@@ -34,9 +34,9 @@ docker:
     imagenet_path: MLC_DATASET_IMAGENET_PATH
     results_dir: MLC_MLPERF_INFERENCE_RESULTS_DIR
     submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
-  docker_run_final_cmds:
-  - mlcr run,mlperf,inference,mobilenet-models,_find-performance --adr.mlperf-inference-implementation.fake_run=True --adr.compiler.tags=gcc
   fake_run_deps: false
+  pre_run_cmds:
+    - mlc pull repo
   mounts:
    - "${{ MLC_DATASET_IMAGENET_PATH }}:${{ MLC_DATASET_IMAGENET_PATH }}"
    - "${{ MLC_MLPERF_INFERENCE_RESULTS_DIR }}:${{ MLC_MLPERF_INFERENCE_RESULTS_DIR }}"
@@ -44,6 +44,10 @@ docker:
    - "${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}:${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}"
   run: true
   docker_it: true
+  mlc_repo: mlcommons@mlperf-automations
+  mlc_repo_branch: dev
+  real_run: False
+  os_version: '22.04'
 input_mapping:
   find-performance: MLC_MLPERF_FIND_PERFORMANCE_MODE
   imagenet_path: IMAGENET_PATH
