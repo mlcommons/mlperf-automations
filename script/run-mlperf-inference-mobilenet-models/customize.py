@@ -1,6 +1,5 @@
 from mlc import utils
 import os
-import mlc
 import sys
 
 
