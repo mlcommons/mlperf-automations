@@ -9,6 +9,7 @@ default_env:
   MLC_MLPERF_RUN_INT8: 'yes'
   MLC_MLPERF_RUN_MOBILENETS: 'no'
   MLC_USE_DATASET_FROM_HOST: 'yes'
+  MLC_MINIMIZE_DISK_SPACE: 'yes'
 deps:
 - tags: get,sys-utils-mlc
 docker:

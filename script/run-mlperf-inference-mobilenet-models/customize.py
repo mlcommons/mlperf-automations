@@ -50,18 +50,18 @@ def preprocess(i):
     }
 
     models = {}
-    if env.get('MLC_MLPERF_RUN_MOBILENET_V1', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_RUN_MOBILENET_V1', '')):
         models['mobilenet'] = {}
         models['mobilenet']['v1'] = models_all['mobilenet']['v1']
-    elif env.get('MLC_MLPERF_RUN_MOBILENET_V2', '') == "yes":
+    elif is_true(env.get('MLC_MLPERF_RUN_MOBILENET_V2', '')):
         models['mobilenet'] = {}
         models['mobilenet']['v2'] = models_all['mobilenet']['v2']
-    elif env.get('MLC_MLPERF_RUN_MOBILENET_V3', '') == "yes":
+    elif is_true(env.get('MLC_MLPERF_RUN_MOBILENET_V3', '')):
         models['mobilenet'] = {}
         models['mobilenet']['v3'] = models_all['mobilenet']['v3']
-    elif env.get('MLC_MLPERF_RUN_MOBILENETS', '') == "yes":
+    elif is_true(env.get('MLC_MLPERF_RUN_MOBILENETS', '')):
         models['mobilenet'] = models_all['mobilenet']
-    elif env.get('MLC_MLPERF_RUN_EFFICIENTNETS', '') == "yes":
+    elif is_true(env.get('MLC_MLPERF_RUN_EFFICIENTNETS', '')):
         models['efficientnet'] = models_all['efficientnet']
 
     variation_strings = {}
@@ -90,16 +90,16 @@ def preprocess(i):
                             variation_list.append("_" + k3)
                         variation_strings[t1].append(",".join(variation_list))
 
-    if env.get('MLC_MLPERF_SUBMISSION_MODE', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_SUBMISSION_MODE', '')):
         var = "_submission"
         execution_mode = "valid"
-    elif env.get('MLC_MLPERF_ACCURACY_MODE', '') == "yes" and env.get('MLC_MLPERF_PERFORMANCE_MODE', '') == "yes":
+    elif is_true(env.get('MLC_MLPERF_ACCURACY_MODE', '')) and is_true(env.get('MLC_MLPERF_PERFORMANCE_MODE', '')):
         var = "_full,_performance-and-accuracy"
         execution_mode = "valid"
-    elif env.get('MLC_MLPERF_ACCURACY_MODE', '') == "yes":
+    elif is_true(env.get('MLC_MLPERF_ACCURACY_MODE', '')):
         var = "_full,_accuracy-only"
         execution_mode = "valid"
-    elif env.get('MLC_MLPERF_PERFORMANCE_MODE', '') == "yes":
+    elif is_true(env.get('MLC_MLPERF_PERFORMANCE_MODE', '')):
         var = "_full,_performance-only"
         execution_mode = "valid"
     else:
@@ -178,21 +178,21 @@ def preprocess(i):
                 if env.get('MLC_MLPERF_INFERENCE_SUBMISSION_DIR', '') != '':
                     mlc_input['submission_dir'] = env['MLC_MLPERF_INFERENCE_SUBMISSION_DIR']
 
-                if env.get('MLC_MLPERF_FIND_PERFORMANCE_MODE', '') == "yes" and env.get(
-                        'MLC_MLPERF_NO_RERUN', '') != 'yes':
+                if is_true(env.get('MLC_MLPERF_FIND_PERFORMANCE_MODE', '')) and not is_true(env.get(
+                        'MLC_MLPERF_NO_RERUN', '')):
                     mlc_input['rerun'] = True
 
-                if env.get('MLC_MLPERF_POWER', '') == "yes":
+                if is_true(env.get('MLC_MLPERF_POWER', '')):
                     mlc_input['power'] = 'yes'
 
-                if env.get('MLC_MLPERF_ACCURACY_MODE', '') == "yes":
+                if is_true(env.get('MLC_MLPERF_ACCURACY_MODE', '')):
                     mlc_input['mode'] = 'accuracy'
                     print(mlc_input)
                     r = mlc.access(mlc_input)
                     if r['return'] > 0:
                         return r
 
-                if env.get('MLC_MLPERF_PERFORMANCE_MODE', '') == "yes":
+                if is_true(env.get('MLC_MLPERF_PERFORMANCE_MODE', '')):
                     mlc_input['mode'] = 'performance'
 
                     print(mlc_input)
