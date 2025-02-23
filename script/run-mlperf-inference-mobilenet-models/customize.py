@@ -196,7 +196,7 @@ def preprocess(i):
 
         clean_input = {
             'action': 'rm',
-            'automation': 'cache',
+            'target': 'cache',
             'tags': 'get,preprocessed,dataset,_for.mobilenet',
                     'quiet': True,
                     'v': verbose,
