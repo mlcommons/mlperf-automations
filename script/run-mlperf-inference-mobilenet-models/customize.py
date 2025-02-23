@@ -3,6 +3,7 @@ import os
 import sys
 from utils import *
 
+
 def preprocess(i):
 
     os_info = i['os_info']
@@ -128,7 +129,7 @@ def preprocess(i):
         'quiet': True,
         'v': verbose,
         'f': True
-        }
+    }
 
     for precision in precisions:
         for model in variation_strings:
@@ -202,7 +203,7 @@ def preprocess(i):
                 if env.get('MLC_TEST_ONE_RUN', '') == "yes":
                     return {'return': 0}
 
-                if is_true(env.get('MLC_MINIMIZE_DISK_SPACE','')):
+                if is_true(env.get('MLC_MINIMIZE_DISK_SPACE', '')):
                     r = mlc.access(clean_input)
                     if r['return'] > 0:
                         print(r)
