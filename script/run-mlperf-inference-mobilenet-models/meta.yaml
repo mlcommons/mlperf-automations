@@ -43,7 +43,7 @@ docker:
    - "${{ OUTPUT_BASE_DIR }}:${{ OUTPUT_BASE_DIR }}"
    - "${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}:${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}"
   run: true
-  docker_it: true
+  interactive: true
   mlc_repo: mlcommons@mlperf-automations
   mlc_repo_branch: dev
   real_run: False
