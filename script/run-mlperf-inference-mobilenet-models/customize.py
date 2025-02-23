@@ -203,7 +203,8 @@ def preprocess(i):
                     'f': True
         }
         r = mlc.access(clean_input)
-        # if r['return'] > 0:
+        if r['return'] > 0:
+            print(r)
         #    return r
     return {'return': 0}
 
