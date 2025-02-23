@@ -1,7 +1,7 @@
 from mlc import utils
 import os
 import sys
-
+from utils import *
 
 def preprocess(i):
 
@@ -121,10 +121,18 @@ def preprocess(i):
     implementation_tags_string = ",".join(implementation_tags)
 
     inp = i['input']
+    clean_input = {
+        'action': 'rm',
+        'target': 'cache',
+        'tags': 'get,preprocessed,dataset,_for.mobilenet',
+        'quiet': True,
+        'v': verbose,
+        'f': True
+        }
 
-    for model in variation_strings:
-        for v in variation_strings[model]:
-            for precision in precisions:
+    for precision in precisions:
+        for model in variation_strings:
+            for v in variation_strings[model]:
 
                 if "small-minimalistic" in v and precision == "uint8":
                     continue
@@ -194,18 +202,16 @@ def preprocess(i):
                 if env.get('MLC_TEST_ONE_RUN', '') == "yes":
                     return {'return': 0}
 
-        clean_input = {
-            'action': 'rm',
-            'target': 'cache',
-            'tags': 'get,preprocessed,dataset,_for.mobilenet',
-                    'quiet': True,
-                    'v': verbose,
-                    'f': True
-        }
-        r = mlc.access(clean_input)
-        if r['return'] > 0:
-            print(r)
-        #    return r
+                if is_true(env.get('MLC_MINIMIZE_DISK_SPACE','')):
+                    r = mlc.access(clean_input)
+                    if r['return'] > 0:
+                        print(r)
+                    #    return r
+
+            r = mlc.access(clean_input)
+            if r['return'] > 0:
+                print(r)
+                #    return r
     return {'return': 0}
 
 
