@@ -45,6 +45,7 @@ docker:
    - "${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}:${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}"
   run: true
   interactive: true
+  user: mlcuser
   mlc_repo: mlcommons@mlperf-automations
   mlc_repo_branch: dev
   real_run: False
