@@ -193,7 +193,6 @@ def preprocess(i):
                     if r['return'] > 0:
                         return r
 
-
                 if is_true(env.get('MLC_MLPERF_PERFORMANCE_MODE', '')):
                     mlc_input['mode'] = 'performance'
 
@@ -201,7 +200,6 @@ def preprocess(i):
                     r = mlc.access(mlc_input)
                     if r['return'] > 0:
                         return r
-
 
                 if is_true(env.get('MLC_MINIMIZE_DISK_SPACE', '')):
                     r = mlc.access(clean_input)
