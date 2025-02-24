@@ -2,7 +2,6 @@ from mlc import utils
 import os
 import sys
 from utils import *
-import mlc
 
 
 def preprocess(i):
@@ -18,7 +17,7 @@ def preprocess(i):
     adr = i['input'].get('adr')
 
     automation = i['automation']
-    # mlc = i['automation'].action_object
+    mlc = i['automation'].action_object
 
     quiet = (env.get('MLC_QUIET', False) == 'yes')
     verbose = (env.get('MLC_VERBOSE', False) == 'yes')
