@@ -31,14 +31,13 @@ def preprocess(i):
             if os.path.exists(os.path.join(input_path, f)):
                 v_sub_folders.append(f)
         CMD = 'tar --directory ' + \
-        str(cd_dir) + ' -czf ' + os.path.join(output_dir,
-                                              output_file) + ' ' + ' '.join(v_sub_folders)
+            str(cd_dir) + ' -czf ' + os.path.join(output_dir,
+                                                  output_file) + ' ' + ' '.join(v_sub_folders)
     else:
         cd_dir = input_path.parent.absolute()
         CMD = 'tar --directory ' + \
             str(cd_dir) + ' -czf ' + os.path.join(output_dir,
-                                              output_file) + ' ' + input_dirname
-
+                                                  output_file) + ' ' + input_dirname
 
     print(CMD)
     ret = os.system(CMD)
