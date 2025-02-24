@@ -18,6 +18,7 @@ def preprocess(i):
 
     automation = i['automation']
     mlc = i['automation'].action_object
+    cache_action = i['automation'].cache_action
 
     quiet = (env.get('MLC_QUIET', False) == 'yes')
     verbose = (env.get('MLC_VERBOSE', False) == 'yes')
@@ -201,7 +202,7 @@ def preprocess(i):
                         return r
 
                 if is_true(env.get('MLC_MINIMIZE_DISK_SPACE', '')):
-                    r = mlc.access(clean_input)
+                    r = cache_action.access(clean_input)
                     if r['return'] > 0:
                         print(r)
                     #    return r
@@ -209,7 +210,7 @@ def preprocess(i):
                 if is_true(env.get('MLC_TEST_ONE_RUN', '')):
                     return {'return': 0}
 
-            r = mlc.access(clean_input)
+            r = cache_action.access(clean_input)
             if r['return'] > 0:
                 print(r)
                 #    return r
