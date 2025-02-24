@@ -1,5 +1,12 @@
 # Getting Started with MLC Script Automation
 
+## Install MLC Scripts
+```
+pip install mlc-scripts
+```
+
+For more customized installation you can see [here](https://docs.mlcommons.org/mlcflow/install/)
+
 ## Running MLC Scripts
 
 To execute a simple script in MLC that captures OS details, use the following command:
@@ -12,7 +19,6 @@ mlcr detect,os -j
 This command gathers details about the system on which it's run, such as:
 
 ```json
-$ mlcr detect,os -j
 [2025-02-03 04:57:23,449 main.py:694 INFO] - Repos path for Index: /home/arjun/MLC/repos
 [2025-02-03 04:57:24,167 main.py:837 INFO] - Shared index for script saved to /home/arjun/MLC/repos/index_script.json.
 [2025-02-03 04:57:24,167 main.py:837 INFO] - Shared index for cache saved to /home/arjun/MLC/repos/index_cache.json.
