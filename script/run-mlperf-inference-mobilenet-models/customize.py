@@ -107,17 +107,17 @@ def preprocess(i):
         execution_mode = "test"
 
     precisions = []
-    if env.get('MLC_MLPERF_RUN_FP32', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_RUN_FP32', '') == "yes":
         precisions.append("fp32")
-    if env.get('MLC_MLPERF_RUN_INT8', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_RUN_INT8', '') == "yes":
         precisions.append("uint8")
 
     implementation_tags = []
-    if env.get('MLC_MLPERF_USE_ARMNN_LIBRARY', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_USE_ARMNN_LIBRARY', '')):
         implementation_tags.append("_armnn")
-    if env.get('MLC_MLPERF_TFLITE_ARMNN_NEON', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_TFLITE_ARMNN_NEON', '')):
         implementation_tags.append("_use-neon")
-    if env.get('MLC_MLPERF_TFLITE_ARMNN_OPENCL', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_TFLITE_ARMNN_OPENCL', '')):
         implementation_tags.append("_use-opencl")
     implementation_tags_string = ",".join(implementation_tags)
 
@@ -200,14 +200,15 @@ def preprocess(i):
                     if r['return'] > 0:
                         return r
 
-                if env.get('MLC_TEST_ONE_RUN', '') == "yes":
-                    return {'return': 0}
-
                 if is_true(env.get('MLC_MINIMIZE_DISK_SPACE', '')):
                     r = mlc.access(clean_input)
                     if r['return'] > 0:
                         print(r)
                     #    return r
+
+                if is_true(env.get('MLC_TEST_ONE_RUN', '')):
+                    return {'return': 0}
+
 
             r = mlc.access(clean_input)
             if r['return'] > 0:
