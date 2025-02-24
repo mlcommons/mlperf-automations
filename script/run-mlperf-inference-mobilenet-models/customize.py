@@ -107,9 +107,9 @@ def preprocess(i):
         execution_mode = "test"
 
     precisions = []
-    if is_true(env.get('MLC_MLPERF_RUN_FP32', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_RUN_FP32', '')):
         precisions.append("fp32")
-    if is_true(env.get('MLC_MLPERF_RUN_INT8', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_RUN_INT8', '')):
         precisions.append("uint8")
 
     implementation_tags=[]
