@@ -112,17 +112,17 @@ def preprocess(i):
     if is_true(env.get('MLC_MLPERF_RUN_INT8', '') == "yes":
         precisions.append("uint8")
 
-    implementation_tags = []
+    implementation_tags=[]
     if is_true(env.get('MLC_MLPERF_USE_ARMNN_LIBRARY', '')):
         implementation_tags.append("_armnn")
     if is_true(env.get('MLC_MLPERF_TFLITE_ARMNN_NEON', '')):
         implementation_tags.append("_use-neon")
     if is_true(env.get('MLC_MLPERF_TFLITE_ARMNN_OPENCL', '')):
         implementation_tags.append("_use-opencl")
-    implementation_tags_string = ",".join(implementation_tags)
+    implementation_tags_string=",".join(implementation_tags)
 
-    inp = i['input']
-    clean_input = {
+    inp=i['input']
+    clean_input={
         'action': 'rm',
         'target': 'cache',
         'tags': 'get,preprocessed,dataset,_for.mobilenet',
@@ -139,9 +139,9 @@ def preprocess(i):
                     continue
 
                 if model == "efficientnet" and precision == "uint8":
-                    precision = "int8"
+                    precision="int8"
 
-                mlc_input = {
+                mlc_input={
                     'action': 'run',
                     'target': 'script',
                     'tags': f'run-mlperf,mlperf,inference,{var}',
@@ -166,42 +166,42 @@ def preprocess(i):
                 }
                 if add_deps_recursive:
                     # script automation will merge adr and add_deps_recursive
-                    mlc_input['add_deps_recursive'] = add_deps_recursive
+                    mlc_input['add_deps_recursive']=add_deps_recursive
 
                 if adr:
                     utils.merge_dicts(
                         {'dict1': mlc_input['adr'], 'dict2': adr, 'append_lists': True, 'append_unique': True})
 
                 if env.get('MLC_MLPERF_INFERENCE_RESULTS_DIR', '') != '':
-                    mlc_input['results_dir'] = env['MLC_MLPERF_INFERENCE_RESULTS_DIR']
+                    mlc_input['results_dir']=env['MLC_MLPERF_INFERENCE_RESULTS_DIR']
 
                 if env.get('MLC_MLPERF_INFERENCE_SUBMISSION_DIR', '') != '':
-                    mlc_input['submission_dir'] = env['MLC_MLPERF_INFERENCE_SUBMISSION_DIR']
+                    mlc_input['submission_dir']=env['MLC_MLPERF_INFERENCE_SUBMISSION_DIR']
 
                 if is_true(env.get('MLC_MLPERF_FIND_PERFORMANCE_MODE', '')) and not is_true(env.get(
                         'MLC_MLPERF_NO_RERUN', '')):
-                    mlc_input['rerun'] = True
+                    mlc_input['rerun']=True
 
                 if is_true(env.get('MLC_MLPERF_POWER', '')):
-                    mlc_input['power'] = 'yes'
+                    mlc_input['power']='yes'
 
                 if is_true(env.get('MLC_MLPERF_ACCURACY_MODE', '')):
-                    mlc_input['mode'] = 'accuracy'
+                    mlc_input['mode']='accuracy'
                     print(mlc_input)
-                    r = mlc.access(mlc_input)
+                    r=mlc.access(mlc_input)
                     if r['return'] > 0:
                         return r
 
                 if is_true(env.get('MLC_MLPERF_PERFORMANCE_MODE', '')):
-                    mlc_input['mode'] = 'performance'
+                    mlc_input['mode']='performance'
 
                     print(mlc_input)
-                    r = mlc.access(mlc_input)
+                    r=mlc.access(mlc_input)
                     if r['return'] > 0:
                         return r
 
                 if is_true(env.get('MLC_MINIMIZE_DISK_SPACE', '')):
-                    r = mlc.access(clean_input)
+                    r=mlc.access(clean_input)
                     if r['return'] > 0:
                         print(r)
                     #    return r
@@ -210,7 +210,7 @@ def preprocess(i):
                     return {'return': 0}
 
 
-            r = mlc.access(clean_input)
+            r=mlc.access(clean_input)
             if r['return'] > 0:
                 print(r)
                 #    return r
