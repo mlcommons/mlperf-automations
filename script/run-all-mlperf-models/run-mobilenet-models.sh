@@ -32,24 +32,20 @@ extra_tags=""
 
 #Add your run commands here...
 # run "$MLC_RUN_CMD"
-run "mlcr run,mobilenet-models,_tflite,_accuracy-only$extra_tags \
+run "mlcr run,mobilenet-models,_tflite$extra_tags \
 --adr.compiler.tags=gcc \
 ${extra_option} "
 
-run "mlcr run,mobilenet-models,_tflite,_performance-only$extra_tags \
-${POWER} \
---adr.compiler.tags=gcc \
-${extra_option}"
-
-
-
-run "mlcr run,mobilenet-models,_tflite,_armnn,_neon,_accuracy-only$extra_tags \
+run "mlcr run,mobilenet-models,_tflite,_armnn,_neon$extra_tags \
 --adr.compiler.tags=gcc \
 ${extra_option} "
 
-run "mlcr run,mobilenet-models,_tflite,_armnn,_neon,_performance-only$extra_tags \
-${POWER} \
-${extra_option} \
---adr.compiler.tags=gcc"
 
+extra_option=" --adr.mlperf-inference-implementation.compressed_dataset=on"
+run "mlcr run,mobilenet-models,_tflite$extra_tags \
+--adr.compiler.tags=gcc \
+${extra_option} "
 
+run "mlcr run,mobilenet-models,_tflite,_armnn,_neon$extra_tags \
+--adr.compiler.tags=gcc \
+${extra_option} "
