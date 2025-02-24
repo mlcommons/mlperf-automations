@@ -9,6 +9,7 @@ input_mapping:
   input_dir: MLC_TAR_INPUT_DIR
   outfile: MLC_TAR_OUTFILE
   output_dir: MLC_TAR_OUTPUT_DIR
+  sub_folders_to_include: MLC_TAR_SUB_FOLDERS_TO_INCLUDE
 new_env_keys:
   - MLC_TAR_OUTFILE
 tags:

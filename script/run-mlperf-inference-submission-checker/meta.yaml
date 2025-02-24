@@ -80,6 +80,8 @@ post_deps:
   tags: run,tar
   env:
     MLC_TAR_INPUT_DIR: <<<MLC_MLPERF_INFERENCE_SUBMISSION_DIR>>>
+    MLC_TAR_SUB_FOLDERS_TO_INCLUDE: closed,open,network
+    COPYFILE_DISABLE: 1
 - enable_if_env:
     MLC_MLPERF_SUBMITTER_ID:
     - 'yes'

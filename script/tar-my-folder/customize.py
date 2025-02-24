@@ -21,10 +21,25 @@ def preprocess(i):
     env['MLC_TAR_OUTFILE'] = output_file
     from pathlib import Path
     input_path = Path(input_dir)
-    cd_dir = input_path.parent.absolute()
-    CMD = 'tar --directory ' + \
+    sub_folders_to_include = env.get('MLC_TAR_SUB_FOLDERS_TO_INCLUDE', '')
+    if sub_folders_to_include != '':
+        cd_dir = input_path.absolute()
+        r = sub_folders_to_include.split(",")
+        v_sub_folders = []
+        for sub_folder in r:
+            f = sub_folder.strip()
+            if os.path.exists(os.path.join(input_path, f)):
+                v_sub_folders.append(f)
+        CMD = 'tar --directory ' + \
         str(cd_dir) + ' -czf ' + os.path.join(output_dir,
+                                              output_file) + ' ' + ' '.join(v_sub_folders)
+    else:
+        cd_dir = input_path.parent.absolute()
+        CMD = 'tar --directory ' + \
+            str(cd_dir) + ' -czf ' + os.path.join(output_dir,
                                               output_file) + ' ' + input_dirname
+
+
     print(CMD)
     ret = os.system(CMD)
     print("Tar file " + os.path.join(output_dir, output_file) + " created")
