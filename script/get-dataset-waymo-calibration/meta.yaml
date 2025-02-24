@@ -1,0 +1,35 @@
+alias: get-dataset-waymo-calibration
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+input_mapping:
+  waymo_calibration_path: MLC_DATASET_WAYMO_CALIBRATION_PATH
+new_env_keys:
+- MLC_DATASET_WAYMO_CALIBRATION_PATH
+tags:
+- get
+- waymo
+- dataset
+- calibration
+uid: 59d3a8d48d5e4767
+variations:
+  kitti_format:
+    default: true
+    env:
+      MLC_DATASET_WAYMO_FORMAT: kitti
+    group: dataset-format
+  mlc:
+    default: true
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+    group: download-src
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+      tags: get,rclone
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+      force_cache: true
+      tags: get,rclone-config,_waymo
