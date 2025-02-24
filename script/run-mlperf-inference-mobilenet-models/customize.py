@@ -2,7 +2,8 @@ from mlc import utils
 import os
 import sys
 from utils import *
-
+import mlc
+import importlib
 
 def preprocess(i):
 
@@ -17,7 +18,7 @@ def preprocess(i):
     adr = i['input'].get('adr')
 
     automation = i['automation']
-    mlc = i['automation'].action_object
+    #mlc = i['automation'].action_object
 
     quiet = (env.get('MLC_QUIET', False) == 'yes')
     verbose = (env.get('MLC_VERBOSE', False) == 'yes')
@@ -192,6 +193,8 @@ def preprocess(i):
                     if r['return'] > 0:
                         return r
 
+                    importlib.reload(mlc)
+
                 if is_true(env.get('MLC_MLPERF_PERFORMANCE_MODE', '')):
                     mlc_input['mode'] = 'performance'
 
@@ -200,10 +203,13 @@ def preprocess(i):
                     if r['return'] > 0:
                         return r
 
+                    importlib.reload(mlc)
+
                 if is_true(env.get('MLC_MINIMIZE_DISK_SPACE', '')):
                     r = mlc.access(clean_input)
                     if r['return'] > 0:
                         print(r)
+                    importlib.reload(mlc)
                     #    return r
 
                 if is_true(env.get('MLC_TEST_ONE_RUN', '')):
