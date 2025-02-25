@@ -186,20 +186,10 @@ def preprocess(i):
                 if is_true(env.get('MLC_MLPERF_POWER', '')):
                     mlc_input['power'] = 'yes'
 
-                if is_true(env.get('MLC_MLPERF_ACCURACY_MODE', '')):
-                    mlc_input['mode'] = 'accuracy'
-                    print(mlc_input)
-                    r = mlc.access(mlc_input)
-                    if r['return'] > 0:
-                        return r
-
-                if is_true(env.get('MLC_MLPERF_PERFORMANCE_MODE', '')):
-                    mlc_input['mode'] = 'performance'
-
-                    print(mlc_input)
-                    r = mlc.access(mlc_input)
-                    if r['return'] > 0:
-                        return r
+                print(mlc_input)
+                r = mlc.access(mlc_input)
+                if r['return'] > 0:
+                    return r
 
                 if is_true(env.get('MLC_MINIMIZE_DISK_SPACE', '')):
                     r = cache_action.access(clean_input)
