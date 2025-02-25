@@ -344,3 +344,51 @@ versions:
       version: 5.0.0
     env:
       MLC_GIT_CHECKOUT: v2.9.0
+  v2.12.0:
+    deps:
+    - names:
+      - python
+      - python3
+      tags: get,python
+      version_max: 3.11.999
+      version_max_usable: 3.11.12
+      version_min: 3.8.0
+    - tags: get,gcc
+      version_max: '12.9'
+      version_min: '9'
+    - tags: get,bazel
+      version: 5.3.0
+    env:
+      MLC_GIT_CHECKOUT: v2.12.0
+  v2.15.0:
+    deps:
+    - names:
+      - python
+      - python3
+      tags: get,python
+      version_max: 3.11.999
+      version_max_usable: 3.11.12
+      version_min: 3.9.0
+    - tags: get,llvm
+      version_max: '16.9.999'
+      version_min: '16.0.0'
+    - tags: get,bazel
+      version: 6.1.0
+    env:
+      MLC_GIT_CHECKOUT: v2.15.0
+  v2.18.0:
+    deps:
+    - names:
+      - python
+      - python3
+      tags: get,python
+      version_max: 3.12.999
+      version_max_usable: 3.12.12
+      version_min: 3.9.0
+    - tags: get,llvm
+      version_max: '17.9.999'
+      version_min: '17.0.6'
+    - tags: get,bazel
+      version: 6.5.0
+    env:
+      MLC_GIT_CHECKOUT: v2.18.0
