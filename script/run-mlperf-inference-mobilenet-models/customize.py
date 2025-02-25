@@ -200,6 +200,8 @@ def preprocess(i):
                     if r['return'] > 0:
                         print(r)
                     #    return r
+                    else:
+                        importlib.reload(mlc.action)
 
                 if is_true(env.get('MLC_TEST_ONE_RUN', '')):
                     return {'return': 0}
