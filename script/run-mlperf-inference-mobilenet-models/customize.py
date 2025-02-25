@@ -5,6 +5,7 @@ from utils import *
 import mlc
 import importlib
 
+
 def preprocess(i):
 
     os_info = i['os_info']
@@ -18,8 +19,8 @@ def preprocess(i):
     adr = i['input'].get('adr')
 
     automation = i['automation']
-    #mlc = i['automation'].action_object
-    #cache_action = i['automation'].cache_action
+    # mlc = i['automation'].action_object
+    # cache_action = i['automation'].cache_action
     cache_action = mlc
 
     quiet = (env.get('MLC_QUIET', False) == 'yes')
