@@ -62,7 +62,7 @@ def preprocess(i):
         models['mobilenet']['v3'] = models_all['mobilenet']['v3']
     elif is_true(env.get('MLC_MLPERF_RUN_MOBILENETS', '')):
         models['mobilenet'] = models_all['mobilenet']
-    elif is_true(env.get('MLC_MLPERF_RUN_EFFICIENTNETS', '')):
+    if is_true(env.get('MLC_MLPERF_RUN_EFFICIENTNETS', '')):
         models['efficientnet'] = models_all['efficientnet']
 
     variation_strings = {}
