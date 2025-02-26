@@ -42,6 +42,7 @@ ${extra_option} "
 
 
 extra_option=" --adr.mlperf-inference-implementation.compressed_dataset=on"
+extra_tags=",_only-fp32"
 run "mlcr run,mobilenet-models,_tflite$extra_tags \
 --adr.compiler.tags=gcc \
 ${extra_option} "
