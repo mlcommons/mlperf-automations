@@ -195,7 +195,7 @@ def preprocess(i):
                     return r
                 importlib.reload(mlc.action)
 
-                if is_true(env.get('MLC_MINIMIZE_DISK_SPACE', '')):
+                if is_true(env.get('MLC_MINIMIZE_DISK_USAGE', '')):
                     r = cache_action.access(clean_input)
                     if r['return'] > 0:
                         print(r)
@@ -206,12 +206,14 @@ def preprocess(i):
                 if is_true(env.get('MLC_TEST_ONE_RUN', '')):
                     return {'return': 0}
 
+            '''
             r = cache_action.access(clean_input)
             if r['return'] > 0:
                 print(r)
                 #    return r
             else:
                 importlib.reload(mlc.action)
+            '''
     return {'return': 0}
 
 

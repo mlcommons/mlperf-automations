@@ -35,6 +35,7 @@ docker:
     imagenet_path: MLC_DATASET_IMAGENET_PATH
     results_dir: MLC_MLPERF_INFERENCE_RESULTS_DIR
     submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
+    minimize_disk_usage: MLC_MINIMIZE_DISK_USAGE
   fake_run_deps: false
   pre_run_cmds:
     - mlc pull repo
