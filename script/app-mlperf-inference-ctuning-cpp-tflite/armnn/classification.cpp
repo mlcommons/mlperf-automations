@@ -422,11 +422,7 @@ void TestSingleStream(Program *prg) {
                   ? mlperf::TestMode::FindPeakPerformance
                   : mlperf::TestMode::SubmissionRun;
 
-  if (ts.FromConfig(mlperf_conf_path, model_name, scenario_string)) {
-    std::cout << "Issue with mlperf.conf file at " << mlperf_conf_path
-              << std::endl;
-    exit(1);
-  }
+  
 
   if (ts.FromConfig(user_conf_path, model_name, scenario_string)) {
     std::cout << "Issue with user.conf file at " << user_conf_path << std::endl;
