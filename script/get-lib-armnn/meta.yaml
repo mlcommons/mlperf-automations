@@ -37,3 +37,7 @@ versions:
     env:
       MLC_LIB_ARMNN_VERSION: v23.11
       MLC_TMP_GIT_BRANCH_NAME: branches/armnn_23_11
+  '25.02':
+    env:
+      MLC_LIB_ARMNN_VERSION: v23.11
+      MLC_TMP_GIT_BRANCH_NAME: branches/armnn_23_11
