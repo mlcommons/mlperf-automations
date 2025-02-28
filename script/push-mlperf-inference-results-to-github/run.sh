@@ -16,8 +16,13 @@ if [[ -n ${MLC_MLPERF_INFERENCE_SUBMISSION_DIR} ]]; then
 fi
 test $? -eq 0 || exit $?
 
-git commit -a -m "${MLC_MLPERF_RESULTS_REPO_COMMIT_MESSAGE}"
-test $? -eq 0 || exit $?
+if ! git diff-index --quiet HEAD --; then
+    git commit -a -m "${MLC_MLPERF_RESULTS_REPO_COMMIT_MESSAGE}"
+    test $? -eq 0 || exit $?
+else
+    echo "No changes to commit."
+fi
+
 
 echo ${MLC_GIT_PUSH_CMD}
 ${MLC_GIT_PUSH_CMD}
