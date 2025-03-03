@@ -16,14 +16,48 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_PACKAGE_URL
+  names:
+    - download-file
 tags:
 - get
 - dataset-mixtral
 - openorca-mbxp-gsm8k-combined
 uid: 89e7c91444804775
 variations:
-  mlcommons-storage:
+  rclone:
+    group: download-tool
     default: true
+    adr:
+      download-file:
+        tags: _rclone
+    env:
+      MLC_DOWNLOAD_TOOL: rclone
+      MLC_RCLONE_COPY_USING: copyurl
+  wget:
+    group: download-tool
+    adr:
+      download-file:
+        tags: _wget
+    env:
+      MLC_DOWNLOAD_TOOL: wget
+  validation:
+    default: true
+    group: dataset-type
+    adr:
+      download-file:
+        extra_cache_tags: mixtral,get-mixtral-dataset,validation
+    env:
+      ML_MODEL_STARTING_WEIGHTS_FILENAME: https://github.com/mlcommons/inference/tree/master/language/mixtral-8x7b#preprocessed
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/mixtral_8x7b/09292024_mixtral_15k_mintoken2_v1.pkl
+  calibration:
+    group: dataset-type
+    adr:
+      download-file:
+        extra_cache_tags: mixtral,get-mixtral-dataset,calibration
+    env:
+      ML_MODEL_STARTING_WEIGHTS_FILENAME: https://github.com/mlcommons/inference/tree/master/language/mixtral-8x7b#calibration-dataset
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/mixtral_8x7b%2F2024.06.06_mixtral_15k_calibration_v4.pkl
+  mlcommons-storage:
     env:
       MLC_DOWNLOAD_CHECKSUM: 78823c13e0e73e518872105c4b09628b
       MLC_DOWNLOAD_FILENAME: 2024.06.06_mixtral_15k_v4.pkl
