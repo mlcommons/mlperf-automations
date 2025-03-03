@@ -33,13 +33,13 @@ variations:
     default: true
     group: dataset-type
     env:
-      MLC_RCLONE_URL: mlc-inference:mlcommons-inference-wg-public/llama3_405b/mlperf_llama3.1_405b_dataset_8313_processed_fp16_eval.pkl 
+      MLC_RCLONE_URL: mlc-inference:mlcommons-inference-wg-public/llama3.1_405b/mlperf_llama3.1_405b_dataset_8313_processed_fp16_eval.pkl 
       MLC_DATASET_TYPE: validation
       MLC_DATASET_FILE_NAME: mlperf_llama3.1_405b_dataset_8313_processed_fp16_eval.pkl
   calibration:
     group: dataset-type
     env:
-      MLC_RCLONE_URL: mlc-inference:mlcommons-inference-wg-public/llama3_405b/mlperf_llama3.1_405b_calibration_dataset_512_processed_fp16_eval.pkl
+      MLC_RCLONE_URL: mlc-inference:mlcommons-inference-wg-public/llama3.1_405b/mlperf_llama3.1_405b_calibration_dataset_512_processed_fp16_eval.pkl
       MLC_DATASET_TYPE: calibration
       MLC_DATASET_FILE_NAME: mlperf_llama3.1_405b_calibration_dataset_512_processed_fp16_eval.pkl
   rclone:
