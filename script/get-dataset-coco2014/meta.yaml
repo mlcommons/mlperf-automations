@@ -9,6 +9,9 @@ cache: true
 category: AI/ML datasets
 category_sort: 8500
 
+input_mapping:
+  num_workers: MLC_DATASET_COCO2014_NUM_WORKERS
+
 tags:
 - get
 - dataset
@@ -18,7 +21,8 @@ tags:
 
 default_env:
   MLC_DATASET_CALIBRATION: 'no'
-
+  MLC_DATASET_COCO2014_NUM_WORKERS: 1
+  
 deps:
 
 - names:
