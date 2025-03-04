@@ -27,7 +27,7 @@ if [[ ${MLC_DATASET_CALIBRATION} == "no" ]]; then
   eval $cmd
   test $? -eq 0 || exit $?
 else
-  cmd="./download-coco-2014-calibration.sh -d ${INSTALL_DIR}"
+  cmd="./download-coco-2014-calibration.sh -d ${INSTALL_DIR} -n ${MLC_DATASET_COCO2014_NUM_WORKERS}"
   echo $cmd
   eval $cmd
   test $? -eq 0 || exit $?
