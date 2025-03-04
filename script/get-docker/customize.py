@@ -12,11 +12,15 @@ def preprocess(i):
 
     recursion_spaces = i['recursion_spaces']
 
-    file_name = 'docker.exe' if os_info['platform'] == 'windows' else 'docker'
-    env['FILE_NAME'] = file_name
+    file_name_docker = 'docker.exe' if os_info['platform'] == 'windows' else 'docker'
+    file_name_podman = 'podman.exe' if os_info['platform'] == 'windows' else 'podman'
 
     if 'MLC_DOCKER_BIN_WITH_PATH' not in env:
-        r = i['automation'].find_artifact({'file_name': file_name,
+        # check for docker
+        # if docker is not found, podman is checked
+        env['FILE_NAME'] = file_name_docker
+        env['CONTAINER_TOOL_NAME'] = "docker"
+        r = i['automation'].find_artifact({'file_name': file_name_docker,
                                            'env': env,
                                            'os_info': os_info,
                                            'default_path_env_key': 'PATH',
@@ -26,11 +30,25 @@ def preprocess(i):
                                            'recursion_spaces': recursion_spaces})
         if r['return'] > 0:
             if r['return'] == 16:
-                run_file_name = "install"
-                r = automation.run_native_script(
-                    {'run_script_input': i['run_script_input'], 'env': env, 'script_name': run_file_name})
+                # check for podman
+                # if podman is also absent, the script will try to automatically install docker in the system
+                env['FILE_NAME'] = file_name_podman
+                env['CONTAINER_TOOL_NAME'] = "podman"
+                r = i['automation'].find_artifact({'file_name': file_name_podman,
+                                           'env': env,
+                                           'os_info': os_info,
+                                           'default_path_env_key': 'PATH',
+                                           'detect_version': True,
+                                           'env_path_key': 'MLC_DOCKER_BIN_WITH_PATH',
+                                           'run_script_input': i['run_script_input'],
+                                           'recursion_spaces': recursion_spaces})
                 if r['return'] > 0:
-                    return r
+                    if r['return'] == 16:
+                        run_file_name = "install"
+                        r = automation.run_native_script(
+                            {'run_script_input': i['run_script_input'], 'env': env, 'script_name': run_file_name})
+                        if r['return'] > 0:
+                            return r
             else:
                 return r
 
