@@ -11,6 +11,12 @@ def preprocess(i):
     recursion_spaces = i['recursion_spaces']
     file_name_c = 'gcc.exe' if os_info['platform'] == 'windows' else 'gcc'
 
+    if 'MLC_GCC_BIN_WITH_PATH' not in env:
+        if env.get('MLC_GCC_DIR_PATH', '') != '':
+            gcc_path = env['MLC_GCC_DIR_PATH']
+            if os.path.exists(os.path.join(gcc_path, 'bin', 'gcc')):
+                env['MLC_TMP_PATH'] = os.path.join(gcc_path, 'bin')
+
     if env.get('MLC_HOST_OS_FLAVOR', '') == 'rhel':
         if "12" in env.get('MLC_VERSION', '') or "12" in env.get(
                 'MLC_VERSION_MIN', ''):

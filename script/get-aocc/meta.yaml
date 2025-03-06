@@ -43,3 +43,7 @@ tags:
 - get
 - aocc
 uid: 1ceb0656e99a44ec
+variations:
+  _path.#:
+    env:
+      MLC_AOCC_DIR_PATH: #
