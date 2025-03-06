@@ -1610,6 +1610,7 @@ class ScriptAutomation(Automation):
                     ii['env'] = env
                     ii['state'] = state
                     ii['meta'] = meta
+                    ii['automation'] = self
                     # may need to detect versions in multiple paths
                     ii['run_script_input'] = run_script_input
 
@@ -1762,6 +1763,7 @@ class ScriptAutomation(Automation):
                 ii['env'] = env
                 ii['state'] = state
                 ii['meta'] = meta
+                ii['automation'] = self
                 # may need to detect versions in multiple paths
                 ii['run_script_input'] = run_script_input
 
@@ -5518,6 +5520,7 @@ def run_detect_version(customize_code, customize_common_input,
         ii['env'] = env
         ii['state'] = state
         ii['meta'] = meta
+        ii['automation'] = customize_common_input['automation']
 
         r = customize_code.detect_version(ii)
         return r
@@ -5548,6 +5551,7 @@ def run_postprocess(customize_code, customize_common_input, recursion_spaces,
         ii['env'] = env
         ii['state'] = state
         ii['meta'] = meta
+        ii['automation'] = customize_common_input['automation']
 
         if run_script_input is not None:
             ii['run_script_input'] = run_script_input

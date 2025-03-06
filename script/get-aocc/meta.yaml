@@ -20,6 +20,7 @@ deps:
 
 input_mapping:
   tar_file_path: MLC_AOCC_TAR_FILE_PATH
+  aocc_dir: MLC_AOCC_DIR_PATH
 
 name: Detect or install AOCC compiler
 new_env_keys:

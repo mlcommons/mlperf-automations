@@ -20,23 +20,12 @@ def preprocess(i):
 
     exe_c = 'clang.exe' if os_info['platform'] == 'windows' else 'clang'
 
-    if env.get('MLC_AOCC_DIR_PATH', '') != '' and env.get(
-            'MLC_AOCC_BIN_WITH_PATH', '') == '':
-        for f in os.listdir(env['MLC_AOCC_DIR_PATH']):
-            if os.path.exists(os.path.join(
-                    env['MLC_AOCC_DIR_PATH'], f, "bin", exe_c)):
-                env['MLC_AOCC_BIN_WITH_PATH'] = os.path.join(
-                    env['MLC_AOCC_DIR_PATH'], f, "bin", exe_c)
-
-    if env.get('MLC_HOST_OS_FLAVOR', '') == 'rhel':
-        if "12" in env.get('MLC_VERSION', '') or "12" in env.get(
-                'MLC_VERSION_MIN', ''):
-            if env.get('MLC_TMP_PATH', '') == '':
-                env['MLC_TMP_PATH'] = ''
-            env['MLC_TMP_PATH'] += "/opt/rh/aocc/root/usr/bin"
-            env['MLC_TMP_PATH_IGNORE_NON_EXISTANT'] = 'yes'
-
     if 'MLC_AOCC_BIN_WITH_PATH' not in env:
+        if env.get('MLC_AOCC_DIR_PATH', '') != '':
+            aocc_path = env['MLC_AOCC_DIR_PATH']
+            if os.path.exists(os.path.join(aocc_path, 'bin', 'clang')):
+                env['MLC_TMP_PATH'] = os.path.join(aocc_path, 'bin')
+
         r = i['automation'].find_artifact({'file_name': exe_c,
                                            'env': env,
                                            'os_info': os_info,
