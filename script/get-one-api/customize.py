@@ -52,7 +52,7 @@ def detect_version(i):
                                        'which_env': i['env']})
     if r['return'] > 0:
         return r
-    
+
     version = r['version']
 
     print(i['recursion_spaces'] + '    Detected version: {}'.format(version))
