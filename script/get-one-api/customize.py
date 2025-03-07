@@ -28,7 +28,8 @@ def preprocess(i):
                                            'recursion_spaces': recursion_spaces})
         if r['return'] > 0:
             # Uncomment when MLC script for installing oneapi compiler is integrated
-            # Initial finding suggests that oneapi could be installed without hastle in linux using apt, but is tricky in windows
+            # Initial finding suggests that oneapi could be installed without
+            # hastle in linux using apt, but is tricky in windows
 
             #           if r['return'] == 16:
             #               if env.get('MLC_TMP_FAIL_IF_NOT_FOUND','').lower() == 'yes':
