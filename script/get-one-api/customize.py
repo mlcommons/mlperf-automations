@@ -50,9 +50,8 @@ def detect_version(i):
                                        'env_key': 'MLC_ONEAPI_VERSION',
                                        'which_env': i['env']})
     if r['return'] > 0:
-        if 'clang' in r['error']:
-            return {'return': 0, 'version': -1}
         return r
+    
     version = r['version']
 
     print(i['recursion_spaces'] + '    Detected version: {}'.format(version))
