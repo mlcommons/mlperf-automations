@@ -5563,26 +5563,32 @@ def run_postprocess(customize_code, customize_common_input, recursion_spaces,
 
 ##############################################################################
 
+
 def get_script_name(env, path, script_name='run'):
-    # Extract environment variables safely, defaulting to empty strings if missing
+    # Extract environment variables safely, defaulting to empty strings if
+    # missing
     os_flavor = env.get('MLC_HOST_OS_FLAVOR', '')
     os_flavor_like = env.get('MLC_HOST_OS_FLAVOR_LIKE', '')
     os_type = env.get('MLC_HOST_OS_TYPE', '')
-    os_version = env.get('MLC_HOST_OS_VERSION', '') if os_flavor else ''  # Only use version if flavor exists
+    # Only use version if flavor exists
+    os_version = env.get('MLC_HOST_OS_VERSION', '') if os_flavor else ''
     platform_flavor = env.get('MLC_HOST_PLATFORM_FLAVOR', '')
 
     # Get a list of all files in the directory
     try:
         available_files = set(os.listdir(path))
     except FileNotFoundError:
-        return os.path.join(path, f"{script_name}.sh")  # Default if directory doesn't exist
+        # Default if directory doesn't exist
+        return os.path.join(path, f"{script_name}.sh")
 
     # Check if any script with a "script_name-" prefix exists
-    has_prefixed_scripts = any(f.startswith(f"{script_name}-") for f in available_files)
+    has_prefixed_scripts = any(f.startswith(
+        f"{script_name}-") for f in available_files)
 
     # Helper function to construct script filenames dynamically
     def script_filename(*parts):
-        suffix = "-".join(filter(None, parts))  # Remove empty values to avoid extra '-'
+        # Remove empty values to avoid extra '-'
+        suffix = "-".join(filter(None, parts))
         return f"{script_name}-{suffix}.sh" if suffix else f"{script_name}.sh"
 
     # Define file search order based on priority
@@ -5606,8 +5612,6 @@ def get_script_name(env, path, script_name='run'):
 
     # Fallback to the default script
     return os.path.join(path, f"{script_name}.sh")
-
-
 
 
 ##############################################################################
