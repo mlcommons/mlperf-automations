@@ -743,6 +743,17 @@ variations:
       wkhtmltopdf:
         apt: wkhtmltopdf
         brew: wkhtmltopdf
+  xfonts-base:
+    env:
+      MLC_SYS_UTIL_NAME: xfonts_base
+    new_env_keys:
+    - MLC_XFONTS_BASE_VERSION
+    state:
+      xfonts_base:
+        apt: xfonts-base
+        dnf: xorg-x11-fonts-misc
+        yum: xorg-x11-fonts-misc
+        zypper: xorg-x11-fonts
   xz:
     env:
       MLC_SYS_UTIL_NAME: xz

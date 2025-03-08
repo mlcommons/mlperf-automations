@@ -8,6 +8,7 @@ tags:
 deps:
   - tags: detect,os
   - tags: detect,sudo
+  - tags: get,generic-sys-util,_xfonts-base
 uid: 67ec874a3dfe4b87
 variations:
   with-qt:
