@@ -5563,31 +5563,52 @@ def run_postprocess(customize_code, customize_common_input, recursion_spaces,
 
 ##############################################################################
 
-
 def get_script_name(env, path, script_name='run'):
-    """
-    Internal: find the most appropriate run script name for the detected OS
-    """
+    # Extract environment variables safely, defaulting to empty strings if missing
+    os_flavor = env.get('MLC_HOST_OS_FLAVOR', '')
+    os_flavor_like = env.get('MLC_HOST_OS_FLAVOR_LIKE', '')
+    os_type = env.get('MLC_HOST_OS_TYPE', '')
+    os_version = env.get('MLC_HOST_OS_VERSION', '') if os_flavor else ''  # Only use version if flavor exists
+    platform_flavor = env.get('MLC_HOST_PLATFORM_FLAVOR', '')
 
-    from os.path import exists
+    # Get a list of all files in the directory
+    try:
+        available_files = set(os.listdir(path))
+    except FileNotFoundError:
+        return os.path.join(path, f"{script_name}.sh")  # Default if directory doesn't exist
 
-    tmp_suff1 = env.get('MLC_HOST_OS_FLAVOR', '')
-    tmp_suff2 = env.get('MLC_HOST_OS_VERSION', '')
-    tmp_suff3 = env.get('MLC_HOST_PLATFORM_FLAVOR', '')
+    # Check if any script with a "script_name-" prefix exists
+    has_prefixed_scripts = any(f.startswith(f"{script_name}-") for f in available_files)
 
-    if exists(os.path.join(path, script_name + '-' + tmp_suff1 +
-              '-' + tmp_suff2 + '-' + tmp_suff3 + '.sh')):
-        return script_name + '-' + tmp_suff1 + '-' + tmp_suff2 + '-' + tmp_suff3 + '.sh'
-    elif exists(os.path.join(path, script_name + '-' + tmp_suff1 + '-' + tmp_suff3 + '.sh')):
-        return script_name + '-' + tmp_suff1 + '-' + tmp_suff3 + '.sh'
-    elif exists(os.path.join(path, script_name + '-' + tmp_suff1 + '-' + tmp_suff2 + '.sh')):
-        return script_name + '-' + tmp_suff1 + '-' + tmp_suff2 + '.sh'
-    elif exists(os.path.join(path, script_name + '-' + tmp_suff1 + '.sh')):
-        return script_name + '-' + tmp_suff1 + '.sh'
-    elif exists(os.path.join(path, script_name + '-' + tmp_suff3 + '.sh')):
-        return script_name + '-' + tmp_suff3 + '.sh'
-    else:
-        return script_name + '.sh'
+    # Helper function to construct script filenames dynamically
+    def script_filename(*parts):
+        suffix = "-".join(filter(None, parts))  # Remove empty values to avoid extra '-'
+        return f"{script_name}-{suffix}.sh" if suffix else f"{script_name}.sh"
+
+    # Define file search order based on priority
+    candidates = [
+        script_filename(os_flavor, os_version, platform_flavor),
+        script_filename(os_flavor, os_version),
+        script_filename(os_flavor, platform_flavor),
+        script_filename(os_flavor),
+        script_filename(os_flavor_like, platform_flavor),
+        script_filename(os_flavor_like),
+        script_filename(os_type, platform_flavor),
+        script_filename(os_type),
+        script_filename(platform_flavor),
+    ]
+
+    # If prefixed scripts exist, check for the first matching candidate
+    if has_prefixed_scripts:
+        for candidate in candidates:
+            if candidate in available_files:
+                return os.path.join(path, candidate)
+
+    # Fallback to the default script
+    return os.path.join(path, f"{script_name}.sh")
+
+
+
 
 ##############################################################################
 
