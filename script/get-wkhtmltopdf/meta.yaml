@@ -10,6 +10,9 @@ deps:
   - tags: detect,sudo
   - tags: get,generic-sys-util,_xfonts-base
 uid: 67ec874a3dfe4b87
+docker:
+  pre_run_cmds:
+    - mlc pull repo
 variations:
   with-qt:
     group: qt
