@@ -43,6 +43,8 @@ jobs:
         mlcr get,dataset,preprocessed,imagenet,_NHWC --quiet
         mlc search cache --tags=get,dataset,preprocessed,imagenet,-_NCHW
         mlc search cache --tags=get,dataset,preprocessed,imagenet,-_NHWC
+        # Tests run-scripts on windows,ubuntu,macos
+        mlcr get,wkhtmltopdf
 
     - name: Test versions
       continue-on-error: true
@@ -51,6 +53,8 @@ jobs:
         mlcr get,generic-python-lib,_package.scipy --version=1.9.3 --quiet
         test $? -eq 0 || exit $?
         mlcr get,generic-python-lib,_package.scipy --version=1.9.2 --quiet
+        test $? -eq 0 || exit $?
+        mlc find cache --tags=get,generic-python-lib,_package.scipy,version-1.9.3
         test $? -eq 0 || exit $?
         # Need to add find cache here
         # mlcr get,generic-python-lib,_package.scipy --version=1.9.3 --quiet --only_execute_from_cache=True
