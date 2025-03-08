@@ -23,5 +23,3 @@ variations:
   with-qt:
     group: qt
     default: true
-
-
