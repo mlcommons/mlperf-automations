@@ -115,6 +115,8 @@ variations:
     env:
       MLC_SYS_UTIL_NAME: libgl # tbd: regular expression for version as well as whether its installed?
       MLC_SYS_UTIL_CHECK_CMD: 'ldconfig -p | grep -i libgl.so.*' 
+    default_env:
+      MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: yes
     new_env_keys:
     - MLC_LIBGL_VERSION
     state:
