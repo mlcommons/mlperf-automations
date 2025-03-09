@@ -3100,8 +3100,8 @@ class ScriptAutomation(Automation):
 
         return {'return': 0, 'return_code': rc}
 
-
     ##########################################################################
+
     def _get_name_for_dynamic_variation_tag(script, variation_tag):
         '''
         Returns the variation name in meta for the dynamic_variation_tag
