@@ -110,6 +110,19 @@ variations:
         brew: ''
         dnf: ''   
         yum: ''
+  
+  libgl:
+    env:
+      MLC_SYS_UTIL_NAME: libgl # tbd: regular expression for version as well as whether its installed?
+      MLC_SYS_UTIL_CHECK_CMD: 'ldconfig -p | grep -i libgl.so.*' 
+    new_env_keys:
+    - MLC_LIBGL_VERSION
+    state:
+      libgl: # tbd: complete for other flavours of linux
+        apt: libgl1
+        brew: ''
+        dnf: mesa-libGL   
+        yum: mesa-libGL
   libsm6:
     env:
       MLC_SYS_UTIL_NAME: libsm6 # tbd: regular expression for version as well as whether its installed?

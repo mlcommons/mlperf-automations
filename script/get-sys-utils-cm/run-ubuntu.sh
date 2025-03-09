@@ -52,7 +52,6 @@ ${MLC_SUDO} ${MLC_APT_TOOL} update && \
            libgl1 \
            libjpeg9-dev \
            unzip \
-           libgl1 \
            zlib1g-dev
 
 # Install Python deps though preference is to install them 
