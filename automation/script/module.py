@@ -2973,14 +2973,14 @@ class ScriptAutomation(Automation):
                             if given_variations:
                                 v_split = []
                                 run_variations = []
-                                for i, v in enumerate(given_variations):
+                                for v in given_variations:
                                     v_split = v.split(",")
-                                    for t in v_split:
+                                    for index, t in enumerate(v_split):
                                         if not t.startswith("_"):
                                             # variations must begin with _. We
                                             # support both with and without _
                                             # in the meta
-                                            given_variations[i] = f"_{t}"
+                                            v_split[index] = f"_{t}"
                                     if v_split:
                                         run_variations.append(
                                             ",".join(v_split))

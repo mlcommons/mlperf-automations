@@ -164,9 +164,8 @@ tests:
   run_inputs:
   - env:
       MLC_TEST_ONE_RUN: 'yes'
-    variations_list: 
-    - tflite
-    - accuracy_only
+    variations_list:
+      - tflite,accuracy-only
     adr:
       compiler:
         tags: gcc
