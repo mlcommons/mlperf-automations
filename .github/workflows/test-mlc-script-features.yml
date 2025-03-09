@@ -44,7 +44,10 @@ jobs:
         mlc search cache --tags=get,dataset,preprocessed,imagenet,-_NCHW
         mlc search cache --tags=get,dataset,preprocessed,imagenet,-_NHWC
         # Tests run-scripts on windows,ubuntu,macos
-        mlcr get,wkhtmltopdf
+
+    - name: Test native script name variants
+      run: |
+        mlcr get,wkhtmltopdf --quiet
 
     - name: Test versions
       continue-on-error: true
