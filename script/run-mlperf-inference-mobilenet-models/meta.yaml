@@ -165,7 +165,7 @@ tests:
   - env:
       MLC_TEST_ONE_RUN: 'yes'
     variations_list:
-      - tflite,accuracy-only
+      - tflite,find-performance
     adr:
       compiler:
         tags: gcc
