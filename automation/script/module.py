@@ -3020,11 +3020,13 @@ class ScriptAutomation(Automation):
                             logger.info(ii)
                             r = self.action_object.access(ii)
                             if r['return'] > 0:
-                                return r
-
+                             return r
+                    if is_true(i.get('docker_prune','')):
+                        docker_prune()
         return {'return': 0, 'list': lst}
 
     ############################################################
+
 
     def native_run(self, i):
         """
@@ -4860,6 +4862,15 @@ def _update_env(env, key=None, value=None):
         return r
 
     return {'return': 0}
+
+def docker_prune():
+    try:
+        # Run the docker prune command with -a (removes all unused images, not just dangling ones)
+        result = subprocess.run(["docker", "system", "prune", "-a", "-f"],
+                                capture_output=True, text=True, check=True)
+        print("Docker prune output:\n", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("Error while running Docker prune:\n", e.stderr)
 
 
 ##########################################################################

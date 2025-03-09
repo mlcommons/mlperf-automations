@@ -42,12 +42,14 @@ tests:
     fail_safe: 'yes'
     ignore_missing: 'yes'
     test-all-variations: 'yes'
+    docker_prune: 'yes'
   - docker: 'yes'
     docker_os: ubuntu
     docker_os_version: '24.04'
     fail_safe: 'yes'
     ignore_missing: 'yes'
     test-all-variations: 'yes'
+    docker_prune: 'yes'
 uid: bb0393afa8404a11
 variations:
   cmake:
