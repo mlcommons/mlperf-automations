@@ -169,3 +169,5 @@ tests:
     adr:
       compiler:
         tags: gcc
+      imagenet-preprocessed:
+        tags: _500

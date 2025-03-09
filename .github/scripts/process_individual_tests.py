@@ -35,3 +35,5 @@ for file in files:
     ret = mlc.access(ii)
     if ret['return'] > 0:
         raise Exception(r['error'])
+    ii = {'action': 'rm', 'target': 'cache', 'f': True}
+    ret = mlc.access(ii)
