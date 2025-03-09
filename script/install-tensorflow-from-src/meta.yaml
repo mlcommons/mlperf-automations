@@ -56,7 +56,7 @@ versions:
       version_max_usable: 17.0.6
       version_min: 17.0.6
     - tags: get,bazel
-      version: 6.5.0
+      version: 7.4.1
     env:
       MLC_GIT_CHECKOUT: master
   v1.15.0:
