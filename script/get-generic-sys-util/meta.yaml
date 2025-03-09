@@ -693,7 +693,7 @@ variations:
   unzip:
     env:
       MLC_SYS_UTIL_NAME: unzip
-      MLC_SYS_UTIL_VERSION_CMD: unzip --version
+      MLC_SYS_UTIL_VERSION_CMD: unzip -v
     new_env_keys:
     - MLC_UNZIP_VERSION
     state:
