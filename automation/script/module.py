@@ -385,6 +385,8 @@ class ScriptAutomation(Automation):
             if 'v' in i:
                 del (i['v'])
             env['MLC_TMP_SILENT'] = 'yes'
+            env['MLC_SILENT'] = 'yes'
+            logger.setLevel(logging.ERROR)
             run_state['tmp_silent'] = True
 
         if 'verbose' in i:
@@ -396,6 +398,7 @@ class ScriptAutomation(Automation):
             env['MLC_VERBOSE'] = 'yes'
             run_state['tmp_verbose'] = True
             logger.setLevel(logging.DEBUG)
+        
 
         print_deps = i.get('print_deps', False)
         print_versions = i.get('print_versions', False)
@@ -553,8 +556,7 @@ class ScriptAutomation(Automation):
 #        if verbose:
 #            logger.info('')
 
-        if not run_state.get('tmp_silent', False):
-            logger.info(recursion_spaces + '* ' + mlc_script_info)
+        logger.info(recursion_spaces + '* ' + mlc_script_info)
 
         #######################################################################
         # Report if scripts were not found or there is an ambiguity with UIDs
@@ -1265,10 +1267,9 @@ class ScriptAutomation(Automation):
                         return r
                     version = r['meta'].get('version')
 
-                    if not run_state.get('tmp_silent', False):
-                        logger.info(
-                            recursion_spaces +
-                            '     ! load {}'.format(path_to_cached_state_file))
+                    logger.info(
+                        recursion_spaces +
+                        '     ! load {}'.format(path_to_cached_state_file))
 
                     ###########################################################
                     # IF REUSE FROM CACHE - update env and state from cache!
@@ -2298,12 +2299,11 @@ class ScriptAutomation(Automation):
     ##########################################################################
     def _dump_version_info_for_script(
             self, output_dir=os.getcwd(), quiet=False, silent=False):
-
+        logger = self.action_object.logger
         if not quiet and not silent:
             pass
         for f in ['mlc-run-script-versions.json', 'version_info.json']:
-            if not quiet and not silent:
-                logger.info('Dumping versions to {}'.format(f))
+            logger.info('Dumping versions to {}'.format(f))
             r = utils.save_json(f, self.run_state.get('version_info', []))
             if r['return'] > 0:
                 return r
@@ -5098,13 +5098,13 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
                 path_to_run_script,
                 run_script,
                 cur_dir))
-        if not run_state.get('tmp_silent', False):
-            logger.info(recursion_spaces + '       ! cd {}'.format(cur_dir))
-            logger.info(
-                recursion_spaces +
-                '       ! call {} from {}'.format(
-                    path_to_run_script,
-                    run_script))
+        
+        logger.info(recursion_spaces + '       ! cd {}'.format(cur_dir))
+        logger.info(
+            recursion_spaces +
+            '       ! call {} from {}'.format(
+                path_to_run_script,
+                run_script))
 
         # Prepare env variables
         import copy
@@ -5245,12 +5245,11 @@ or full console log.
 
     if postprocess != '' and customize_code is not None and postprocess in dir(
             customize_code):
-        if not run_state.get('tmp_silent', False):
-            logger.info(
-                recursion_spaces +
-                '       ! call "{}" from {}'.format(
-                    postprocess,
-                    customize_code.__file__))
+        logger.info(
+            recursion_spaces +
+            '       ! call "{}" from {}'.format(
+                postprocess,
+                customize_code.__file__))
 
     if len(posthook_deps) > 0 and (postprocess == "postprocess"):
         r = script_automation._call_run_deps(posthook_deps, local_env_keys, local_env_keys_from_meta, env, state, const, const_state,
