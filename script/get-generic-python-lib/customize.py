@@ -150,7 +150,7 @@ def detect_version(i):
     version = r['version']
     current_detected_version = version
 
-    if env.get('MLC_TMP_SILENT', '') != 'yes':
+    if env.get('MLC_SILENT', '') != 'yes':
         print(
             i['recursion_spaces'] +
             '      Detected version: {}'.format(version))

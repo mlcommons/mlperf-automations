@@ -56,7 +56,7 @@ def postprocess(i):
 
     top_classification = data.get('top_classification', '')
 
-    if env.get('MLC_TMP_SILENT', '') != 'yes':
+    if env.get('MLC_SILENT', '') != 'yes':
         if top_classification != '':
             print('')
             x = 'Top classification: {}'.format(top_classification)

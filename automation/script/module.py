@@ -202,7 +202,7 @@ class ScriptAutomation(Automation):
                               to let scripts deal with that
 
           (silent) (bool): if True, attempt to suppress all info if supported
-                           (sets MLC_TMP_SILENT=yes)
+                           (sets MLC_SILENT=yes)
           (s) (bool): the same as 'silent'
           ...
 
@@ -384,7 +384,6 @@ class ScriptAutomation(Automation):
                 del (i['verbose'])
             if 'v' in i:
                 del (i['v'])
-            env['MLC_TMP_SILENT'] = 'yes'
             env['MLC_SILENT'] = 'yes'
             logger.setLevel(logging.ERROR)
             run_state['tmp_silent'] = True
