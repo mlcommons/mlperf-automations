@@ -397,7 +397,6 @@ class ScriptAutomation(Automation):
             env['MLC_VERBOSE'] = 'yes'
             run_state['tmp_verbose'] = True
             logger.setLevel(logging.DEBUG)
-        
 
         print_deps = i.get('print_deps', False)
         print_versions = i.get('print_versions', False)
@@ -5097,7 +5096,7 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
                 path_to_run_script,
                 run_script,
                 cur_dir))
-        
+
         logger.info(recursion_spaces + '       ! cd {}'.format(cur_dir))
         logger.info(
             recursion_spaces +
