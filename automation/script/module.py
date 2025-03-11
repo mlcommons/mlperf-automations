@@ -373,7 +373,8 @@ class ScriptAutomation(Automation):
 
         # Check verbose and silent
 
-        #get the current log level so that the log levels could be reverted back when calling the dependency scripts
+        # get the current log level so that the log levels could be reverted
+        # back when calling the dependency scripts
         current_logging_level = logging.getLevelName(logger.level)
         tmp_logging_level = logging.getLevelName(logger.level)
 
@@ -391,7 +392,7 @@ class ScriptAutomation(Automation):
                 del (i['v'])
             env['MLC_TMP_SILENT'] = 'yes'
             logger.setLevel(logging.ERROR)
-            tmp_logging_level = logging.ERROR 
+            tmp_logging_level = logging.ERROR
             run_state['tmp_silent'] = True
 
         if 'verbose' in i:
@@ -404,7 +405,7 @@ class ScriptAutomation(Automation):
             run_state['tmp_verbose'] = True
             logger.setLevel(logging.DEBUG)
             tmp_logging_level = logging.DEBUG
-        
+
         # populate the logging levels in run state
         run_state['tmp_logging_level'] = tmp_logging_level
         run_state['current_logging_level'] = current_logging_level
@@ -1542,7 +1543,7 @@ class ScriptAutomation(Automation):
                     logger.debug(
                         recursion_spaces +
                         '  - Checking docker run dependencies on other MLC scripts:')
-                    
+
                     logger.setLevel(current_logging_level)
                     r = self._call_run_deps(docker_deps, self.local_env_keys, local_env_keys_from_meta, env, state, const, const_state, add_deps_recursive,
                                             recursion_spaces + extra_recursion_spaces,
@@ -1901,7 +1902,7 @@ class ScriptAutomation(Automation):
                 # Check chain of post dependencies on other MLC scripts
                 clean_env_keys_post_deps = meta.get(
                     'clean_env_keys_post_deps', [])
-                
+
                 logger.setLevel(current_logging_level)
                 r = self._run_deps(post_deps, clean_env_keys_post_deps, env, state, const, const_state, add_deps_recursive, recursion_spaces,
                                    remembered_selections, variation_tags_string, found_cached, debug_script_tags, False, show_time, extra_recursion_spaces, run_state)
@@ -5277,7 +5278,6 @@ or full console log.
             '       ! call "{}" from {}'.format(
                 postprocess,
                 customize_code.__file__))
-
 
     logger.setLevel(run_state['current_logging_level'])
     if len(posthook_deps) > 0 and (postprocess == "postprocess"):
