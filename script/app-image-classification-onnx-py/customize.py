@@ -20,6 +20,8 @@ def postprocess(i):
     env = i['env']
     state = i['state']
 
+    automation = i['automation']
+    logger = automation.action_object.logger
 
 #    print ('')
 #    print ('Running postprocess function in customize.py ...')
@@ -45,22 +47,20 @@ def postprocess(i):
         with open(fjson, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
     except Exception as e:
-        print('CM warning: {}'.format(e))
+        logger.warning('CM warning: {}'.format(e))
 
     try:
         import yaml
         with open(fyaml, 'w', encoding='utf-8') as f:
             yaml.dump(data, f)
     except Exception as e:
-        print('CM warning: {}'.format(e))
+        logger.warning('{}'.format(e))
 
     top_classification = data.get('top_classification', '')
 
-    if env.get('MLC_SILENT', '') != 'yes':
-        if top_classification != '':
-            print('')
-            x = 'Top classification: {}'.format(top_classification)
-            print('=' * len(x))
-            print(x)
+    if top_classification != '':
+        x = 'Top classification: {}'.format(top_classification)
+        logger.info('=' * len(x))
+        logger.info(x)
 
     return {'return': 0}
