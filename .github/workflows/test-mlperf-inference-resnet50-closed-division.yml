@@ -1,17 +1,8 @@
 name: MLPerf inference ResNet50 Closed Division for testing Compliance
 
 on:
-  # push:
-  #   branches:
-  #     - test
   schedule:
-    - cron: '0 0 * * 0' # Runs once a week
-  pull_request_target:
-    branches: [ "main", "dev" ]
-    paths:
-      - '.github/workflows/test-mlperf-inference-resnet50-closed-division.yml'
-      - '**'
-      - '!**.md'
+    - cron: '0 0 * * 0' # Runs once a week on Sunday at 00:00 UTC
   # workflow_dispatch: # Allows manual triggering of the workflow
 jobs:
   build:
@@ -54,8 +45,7 @@ jobs:
         
     - name: Pull MLOps repo
       run: |
-        mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
-        
+        mlc pull repo mlcommons@mlperf-automations --branch=dev         
 
     - name: Test MLPerf Inference ResNet50 Offline (Windows)
       if: matrix.os == 'windows-latest'
