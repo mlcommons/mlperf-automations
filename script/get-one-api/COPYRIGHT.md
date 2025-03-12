@@ -1,6 +1,6 @@
 # Copyright Notice
 
-© 2022-2025 MLCommons. All Rights Reserved.
+© 2025-2026 MLCommons. All Rights Reserved.
 
 This file is licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License can be obtained at:
 

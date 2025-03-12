@@ -11,7 +11,7 @@ def preprocess(i):
     state = i['state']
     automation = i['automation']
 
-    # Use VERSION_CMD and CHECK_CMD if no CHECK_CMD is set
+    # Use VERSION_CMD as CHECK_CMD if no CHECK_CMD is set
     if env.get('MLC_SYS_UTIL_VERSION_CMD', '') != '' and env.get(
             'MLC_SYS_UTIL_CHECK_CMD', '') == '':
         env['MLC_SYS_UTIL_CHECK_CMD'] = env['MLC_SYS_UTIL_VERSION_CMD']

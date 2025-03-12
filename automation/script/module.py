@@ -502,8 +502,7 @@ class ScriptAutomation(Automation):
         ii = {}
         ii['tags'] = tags_string
         ii['out'] = None
-        for key in ["automation", "parsed_automation",
-                    "artifact", "parsed_artifact"]:
+        for key in ["automation", "artifact", "item", "details"]:
             if i.get(key):
                 ii[key] = i[key]
 
@@ -1831,6 +1830,10 @@ class ScriptAutomation(Automation):
                 import json
                 logger.debug(json.dumps(env, indent=2, sort_keys=True))
 
+            r = update_env_with_values(env)
+            if r['return'] > 0:
+                return r
+
             # Check chain of pre hook dependencies on other MLC scripts
             if len(prehook_deps) > 0:
                 logger.debug(
@@ -2792,13 +2795,19 @@ class ScriptAutomation(Automation):
         # Find MLC script(s) based on thier tags to get their meta (can be more than 1)
         # Then check if variations exists inside meta
 
-        i['tags'] = ','.join(script_tags)
+        ii = {}
+        ii['tags'] = ','.join(script_tags)
 
-        i['out'] = None
-        i['common'] = True
+        ii['out'] = None
+        ii['common'] = True
 
-        i['target_name'] = "script"
-        r = super(ScriptAutomation, self).search(i)
+        ii['target'] = "script"
+        for key in ["automation", "item",
+                    "artifact", "details"]:
+            if i.get(key):
+                ii[key] = i[key]
+
+        r = super(ScriptAutomation, self).search(ii)
         if r['return'] > 0:
             return r
 
@@ -2901,7 +2910,6 @@ class ScriptAutomation(Automation):
         # Find script item(s)
         i['out'] = None
         r = self.search(i)
-
         if r['return'] > 0:
             return r
 
@@ -2910,7 +2918,6 @@ class ScriptAutomation(Automation):
         for script_item in lst:
             path = script_item.path
             meta = script_item.meta
-            original_meta = script_item.original_meta
 
             alias = meta.get('alias', '')
             uid = meta.get('uid', '')
@@ -2970,14 +2977,14 @@ class ScriptAutomation(Automation):
                             if given_variations:
                                 v_split = []
                                 run_variations = []
-                                for i, v in enumerate(given_variations):
+                                for v in given_variations:
                                     v_split = v.split(",")
-                                    for t in v_split:
+                                    for index, t in enumerate(v_split):
                                         if not t.startswith("_"):
                                             # variations must begin with _. We
                                             # support both with and without _
                                             # in the meta
-                                            given_variations[i] = f"_{t}"
+                                            v_split[index] = f"_{t}"
                                     if v_split:
                                         run_variations.append(
                                             ",".join(v_split))
@@ -3018,7 +3025,8 @@ class ScriptAutomation(Automation):
                             r = self.action_object.access(ii)
                             if r['return'] > 0:
                                 return r
-
+                    if is_true(i.get('docker_prune', '')):
+                        docker_prune()
         return {'return': 0, 'list': lst}
 
     ############################################################
@@ -3097,250 +3105,8 @@ class ScriptAutomation(Automation):
 
         return {'return': 0, 'return_code': rc}
 
-    ############################################################
-    def add(self, i):
-        """
-        Add MLC script
-
-        Args:
-          (MLC input dict):
-
-          (out) (str): if 'con', output to console
-
-          parsed_artifact (list): prepared in MLC CLI or MLC access function
-                                    [ (artifact alias, artifact UID) ] or
-                                    [ (artifact alias, artifact UID), (artifact repo alias, artifact repo UID) ]
-
-          (tags) (str): tags to find an MLC script (MLC artifact)
-
-          (script_name) (str): name of script (it will be copied to the new entry and added to the meta)
-
-          (tags) (string or list): tags to be added to meta
-
-          (new_tags) (string or list): new tags to be added to meta (the same as tags)
-
-          (json) (bool): if True, record JSON meta instead of YAML
-
-          (meta) (dict): preloaded meta
-
-          (template) (string): template to use (python)
-          (python) (bool): template=python
-          (pytorch) (bool): template=pytorch
-          ...
-
-        Returns:
-          (MLC return dict):
-
-          * return (int): return code == 0 if no error and >0 if error
-          * (error) (str): error string if return>0
-
-        """
-
-        import shutil
-
-        console = i.get('out') == 'con'
-        logger = self.action_object.logger
-
-        # Try to find script artifact by alias and/or tags
-        # ii = utils.sub_input(i, self.cmind.cfg['artifact_keys'])
-        ii = {}
-        ii['tags'] = tags_string
-        ii['out'] = None
-
-        for key in ["automation", "parsed_automation",
-                    "artifact", "parsed_artifact"]:
-            if i.get(key):
-                ii[key] = i[key]
-
-        parsed_artifact = i.get('parsed_artifact', [])
-
-        artifact_obj = parsed_artifact[0] if len(parsed_artifact) > 0 else None
-        artifact_repo = parsed_artifact[1] if len(
-            parsed_artifact) > 1 else None
-
-        script_name = ''
-        if 'script_name' in i:
-            script_name = i.get('script_name', '').strip()
-            del (i['script_name'])
-
-            if script_name != '' and not os.path.isfile(script_name):
-                return {'return': 1,
-                        'error': 'file {} not found'.format(script_name)}
-
-        # Move tags from input to meta of the newly created script artifact
-        res = utils.convert_tags_to_list(i['tags'])
-        if res['return'] > 0:
-            return res
-        tags_list = res['tags']
-        if 'tags' in i:
-            del (i['tags'])
-
-        if len(tags_list) == 0:
-            if console:
-                x = input(
-                    'Please specify a combination of unique tags separated by comma for this script: ')
-                x = x.strip()
-                if x != '':
-                    tags_list = x.split(',')
-
-        if len(tags_list) == 0:
-            return {
-                'return': 1, 'error': 'you must specify a combination of unique tags separate by comman using "--new_tags"'}
-
-        # Add placeholder (use common action)
-        ii['out'] = 'con'
-        # Avoid recursion - use internal MLC add function to add the script
-        # artifact
-        ii['common'] = True
-
-        # Check template path
-        template_dir = 'template'
-
-        template = i.get('template', '')
-
-        if template == '':
-            if i.get('python', False):
-                template = 'python'
-            elif i.get('pytorch', False):
-                template = 'pytorch'
-
-        if template != '':
-            template_dir += '-' + template
-
-        template_path = os.path.join(self.path, template_dir)
-
-        if not os.path.isdir(template_path):
-            return {'return': 1, 'error': 'template path {} not found'.format(
-                template_path)}
-
-        # Check if preloaded meta exists
-        meta = {
-            'cache': False
-            # 20240127: Grigori commented that because newly created script meta looks ugly
-            #                 'new_env_keys':[],
-            #                 'new_state_keys':[],
-            #                 'input_mapping':{},
-            #                 'docker_input_mapping':{},
-            #                 'deps':[],
-            #                 'prehook_deps':[],
-            #                 'posthook_deps':[],
-            #                 'post_deps':[],
-            #                 'versions':{},
-            #                 'variations':{},
-            #                 'input_description':{}
-        }
-
-        fmeta = os.path.join(
-            template_path,
-            self.action_object.cfg['file_cmeta'])
-
-        r = utils.load_yaml_and_json(fmeta)
-        if r['return'] == 0:
-            utils.merge_dicts({'dict1': meta,
-                               'dict2': r['meta'],
-                               'append_lists': True,
-                               'append_unique': True})
-
-        # Check meta from CMD
-        xmeta = i.get('meta', {})
-
-        if len(xmeta) > 0:
-            utils.merge_dicts({'dict1': meta, 'dict2': xmeta,
-                              'append_lists': True, 'append_unique': True})
-
-        meta['automation_alias'] = self.meta['alias']
-        meta['automation_uid'] = self.meta['uid']
-        meta['tags'] = tags_list
-
-        script_name_base = script_name
-        script_name_ext = ''
-        if script_name != '':
-            # separate name and extension
-            j = script_name.rfind('.')
-            if j >= 0:
-                script_name_base = script_name[:j]
-                script_name_ext = script_name[j:]
-
-            meta['script_name'] = script_name_base
-
-        ii['meta'] = meta
-        ii['action'] = 'add'
-
-        use_yaml = True if not i.get('json', False) else False
-
-        if use_yaml:
-            ii['yaml'] = True
-
-        ii['automation'] = 'script,5b4e0237da074764'
-
-        for k in ['parsed_automation', 'parsed_artifact']:
-            if k in ii:
-                del ii[k]
-
-        if artifact_repo is not None:
-            ii['artifact'] = utils.assemble_object2(
-                artifact_repo) + ':' + utils.assemble_object2(artifact_obj)
-
-        r_obj = self.action_object.access(ii)
-        if r_obj['return'] > 0:
-            return r_obj
-
-        new_script_path = r_obj['path']
-
-        if console:
-            logger.info('Created script in {}'.format(new_script_path))
-
-        # Copy files from template (only if exist)
-        files = [
-            (template_path, 'README-extra.md', ''),
-            (template_path, 'customize.py', ''),
-            (template_path, 'main.py', ''),
-            (template_path, 'requirements.txt', ''),
-            (template_path, 'install_deps.bat', ''),
-            (template_path, 'install_deps.sh', ''),
-            (template_path, 'plot.bat', ''),
-            (template_path, 'plot.sh', ''),
-            (template_path, 'analyze.bat', ''),
-            (template_path, 'analyze.sh', ''),
-            (template_path, 'validate.bat', ''),
-            (template_path, 'validate.sh', '')
-        ]
-
-        if script_name == '':
-            files += [(template_path, 'run.bat', ''),
-                      (template_path, 'run.sh', '')]
-        else:
-            if script_name_ext == '.bat':
-                files += [(template_path, 'run.sh', script_name_base + '.sh')]
-                files += [('', script_name, script_name)]
-
-            else:
-                files += [(template_path, 'run.bat',
-                           script_name_base + '.bat')]
-                files += [('', script_name, script_name_base + '.sh')]
-
-        for x in files:
-            path = x[0]
-            f1 = x[1]
-            f2 = x[2]
-
-            if f2 == '':
-                f2 = f1
-
-            if path != '':
-                f1 = os.path.join(path, f1)
-
-            if os.path.isfile(f1):
-                f2 = os.path.join(new_script_path, f2)
-
-                if console:
-                    logger.info('  * Copying {} to {}'.format(f1, f2))
-
-                shutil.copyfile(f1, f2)
-
-        return r_obj
-
     ##########################################################################
+
     def _get_name_for_dynamic_variation_tag(script, variation_tag):
         '''
         Returns the variation name in meta for the dynamic_variation_tag
@@ -5101,6 +4867,17 @@ def _update_env(env, key=None, value=None):
     return {'return': 0}
 
 
+def docker_prune():
+    try:
+        # Run the docker prune command with -a (removes all unused images, not
+        # just dangling ones)
+        result = subprocess.run(["docker", "system", "prune", "-a", "-f"],
+                                capture_output=True, text=True, check=True)
+        print("Docker prune output:\n", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("Error while running Docker prune:\n", e.stderr)
+
+
 ##########################################################################
 def update_env_with_values(env, fail_on_not_found=False, extra_env=None):
     """
@@ -5565,29 +5342,54 @@ def run_postprocess(customize_code, customize_common_input, recursion_spaces,
 
 
 def get_script_name(env, path, script_name='run'):
-    """
-    Internal: find the most appropriate run script name for the detected OS
-    """
+    # Extract environment variables safely, defaulting to empty strings if
+    # missing
+    os_flavor = env.get('MLC_HOST_OS_FLAVOR', '')
+    os_flavor_like = env.get('MLC_HOST_OS_FLAVOR_LIKE', '')
+    os_type = env.get('MLC_HOST_OS_TYPE', '')
+    # Only use version if flavor exists
+    os_version = env.get('MLC_HOST_OS_VERSION', '') if os_flavor else ''
+    platform_flavor = env.get('MLC_HOST_PLATFORM_FLAVOR', '')
 
-    from os.path import exists
+    # Get a list of all files in the directory
+    try:
+        available_files = set(os.listdir(path))
+    except FileNotFoundError:
+        # Default if directory doesn't exist
+        return os.path.join(path, f"{script_name}.sh")
 
-    tmp_suff1 = env.get('MLC_HOST_OS_FLAVOR', '')
-    tmp_suff2 = env.get('MLC_HOST_OS_VERSION', '')
-    tmp_suff3 = env.get('MLC_HOST_PLATFORM_FLAVOR', '')
+    # Check if any script with a "script_name-" prefix exists
+    has_prefixed_scripts = any(f.startswith(
+        f"{script_name}-") for f in available_files)
 
-    if exists(os.path.join(path, script_name + '-' + tmp_suff1 +
-              '-' + tmp_suff2 + '-' + tmp_suff3 + '.sh')):
-        return script_name + '-' + tmp_suff1 + '-' + tmp_suff2 + '-' + tmp_suff3 + '.sh'
-    elif exists(os.path.join(path, script_name + '-' + tmp_suff1 + '-' + tmp_suff3 + '.sh')):
-        return script_name + '-' + tmp_suff1 + '-' + tmp_suff3 + '.sh'
-    elif exists(os.path.join(path, script_name + '-' + tmp_suff1 + '-' + tmp_suff2 + '.sh')):
-        return script_name + '-' + tmp_suff1 + '-' + tmp_suff2 + '.sh'
-    elif exists(os.path.join(path, script_name + '-' + tmp_suff1 + '.sh')):
-        return script_name + '-' + tmp_suff1 + '.sh'
-    elif exists(os.path.join(path, script_name + '-' + tmp_suff3 + '.sh')):
-        return script_name + '-' + tmp_suff3 + '.sh'
-    else:
-        return script_name + '.sh'
+    # Helper function to construct script filenames dynamically
+    def script_filename(*parts):
+        # Remove empty values to avoid extra '-'
+        suffix = "-".join(filter(None, parts))
+        return f"{script_name}-{suffix}.sh" if suffix else f"{script_name}.sh"
+
+    # Define file search order based on priority
+    candidates = [
+        script_filename(os_flavor, os_version, platform_flavor),
+        script_filename(os_flavor, os_version),
+        script_filename(os_flavor, platform_flavor),
+        script_filename(os_flavor),
+        script_filename(os_flavor_like, platform_flavor),
+        script_filename(os_flavor_like),
+        script_filename(os_type, platform_flavor),
+        script_filename(os_type),
+        script_filename(platform_flavor),
+    ]
+
+    # If prefixed scripts exist, check for the first matching candidate
+    if has_prefixed_scripts:
+        for candidate in candidates:
+            if candidate in available_files:
+                return os.path.join(path, candidate)
+
+    # Fallback to the default script
+    return os.path.join(path, f"{script_name}.sh")
+
 
 ##############################################################################
 

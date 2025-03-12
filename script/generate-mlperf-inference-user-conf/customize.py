@@ -480,6 +480,7 @@ def run_files_exist(mode, OUTPUT_DIR, run_files, env):
             if (
                 "result_validity" not in mlperf_log.get_keys()
                 or mlperf_log["result_validity"] != "VALID"
+                or "error_invalid_config" in mlperf_log.get_keys()
             ):
                 return False
 

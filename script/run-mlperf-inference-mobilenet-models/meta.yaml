@@ -159,13 +159,15 @@ variations:
     group: optimization
   use-neon:
     alias: neon
+
 tests:
   run_inputs:
   - env:
       MLC_TEST_ONE_RUN: 'yes'
-    variations_list: 
-    - tflite
-    - accuracy_only
+    variations_list:
+      - tflite,find-performance
     adr:
       compiler:
         tags: gcc
+      imagenet-preprocessed:
+        tags: _500

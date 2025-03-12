@@ -35,7 +35,7 @@ new_env_keys:
 - + LDFLAGS
 - +MLC_HOST_OS_DEFAULT_INCLUDE_PATH
 - +PATH
-post_depsq:
+post_deps_off:
 - tags: get,compiler-flags
 sort: 500
 tags:
@@ -43,3 +43,7 @@ tags:
 - get
 - aocc
 uid: 1ceb0656e99a44ec
+variations:
+  _path.#:
+    env:
+      MLC_AOCC_DIR_PATH: #

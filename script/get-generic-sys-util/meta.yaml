@@ -42,12 +42,14 @@ tests:
     fail_safe: 'yes'
     ignore_missing: 'yes'
     test-all-variations: 'yes'
+    docker_prune: 'yes'
   - docker: 'yes'
     docker_os: ubuntu
     docker_os_version: '24.04'
     fail_safe: 'yes'
     ignore_missing: 'yes'
     test-all-variations: 'yes'
+    docker_prune: 'yes'
 uid: bb0393afa8404a11
 variations:
   cmake:
@@ -108,6 +110,21 @@ variations:
         brew: ''
         dnf: ''   
         yum: ''
+  
+  libgl:
+    env:
+      MLC_SYS_UTIL_NAME: libgl # tbd: regular expression for version as well as whether its installed?
+      MLC_SYS_UTIL_CHECK_CMD: 'ldconfig -p | grep -i libgl.so.*' 
+    default_env:
+      MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: yes
+    new_env_keys:
+    - MLC_LIBGL_VERSION
+    state:
+      libgl: # tbd: complete for other flavours of linux
+        apt: libgl1
+        brew: ''
+        dnf: mesa-libGL   
+        yum: mesa-libGL
   libsm6:
     env:
       MLC_SYS_UTIL_NAME: libsm6 # tbd: regular expression for version as well as whether its installed?
@@ -693,7 +710,7 @@ variations:
   unzip:
     env:
       MLC_SYS_UTIL_NAME: unzip
-      MLC_SYS_UTIL_VERSION_CMD: unzip --version
+      MLC_SYS_UTIL_VERSION_CMD: unzip -v
     new_env_keys:
     - MLC_UNZIP_VERSION
     state:
@@ -743,6 +760,17 @@ variations:
       wkhtmltopdf:
         apt: wkhtmltopdf
         brew: wkhtmltopdf
+  xfonts-base:
+    env:
+      MLC_SYS_UTIL_NAME: xfonts_base
+    new_env_keys:
+    - MLC_XFONTS_BASE_VERSION
+    state:
+      xfonts_base:
+        apt: xfonts-base
+        dnf: xorg-x11-fonts-misc
+        yum: xorg-x11-fonts-misc
+        zypper: xorg-x11-fonts
   xz:
     env:
       MLC_SYS_UTIL_NAME: xz

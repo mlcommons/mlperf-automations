@@ -1,5 +1,4 @@
 name: "Check .md README files for broken links"
-
 on:
   pull_request: 
     branches: 
@@ -12,7 +11,6 @@ jobs:
     # check out the latest version of the code
     steps:
     - uses: actions/checkout@v4
-
 
     # Checks the status of hyperlinks in .md files in verbose mode
     - name: Check links

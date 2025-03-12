@@ -51,6 +51,7 @@ deps:
     MLC_IMAGENET_PREPROCESSED_PATH:
     - 'on'
   tags: mlperf,mlcommons,inference,source,src
+- tags: get,generic-sys-util,_libgl
 docker:
   run: false
 env:

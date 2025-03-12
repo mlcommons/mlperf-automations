@@ -1,0 +1,31 @@
+alias: get-one-api
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+category: Compiler automation
+clean_files: []
+deps:
+- tags: detect,os
+name: Detect or install OneAPI compiler
+new_env_keys:
+- MLC_ONEAPI_*
+- MLC_ONEAPI_COMPILER_*
+- MLC_COMPILER_*
+- MLC_LINKER_*
+
+input_mapping:
+  oneapi_dir: MLC_ONEAPI_DIR_PATH
+ 
+post_deps_off:
+- tags: get,compiler-flags
+sort: 500
+tags:
+- get
+- oneapi
+- compiler
+- get-oneapi
+uid: 1af872e81ef54742
+variations:
+  _path.#:
+    env:
+      MLC_ONEAPI_DIR_PATH: "#"
