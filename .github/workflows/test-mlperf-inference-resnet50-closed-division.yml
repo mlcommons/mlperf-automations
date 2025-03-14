@@ -3,7 +3,7 @@ name: MLPerf inference ResNet50 Closed Division for testing Compliance
 on:
   schedule:
     - cron: '0 0 * * 0' # Runs once a week on Sunday at 00:00 UTC
-  # workflow_dispatch: # Allows manual triggering of the workflow
+  workflow_dispatch: {} # Allows manual triggering of the workflow
 jobs:
   build:
     name: MLPerf inference MLCommons ResNet50 Closed Division
@@ -47,45 +47,16 @@ jobs:
       run: |
         mlc pull repo mlcommons@mlperf-automations --branch=dev         
 
-    - name: Test MLPerf Inference ResNet50 Offline (Windows)
+    - name: Test MLPerf Inference ResNet50 (Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        mlcr run-mlperf, inference, _submission, _short, scenario=Offline, --division=closed, --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }} x86" --model=resnet50 --adr.loadgen.tags=_from-pip --pip_loadgen=yes --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --test_query_count=1000 --quiet --execution_mode=valid
-    
-    - name: Test MLPerf Inference ResNet50 Singlestream (Windows)
-      if: matrix.os == 'windows-latest'
-      run: |
-          mlcr run-mlperf, inference, _submission, _short, scenario=SingleStream, --division=closed, --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }} x86" --model=resnet50 --adr.loadgen.tags=_from-pip --pip_loadgen=yes --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --test_query_count=1000 --quiet --execution_mode=valid --target_latency=10
-          
-    - name: Test MLPerf Inference ResNet50 Multistream (Windows)
-      if: matrix.os == 'windows-latest'
-      run: |
-            mlcr run-mlperf, inference, _submission, _short, scenario=MultiStream , --division=closed, --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }} x86" --model=resnet50 --adr.loadgen.tags=_from-pip --pip_loadgen=yes --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --quiet --execution_mode=valid --target_latency=10
-                  
-    - name: Compliance Test MLPerf Inference ResNet50 (Windows)
-      if: matrix.os == 'windows-latest'
-      run: mlcr run-mlperf, inference, _submission, _short,_all-scenarios, --division=closed, --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }} x86" --model=resnet50 --adr.loadgen.tags=_from-pip --pip_loadgen=yes --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --test_query_count=1000 --quiet --execution_mode=valid  --compliance=yes # mentioning only --compliance currently doesnt work needs to be --compliance=yes
-
+        mlcr run-mlperf,inference,_submission,_short,_all-scenarios --division=closed --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }} x86" --model=resnet50 --adr.loadgen.tags=_from-pip --pip_loadgen=yes --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --test_query_count=1000 --quiet --execution_mode=valid
+                      
     - name: Test MLPerf Inference ResNet50 Offline(Linux/macOS)
       if: matrix.os != 'windows-latest'
       run: |
-        mlcr run-mlperf, inference, _submission, _short, scenario=Offline, --division=closed --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }} x86" --model=resnet50 --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --test_query_count=1000 --quiet --execution_mode=valid 
-        
-    - name: Test MLPerf Inference ResNet50 SingleStream(Linux/macOS)
-      if: matrix.os != 'windows-latest'
-      run: |
-        mlcr run-mlperf, inference, _submission, _short, scenario=SingleStream, --division=closed --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }} x86" --model=resnet50 --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --quiet --execution_mode=valid --target_latency=10
-    
-    - name: Test MLPerf Inference ResNet50 MultiStream(Linux/macOS)
-      if: matrix.os != 'windows-latest'
-      run: |
-        mlcr run-mlperf, inference, _submission, _short, scenario=MultiStream, --division=closed --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }} x86" --model=resnet50 --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --quiet --execution_mode=valid --target_latency=10
-              
-    - name: Compliance Test MLPerf Inference ResNet50 (Linux/macOS)
-      if: matrix.os != 'windows-latest'
-      run: |
-        mlcr run-mlperf, inference, _submission, _short, _all-scenarios --division=closed, --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }} x86" --model=resnet50 --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --test_query_count=1000 -v --quiet --execution_mode=valid  --compliance=yes        
-        
+        mlcr run-mlperf,inference,_submission,_short,_all-scenarios --division=closed --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }} x86" --model=resnet50 --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --test_query_count=1000 --quiet --execution_mode=valid 
+                
     # Step for Linux/MacOS
     - name: Randomly Execute Step (Linux/MacOS)
       if: runner.os != 'Windows'
