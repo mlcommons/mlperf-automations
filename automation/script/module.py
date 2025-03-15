@@ -460,11 +460,11 @@ class ScriptAutomation(Automation):
         # Add permanent env from OS (such as MLC_WINDOWS:"yes" on Windows)
         env_from_os_info = os_info.get('env', {})
         if len(env_from_os_info) > 0:
-            #env.update(env_from_os_info)
+            # env.update(env_from_os_info)
             utils.merge_dicts({'dict1': env,
-                                'dict2': env_from_os_info,
-                                'append_lists': True,
-                                'append_unique': True})
+                               'dict2': env_from_os_info,
+                               'append_lists': True,
+                               'append_unique': True})
 
         # take some env from the user environment
         keys = [
