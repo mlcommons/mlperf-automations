@@ -92,6 +92,8 @@ def preprocess(i):
 
         if env.get('MLC_DOWNLOAD_PATH', '') != '':
             download_path = env['MLC_DOWNLOAD_PATH']
+            if os.path.isfile(download_path):
+                download_path = os.path.dirname(download_path)
             if not os.path.exists(download_path):
                 os.makedirs(download_path, exist_ok=True)
             os.chdir(download_path)

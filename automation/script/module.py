@@ -1852,6 +1852,10 @@ class ScriptAutomation(Automation):
                 import json
                 logger.debug(json.dumps(env, indent=2, sort_keys=True))
 
+            r = update_env_with_values(env)
+            if r['return'] > 0:
+                return r
+
             # Check chain of pre hook dependencies on other MLC scripts
             if len(prehook_deps) > 0:
                 logger.debug(
@@ -4812,11 +4816,6 @@ def enable_or_skip_script(meta, env):
     Internal: enable a dependency based on enable_if_env and skip_if_env meta information
     (AND function)
     """
-
-    if not isinstance(meta, dict):
-        logger.warn(
-            "The meta entry is not a dictionary for skip/enable if_env: %s",
-            meta)
 
     for key in meta:
         meta_key = [str(v).lower() for v in meta[key]]
