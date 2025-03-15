@@ -11,6 +11,8 @@ def preprocess(i):
 
     env = i['env']
 
+    q = '"' if os_info['platform'] == 'windows' else "'"
+
     clang_file_name = "clang"
     extra_cmake_options = ''
 
@@ -27,22 +29,21 @@ def preprocess(i):
         # env['USE_LLVM'] = install_prefix
         # env['LLVM_DIR'] = os.path.join(env['USE_LLVM'], "lib", "cmake", "llvm")
     else:
-        if env.get('MLC_LLVM_ENABLE_RUNTIMES', '') != '':
-            enable_runtimes = env['MLC_LLVM_ENABLE_RUNTIMES'].replace(":", ";")
+        if env.get('+MLC_LLVM_ENABLE_RUNTIMES', '') != '':
+            enable_runtimes = ";".join(env['+MLC_LLVM_ENABLE_RUNTIMES'])
         else:
             enable_runtimes = ''
 
-        if env.get('MLC_LLVM_ENABLE_PROJECTS', '') != '':
-            enable_projects = env['MLC_LLVM_ENABLE_PROJECTS'].replace(":", ";")
+        if env.get('+MLC_LLVM_ENABLE_PROJECTS', '') != '':
+            enable_projects = ";".join(env['+MLC_LLVM_ENABLE_PROJECTS'])
         else:
             enable_projects = ''
 
         llvm_build_type = env['MLC_LLVM_BUILD_TYPE']
 
-        cmake_cmd = "cmake " + os.path.join(env["MLC_LLVM_SRC_REPO_PATH"], "llvm") + " -GNinja -DCMAKE_BUILD_TYPE=" + llvm_build_type + " -DLLVM_ENABLE_PROJECTS=" + enable_projects + " -DLLVM_ENABLE_RUNTIMES='" + \
-            enable_runtimes + "' -DCMAKE_INSTALL_PREFIX=" + install_prefix + \
-            " -DLLVM_ENABLE_RTTI=ON  -DLLVM_INSTALL_UTILS=ON -DLLVM_TARGETS_TO_BUILD=X86 " + \
-            extra_cmake_options
+        targets_to_buuild = env.get('MLC_LLVM_TARGETS_TO_BUILD', 'X86')
+
+        cmake_cmd = f"""cmake {os.path.join(env["MLC_LLVM_SRC_REPO_PATH"], "llvm")} -GNinja -DCMAKE_BUILD_TYPE={llvm_build_type } -DLLVM_ENABLE_PROJECTS={q}{enable_projects}{q} -DLLVM_ENABLE_RUNTIMES={q}{enable_runtimes}{q} -DCMAKE_INSTALL_PREFIX={q}{install_prefix} -DLLVM_ENABLE_RTTI=ON  -DLLVM_INSTALL_UTILS=ON -DLLVM_TARGETS_TO_BUILD={targets_to_build} {extra_cmake_options}"""
 
         env['MLC_LLVM_CMAKE_CMD'] = cmake_cmd
 

@@ -37,6 +37,8 @@ def preprocess(i):
     # later if cache is cleaned)
     extract_path = env.get('MLC_EXTRACT_PATH', '')
     if extract_path != '':
+        if os.path.isfile(extract_path):
+            extract_path = os.path.dirname(extract_path)
         if not os.path.exists(extract_path):
             os.makedirs(extract_path, exist_ok=True)
 

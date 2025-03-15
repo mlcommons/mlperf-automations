@@ -4789,11 +4789,6 @@ def enable_or_skip_script(meta, env):
     (AND function)
     """
 
-    if not isinstance(meta, dict):
-        logger.warn(
-            "The meta entry is not a dictionary for skip/enable if_env: %s",
-            meta)
-
     for key in meta:
         meta_key = [str(v).lower() for v in meta[key]]
         if key in env:
