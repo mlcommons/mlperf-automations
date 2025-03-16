@@ -760,6 +760,7 @@ variations:
       wkhtmltopdf:
         apt: wkhtmltopdf
         brew: wkhtmltopdf
+        choco: wkhtmltopdf
   xfonts-base:
     env:
       MLC_SYS_UTIL_NAME: xfonts_base
