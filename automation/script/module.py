@@ -2593,6 +2593,7 @@ class ScriptAutomation(Automation):
                         variation_name = self._get_name_for_dynamic_variation_tag(
                             variation_name)
 
+                    # TODO: Move this to a function and apply it for combination of variations too
                     # base variations are automatically turned on. Only
                     # variations outside of any variation group can be added as
                     # a base_variation
