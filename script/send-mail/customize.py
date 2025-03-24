@@ -10,7 +10,6 @@ def preprocess(i):
 
     os_info = i['os_info']
 
-
     # Start constructing the argument string
     args = f"--subject \"{env.get('MLC_EMAIL_SUBJECT', '')}\" "
 
