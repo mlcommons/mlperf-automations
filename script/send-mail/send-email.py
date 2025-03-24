@@ -22,6 +22,7 @@ def send_email(subject, to_addresses, cc_addresses, bcc_addresses, content_file,
     else:
         email_content = ''
 
+
     msg = MIMEMultipart()
     msg['From'] = email if use_smtp_server else 'localhost'
     msg['To'] = COMMASPACE.join(to_list)
@@ -33,6 +34,7 @@ def send_email(subject, to_addresses, cc_addresses, bcc_addresses, content_file,
     for attachment in attachment_list:
         if attachment.strip() == '':
             continue
+
         with open(attachment, 'rb') as file:
             part = MIMEBase('application', 'octet-stream')
             part.set_payload(file.read())
@@ -89,6 +91,7 @@ if __name__ == '__main__':
         type=str,
         nargs='?',
         default='',
+
         help='Attachments, comma-separated file paths')
 
     parser.add_argument(

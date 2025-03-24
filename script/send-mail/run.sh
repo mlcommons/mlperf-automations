@@ -14,4 +14,5 @@ function run() {
 }
 
 #Add your run commands here...
+
 run "$MLC_RUN_CMD"

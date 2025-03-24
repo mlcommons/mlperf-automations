@@ -34,7 +34,6 @@ def preprocess(i):
 
     env['MLC_RUN_CMD'] = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(env['MLC_TMP_CURRENT_SCRIPT_PATH'], 'send-email.py')} {args}"""
 
-    print(env)
     return {'return': 0}
 
 
