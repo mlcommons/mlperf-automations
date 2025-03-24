@@ -16,8 +16,11 @@ def send_email(subject, to_addresses, cc_addresses, bcc_addresses, content_file,
     bcc_list = bcc_addresses.split(',')
     attachment_list = attachments.split(',')
 
-    with open(content_file, 'r') as file:
-        email_content = file.read()
+    if content_file and os.path.exists(content_file):
+        with open(content_file, 'r') as file:
+            email_content = file.read()
+    else:
+        email_content=''
 
     msg = MIMEMultipart()
     msg['From'] = email if use_smtp_server else 'localhost'
@@ -28,6 +31,8 @@ def send_email(subject, to_addresses, cc_addresses, bcc_addresses, content_file,
     msg.attach(MIMEText(email_content, 'plain'))
 
     for attachment in attachment_list:
+        if attachment.strip() == '':
+            continue
         with open(attachment, 'rb') as file:
             part = MIMEBase('application', 'octet-stream')
             part.set_payload(file.read())
@@ -56,26 +61,34 @@ def send_email(subject, to_addresses, cc_addresses, bcc_addresses, content_file,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Send an email with specified attachments')
-    parser.add_argument('subject', type=str, help='Email subject')
+    parser.add_argument('--subject', type=str, help='Email subject')
     parser.add_argument(
-        'to_addresses',
+        '--to_addresses',
         type=str,
         help='To addresses, comma-separated')
     parser.add_argument(
-        'cc_addresses',
+        '--cc_addresses',
         type=str,
+        nargs='?',
+        default='',
         help='CC addresses, comma-separated')
     parser.add_argument(
-        'bcc_addresses',
+        '--bcc_addresses',
         type=str,
+        nargs='?',
+        default='',
         help='BCC addresses, comma-separated')
     parser.add_argument(
-        'content_file',
+        '--content_file',
         type=str,
+        nargs='?',
+        default='',
         help='File containing email content')
     parser.add_argument(
-        'attachments',
+        '--attachments',
         type=str,
+        nargs='?',
+        default='',
         help='Attachments, comma-separated file paths')
 
     parser.add_argument(
@@ -85,10 +98,14 @@ if __name__ == '__main__':
     parser.add_argument(
         '--email',
         type=str,
+        default='',
+        nargs='?',
         help='Email address for SMTP server')
     parser.add_argument(
         '--password',
         type=str,
+        default='',
+        nargs='?',
         help='Password for SMTP server')
     parser.add_argument('--smtp_server', type=str, help='SMTP server address')
 

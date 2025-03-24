@@ -14,5 +14,4 @@ function run() {
 }
 
 #Add your run commands here...
-MLC_RUN_CMD="${MLC_PYTHON_BIN_WITH_PATH} ${MLC_TMP_CURRENT_SCRIPT_PATH}/send-email.py"
 run "$MLC_RUN_CMD"
