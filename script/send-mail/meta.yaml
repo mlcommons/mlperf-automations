@@ -1,0 +1,18 @@
+alias: send-mail
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: Utils
+deps:
+  - tags: get,generic-sys-util,_postfix
+    enable_if_env:
+      MLC_HOST_OS_FLAVOR:
+      - ubuntu
+new_env_keys: []
+new_state_keys: []
+post_deps: []
+posthook_deps: []
+prehook_deps: []
+tags:
+- generic
+- template
+uid: 5f9b9654ecbe4662
