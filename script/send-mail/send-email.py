@@ -22,7 +22,6 @@ def send_email(subject, to_addresses, cc_addresses, bcc_addresses, content_file,
     else:
         email_content = ''
 
-
     msg = MIMEMultipart()
     msg['From'] = email if use_smtp_server else 'localhost'
     msg['To'] = COMMASPACE.join(to_list)
