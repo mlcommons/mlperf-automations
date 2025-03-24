@@ -1,0 +1,50 @@
+name: Build wheel and release into PYPI
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch: {}
+
+jobs:
+
+  build_wheels:
+    if: github.repository_owner == 'mlcommons'
+    name: Build wheel
+    runs-on: ubuntu-latest
+    environment: release
+
+    permissions:
+      id-token: write
+      contents: write
+
+    strategy:
+      fail-fast: false
+    steps:
+      # Step : Checkout the code
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+          ref: ${{ github.ref_name }}
+
+      # Step : Set up Python
+      - uses: actions/setup-python@v3
+
+      # Step : Install required dependencies
+      - name: Install requirements
+        run: python3 -m pip install setuptools wheel build
+
+      # Step : Build the Python wheel
+      - name: Build wheels
+        working-directory: ./
+        run: python3 -m build && rm dist/*.whl
+
+      # Step : Publish to PyPI
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          verify-metadata: true
+          skip-existing: true
+          packages-dir: dist
+          repository-url: https://upload.pypi.org/legacy/
+          verbose: true

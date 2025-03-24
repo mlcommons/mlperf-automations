@@ -1,9 +1,6 @@
 name: Build wheel and release into PYPI
 
-on:
-  release:
-    types: [published]
-    
+on: 
   push:
     branches:
       - dev_off
