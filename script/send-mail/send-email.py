@@ -20,7 +20,7 @@ def send_email(subject, to_addresses, cc_addresses, bcc_addresses, content_file,
         with open(content_file, 'r') as file:
             email_content = file.read()
     else:
-        email_content=''
+        email_content = ''
 
     msg = MIMEMultipart()
     msg['From'] = email if use_smtp_server else 'localhost'

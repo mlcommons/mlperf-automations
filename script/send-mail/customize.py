@@ -13,13 +13,11 @@ def preprocess(i):
     # Start constructing the argument string
     args = f"--subject '{env.get('MLC_EMAIL_SUBJECT', '')}' "
 
-
     # Process other arguments
     args += f"--to_addresses '{env.get('MLC_EMAIL_TO_ADDRESSES', '')}' "
     args += f"--cc_addresses '{env.get('MLC_EMAIL_CC_ADDRESSES', '')}' "
     args += f"--bcc_addresses '{env.get('MLC_EMAIL_BCC_ADDRESSES', '')}' "
     args += f"--content_file '{env.get('MLC_EMAIL_CONTENT_FILE', '')}' "
-
 
     # Process attachments
     args += f"--attachments '{env.get('MLC_EMAIL_ATTACHMENTS', '')}'"
