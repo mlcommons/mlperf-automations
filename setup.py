@@ -82,7 +82,7 @@ class CustomInstallCommand(install):
                               })
 
             if res['return'] > 0:
-                return Exception(
+                raise Exception(
                     f"Return code:{res['return']} with error:{res.get('error')}")
 
             # subprocess.run(["echo", "Custom command executed!"], check=True)
