@@ -42,7 +42,7 @@ def preprocess(i):
 
 
 def detect_version(i):
-    r = i['automation'].parse_version({'match_text': r'AMD\s+clang\sversion\s([\d.]+)',
+    r = i['automation'].parse_version({'match_text': r'CLANG:\sAOCC_([\d.]+-Build#[\d]+)',
                                        'group_number': 1,
                                        'env_key': 'MLC_AOCC_VERSION',
                                        'which_env': i['env']})
