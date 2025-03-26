@@ -24,9 +24,11 @@ def get_project_meta(file_path="pyproject.toml"):
         with open(file_path, "r") as f:
             content_tmp = f.read()
             if 'tomllib' in globals():
-                project_data = tomllib.loads(content_tmp)  # Use tomllib for Python 3.11+
+                # Use tomllib for Python 3.11+
+                project_data = tomllib.loads(content_tmp)
             else:
-                project_data = toml.loads(content_tmp)  # Use toml for older versions
+                # Use toml for older versions
+                project_data = toml.loads(content_tmp)
 
         # Extract metadata under [project]
         project_meta = project_data.get("project", {})
@@ -78,9 +80,10 @@ class CustomInstallCommand(install):
                               'branch': branch,
                               # 'checkout': commit_hash
                               })
-            
+
             if res['return'] > 0:
-                return Exception(f"Return code:{res['return']} with error:{res.get('error')}")
+                return Exception(
+                    f"Return code:{res['return']} with error:{res.get('error')}")
 
             # subprocess.run(["echo", "Custom command executed!"], check=True)
         except Exception as e:
