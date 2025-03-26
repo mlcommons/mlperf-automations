@@ -42,7 +42,7 @@ def get_project_meta(file_path="pyproject.toml"):
 
 
 def check_prerequisites():
-    """Check if Git and python-venv are installed on the system."""
+    """Check if Git and python-venv are installed on the system. """
     try:
         # Check for Git
         subprocess.run(["git", "--version"], check=True,
