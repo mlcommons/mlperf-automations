@@ -1,0 +1,21 @@
+alias: parse-dmidecode-memory-info
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: MLC Utils
+deps:
+  - tags: get,generic-python-lib,_package.dmiparser
+new_env_keys:
+  - MLC_MEMINFO_OUTFILE
+input_mapping:
+  input: MLC_MEMINFO_FILE
+  output: MLC_MEMINFO_OUTFILE
+new_state_keys: []
+post_deps: []
+posthook_deps: []
+prehook_deps: []
+tags:
+- dmidecode
+- parse
+- memory
+- info
+uid: 1a6be59b1e564fbf

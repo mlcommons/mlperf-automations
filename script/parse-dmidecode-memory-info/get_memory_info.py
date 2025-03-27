@@ -1,8 +1,15 @@
 import os
 import json
+import argparse
 from dmiparser import DmiParser
 
-with open("meminfo.out", "r") as f:
+# Adding argument parser
+parser = argparse.ArgumentParser(description='Process meminfo and output MLC_HOST_MEM_INFO.')
+parser.add_argument("input_file", help="Path to the input file (e.g. meminfo.out)")
+parser.add_argument("output_file", help="Path to the output file (e.g. tmp-run-env.out)")
+args = parser.parse_args()
+
+with open(args.input_file, "r") as f:
     text = f.read()
     parser = DmiParser(text, sort_keys=True, indent=4)
 
@@ -57,5 +64,5 @@ with open("meminfo.out", "r") as f:
         meminfo.append("; ".join(item['info']))
 
     meminfo_string = ",   ".join(meminfo)
-    with open("tmp-run-env.out", "w") as f:
-        f.write(f"MLC_HOST_MEM_INFO={meminfo_string}")
+    with open(args.output_file, "w") as f:
+        f.write(meminfo_string)
