@@ -2,7 +2,7 @@ from mlc import utils
 import os
 import json
 import shutil
-
+from utils import *
 
 def preprocess(i):
     env = i['env']
@@ -41,6 +41,8 @@ def preprocess(i):
     sut_desc_path = env['MLC_MLPERF_INFERENCE_SUT_DESC_PATH']
 
     sut_path = os.path.join(sut_desc_path, "suts", sut + ".json")
+    env['MLC_SUT_PATH'] = sut_path
+
     if os.path.exists(sut_path) and env.get('MLC_SUT_DESC_CACHE', '') == "yes":
         print(f"Reusing SUT description file {sut}")
         state['MLC_SUT_META'] = json.load(open(sut_path))
@@ -168,18 +170,11 @@ def preprocess(i):
 
         if env.get('MLC_SUDO_USER', '') == "yes" and env.get(
                 'MLC_HOST_OS_TYPE', 'linux'):
+            env['MLC_MEMINFO_FILE'] = os.path.join(os.getcwd(), 'meminfo.dump')
             r = i['automation'].run_native_script(
                 {'run_script_input': i['run_script_input'], 'env': env, 'script_name': 'detect_memory'})
             if r['return'] > 0:
                 return r
-            if env.get('MLC_HOST_MEM_INFO', '') != '':
-                state['MLC_SUT_META']['host_memory_configuration'] = env['MLC_HOST_MEM_INFO']
-
-        state['MLC_SUT_META'] = dict(sorted(state['MLC_SUT_META'].items()))
-
-        sut_file = open(sut_path, "w")
-        json.dump(state['MLC_SUT_META'], sut_file, indent=4)
-        sut_file.close()
 
     return {'return': 0}
 
@@ -187,5 +182,19 @@ def preprocess(i):
 def postprocess(i):
 
     env = i['env']
+    state = i['state']
 
+    if env.get('MLC_MEMINFO_OUTFILE', '') != '' and os.path.exists(env['MLC_MEMINFO_OUTFILE']):
+        with open(env['MLC_MEMINFO_OUTFILE'], "r") as f:
+            data = f.read()
+        state['MLC_SUT_META']['host_memory_configuration'] = data
+
+    state['MLC_SUT_META'] = dict(sorted(state['MLC_SUT_META'].items()))
+
+    sut_path = env['MLC_SUT_PATH']
+
+    sut_file = open(sut_path, "w")
+    json.dump(state['MLC_SUT_META'], sut_file, indent=4)
+    sut_file.close()
+    
     return {'return': 0}

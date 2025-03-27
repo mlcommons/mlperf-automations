@@ -1860,6 +1860,7 @@ class ScriptAutomation(Automation):
 
                 run_script_input['meta'] = meta
                 run_script_input['env'] = env
+                run_script_input['state'] = state
                 run_script_input['run_state'] = run_state
                 run_script_input['recursion'] = recursion
 
