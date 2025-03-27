@@ -4,6 +4,7 @@ import json
 import shutil
 from utils import *
 
+
 def preprocess(i):
     env = i['env']
     state = i['state']
@@ -184,7 +185,8 @@ def postprocess(i):
     env = i['env']
     state = i['state']
 
-    if env.get('MLC_MEMINFO_OUTFILE', '') != '' and os.path.exists(env['MLC_MEMINFO_OUTFILE']):
+    if env.get('MLC_MEMINFO_OUTFILE', '') != '' and os.path.exists(
+            env['MLC_MEMINFO_OUTFILE']):
         with open(env['MLC_MEMINFO_OUTFILE'], "r") as f:
             data = f.read()
         state['MLC_SUT_META']['host_memory_configuration'] = data
@@ -196,5 +198,5 @@ def postprocess(i):
     sut_file = open(sut_path, "w")
     json.dump(state['MLC_SUT_META'], sut_file, indent=4)
     sut_file.close()
-    
+
     return {'return': 0}

@@ -4,9 +4,14 @@ import argparse
 from dmiparser import DmiParser
 
 # Adding argument parser
-parser = argparse.ArgumentParser(description='Process meminfo and output MLC_HOST_MEM_INFO.')
-parser.add_argument("input_file", help="Path to the input file (e.g. meminfo.out)")
-parser.add_argument("output_file", help="Path to the output file (e.g. tmp-run-env.out)")
+parser = argparse.ArgumentParser(
+    description='Process meminfo and output MLC_HOST_MEM_INFO.')
+parser.add_argument(
+    "input_file",
+    help="Path to the input file (e.g. meminfo.out)")
+parser.add_argument(
+    "output_file",
+    help="Path to the output file (e.g. tmp-run-env.out)")
 args = parser.parse_args()
 
 with open(args.input_file, "r") as f:
