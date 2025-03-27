@@ -6,6 +6,7 @@ can_force_cache: true
 category: DevOps automation
 default_env:
   MLC_RCLONE_COPY_USING: sync
+  MLC_EXTRACT_REMOVE_EXTRACTED: no
 deps:
 - tags: detect,os
 - enable_if_env:
@@ -40,9 +41,11 @@ tags_help: download file
 uid: 9cdc8dc41aae437e
 variations:
   cmutil:
+    alias: mlcutil
+  mlcutil:
     default: true
     env:
-      MLC_DOWNLOAD_TOOL: cmutil
+      MLC_DOWNLOAD_TOOL: mlcutil
     group: download-tool
   curl:
     default_env:

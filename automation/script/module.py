@@ -473,7 +473,11 @@ class ScriptAutomation(Automation):
         # Add permanent env from OS (such as MLC_WINDOWS:"yes" on Windows)
         env_from_os_info = os_info.get('env', {})
         if len(env_from_os_info) > 0:
-            env.update(env_from_os_info)
+            # env.update(env_from_os_info)
+            utils.merge_dicts({'dict1': env,
+                               'dict2': env_from_os_info,
+                               'append_lists': True,
+                               'append_unique': True})
 
         # take some env from the user environment
         keys = [
@@ -845,7 +849,10 @@ class ScriptAutomation(Automation):
         script_item_env = meta.get('env', {})
         # print(f"script meta env= {script_item_env}")
 
-        env.update(script_item_env)
+        utils.merge_dicts({'dict1': env,
+                           'dict2': script_item_env,
+                           'append_lists': True,
+                           'append_unique': True})
         # print(f"env = {env}")
 
         script_item_state = meta.get('state', {})
@@ -1877,6 +1884,7 @@ class ScriptAutomation(Automation):
 
                 run_script_input['meta'] = meta
                 run_script_input['env'] = env
+                run_script_input['state'] = state
                 run_script_input['run_state'] = run_state
                 run_script_input['recursion'] = recursion
 
@@ -1941,8 +1949,7 @@ class ScriptAutomation(Automation):
         # Finalize script
 
         # Force consts in the final new env and state
-        utils.merge_dicts({'dict1': env, 'dict2': const,
-                          'append_lists': True, 'append_unique': True})
+        env.update(const)
         utils.merge_dicts({'dict1': state,
                            'dict2': const_state,
                            'append_lists': True,
@@ -2618,6 +2625,7 @@ class ScriptAutomation(Automation):
                         variation_name = self._get_name_for_dynamic_variation_tag(
                             variation_name)
 
+                    # TODO: Move this to a function and apply it for combination of variations too
                     # base variations are automatically turned on. Only
                     # variations outside of any variation group can be added as
                     # a base_variation
@@ -3504,7 +3512,7 @@ class ScriptAutomation(Automation):
                     if r['return'] > 0:
                         return r
 
-                    # Update env/state with cost
+                    # Update env/state with const
                     env.update(const)
                     utils.merge_dicts({'dict1': state,
                                        'dict2': const_state,
@@ -4747,6 +4755,9 @@ def find_cached_script(i):
                     r = docker_utils.get_container_path_script(i)
                     if not os.path.exists(r['value_env']):
                         # Need to rm this cache entry
+                        logger.debug(
+                            recursion_spaces +
+                            '  - Skipping cached entry as the dependent path {} is missing!'.format(r['value_env']))
                         skip_cached_script = True
                         continue
 
@@ -5080,10 +5091,7 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
             'return': 16, 'error': 'script {} not found - please add one'.format(path_to_run_script)}
 
     # Update env and state with const
-    utils.merge_dicts({'dict1': env,
-                       'dict2': const,
-                       'append_lists': True,
-                       'append_unique': True})
+    env.update(const)
     utils.merge_dicts({'dict1': state, 'dict2': const_state,
                       'append_lists': True, 'append_unique': True})
 
@@ -5310,8 +5318,7 @@ def run_detect_version(customize_code, customize_common_input,
             logger.debug(recursion_spaces + '  - Running detect_version ...')
 
         # Update env and state with const
-        utils.merge_dicts({'dict1': env, 'dict2': const,
-                          'append_lists': True, 'append_unique': True})
+        env.update(const)
         utils.merge_dicts({'dict1': state,
                            'dict2': const_state,
                            'append_lists': True,
@@ -5341,8 +5348,7 @@ def run_postprocess(customize_code, customize_common_input, recursion_spaces,
             logger.debug(recursion_spaces + '  - Running postprocess ...')
 
         # Update env and state with const
-        utils.merge_dicts({'dict1': env, 'dict2': const,
-                          'append_lists': True, 'append_unique': True})
+        env.update(const)
         utils.merge_dicts({'dict1': state,
                            'dict2': const_state,
                            'append_lists': True,
@@ -5774,7 +5780,8 @@ def update_state_from_meta(meta, env, state, const, const_state, deps, post_deps
         env.setdefault(key, default_env[key])
 
     update_env = meta.get('env', {})
-    env.update(update_env)
+    utils.merge_dicts({'dict1': env, 'dict2': update_env,
+                      'append_lists': True, 'append_unique': True})
 
     update_meta_if_env = meta.get('update_meta_if_env', [])
     update_meta_if_env_from_state = run_state.get('update_meta_if_env', [])

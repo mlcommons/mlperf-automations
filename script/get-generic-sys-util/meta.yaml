@@ -602,6 +602,14 @@ variations:
         brew: pkg-config
         dnf: pkg-config
         yum: pkg-config
+  postfix:
+    env:
+      MLC_SYS_UTIL_NAME: postfix
+    new_env_keys:
+    - MLC_POSTFIX_VERSION
+    state:
+      postfix:
+        apt: postfix
   psmisc:
     env:
       MLC_SYS_UTIL_NAME: psmisc
@@ -760,6 +768,7 @@ variations:
       wkhtmltopdf:
         apt: wkhtmltopdf
         brew: wkhtmltopdf
+        choco: wkhtmltopdf
   xfonts-base:
     env:
       MLC_SYS_UTIL_NAME: xfonts_base

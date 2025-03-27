@@ -76,7 +76,7 @@ def preprocess(i):
         print('')
         print('Downloading from {}'.format(url))
 
-        if '&' in url and tool != "cmutil":
+        if '&' in url and tool != "mlcutil":
             if os_info['platform'] == 'windows':
                 url = '"' + url + '"'
             else:
@@ -112,8 +112,8 @@ def preprocess(i):
             else:
                 env['MLC_DOWNLOAD_FILENAME'] = "index.html"
 
-        if tool == "cmutil":
-            cmutil_require_download = 0
+        if tool == "mlcutil":
+            mlcutil_require_download = 0
             if env.get('MLC_DOWNLOAD_CHECKSUM_FILE', '') != '':
                 if os_info['platform'] == 'windows':
                     checksum_cmd = f"cd {q}{filepath}{q} {xsep}  md5sum -c{x_c} {x}{escape_special_chars(env['MLC_DOWNLOAD_CHECKSUM_FILE'])}"
@@ -126,7 +126,7 @@ def preprocess(i):
                     text=True,
                     shell=True,
                     env=subprocess_env)
-            elif env.get('MLC_DOWNLOAD_CHECKSUM', '') != '':
+            elif env.get('MLC_DOWNLOAD_CHECKSUM', '') != '' and os.path.isfile(env['MLC_DOWNLOAD_FILENAME']):
                 if os_info['platform'] == 'windows':
                     checksum_cmd = f"echo {env.get('MLC_DOWNLOAD_CHECKSUM')} {x}{escape_special_chars(env['MLC_DOWNLOAD_FILENAME'])} | md5sum -c{x_c} -"
                 else:
@@ -137,8 +137,8 @@ def preprocess(i):
                     text=True,
                     shell=True,
                     env=subprocess_env)
-            if env.get('MLC_DOWNLOAD_CHECKSUM_FILE', '') != '' or env.get(
-                    'MLC_DOWNLOAD_CHECKSUM', '') != '':
+            if (env.get('MLC_DOWNLOAD_CHECKSUM_FILE', '') != '' or env.get(
+                    'MLC_DOWNLOAD_CHECKSUM', '') != '') and os.path.isfile(env['MLC_DOWNLOAD_FILENAME']):
                 # print(checksum_result) #for debugging
                 if "checksum did not match" in checksum_result.stderr.lower():
                     computed_checksum = subprocess.run(
@@ -155,10 +155,10 @@ def preprocess(i):
                     except PermissionError:
                         return {
                             "return": 1, "error": f"Permission denied to delete file {env['MLC_DOWNLOAD_FILENAME']}."}
-                    cmutil_require_download = 1
+                    mlcutil_require_download = 1
                 elif "no such file" in checksum_result.stderr.lower():
-                    # print(f"No file {env['MLC_DOWNLOAD_FILENAME']}. Downloading through cmutil.")
-                    cmutil_require_download = 1
+                    # print(f"No file {env['MLC_DOWNLOAD_FILENAME']}. Downloading through mlcutil.")
+                    mlcutil_require_download = 1
                 elif checksum_result.returncode > 0:
                     return {
                         "return": 1, "error": f"Error while checking checksum: {checksum_result.stderr}"}
@@ -166,10 +166,9 @@ def preprocess(i):
                     print(
                         f"File {env['MLC_DOWNLOAD_FILENAME']} already present, original checksum and computed checksum matches! Skipping Download..")
             else:
-                cmutil_require_download = 1
+                mlcutil_require_download = 1
 
-            if cmutil_require_download == 1:
-                cm = automation.action_object
+            if mlcutil_require_download == 1:
                 for i in range(1, 5):
                     r = download_file({
                         'url': url,

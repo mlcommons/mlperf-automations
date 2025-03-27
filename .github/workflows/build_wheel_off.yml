@@ -1,15 +1,11 @@
-name: Build wheel and release into PYPI
+name: Build wheel and release into PYPI (off now)
 
-on:
-  release:
-    types: [published]
-    
+on: 
   push:
     branches:
       - dev_off
     paths:
       - VERSION
-
 
 jobs:
 

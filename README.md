@@ -8,7 +8,7 @@
 
 Welcome to the **MLPerf Automations and Scripts** repository! This repository is your go-to resource for tools, automations, and scripts designed to streamline the execution of **MLPerf benchmarks**—with a strong emphasis on **MLPerf Inference benchmarks**.
 
-Starting **January 2025**, MLPerf automation scripts will be powered by the advanced [MLCFlow](https://github.com/mlcommons/mlcflow) automation interface. This modern framework replaces the previous [Collective Mind (CM)](https://github.com/mlcommons/ck/tree/master/cm), providing a more robust, efficient, and self-contained solution for benchmarking workflows, making MLPerf automations independent of any external projects. 
+Starting **January 2025**, MLPerf automation scripts is powered by [MLCFlow](https://github.com/mlcommons/mlcflow) automation interface. This new and simplified framework replaces the previous [Collective Mind (CM)](https://github.com/mlcommons/ck/tree/master/cm), providing a more robust, efficient, and self-contained solution for benchmarking workflows, making MLPerf automations independent of any external projects. 
 
 
 ---
@@ -17,7 +17,6 @@ Starting **January 2025**, MLPerf automation scripts will be powered by the adva
 - **Automated Benchmarking** – Simplifies running MLPerf Inference benchmarks with minimal manual intervention.
 - **Modular and Extensible** – Easily extend the scripts to support additional benchmarks and configurations.
 - **Seamless Integration** – Compatible with Docker, cloud environments, and local machines.
-- **MLCFlow (MLC) Integration** – Utilizes the MLC framework to enhance reproducibility and automation.
 
 ---
 
@@ -61,6 +60,7 @@ This project is made possible through the generous support of:
 - [OctoML](https://octoml.ai)
 - [cKnowledge.org](https://cKnowledge.org)
 - [cTuning Foundation](https://cTuning.org)
+- [GATEOverflow](https://gateoverflow.in)
 - [MLCommons](https://mlcommons.org)
 
 We appreciate their contributions and sponsorship!

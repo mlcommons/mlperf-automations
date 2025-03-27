@@ -1,6 +1,7 @@
 from mlc import utils
 import os
 import hashlib
+from utils import *
 
 
 def preprocess(i):
@@ -209,7 +210,7 @@ def postprocess(i):
     env['MLC_GET_DEPENDENT_CACHED_PATH'] = filepath
 
     # Check if need to remove archive after extraction
-    if env.get('MLC_EXTRACT_REMOVE_EXTRACTED', '').lower() != 'no':
+    if is_true(env.get('MLC_EXTRACT_REMOVE_EXTRACTED', '')):
         archive_filepath = env.get('MLC_EXTRACT_FILEPATH', '')
         if archive_filepath != '' and os.path.isfile(archive_filepath):
             os.remove(archive_filepath)

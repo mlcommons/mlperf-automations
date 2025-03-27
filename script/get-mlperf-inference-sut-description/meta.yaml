@@ -29,16 +29,22 @@ deps:
     MLC_HOST_OS_TYPE:
     - linux
   tags: detect,sudo
-- tags: get,generic-python-lib,_package.dmiparser
 - env:
     MLC_CACHE_DIR_ENV_NAME: MLC_MLPERF_INFERENCE_SUT_DESC_PATH
   extra_cache_tags: mlperf,inference,sut,descriptions
   tags: get,cache,dir,_name.mlperf-inference-sut-descriptions
+
+posthook_deps:
+  - tags: parse,dmidecode,memory,info
+    enable_if_env:
+      MLC_MEMINFO_FILE:
+        - on
 docker:
   run: false
 input_mapping:
   name: MLC_HW_NAME
   submitter: MLC_MLPERF_SUBMITTER
+  memory: MLC_DETERMINE_MEMORY_CONFIGURATION
 new_env_keys:
 - MLC_HW_*
 - MLC_SUT_*

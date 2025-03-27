@@ -63,12 +63,14 @@ variations:
   clang:
     default: true
     env:
-      +MLC_LLVM_ENABLE_PROJECTS: clang
+      +MLC_LLVM_ENABLE_PROJECTS:
+        - clang
     group: clang
   lld:
     default: true
     env:
-      +MLC_LLVM_ENABLE_PROJECTS: lld
+      +MLC_LLVM_ENABLE_PROJECTS:
+        - lld
     group: lld
   no-clang:
     group: clang
@@ -208,7 +210,8 @@ variations:
     group: repo
   runtimes.#:
     env:
-      +MLC_LLVM_ENABLE_RUNTIMES: '#'
+      +MLC_LLVM_ENABLE_RUNTIMES: 
+        - '#'
   sha.#:
     env:
       MLC_GIT_CHECKOUT_SHA: '#'

@@ -19,7 +19,7 @@ if not "%MLC_DOWNLOAD_LOCAL_FILE_PATH%" == "" (
   set require_download=0
 )
 
-if "%MLC_DOWNLOAD_TOOL%" == "cmutil" (
+if "%MLC_DOWNLOAD_TOOL%" == "mlcutil" (
   set require_download=0
 )
 

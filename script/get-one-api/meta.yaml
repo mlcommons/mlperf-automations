@@ -26,6 +26,6 @@ tags:
 - get-oneapi
 uid: 1af872e81ef54742
 variations:
-  _path.#:
+  path.#:
     env:
       MLC_ONEAPI_DIR_PATH: "#"

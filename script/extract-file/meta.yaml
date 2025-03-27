@@ -36,9 +36,12 @@ tags_help: extract file
 uid: 3f0b76219d004817
 variations:
   keep:
+    group: keep
+    default: true
     env:
       MLC_EXTRACT_REMOVE_EXTRACTED: 'no'
   no-remove-extracted:
+    group: keep
     env:
       MLC_EXTRACT_REMOVE_EXTRACTED: 'no'
   path.#:

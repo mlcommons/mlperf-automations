@@ -12,9 +12,11 @@ deps:
       MLC_HOST_OS_TYPE:
         - windows
   - tags: get,generic-sys-util,_wkhtmltopdf
-    enable_if_env:
+    enable_if_any_env:
       MLC_INSTALL_FROM_PACKAGE_MANAGER:
-        - on
+      - on
+      MLC_HOST_OS_TYPE:
+      - windows
 uid: 67ec874a3dfe4b87
 docker:
   pre_run_cmds:

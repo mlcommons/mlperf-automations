@@ -31,6 +31,6 @@ tags:
 - get-gcc
 uid: dbf4ab5cbed74372
 variations:
-  _path.#:
+  path.#:
     env:
-      MLC_GCC_DIR_PATH: #
+      MLC_GCC_DIR_PATH: '#'
