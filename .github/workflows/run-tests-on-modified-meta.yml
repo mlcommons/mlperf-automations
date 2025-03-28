@@ -23,6 +23,8 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: '3.x'
+
+    - name: Install dependencies
       run: |
         pip install pyyaml
 
@@ -44,7 +46,9 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Process meta.yaml file
         run: |
