@@ -238,9 +238,9 @@ def preprocess(i):
                 env['MLC_DOWNLOAD_CMD'] = f"rclone {rclone_copy_using} {q}{url}{q} {q}{os.path.join(os.getcwd(), temp_download_file)}{q} -P --error-on-no-transfer"
             else:
                 env['MLC_DOWNLOAD_CMD'] = f"rclone {rclone_copy_using} {q}{url}{q} {q}{os.path.join(os.getcwd(), env['MLC_DOWNLOAD_FILENAME'])}{q} -P --error-on-no-transfer"
-            if verify_ssl:
+            if not verify_ssl:
                 env['MLC_DOWNLOAD_CMD'] += f" --no-check-certificate"
-                
+
         filename = env['MLC_DOWNLOAD_FILENAME']
         env['MLC_DOWNLOAD_DOWNLOADED_FILENAME'] = filename
 
