@@ -24,7 +24,7 @@ def process_files(files):
             "num_run": i
         }
         for file in filenames
-        if file.endswith('meta.yaml') and (uid, num_tests := get_file_info(file))
+        for uid, num_tests in [get_file_info(file)] if file.endswith('meta.yaml')
         for i in range(1, num_tests + 1)
     ]
 
