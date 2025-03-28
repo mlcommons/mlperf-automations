@@ -17,6 +17,7 @@ deps:
         - MLC_DOWNLOAD_URL
     extra_cache_tags: intel,sde,tool
     force_cache: True
+    
 new_env_keys:
   - MLC_INTEL_SDE_DIR_PATH
   - MLC_INTEL_SDE_BIN_WITH_PATH
