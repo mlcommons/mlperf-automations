@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: get_modified_files
     strategy:
-      fail_fast: false
+      fail-fast: false
       matrix:
         file_info: ${{ fromJSON(needs.get_modified_files.outputs.processed_files) }}
 
