@@ -5,6 +5,7 @@ import os
 
 
 def get_file_info(filepath):
+    print(filepath)
     with open(filepath, 'r') as file:
         content = yaml.safe_load(file)
         tests = content.get('tests', [])
