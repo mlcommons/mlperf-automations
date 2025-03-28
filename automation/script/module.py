@@ -2929,7 +2929,7 @@ class ScriptAutomation(Automation):
 
             alias = meta.get('alias', '')
             uid = meta.get('uid', '')
-            if console or True: #Todo restrict to console only?
+            if console or True:  # Todo restrict to console only?
                 logger.info(path)
                 test_config = meta.get('tests', '')
                 if test_config:
