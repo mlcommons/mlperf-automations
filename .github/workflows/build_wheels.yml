@@ -1,4 +1,4 @@
-name: Build wheel and release into PYPI
+name: Build wheel (only src) and release into PYPI
 
 on:
   release:
