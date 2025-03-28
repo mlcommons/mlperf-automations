@@ -1,6 +1,7 @@
 import yaml
 import sys
 import json
+import os
 
 
 def get_file_info(filepath):
@@ -24,14 +25,13 @@ def process_files(files):
             "num_run": i
         }
         for file in filenames
-        for uid, num_tests in [get_file_info(file)] if file.endswith('meta.yaml')
+        for uid, num_tests in [get_file_info(file)] if os.path.basename(file) == 'meta.yaml'
         for i in range(1, num_tests + 1)
     ]
 
 
 if __name__ == "__main__":
     changed_files = sys.stdin.read().strip()
-    print(changed_files)
     processed_files = process_files(changed_files)
     json_processed_files = json.dumps(processed_files)
     print(f"::set-output name=processed_files::{json_processed_files}")
