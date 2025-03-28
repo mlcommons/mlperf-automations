@@ -180,7 +180,7 @@ def postprocess(i):
     extracted_file = env.get('MLC_EXTRACT_EXTRACTED_FILENAME', '')
 
     # Preparing filepath
-    #   Can be either the full extracted filename (such as model file) or folder
+    # Can be either the full extracted filename (such as model file) or folder
 
     if extracted_file != '':
         filename = os.path.basename(extracted_file)
@@ -215,12 +215,17 @@ def postprocess(i):
         if archive_filepath != '' and os.path.isfile(archive_filepath):
             os.remove(archive_filepath)
 
-    # Check if only a single folder is created and if so, export the folder name
+    # Check if only a single folder is created and if so, export the folder
+    # name
     if folderpath:
         sub_items = os.listdir(folderpath)
-        sub_folders = [item for item in sub_items if os.path.isdir(os.path.join(folderpath, item))]
+        sub_folders = [
+            item for item in sub_items if os.path.isdir(
+                os.path.join(
+                    folderpath, item))]
         if len(sub_folders) == 1:
-            env['MLC_EXTRACT_EXTRACTED_SUBDIR_PATH'] = os.path.join(folderpath, sub_folders[0])
+            env['MLC_EXTRACT_EXTRACTED_SUBDIR_PATH'] = os.path.join(
+                folderpath, sub_folders[0])
 
     # Since may change directory, check if need to clean some temporal files
     automation.clean_some_tmp_files({'env': env})

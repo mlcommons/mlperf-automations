@@ -38,6 +38,7 @@ def preprocess(i):
 
     return {'return': 0}
 
+
 def detect_version(i):
     r = i['automation'].parse_version({'match_text': r'Software Development Emulator.\s+Version:\s*([\d.]+)',
                                        'group_number': 1,
@@ -52,21 +53,18 @@ def detect_version(i):
     return {'return': 0, 'version': version}
 
 
-
 def postprocess(i):
 
     env = i['env']
     state = i['state']
-    
+
     r = detect_version(i)
     if r['return'] > 0:
         return r
 
-
     env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_INTEL_SDE_BIN_WITH_PATH']
     if '+PATH' not in env:
         env['+PATH'] = []
-
 
     os_info = i['os_info']
 
