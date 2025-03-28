@@ -6,7 +6,7 @@ import json
 def get_file_info(filepath):
     with open(filepath, 'r') as file:
         content = yaml.safe_load(file)
-        tests = content.get('tests', {})
+        tests = content.get('tests', [])
         if tests:
             num_tests = len(tests.get('run_inputs', []))
         else:
