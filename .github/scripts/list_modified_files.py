@@ -5,7 +5,6 @@ import os
 
 
 def get_file_info(filepath):
-    print(filepath)
     with open(filepath, 'r') as file:
         content = yaml.safe_load(file)
         tests = content.get('tests', [])
@@ -25,8 +24,8 @@ def process_files(files):
             "uid": uid,
             "num_run": i
         }
-        for file in filenames
-        for uid, num_tests in [get_file_info(file)] if os.path.basename(file) == 'meta.yaml'
+        for file in filenames if os.path.basename(file) == 'meta.yaml'
+        for uid, num_tests in [get_file_info(file)]
         for i in range(1, num_tests + 1)
     ]
 
