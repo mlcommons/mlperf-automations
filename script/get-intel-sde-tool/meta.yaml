@@ -7,9 +7,10 @@ deps:
   - tags: detect,os
   - tags: download-and-extract,_extract
     enable_if_env:
-      MLC_TMP_REQUIRE_DOWNLOAD:
-        - yes
       MLC_DOWNLOAD_URL:
+        - on
+    skip_if_env:
+      MLC_INTEL_SDE_DIR_PATH:
         - on
     update_tags_from_env_with_prefix:
       _url.:
@@ -31,8 +32,6 @@ tags:
 - intel
 input_mapping:
   sde_dir: MLC_INTEL_SDE_DIR_PATH
-default_env:
-  MLC_TMP_REQUIRE_DOWNLOAD: yes
 uid: 3546409e71c847bc
 variations:
   version.9_53_0:
@@ -40,6 +39,8 @@ variations:
     default: true
     env:
       MLC_DOWNLOAD_URL: https://downloadmirror.intel.com/850782/sde-external-9.53.0-2025-03-16-lin.tar.xz
-
+tests:
+  run_inputs:
+    - {}
 
 
