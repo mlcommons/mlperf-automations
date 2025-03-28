@@ -2,6 +2,7 @@ import yaml
 import sys
 import json
 
+
 def get_file_info(filepath):
     with open(filepath, 'r') as file:
         content = yaml.safe_load(file)
@@ -12,6 +13,7 @@ def get_file_info(filepath):
             num_tests = 0
         uid = content['uid']
         return uid, num_tests
+
 
 def process_files(files):
     filenames = files.split()
@@ -25,6 +27,7 @@ def process_files(files):
         if file.endswith('meta.yaml') and (uid, num_tests := get_file_info(file))
         for i in range(1, num_tests + 1)
     ]
+
 
 if __name__ == "__main__":
     changed_files = sys.stdin.read().strip()
