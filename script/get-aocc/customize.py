@@ -65,7 +65,6 @@ def preprocess(i):
                                            'run_script_input': i['run_script_input'],
                                            'recursion_spaces': i['recursion_spaces']})
         if r['return'] > 0:
-
             return r
 
     return {'return': 0}
