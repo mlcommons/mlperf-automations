@@ -4,5 +4,3 @@ echo "${aocc_bin} --version"
 
 ${aocc_bin} --version > tmp-ver.out
 test $? -eq 0 || exit $?
-
-cat tmp-ver.out

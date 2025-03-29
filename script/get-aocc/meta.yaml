@@ -62,10 +62,25 @@ versions:
   5.0.0:
     env:
       MLC_AOCC_URL: https://download.amd.com/developer/eula/aocc/aocc-5-0/aocc-compiler-5.0.0.tar
-      MLC_DOWNLOAD_CHECKSUM: 966fac2d2c759e9de6e969c10ada7a7b306c113f7f1e07ea376829ec86380daa
+      MLC_DOWNLOAD_CHECKSUM: c01ee764a8370a2ed546c1a38e41bb42
       MLC_AOCC_NEEDS_TAR: yes
       MLC_VERSION: '5.0.0-Build#1377' 
 variations:
+  download-and-install:
+    group: install-type
+    default: true
+    default_version: "5.0.0"
+    env: 
+      MLC_AOCC_DOWNLOAD: yes
+  local-install:
+    group: install-type
+    env: 
+      MLC_AOCC_DOWNLOAD: no
   path.#:
+    default_variation:
+      install-type: local-install
     env:
       MLC_AOCC_DIR_PATH: '#'
+tests:
+  run_inputs:
+    - accept_eula: yes

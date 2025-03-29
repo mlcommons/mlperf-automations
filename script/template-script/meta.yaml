@@ -22,3 +22,5 @@ tags:
 - template
 
 uid: fc3e6915a29342d8
+tests:
+  run_inputs: []

@@ -45,7 +45,7 @@ variations:
   mlcutil:
     default: true
     env:
-      MLC_DOWNLOAD_TOOL: cmutil
+      MLC_DOWNLOAD_TOOL: mlcutil
     group: download-tool
   curl:
     default_env:

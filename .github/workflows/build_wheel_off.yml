@@ -8,7 +8,6 @@ on:
       - VERSION
 
 jobs:
-
   build_wheels:
     if: github.repository_owner == 'mlcommons'
     name: Build wheel

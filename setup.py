@@ -21,25 +21,28 @@ def get_project_meta(file_path="pyproject.toml"):
         dict: Dictionary containing the project metadata.
     """
     try:
-        with open(file_path, "rb") as f:
+        with open(file_path, "r") as f:
+            content_tmp = f.read()
             if 'tomllib' in globals():
-                project_data = tomllib.load(f)  # Use tomllib for Python 3.11+
+                # Use tomllib for Python 3.11+
+                project_data = tomllib.loads(content_tmp)
             else:
-                project_data = toml.load(f)  # Use toml for older versions
+                # Use toml for older versions
+                project_data = toml.loads(content_tmp)
 
         # Extract metadata under [project]
         project_meta = project_data.get("project", {})
         return project_meta
 
     except FileNotFoundError:
-        print(f"Error: {file_path} not found.")
+        raise FileNotFoundError(f"Error: {file_path} not found.")
     except Exception as e:
-        print(f"Error reading {file_path}: {e}")
+        raise RuntimeError(f"Error reading {file_path}: {e}")
     return {}
 
 
 def check_prerequisites():
-    """Check if Git and python-venv are installed on the system."""
+    """Check if Git and python-venv are installed on the system. """
     try:
         # Check for Git
         subprocess.run(["git", "--version"], check=True,
@@ -77,9 +80,10 @@ class CustomInstallCommand(install):
                               'branch': branch,
                               # 'checkout': commit_hash
                               })
-            print(res)
+
             if res['return'] > 0:
-                return res['return']
+                raise Exception(
+                    f"Return code:{res['return']} with error:{res.get('error')}")
 
             # subprocess.run(["echo", "Custom command executed!"], check=True)
         except Exception as e:

@@ -1,5 +1,22 @@
 from mlc import utils
 import os
+from utils import *
+
+
+def ask_url_acceptance(url):
+    print(f"Please take a moment to read the EULA at this URL:\n{url}")
+    print("\nDo you accept the terms of this EULA? [yes/no]")
+
+    while True:
+        response = input().lower()
+        if response in ["yes", "y"]:
+            print("You have accepted the EULA.")
+            return True
+        elif response in ["no", "n"]:
+            print("You have not accepted the EULA.")
+            return False
+        else:
+            print("Invalid input. Please enter 'yes' or 'no'.")
 
 
 def predeps(i):
@@ -8,6 +25,12 @@ def predeps(i):
     env = i['env']
     if env.get('MLC_AOCC_TAR_FILE_PATH', '') != '':
         env['MLC_AOCC_NEEDS_TAR'] = 'yes'
+
+    elif is_true(env.get('MLC_AOCC_DOWNLOAD')) and not is_true(env.get('MLC_AOCC_ACCEPT_EULA')):
+        url = "https://www.amd.com/en/developer/aocc/aocc-compiler/eula.html"
+        accepted = ask_url_acceptance(url)
+        if accepted:
+            env['MLC_AOCC_ACCEPT_EULA'] = 'yes'
 
     return {'return': 0}
 
@@ -42,7 +65,6 @@ def preprocess(i):
                                            'run_script_input': i['run_script_input'],
                                            'recursion_spaces': i['recursion_spaces']})
         if r['return'] > 0:
-
             return r
 
     return {'return': 0}

@@ -5,7 +5,7 @@ on:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlc-based-submission-generation.yml'
-      - '**'  
+      - 'script/generate-mlperf-inference-submission/**'  
       - '!**.md'
 jobs:
   submission_generation:

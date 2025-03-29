@@ -9,8 +9,8 @@ fi
 # Assume download is required by default
 require_download=1
 
-# No download needed if a local file path is specified or the tool is 'cmutil'
-if [[ -n "${MLC_DOWNLOAD_LOCAL_FILE_PATH}" || ${MLC_DOWNLOAD_TOOL} == "cmutil" ]]; then
+# No download needed if a local file path is specified or the tool is 'mlcutil'
+if [[ -n "${MLC_DOWNLOAD_LOCAL_FILE_PATH}" || ${MLC_DOWNLOAD_TOOL} == "mlcutil" ]]; then
   require_download=0
 fi
 
@@ -50,7 +50,7 @@ if [[ ${require_download} == 1 ]]; then
 fi
 
 # Verify checksum again if necessary
-if [[ ${MLC_DOWNLOAD_TOOL} == "cmutil" || ${require_download} == 1 ]]; then
+if [[ ${MLC_DOWNLOAD_TOOL} == "mlcutil" || ${require_download} == 1 ]]; then
   if [[ -n "${MLC_DOWNLOAD_CHECKSUM_CMD}" ]]; then
     echo -e "\nVerifying checksum after download: ${MLC_DOWNLOAD_CHECKSUM_CMD}"
     eval "${MLC_DOWNLOAD_CHECKSUM_CMD}" || exit $?
