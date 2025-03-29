@@ -11,6 +11,8 @@ def preprocess(i):
     run_script_input = i['run_script_input']
     pip_version = env.get('MLC_PIP_VERSION', '').strip().split('.')
 
+    logger = automation.action_object.logger
+
     package_name = env.get('MLC_GENERIC_PYTHON_PACKAGE_NAME', '').strip()
     if package_name == '':
         return automation._available_variations({'meta': meta})
@@ -115,9 +117,7 @@ def preprocess(i):
                     True, 'true', 'yes', 'on']:
                 extra += ' -U'
 
-            print('')
-            print(recursion_spaces + '      Extra PIP CMD: ' + extra)
-            print('')
+            logger.info(recursion_spaces + '      Extra PIP CMD: ' + extra)
 
             env['MLC_GENERIC_PYTHON_PIP_EXTRA'] = extra
 
@@ -133,6 +133,8 @@ def preprocess(i):
 def detect_version(i):
 
     env = i['env']
+    automation = i['automation']
+    logger = automation.action_object.logger
 
     if env.get('MLC_TMP_PYTHON_PACKAGE_NAME_ENV', '') != '':
         env_version_key = 'MLC_' + \
@@ -150,10 +152,9 @@ def detect_version(i):
     version = r['version']
     current_detected_version = version
 
-    if env.get('MLC_TMP_SILENT', '') != 'yes':
-        print(
-            i['recursion_spaces'] +
-            '      Detected version: {}'.format(version))
+    logger.info(
+        i['recursion_spaces'] +
+        '      Detected version: {}'.format(version))
 
     return {'return': 0, 'version': version}
 
