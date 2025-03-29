@@ -230,5 +230,6 @@ versions: {}
 tests:
   run_inputs:
     - version: "20.1.0"
+    - version: "20.1.0"
       variations_list: 
       - flang 
