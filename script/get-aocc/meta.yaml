@@ -77,7 +77,7 @@ variations:
     env: 
       MLC_AOCC_DOWNLOAD: no
   path.#:
-    default_variation:
+    default_variations:
       install-type: local-install
     env:
       MLC_AOCC_DIR_PATH: '#'
