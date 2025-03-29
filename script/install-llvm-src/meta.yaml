@@ -66,6 +66,13 @@ variations:
       +MLC_LLVM_ENABLE_PROJECTS:
         - clang
     group: clang
+  flang:
+    env:
+      +MLC_LLVM_ENABLE_PROJECTS:
+        - flang
+      +MLC_LLVM_ENABLE_RUNTIMES: 
+        - flang-rt
+    group: flang
   lld:
     default: true
     env:
@@ -223,4 +230,6 @@ variations:
 versions: {}
 tests:
   run_inputs:
-    - version: "20.1.0"
+    - version: "20.1.1"
+    - variations_list: 
+      - flang,branch.main

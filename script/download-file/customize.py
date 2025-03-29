@@ -138,7 +138,7 @@ def preprocess(i):
                     shell=True,
                     env=subprocess_env)
             if (env.get('MLC_DOWNLOAD_CHECKSUM_FILE', '') != '' or env.get(
-                    'MLC_DOWNLOAD_CHECKSUM', '') != '') and os.path.isfile(env['MLC_DOWNLOAD_FILENAME']):
+                    'MLC_DOWNLOAD_CHECKSUM', '') != '') and os.path.exists(env['MLC_DOWNLOAD_FILENAME']):
                 # print(checksum_result) #for debugging
                 if "checksum did not match" in checksum_result.stderr.lower():
                     computed_checksum = subprocess.run(
@@ -238,6 +238,8 @@ def preprocess(i):
                 env['MLC_DOWNLOAD_CMD'] = f"rclone {rclone_copy_using} {q}{url}{q} {q}{os.path.join(os.getcwd(), temp_download_file)}{q} -P --error-on-no-transfer"
             else:
                 env['MLC_DOWNLOAD_CMD'] = f"rclone {rclone_copy_using} {q}{url}{q} {q}{os.path.join(os.getcwd(), env['MLC_DOWNLOAD_FILENAME'])}{q} -P --error-on-no-transfer"
+            if not verify_ssl:
+                env['MLC_DOWNLOAD_CMD'] += f" --no-check-certificate"
 
         filename = env['MLC_DOWNLOAD_FILENAME']
         env['MLC_DOWNLOAD_DOWNLOADED_FILENAME'] = filename
