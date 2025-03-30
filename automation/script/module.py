@@ -82,7 +82,8 @@ class ScriptAutomation(Automation):
                                              'skip_system_deps',
                                              'git_ssh',
                                              'gh_token',
-                                             'hf_token']
+                                             'hf_token',
+                                             'verify_ssl']
 
     ############################################################
 
@@ -484,6 +485,9 @@ class ScriptAutomation(Automation):
                 env[key] = os.environ[key]
 
         r = self._update_env_from_input(env, i)
+
+        print(env.get('MLC_VERIFY_SSL'))
+        print("#######")
 
         #######################################################################
         # Check if we want to skip cache (either by skip_cache or by fake_run)
