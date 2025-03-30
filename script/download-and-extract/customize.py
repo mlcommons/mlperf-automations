@@ -54,6 +54,10 @@ def preprocess(i):
 def postprocess(i):
 
     env = i['env']
+
+    if env.get('MLC_DOWNLOAD_MODE') == "dry":
+        return {'return': 0}
+
     filepath = env.get('MLC_EXTRACT_EXTRACTED_PATH', '')
     if filepath == '':
         filepath = env.get('MLC_DOWNLOAD_DOWNLOADED_PATH', '')

@@ -31,6 +31,9 @@ posthook_deps:
     MLC_DAE_EXTRACT_DOWNLOADED:
     - 'yes'
     - 'True'
+  skip_if_env:
+    MLC_DOWNLOAD_MODE:
+    - 'dry'
   names:
   - extract-script
   tags: extract,file

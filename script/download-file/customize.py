@@ -237,7 +237,7 @@ def preprocess(i):
                     "%", "%%")
                 env['MLC_DOWNLOAD_CMD'] = f"rclone {rclone_copy_using} {q}{url}{q} {q}{os.path.join(os.getcwd(), temp_download_file)}{q} -P --error-on-no-transfer"
             else:
-                env['MLC_DOWNLOAD_CMD'] = f"rclone {rclone_copy_using} {q}{url}{q} {q}{os.path.join(os.getcwd(), env['MLC_DOWNLOAD_FILENAME'])}{q} -P --error-on-no-transfer"
+                env['MLC_DOWNLOAD_CMD'] = f"rclone {rclone_copy_using} {q}{url}{q} {q}{os.path.join(os.getcwd(), env['MLC_DOWNLOAD_FILENAME'])}{q} -P --error-on-no-transfer {extra_download_options}"
             if not verify_ssl:
                 env['MLC_DOWNLOAD_CMD'] += f" --no-check-certificate"
 
@@ -313,6 +313,9 @@ def postprocess(i):
 
     env = i['env']
 
+    if env.get('MLC_DOWNLOAD_MODE') == "dry":
+        return {'return': 0}
+    
     filepath = env['MLC_DOWNLOAD_DOWNLOADED_PATH']
 
     if not os.path.exists(filepath):
