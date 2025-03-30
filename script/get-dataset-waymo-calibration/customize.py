@@ -14,7 +14,7 @@ def preprocess(i):
     if env.get('MLC_DATASET_WAYMO_CALIBRATION_PATH', '') != '':
         if not os.path.exists(env['MLC_DATASET_WAYMO_CALIBRATION_PATH']):
             return {
-                'return': 1, 'error': f"Path {env['MLC_DATASET_WAYMO_CALIBRATION_PATH']} does not exists!"}
+                'return': 1, 'error': f"Path {env['MLC_DATASET_WAYMO_CALIBRATION_PATH']} does not exist!"}
     else:
         env['MLC_TMP_REQUIRE_DOWNLOAD'] = "yes"
 
