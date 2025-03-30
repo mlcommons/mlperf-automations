@@ -486,9 +486,6 @@ class ScriptAutomation(Automation):
 
         r = self._update_env_from_input(env, i)
 
-        print(env.get('MLC_VERIFY_SSL'))
-        print("#######")
-
         #######################################################################
         # Check if we want to skip cache (either by skip_cache or by fake_run)
         force_skip_cache = True if skip_cache else False
