@@ -24,8 +24,6 @@ input_mapping:
   output_file: MLC_DOWNLOAD_FILENAME
   store: MLC_DOWNLOAD_PATH
   url: MLC_DOWNLOAD_URL
-  verify: MLC_VERIFY_SSL
-  verify_ssl: MLC_VERIFY_SSL
 new_env_keys:
 - MLC_DOWNLOAD_DOWNLOADED_PATH
 - <<<MLC_DOWNLOAD_FINAL_ENV_NAME>>>

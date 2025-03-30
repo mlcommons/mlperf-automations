@@ -15,7 +15,6 @@ input_mapping:
   store: MLC_DOWNLOAD_PATH
   to: MLC_EXTRACT_PATH
   url: MLC_DAE_URL
-  verify: MLC_VERIFY_SSL
 new_env_keys:
 - MLC_DOWNLOAD_DOWNLOADED_PATH*
 - MLC_EXTRACT_EXTRACTED_PATH

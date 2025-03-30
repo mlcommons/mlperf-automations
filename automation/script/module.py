@@ -82,7 +82,8 @@ class ScriptAutomation(Automation):
                                              'skip_system_deps',
                                              'git_ssh',
                                              'gh_token',
-                                             'hf_token']
+                                             'hf_token',
+                                             'verify_ssl']
 
     ############################################################
 

@@ -178,10 +178,10 @@ def download_file(i):
 
     text = i.get('text', 'Downloaded: ')
 
-    if 'MLC_UTILS_DOWNLOAD_VERIFY_SSL' in os.environ:
-        verify = os.environ['MLC_UTILS_DOWNLOAD_VERIFY_SSL'] == 'yes'
+    if 'MLC_VERIFY_SSL' in os.environ:
+        verify = is_true(os.environ['MLC_VERIFY_SSL'])
     else:
-        verify = i.get('verify', True)
+        verify = is_true(i.get('verify_ssl', True))
 
     try:
         with requests.get(url, stream=True, allow_redirects=True, verify=verify) as download:
