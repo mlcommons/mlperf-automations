@@ -27,8 +27,10 @@ deps:
   tags: get,mlperf,results,dir,local
 - names:
   - get-mlperf-submission-dir
-  skip_if_env:
+  skip_if_any_env:
     MLC_MLPERF_INFERENCE_SUBMISSION_DIR:
+    - 'on'
+    MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR:
     - 'on'
   tags: get,mlperf,submission,dir
 docker:
