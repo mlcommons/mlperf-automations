@@ -386,7 +386,7 @@ class ScriptAutomation(Automation):
             verbose = True if is_true(i.get('v', '')) else False
         elif env.get('MLC_VERBOSE', '') != '':
             verbose = True if is_true(env.get('MLC_VERBOSE', '')) else False
-        
+
         if i.get('silent', '') != '':
             silent = True if is_true(i.get('silent', '')) else False
         elif i.get('s', '') != '':
@@ -395,7 +395,8 @@ class ScriptAutomation(Automation):
             silent = True if is_true(env.get('MLC_SILENT', '')) else False
 
         if verbose and silent:
-            logger.warning("Both verbose and silent is set to True. Verbose will take precedence.")
+            logger.warning(
+                "Both verbose and silent is set to True. Verbose will take precedence.")
             silent = False
 
         if silent:
@@ -2250,7 +2251,7 @@ class ScriptAutomation(Automation):
         if i.get('pause', False):
             input('Press Enter to continue ...')
 
-        # set the logger level back to the original 
+        # set the logger level back to the original
         logger.setLevel(original_logging_level)
 
         return rr
