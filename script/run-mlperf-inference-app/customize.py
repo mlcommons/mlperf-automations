@@ -159,7 +159,7 @@ def preprocess(i):
     tags = "app,mlperf,inference,generic," + variation_implementation + variation_model + variation_backend + variation_device + \
         variation_run_style + variation_reproducibility + \
         variation_quantization_string + power_variation + variation_all_models
-    verbose = inp.get('v', False)
+
     print_env = inp.get('print_env', False)
     print_deps = inp.get('print_deps', False)
     add_deps_recursive = inp.get('add_deps_recursive', {})
@@ -273,7 +273,7 @@ def preprocess(i):
             print(f"\nRunning loadgen scenario: {scenario} and mode: {mode}")
             ii = {'action': action, 'automation': 'script', 'tags': scenario_tags, 'quiet': 'true',
                   'env': env_copy, 'const': const_copy, 'input': inp, 'state': state, 'add_deps': copy.deepcopy(add_deps), 'add_deps_recursive':
-                  copy.deepcopy(add_deps_recursive), 'ad': ad, 'adr': copy.deepcopy(adr), 'v': verbose, 'print_env': print_env, 'print_deps': print_deps, 'dump_version_info': dump_version_info}
+                  copy.deepcopy(add_deps_recursive), 'ad': ad, 'adr': copy.deepcopy(adr), 'print_env': print_env, 'print_deps': print_deps, 'dump_version_info': dump_version_info}
 
             if action == "docker":
                 for k in docker_extra_input:
@@ -311,7 +311,7 @@ def preprocess(i):
                 env['MLC_MLPERF_LOADGEN_MODE'] = "compliance"
                 ii = {'action': action, 'automation': 'script', 'tags': scenario_tags, 'quiet': 'true',
                       'env': copy.deepcopy(env), 'const': copy.deepcopy(const), 'input': inp, 'state': state, 'add_deps': copy.deepcopy(add_deps), 'add_deps_recursive':
-                      copy.deepcopy(add_deps_recursive), 'adr': copy.deepcopy(adr), 'ad': ad, 'v': verbose, 'print_env': print_env, 'print_deps': print_deps, 'dump_version_info': dump_version_info}
+                      copy.deepcopy(add_deps_recursive), 'adr': copy.deepcopy(adr), 'ad': ad, 'print_env': print_env, 'print_deps': print_deps, 'dump_version_info': dump_version_info}
                 if action == "docker":
                     for k in docker_extra_input:
                         ii[k] = docker_extra_input[k]
