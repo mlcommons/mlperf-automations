@@ -4761,7 +4761,7 @@ def find_cached_script(i):
                 if deps:
                     r = self_obj._call_run_deps(deps, self_obj.local_env_keys, meta.get('local_env_keys', []), env, state, const, const_state, add_deps_recursive,
                                                 recursion_spaces + extra_recursion_spaces,
-                                                remembered_selections, variation_tags_string, True, '', False, show_time, extra_recursion_spaces, {})
+                                                remembered_selections, variation_tags_string, True, '', show_time, extra_recursion_spaces, {})
                     if r['return'] > 0:
                         return r
 
