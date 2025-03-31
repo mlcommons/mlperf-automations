@@ -380,7 +380,6 @@ class ScriptAutomation(Automation):
 
         verbose = False
         silent = False
-
         if i.get('verbose', '') != '':
             verbose = True if is_true(i.get('verbose', '')) else False
         elif i.get('v', '') != '':
@@ -402,13 +401,19 @@ class ScriptAutomation(Automation):
 
         if silent:
             env['MLC_TMP_SILENT'] = 'yes'
-            logger.setLevel(logging.ERROR)
+            logger.setLevel(logging.WARNING)
             run_state['tmp_silent'] = True
 
         if verbose:
             env['MLC_TMP_VERBOSE'] = 'yes'
             run_state['tmp_verbose'] = True
             logger.setLevel(logging.DEBUG)
+
+        if not env.get('MLC_TMP_SILENT') and not env.get('MLC_TMP_VERBOSE'):
+            if logger.level == logging.DEBUG:
+                env['MLC_TMP_VERBOSE'] = "yes"
+            elif logger.level == logging.DEBUG:
+                env['MLC_TMP_SILENT'] = "yes" 
 
         print_deps = i.get('print_deps', False)
         print_versions = i.get('print_versions', False)
@@ -566,9 +571,6 @@ class ScriptAutomation(Automation):
 
                 x_variation_tags = ['_' + v for v in variation_tags]
                 mlc_script_info += y.join(x_variation_tags)
-
-#        if verbose:
-#            logger.info('')
 
         logger.info(recursion_spaces + '* ' + mlc_script_info)
 
@@ -731,7 +733,6 @@ class ScriptAutomation(Automation):
                     False,
                     script_tags_string,
                     quiet,
-                    verbose,
                     logger)
 
                 # Remember selection
@@ -916,8 +917,7 @@ class ScriptAutomation(Automation):
             new_state_keys_from_meta,
             add_deps_recursive,
             run_state,
-            recursion_spaces,
-            verbose)
+            recursion_spaces)
         if r['return'] > 0:
             return r
 
@@ -1182,7 +1182,6 @@ class ScriptAutomation(Automation):
                                     'skip_remembered_selections': skip_remembered_selections,
                                     'remembered_selections': remembered_selections,
                                     'quiet': quiet,
-                                    'verbose': verbose,
                                     'show_time': show_time
                                     })
             if r['return'] > 0:
@@ -1216,7 +1215,6 @@ class ScriptAutomation(Automation):
                         True,
                         script_tags_string,
                         quiet,
-                        verbose,
                         logger)
 
                     if selection >= 0:
@@ -1244,7 +1242,7 @@ class ScriptAutomation(Automation):
                             '  - Checking dynamic dependencies on other MLC scripts:')
                         r = self._call_run_deps(deps, self.local_env_keys, local_env_keys_from_meta, env, state, const, const_state, add_deps_recursive,
                                                 recursion_spaces + extra_recursion_spaces,
-                                                remembered_selections, variation_tags_string, True, debug_script_tags, verbose, show_time, extra_recursion_spaces, run_state)
+                                                remembered_selections, variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
                         if r['return'] > 0:
                             return r
 
@@ -1264,7 +1262,7 @@ class ScriptAutomation(Automation):
 
                     r = self._call_run_deps(prehook_deps, self.local_env_keys, local_env_keys_from_meta, env, state, const, const_state, add_deps_recursive,
                                             recursion_spaces + extra_recursion_spaces,
-                                            remembered_selections, variation_tags_string, True, debug_script_tags, verbose, show_time, extra_recursion_spaces, run_state)
+                                            remembered_selections, variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
                     if r['return'] > 0:
                         return r
 
@@ -1327,7 +1325,7 @@ class ScriptAutomation(Automation):
 
                         r = self._call_run_deps(posthook_deps, self.local_env_keys, clean_env_keys_post_deps, env, state, const, const_state, add_deps_recursive,
                                                 recursion_spaces + extra_recursion_spaces,
-                                                remembered_selections, variation_tags_string, True, debug_script_tags, verbose, show_time, extra_recursion_spaces, run_state)
+                                                remembered_selections, variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
                         if r['return'] > 0:
                             return r
 
@@ -1338,7 +1336,7 @@ class ScriptAutomation(Automation):
                         # Check chain of post dependencies on other MLC scripts
                         r = self._call_run_deps(post_deps, self.local_env_keys, clean_env_keys_post_deps, env, state, const, const_state, add_deps_recursive,
                                                 recursion_spaces + extra_recursion_spaces,
-                                                remembered_selections, variation_tags_string, True, debug_script_tags, verbose, show_time, extra_recursion_spaces, run_state)
+                                                remembered_selections, variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
                         if r['return'] > 0:
                             return r
 
@@ -1545,7 +1543,7 @@ class ScriptAutomation(Automation):
 
                     r = self._call_run_deps(docker_deps, self.local_env_keys, local_env_keys_from_meta, env, state, const, const_state, add_deps_recursive,
                                             recursion_spaces + extra_recursion_spaces,
-                                            remembered_selections, variation_tags_string, False, debug_script_tags, verbose, show_time, extra_recursion_spaces, run_state)
+                                            remembered_selections, variation_tags_string, False, debug_script_tags, show_time, extra_recursion_spaces, run_state)
                     if r['return'] > 0:
                         return r
 
@@ -1582,7 +1580,6 @@ class ScriptAutomation(Automation):
                 'variation_tags_string': variation_tags_string,
                 'found_cached': False,
                 'debug_script_tags': debug_script_tags,
-                'verbose': verbose,
                 'meta': meta,
                 'self': self
             }
@@ -1643,7 +1640,7 @@ class ScriptAutomation(Automation):
 
                 r = self._call_run_deps(deps, self.local_env_keys, local_env_keys_from_meta, env, state, const, const_state, add_deps_recursive,
                                         recursion_spaces + extra_recursion_spaces,
-                                        remembered_selections, variation_tags_string, False, debug_script_tags, verbose, show_time, extra_recursion_spaces, run_state)
+                                        remembered_selections, variation_tags_string, False, debug_script_tags, show_time, extra_recursion_spaces, run_state)
                 if r['return'] > 0:
                     return r
 
@@ -1686,7 +1683,6 @@ class ScriptAutomation(Automation):
                 'variation_tags_string': variation_tags_string,
                 'found_cached': False,
                 'debug_script_tags': debug_script_tags,
-                'verbose': verbose,
                 'meta': meta,
                 'self': self
             }
@@ -1859,7 +1855,7 @@ class ScriptAutomation(Automation):
 
                 r = self._call_run_deps(prehook_deps, self.local_env_keys, local_env_keys_from_meta, env, state, const, const_state, add_deps_recursive,
                                         recursion_spaces + extra_recursion_spaces,
-                                        remembered_selections, variation_tags_string, found_cached, debug_script_tags, verbose, show_time, extra_recursion_spaces, run_state)
+                                        remembered_selections, variation_tags_string, found_cached, debug_script_tags, show_time, extra_recursion_spaces, run_state)
                 if r['return'] > 0:
                     return r
 
@@ -1902,7 +1898,7 @@ class ScriptAutomation(Automation):
                     'clean_env_keys_post_deps', [])
 
                 r = self._run_deps(post_deps, clean_env_keys_post_deps, env, state, const, const_state, add_deps_recursive, recursion_spaces,
-                                   remembered_selections, variation_tags_string, found_cached, debug_script_tags, verbose, show_time, extra_recursion_spaces, run_state)
+                                   remembered_selections, variation_tags_string, found_cached, debug_script_tags, show_time, extra_recursion_spaces, run_state)
                 if r['return'] > 0:
                     return r
 
@@ -2181,7 +2177,7 @@ class ScriptAutomation(Automation):
                 f.write(readme)
 
         if dump_version_info:
-            r = self._dump_version_info_for_script(quiet=quiet, silent=silent)
+            r = self._dump_version_info_for_script(quiet=quiet)
             if r['return'] > 0:
                 return r
 
@@ -2231,17 +2227,16 @@ class ScriptAutomation(Automation):
                     '  - used disk space: {} MB'.format(used_disk_space_in_mb))
 
         # Check if need to print some final info such as path to model, etc
-        if not run_state.get('tmp_silent', False):
-            print_env_at_the_end = meta.get('print_env_at_the_end', {})
-            if len(print_env_at_the_end) > 0:
-                for p in sorted(print_env_at_the_end):
-                    t = print_env_at_the_end[p]
-                    if t == '':
-                        t = 'ENV[{}]'.format(p)
+        print_env_at_the_end = meta.get('print_env_at_the_end', {})
+        if len(print_env_at_the_end) > 0:
+            for p in sorted(print_env_at_the_end):
+                t = print_env_at_the_end[p]
+                if t == '':
+                    t = 'ENV[{}]'.format(p)
 
-                    v = new_env.get(p, None)
+                v = new_env.get(p, None)
 
-                    logger.info('{}: {}'.format(t, str(v)))
+                logger.info('{}: {}'.format(t, str(v)))
 
         # Check if print nice versions
         if print_versions:
@@ -2327,12 +2322,11 @@ class ScriptAutomation(Automation):
 
     ##########################################################################
     def _dump_version_info_for_script(
-            self, output_dir=os.getcwd(), quiet=False, silent=False):
+            self, output_dir=os.getcwd(), quiet=False):
         logger = self.action_object.logger
-        if not quiet and not silent:
-            pass
         for f in ['mlc-run-script-versions.json', 'version_info.json']:
-            logger.info('Dumping versions to {}'.format(f))
+            if not quiet:
+                logger.info('Dumping versions to {}'.format(f))
             r = utils.save_json(f, self.run_state.get('version_info', []))
             if r['return'] > 0:
                 return r
@@ -2341,7 +2335,7 @@ class ScriptAutomation(Automation):
 
     ##########################################################################
     def _update_state_from_variations(self, i, meta, variation_tags, variations, env, state, const, const_state, deps, post_deps, prehook_deps,
-                                      posthook_deps, new_env_keys_from_meta, new_state_keys_from_meta, add_deps_recursive, run_state, recursion_spaces, verbose):
+                                      posthook_deps, new_env_keys_from_meta, new_state_keys_from_meta, add_deps_recursive, run_state, recursion_spaces):
 
         logger = self.action_object.logger
         # Save current explicit variations
@@ -3303,7 +3297,7 @@ class ScriptAutomation(Automation):
 
     def _call_run_deps(script, deps, local_env_keys, local_env_keys_from_meta, env, state, const, const_state,
                        add_deps_recursive, recursion_spaces, remembered_selections, variation_tags_string, found_cached, debug_script_tags='',
-                       verbose=False, show_time=False, extra_recursion_spaces='  ', run_state={'deps': [], 'fake_deps': [], 'parent': None}):
+                       show_time=False, extra_recursion_spaces='  ', run_state={'deps': [], 'fake_deps': [], 'parent': None}):
         if len(deps) == 0:
             return {'return': 0}
 
@@ -3317,8 +3311,8 @@ class ScriptAutomation(Automation):
             local_env_keys += local_env_keys_from_meta
 
         r = script._run_deps(deps, local_env_keys, env, state, const, const_state, add_deps_recursive, recursion_spaces,
-                             remembered_selections, variation_tags_string, found_cached, debug_script_tags,
-                             verbose, show_time, extra_recursion_spaces, run_state)
+                             remembered_selections, variation_tags_string, found_cached, debug_script_tags, 
+                             show_time, extra_recursion_spaces, run_state)
         if r['return'] > 0:
             return r
 
@@ -3327,7 +3321,7 @@ class ScriptAutomation(Automation):
     ##########################################################################
     def _run_deps(self, deps, clean_env_keys_deps, env, state, const, const_state, add_deps_recursive, recursion_spaces,
                   remembered_selections, variation_tags_string='', from_cache=False, debug_script_tags='',
-                  verbose=False, show_time=False, extra_recursion_spaces='  ', run_state={'deps': [], 'fake_deps': [], 'parent': None}):
+                  show_time=False, extra_recursion_spaces='  ', run_state={'deps': [], 'fake_deps': [], 'parent': None}):
         """
         Runs all the enabled dependencies and pass them env minus local env
         """
@@ -3470,8 +3464,6 @@ class ScriptAutomation(Automation):
                         'const_state': copy.deepcopy(const_state),
                         'add_deps_recursive': add_deps_recursive,
                         'debug_script_tags': debug_script_tags,
-                        'verbose': verbose,
-                        'silent': run_state.get('tmp_silent', False),
                         'time': show_time,
                         'run_state': run_state_copy
 
@@ -3763,10 +3755,6 @@ pip install mlcflow
         recursion_spaces = i.get('recursion_spaces', '')
         logger = self.action_object.logger
         hook = i.get('hook', None)
-
-        verbose = i.get('verbose', False)
-        if not verbose:
-            verbose = i.get('v', False)
 
         file_name = i.get('file_name', '')
         file_name_re = i.get('file_name_re', '')
@@ -5019,9 +5007,6 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
     state = i.get('state', {})
     const_state = i.get('const_state', {})
     run_state = i.get('run_state', {})
-    verbose = i.get('verbose', False)
-    if not verbose:
-        verbose = i.get('v', False)
 
     show_time = i.get('time', False)
     logger = i['self'].action_object.logger
@@ -5275,17 +5260,17 @@ or full console log.
 
     if len(posthook_deps) > 0 and (postprocess == "postprocess"):
         r = script_automation._call_run_deps(posthook_deps, local_env_keys, local_env_keys_from_meta, env, state, const, const_state,
-                                             add_deps_recursive, recursion_spaces, remembered_selections, variation_tags_string, found_cached, debug_script_tags, verbose, show_time, ' ', run_state)
+                                             add_deps_recursive, recursion_spaces, remembered_selections, variation_tags_string, found_cached, debug_script_tags, show_time, ' ', run_state)
         if r['return'] > 0:
             return r
 
     if (postprocess == "postprocess") and customize_code is not None and 'postprocess' in dir(
             customize_code):
         rr = run_postprocess(customize_code, customize_common_input, recursion_spaces, env, state, const,
-                             const_state, meta, verbose, i)  # i as run_script_input
+                             const_state, meta, i)  # i as run_script_input
     elif (postprocess == "detect_version") and customize_code is not None and 'detect_version' in dir(customize_code):
         rr = run_detect_version(customize_code, customize_common_input, recursion_spaces, env, state, const,
-                                const_state, meta, verbose)
+                                const_state, meta)
 
     return rr
 
@@ -5293,7 +5278,7 @@ or full console log.
 
 
 def run_detect_version(customize_code, customize_common_input,
-                       recursion_spaces, env, state, const, const_state, meta, verbose=False):
+                       recursion_spaces, env, state, const, const_state, meta):
 
     if customize_code is not None and 'detect_version' in dir(customize_code):
         import copy
@@ -5324,7 +5309,7 @@ def run_detect_version(customize_code, customize_common_input,
 
 
 def run_postprocess(customize_code, customize_common_input, recursion_spaces,
-                    env, state, const, const_state, meta, verbose=False, run_script_input=None):
+                    env, state, const, const_state, meta, run_script_input=None):
 
     if customize_code is not None and 'postprocess' in dir(customize_code):
         import copy
@@ -5962,7 +5947,7 @@ def detect_state_diff(env, saved_env, new_env_keys,
 
 
 def select_script_item(lst, text, recursion_spaces,
-                       can_skip, script_tags_string, quiet, verbose, logger=None):
+                       can_skip, script_tags_string, quiet, logger=None):
     """
     Internal: select script
     """
