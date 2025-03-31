@@ -202,7 +202,7 @@ class ScriptAutomation(Automation):
                               to let scripts deal with that
 
           (silent) (bool): if True, attempt to suppress all info if supported
-                           (sets MLC_SILENT=yes)
+                           (sets MLC_TMP_SILENT=yes)
           (s) (bool): the same as 'silent'
           ...
 
@@ -373,42 +373,40 @@ class ScriptAutomation(Automation):
 
         # Check verbose and silent
 
-        # get the current log level so that the log levels could be reverted
-        # back when calling the dependency scripts
-        current_logging_level = logging.getLevelName(logger.level)
-        tmp_logging_level = logging.getLevelName(logger.level)
+        # Get the current log level so that the log levels could be reverted
+        # after execution of the script and corresponding dependencies
+        original_logging_level = logger.level
 
         verbose = False
+        silent = False
 
-        silent = True if is_true(i.get('silent', '')) else False
-
-        if not silent:
+        if i.get('verbose', '') != '':
+            verbose = True if is_true(i.get('verbose', '')) else False
+        elif i.get('v', '') != '':
+            verbose = True if is_true(i.get('v', '')) else False
+        elif env.get('MLC_VERBOSE', '') != '':
+            verbose = True if is_true(env.get('MLC_VERBOSE', '')) else False
+        
+        if i.get('silent', '') != '':
+            silent = True if is_true(i.get('silent', '')) else False
+        elif i.get('s', '') != '':
             silent = True if is_true(i.get('s', '')) else False
+        elif env.get('MLC_SILENT', '') != '':
+            silent = True if is_true(env.get('MLC_SILENT', '')) else False
+
+        if verbose and silent:
+            logger.warning("Both verbose and silent is set to True. Verbose will take precedence.")
+            silent = False
 
         if silent:
-            if 'verbose' in i:
-                del (i['verbose'])
-            if 'v' in i:
-                del (i['v'])
             env['MLC_TMP_SILENT'] = 'yes'
             logger.setLevel(logging.ERROR)
-            tmp_logging_level = logging.ERROR
             run_state['tmp_silent'] = True
-
-        if 'verbose' in i:
-            verbose = i['verbose']
-        elif 'v' in i:
-            verbose = i['v']
 
         if verbose:
             env['MLC_TMP_VERBOSE'] = 'yes'
             run_state['tmp_verbose'] = True
             logger.setLevel(logging.DEBUG)
-            tmp_logging_level = logging.DEBUG
-
-        # populate the logging levels in run state
-        run_state['tmp_logging_level'] = tmp_logging_level
-        run_state['current_logging_level'] = current_logging_level
 
         print_deps = i.get('print_deps', False)
         print_versions = i.get('print_versions', False)
@@ -1242,13 +1240,11 @@ class ScriptAutomation(Automation):
                         logger.debug(
                             recursion_spaces +
                             '  - Checking dynamic dependencies on other MLC scripts:')
-                        logger.setLevel(current_logging_level)
                         r = self._call_run_deps(deps, self.local_env_keys, local_env_keys_from_meta, env, state, const, const_state, add_deps_recursive,
                                                 recursion_spaces + extra_recursion_spaces,
-                                                remembered_selections, variation_tags_string, True, debug_script_tags, False, show_time, extra_recursion_spaces, run_state)
+                                                remembered_selections, variation_tags_string, True, debug_script_tags, verbose, show_time, extra_recursion_spaces, run_state)
                         if r['return'] > 0:
                             return r
-                        logger.setLevel(tmp_logging_level)
 
                         logger.debug(
                             recursion_spaces +
@@ -1264,13 +1260,11 @@ class ScriptAutomation(Automation):
                         recursion_spaces +
                         '    - Checking prehook dependencies on other MLC scripts:')
 
-                    logger.setLevel(current_logging_level)
                     r = self._call_run_deps(prehook_deps, self.local_env_keys, local_env_keys_from_meta, env, state, const, const_state, add_deps_recursive,
                                             recursion_spaces + extra_recursion_spaces,
-                                            remembered_selections, variation_tags_string, True, debug_script_tags, False, show_time, extra_recursion_spaces, run_state)
+                                            remembered_selections, variation_tags_string, True, debug_script_tags, verbose, show_time, extra_recursion_spaces, run_state)
                     if r['return'] > 0:
                         return r
-                    logger.setLevel(tmp_logging_level)
 
                     # Continue with the selected cached script
                     cached_script = found_cached_scripts[selection]
@@ -1329,26 +1323,22 @@ class ScriptAutomation(Automation):
                         clean_env_keys_post_deps = meta.get(
                             'clean_env_keys_post_deps', [])
 
-                        logger.setLevel(current_logging_level)
                         r = self._call_run_deps(posthook_deps, self.local_env_keys, clean_env_keys_post_deps, env, state, const, const_state, add_deps_recursive,
                                                 recursion_spaces + extra_recursion_spaces,
-                                                remembered_selections, variation_tags_string, True, debug_script_tags, False, show_time, extra_recursion_spaces, run_state)
+                                                remembered_selections, variation_tags_string, True, debug_script_tags, verbose, show_time, extra_recursion_spaces, run_state)
                         if r['return'] > 0:
                             return r
-                        logger.setLevel(tmp_logging_level)
 
                         logger.debug(
                             recursion_spaces +
                             '    - Checking post dependencies on other MLC scripts:')
 
                         # Check chain of post dependencies on other MLC scripts
-                        logger.setLevel(current_logging_level)
                         r = self._call_run_deps(post_deps, self.local_env_keys, clean_env_keys_post_deps, env, state, const, const_state, add_deps_recursive,
                                                 recursion_spaces + extra_recursion_spaces,
-                                                remembered_selections, variation_tags_string, True, debug_script_tags, False, show_time, extra_recursion_spaces, run_state)
+                                                remembered_selections, variation_tags_string, True, debug_script_tags, verbose, show_time, extra_recursion_spaces, run_state)
                         if r['return'] > 0:
                             return r
-                        logger.setLevel(tmp_logging_level)
 
             if renew or (not found_cached and num_found_cached_scripts == 0):
                 # Add more tags to cached tags
@@ -1551,13 +1541,11 @@ class ScriptAutomation(Automation):
                         recursion_spaces +
                         '  - Checking docker run dependencies on other MLC scripts:')
 
-                    logger.setLevel(current_logging_level)
                     r = self._call_run_deps(docker_deps, self.local_env_keys, local_env_keys_from_meta, env, state, const, const_state, add_deps_recursive,
                                             recursion_spaces + extra_recursion_spaces,
-                                            remembered_selections, variation_tags_string, False, debug_script_tags, False, show_time, extra_recursion_spaces, run_state)
+                                            remembered_selections, variation_tags_string, False, debug_script_tags, verbose, show_time, extra_recursion_spaces, run_state)
                     if r['return'] > 0:
                         return r
-                    logger.setLevel(tmp_logging_level)
 
                     logger.debug(
                         recursion_spaces +
@@ -1592,7 +1580,7 @@ class ScriptAutomation(Automation):
                 'variation_tags_string': variation_tags_string,
                 'found_cached': False,
                 'debug_script_tags': debug_script_tags,
-                'verbose': False,
+                'verbose': verbose,
                 'meta': meta,
                 'self': self
             }
@@ -1651,13 +1639,11 @@ class ScriptAutomation(Automation):
                 logger.debug(recursion_spaces +
                              '  - Checking dependencies on other MLC scripts:')
 
-                logger.setLevel(current_logging_level)
                 r = self._call_run_deps(deps, self.local_env_keys, local_env_keys_from_meta, env, state, const, const_state, add_deps_recursive,
                                         recursion_spaces + extra_recursion_spaces,
-                                        remembered_selections, variation_tags_string, False, debug_script_tags, False, show_time, extra_recursion_spaces, run_state)
+                                        remembered_selections, variation_tags_string, False, debug_script_tags, verbose, show_time, extra_recursion_spaces, run_state)
                 if r['return'] > 0:
                     return r
-                logger.setLevel(tmp_logging_level)
 
                 logger.debug(recursion_spaces +
                              '  - Processing env after dependencies ...')
@@ -1869,13 +1855,11 @@ class ScriptAutomation(Automation):
                     recursion_spaces +
                     '  - Checking prehook dependencies on other MLC scripts:')
 
-                logger.setLevel(current_logging_level)
                 r = self._call_run_deps(prehook_deps, self.local_env_keys, local_env_keys_from_meta, env, state, const, const_state, add_deps_recursive,
                                         recursion_spaces + extra_recursion_spaces,
-                                        remembered_selections, variation_tags_string, found_cached, debug_script_tags, False, show_time, extra_recursion_spaces, run_state)
+                                        remembered_selections, variation_tags_string, found_cached, debug_script_tags, verbose, show_time, extra_recursion_spaces, run_state)
                 if r['return'] > 0:
                     return r
-                logger.setLevel(tmp_logging_level)
 
             if not fake_run:
                 env_key_mappings = meta.get("env_key_mappings", {})
@@ -1915,12 +1899,10 @@ class ScriptAutomation(Automation):
                 clean_env_keys_post_deps = meta.get(
                     'clean_env_keys_post_deps', [])
 
-                logger.setLevel(current_logging_level)
                 r = self._run_deps(post_deps, clean_env_keys_post_deps, env, state, const, const_state, add_deps_recursive, recursion_spaces,
-                                   remembered_selections, variation_tags_string, found_cached, debug_script_tags, False, show_time, extra_recursion_spaces, run_state)
+                                   remembered_selections, variation_tags_string, found_cached, debug_script_tags, verbose, show_time, extra_recursion_spaces, run_state)
                 if r['return'] > 0:
                     return r
-                logger.setLevel(tmp_logging_level)
 
             # Add extra tags from env updated by deps (such as python version
             # and compiler version, etc)
@@ -2267,6 +2249,9 @@ class ScriptAutomation(Automation):
         # that may close automatically)
         if i.get('pause', False):
             input('Press Enter to continue ...')
+
+        # set the logger level back to the original 
+        logger.setLevel(original_logging_level)
 
         return rr
 
@@ -5286,13 +5271,11 @@ or full console log.
                 postprocess,
                 customize_code.__file__))
 
-    logger.setLevel(run_state['current_logging_level'])
     if len(posthook_deps) > 0 and (postprocess == "postprocess"):
         r = script_automation._call_run_deps(posthook_deps, local_env_keys, local_env_keys_from_meta, env, state, const, const_state,
                                              add_deps_recursive, recursion_spaces, remembered_selections, variation_tags_string, found_cached, debug_script_tags, verbose, show_time, ' ', run_state)
         if r['return'] > 0:
             return r
-    logger.setLevel(run_state['tmp_logging_level'])
 
     if (postprocess == "postprocess") and customize_code is not None and 'postprocess' in dir(
             customize_code):

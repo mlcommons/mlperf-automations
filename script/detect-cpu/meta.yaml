@@ -8,6 +8,8 @@ clean_files:
 - tmp-wmic-cpu.csv
 deps:
 - tags: detect,os
+  names:
+    - detect-os
 new_env_keys:
 - MLC_HOST_CPU_*
 - MLC_HOST_MEMORY_CAPACITY
