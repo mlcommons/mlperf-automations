@@ -346,7 +346,7 @@ def regenerate_script_cmd(i):
             else:
                 if full_key in ['s', 'v']:
                     command_line += f" -{full_key}"
-                else:    
+                else:
                     command_line += f" --{full_key}={quote}{str(value)}{quote}"
 
         return command_line
