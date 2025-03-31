@@ -413,7 +413,7 @@ class ScriptAutomation(Automation):
             if logger.level == logging.DEBUG:
                 env['MLC_TMP_VERBOSE'] = "yes"
             elif logger.level == logging.DEBUG:
-                env['MLC_TMP_SILENT'] = "yes" 
+                env['MLC_TMP_SILENT'] = "yes"
 
         print_deps = i.get('print_deps', False)
         print_versions = i.get('print_versions', False)
@@ -3311,7 +3311,7 @@ class ScriptAutomation(Automation):
             local_env_keys += local_env_keys_from_meta
 
         r = script._run_deps(deps, local_env_keys, env, state, const, const_state, add_deps_recursive, recursion_spaces,
-                             remembered_selections, variation_tags_string, found_cached, debug_script_tags, 
+                             remembered_selections, variation_tags_string, found_cached, debug_script_tags,
                              show_time, extra_recursion_spaces, run_state)
         if r['return'] > 0:
             return r
