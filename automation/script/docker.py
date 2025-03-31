@@ -238,7 +238,7 @@ def docker_run(self_module, i):
     env = i.get('env', {})
 
     regenerate_docker_file = not i.get('docker_noregenerate', False)
-    
+
     rebuild_docker_image = i.get('docker_rebuild', False)
 
     # Prune unnecessary Docker-related input keys
