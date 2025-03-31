@@ -183,11 +183,13 @@ def dockerfile(self_module, input_params):
 
         docker_v = False
         docker_s = False
-        if is_true(input_params.get('docker_v', input_params.get('docker_verbose', False))):
+        if is_true(input_params.get(
+                'docker_v', input_params.get('docker_verbose', False))):
             docker_v = True
-        if is_true(input_params.get('docker_s', input_params.get('docker_silent', False))):
+        if is_true(input_params.get(
+                'docker_s', input_params.get('docker_silent', False))):
             docker_s = True
-        
+
         if docker_s and docker_v:
             logger.warning(
                 "Both verbose and silent is set to True. Verbose will take precedence.")
@@ -198,7 +200,7 @@ def dockerfile(self_module, input_params):
                 docker_v = True
             elif logger.level == logging.WARNING:
                 docker_s = True
-        
+
         if docker_s:
             mlc_docker_input['run_cmd'] += ' -s'
         elif docker_v:
