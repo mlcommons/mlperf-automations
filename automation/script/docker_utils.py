@@ -344,7 +344,10 @@ def regenerate_script_cmd(i):
                 command_line += f" --{full_key},={list_values}"
             # Process scalar values.
             else:
-                command_line += f" --{full_key}={quote}{str(value)}{quote}"
+                if full_key in ['s', 'v']:
+                    command_line += f" -{full_key}"
+                else:    
+                    command_line += f" --{full_key}={quote}{str(value)}{quote}"
 
         return command_line
 
