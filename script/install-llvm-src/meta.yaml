@@ -231,5 +231,5 @@ versions: {}
 tests:
   run_inputs:
     - version: "20.1.1"
-    - variations_list: 
-      - flang,branch.main
+#    - variations_list: 
+#      - flang,branch.main

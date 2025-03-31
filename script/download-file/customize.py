@@ -84,8 +84,8 @@ def preprocess(i):
 
         extra_download_options = env.get('MLC_DOWNLOAD_EXTRA_OPTIONS', '')
 
-        verify_ssl = env.get('MLC_VERIFY_SSL', "True")
-        if is_false(verify_ssl) or os_info['platform'] == 'windows':
+        verify_ssl = is_true(env.get('MLC_VERIFY_SSL', "True"))
+        if not verify_ssl or os_info['platform'] == 'windows':
             verify_ssl = False
         else:
             verify_ssl = True
@@ -229,17 +229,17 @@ def preprocess(i):
             rclone_copy_using = env.get('MLC_RCLONE_COPY_USING', 'sync')
             if rclone_copy_using == "sync":
                 pre_clean = False
+            if not verify_ssl:
+                extra_download_options += " --no-check-certificate "
             if env["MLC_HOST_OS_TYPE"] == "windows":
                 # have to modify the variable from url to temp_url if it is
                 # going to be used anywhere after this point
                 url = url.replace("%", "%%")
                 temp_download_file = env['MLC_DOWNLOAD_FILENAME'].replace(
                     "%", "%%")
-                env['MLC_DOWNLOAD_CMD'] = f"rclone {rclone_copy_using} {q}{url}{q} {q}{os.path.join(os.getcwd(), temp_download_file)}{q} -P --error-on-no-transfer"
+                env['MLC_DOWNLOAD_CMD'] = f"rclone {rclone_copy_using} {q}{url}{q} {q}{os.path.join(os.getcwd(), temp_download_file)}{q} -P --error-on-no-transfer {extra_download_options}"
             else:
-                env['MLC_DOWNLOAD_CMD'] = f"rclone {rclone_copy_using} {q}{url}{q} {q}{os.path.join(os.getcwd(), env['MLC_DOWNLOAD_FILENAME'])}{q} -P --error-on-no-transfer"
-            if not verify_ssl:
-                env['MLC_DOWNLOAD_CMD'] += f" --no-check-certificate"
+                env['MLC_DOWNLOAD_CMD'] = f"rclone {rclone_copy_using} {q}{url}{q} {q}{os.path.join(os.getcwd(), env['MLC_DOWNLOAD_FILENAME'])}{q} -P --error-on-no-transfer {extra_download_options}"
 
         filename = env['MLC_DOWNLOAD_FILENAME']
         env['MLC_DOWNLOAD_DOWNLOADED_FILENAME'] = filename
