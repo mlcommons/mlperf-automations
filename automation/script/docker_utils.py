@@ -1,10 +1,14 @@
 import os
 from mlc import utils
 from utils import *
-from pathlib import PureWindowsPath, PurePosixPath
+from pathlib import PureWindowsPath, PurePosixPath, Path
 from script.docker_utils import *
 import copy
 
+def convert_to_abs_path(path):
+    if not os.path.isabs(path):
+        path = os.path.abspath(path)
+    return path
 
 def process_mounts(mounts, env, docker_settings, f_run_cmd):
     """
@@ -63,7 +67,6 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd):
                 else:  # Skip mount if variable is missing
                     mounts[index] = None
                     break
-
         # Skip further processing if the mount was invalid
         if mounts[index] is None:
             continue
@@ -241,7 +244,6 @@ def update_container_paths(path, mounts=None, force_target_path=''):
     if mounts is not None:
         if all(mount.lower() != mount_entry.lower() for mount in mounts):
             mounts.append(mount_entry)
-
     return host_path, container_path
 
 
@@ -387,6 +389,9 @@ def get_docker_default(key):
 
 
 def get_host_path(value):
+    # convert relative path to absolute path
+    value = convert_to_abs_path(value)
+
     path_split = value.split(os.sep)
     if len(path_split) == 1:
         return value
@@ -413,6 +418,9 @@ def get_container_path_script(i):
 
 
 def get_container_path(value, username="mlcuser"):
+    # convert relative path to absolute path
+    value = convert_to_abs_path(value)
+
     path_split = value.split(os.sep)
     if len(path_split) == 1:
         return value, value
