@@ -395,8 +395,6 @@ def get_host_path(value):
     value = convert_to_abs_path(value)
 
     path_split = value.split(os.sep)
-    if len(path_split) == 1:
-        return value
 
     new_value = ''
     if "cache" in path_split and "local":
@@ -424,8 +422,6 @@ def get_container_path(value, username="mlcuser"):
     value = convert_to_abs_path(value)
 
     path_split = value.split(os.sep)
-    if len(path_split) == 1:
-        return value, value
 
     new_value = ''
     if "cache" in path_split and "local" in path_split:
