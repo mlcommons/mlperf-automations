@@ -5,10 +5,12 @@ from pathlib import PureWindowsPath, PurePosixPath
 from script.docker_utils import *
 import copy
 
+
 def convert_to_abs_path(path):
     if not os.path.isabs(path):
         path = os.path.abspath(path)
     return path
+
 
 def process_mounts(mounts, env, docker_settings, f_run_cmd):
     """
