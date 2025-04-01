@@ -1,7 +1,7 @@
 import os
 from mlc import utils
 from utils import *
-from pathlib import PureWindowsPath, PurePosixPath, Path
+from pathlib import PureWindowsPath, PurePosixPath
 from script.docker_utils import *
 import copy
 
