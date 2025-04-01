@@ -72,20 +72,15 @@ def generate_submission(env, state, inp, submission_division):
     sys.path.append(submission_checker_dir)
 
     if env.get('MLC_MLPERF_INFERENCE_SUBMISSION_DIR', '') == '':
-        user_home = str(Path.home())
-        env['MLC_MLPERF_INFERENCE_SUBMISSION_DIR'] = os.path.join(
-            user_home, "mlperf_submission")
+        if env.get('MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR', '') == '':
+            user_home = str(Path.home())
+            env['MLC_MLPERF_INFERENCE_SUBMISSION_DIR'] = os.path.join(
+                user_home, "mlperf_submission")
+        else:
+            env['MLC_MLPERF_INFERENCE_SUBMISSION_DIR'] = os.path.join(
+                env['MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR'], "mlperf_submission")
 
     submission_dir = env.get('MLC_MLPERF_INFERENCE_SUBMISSION_DIR', '')
-    if submission_dir == '':
-        submission_base_dir = env.get(
-            'MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR', '')
-        if submission_base_dir == '':
-            return {'return': 1, 'error': f"Both MLC_MLPERF_INFERENCE_SUBMISSION_DIR and MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR can not be empty!"}
-        else:
-            submission_dir = os.path.join(
-                submission_base_dir, "mlperf_inference_submission")
-            env['MLC_MLPERF_INFERENCE_SUBMISSION_DIR'] = submission_dir
 
     if env.get('MLC_MLPERF_CLEAN_SUBMISSION_DIR', '') != '':
         print('=================================================')
