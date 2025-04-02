@@ -3,7 +3,6 @@ import os
 import subprocess
 
 
-
 def generate_kill_command(env):
     kill_cmd = ""
 
@@ -15,7 +14,8 @@ def generate_kill_command(env):
 
         elif env.get("MLC_KILL_PROCESS_NAME"):
             process_name = env["MLC_KILL_PROCESS_NAME"]
-            # Find process group of the first matching process name and kill all in that group
+            # Find process group of the first matching process name and kill
+            # all in that group
             kill_cmd = f"pkill -g $(pgrep -o {process_name} | xargs ps -o pgid= -p | tr -d ' ')"
 
     else:
@@ -25,8 +25,8 @@ def generate_kill_command(env):
 
         elif env.get("MLC_KILL_PROCESS_NAME"):
             process_name = env["MLC_KILL_PROCESS_NAME"]
-            kill_cmd = f"pkill {process_name}"  # Kill all processes matching the name
-
+            # Kill all processes matching the name
+            kill_cmd = f"pkill {process_name}"
 
     env["MLC_RUN_CMD"] = kill_cmd if kill_cmd else "echo 'No valid input provided'"
 
