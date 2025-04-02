@@ -50,7 +50,7 @@ if [[ ${require_download} == 1 ]]; then
 fi
 
 # Verify checksum again if necessary
-if [[ ${MLC_DOWNLOAD_TOOL} == "mlcutil" || ${require_download} == 1 ]]; then
+if [[ "${MLC_DOWNLOAD_MODE}" != "dry" && ( "${MLC_DOWNLOAD_TOOL}" == "mlcutil" || ${require_download} == 1 ) ]]; then
   if [[ -n "${MLC_DOWNLOAD_CHECKSUM_CMD}" ]]; then
     echo -e "\nVerifying checksum after download: ${MLC_DOWNLOAD_CHECKSUM_CMD}"
     eval "${MLC_DOWNLOAD_CHECKSUM_CMD}" || exit $?

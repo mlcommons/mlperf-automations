@@ -30,5 +30,35 @@ variations:
         enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - yes
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - 'yes'
+        env:
+          MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_WAYMO_PATH
+          MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_WAYMO_PATH
+          MLC_DOWNLOAD_URL: mlc-waymo:waymo_preprocessed_dataset/kitti_format
+        extra_cache_tags: waymo,dataset
+        force_cache: true
+        names:
+          - dae
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
     env:
       MLC_DOWNLOAD_SRC: mlcommons
+  rclone:
+    group: download-tool
+    add_deps_recursive:
+      dae:
+        tags: _rclone
+    default: true
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run

@@ -20,7 +20,6 @@ def dockerfile(self_module, input_params):
     run_command_arc = prune_result['new_input']
     current_directory = os.getcwd()
     is_quiet_mode = input_params.get('quiet', False)
-    verbose = input_params.get('v', False)
     is_console_output = input_params.get('out') == 'con'
 
     # Step 2: Search for scripts
@@ -88,8 +87,7 @@ def dockerfile(self_module, input_params):
             new_state_keys_from_meta=[],  # Add state keys from meta if needed
             add_deps_recursive=add_deps_recursive,
             run_state=run_state,
-            recursion_spaces='',
-            verbose=verbose  # Set to True or False as needed
+            recursion_spaces=''
         )
         if update_variations_result['return'] > 0:
             return update_variations_result
@@ -109,7 +107,7 @@ def dockerfile(self_module, input_params):
         deps = docker_settings.get('build_deps', [])
         if deps:
             r = self_module._run_deps(
-                deps, [], env, {}, {}, {}, {}, '', [], '', False, '', verbose,
+                deps, [], env, {}, {}, {}, {}, '', [], '', False, '',
                 show_time, ' ', run_state)
             if r['return'] > 0:
                 return r
@@ -180,8 +178,34 @@ def dockerfile(self_module, input_params):
             'comments': comments, 'run_cmd': f"{run_command_string} --quiet",
             'script_tags': input_params.get('tags'), 'env': env,
             'dockerfile_env': dockerfile_env,
-            'quiet': True, 'v': input_params.get('v', False), 'real_run': True
+            'quiet': True, 'real_run': True
         }
+
+        docker_v = False
+        docker_s = False
+        if is_true(input_params.get(
+                'docker_v', input_params.get('docker_verbose', False))):
+            docker_v = True
+        if is_true(input_params.get(
+                'docker_s', input_params.get('docker_silent', False))):
+            docker_s = True
+
+        if docker_s and docker_v:
+            logger.warning(
+                "Both verbose and silent is set to True. Verbose will take precedence.")
+            docker_s = False
+
+        if not docker_s and not docker_v:
+            if logger.level == logging.DEBUG:
+                docker_v = True
+            elif logger.level == logging.WARNING:
+                docker_s = True
+
+        if docker_s:
+            mlc_docker_input['run_cmd'] += ' -s'
+        elif docker_v:
+            mlc_docker_input['run_cmd'] += ' -v'
+
         mlc_docker_input.update(docker_inputs)
 
         dockerfile_result = self_module.action_object.access(mlc_docker_input)
@@ -209,7 +233,6 @@ def docker_run(self_module, i):
 
     # Extract and handle basic inputs
     quiet = i.get('quiet', False)
-    verbose = i.get('v', False)
     show_time = i.get('show_time', False)
     logger = self_module.logger
     env = i.get('env', {})
@@ -296,8 +319,7 @@ def docker_run(self_module, i):
             posthook_deps=[],
             new_env_keys_from_meta=[],
             new_state_keys_from_meta=[],
-            add_deps_recursive=add_deps_recursive, run_state=run_state, recursion_spaces='',
-            verbose=False)
+            add_deps_recursive=add_deps_recursive, run_state=run_state, recursion_spaces='')
         if r['return'] > 0:
             return r
 
@@ -306,7 +328,7 @@ def docker_run(self_module, i):
         deps = docker_settings.get('deps', [])
         if deps:
             r = self_module._run_deps(
-                deps, [], env, {}, {}, {}, {}, '', [], '', False, '', verbose,
+                deps, [], env, {}, {}, {}, {}, '', [], '', False, '',
                 show_time, ' ', run_state)
             if r['return'] > 0:
                 return r
@@ -374,7 +396,7 @@ def docker_run(self_module, i):
             'action': 'run', 'target': 'script', 'tags': 'run,docker,container',
             'rebuild': rebuild_docker_image,
             'env': env, 'mounts': mounts,
-            'script_tags': i.get('tags'), 'run_cmd': final_run_cmd, 'v': verbose,
+            'script_tags': i.get('tags'), 'run_cmd': final_run_cmd,
             'quiet': True, 'real_run': True, 'add_deps_recursive': {'build-docker-image': {'dockerfile': dockerfile_path}},
             **docker_inputs
         }

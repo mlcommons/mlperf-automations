@@ -27,8 +27,10 @@ deps:
   tags: get,mlperf,results,dir,local
 - names:
   - get-mlperf-submission-dir
-  skip_if_env:
+  skip_if_any_env:
     MLC_MLPERF_INFERENCE_SUBMISSION_DIR:
+    - 'on'
+    MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR:
     - 'on'
   tags: get,mlperf,submission,dir
 docker:
@@ -82,6 +84,7 @@ input_mapping:
   submission_base_dir: MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR
   submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
   submitter: MLC_MLPERF_SUBMITTER
+  submitter_id: MLC_MLPERF_SUBMITTER_ID
   sw_notes_extra: MLC_MLPERF_SUT_SW_NOTES_EXTRA
   tar: MLC_TAR_SUBMISSION_DIR
   get_platform_details: MLC_GET_PLATFORM_DETAILS
