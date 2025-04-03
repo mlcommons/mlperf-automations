@@ -46,3 +46,6 @@ variations:
     ad:
       llvm-install:
         tags: src,_clang
+  path.#:
+    env:
+      MLC_LLVM_DIR_PATH: '#'
