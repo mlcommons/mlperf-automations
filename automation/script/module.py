@@ -3165,7 +3165,7 @@ class ScriptAutomation(Automation):
                                     "#", variation_tag_dynamic_suffix)
                     elif isinstance(item, str):
                         value[i] = value[i].replace(
-                                    "#", variation_tag_dynamic_suffix)
+                            "#", variation_tag_dynamic_suffix)
 
             elif isinstance(value, dict):  # add_deps, env, ..
                 for item in value:
@@ -3192,7 +3192,8 @@ class ScriptAutomation(Automation):
                                 "#", variation_tag_dynamic_suffix)
 
             else:  # scalar value, never used?
-                variation_meta[key] = variation_meta[key].replace("#", variation_tag_dynamic_suffix)
+                variation_meta[key] = variation_meta[key].replace(
+                    "#", variation_tag_dynamic_suffix)
 
     ##########################################################################
 
