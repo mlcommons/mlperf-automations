@@ -62,8 +62,11 @@ variations:
       - branch.main
   version.#:
     group: version
-    base:
-      - tag.#
+    ad:
+      llvm-src-repo:
+        tags: _full-history
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
   branch.#:
     env:
       MLC_GIT_CHECKOUT: '#'
