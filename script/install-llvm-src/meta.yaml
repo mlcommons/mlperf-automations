@@ -56,6 +56,14 @@ tags:
 - src-llvm
 uid: 2af16e9a6c5f4702
 variations:
+  version.main:
+    group: version
+    base:
+      - branch.main
+  version.#:
+    group: version
+    base:
+      - tag.#
   branch.#:
     env:
       MLC_GIT_CHECKOUT: '#'
