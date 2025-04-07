@@ -279,7 +279,7 @@ versions:
       - tags: get,generic-python-lib,_package.cuda-python
         names:
         - cuda-python
-        version_max: 12.6
+        version_max: '12.6'
         version_max_usable: '12.3.0'
       - tags: get,generic-python-lib,_package.networkx
         version_max: '2.9.99'
@@ -294,7 +294,7 @@ versions:
       - tags: get,generic-python-lib,_package.cuda-python
         names:
         - cuda-python
-        version_max: 12.6
+        version_max: '12.6'
         version_max_usable: '12.3.0'
       - tags: get,generic-python-lib,_package.networkx
         version_max: '2.9.99'
