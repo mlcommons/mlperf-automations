@@ -404,6 +404,15 @@ variations:
             _tp-size.:
               - MLC_NVIDIA_TP_SIZE
 
+  nvidia-original,r5.0-dev_default,gptj_:
+    docker:
+      image_name: mlperf-inference-nvidia-v4.1-dev-llm
+      deps:
+        - tags: get,ml-model,gptj,_nvidia,_fp8
+          update_tags_from_env_with_prefix:
+            _tp-size.:
+              - MLC_NVIDIA_TP_SIZE
+
   nvidia-original,r4.1_default:
     docker:
       base_image: nvcr.io/nvidia/mlperf/mlperf-inference:mlpinf-v4.1-cuda12.4-pytorch24.04-ubuntu22.04-x86_64-release

@@ -300,7 +300,7 @@ def preprocess(i):
         if not os.path.exists(fp32_model_path):
             # download via prehook_deps
             env['MLC_REQUIRE_GPTJ_MODEL_DOWNLOAD'] = 'yes'
-            if make_command == "build_engine":
+            if make_command in ["build_engine", "preprocess_data"]:
                 cmds.append(
                     f"cp -r $MLC_ML_MODEL_FILE_WITH_PATH {fp32_model_path}")
 
