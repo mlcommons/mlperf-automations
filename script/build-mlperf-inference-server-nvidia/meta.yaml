@@ -111,7 +111,7 @@ deps:
 
   # Detect pycuda
   - tags: get,generic-python-lib,_pycuda
-    version: "2022.2.2"
+    version: "2023.1"
     skip_if_env:
       MLC_RUN_STATE_DOCKER:
         - 'yes'

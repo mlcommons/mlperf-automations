@@ -248,6 +248,10 @@ def preprocess(i):
     for cmd in config['RUN_CMDS']:
         f.write('RUN ' + cmd + EOL)
 
+    if env.get('MLC_MLPERF_IMPLEMENTATION', '') == "nvidia" and env.get(
+            'MLC_MLPERF_INFERENCE_VERSION', '') == "5.0":
+        f.write('ENV ' + 'ENV' + "=\"" + 'release' + "\"" + EOL)
+
     f.write(EOL + '# Setup docker user' + EOL)
     docker_user = get_value(env, config, 'USER', 'MLC_DOCKER_USER')
     docker_group = get_value(env, config, 'GROUP', 'MLC_DOCKER_GROUP')

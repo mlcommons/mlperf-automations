@@ -366,7 +366,6 @@ variations:
     group: benchmark-version
   
   r5.0-dev:
-    default: true
     env:
       MLC_MLPERF_INFERENCE_VERSION: '5.0-dev'
       MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r5.0-dev_default
@@ -379,6 +378,21 @@ variations:
         tags: _version.r5.0-dev
       mlperf-inference-nvidia-scratch-space:
         tags: _version.r5.0-dev
+
+  r5.0:
+    default: true
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: '5.0'
+      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r5.0_default
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v5.0
+    group: benchmark-version
+    adr:
+      get-mlperf-inference-results-dir:
+        tags: _version.r5.0
+      get-mlperf-inference-submission-dir:
+        tags: _version.r5.0
+      mlperf-inference-nvidia-scratch-space:
+        tags: _version.r5.0
 
   short:
     add_deps_recursive:
