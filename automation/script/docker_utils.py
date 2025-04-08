@@ -78,19 +78,10 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd):
 
         # Update container environment string and mappings
         if host_env_key:
-            # We are modifying the input mapping variables wrt to the new container env variable. Is explicit passing of env variable necessary?
-            # container_env_string += f" --env.{host_env_key}={container_env_key} "
+            container_env_string += f" --env.{host_env_key}={container_env_key} "
             for key, value in docker_input_mapping.items():
                 if value == host_env_key:
-                    # If we want to pass/mount a filepath, now its mounting its parent folder
-                    # and in the input, along with the parent folder, filename
-                    # is also passed to access
-                    if os.path.basename(env[host_env_key]) != "":
-                        f_run_cmd[key] = os.path.join(
-                            container_env_key, os.path.basename(
-                                env[host_env_key]))
-                    else:
-                        f_run_cmd[key] = container_env_key
+                    f_run_cmd[key] = container_env_key
 
     # Remove invalid mounts and construct mount string
     mounts = [item for item in mounts if item is not None]
@@ -429,7 +420,6 @@ def get_container_path_script(i):
 def get_container_path(value, username="mlcuser"):
     # convert relative path to absolute path
     # if we are trying to mount a file, mount the parent folder.
-    value = os.path.dirname(convert_to_abs_path(value))
 
     path_split = value.split(os.sep)
 
@@ -444,4 +434,4 @@ def get_container_path(value, username="mlcuser"):
             return "/".join(new_path_split1), "/".join(new_path_split2)
     else:
         orig_path, target_path = update_container_paths(path=value)
-        return target_path, target_path
+        return os.path.dirname(target_path), target_path
