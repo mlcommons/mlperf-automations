@@ -1,5 +1,5 @@
 from mlc import utils
-from mlc.utils import *
+from utils import *
 import os
 import subprocess
 
