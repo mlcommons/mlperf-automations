@@ -529,7 +529,8 @@ def run_files_exist(mode, OUTPUT_DIR, run_files, env):
 
         return is_valid
 
-    if "power" in mode and not is_true(env.get('MLC_MLPERF_SKIP_POWER_CHECKS', 'no')):
+    if "power" in mode and not is_true(
+            env.get('MLC_MLPERF_SKIP_POWER_CHECKS', 'no')):
         from power.power_checker import check as check_power_more
         try:
             is_valid = check_power_more(os.path.dirname(OUTPUT_DIR)) == 0
