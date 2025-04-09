@@ -671,7 +671,10 @@ def preprocess(i):
         if num_warmups != '':
             run_config += f" --num_warmups={num_warmups}"
 
-        skip_postprocess = str(env.get('MLC_MLPERF_NVIDIA_HARNESS_SKIP_POSTPROCESS', ''))
+        skip_postprocess = str(
+            env.get(
+                'MLC_MLPERF_NVIDIA_HARNESS_SKIP_POSTPROCESS',
+                ''))
         if skip_postprocess and is_true(skip_postprocess):
             run_config += f" --skip_postprocess"
 

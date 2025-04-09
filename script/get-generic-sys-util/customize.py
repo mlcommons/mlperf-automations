@@ -156,12 +156,14 @@ def postprocess(i):
 
     version_env_key = f"MLC_{env['MLC_SYS_UTIL_NAME'].upper()}_VERSION"
 
-    if (env.get('MLC_SYS_UTIL_VERSION_CMD', '') != '' or env.get('MLC_SYS_UTIL_VERSION_CMD_OVERRIDE', '') != '') and env.get(version_env_key, '') == '' and is_false(env.get('MLC_TMP_GENERIC_SYS_UTIL_PACKAGE_INSTALL_IGNORED', '')) and env.get('MLC_GET_GENERIC_SYS_UTIL_INSTALL_FAILED', '') != 'yes':
+    if (env.get('MLC_SYS_UTIL_VERSION_CMD', '') != '' or env.get('MLC_SYS_UTIL_VERSION_CMD_OVERRIDE', '') != '') and env.get(version_env_key, '') == '' and is_false(
+            env.get('MLC_TMP_GENERIC_SYS_UTIL_PACKAGE_INSTALL_IGNORED', '')) and env.get('MLC_GET_GENERIC_SYS_UTIL_INSTALL_FAILED', '') != 'yes':
         automation = i['automation']
 
         r = automation.run_native_script(
             {'run_script_input': i['run_script_input'], 'env': env, 'script_name': 'detect'})
-        if r['return'] > 0 and not is_true(env.get('MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE', False)):
+        if r['return'] > 0 and not is_true(
+                env.get('MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE', False)):
             return {'return': 1, 'error': 'Version detection failed after installation. Please check the provided version command or use env.MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE=yes to ignore the error.'}
 
         elif r['return'] == 0:
