@@ -218,8 +218,7 @@ def update_container_paths(path, mounts=None, force_target_path=''):
     if not path:
         return '', ''  # Return empty paths if no path is provided.
 
-    # Normalize and resolve the absolute path.
-    host_path = os.path.abspath(path)
+    host_path = path
     container_path = host_path  # Default to the same path for containers.
 
     # Handle Windows-specific path conversion for Docker.
@@ -420,6 +419,7 @@ def get_container_path_script(i):
 def get_container_path(value, username="mlcuser"):
     # convert relative path to absolute path
     # if we are trying to mount a file, mount the parent folder.
+    value = convert_to_abs_path(value)
 
     path_split = value.split(os.sep)
 
