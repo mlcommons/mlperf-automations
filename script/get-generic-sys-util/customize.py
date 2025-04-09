@@ -1,8 +1,7 @@
 from mlc import utils
 import os
 import re
-from mlc.utils import *
-from automation.utils import is_true, is_false
+from utils import *
 
 
 def preprocess(i):

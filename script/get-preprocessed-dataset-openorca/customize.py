@@ -1,6 +1,5 @@
 from mlc import utils
 from mlc.utils import *
-from automation.utils import is_true, is_false
 import os
 import shutil
 
@@ -9,8 +8,7 @@ def preprocess(i):
 
     env = i['env']
 
-    if str(env.get('MLC_DATASET_PREPROCESSED_BY_MLC', '')
-           ).lower() in ["yes", "1", "true"]:
+    if is_true(str(env.get('MLC_DATASET_PREPROCESSED_BY_MLC', ''))):
         run_dir = os.getcwd()
         if env.get('MLC_DATASET_CALIBRATION', '') == "yes":
             env['MLC_DATASET_CALIBRATION_PATH'] = os.path.join(

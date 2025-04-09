@@ -5,8 +5,7 @@ import shutil
 import subprocess
 import copy
 from tabulate import tabulate
-from mlc.utils import *
-from automation.utils import is_true, is_false
+from utils import *
 
 summary_ext = ['.csv', '.json', '.xlsx']
 
@@ -67,8 +66,7 @@ def preprocess(i):
         if 'MLC_RERUN' not in env:
             env['MLC_RERUN'] = "yes"
 
-    if str(env.get('MLC_SYSTEM_POWER', 'no')).lower(
-    ) != "no" or env.get('MLC_MLPERF_POWER', '') == "yes":
+    if is_true(str(env.get('MLC_SYSTEM_POWER', 'no'))) or is_true(env.get('MLC_MLPERF_POWER', '')):
         power_variation = ",_power"
         env['MLC_MLPERF_POWER'] = "yes"
     else:
@@ -94,7 +92,7 @@ def preprocess(i):
         if 'MLC_MLPERF_LOADGEN_SCENARIO' not in env:
             env['MLC_MLPERF_LOADGEN_SCENARIO'] = "Offline"
 
-    if env.get('MLC_MLPERF_LOADGEN_ALL_SCENARIOS', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_LOADGEN_ALL_SCENARIOS', '')):
         env['MLC_MLPERF_LOADGEN_SCENARIOS'] = get_valid_scenarios(
             env['MLC_MODEL'],
             system_meta['system_type'],
@@ -105,7 +103,7 @@ def preprocess(i):
         env['MLC_MLPERF_LOADGEN_SCENARIOS'] = [
             env['MLC_MLPERF_LOADGEN_SCENARIO']]
 
-    if env.get('MLC_MLPERF_LOADGEN_ALL_MODES', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_LOADGEN_ALL_MODES', '')):
         env['MLC_MLPERF_LOADGEN_MODES'] = ["performance", "accuracy"]
     else:
         env['MLC_MLPERF_LOADGEN_MODES'] = [env['MLC_MLPERF_LOADGEN_MODE']]
@@ -199,8 +197,7 @@ def preprocess(i):
 
         print('=========================================================')
 
-    if str(env.get('MLC_MLPERF_USE_DOCKER', '')
-           ).lower() in ["1", "true", "yes"]:
+    if is_true(str(env.get('MLC_MLPERF_USE_DOCKER', ''))):
         action = "docker"
         del (env['OUTPUT_BASE_DIR'])
         state = {}

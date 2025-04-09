@@ -5,7 +5,6 @@ import shutil
 import subprocess
 import sys
 from utils import *
-from automation.utils import is_true, is_false
 
 
 def preprocess(i):
@@ -437,8 +436,7 @@ def preprocess(i):
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    if str(env.get('MLC_MLPERF_RESULTS_DIR_SHARED', '')
-           ).lower() in ["yes", "true", "1"]:
+    if is_true(env.get('MLC_MLPERF_RESULTS_DIR_SHARED', '')):
         os.chmod(OUTPUT_DIR, 0o2775)
 
     return {'return': 0}

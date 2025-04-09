@@ -2,7 +2,6 @@ from mlc import utils
 import os
 import shutil
 from utils import *
-from automation.utils import is_true, is_false
 
 
 def preprocess(i):
@@ -642,7 +641,7 @@ def preprocess(i):
             run_config += f" --audio_buffer_num_lines={audio_buffer_num_lines}"
 
         use_fp8 = str(env.get('MLC_MLPERF_NVIDIA_HARNESS_USE_FP8', ''))
-        if use_fp8 and use_fp8.lower() not in ["no", "false", "0", ""]:
+        if use_fp8 and is_true(use_fp8):
             run_config += f" --use_fp8"
 
         if "llama2" in env["MLC_MODEL"]:
@@ -672,12 +671,8 @@ def preprocess(i):
         if num_warmups != '':
             run_config += f" --num_warmups={num_warmups}"
 
-        skip_postprocess = str(
-            env.get(
-                'MLC_MLPERF_NVIDIA_HARNESS_SKIP_POSTPROCESS',
-                ''))
-        if skip_postprocess and skip_postprocess.lower() not in [
-                "no", "false", "0", ""]:
+        skip_postprocess = str(env.get('MLC_MLPERF_NVIDIA_HARNESS_SKIP_POSTPROCESS', ''))
+        if skip_postprocess and is_true(skip_postprocess):
             run_config += f" --skip_postprocess"
 
         if test_mode:

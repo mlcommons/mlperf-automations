@@ -6,8 +6,7 @@ import sys
 from tabulate import tabulate
 import mlperf_utils
 from pathlib import Path
-from mlc.utils import *
-from automation.utils import is_true, is_false
+from utils import is_true
 
 
 def preprocess(i):
@@ -96,8 +95,7 @@ def generate_submission(env, state, inp, submission_division):
     if not os.path.isdir(submission_dir):
         os.makedirs(submission_dir)
 
-    if str(env.get('MLC_MLPERF_SUBMISSION_DIR_SHARED', '')
-           ).lower() in ["yes", "true", "1"]:
+    if is_true(str(env.get('MLC_MLPERF_SUBMISSION_DIR_SHARED', ''))):
         os.chmod(submission_dir, 0o2775)
 
     print('* MLPerf inference submission dir: {}'.format(submission_dir))

@@ -1,8 +1,6 @@
 from mlc import utils
 import os
 import hashlib
-from mlc.utils import *
-from automation.utils import is_true, is_false
 
 
 def preprocess(i):
@@ -49,9 +47,6 @@ def preprocess(i):
         if (env.get('MLC_EXTRACT_FINAL_ENV_NAME', '') == '') and (
                 env.get('MLC_DAE_FINAL_ENV_NAME', '') != ''):
             env['MLC_EXTRACT_FINAL_ENV_NAME'] = env['MLC_DAE_FINAL_ENV_NAME']
-
-    if is_true(env.get('MLC_DOWNLOAD_AND_EXTRACT_SKIP_DOWNLOAD', False)):
-        return {'return': 0}
 
     return {'return': 0}
 

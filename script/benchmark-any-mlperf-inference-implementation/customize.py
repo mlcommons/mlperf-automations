@@ -1,6 +1,6 @@
 from mlc import utils
 from mlc.utils import *
-from automation.utils import is_true, is_false
+from automation.utils import is_true
 import os
 
 
