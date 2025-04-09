@@ -1,4 +1,5 @@
 from mlc import utils
+from automation.utils import is_true, is_false
 import os
 
 
@@ -16,7 +17,7 @@ def preprocess(i):
         i['run_script_input']['script_name'] = "run-rhel"
 
     # Test (not needed - will be removed)
-    if str(env.get('MLC_SKIP_SYS_UTILS', '')).lower() in [True, 'yes', 'on']:
+    if is_true(str(env.get('MLC_SKIP_SYS_UTILS', ''))):
         return {'return': 0, 'skip': True}
 
 

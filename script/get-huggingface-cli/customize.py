@@ -1,4 +1,5 @@
 from mlc import utils
+from automation.utils import is_true, is_false
 import os
 
 
@@ -7,7 +8,7 @@ def preprocess(i):
     if env.get('MLC_HF_TOKEN', '') != '':
         env['MLC_HF_LOGIN_CMD'] = f"""git config --global credential.helper store && huggingface-cli login --token {env['MLC_HF_TOKEN']} --add-to-git-credential
 """
-    elif str(env.get('MLC_HF_DO_LOGIN')).lower() in ["yes", "1", "true"]:
+    elif is_true(str(env.get('MLC_HF_DO_LOGIN'))):
         env['MLC_HF_LOGIN_CMD'] = f"""git config --global credential.helper store && huggingface-cli login
 """
     return {'return': 0}

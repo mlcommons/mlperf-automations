@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import sys
 from utils import *
+from automation.utils import is_true, is_false
 
 
 def preprocess(i):
@@ -149,7 +150,7 @@ def preprocess(i):
                     print("In find performance mode: using 0.5ms as target_latency")
                 else:
                     print("No target_latency specified. Using default")
-                if env.get('MLC_MLPERF_USE_MAX_DURATION', 'yes').lower() in ["no", "false", "0"] or env.get(
+                if is_false(env.get('MLC_MLPERF_USE_MAX_DURATION', 'yes')) or env.get(
                         'MLC_MLPERF_MODEL_EQUAL_ISSUE_MODE', 'no').lower() in ["yes", "1", "true"]:
                     # Total number of queries needed is a multiple of dataset
                     # size. So we dont use max_duration and so we need to be
@@ -324,8 +325,7 @@ def preprocess(i):
         env['MLC_MLPERF_MAX_QUERY_COUNT'] = max_query_count
 
         # max_duration is effective for all scenarios except the Offline
-        if env.get('MLC_MLPERF_USE_MAX_DURATION', 'yes').lower() not in [
-                "no", "false", "0"]:
+        if not is_true(env.get('MLC_MLPERF_USE_MAX_DURATION', 'yes')):
             if scenario != "Offline":
                 user_conf += ml_model_name + "." + scenario + \
                     f".max_duration = {max_duration_test}" + "\n"
@@ -531,8 +531,7 @@ def run_files_exist(mode, OUTPUT_DIR, run_files, env):
 
         return is_valid
 
-    if "power" in mode and env.get(
-            'MLC_MLPERF_SKIP_POWER_CHECKS', 'no').lower() not in ["yes", "true", "on"]:
+    if "power" in mode and not is_true(env.get('MLC_MLPERF_SKIP_POWER_CHECKS', 'no')):
         from power.power_checker import check as check_power_more
         try:
             is_valid = check_power_more(os.path.dirname(OUTPUT_DIR)) == 0

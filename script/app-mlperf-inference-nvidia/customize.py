@@ -2,6 +2,7 @@ from mlc import utils
 import os
 import shutil
 from utils import *
+from automation.utils import is_true, is_false
 
 
 def preprocess(i):
@@ -649,7 +650,7 @@ def preprocess(i):
             run_config += f" --tensor_parallelism={tmp_tp_size}"
 
         enable_sort = env.get('MLC_MLPERF_NVIDIA_HARNESS_ENABLE_SORT')
-        if enable_sort and enable_sort.lower() not in ["no", "false", "0"]:
+        if enable_sort and is_true(enable_sort):
             run_config += f" --enable_sort"
 
         sdxl_server_batcher_time_limit = env.get(

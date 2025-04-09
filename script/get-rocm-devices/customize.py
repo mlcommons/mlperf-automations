@@ -1,6 +1,8 @@
 from mlc import utils
 import os
 import subprocess
+from mlc.utils import *
+from automation.utils import is_true, is_false
 
 
 def preprocess(i):
@@ -10,6 +12,9 @@ def preprocess(i):
     if str(env.get('MLC_DETECT_USING_HIP-PYTHON', '')
            ).lower() in ["1", "yes", "true"]:
         i['run_script_input']['script_name'] = 'detect'
+
+    if is_true(env.get('MLC_ROCM_DEVICES_SKIP_DETECTION', False)):
+        i['run_script_input']['script_name'] = 'skip'
 
     return {'return': 0}
 

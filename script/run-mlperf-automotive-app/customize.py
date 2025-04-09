@@ -5,6 +5,8 @@ import shutil
 import subprocess
 import copy
 from tabulate import tabulate
+from mlc.utils import *
+from automation.utils import is_true, is_false
 
 summary_ext = ['.csv', '.json', '.xlsx']
 

@@ -1,4 +1,6 @@
 from mlc import utils
+from mlc.utils import *
+from automation.utils import is_true, is_false
 import os
 
 
@@ -29,7 +31,7 @@ def preprocess(i):
 
     power = env.get('POWER', '')
 
-    if str(power).lower() in ["yes", "true"]:
+    if is_true(str(power)):
         POWER_STRING = " --power=yes --adr.mlperf-power-client.power_server=" + env.get(
             'POWER_SERVER',
             '192.168.0.15') + " --adr.mlperf-power-client.port=" + str(

@@ -6,6 +6,8 @@ import sys
 from tabulate import tabulate
 import mlperf_utils
 from pathlib import Path
+from mlc.utils import *
+from automation.utils import is_true, is_false
 
 
 def preprocess(i):

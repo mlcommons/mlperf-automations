@@ -1,4 +1,6 @@
 from mlc import utils
+from mlc.utils import *
+from automation.utils import is_true, is_false
 import os
 import subprocess
 
@@ -10,6 +12,9 @@ def preprocess(i):
     if str(env.get('MLC_DETECT_USING_PYCUDA', '')
            ).lower() in ["1", "yes", "true"]:
         i['run_script_input']['script_name'] = 'detect'
+
+    if is_true(env.get('MLC_CUDA_DEVICES_SKIP_DETECTION', False)):
+        i['run_script_input']['script_name'] = 'skip'
 
     return {'return': 0}
 
