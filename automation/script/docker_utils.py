@@ -11,16 +11,20 @@ def convert_to_abs_path(path):
         path = os.path.abspath(path)
     return path
 
-# gets parent directory if the path is a file. Works even though the file is not present and is just a path 
+# gets parent directory if the path is a file. Works even though the file
+# is not present and is just a path
+
+
 def get_directory(path_str):
     path = Path(path_str).resolve()
-    
+
     # If it has a file extension, assume it's a file and return parent dir
     if path.suffix:
         return str(path.parent)
     else:
         return str(path)
-    
+
+
 def process_mounts(mounts, env, docker_settings, f_run_cmd):
     """
     Processes and updates the Docker mounts based on the provided inputs and environment variables.
@@ -444,5 +448,6 @@ def get_container_path(value, username="mlcuser"):
             return "/".join(new_path_split1), "/".join(new_path_split2)
     else:
         orig_path, target_path = update_container_paths(path=value)
-        # new container path is the parent folder of the target path if it is a file
+        # new container path is the parent folder of the target path if it is a
+        # file
         return get_directory(target_path), target_path
