@@ -14,7 +14,6 @@ def convert_to_abs_path(path):
 # gets parent directory if the path is a file. Works even though the file is not present and is just a path 
 def get_directory(path_str):
     path = Path(path_str).resolve()
-    
     # If it has a file extension, assume it's a file and return parent dir
     if path.suffix:
         return str(path.parent)
