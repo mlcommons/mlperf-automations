@@ -31,7 +31,6 @@ def generate_kill_command(env):
             # Kill all processes matching the name
             kill_cmd = f"pkill {process_name}"
 
-    
     env["MLC_RUN_CMD"] = kill_cmd if kill_cmd else "echo 'No valid input provided'"
 
 
