@@ -40,6 +40,11 @@ def preprocess(i):
                 env['MLC_CUDA_DEVICE_PROP_GPU_COMPUTE_CAPABILITY']) *
             10)
         env['MLC_GPU_ARCH'] = gpu_arch
+        env['DOCKER_RUN_ARGS'] = f" -v {env['MLC_NVIDIA_MLPERF_SCRATCH_PATH']}:/mnt"
+
+        if is_true(env.get('MLC_DOCKER_USE_GOOGLE_DNS', '')):
+            env['DOCKER_RUN_ARGS'] += '  --dns 8.8.8.8 --dns 8.8.4.4 ' 
+
         env['MLC_TMP_REQUIRE_DOWNLOAD'] = 'no'
 
     else:
