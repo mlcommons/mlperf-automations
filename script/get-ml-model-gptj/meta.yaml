@@ -36,8 +36,7 @@ prehook_deps:
     - MLC_DOWNLOAD_URL
 tests:
   run_inputs:
-    - variations_list:
-        - nvidia,fp8
+    - fp32
   
     
 print_env_at_the_end:
