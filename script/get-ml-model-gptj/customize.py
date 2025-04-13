@@ -43,7 +43,7 @@ def preprocess(i):
         env['DOCKER_RUN_ARGS'] = f" -v {env['MLC_NVIDIA_MLPERF_SCRATCH_PATH']}:/mnt"
 
         if is_true(env.get('MLC_DOCKER_USE_GOOGLE_DNS', '')):
-            env['DOCKER_RUN_ARGS'] += '  --dns 8.8.8.8 --dns 8.8.4.4 ' 
+            env['DOCKER_RUN_ARGS'] += '  --dns 8.8.8.8 --dns 8.8.4.4 '
 
         env['MLC_TMP_REQUIRE_DOWNLOAD'] = 'no'
 
