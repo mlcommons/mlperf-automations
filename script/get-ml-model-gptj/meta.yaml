@@ -36,7 +36,8 @@ prehook_deps:
     - MLC_DOWNLOAD_URL
 tests:
   run_inputs:
-    - fp32
+    - variations_list:
+      - fp32
   
     
 print_env_at_the_end:
