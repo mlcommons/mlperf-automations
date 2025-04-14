@@ -381,7 +381,12 @@ def docker_run(self_module, i):
                        for key in docker_input_mapping if key in i})
 
         # Handle environment variable-based mounts
-        res = process_mounts(mounts, env, docker_settings, f_run_cmd, run_state)
+        res = process_mounts(
+            mounts,
+            env,
+            docker_settings,
+            f_run_cmd,
+            run_state)
         if res['return'] > 0:
             return res
         docker_inputs['mounts'] = res['mounts']

@@ -68,11 +68,14 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd, run_state):
             for placeholder in host_placeholders:
                 if placeholder in env:
                     host_env_key = placeholder
-                    # if the env variable is in the file_path_env_keys, then we need to get the parent folder path(set extract_parent_folder to True)
+                    # if the env variable is in the file_path_env_keys, then we
+                    # need to get the parent folder path(set
+                    # extract_parent_folder to True)
                     if placeholder in run_state['file_path_env_keys']:
                         # set extract_parent_folder to True
                         extract_parent_folder = True
-                    new_host_mount = get_host_path(env[placeholder], extract_parent_folder)
+                    new_host_mount = get_host_path(
+                        env[placeholder], extract_parent_folder)
                 else:  # Skip mount if variable is missing
                     mounts[index] = None
                     break
@@ -82,7 +85,9 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd, run_state):
         if container_placeholders:
             for placeholder in container_placeholders:
                 if placeholder in env:
-                    # if the env variable is in the folder_path_env_keys, then we need to get the parent folder path(set extract_parent_folder to True)
+                    # if the env variable is in the folder_path_env_keys, then
+                    # we need to get the parent folder path(set
+                    # extract_parent_folder to True)
                     if placeholder in run_state['folder_path_env_keys']:
                         # set extract_parent_folder to True
                         extract_parent_folder = True
@@ -410,7 +415,8 @@ def get_host_path(value, extract_parent_folder=False):
     # convert relative path to absolute path
     value = convert_to_abs_path(value)
 
-    # if extract_parent_folder is True, then we need to get the parent folder path
+    # if extract_parent_folder is True, then we need to get the parent folder
+    # path
     if extract_parent_folder:
         value = get_directory(value)
 
@@ -455,7 +461,8 @@ def get_container_path(value, username="mlcuser", extract_parent_folder=False):
             return "/".join(new_path_split1), "/".join(new_path_split2)
     else:
         orig_path, target_path = update_container_paths(path=value)
-        # new container path is the parent folder of the target path if extract_parent_folder is True
+        # new container path is the parent folder of the target path if
+        # extract_parent_folder is True
         if extract_parent_folder:
             return get_directory(target_path), target_path
         else:
