@@ -74,7 +74,8 @@ def preprocess(i):
         if 'MLC_RERUN' not in env:
             env['MLC_RERUN'] = "yes"
 
-    if not is_false(env.get('MLC_SYSTEM_POWER', 'no')) or is_true(env.get('MLC_MLPERF_POWER', '')):
+    if not is_false(env.get('MLC_SYSTEM_POWER', 'no')) or is_true(
+            env.get('MLC_MLPERF_POWER', '')):
         power_variation = ",_power"
         env['MLC_MLPERF_POWER'] = "yes"
     else:

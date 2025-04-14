@@ -3,6 +3,7 @@ import os
 import shutil
 from utils import is_true, is_false
 
+
 def preprocess(i):
 
     os_info = i['os_info']

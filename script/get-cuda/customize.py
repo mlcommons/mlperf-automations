@@ -74,7 +74,8 @@ def preprocess(i):
             if os_info['platform'] == 'windows':
                 return r
 
-            if r['return'] == 16 and is_true(env['MLC_CUDA_FULL_TOOLKIT_INSTALL']):
+            if r['return'] == 16 and is_true(
+                    env['MLC_CUDA_FULL_TOOLKIT_INSTALL']):
                 env['MLC_REQUIRE_INSTALL'] = "yes"
                 return {'return': 0}
             else:

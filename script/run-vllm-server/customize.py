@@ -18,7 +18,8 @@ def preprocess(i):
     # Base command with required model argument
     cmd_args = f" --model {env['MLC_ML_MODEL_PATH']} --served-model-name {model_name}"
 
-    # Dictionary mapping environment variables to their corresponding command line arguments
+    # Dictionary mapping environment variables to their corresponding command
+    # line arguments
     param_mapping = {
         "MLC_VLLM_SERVER_TP_SIZE": "--tensor-parallel-size",
         "MLC_VLLM_SERVER_PP_SIZE": "--pipeline-parallel-size",

@@ -25,7 +25,8 @@ def preprocess(i):
         return {
             'return': 1, 'error': 'Please select a variation specifying the device to run on'}
 
-    if is_true(env.get('MLC_MLPERF_SKIP_RUN', '')) and make_command == "run_harness":
+    if is_true(env.get('MLC_MLPERF_SKIP_RUN', '')
+               ) and make_command == "run_harness":
         return {'return': 0}
 
     env['MLPERF_SCRATCH_PATH'] = env['MLC_NVIDIA_MLPERF_SCRATCH_PATH']

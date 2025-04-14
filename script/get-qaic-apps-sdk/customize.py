@@ -3,6 +3,7 @@ import os
 import xml.etree.ElementTree as et
 from utils import is_true
 
+
 def preprocess(i):
 
     os_info = i['os_info']
