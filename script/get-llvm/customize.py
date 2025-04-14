@@ -15,6 +15,19 @@ def preprocess(i):
     env['FILE_NAME_C'] = file_name_c
 
     if 'MLC_LLVM_CLANG_BIN_WITH_PATH' not in env:
+
+        if env.get('MLC_LLVM_DIR_PATH', '') != '':
+            llvm_path = env['MLC_LLVM_DIR_PATH']
+            if os.path.exists(os.path.join(llvm_path, 'bin', 'clang')):
+                env['MLC_TMP_PATH'] = os.path.join(llvm_path, 'bin')
+            else:
+                for l in os.listdir(aocc_path):
+                    if os.path.exists(os.path.join(
+                            llvm_path, l, 'bin', 'clang')):
+                        llvm_path = os.path.join(llvm_path, l)
+                        env['MLC_LLVM_DIR_PATH'] = llvm_path
+                        env['MLC_TMP_PATH'] = os.path.join(llvm_path, 'bin')
+
         r = i['automation'].find_artifact({'file_name': file_name_c,
                                            'env': env,
                                            'os_info': os_info,

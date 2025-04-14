@@ -18,6 +18,9 @@ def generate_kill_command(env):
             # all in that group
             kill_cmd = f"pkill -g $(pgrep -o {process_name} | xargs ps -o pgid= -p | tr -d ' ')"
 
+        elif is_true(env.get("MLC_KILL_BUSIEST_PROCESS_GROUP")):
+            kill_cmd = r"busy_pgid=\$(ps -eo pgid,pcpu --sort=-pcpu | head -n 2 | tail -n 1 | awk '{print $1}') && kill -- -\$busy_pgid"
+
     else:
         if env.get("MLC_KILL_PROCESS_ID"):
             process_id = env["MLC_KILL_PROCESS_ID"]

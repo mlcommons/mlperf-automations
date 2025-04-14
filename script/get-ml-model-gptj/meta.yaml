@@ -34,6 +34,12 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_DOWNLOAD_URL
+tests:
+  run_inputs:
+    - variations_list:
+      - fp32
+  
+    
 print_env_at_the_end:
   MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
 tags:
@@ -150,6 +156,13 @@ variations:
       tags: get,cuda
     - tags: get,nvidia,scratch,space
     - tags: get,cuda-devices,_with-pycuda
+      enable_if_env:
+        MLC_HOST_OS_FLAVOR:
+        - ubuntu
+    - tags: get,cuda-devices
+      skip_if_env:
+        MLC_HOST_OS_FLAVOR:
+        - ubuntu
     - env: {}
       force_new_env_keys:
       - GPTJ_CHECKPOINT_PATH
