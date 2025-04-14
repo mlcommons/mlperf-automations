@@ -168,7 +168,7 @@ def postprocess(i):
     if env.get('MLC_DOCKER_ADD_DEVICE', '') != '':
         run_opts += " --device=" + env['MLC_DOCKER_ADD_DEVICE']
 
-    if env.get('MLC_DOCKER_PRIVILEGED_MODE', '') == 'yes':
+    if is_true(env.get('MLC_DOCKER_PRIVILEGED_MODE', '')):
         run_opts += " --privileged "
 
     if env.get('MLC_DOCKER_ADD_NUM_GPUS', '') != '':
@@ -310,7 +310,7 @@ def postprocess(i):
         x1 = ''
         x2 = ''
         run_cmd_prefix = ""
-        if env.get('MLC_DOCKER_INTERACTIVE_MODE', '') in ['yes', 'True', True]:
+        if is_true(env.get('MLC_DOCKER_INTERACTIVE_MODE', '')):
             run_cmd_prefix = "("
             x1 = '-it'
             x2 = " && bash ) || bash"

@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -12,7 +13,7 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     network_env_name = env['MLC_TINY_FPGACONVNET_NETWORK_ENV_NAME']
     run_dir = env['MLC_TINY_FPGACONVNET_' + network_env_name + '_RUN_DIR']

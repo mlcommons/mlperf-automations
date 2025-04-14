@@ -1,6 +1,6 @@
 from mlc import utils
 import os
-
+from utils import is_true
 
 def preprocess(i):
 
@@ -12,7 +12,7 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     env['ZENDNN_BLIS_PATH'] = env['MLC_BLIS_INSTALL_PATH']
     env['ZENDNN_LIBM_PATH'] = env['MLC_AOCL_BUILD_PATH']

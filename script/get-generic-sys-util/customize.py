@@ -18,7 +18,7 @@ def preprocess(i):
         env['MLC_SYS_UTIL_CHECK_CMD'] = env['MLC_SYS_UTIL_VERSION_CMD']
 
     if env.get('MLC_GENERIC_SYS_UTIL_RUN_MODE', '') == "install":
-        if env.get('MLC_SYS_UTIL_INSTALL_WITH_RETRY', '') == "yes":
+        if is_true(env.get('MLC_SYS_UTIL_INSTALL_WITH_RETRY', '')):
             i['run_script_input']['script_name'] = "install-with-retry"
         else:
             i['run_script_input']['script_name'] = "install"
@@ -156,7 +156,7 @@ def postprocess(i):
 
     version_env_key = f"MLC_{env['MLC_SYS_UTIL_NAME'].upper()}_VERSION"
 
-    if (env.get('MLC_SYS_UTIL_VERSION_CMD', '') != '' or env.get('MLC_SYS_UTIL_VERSION_CMD_OVERRIDE', '') != '') and env.get(version_env_key, '') == '' and is_false(
+    if (env.get('MLC_SYS_UTIL_VERSION_CMD', '') != '' or env.get('MLC_SYS_UTIL_VERSION_CMD_OVERRIDE', '') != '') and env.get(version_env_key, '') == '' and not is_true(
             env.get('MLC_TMP_GENERIC_SYS_UTIL_PACKAGE_INSTALL_IGNORED', '')) and env.get('MLC_GET_GENERIC_SYS_UTIL_INSTALL_FAILED', '') != 'yes':
         automation = i['automation']
 

@@ -1,6 +1,6 @@
 from mlc import utils
 import os
-
+from utils import is_true
 
 def preprocess(i):
 
@@ -13,7 +13,7 @@ def preprocess(i):
     automation = i['automation']
     mlc = automation.action_object
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     cmd = env.get('MLC_GH_ACTIONS_RUNNER_COMMAND', '')
     if cmd == "config":

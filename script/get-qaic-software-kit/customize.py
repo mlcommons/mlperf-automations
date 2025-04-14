@@ -1,6 +1,6 @@
 from mlc import utils
 import os
-
+from utils import is_true
 
 def preprocess(i):
 
@@ -14,7 +14,7 @@ def preprocess(i):
 
     env['MLC_QAIC_SOFTWARE_KIT_PATH'] = env['MLC_GIT_CHECKOUT_PATH']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     if env.get('+ CXXFLAGS', []) == []:
         env['+ CXXFLAGS'] = []

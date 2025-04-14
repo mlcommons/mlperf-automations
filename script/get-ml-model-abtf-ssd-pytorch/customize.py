@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -8,7 +9,7 @@ def preprocess(i):
 
     env = i['env']
 
-    if env.get('MLC_ML_MODEL_LOCAL', '') == 'yes':
+    if is_true(env.get('MLC_ML_MODEL_LOCAL', '')):
         ml_model = env.get('MLC_ML_MODEL_FILENAME', '')
         if ml_model == '':
             return {'return': 1, 'error': '_local.{model name.pth} is not specified'}

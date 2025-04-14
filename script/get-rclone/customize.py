@@ -1,7 +1,7 @@
 from mlc import utils
 import os
 import configparser
-
+from utils import is_true
 
 def preprocess(i):
 
@@ -31,8 +31,8 @@ def preprocess(i):
     if r['return'] > 0:
         if r['return'] == 16:
             install_script = 'install'
-            if os_info['platform'] != 'windows' and env.get(
-                    'MLC_RCLONE_SYSTEM', '') == 'yes':
+            if os_info['platform'] != 'windows' and is_true(env.get(
+                    'MLC_RCLONE_SYSTEM', '')):
                 install_script += '-system'
             else:
                 if os_info['platform'] != 'windows':
@@ -135,8 +135,8 @@ def postprocess(i):
 
     file_name = 'rclone.exe' if os_info['platform'] == 'windows' else 'rclone'
 
-    if os_info['platform'] == 'windows' or env.get(
-            'MLC_RCLONE_SYSTEM', '') != 'yes':
+    if os_info['platform'] == 'windows' or not is_true(env.get(
+            'MLC_RCLONE_SYSTEM', '')):
         cur_dir = os.getcwd()
         path_bin = os.path.join(cur_dir, file_name)
         if os.path.isfile(path_bin):

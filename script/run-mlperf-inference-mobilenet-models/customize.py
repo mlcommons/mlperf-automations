@@ -23,8 +23,8 @@ def preprocess(i):
     # cache_action = i['automation'].cache_action
     cache_action = mlc
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
-    verbose = (env.get('MLC_VERBOSE', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
+    verbose = is_true(env.get('MLC_VERBOSE', False))
 
     models_all = {
         "mobilenet": {

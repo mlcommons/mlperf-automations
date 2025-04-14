@@ -1,7 +1,7 @@
 from mlc import utils
 import os
 import json
-
+from utils import is_true
 
 def preprocess(i):
 
@@ -65,7 +65,7 @@ def postprocess(i):
 
     cur_dir = os.getcwd()
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     mlc_cache_dataset_path = env.get(
         'MLC_CUSTOM_CACHE_ENTRY_DATASET_MLCOMMONS_COGNATA_PATH', '').strip()
@@ -106,7 +106,7 @@ def postprocess(i):
     env['MLC_DATASET_MLCOMMONS_COGNATA_PATH'] = dataset_path
 
     # If imported, don't process further
-    if env.get('MLC_DATASET_MLCOMMONS_COGNATA_IMPORTED', '') == 'yes':
+    if is_true(env.get('MLC_DATASET_MLCOMMONS_COGNATA_IMPORTED', '')):
         cfg['imported'] = True
     else:
         cfg['imported'] = False

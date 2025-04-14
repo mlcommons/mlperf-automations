@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -7,8 +8,8 @@ def preprocess(i):
     os_info = i['os_info']
     env = i['env']
 
-    if env.get('MLC_TMP_MLPERF_INFERENCE_LOADGEN_INSTALL_FROM_PIP',
-               '') == 'yes':
+    if is_true(env.get('MLC_TMP_MLPERF_INFERENCE_LOADGEN_INSTALL_FROM_PIP',
+               '')):
         i['run_script_input']['script_name'] = "donotrun"
 
     return {'return': 0}
@@ -19,8 +20,8 @@ def postprocess(i):
     os_info = i['os_info']
     env = i['env']
 
-    if env.get('MLC_TMP_MLPERF_INFERENCE_LOADGEN_INSTALL_FROM_PIP',
-               '') == 'yes':
+    if is_true(env.get('MLC_TMP_MLPERF_INFERENCE_LOADGEN_INSTALL_FROM_PIP',
+               '')):
         return {'return': 0}
 
     for key in ['+PYTHONPATH', '+C_INCLUDE_PATH', '+CPLUS_INCLUDE_PATH',

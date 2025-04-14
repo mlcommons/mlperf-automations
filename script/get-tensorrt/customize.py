@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 import tarfile
 
@@ -89,7 +90,7 @@ def preprocess(i):
 
     if env.get('MLC_TENSORRT_TAR_FILE_PATH', '') == '':
         tags = ["get", "tensorrt"]
-        if env.get('MLC_TENSORRT_REQUIRE_DEV', '') != 'yes':
+        if not is_true(env.get('MLC_TENSORRT_REQUIRE_DEV', '')):
             tags.append("_dev")
         return {'return': 1, 'error': 'Please envoke mlcr "' +
                 ",".join(tags) + '" --tar_file={full path to the TensorRT tar file}'}

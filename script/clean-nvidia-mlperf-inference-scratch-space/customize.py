@@ -1,6 +1,6 @@
 from mlc import utils
 import os
-
+from utils import is_true
 
 def preprocess(i):
 
@@ -12,7 +12,7 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     clean_cmd = ''
     cache_rm_tags = ''

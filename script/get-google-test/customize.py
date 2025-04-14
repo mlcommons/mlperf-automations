@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -13,7 +14,7 @@ def preprocess(i):
     automation = i['automation']
 
     env['MLC_GIT_CHECKOUT'] = "v" + env['MLC_VERSION']
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     return {'return': 0}
 

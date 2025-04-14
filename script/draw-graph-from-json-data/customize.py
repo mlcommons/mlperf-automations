@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -12,7 +13,7 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
     q = '"' if os_info['platform'] == 'windows' else "'"
 
     env['MLC_RUN_CMD'] = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {q}{os.path.join(env['MLC_TMP_CURRENT_SCRIPT_PATH'],"process-mlc-deps.py")}{q} {q}{env['MLC_JSON_INPUT_FILE']}{q} """

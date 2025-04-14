@@ -1,6 +1,6 @@
 from mlc import utils
 import os
-
+from utils import is_true
 
 def preprocess(i):
 
@@ -11,7 +11,7 @@ def preprocess(i):
 
     env = i['env']
 
-    if env.get('MLC_MLPERF_INFERENCE_INTEL_LANGUAGE_MODEL', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_INFERENCE_INTEL_LANGUAGE_MODEL', '')):
         i['run_script_input']['script_name'] = "run-intel-mlperf-inference-v3_1"
         run_cmd = "CC=clang CXX=clang++ USE_CUDA=OFF python -m pip install -e . "
 

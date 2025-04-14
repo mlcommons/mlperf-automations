@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -13,7 +14,7 @@ def preprocess(i):
 
     env['MLC_DATASET_IMAGENET_VAL_REQUIRE_DAE'] = 'no'
 
-    full = env.get('MLC_IMAGENET_FULL', '').strip() == 'yes'
+    full = is_true(env.get('MLC_IMAGENET_FULL', '').strip())
 
     path = env.get(
         'MLC_INPUT',

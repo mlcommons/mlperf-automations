@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -21,7 +22,7 @@ def preprocess(i):
     meta = i['meta']
 
     found = False
-    install = env.get('MLC_JAVA_PREBUILT_INSTALL', '') in ['on', 'True', True]
+    install = is_true(env.get('MLC_JAVA_PREBUILT_INSTALL', ''))
 
     env_path_key = 'MLC_JAVA_BIN_WITH_PATH'
 

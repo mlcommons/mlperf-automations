@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -35,7 +36,7 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     variation = env['MLC_DLRM_DATA_VARIATION']
 
@@ -84,14 +85,14 @@ def preprocess(i):
         xsep = ' && '
 
         # addition of run command to download the datasets and model
-        if env.get('MLC_DLRM_DATASET_DOWNLOAD', False) == True:
+        if is_true(env.get('MLC_DLRM_DATASET_DOWNLOAD', False)):
             run_cmd += 'cp -r "$MLC_CRITEO_PREPROCESSED_PATH"/. ' + \
                 os.path.join(dlrm_data_path, "criteo", "day23", "fp32") + xsep
-        if env.get('MLC_DLRM_MODEL_DOWNLOAD', False) == True:
+        if is_true(env.get('MLC_DLRM_MODEL_DOWNLOAD', False)):
             run_cmd += 'cp -r "$MLC_ML_MODEL_FILE_WITH_PATH"/. ' + \
                 os.path.join(dlrm_data_path, "model") + xsep
 
-        if env.get('MLC_DLRM_DATASET_DOWNLOAD', '') != True:
+        if not is_true(env.get('MLC_DLRM_DATASET_DOWNLOAD', '')):
             if not os.path.exists(os.path.join(
                     dlrm_data_path, "criteo", "day23", "fp32", "day_23_sparse_multi_hot_unpacked")):
                 os.system(f"unzip {os.path.join(dlrm_data_path, 'criteo', 'day23', 'fp32', 'day_23_sparse_multi_hot.npz')} -d {os.path.join(dlrm_data_path, 'criteo', 'day23', 'fp32', 'day_23_sparse_multi_hot_unpacked')}")
@@ -99,7 +100,7 @@ def preprocess(i):
             run_cmd += f"unzip {os.path.join(dlrm_data_path, 'criteo', 'day23', 'fp32', 'day_23_sparse_multi_hot.npz')} -d {os.path.join(dlrm_data_path, 'criteo', 'day23', 'fp32', 'day_23_sparse_multi_hot_unpacked')}" + xsep
 
         if os.path.exists(os.path.join(dlrm_data_path, "criteo", "day23", "fp32",
-                          "day_23_sparse_multi_hot.npz")) or env['MLC_DLRM_DATASET_DOWNLOAD'] == True:
+                          "day_23_sparse_multi_hot.npz")) or is_true(env['MLC_DLRM_DATASET_DOWNLOAD']):
             file_path = os.path.join(
                 dlrm_data_path,
                 "criteo",

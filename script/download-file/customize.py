@@ -33,7 +33,7 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     tool = env.get('MLC_DOWNLOAD_TOOL', '')
     pre_clean = env.get('MLC_PRE_DOWNLOAD_CLEAN', False)

@@ -22,7 +22,7 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     filename = env.get('MLC_EXTRACT_FILEPATH', '')
     if filename == '':
@@ -91,12 +91,12 @@ def preprocess(i):
             ' > ' + q + extracted_filename + q + ' < '
 
         env['MLC_EXTRACT_TOOL'] = 'gzip '
-    elif env.get('MLC_EXTRACT_UNZIP', '') == 'yes':
+    elif is_true(env.get('MLC_EXTRACT_UNZIP', '')):
         env['MLC_EXTRACT_TOOL'] = 'unzip '
-    elif env.get('MLC_EXTRACT_UNTAR', '') == 'yes':
+    elif is_true(env.get('MLC_EXTRACT_UNTAR', '')):
         env['MLC_EXTRACT_TOOL_OPTIONS'] = ' -xvf'
         env['MLC_EXTRACT_TOOL'] = 'tar '
-    elif env.get('MLC_EXTRACT_GZIP', '') == 'yes':
+    elif is_true(env.get('MLC_EXTRACT_GZIP', '')):
         env['MLC_EXTRACT_CMD'] = 'gzip '
         env['MLC_EXTRACT_TOOL_OPTIONS'] = ' -d ' + \
             ('-k ' if not remove_extracted else '')

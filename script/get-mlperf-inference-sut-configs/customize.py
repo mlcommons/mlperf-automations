@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 import yaml
 import shutil
@@ -50,7 +51,7 @@ def postprocess(i):
 
     if env.get('MLC_SUT_CONFIGS_PATH', '') != '':
         path = env['MLC_SUT_CONFIGS_PATH']
-    elif env.get('MLC_SUT_USE_EXTERNAL_CONFIG_REPO', '') == "yes":
+    elif is_true(env.get('MLC_SUT_USE_EXTERNAL_CONFIG_REPO', '')):
         path = env.get('MLC_GIT_CHECKOUT_PATH')
     else:
         path = os.path.join(os.getcwd(), "configs")

@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 import subprocess
 import select
@@ -18,7 +19,7 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     if os.geteuid() == 0:
         env['MLC_SUDO'] = ''  # root user does not need sudo

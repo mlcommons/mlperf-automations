@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 import subprocess
 
@@ -30,7 +31,7 @@ def preprocess(i):
     submission_checker_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission",
                                            "submission_checker.py")
 
-    if env['MLC_MLPERF_SHORT_RUN'] == "yes":
+    if is_true(env['MLC_MLPERF_SHORT_RUN']):
         import shutil
         new_submission_checker_file = os.path.join(
             os.path.dirname(submission_checker_file),
@@ -51,7 +52,7 @@ def preprocess(i):
     else:
         extra_map = ""
 
-    if env.get('MLC_MLPERF_SKIP_POWER_CHECK', 'no') == "yes":
+    if is_true(env.get('MLC_MLPERF_SKIP_POWER_CHECK', 'no')):
         power_check = " --skip-power-check"
     else:
         power_check = ""

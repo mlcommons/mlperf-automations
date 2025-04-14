@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -45,7 +46,7 @@ def preprocess(i):
     if conda_prefix_name != '' or r['return'] > 0:
         if conda_prefix_name != '' or r['return'] == 16:
             if conda_prefix_name == '':
-                if env.get('MLC_TMP_FAIL_IF_NOT_FOUND', '').lower() == 'yes':
+                if is_true(env.get('MLC_TMP_FAIL_IF_NOT_FOUND', '')):
                     return r
 
                 print(recursion_spaces + '    # {}'.format(r['error']))

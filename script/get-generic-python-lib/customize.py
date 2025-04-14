@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true, is_false
 import os
 
 
@@ -36,10 +37,10 @@ def preprocess(i):
         extra += '  --break-system-packages '
         env['MLC_PYTHON_PIP_COMMON_EXTRA'] = " --break-system-packages"
 
-    if env.get('MLC_GENERIC_PYTHON_PACKAGE_INSTALL_DEPS', '') == "no":
+    if is_false(env.get('MLC_GENERIC_PYTHON_PACKAGE_INSTALL_DEPS', '')):
         env['MLC_PYTHON_PIP_COMMON_EXTRA'] = " --no-deps"
 
-    if env.get('MLC_PIP_INSTALL_NEEDS_USER', '') == "yes":
+    if is_true(env.get('MLC_PIP_INSTALL_NEEDS_USER', '')):
         env['MLC_PYTHON_PIP_COMMON_EXTRA'] = " --user"
 
     if env.get('MLC_GENERIC_PYTHON_PIP_UNINSTALL_DEPS', '') != '':
@@ -62,13 +63,9 @@ def preprocess(i):
         'recursion_spaces': recursion_spaces})
 
     force_install = (
-        env.get(
+        is_true(env.get(
             'MLC_TMP_PYTHON_PACKAGE_FORCE_INSTALL',
-            '') in [
-            'yes',
-            'true',
-            'True',
-            True])
+            '')))
 
     if r['return'] > 0 or force_install:
         if r['return'] == 16 or force_install:
@@ -113,8 +110,7 @@ def preprocess(i):
                 extra += ' -f ' + find_links_url
 
             # Check update
-            if env.get('MLC_GENERIC_PYTHON_PIP_UPDATE', '') in [
-                    True, 'true', 'yes', 'on']:
+            if is_true(env.get('MLC_GENERIC_PYTHON_PIP_UPDATE', '')):
                 extra += ' -U'
 
             logger.info(recursion_spaces + '      Extra PIP CMD: ' + extra)

@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -18,7 +19,7 @@ def preprocess(i):
     if path == '':
         path = os.getcwd()
 
-    if env.get('MLC_GIT_CLONE_REPO', '') != 'yes':
+    if not is_true(env.get('MLC_GIT_CLONE_REPO', '')):
         run_cmd = env.get('MLC_PYTHON_BIN_WITH_PATH') + " " + \
             os.path.join(script_path, 'download_model.py')
     else:

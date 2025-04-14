@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -13,13 +14,13 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     if not state.get(
             'mlperf-inference-implementation'):  # No state information. Just returning
         return {'return': 0}
 
-    if env.get('MLC_MLPERF_README', "") == "yes":
+    if is_true(env.get('MLC_MLPERF_README', "")):
         import mlc
         inp = i['input']
 

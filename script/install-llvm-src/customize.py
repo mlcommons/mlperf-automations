@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -22,7 +23,7 @@ def preprocess(i):
         install_prefix = env['MLC_CONDA_PREFIX']
         extra_cmake_options = f"-DCMAKE_SHARED_LINKER_FLAGS=-L{install_prefix} -Wl,-rpath,{install_prefix}"
 
-    if env.get('MLC_LLVM_16_INTEL_MLPERF_INFERENCE', '') == "yes":
+    if is_true(env.get('MLC_LLVM_16_INTEL_MLPERF_INFERENCE', '')):
         env['MLC_REQUIRE_INSTALL'] = 'yes'
         i['run_script_input']['script_name'] = "install-llvm-16-intel-mlperf-inference"
         clang_file_name = "llvm-link"

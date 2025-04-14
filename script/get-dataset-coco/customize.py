@@ -1,7 +1,7 @@
 from mlc import utils
 import os
 import shutil
-
+from utils import is_true
 
 def preprocess(i):
 
@@ -10,7 +10,7 @@ def preprocess(i):
     automation = i['automation']
     env = i['env']
     meta = i['meta']
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     # Check if path is there to detect existing data set
     detected = False

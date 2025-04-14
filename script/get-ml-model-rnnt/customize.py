@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -26,7 +27,7 @@ def preprocess(i):
 
     filename = r['filename']
 
-    if env.get('MLC_UNZIP') == "yes":
+    if is_true(env.get('MLC_UNZIP')):
         os.system("unzip " + filename)
         filename = env['MLC_ML_MODEL_FILE']
         env['MLC_ML_MODEL_FILE_WITH_PATH'] = os.path.join(path, filename)

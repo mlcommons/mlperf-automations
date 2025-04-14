@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -16,9 +17,9 @@ def postprocess(i):
 
     env['MLC_MLPERF_RUN_CMD'] = env.get('MLC_RUN_CMD')
 
-    if env.get('MLC_MLPERF_POWER', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_POWER', '')):
 
-        if env.get('MLC_MLPERF_SHORT_RANGING_RUN', '') != 'no':
+        if not is_false(env.get('MLC_MLPERF_SHORT_RANGING_RUN', '')):
             # Write '0' to the count.txt file in MLC_RUN_DIR
             count_file = os.path.join(env.get('MLC_RUN_DIR', ''), 'count.txt')
             with open(count_file, 'w') as f:

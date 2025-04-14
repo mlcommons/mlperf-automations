@@ -44,7 +44,7 @@ def preprocess(i):
     sut_path = os.path.join(sut_desc_path, "suts", sut + ".json")
     env['MLC_SUT_PATH'] = sut_path
 
-    if os.path.exists(sut_path) and env.get('MLC_SUT_DESC_CACHE', '') == "yes":
+    if os.path.exists(sut_path) and is_true(env.get('MLC_SUT_DESC_CACHE', '')):
         print(f"Reusing SUT description file {sut}")
         state['MLC_SUT_META'] = json.load(open(sut_path))
     else:

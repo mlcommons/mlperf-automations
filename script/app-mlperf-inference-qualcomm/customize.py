@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 import shutil
 
@@ -11,7 +12,7 @@ def preprocess(i):
         return {'return': 1, 'error': 'Windows is not supported in this script yet'}
     env = i['env']
 
-    if env.get('MLC_MLPERF_SKIP_RUN', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_SKIP_RUN', '')):
         return {'return': 0}
 
     if 'MLC_MODEL' not in env:
@@ -78,7 +79,7 @@ def preprocess(i):
 
         keys = ['LOC_OFFSET', 'LOC_SCALE', 'CONF_OFFSET', 'CONF_SCALE']
 
-        if env.get('MLC_RETINANET_USE_MULTIPLE_SCALES_OFFSETS', '') == 'yes':
+        if is_true(env.get('MLC_RETINANET_USE_MULTIPLE_SCALES_OFFSETS', '')):
             env['+ CXXFLAGS'].append("-DUSE_MULTIPLE_SCALES_OFFSETS=1")
             for j in range(0, 4):
                 keys.append(f'LOC_OFFSET{j}')

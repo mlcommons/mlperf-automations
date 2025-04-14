@@ -1,6 +1,6 @@
 from mlc import utils
 import os
-
+from utils import is_true
 
 def preprocess(i):
 
@@ -13,7 +13,7 @@ def preprocess(i):
 
     run_cmd = "./build.sh --config RelWithDebInfo --build_wheel --parallel --allow_running_as_root --skip_tests "
 
-    if env.get('MLC_ONNXRUNTIME_GPU', '') == "yes":
+    if is_true(env.get('MLC_ONNXRUNTIME_GPU', '')):
         cuda_home = env['CUDA_HOME']
         run_cmd += f"--use_cuda --cuda_home {cuda_home} --cudnn_home {cuda_home}"
 

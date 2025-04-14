@@ -22,7 +22,7 @@ def preprocess(i):
     script_path = i['run_script_input']['path']
     mlc = i['automation'].action_object
 
-    if env.get('MLC_RUN_DOCKER_CONTAINER', '') == "yes":
+    if is_true(env.get('MLC_RUN_DOCKER_CONTAINER', '')):
         return {'return': 0}
 
     dump_version_info = env.get('MLC_DUMP_VERSION_INFO', True)
@@ -66,7 +66,7 @@ def preprocess(i):
         if 'MLC_RERUN' not in env:
             env['MLC_RERUN'] = "yes"
 
-    if is_true(str(env.get('MLC_SYSTEM_POWER', 'no'))) or is_true(
+    if not is_false(env.get('MLC_SYSTEM_POWER', 'no')) or is_true(
             env.get('MLC_MLPERF_POWER', '')):
         power_variation = ",_power"
         env['MLC_MLPERF_POWER'] = "yes"
@@ -264,7 +264,7 @@ def preprocess(i):
             if state.get('docker', {}):
                 del (state['docker'])
 
-        if env.get("MLC_MLPERF_LOADGEN_COMPLIANCE", "") == "yes":
+        if is_true(env.get("MLC_MLPERF_LOADGEN_COMPLIANCE", "")):
             for test in test_list:
                 env_copy = copy.deepcopy(env)
                 for key in env_copy:

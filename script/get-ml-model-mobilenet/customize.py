@@ -25,10 +25,10 @@ def preprocess(i):
 
     filename = r['filename']
 
-    if env.get('MLC_UNZIP') == "yes" or env.get('MLC_UNTAR') == "yes":
-        if env.get('MLC_UNZIP') == "yes":
+    if is_true(env.get('MLC_UNZIP')) or is_true(env.get('MLC_UNTAR')):
+        if is_true(env.get('MLC_UNZIP')):
             cmd = "unzip "
-        elif env.get('MLC_UNTAR') == "yes":
+        elif is_true(env.get('MLC_UNTAR')):
             cmd = "tar -xvzf "
         os.system(cmd + filename)
 

@@ -1,6 +1,6 @@
 from mlc import utils
 import os
-
+from utils import is_true
 
 def preprocess(i):
 
@@ -12,7 +12,7 @@ def preprocess(i):
 
     env = i['env']
 
-    if str(env.get('CUDA_SKIP_SUDO', '')).lower() == 'true':
+    if is_true(env.get('CUDA_SKIP_SUDO', '')):
         env['MLC_SUDO'] = ''
 
     meta = i['meta']

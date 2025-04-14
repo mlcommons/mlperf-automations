@@ -1,7 +1,7 @@
 from mlc import utils
 import os
 import shutil
-
+from utils import is_true, is_false
 
 def preprocess(i):
 
@@ -22,11 +22,11 @@ def preprocess(i):
 
 def postprocess(i):
     env = i['env']
-    if env.get('MLC_GENERATE_SAMPLE_ID', '') == "yes":
+    if is_true(env.get('MLC_GENERATE_SAMPLE_ID', '')):
         env['MLC_COCO2014_SAMPLE_ID_PATH'] = os.path.join(
             os.getcwd(), 'sample_ids.txt')
         print(env['MLC_COCO2014_SAMPLE_ID_PATH'])
-    if env.get('MLC_DATASET_CALIBRATION', '') == "no":
+    if is_false(env.get('MLC_DATASET_CALIBRATION', '')):
         env['MLC_DATASET_PATH_ROOT'] = os.getcwd()
         # env['MLC_DATASET_PATH'] = os.path.join(os.getcwd(), 'install', 'validation', 'data')
         env['MLC_DATASET_CAPTIONS_DIR_PATH'] = os.path.join(

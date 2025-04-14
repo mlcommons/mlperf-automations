@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -12,7 +13,7 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     if env.get('MLC_REGISTER_CACHE', '') == '':
 
@@ -49,7 +50,7 @@ def construct_compilation_cmd(env):
         ' ' + env.get('MLC_QAIC_MODEL_COMPILER_ARGS_SUT', '')
     batchsize = env.get('MLC_QAIC_MODEL_BATCH_SIZE')
 
-    if env.get('MLC_QAIC_MODEL_QUANTIZATION', '') == 'yes':
+    if is_true(env.get('MLC_QAIC_MODEL_QUANTIZATION', '')):
         profile_string = " -load-profile=" + \
             env['MLC_QAIC_MODEL_PROFILE_WITH_PATH']
     else:

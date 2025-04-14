@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -16,7 +17,7 @@ def preprocess(i):
     file_name = file_name_core + \
         '.exe' if os_info['platform'] == 'windows' else file_name_core
 
-    force_install = env.get('MLC_FORCE_INSTALL', False) == True
+    force_install = is_true(env.get('MLC_FORCE_INSTALL', False))
 
     if not force_install:
         r = i['automation'].find_artifact({'file_name': file_name,
@@ -70,8 +71,8 @@ def preprocess(i):
         if r['return'] > 0:
             return r
 
-        if os_info['platform'] == 'windows' or env.get(
-                'MLC_ARIA2_BUILD_FROM_SRC', '').lower() == 'true':
+        if os_info['platform'] == 'windows' or is_true(env.get(
+                'MLC_ARIA2_BUILD_FROM_SRC', '')):
             install_path = os.path.join(os.getcwd(), archive)
 
             path_to_file = os.path.join(install_path, file_name)
@@ -129,7 +130,7 @@ def postprocess(i):
 
     env['MLC_ARIA2_INSTALLED_PATH'] = found_path
 
-    if env.get('MLC_ARIA2_INSTALLED_TO_CACHE', '') == 'yes':
+    if is_true(env.get('MLC_ARIA2_INSTALLED_TO_CACHE', '')):
         env['+PATH'] = [env['MLC_ARIA2_INSTALLED_PATH']]
 
     return {'return': 0, 'version': version}

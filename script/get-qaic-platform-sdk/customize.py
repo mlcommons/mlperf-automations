@@ -1,7 +1,7 @@
 from mlc import utils
 import os
 import xml.etree.ElementTree as et
-
+from utils import is_true
 
 def preprocess(i):
 
@@ -35,7 +35,7 @@ def preprocess(i):
     env['MLC_QAIC_RUNNER_PATH'] = os.path.join(path, "exec", "qaic-runner")
     env['MLC_QAIC_TOOLS_PATH'] = os.path.join(path, "tools")
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     return {'return': 0}
 
