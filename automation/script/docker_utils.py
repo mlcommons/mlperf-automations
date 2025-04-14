@@ -24,7 +24,7 @@ def get_directory(path_str):
         return str(path)
 
 
-def process_mounts(mounts, env, docker_settings, f_run_cmd):
+def process_mounts(mounts, env, docker_settings, f_run_cmd, run_state):
     """
     Processes and updates the Docker mounts based on the provided inputs and environment variables.
 
@@ -44,6 +44,8 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd):
     container_env_string = ""
 
     for index in range(len(mounts)):
+        extract_parent_folder = False
+
         mount = mounts[index]
 
         # Locate the last ':' to separate the mount into host and container
@@ -66,7 +68,11 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd):
             for placeholder in host_placeholders:
                 if placeholder in env:
                     host_env_key = placeholder
-                    new_host_mount = get_host_path(env[placeholder])
+                    # if the env variable is in the file_path_env_keys, then we need to get the parent folder path(set extract_parent_folder to True)
+                    if placeholder in run_state['file_path_env_keys']:
+                        # set extract_parent_folder to True
+                        extract_parent_folder = True
+                    new_host_mount = get_host_path(env[placeholder], extract_parent_folder)
                 else:  # Skip mount if variable is missing
                     mounts[index] = None
                     break
@@ -76,8 +82,12 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd):
         if container_placeholders:
             for placeholder in container_placeholders:
                 if placeholder in env:
+                    # if the env variable is in the folder_path_env_keys, then we need to get the parent folder path(set extract_parent_folder to True)
+                    if placeholder in run_state['folder_path_env_keys']:
+                        # set extract_parent_folder to True
+                        extract_parent_folder = True
                     new_container_mount, container_env_key = get_container_path(
-                        env[placeholder], docker_settings.get('user', 'mlcuser'))
+                        env[placeholder], docker_settings.get('user', 'mlcuser'), extract_parent_folder)
                 else:  # Skip mount if variable is missing
                     mounts[index] = None
                     break
@@ -246,12 +256,7 @@ def update_container_paths(path, mounts=None, force_target_path=''):
     container_path = '/mlc-mount' + \
         container_path if not force_target_path else force_target_path
 
-    # Determine the mount string based on whether the path is a file or
-    # directory.
-    if os.path.isfile(host_path) or not os.path.isdir(host_path):
-        mount_entry = f"""{os.path.dirname(host_path)}: {os.path.dirname(container_path)}"""
-    else:
-        mount_entry = f"""{host_path}:{container_path}"""
+    mount_entry = f"""{host_path}:{container_path}"""
 
     # Add the mount entry to the mounts list if it's not already present.
     if mounts is not None:
@@ -401,10 +406,13 @@ def get_docker_default(key):
     return None
 
 
-def get_host_path(value):
+def get_host_path(value, extract_parent_folder=False):
     # convert relative path to absolute path
-    # if file path is given, return the parent folder path
-    value = get_directory(value)
+    value = convert_to_abs_path(value)
+
+    # if extract_parent_folder is True, then we need to get the parent folder path
+    if extract_parent_folder:
+        value = get_directory(value)
 
     path_split = value.split(os.sep)
 
@@ -429,7 +437,7 @@ def get_container_path_script(i):
     return {'return': 0, 'value_mnt': value_mnt, 'value_env': value_env}
 
 
-def get_container_path(value, username="mlcuser"):
+def get_container_path(value, username="mlcuser", extract_parent_folder=False):
     # convert relative path to absolute path
     # if we are trying to mount a file, mount the parent folder.
     value = convert_to_abs_path(value)
@@ -447,6 +455,8 @@ def get_container_path(value, username="mlcuser"):
             return "/".join(new_path_split1), "/".join(new_path_split2)
     else:
         orig_path, target_path = update_container_paths(path=value)
-        # new container path is the parent folder of the target path if it is a
-        # file
-        return get_directory(target_path), target_path
+        # new container path is the parent folder of the target path if extract_parent_folder is True
+        if extract_parent_folder:
+            return get_directory(target_path), target_path
+        else:
+            return target_path, target_path

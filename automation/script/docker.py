@@ -294,12 +294,22 @@ def docker_run(self_module, i):
                 'docker_mounts',
                 []))  # do we need a copy here?
         variations = meta.get('variations', {})
+
         docker_settings = meta.get('docker', {})
         state['docker'] = docker_settings
+        # take the folder path as well as file path env variables from meta
+        file_path_env_keys = docker_settings.get('file_path_env_keys', [])
+        folder_path_env_keys = docker_settings.get('folder_path_env_keys', [])
+        print(f"file_path_env_keys: {file_path_env_keys}")
+        print(f"folder_path_env_keys: {folder_path_env_keys}")
+        # from time import sleep
+        # sleep(5)
         run_state = {
             'deps': [], 'fake_deps': [], 'parent': None,
             'script_id': f"{script_alias},{script_uid}",
-            'script_variation_tags': variation_tags
+            'script_variation_tags': variation_tags,
+            'file_path_env_keys': file_path_env_keys,
+            'folder_path_env_keys': folder_path_env_keys
         }
 
         # Update state and handle variations
@@ -371,7 +381,7 @@ def docker_run(self_module, i):
                        for key in docker_input_mapping if key in i})
 
         # Handle environment variable-based mounts
-        res = process_mounts(mounts, env, docker_settings, f_run_cmd)
+        res = process_mounts(mounts, env, docker_settings, f_run_cmd, run_state)
         if res['return'] > 0:
             return res
         docker_inputs['mounts'] = res['mounts']
