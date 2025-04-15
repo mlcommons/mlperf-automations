@@ -300,10 +300,6 @@ def docker_run(self_module, i):
         # take the folder path as well as file path env variables from meta
         file_path_env_keys = docker_settings.get('file_path_env_keys', [])
         folder_path_env_keys = docker_settings.get('folder_path_env_keys', [])
-        print(f"file_path_env_keys: {file_path_env_keys}")
-        print(f"folder_path_env_keys: {folder_path_env_keys}")
-        # from time import sleep
-        # sleep(5)
         run_state = {
             'deps': [], 'fake_deps': [], 'parent': None,
             'script_id': f"{script_alias},{script_uid}",
