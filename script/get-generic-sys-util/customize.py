@@ -157,7 +157,7 @@ def postprocess(i):
     version_env_key = f"MLC_{env['MLC_SYS_UTIL_NAME'].upper()}_VERSION"
 
     if (env.get('MLC_SYS_UTIL_VERSION_CMD', '') != '' or env.get('MLC_SYS_UTIL_VERSION_CMD_OVERRIDE', '') != '') and env.get(version_env_key, '') == '' and not is_true(
-            env.get('MLC_TMP_GENERIC_SYS_UTIL_PACKAGE_INSTALL_IGNORED', '')) and env.get('MLC_GET_GENERIC_SYS_UTIL_INSTALL_FAILED', '') != 'yes':
+            env.get('MLC_TMP_GENERIC_SYS_UTIL_PACKAGE_INSTALL_IGNORED', '')) and not is_true(env.get('MLC_GET_GENERIC_SYS_UTIL_INSTALL_FAILED', '')):
         automation = i['automation']
 
         r = automation.run_native_script(
