@@ -15,13 +15,13 @@ def preprocess(i):
     if is_true(env.get('MLC_RUN_STATE_DOCKER', '')):
         return {'return': 0}
 
-    if not env.get('MLC_MODEL', ''):
+    if env.get('MLC_MODEL', '') == '':
         return {
             'return': 1, 'error': 'Please select a variation specifying the model to run'}
 
     make_command = env['MLPERF_NVIDIA_RUN_COMMAND']
 
-    if not env.get('MLC_MLPERF_DEVICE', ''):
+    if env.get('MLC_MLPERF_DEVICE', '') == '':
         return {
             'return': 1, 'error': 'Please select a variation specifying the device to run on'}
 
