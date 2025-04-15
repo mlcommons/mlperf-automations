@@ -295,11 +295,13 @@ def docker_run(self_module, i):
                 []))  # do we need a copy here?
         variations = meta.get('variations', {})
 
+        # take the folder path as well as file path env variables from meta
+        file_path_env_keys = meta.get('file_path_env_keys', [])
+        folder_path_env_keys = meta.get('folder_path_env_keys', [])
+
         docker_settings = meta.get('docker', {})
         state['docker'] = docker_settings
-        # take the folder path as well as file path env variables from meta
-        file_path_env_keys = docker_settings.get('file_path_env_keys', [])
-        folder_path_env_keys = docker_settings.get('folder_path_env_keys', [])
+        
         run_state = {
             'deps': [], 'fake_deps': [], 'parent': None,
             'script_id': f"{script_alias},{script_uid}",
