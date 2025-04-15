@@ -301,7 +301,7 @@ def docker_run(self_module, i):
 
         docker_settings = meta.get('docker', {})
         state['docker'] = docker_settings
-        
+
         run_state = {
             'deps': [], 'fake_deps': [], 'parent': None,
             'script_id': f"{script_alias},{script_uid}",
