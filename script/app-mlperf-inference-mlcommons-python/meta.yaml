@@ -1329,6 +1329,7 @@ variations:
         update_tags_from_env_with_prefix:
           _find_links_url.:
             - MLC_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL_DGL
+        version_max: "2.4.0"
 
   rgat,cuda:
     env:
