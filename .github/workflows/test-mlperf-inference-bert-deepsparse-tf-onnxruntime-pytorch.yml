@@ -31,7 +31,8 @@ jobs:
           # AES-256 encrypt
           encrypted=$(echo "${{ steps.op-load-secret.outputs.pat }}" | \
             openssl enc -e -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 \
-            -pass pass:"$ENCRYPTION_KEY" -base64)
+            -pass pass:"$ENCRYPTION_KEY" -base64 -A)
+
           echo "encrypted_secret=$encrypted" >> $GITHUB_OUTPUT
           
   build:
@@ -96,7 +97,7 @@ jobs:
         # Decrypt
         decrypted=$(echo "$encrypted_secret" | \
           openssl enc -d -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 \
-          -pass pass:"$ENCRYPTION_KEY" -base64)
+          -pass pass:"$ENCRYPTION_KEY" -base64 -A)
           
         echo "::add-mask::$decrypted"
         echo "DECRYPTED_SECRET=$decrypted" >> $GITHUB_OUTPUT
