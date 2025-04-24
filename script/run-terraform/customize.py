@@ -8,6 +8,7 @@ def preprocess(i):
 
     os_info = i['os_info']
     env = i['env']
+    logger = i['automation'].logger
     script_dir = i['run_script_input']['path']
     config_dir = os.path.join(
         script_dir, env.get(
@@ -15,7 +16,7 @@ def preprocess(i):
     env['MLC_TERRAFORM_CONFIG_DIR'] = config_dir
     cache_dir = os.getcwd()
 
-    print(f"Running terraform from {cache_dir}")
+    logger.info(f"Running terraform from {cache_dir}")
 
     shutil.copy(os.path.join(config_dir, "main.tf"), cache_dir)
     env['MLC_TERRAFORM_RUN_DIR'] = cache_dir
@@ -24,6 +25,7 @@ def preprocess(i):
 
 
 def postprocess(i):
+    logger = i["automation"].logger
     env = i['env']
     if env.get('MLC_DESTROY_TERRAFORM'):
         return {'return': 0}
@@ -83,8 +85,3 @@ def postprocess(i):
         print_attr(instance_attributes, "security_groups")
 
     return {'return': 0}
-
-
-def print_attr(instance_attributes, key):
-    if key in instance_attributes:
-        print(key.upper() + ": " + str(instance_attributes[key]))

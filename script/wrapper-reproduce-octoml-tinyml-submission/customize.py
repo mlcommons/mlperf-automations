@@ -37,7 +37,3 @@ def preprocess(i):
                     return r
 
     return {'return': 0}
-
-
-def postprocess(i):
-    return {'return': 0}

@@ -6,6 +6,8 @@ def preprocess(i):
     os_info = i['os_info']
     env = i['env']
 
+    logger = i['automation'].logger
+
     machine = env.get('MLC_HOST_OS_MACHINE', '')
     if machine == '':
         machine = 'x86_64'
@@ -35,9 +37,9 @@ def preprocess(i):
     URL = 'https://github.com/microsoft/onnxruntime/releases/download/v{}/{}'.format(
         version, FILENAME)
 
-    print('')
-    print('Downloading from {}'.format(URL))
-    print('')
+    logger.info('')
+    logger.info('Downloading from {}'.format(URL))
+    logger.info('')
 
     env['FOLDER'] = FOLDER
     env['FILENAME'] = FILENAME

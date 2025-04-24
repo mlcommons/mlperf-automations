@@ -8,11 +8,11 @@ def preprocess(i):
 
     os_info = i['os_info']
     env = i['env']
-
-    print("")
+    logger = i['automation'].logger
+    logger.info("")
     print("Using MLCommons Inference source from '" +
           env['MLC_MLPERF_INFERENCE_SOURCE'] + "'")
-    print("")
+    logger.info("")
 
     if os_info['platform'] == 'windows':
         MLPERF_CLASSES = ['Airplane', 'Antelope', 'Apple', 'Backpack', 'Balloon', 'Banana',

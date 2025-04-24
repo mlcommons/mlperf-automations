@@ -16,7 +16,3 @@ def preprocess(i):
     recursion_spaces = i['recursion_spaces']
 
     return {'return': 0}
-
-
-def postprocess(i):
-    return {'return': 0}

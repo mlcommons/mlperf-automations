@@ -14,6 +14,8 @@ def preprocess(i):
 
     mlc = i['automation'].action_object
 
+    logger = i['automation'].logger
+
     interactive = env.get('MLC_DOCKER_INTERACTIVE_MODE', '')
 
     if is_true(interactive):
@@ -51,9 +53,9 @@ def preprocess(i):
     DOCKER_CONTAINER = docker_image_repo + "/" + \
         docker_image_name + ":" + docker_image_tag
 
-    print('')
-    print('Checking existing Docker container:')
-    print('')
+    logger.info('')
+    logger.info('Checking existing Docker container:')
+    logger.info('')
     # CMD = f"""{env['MLC_CONTAINER_TOOL']} ps --format=json  --filter "ancestor={DOCKER_CONTAINER}" """
     CMD = f"""{env['MLC_CONTAINER_TOOL']} ps --format """ + \
         '"{{ .ID }},"' + f"""  --filter "ancestor={DOCKER_CONTAINER}" """
@@ -61,8 +63,8 @@ def preprocess(i):
         CMD += " 2> nul"
     else:
         CMD += " 2> /dev/null"
-    print('  ' + CMD)
-    print('')
+    logger.info('  ' + CMD)
+    logger.info('')
 
     try:
         out = subprocess.check_output(
@@ -81,7 +83,7 @@ def preprocess(i):
 
     if existing_container_id and is_true(
             env.get('MLC_DOCKER_REUSE_EXISTING_CONTAINER', '')):
-        print(f"Reusing existing container {existing_container_id}")
+        logger.info(f"Reusing existing container {existing_container_id}")
         env['MLC_DOCKER_CONTAINER_ID'] = existing_container_id
 
     else:
@@ -89,7 +91,7 @@ def preprocess(i):
             print(
                 f"""Not using existing container {existing_container_id} as env['MLC_DOCKER_REUSE_EXISTING_CONTAINER'] is not set""")
         else:
-            print("No existing container")
+            logger.info("No existing container")
         if env.get('MLC_DOCKER_CONTAINER_ID', '') != '':
             del (env['MLC_DOCKER_CONTAINER_ID'])  # not valid ID
 
@@ -100,11 +102,11 @@ def preprocess(i):
         else:
             CMD += " 2> /dev/null"
 
-        print('')
-        print('Checking Docker images:')
-        print('')
-        print('  ' + CMD)
-        print('')
+        logger.info('')
+        logger.info('Checking Docker images:')
+        logger.info('')
+        logger.info('  ' + CMD)
+        logger.info('')
 
         try:
             docker_image = subprocess.check_output(
@@ -117,7 +119,7 @@ def preprocess(i):
 
         if is_false(recreate_image):
             if docker_image:
-                print("Docker image exists with ID: " + docker_image)
+                logger.info("Docker image exists with ID: " + docker_image)
                 env['MLC_DOCKER_IMAGE_EXISTS'] = "yes"
 
     #    elif recreate_image == "yes":
@@ -130,6 +132,8 @@ def postprocess(i):
     os_info = i['os_info']
 
     env = i['env']
+
+    logger = i['automation'].logger
 
     # Updating Docker info
     update_docker_info(env)
@@ -258,11 +262,11 @@ def postprocess(i):
 
         CMD += ' && echo "ID=$ID"'
 
-        print('=========================')
-        print("Container launch command:")
-        print('')
-        print(CMD)
-        print('')
+        logger.info('=========================')
+        logger.info("Container launch command:")
+        logger.info('')
+        logger.info(f"{CMD}")
+        logger.info('')
         print(
             "Running " +
             run_cmd +
@@ -270,7 +274,7 @@ def postprocess(i):
 
         record_script({'cmd': CMD, 'env': env})
 
-        print('')
+        logger.info('')
         # Execute the command
         try:
             result = subprocess.run(
@@ -280,12 +284,12 @@ def postprocess(i):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True)
-            print("Command Output:", result.stdout)
+            logger.info("Command Output:", result.stdout)
         except subprocess.CalledProcessError as e:
-            print("Error Occurred!")
-            print(f"Command: {e.cmd}")
-            print(f"Return Code: {e.returncode}")
-            print(f"Error Output: {e.stderr}")
+            logger.error("Error Occurred!")
+            logger.info(f"Command: {e.cmd}")
+            logger.info(f"Return Code: {e.returncode}")
+            logger.error(f"Error Output: {e.stderr}")
             return {'return': 1, 'error': e.stderr}
 
         docker_out = result.stdout
@@ -300,7 +304,7 @@ def postprocess(i):
                 ID = line[3:]
                 env['MLC_DOCKER_CONTAINER_ID'] = ID
 
-        print(docker_out)
+        logger.info(f"{docker_out}")
 
     else:
         x = "'"
@@ -319,14 +323,14 @@ def postprocess(i):
             " " + docker_image_repo + "/" + docker_image_name + ":" + docker_image_tag
         CMD = CONTAINER + " bash -c " + x + run_cmd_prefix + run_cmd + x2 + x
 
-        print('')
-        print("Container launch command:")
-        print('')
-        print(CMD)
+        logger.info('')
+        logger.info("Container launch command:")
+        logger.info('')
+        logger.info(f"{CMD}")
 
         record_script({'cmd': CMD, 'env': env})
 
-        print('')
+        logger.info('')
         docker_out = os.system(CMD)
         if docker_out != 0:
             if docker_out % 256 == 0:

@@ -63,6 +63,8 @@ def postprocess(i):
     state = i['state']
     mlc = i['automation'].action_object
 
+    logger = i['automation'].logger
+
     # if env.get('MLC_MLPERF_USER_CONF', '') == '':
     #    return {'return': 0}
 
@@ -218,7 +220,7 @@ def postprocess(i):
         pattern["Offline"] = "Samples per second: (.*)\n"
         pattern["SingleStream"] = "Mean latency \\(ns\\)\\s*:(.*)"
         pattern["MultiStream"] = "Mean latency \\(ns\\)\\s*:(.*)"
-        print("\n")
+        logger.info("\n")
         with open("mlperf_log_summary.txt", "r") as fp:
             summary = fp.read()
 
@@ -241,7 +243,7 @@ def postprocess(i):
 
         print(
             f"SUT: {sut_name}, model: {model_full_name}, scenario: {scenario}, {metric} (mean value) updated as {value}")
-        print(f"New config stored in {sut_config_path}")
+        logger.info(f"New config stored in {sut_config_path}")
         with open(sut_config_path, "w") as f:
             yaml.dump(sut_config, f)
 
@@ -288,8 +290,8 @@ def postprocess(i):
                                                               ] = y[1].strip()
 
         if not is_false(env.get("MLC_MLPERF_PRINT_SUMMARY", "")):
-            print("\n")
-            print(mlperf_log_summary)
+            logger.info("\n")
+            logger.info(mlperf_log_summary)
 
         with open("measurements.json", "w") as fp:
             json.dump(measurements, fp, indent=2)
@@ -503,7 +505,7 @@ def postprocess(i):
         else:
             cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']}  {q}{SCRIPT_PATH}{q}  -r {q}{RESULT_DIR}{q} -c  {q}{COMPLIANCE_DIR}{q}  -o  {q}{OUTPUT_DIR}{q}"""
 
-        print(cmd)
+        logger.info(cmd)
         os.system(cmd)
 
         if test == "TEST01":
@@ -520,13 +522,13 @@ def postprocess(i):
 
             ACCURACY_DIR = os.path.join(RESULT_DIR, "accuracy")
             if not os.path.exists(ACCURACY_DIR):
-                print("Accuracy run not yet completed")
+                logger.warning("Accuracy run not yet completed")
                 return {
                     'return': 1, 'error': 'TEST01 needs accuracy run to be completed first'}
 
             cmd = f"""cd {q}{TEST01_DIR}{q} &&  bash {q}{SCRIPT_PATH}{q} {q}{os.path.join(ACCURACY_DIR, "mlperf_log_accuracy.json")}{q} {q}{os.path.join(COMPLIANCE_DIR, "mlperf_log_accuracy.json")}{q} """
             env['CMD'] = cmd
-            print(cmd)
+            logger.info(cmd)
             r = automation.run_native_script(
                 {'run_script_input': run_script_input, 'env': env, 'script_name': 'verify_accuracy'})
             if r['return'] > 0:
@@ -538,7 +540,8 @@ def postprocess(i):
                 data = file.read().replace('\n', '\t')
 
             if 'TEST PASS' not in data:
-                print("\nDeterministic TEST01 failed... Trying with non-determinism.\n")
+                logger.warning(
+                    "\nDeterministic TEST01 failed... Trying with non-determinism.\n")
             # #Normal test failed, trying the check with non-determinism
 
                 baseline_accuracy_file = os.path.join(
@@ -603,8 +606,8 @@ def postprocess(i):
             sys_utilisation_log['timestamp'])
         '''
         for i in range(len(sys_utilisation_log['timestamp'])):
-            print(f"{sys_utilisation_log['timestamp'][i]} {power_begin_time}")
-            print(sys_utilisation_log['timestamp'][i]>=power_begin_time)
+            logger.info(f"{sys_utilisation_log['timestamp'][i]} {power_begin_time}")
+            logger.info(sys_utilisation_log['timestamp'][i]>=power_begin_time)
         '''
         # print(f"{sys_utilisation_log['timestamp'][0]} {power_begin_time}")
         # print(sys_utilisation_log['timestamp'][0]>=power_begin_time)
@@ -616,9 +619,9 @@ def postprocess(i):
         )
         system_utilisation_info_dump["avg_used_memory_gb"] = filtered_log['used_memory_gb'].mean(
         )
-        print("\nSystem utilisation info for the current run:")
-        print(system_utilisation_info_dump)
-        print("\n")
+        logger.info("\nSystem utilisation info for the current run:")
+        logger.info(system_utilisation_info_dump)
+        logger.info("\n")
 
     if state.get(
             'mlperf-inference-implementation') and state['mlperf-inference-implementation'].get('version_info'):

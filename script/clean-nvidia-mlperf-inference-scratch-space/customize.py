@@ -37,7 +37,7 @@ def preprocess(i):
     if cache_rm_tags:
         r = mlc_cache.access({'action': 'rm', 'target': 'cache',
                               'tags': cache_rm_tags, 'f': True})
-        print(r)
+        logger.info(r)
         # Check if return code is 0 (success)
         # currently, the warning code is not being checked as the possibility
         # arises only for missing cache entry

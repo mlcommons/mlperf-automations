@@ -15,6 +15,8 @@ def preprocess(i):
 
     automation = i['automation']
 
+    logger = automation.logger
+
     quiet = is_true(env.get('MLC_QUIET', False))
 
     if is_true(env.get('MLC_CREATE_INPUT_BATCH', '')):
@@ -27,7 +29,7 @@ def preprocess(i):
         return r
     cmd = r['cmd']
 
-    print("Profiling from " + os.getcwd())
+    logger.info("Profiling from " + os.getcwd())
 
     env['MLC_RUN_CMD'] = cmd
 
@@ -214,8 +216,3 @@ if isinstance(doc,                     if )
     return {'return': 0}
 
 
-def get_scale_offset(min_val, max_val):
-    total_range = max_val - min_val
-    scale = total_range /256.0
-    offset = round(-min_val / scale)
-    return scale, offset

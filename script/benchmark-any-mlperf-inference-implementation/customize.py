@@ -14,6 +14,8 @@ def preprocess(i):
 
     automation = i['automation']
 
+    logger = automation.logger
+
     quiet = is_true(env.get('MLC_QUIET', False))
 
     models = env['MODELS'].split(",")
@@ -165,7 +167,7 @@ def preprocess(i):
 
     with open(os.path.join(script_path, run_file_name + ".sh"), 'w') as f:
         f.write(run_script_content)
-    print(run_script_content)
+    logger.info(run_script_content)
 
     run_script_input = i['run_script_input']
     r = automation.run_native_script(

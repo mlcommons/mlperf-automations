@@ -12,6 +12,8 @@ def preprocess(i):
         return {'return': 1, 'error': 'Windows is not supported in this script yet'}
     env = i['env']
 
+    logger = i['automation'].logger
+
     if is_true(env.get('MLC_MLPERF_SKIP_RUN', '')):
         return {'return': 0}
 
@@ -30,8 +32,8 @@ def preprocess(i):
         return r
     run_cmd = r['run_cmd']
     run_dir = r['run_dir']
-    print(run_cmd)
-    print(run_dir)
+    logger.info(run_cmd)
+    logger.info(run_dir)
     env['MLC_MLPERF_RUN_CMD'] = run_cmd
     env['MLC_RUN_DIR'] = run_dir
     env['MLC_RUN_CMD'] = run_cmd

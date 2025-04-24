@@ -11,6 +11,7 @@ def preprocess(i):
 
     os_info = i['os_info']
     env = i['env']
+    logger = i['automation'].logger
 
     if env["MLC_DOCKER_OS"] not in ["ubuntu", "rhel", "arch"]:
         return {
@@ -379,7 +380,7 @@ def preprocess(i):
             env['MLC_DOCKER_RUN_CMD'] = "mlc pull repo && " + \
                 env['MLC_DOCKER_RUN_CMD']
 
-    print(env['MLC_DOCKER_RUN_CMD'])
+    logger.info(env['MLC_DOCKER_RUN_CMD'])
     fake_run = env.get("MLC_DOCKER_FAKE_RUN_OPTION",
                        " --fake_run") + dockerfile_env_input_string
     fake_run = fake_run + \
@@ -441,7 +442,7 @@ def preprocess(i):
         s = r['string']
         f.write(s + EOL)
 
-    print(f"""Dockerfile written at {dockerfile_with_path}""")
+    logger.info(f"""Dockerfile written at {dockerfile_with_path}""")
 
     f.close()
 

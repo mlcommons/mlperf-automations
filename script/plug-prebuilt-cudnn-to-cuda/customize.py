@@ -18,6 +18,8 @@ def preprocess(i):
 
     meta = i['meta']
     automation = i['automation']
+    logger = automation.logger
+
     version = env.get('MLC_VERSION')
 
     supported_versions = list(meta['versions'].keys())
@@ -42,8 +44,8 @@ def preprocess(i):
 
     cudnn_url = f'https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-x86_64/{filename}'
 
-    print('')
-    print(f'URL to download cuDNN: {cudnn_url}')
+    logger.info('')
+    logger.info(f'URL to download cuDNN: {cudnn_url}')
 
     env['MLC_CUDNN_TAR_DIR'] = cudnn_dir
     env['MLC_CUDNN_UNTAR_PATH'] = os.path.join(cur_dir, cudnn_dir)

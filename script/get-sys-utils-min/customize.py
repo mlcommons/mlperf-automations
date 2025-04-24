@@ -9,6 +9,8 @@ def preprocess(i):
 
     env = i['env']
 
+    logger = i['automation'].logger
+
     automation = i['automation']
     cm = automation.action_object
 
@@ -23,22 +25,22 @@ def preprocess(i):
             for cd in clean_dirs.split(','):
                 if cd != '':
                     if os.path.isdir(cd):
-                        print('Cleaning directory {}'.format(cd))
+                        logger.info('Cleaning directory {}'.format(cd))
                         shutil.rmtree(cd)
 
         url = env['MLC_PACKAGE_WIN_URL']
 
         urls = [url] if ';' not in url else url.split(';')
 
-        print('')
-        print('Current directory: {}'.format(os.getcwd()))
+        logger.info('')
+        logger.info('Current directory: {}'.format(os.getcwd()))
 
         for url in urls:
 
             url = url.strip()
 
-            print('')
-            print('Downloading from {}'.format(url))
+            logger.info('')
+            logger.info('Downloading from {}'.format(url))
             r = download_file({
                 'url': url,
                 'verify': False})
@@ -47,7 +49,7 @@ def preprocess(i):
 
             filename = r['filename']
 
-            print('Unzipping file {}'.format(filename))
+            logger.info('Unzipping file {}'.format(filename))
 
             r = unzip_file({
                 'filename': filename})
@@ -55,10 +57,10 @@ def preprocess(i):
                 return r
 
             if os.path.isfile(filename):
-                print('Removing file {}'.format(filename))
+                logger.info('Removing file {}'.format(filename))
                 os.remove(filename)
 
-        print('')
+        logger.info('')
 
         # Add to path
         env['+PATH'] = [os.path.join(path, 'bin')]

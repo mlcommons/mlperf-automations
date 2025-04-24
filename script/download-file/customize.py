@@ -33,6 +33,8 @@ def preprocess(i):
 
     automation = i['automation']
 
+    logger = automation.logger
+
     quiet = is_true(env.get('MLC_QUIET', False))
 
     tool = env.get('MLC_DOWNLOAD_TOOL', '')
@@ -64,8 +66,8 @@ def preprocess(i):
         env['MLC_DOWNLOAD_FILENAME'] = filepath
 
         if not quiet:
-            print('')
-            print('Using local file: {}'.format(filepath))
+            logger.info('')
+            logger.info('Using local file: {}'.format(filepath))
     else:
         url = env.get('MLC_DOWNLOAD_URL', '')
 
@@ -73,8 +75,8 @@ def preprocess(i):
             return {
                 'return': 1, 'error': 'please specify URL using --url={URL} or --env.MLC_DOWNLOAD_URL={URL}'}
 
-        print('')
-        print('Downloading from {}'.format(url))
+        logger.info('')
+        logger.info('Downloading from {}'.format(url))
 
         if '&' in url and tool != "mlcutil":
             if os_info['platform'] == 'windows':
@@ -179,7 +181,8 @@ def preprocess(i):
                     url = env.get('MLC_DOWNLOAD_URL' + str(i), '')
                     if url == '':
                         break
-                    print(f"Download from {oldurl} failed, trying from {url}")
+                    logger.error(
+                        f"Download from {oldurl} failed, trying from {url}")
 
                 if r['return'] > 0:
                     return r
@@ -198,7 +201,7 @@ def preprocess(i):
                 if url == '':
                     break
                 env['MLC_DOWNLOAD_CMD'] += f" || (({del_cmd} {env['MLC_DOWNLOAD_FILENAME']} || true) && wget -nc {extra_download_options} {url})"
-            print(env['MLC_DOWNLOAD_CMD'])
+            logger.info(f"{env['MLC_DOWNLOAD_CMD']}")
 
         elif tool == "curl":
             if env.get('MLC_DOWNLOAD_FILENAME', '') != '':
