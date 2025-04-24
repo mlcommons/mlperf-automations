@@ -201,7 +201,7 @@ def preprocess(i):
                 if url == '':
                     break
                 env['MLC_DOWNLOAD_CMD'] += f" || (({del_cmd} {env['MLC_DOWNLOAD_FILENAME']} || true) && wget -nc {extra_download_options} {url})"
-            logger.info(fenv['MLC_DOWNLOAD_CMD'])
+            logger.info(f"{env['MLC_DOWNLOAD_CMD']}")
 
         elif tool == "curl":
             if env.get('MLC_DOWNLOAD_FILENAME', '') != '':
