@@ -6,7 +6,7 @@ def preprocess(i):
     os_info = i['os_info']
 
     q = '"' if os_info['platform'] == 'windows' else "'"
-
+    logger = i['automation'].logger
     env = i['env']
     CPPFLAGS = env.get('+ CPPFLAGS', [])
     env['MLC_C_COMPILER_FLAGS'] = " ".join(env.get('+ CFLAGS', []) + CPPFLAGS)
@@ -30,7 +30,7 @@ def preprocess(i):
     # If windows, need to extend it more ...
     if os_info['platform'] == 'windows' and env.get(
             'MLC_COMPILER_FAMILY', '') != 'LLVM':
-        print("WARNING: compile-program script should be extended to support flags for non-LLVM compilers on Windows")
+        logger.warning("Compile-program script should be extended to support flags for non-LLVM compilers on Windows")
         return {'return': 0}
 
     LDFLAGS = env.get('+ LDFLAGS', [])

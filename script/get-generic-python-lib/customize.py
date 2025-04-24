@@ -9,6 +9,7 @@ def preprocess(i):
     env = i['env']
     meta = i['meta']
     automation = i['automation']
+    logger = automation.logger
     run_script_input = i['run_script_input']
     pip_version = env.get('MLC_PIP_VERSION', '').strip().split('.')
 

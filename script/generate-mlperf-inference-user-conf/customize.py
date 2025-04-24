@@ -13,6 +13,7 @@ def preprocess(i):
     env = i['env']
     state = i['state']
     script_path = i['run_script_input']['path']
+    logger = i['automation'].logger
 
     rerun = True if env.get("MLC_RERUN", "") != '' else False
 
@@ -31,7 +32,7 @@ def preprocess(i):
         env['MLC_MLPERF_LOADGEN_SCENARIO'] = "Offline"
 
     if 'MLC_MLPERF_LOADGEN_MODE' not in env:
-        print("\nNo mode given. Using accuracy as default\n")
+        logger.info("\nNo mode given. Using accuracy as default\n")
         env['MLC_MLPERF_LOADGEN_MODE'] = "accuracy"
 
     if env.get('OUTPUT_BASE_DIR', '') == '':
@@ -140,15 +141,15 @@ def preprocess(i):
             # if env.get("MLC_MLPERF_FIND_PERFORMANCE_MODE", '') == "yes":
             if metric == "target_qps":
                 if is_true(env.get("MLC_MLPERF_FIND_PERFORMANCE_MODE", '')):
-                    print("In find performance mode: using 1 as target_qps")
+                    logger.info("In find performance mode: using 1 as target_qps")
                 else:
-                    print("No target_qps specified. Using 1 as target_qps")
+                    logger.info("No target_qps specified. Using 1 as target_qps")
                 conf[metric] = 1
             if metric == "target_latency":
                 if is_true(env.get("MLC_MLPERF_FIND_PERFORMANCE_MODE", '')):
-                    print("In find performance mode: using 0.5ms as target_latency")
+                    logger.info("In find performance mode: using 0.5ms as target_latency")
                 else:
-                    print("No target_latency specified. Using default")
+                    logger.info("No target_latency specified. Using default")
                 if is_false(env.get('MLC_MLPERF_USE_MAX_DURATION', 'yes')) or is_true(env.get(
                         'MLC_MLPERF_MODEL_EQUAL_ISSUE_MODE', 'no')):
                     # Total number of queries needed is a multiple of dataset
@@ -288,7 +289,7 @@ def preprocess(i):
     else:
         env['MLC_MLPERF_ACCURACY_RESULTS_DIR'] = ''
 
-    run_exists = run_files_exist(log_mode, OUTPUT_DIR, required_files, env)
+    run_exists = run_files_exist(log_mode, OUTPUT_DIR, required_files, env, logger)
 
     if 'MLC_MLPERF_POWER' in env and env.get(
             'MLC_MLPERF_SHORT_RANGING_RUN', '') != 'no' and env['MLC_MLPERF_RUN_STYLE'] == "valid" and mode == "performance":
@@ -405,14 +406,14 @@ def preprocess(i):
 
     if not run_exists or rerun:
 
-        print("Output Dir: '" + OUTPUT_DIR + "'")
-        print(user_conf)
+        logger.info("Output Dir: '" + OUTPUT_DIR + "'")
+        logger.info(user_conf)
         if env.get('MLC_MLPERF_POWER', '') == "yes" and os.path.exists(
                 env.get('MLC_MLPERF_POWER_LOG_DIR', '')):
             shutil.rmtree(env['MLC_MLPERF_POWER_LOG_DIR'])
     else:
         if not env.get('MLC_MLPERF_COMPLIANCE_RUN_POSTPONED', False):
-            print("Run files exist, skipping run...\n")
+            logger.warning("Run files exist, skipping run...\n")
         env['MLC_MLPERF_SKIP_RUN'] = "yes"
 
     if not run_exists or rerun or not measure_files_exist(OUTPUT_DIR,
@@ -442,7 +443,7 @@ def preprocess(i):
     return {'return': 0}
 
 
-def run_files_exist(mode, OUTPUT_DIR, run_files, env):
+def run_files_exist(mode, OUTPUT_DIR, run_files, env, logger):
     import submission_checker as checker
     from log_parser import MLPerfLog
 
@@ -516,7 +517,7 @@ def run_files_exist(mode, OUTPUT_DIR, run_files, env):
         else:
             cmd = f"{env['MLC_PYTHON_BIN_WITH_PATH']}  {SCRIPT_PATH}  -r {RESULT_DIR} -c  {COMPLIANCE_DIR}  -o  {OUTPUT_DIR}"
 
-        print(cmd)
+        logger.info(cmd)
         os.system(cmd)
 
         is_valid = checker.check_compliance_perf_dir(COMPLIANCE_DIR)

@@ -8,6 +8,7 @@ def preprocess(i):
     # Pre-set by CM
     os_info = i['os_info']
     env = i['env']
+    logger = i['automation'].logger
     recursion_spaces = i['recursion_spaces']
     automation = i['automation']
     run_script_input = i['run_script_input']
@@ -64,7 +65,7 @@ def preprocess(i):
             version, archive_with_ext)
         env['MLC_ARIA2_DOWNLOAD_URL'] = url
 
-        print('URL to download ARIA2: {}'.format(url))
+        logger.info('URL to download ARIA2: {}'.format(url))
 
         r = automation.run_native_script(
             {'run_script_input': run_script_input, 'env': env, 'script_name': 'install'})
@@ -102,7 +103,7 @@ def preprocess(i):
 
 def detect_version(i):
     env = i['env']
-
+    logger = i['automation'].logger
     r = i['automation'].parse_version({'match_text': r'aria2 version\s*([\d.]+)',
                                        'group_number': 1,
                                        'env_key': 'MLC_ARIA2_VERSION',
@@ -111,7 +112,7 @@ def detect_version(i):
         return r
 
     version = r['version']
-    print(i['recursion_spaces'] + '    Detected version: {}'.format(version))
+    logger.info(i['recursion_spaces'] + '    Detected version: {}'.format(version))
 
     return {'return': 0, 'version': version}
 

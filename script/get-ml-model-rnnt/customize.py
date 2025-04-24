@@ -11,13 +11,15 @@ def preprocess(i):
 
     automation = i['automation']
 
+    logger = automation.logger
+
     cm = automation.action_object
 
     path = os.getcwd()
 
     url = env['MLC_PACKAGE_URL']
 
-    print('Downloading from {}'.format(url))
+    logger.info('Downloading from {}'.format(url))
 
     r = cm.access({'action': 'download_file',
                    'automation': 'utils,dc2743f8450541e3',

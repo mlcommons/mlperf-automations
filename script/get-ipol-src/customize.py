@@ -11,7 +11,7 @@ def preprocess(i):
     script_path = i['artifact'].path
 
     automation = i['automation']
-
+    logger = automation.logger
     cm = automation.action_object
 
     path = os.getcwd()
@@ -27,7 +27,7 @@ def preprocess(i):
         '{{MLC_IPOL_NUMBER}}',
         number)
 
-    print('Downloading from {}'.format(url))
+    logger.info('Downloading from {}'.format(url))
 
     r = cm.access({'action': 'download_file',
                    'automation': 'utils,dc2743f8450541e3',
@@ -37,7 +37,7 @@ def preprocess(i):
 
     filename = r['filename']
 
-    print('Unzipping file {}'.format(filename))
+    logger.info('Unzipping file {}'.format(filename))
 
     r = cm.access({'action': 'unzip_file',
                    'automation': 'utils,dc2743f8450541e3',
@@ -46,7 +46,7 @@ def preprocess(i):
         return r
 
     if os.path.isfile(filename):
-        print('Removing file {}'.format(filename))
+        logger.info('Removing file {}'.format(filename))
         os.remove(filename)
 
     # Get sub-directory from filename
@@ -60,7 +60,7 @@ def preprocess(i):
     cmd = 'patch -p0 < {}'.format(os.path.join(script_path,
                                   'patch', '20240127.patch'))
 
-    print('Patching code: {}'.format(cmd))
+    logger.info('Patching code: {}'.format(cmd))
     os.system(cmd)
 
     return {'return': 0}

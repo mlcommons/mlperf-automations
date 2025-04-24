@@ -10,7 +10,7 @@ def preprocess(i):
     env = i['env']
 
     automation = i['automation']
-
+    logger = automation.logger
     recursion_spaces = i['recursion_spaces']
 
     run_script_input = i['run_script_input']
@@ -68,7 +68,7 @@ def preprocess(i):
         env['MLC_JAVAC_PREBUILT_URL'] = url
         env['MLC_JAVAC_PREBUILT_FILENAME'] = filename
 
-        print('')
+        logger.info('')
         print(
             recursion_spaces +
             '    Downloading and installing prebuilt Java from {} ...'.format(
@@ -88,7 +88,7 @@ def preprocess(i):
             return {'return': 1,
                     'error': 'can\'t find target file {}'.format(target_file)}
 
-        print('')
+        logger.info('')
         print(
             recursion_spaces +
             '    Registering file {} ...'.format(target_file))
@@ -126,8 +126,9 @@ def detect_version(i):
         return r
 
     version = r['version']
+    logger = i['automation'].logger
 
-    print(i['recursion_spaces'] + '    Detected version: {}'.format(version))
+    logger.info(i['recursion_spaces'] + '    Detected version: {}'.format(version))
 
     return {'return': 0, 'version': version}
 

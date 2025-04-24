@@ -36,6 +36,7 @@ def preprocess(i):
         return {'return': 1, 'error': 'Windows is not supported in this script yet'}
 
     env = i['env']
+    logger = i['automation'].logger
 
     if env.get("MLC_RUN_DIR", "") == "":
         env['MLC_RUN_DIR'] = os.getcwd()
@@ -46,11 +47,11 @@ def preprocess(i):
 
     interval = int(env.get('MLC_SYSTEM_INFO_MEASUREMENT_INTERVAL', '2'))
 
-    print(f"The system dumps are created to the folder:{logs_dir}")
+    logger.info(f"The system dumps are created to the folder:{logs_dir}")
 
-    print("WARNING: Currently the script is in its development stage. Only memory measurements supports as of now!")
+    logger.warning("Currently the script is in its development stage. Only memory measurements supports as of now!")
 
-    print("Started measuring system info!")
+    logger.info("Started measuring system info!")
 
     csv_headers = [
         'timestamp',

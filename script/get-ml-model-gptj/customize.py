@@ -7,6 +7,7 @@ def preprocess(i):
 
     os_info = i['os_info']
     env = i['env']
+    logger = i['automation'].logger
 
     if env.get('MLC_GPTJ_INTEL_MODEL', '') == 'yes':
         i['run_script_input']['script_name'] = 'run-intel'
@@ -17,7 +18,7 @@ def preprocess(i):
             'code',
             'gptj-99',
             'pytorch-cpu')
-        print(f"Harness Root: {harness_root}")
+        logger.info(f"Harness Root: {harness_root}")
         env['MLC_HARNESS_CODE_ROOT'] = harness_root
         env['MLC_CALIBRATION_CODE_ROOT'] = os.path.join(
             env['MLC_MLPERF_INFERENCE_RESULTS_PATH'], 'closed', 'Intel', 'calibration')

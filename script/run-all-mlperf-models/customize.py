@@ -13,7 +13,7 @@ def preprocess(i):
     script_path = i['run_script_input']['path']
 
     automation = i['automation']
-
+    logger = automation.logger
     quiet = is_true(env.get('MLC_QUIET', False))
 
     models = env['MODELS'].split(",")
@@ -26,7 +26,7 @@ def preprocess(i):
     if devices:
         devices = devices.split(",")
 
-    print(backends)
+    logger.info(f"BACKENDS: {backends}")
     implementation = env['IMPLEMENTATION']
 
     power = env.get('POWER', '')
@@ -101,7 +101,7 @@ def preprocess(i):
                 run_script_content += "\n\n" + "\n\n".join(cmds)
                 with open(os.path.join(script_path, run_file_name + ".sh"), 'w') as f:
                     f.write(run_script_content)
-        print(cmds)
+        logger.info(f"CMDS: {cmds}")
 
     return {'return': 0}
 

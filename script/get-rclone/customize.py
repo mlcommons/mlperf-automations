@@ -91,7 +91,8 @@ def detect_version(i):
 
     version = r['version']
 
-    print(i['recursion_spaces'] + '    Detected version: {}'.format(version))
+    logger = i['automation'].logger
+    logger.info(i['recursion_spaces'] + '    Detected version: {}'.format(version))
 
     return {'return': 0, 'version': version}
 
@@ -100,6 +101,8 @@ def postprocess(i):
 
     os_info = i['os_info']
     env = i['env']
+
+    logger = i['automation'].logger
 
     gdrive = env.get('MLC_RCLONE_GDRIVE', '')
     if gdrive == "yes":
@@ -122,8 +125,7 @@ def postprocess(i):
 
         with open(default_config_path, 'w') as configfile:
             default_config.write(configfile)
-        print({section: dict(default_config[section])
-              for section in default_config.sections()})
+        logger.info(f"{section: dict(default_config[section]) for section in default_config.sections()}")
 
     r = detect_version(i)
 

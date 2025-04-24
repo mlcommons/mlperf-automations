@@ -9,15 +9,17 @@ def preprocess(i):
 
     os_info = i['os_info']
     env = i['env']
+    logger = i['automation'].logger
+
     submission_dir = env.get("MLC_MLPERF_INFERENCE_SUBMISSION_DIR", "")
 
     if submission_dir == "":
-        print("Please set --env.MLC_MLPERF_INFERENCE_SUBMISSION_DIR")
+        logger.error("Please set --env.MLC_MLPERF_INFERENCE_SUBMISSION_DIR")
         return {'return': 1,
                 'error': 'MLC_MLPERF_INFERENCE_SUBMISSION_DIR is not specified'}
 
     if not os.path.exists(submission_dir):
-        print("Please set --env.MLC_MLPERF_INFERENCE_SUBMISSION_DIR to a valid submission directory")
+        logger.error("Please set --env.MLC_MLPERF_INFERENCE_SUBMISSION_DIR to a valid submission directory")
         return {'return': 1,
                 'error': 'MLC_MLPERF_INFERENCE_SUBMISSION_DIR is not existing'}
 
@@ -26,7 +28,7 @@ def preprocess(i):
     submission_processed = f"{submission_dir}_processed"
 
     if os.path.exists(submission_processed):
-        print(f"Cleaning {submission_processed}")
+        logger.info(f"Cleaning {submission_processed}")
         shutil.rmtree(submission_processed)
 
     version = env.get('MLC_MLPERF_SUBMISSION_CHECKER_VERSION', '')

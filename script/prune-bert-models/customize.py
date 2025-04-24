@@ -8,6 +8,8 @@ def preprocess(i):
 
     env = i['env']
 
+    logger = i['automation'].logger
+
     ckpt_path = env.get('MLC_BERT_PRUNE_CKPT_PATH', '')
     if ckpt_path == '':
         p = env['MLC_ML_MODEL_FILE_WITH_PATH']
@@ -29,17 +31,17 @@ def preprocess(i):
         out_dir = os.path.join(os.getcwd(), 'pruned-model-output')
     env['MLC_BERT_PRUNE_OUTPUT_DIR'] = out_dir
 
-    print('')
+    logger.info('')
     print(
         'Local CM cache path to the updated BERT pruner src from NeurIPS 2022: ' +
         env['MLC_GIT_REPO_BERT_PRUNER_NEURIPS_2022_CHECKOUT_PATH'])
 
-    print('')
+    logger.info('')
     for k in ["MLC_ML_MODEL_FILE_WITH_PATH",
               "MLC_BERT_PRUNE_CKPT_PATH", "MLC_BERT_PRUNE_OUTPUT_DIR"]:
-        print('ENV["{}"]: {}'.format(k, env[k]))
+        logger.info(f"ENV[\"{k}\"]: {env[k]}")
 
-    print('')
+    logger.info('')
 
     return {'return': 0}
 
@@ -48,6 +50,8 @@ def postprocess(i):
 
     env = i['env']
 
-    print("Entered postprocess")
+    logger = i['automation'].logger
+
+    logger.info("Entered postprocess")
 
     return {'return': 0}

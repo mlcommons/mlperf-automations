@@ -8,6 +8,7 @@ def preprocess(i):
 
     os_info = i['os_info']
     env = i['env']
+    logger = i['automation'].logger
     input_dir = env.get("MLC_TAR_INPUT_DIR", "")
     if input_dir == "":
         return {'return': 1, 'error': 'Please set MLC_TAR_INPUT_DIR'}
@@ -39,8 +40,8 @@ def preprocess(i):
             str(cd_dir) + ' -czf ' + os.path.join(output_dir,
                                                   output_file) + ' ' + input_dirname
 
-    print(CMD)
+    logger.info(f"{CMD}")
     ret = os.system(CMD)
-    print("Tar file " + os.path.join(output_dir, output_file) + " created")
+    logger.info(f"Tar file {os.path.join(output_dir, output_file)} created")
 
     return {'return': ret}

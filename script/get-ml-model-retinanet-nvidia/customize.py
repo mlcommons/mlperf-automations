@@ -29,10 +29,3 @@ def preprocess(i):
     return {'return': 0}
 
 
-def postprocess(i):
-    env = i['env']
-    env['MLC_NVIDIA_RETINANET_EFFICIENT_NMS_CONCAT_MODEL_WITH_PATH'] = os.path.join(
-        os.getcwd(), "test_fpn_efficientnms_concatall.onnx")
-    if "MLC_NVIDIA_EFFICIENT_NMS" in env:
-        env['MLC_NVIDIA_RETINANET_EFFICIENT_NMS_CONCAT_MODEL_WITH_PATH'] = env['MLC_NVIDIA_MODEL_PATCHED_PATH']
-    return {'return': 0}

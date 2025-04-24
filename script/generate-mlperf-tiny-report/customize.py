@@ -12,6 +12,8 @@ def preprocess(i):
 
     cur_dir = os.getcwd()
 
+    logger = i['automation'].logger
+
     # Query cache for results dirs
     env_repo_tags = env.get('MLC_IMPORT_TINYMLPERF_REPO_TAGS', '').strip()
     xtags = '' if env_repo_tags == '' else ',version-' + env_repo_tags
@@ -49,8 +51,8 @@ def preprocess(i):
             env['MLC_TINYMLPERF_CURRENT_DIR'] = cur_dir
             env['MLC_TINYMLPERF_REPO_VERSION'] = version
 
-            print('')
-            print('Repo path: {}'.format(path))
+            logger.info('')
+            logger.info('Repo path: {}'.format(path))
 
             r = automation.run_native_script({'run_script_input': run_script_input,
                                               'env': env,

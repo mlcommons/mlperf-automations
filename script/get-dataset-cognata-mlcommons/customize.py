@@ -64,6 +64,8 @@ def postprocess(i):
     automation = i['automation']
     mlc = automation.action_object
 
+    logger = automation.logger
+
     cur_dir = os.getcwd()
 
     quiet = is_true(env.get('MLC_QUIET', False))
@@ -101,8 +103,8 @@ def postprocess(i):
 
     cfg['real_path'] = dataset_path
 
-    print('')
-    print('Used dataset path: {}'.format(dataset_path))
+    logger.info('')
+    logger.info('Used dataset path: {}'.format(dataset_path))
 
     env['MLC_DATASET_MLCOMMONS_COGNATA_PATH'] = dataset_path
 
@@ -121,8 +123,8 @@ def postprocess(i):
     if cfg.get('processed', False):
         if not utils.check_if_true_yes_on(
                 env, 'MLC_DATASET_MLCOMMONS_COGNATA_UPDATE'):
-            print('')
-            print('Already processed: use --update to update this dataset')
+            logger.info('')
+            logger.info('Already processed: use --update to update this dataset')
 
             return {'return': 0}
 
@@ -152,7 +154,7 @@ def postprocess(i):
         if x != '':
             first_url = x
         else:
-            print('')
+            logger.info('')
             first_url = input(
                 'Please register at https://mlcommons.org/datasets/cognata and enter private URL: ')
 
@@ -232,12 +234,12 @@ def postprocess(i):
         return {'return': 0, 'error': 'no sets found'}
 
     ##########################################################################
-    print('')
-    print('Available or selected serial numbers (use --serial_numbers=a,b,c to download specific subsets):')
-    print('')
+    logger.info('')
+    logger.info('Available or selected serial numbers (use --serial_numbers=a,b,c to download specific subsets):')
+    logger.info('')
     for d in data:
         s = d[serial_key]
-        print(s)
+        logger.info(s)
 
     for d in data:
         url = d[url_key]
@@ -253,8 +255,8 @@ def postprocess(i):
 
         if not os.path.isfile(dataset_path2):
 
-            print('')
-            print('Downloading {} ...'.format(url_export))
+            logger.info('')
+            logger.info('Downloading {} ...'.format(url_export))
 
             r = mlc.access({'action': 'run',
                            'automation': 'script',
@@ -267,8 +269,8 @@ def postprocess(i):
                 return r
 
     ##########################################################################
-    print('')
-    print('Processing subsets ...')
+    logger.info('')
+    logger.info('Processing subsets ...')
 
     group_names = []
     for s in env.get('MLC_DATASET_MLCOMMONS_COGNATA_GROUP_NAMES',
@@ -289,8 +291,8 @@ def postprocess(i):
         dataset_path2 = os.path.join(dataset_path1, serial_file)
         dataset_path3 = os.path.join(dataset_path1, d[serial_key])
 
-        print('')
-        print('Processing {} ...'.format(serial_file))
+        logger.info('')
+        logger.info('Processing {} ...'.format(serial_file))
 
         dataset_key = 'File_Data'
         url_key = 'File_Link'
@@ -332,12 +334,12 @@ def postprocess(i):
 
             url = d[url_key]
 
-            print('')
-            print('Downloading {} ...'.format(file_name))
+            logger.info('')
+            logger.info('Downloading {} ...'.format(file_name))
 
             if os.path.isfile(file_name_with_path_done):
-                print('')
-                print('  Already processed - skipping ...')
+                logger.info('')
+                logger.warning('  Already processed - skipping ...')
                 continue
 
             if os.name == 'nt':
@@ -349,16 +351,16 @@ def postprocess(i):
                 ' --async-dns=false -x15 -s15 "{}" --dir "{}" -o "{}"'.format(
                     url, dataset_path3, file_name)
 
-            print('')
-            print(cmd)
-            print('')
+            logger.info('')
+            logger.info(cmd)
+            logger.info('')
 
             os.system(cmd)
 
             # Unarchive
-            print('')
-            print('Extracting file {} ...'.format(file_name_with_path))
-            print('')
+            logger.info('')
+            logger.info('Extracting file {} ...'.format(file_name_with_path))
+            logger.info('')
 
             if file_name.endswith('.zip'):
 
@@ -390,7 +392,7 @@ def postprocess(i):
             # Remove file
             os.remove(file_name_with_path)
 
-    print('')
+    logger.info('')
 
     # Mark that processed this dataset once correctly
     cfg['processed'] = True

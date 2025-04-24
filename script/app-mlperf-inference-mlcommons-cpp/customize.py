@@ -11,10 +11,12 @@ def preprocess(i):
 
     meta = i['meta']
 
+    logger = i['automation'].logger
+
     if os_info['platform'] == 'windows':
-        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-        print('WARNING: this script was not thoroughly tested on Windows and compilation may fail - please help us test and improve it!')
-        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+        logger.info('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+        logger.warning('This script was not thoroughly tested on Windows and compilation may fail - please help us test and improve it!')
+        logger.info('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
 #        # Currently support only LLVM on Windows
 #        print ('# Forcing LLVM on Windows')
 #        r = automation.update_deps({'deps':meta['post_deps'], 'update_deps':{'compile-program': {'adr':{'compiler':{'tags':'llvm'}}}}})

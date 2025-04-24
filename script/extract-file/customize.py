@@ -22,6 +22,8 @@ def preprocess(i):
 
     automation = i['automation']
 
+    logger = automation.logger
+
     quiet = is_true(env.get('MLC_QUIET', False))
 
     filename = env.get('MLC_EXTRACT_FILEPATH', '')
@@ -133,10 +135,10 @@ def preprocess(i):
         env.get('MLC_EXTRACT_TOOL_EXTRA_OPTIONS', '') + \
         ' ' + env.get('MLC_EXTRACT_TOOL_OPTIONS', '') + ' ' + x + filename + x
 
-    print('')
-    print('Current directory: {}'.format(os.getcwd()))
-    print('Command line: "{}"'.format(env['MLC_EXTRACT_CMD']))
-    print('')
+    logger.info('')
+    logger.info('Current directory: {}'.format(os.getcwd()))
+    logger.info('Command line: "{}"'.format(env['MLC_EXTRACT_CMD']))
+    logger.info('')
 
     final_file = env.get('MLC_EXTRACT_EXTRACTED_FILENAME', '')
 

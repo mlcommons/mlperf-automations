@@ -10,6 +10,8 @@ def preprocess(i):
 
     automation = i['automation']
 
+    logger = automation.logger
+
     recursion_spaces = i['recursion_spaces']
 
     need_version = env.get('MLC_VERSION', '')
@@ -18,7 +20,7 @@ def preprocess(i):
         return {'return': 1,
                 'error': 'internal problem - MLC_VERSION is not defined in env'}
 
-    print(recursion_spaces + '    # Requested version: {}'.format(need_version))
+    logger.info(f"{recursion_spaces}    # Requested version: {need_version}")
 
     host_os_bits = env['MLC_HOST_OS_BITS']
 
@@ -60,12 +62,12 @@ def preprocess(i):
             package_name = 'LLVM-' + need_version + '-win' + host_os_bits + '.exe'
             clang_file_name = "clang.exe"
 
-            print('')
-            print('WARNING: Please copy the following path and then paste it')
-            print('         when LLVM installer asks you about the "Destination Folder":')
-            print('')
-            print(os.getcwd())
-            print('')
+            logger.info('')
+            logger.warning('WARNING: Please copy the following path and then paste it')
+            logger.info('         when LLVM installer asks you about the "Destination Folder":')
+            logger.info('')
+            logger.info(fos.getcwd())
+            logger.info('')
             input('Press Enter to continue!')
 
         else:
@@ -164,10 +166,10 @@ def preprocess(i):
     package_url = 'https://github.com/llvm/llvm-project/releases/download/llvmorg-' + \
         need_version + '/' + package_name
 
-    print(recursion_spaces + '    # Prepared package URL: {}'.format(package_url))
+    logger.info(f"{recursion_spaces}    # Prepared package URL: {package_url}")
 
-    print('')
-    print('Downloading from {} ...'.format(package_url))
+    logger.info('')
+    logger.info(f"Downloading from {package_url} ...")
 
     cm = automation.action_object
 
