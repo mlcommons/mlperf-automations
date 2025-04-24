@@ -181,7 +181,8 @@ def preprocess(i):
                     url = env.get('MLC_DOWNLOAD_URL' + str(i), '')
                     if url == '':
                         break
-                    logger.error(f"Download from {oldurl} failed, trying from {url}")
+                    logger.error(
+                        f"Download from {oldurl} failed, trying from {url}")
 
                 if r['return'] > 0:
                     return r

@@ -135,7 +135,8 @@ def preprocess(i):
         print(
             "Copying cudnn include files to {}(CUDA_INCLUDE_PATH)".format(cuda_inc_path))
         shutil.copytree(inc_path, cuda_inc_path, dirs_exist_ok=True)
-        logger.info("Copying cudnn lib files to {}CUDA_LIB_PATH".format(cuda_lib_path))
+        logger.info(
+            "Copying cudnn lib files to {}CUDA_LIB_PATH".format(cuda_lib_path))
         shutil.copytree(lib_path, cuda_lib_path, dirs_exist_ok=True)
     except BaseException:
         # Need to copy to system path via run.sh

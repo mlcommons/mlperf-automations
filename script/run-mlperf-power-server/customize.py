@@ -66,7 +66,8 @@ def preprocess(i):
     with open('tmp-power-server.conf', 'w') as configfile:
         config.write(configfile)
 
-    logger.info(f"{section: dict(config[section]) for section in config.sections()}")
+    logger.info(
+        f"{section: dict(config[section]) for section in config.sections()}")
 
     if env['MLC_HOST_OS_TYPE'] == "windows":
         cmd_prefix = ""
@@ -85,5 +86,3 @@ def preprocess(i):
     env['RUN_CMD'] = cmd
 
     return {'return': 0}
-
-

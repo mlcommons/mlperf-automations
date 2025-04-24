@@ -49,7 +49,8 @@ def preprocess(i):
 
     logger.info(f"The system dumps are created to the folder:{logs_dir}")
 
-    logger.warning("Currently the script is in its development stage. Only memory measurements supports as of now!")
+    logger.warning(
+        "Currently the script is in its development stage. Only memory measurements supports as of now!")
 
     logger.info("Started measuring system info!")
 

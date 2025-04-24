@@ -42,5 +42,3 @@ def preprocess(i):
         env['MLC_GIT_PUSH_CMD'] = "git push"
 
     return {'return': 0}
-
-

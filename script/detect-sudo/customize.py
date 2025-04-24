@@ -27,7 +27,8 @@ def preprocess(i):
         env['MLC_SUDO'] = ''  # root user does not need sudo
         env['MLC_SUDO_USER'] = "yes"
     else:
-        if can_execute_sudo_without_password(logger) or prompt_sudo(logger) == 0:
+        if can_execute_sudo_without_password(
+                logger) or prompt_sudo(logger) == 0:
             env['MLC_SUDO_USER'] = "yes"
             env['MLC_SUDO'] = 'sudo'
 
@@ -70,9 +71,11 @@ def prompt_retry(logger, timeout=10, default_retry=False):
     # Check if we're in an interactive terminal
     if not sys.stdin.isatty():
         if default_retry:
-            logger.info(f"Non-interactive environment detected. Automatically retrying.")
+            logger.info(
+                f"Non-interactive environment detected. Automatically retrying.")
         else:
-            logger.warning(f"Non-interactive environment detected. Skipping retry.")
+            logger.warning(
+                f"Non-interactive environment detected. Skipping retry.")
         return default_retry  # Automatically use the default in non-interactive terminals
 
     print(
@@ -126,12 +129,14 @@ def timeout_input(prompt, timeout=15, default=""):
 
 
 def prompt_sudo(logger):
-    if os.geteuid() != 0 and not is_user_in_sudo_group(logger):  # No sudo required for root user
+    if os.geteuid() != 0 and not is_user_in_sudo_group(
+            logger):  # No sudo required for root user
 
         # Prompt for the password
 
         if not os.isatty(sys.stdin.fileno()):
-            logger.warning("Skipping password prompt - non-interactive terminal detected!")
+            logger.warning(
+                "Skipping password prompt - non-interactive terminal detected!")
             password = None
         else:
             # password = getpass.getpass("Enter password (-1 to skip): ")

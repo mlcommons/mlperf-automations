@@ -205,5 +205,3 @@ def trigger_submission_checker(
             "return": 500,
             "error": str(e)
         }
-
-

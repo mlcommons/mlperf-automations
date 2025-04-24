@@ -281,7 +281,8 @@ def generate_submission(env, state, inp, submission_division, logger):
         else:
             new_res = res.replace(" ", "_")
 
-        logger.info(f"The SUT folder name for submission generation is: {new_res}")
+        logger.info(
+            f"The SUT folder name for submission generation is: {new_res}")
 
         platform_prefix = inp.get('platform_prefix', '')
         if platform_prefix:
@@ -468,7 +469,8 @@ def generate_submission(env, state, inp, submission_division, logger):
                                 saved_system_meta_file_path = os.path.join(
                                     result_mode_path, "system_meta.json")
                             else:
-                                logger.error("WARNING: system_meta.json was not found in the SUT root or mode directory inside the results folder. CM is automatically creating one using the system defaults. Please modify them as required.")
+                                logger.error(
+                                    "WARNING: system_meta.json was not found in the SUT root or mode directory inside the results folder. CM is automatically creating one using the system defaults. Please modify them as required.")
                         if os.path.exists(saved_system_meta_file_path):
                             with open(saved_system_meta_file_path, "r") as f:
                                 saved_system_meta = json.load(f)
@@ -746,12 +748,18 @@ def postprocess(i):
     # if submission division is not assigned, default value would be taken in
     # submission_generation function
     if env.get('MLC_MLPERF_SUBMISSION_DIVISION', '') == '':
-        r = generate_submission(env, state, inp, submission_division="", logger=logger)
+        r = generate_submission(
+            env,
+            state,
+            inp,
+            submission_division="",
+            logger=logger)
         if r['return'] > 0:
             return r
     else:
         for submission_division in submission_divisions:
-            r = generate_submission(env, state, inp, submission_division, logger=logger)
+            r = generate_submission(
+                env, state, inp, submission_division, logger=logger)
             if r['return'] > 0:
                 return r
 

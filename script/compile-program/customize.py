@@ -30,7 +30,8 @@ def preprocess(i):
     # If windows, need to extend it more ...
     if os_info['platform'] == 'windows' and env.get(
             'MLC_COMPILER_FAMILY', '') != 'LLVM':
-        logger.warning("Compile-program script should be extended to support flags for non-LLVM compilers on Windows")
+        logger.warning(
+            "Compile-program script should be extended to support flags for non-LLVM compilers on Windows")
         return {'return': 0}
 
     LDFLAGS = env.get('+ LDFLAGS', [])

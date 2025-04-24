@@ -243,7 +243,8 @@ def preprocess(i):
                         "MLC_TMP_"):
                     del env_copy[key]
 
-            logger.info(f"\nRunning loadgen scenario: {scenario} and mode: {mode}")
+            logger.info(
+                f"\nRunning loadgen scenario: {scenario} and mode: {mode}")
             ii = {'action': action, 'automation': 'script', 'tags': scenario_tags, 'quiet': 'true',
                   'env': env_copy, 'input': inp, 'state': state, 'add_deps': copy.deepcopy(add_deps), 'add_deps_recursive':
                   copy.deepcopy(add_deps_recursive), 'ad': ad, 'adr': copy.deepcopy(adr), 'v': verbose, 'print_env': print_env, 'print_deps': print_deps, 'dump_version_info': dump_version_info}
@@ -297,7 +298,8 @@ def preprocess(i):
             logger.info(f"{sut}")
             result_table, headers = mlperf_utils.get_result_table(
                 state["mlc-mlperf-inference-results"][sut])
-            logger.info(f"{tabulate(result_table, headers=headers, tablefmt='pretty')}")
+            logger.info(
+                f"{tabulate(result_table, headers=headers, tablefmt='pretty')}")
 
             print(
                 f"\nThe MLPerf inference results are stored at {output_dir}\n")

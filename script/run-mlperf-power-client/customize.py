@@ -40,5 +40,3 @@ def preprocess(i):
     env['MLC_MLPERF_POWER_RUN_CMD'] = cmd
 
     return {'return': 0}
-
-

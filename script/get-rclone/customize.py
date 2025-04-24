@@ -92,7 +92,9 @@ def detect_version(i):
     version = r['version']
 
     logger = i['automation'].logger
-    logger.info(i['recursion_spaces'] + '    Detected version: {}'.format(version))
+    logger.info(
+        i['recursion_spaces'] +
+        '    Detected version: {}'.format(version))
 
     return {'return': 0, 'version': version}
 
@@ -125,7 +127,8 @@ def postprocess(i):
 
         with open(default_config_path, 'w') as configfile:
             default_config.write(configfile)
-        logger.info(f"{section: dict(default_config[section]) for section in default_config.sections()}")
+        logger.info(
+            f"{section: dict(default_config[section]) for section in default_config.sections()}")
 
     r = detect_version(i)
 

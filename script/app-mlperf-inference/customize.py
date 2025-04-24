@@ -540,7 +540,8 @@ def postprocess(i):
                 data = file.read().replace('\n', '\t')
 
             if 'TEST PASS' not in data:
-                logger.warning("\nDeterministic TEST01 failed... Trying with non-determinism.\n")
+                logger.warning(
+                    "\nDeterministic TEST01 failed... Trying with non-determinism.\n")
             # #Normal test failed, trying the check with non-determinism
 
                 baseline_accuracy_file = os.path.join(

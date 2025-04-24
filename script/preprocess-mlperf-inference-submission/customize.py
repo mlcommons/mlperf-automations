@@ -19,7 +19,8 @@ def preprocess(i):
                 'error': 'MLC_MLPERF_INFERENCE_SUBMISSION_DIR is not specified'}
 
     if not os.path.exists(submission_dir):
-        logger.error("Please set --env.MLC_MLPERF_INFERENCE_SUBMISSION_DIR to a valid submission directory")
+        logger.error(
+            "Please set --env.MLC_MLPERF_INFERENCE_SUBMISSION_DIR to a valid submission directory")
         return {'return': 1,
                 'error': 'MLC_MLPERF_INFERENCE_SUBMISSION_DIR is not existing'}
 

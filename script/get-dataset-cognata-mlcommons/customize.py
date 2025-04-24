@@ -124,7 +124,8 @@ def postprocess(i):
         if not utils.check_if_true_yes_on(
                 env, 'MLC_DATASET_MLCOMMONS_COGNATA_UPDATE'):
             logger.info('')
-            logger.info('Already processed: use --update to update this dataset')
+            logger.info(
+                'Already processed: use --update to update this dataset')
 
             return {'return': 0}
 
@@ -235,7 +236,8 @@ def postprocess(i):
 
     ##########################################################################
     logger.info('')
-    logger.info('Available or selected serial numbers (use --serial_numbers=a,b,c to download specific subsets):')
+    logger.info(
+        'Available or selected serial numbers (use --serial_numbers=a,b,c to download specific subsets):')
     logger.info('')
     for d in data:
         s = d[serial_key]

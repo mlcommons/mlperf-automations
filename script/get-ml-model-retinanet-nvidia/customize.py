@@ -27,5 +27,3 @@ def preprocess(i):
             "onnx_generator",
             "retinanet_anchor_xywh_1x1.npy")
     return {'return': 0}
-
-

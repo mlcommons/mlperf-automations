@@ -85,5 +85,3 @@ def postprocess(i):
         print_attr(instance_attributes, "security_groups")
 
     return {'return': 0}
-
-

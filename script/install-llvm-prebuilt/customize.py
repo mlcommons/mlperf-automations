@@ -63,8 +63,10 @@ def preprocess(i):
             clang_file_name = "clang.exe"
 
             logger.info('')
-            logger.warning('WARNING: Please copy the following path and then paste it')
-            logger.info('         when LLVM installer asks you about the "Destination Folder":')
+            logger.warning(
+                'WARNING: Please copy the following path and then paste it')
+            logger.info(
+                '         when LLVM installer asks you about the "Destination Folder":')
             logger.info('')
             logger.info(fos.getcwd())
             logger.info('')

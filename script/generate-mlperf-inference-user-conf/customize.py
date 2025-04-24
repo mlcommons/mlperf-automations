@@ -141,13 +141,16 @@ def preprocess(i):
             # if env.get("MLC_MLPERF_FIND_PERFORMANCE_MODE", '') == "yes":
             if metric == "target_qps":
                 if is_true(env.get("MLC_MLPERF_FIND_PERFORMANCE_MODE", '')):
-                    logger.info("In find performance mode: using 1 as target_qps")
+                    logger.info(
+                        "In find performance mode: using 1 as target_qps")
                 else:
-                    logger.info("No target_qps specified. Using 1 as target_qps")
+                    logger.info(
+                        "No target_qps specified. Using 1 as target_qps")
                 conf[metric] = 1
             if metric == "target_latency":
                 if is_true(env.get("MLC_MLPERF_FIND_PERFORMANCE_MODE", '')):
-                    logger.info("In find performance mode: using 0.5ms as target_latency")
+                    logger.info(
+                        "In find performance mode: using 0.5ms as target_latency")
                 else:
                     logger.info("No target_latency specified. Using default")
                 if is_false(env.get('MLC_MLPERF_USE_MAX_DURATION', 'yes')) or is_true(env.get(
@@ -289,7 +292,12 @@ def preprocess(i):
     else:
         env['MLC_MLPERF_ACCURACY_RESULTS_DIR'] = ''
 
-    run_exists = run_files_exist(log_mode, OUTPUT_DIR, required_files, env, logger)
+    run_exists = run_files_exist(
+        log_mode,
+        OUTPUT_DIR,
+        required_files,
+        env,
+        logger)
 
     if 'MLC_MLPERF_POWER' in env and env.get(
             'MLC_MLPERF_SHORT_RANGING_RUN', '') != 'no' and env['MLC_MLPERF_RUN_STYLE'] == "valid" and mode == "performance":

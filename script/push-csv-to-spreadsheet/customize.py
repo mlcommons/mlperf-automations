@@ -10,5 +10,3 @@ def preprocess(i):
     automation = i['automation']
 
     return {'return': 0}
-
-

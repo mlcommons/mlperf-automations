@@ -51,7 +51,8 @@ def preprocess(i):
 
         cmd = python_path + ' -m venv ' + name + create_dir.format(name)
 
-        logger.info('====================================================================')
+        logger.info(
+            '====================================================================')
 
         logger.info('Creating venv: "{}" ...'.format(cmd))
         os.system(cmd)
@@ -88,11 +89,13 @@ def preprocess(i):
             with open(script_file, 'w') as f:
                 f.write(cmd)
 
-        logger.info('====================================================================')
+        logger.info(
+            '====================================================================')
         logger.info('Please run the following command:')
         logger.info('')
         logger.info(f"{xcmd}")
-        logger.info('====================================================================')
+        logger.info(
+            '====================================================================')
 
     return {'return': 0}
 

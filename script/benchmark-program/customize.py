@@ -104,7 +104,8 @@ def preprocess(i):
     env['MLC_POST_RUN_CMD'] = post_run_cmd
 
     # Print info
-    logger.info('***************************************************************************')
+    logger.info(
+        '***************************************************************************')
     logger.info('CM script::benchmark-program/run.sh')
     logger.info('')
     logger.info('Run Directory: {}'.format(env.get('MLC_RUN_DIR', '')))

@@ -44,10 +44,12 @@ def preprocess(i):
 
     if variation == "nvidia":
         if not os.path.exists(os.path.join(dlrm_data_path, "model")):
-            logger.warning(f'model directory is missing inside {dlrm_data_path}')
+            logger.warning(
+                f'model directory is missing inside {dlrm_data_path}')
             env['MLC_DLRM_MODEL_DOWNLOAD'] = True
         if not os.path.exists(os.path.join(dlrm_data_path, "criteo")):
-            logger.warning(f'criteo directory is missing inside {dlrm_data_path}')
+            logger.warning(
+                f'criteo directory is missing inside {dlrm_data_path}')
             env['MLC_DLRM_DATASET_DOWNLOAD'] = True
         if not os.path.exists(os.path.join(
                 dlrm_data_path, "model", "model_weights")):
@@ -55,7 +57,8 @@ def preprocess(i):
                 f'model_weights directory is missing inside {dlrm_data_path}/model')
             env['MLC_DLRM_MODEL_DOWNLOAD'] = True
         if not os.path.exists(os.path.join(dlrm_data_path, "criteo", "day23")):
-            logger.warning(f'day23 directory is missing inside {dlrm_data_path}/day23')
+            logger.warning(
+                f'day23 directory is missing inside {dlrm_data_path}/day23')
             env['MLC_DLRM_DATASET_DOWNLOAD'] = True
         if not os.path.exists(os.path.join(
                 dlrm_data_path, "criteo", "day23", "fp32")):

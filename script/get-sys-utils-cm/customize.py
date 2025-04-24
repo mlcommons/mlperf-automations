@@ -84,9 +84,12 @@ def preprocess(i):
 #
     else:
         logger.info('')
-        logger.info('***********************************************************************')
-        logger.info('This script will attempt to install minimal system dependencies for CM.')
+        logger.info(
+            '***********************************************************************')
+        logger.info(
+            'This script will attempt to install minimal system dependencies for CM.')
         logger.info('Note that you may be asked for your SUDO password ...')
-        logger.info('***********************************************************************')
+        logger.info(
+            '***********************************************************************')
 
     return {'return': 0}
