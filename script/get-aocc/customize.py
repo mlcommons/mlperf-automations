@@ -82,8 +82,7 @@ def detect_version(i):
     version = r['version']
 
     logger.info(
-        fi['recursion_spaces'] +
-        '    Detected version: {}'.format(version))
+        f"{i['recursion_spaces']}    Detected version: {version}")
 
     return {'return': 0, 'version': version}
 
