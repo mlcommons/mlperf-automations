@@ -121,6 +121,8 @@ def preprocess(i):
     if int(
             NUM_THREADS) > 2 and env['MLC_MLPERF_DEVICE'] == "gpu" and env['MLC_MODEL'] != "rgat":
         NUM_THREADS = "2"  # Don't use more than 2 threads when run on GPU
+        if env['MLC_MODEL'] in ['retinanet']:
+            NUM_THREADS = "1"
 
     if env['MLC_MODEL'] in ['resnet50', 'retinanet',
                             'stable-diffusion-xl', 'rgat']:
