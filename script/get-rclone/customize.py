@@ -19,6 +19,9 @@ def preprocess(i):
     automation = i['automation']
 
     need_version = env.get('MLC_VERSION', '')
+    if need_version != '':
+        env['MLC_RCLONE_CUSTOM_VERSION'] = need_version
+        env['MLC_RCLONE_CUSTOM_VERSION_FLAG'] = '--version'
 
     host_os_machine = ''
     if os_info['platform'] != 'windows':
