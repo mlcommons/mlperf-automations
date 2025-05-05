@@ -237,7 +237,8 @@ def preprocess(i):
             # check rclojne version to add --multi-thread-streams=0
             tmp_rclone_version = env.get('MLC_RCLONE_VERSION', '')
             if tmp_rclone_version == '':
-                logger.warning("MLC_RCLONE_VERSION not set, was get-rclone called as dependency?")
+                logger.warning(
+                    "MLC_RCLONE_VERSION not set, was get-rclone called as dependency?")
             else:
                 ref_version = list(map(int, "1.60.0"))
                 rclone_version = list(map(int, tmp_rclone_version))
