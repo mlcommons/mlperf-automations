@@ -3,6 +3,7 @@ import os
 import subprocess
 from utils import *
 
+
 def escape_special_chars(text, tool=None):
     special_chars = [
         '&', '|', '(', ')'
