@@ -10,6 +10,8 @@ def preprocess(i):
     state = i['state']
     os_info = i['os_info']
 
+    logger = i['automation'].logger
+
     submitter = env.get('MLC_MLPERF_SUBMITTER', 'MLCommons')
 
     auto_detected_hw_name = False
@@ -45,13 +47,13 @@ def preprocess(i):
     env['MLC_SUT_PATH'] = sut_path
 
     if os.path.exists(sut_path) and is_true(env.get('MLC_SUT_DESC_CACHE', '')):
-        print(f"Reusing SUT description file {sut}")
+        logger.info(f"Reusing SUT description file {sut}")
         state['MLC_SUT_META'] = json.load(open(sut_path))
     else:
         if not os.path.exists(os.path.dirname(sut_path)):
             os.makedirs(os.path.dirname(sut_path))
 
-        print("Generating SUT description file for " + sut)
+        logger.info("Generating SUT description file for " + sut)
         hw_path = os.path.join(os.getcwd(), "hardware", hw_name + ".json")
         if not os.path.exists(os.path.dirname(hw_path)):
             os.makedirs(os.path.dirname(hw_path))

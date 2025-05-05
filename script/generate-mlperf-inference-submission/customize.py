@@ -56,7 +56,7 @@ def model_in_valid_models(model, mlperf_version):
         return (True, model)
 
 
-def generate_submission(env, state, inp, submission_division):
+def generate_submission(env, state, inp, submission_division, logger):
 
     # Save current user directory
     cur_dir = os.getcwd()
@@ -84,13 +84,13 @@ def generate_submission(env, state, inp, submission_division):
     submission_dir = env.get('MLC_MLPERF_INFERENCE_SUBMISSION_DIR', '')
 
     if env.get('MLC_MLPERF_CLEAN_SUBMISSION_DIR', '') != '':
-        print('=================================================')
+        logger.info('=================================================')
         print(
             'Cleaning {} ...'.format(
                 env['MLC_MLPERF_INFERENCE_SUBMISSION_DIR']))
         if os.path.exists(submission_dir):
             shutil.rmtree(submission_dir)
-        print('=================================================')
+        logger.info('=================================================')
 
     if not os.path.isdir(submission_dir):
         os.makedirs(submission_dir)
@@ -98,8 +98,8 @@ def generate_submission(env, state, inp, submission_division):
     if is_true(str(env.get('MLC_MLPERF_SUBMISSION_DIR_SHARED', ''))):
         os.chmod(submission_dir, 0o2775)
 
-    print('* MLPerf inference submission dir: {}'.format(submission_dir))
-    print('* MLPerf inference results dir: {}'.format(results_dir))
+    logger.info('* MLPerf inference submission dir: {}'.format(submission_dir))
+    logger.info('* MLPerf inference results dir: {}'.format(results_dir))
     results = [
         f for f in os.listdir(results_dir) if not os.path.isfile(
             os.path.join(
@@ -137,7 +137,7 @@ def generate_submission(env, state, inp, submission_division):
     if division not in ['open', 'closed']:
         return {'return': 1, 'error': '"division" must be "open" or "closed"'}
 
-    print('* MLPerf inference division: {}'.format(division))
+    logger.info('* MLPerf inference division: {}'.format(division))
 
     path_submission_root = submission_dir
     path_submission_division = os.path.join(path_submission_root, division)
@@ -152,7 +152,7 @@ def generate_submission(env, state, inp, submission_division):
         submitter = system_meta_default['submitter']
         env['MLC_MLPERF_SUBMITTER'] = submitter
 
-    print('* MLPerf inference submitter: {}'.format(submitter))
+    logger.info('* MLPerf inference submitter: {}'.format(submitter))
 
     if env.get('MLC_MLPERF_SUT_SW_NOTES_EXTRA', '') != '':
         sw_notes = f"""{system_meta_tmp.get('sw_notes','')} {env['MLC_MLPERF_SUT_SW_NOTES_EXTRA']}"""
@@ -281,7 +281,8 @@ def generate_submission(env, state, inp, submission_division):
         else:
             new_res = res.replace(" ", "_")
 
-        print(f"The SUT folder name for submission generation is: {new_res}")
+        logger.info(
+            f"The SUT folder name for submission generation is: {new_res}")
 
         platform_prefix = inp.get('platform_prefix', '')
         if platform_prefix:
@@ -338,7 +339,7 @@ def generate_submission(env, state, inp, submission_division):
                 with open(os.path.join(submission_code_path, "README.md"), mode='w') as f:
                     f.write("TBD")  # create an empty README
 
-            print('* MLPerf inference model: {}'.format(model))
+            logger.info('* MLPerf inference model: {}'.format(model))
             for scenario in scenarios:
                 # the system_info.txt is copied from the mode directory if
                 # found, else it would be looked under scenario directory
@@ -468,7 +469,8 @@ def generate_submission(env, state, inp, submission_division):
                                 saved_system_meta_file_path = os.path.join(
                                     result_mode_path, "system_meta.json")
                             else:
-                                print("WARNING: system_meta.json was not found in the SUT root or mode directory inside the results folder. CM is automatically creating one using the system defaults. Please modify them as required.")
+                                logger.error(
+                                    "WARNING: system_meta.json was not found in the SUT root or mode directory inside the results folder. CM is automatically creating one using the system defaults. Please modify them as required.")
                         if os.path.exists(saved_system_meta_file_path):
                             with open(saved_system_meta_file_path, "r") as f:
                                 saved_system_meta = json.load(f)
@@ -485,7 +487,7 @@ def generate_submission(env, state, inp, submission_division):
                         # system_meta.json is not detected, default one will be
                         # written
                         system_meta = {**system_meta_default, **system_meta}
-                        print(system_meta)
+                        logger.info(system_meta)
                         # check if framework version is there in system_meta,
                         # if not try to fill it from sut_info
                         if system_meta['framework'] == "":
@@ -636,7 +638,7 @@ def generate_submission(env, state, inp, submission_division):
                                     submission_results_path, "images"))
 
                     for f in files:
-                        print(' * ' + f)
+                        logger.info(' * ' + f)
                         p_target = os.path.join(submission_results_path, f)
                         shutil.copy(
                             os.path.join(
@@ -720,7 +722,7 @@ def generate_submission(env, state, inp, submission_division):
 
         result_table, headers = mlperf_utils.get_result_table(results)
 
-        print(tabulate(result_table, headers=headers, tablefmt="pretty"))
+        logger.info(tabulate(result_table, headers=headers, tablefmt="pretty"))
 
         sut_readme_file = os.path.join(measurement_path, "README.md")
         with open(sut_readme_file, mode='w') as f:
@@ -733,6 +735,7 @@ def postprocess(i):
     env = i['env']
     state = i['state']
     inp = i['input']
+    logger = i['automation'].logger
 
     submission_divisions = []
 
@@ -745,12 +748,18 @@ def postprocess(i):
     # if submission division is not assigned, default value would be taken in
     # submission_generation function
     if env.get('MLC_MLPERF_SUBMISSION_DIVISION', '') == '':
-        r = generate_submission(env, state, inp, submission_division="")
+        r = generate_submission(
+            env,
+            state,
+            inp,
+            submission_division="",
+            logger=logger)
         if r['return'] > 0:
             return r
     else:
         for submission_division in submission_divisions:
-            r = generate_submission(env, state, inp, submission_division)
+            r = generate_submission(
+                env, state, inp, submission_division, logger=logger)
             if r['return'] > 0:
                 return r
 

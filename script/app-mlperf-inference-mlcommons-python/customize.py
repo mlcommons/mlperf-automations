@@ -13,6 +13,8 @@ def preprocess(i):
     state = i['state']
     script_path = i['run_script_input']['path']
 
+    logger = i['automation'].logger
+
     if env.get('MLC_MLPERF_SKIP_RUN', '') == "yes":
         return {'return': 0}
 
@@ -121,6 +123,8 @@ def preprocess(i):
     if int(
             NUM_THREADS) > 2 and env['MLC_MLPERF_DEVICE'] == "gpu" and env['MLC_MODEL'] != "rgat":
         NUM_THREADS = "2"  # Don't use more than 2 threads when run on GPU
+        if env['MLC_MODEL'] in ['retinanet']:
+            NUM_THREADS = "1"
 
     if env['MLC_MODEL'] in ['resnet50', 'retinanet',
                             'stable-diffusion-xl', 'rgat']:
@@ -179,7 +183,7 @@ def preprocess(i):
 
     mlperf_implementation = env.get('MLC_MLPERF_IMPLEMENTATION', 'reference')
     cmd, run_dir = get_run_cmd(os_info, env, scenario_extra_options,
-                               mode_extra_options, dataset_options, mlperf_implementation)
+                               mode_extra_options, dataset_options, logger, mlperf_implementation)
 
     if env.get('MLC_NETWORK_LOADGEN', '') == "lon":
 
@@ -202,10 +206,10 @@ def preprocess(i):
 
 
 def get_run_cmd(os_info, env, scenario_extra_options,
-                mode_extra_options, dataset_options, implementation="reference"):
+                mode_extra_options, dataset_options, logger, implementation="reference"):
     if implementation == "reference":
         return get_run_cmd_reference(
-            os_info, env, scenario_extra_options, mode_extra_options, dataset_options)
+            os_info, env, scenario_extra_options, mode_extra_options, dataset_options, logger)
     if implementation == "nvidia":
         return get_run_cmd_nvidia(
             os_info, env, scenario_extra_options, mode_extra_options, dataset_options)
@@ -213,7 +217,7 @@ def get_run_cmd(os_info, env, scenario_extra_options,
 
 
 def get_run_cmd_reference(
-        os_info, env, scenario_extra_options, mode_extra_options, dataset_options):
+        os_info, env, scenario_extra_options, mode_extra_options, dataset_options, logger):
 
     device = env['MLC_MLPERF_DEVICE'] if env['MLC_MLPERF_DEVICE'] not in [
         "gpu", "rocm"] else "cuda"
@@ -533,7 +537,7 @@ def get_run_cmd_reference(
         if env.get('MLC_MLPERF_POINTPAINTING_TIME', '') != '':
             cmd += f" --time {env['MLC_MLPERF_POINTPAINTING_TIME']}"
 
-        print(cmd)
+        logger.info(fcmd)
 
     if env.get('MLC_NETWORK_LOADGEN', '') in ["lon", "sut"]:
         cmd = cmd + " " + "--network " + env['MLC_NETWORK_LOADGEN']

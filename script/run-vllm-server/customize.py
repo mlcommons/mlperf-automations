@@ -10,8 +10,11 @@ def preprocess(i):
     meta = i['meta']
     automation = i['automation']
 
-    # Required parameter check
-    model_name = env.get("MLC_VLLM_SERVER_MODEL_NAME")
+    logger = automation.logger
+
+    cmd_args = ""
+
+    model_name = env.get("MLC_VLLM_SERVER_MODEL_NAME", False)
     if not model_name:
         return {'return': 1, 'error': 'Model name not specified'}
 
@@ -93,7 +96,7 @@ def preprocess(i):
             cmd_args += f" {arg_name}"
 
     cmd = f"{env['MLC_PYTHON_BIN_WITH_PATH']} -m vllm.entrypoints.openai.api_server {cmd_args}"
-    print(cmd)
+    logger.info(f"{cmd}")
 
     env['MLC_VLLM_RUN_CMD'] = cmd
 

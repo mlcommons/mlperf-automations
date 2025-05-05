@@ -12,6 +12,8 @@ def preprocess(i):
 
     env = i['env']
 
+    logger = i['automation'].logger
+
     # Not enforcing dev requirement for now
     if env.get('MLC_TENSORRT_TAR_FILE_PATH', '') == '' and env.get(
             'MLC_TENSORRT_REQUIRE_DEV1', '') != 'yes' and env.get('MLC_HOST_PLATFORM_FLAVOR_', '') != 'aarch64':
@@ -95,7 +97,7 @@ def preprocess(i):
         return {'return': 1, 'error': 'Please envoke mlcr "' +
                 ",".join(tags) + '" --tar_file={full path to the TensorRT tar file}'}
 
-    print('Untaring file - can take some time ...')
+    logger.info('Untaring file - can take some time ...')
 
     file_name = "trtexec"
     my_tar = tarfile.open(

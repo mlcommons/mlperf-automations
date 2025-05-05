@@ -9,6 +9,7 @@ def preprocess(i):
     env = i['env']
 
     automation = i['automation']
+    logger = automation.logger
 
     cm = automation.action_object
 
@@ -17,7 +18,7 @@ def preprocess(i):
     url = env['MLC_PACKAGE_URL']
     env['MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME'] = url
 
-    print('Downloading from {}'.format(url))
+    logger.info('Downloading from {}'.format(url))
 
     r = download_file({'url': url})
     if r['return'] > 0:

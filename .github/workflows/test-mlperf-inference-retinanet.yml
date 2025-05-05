@@ -9,34 +9,8 @@ on:
       - '!**.md'
 
 jobs:
-  fetch-secret:
-    runs-on: ubuntu-latest
-    outputs:
-      encrypted_secret: ${{ steps.encrypt-secret.outputs.encrypted_secret }}
-    steps:
-      - name: Load secret
-        id: op-load-secret
-        uses: 1password/load-secrets-action@v2
-        with:
-          export-env: false
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          PAT: op://7basd2jirojjckncf6qnq3azai/bzbaco3uxoqs2rcyu42rvuccga/credential
-
-      - name: Encrypt secret
-        id: encrypt-secret
-        env:
-          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
-        run: |
-          # AES-256 encrypt
-          encrypted=$(echo "${{ steps.op-load-secret.outputs.pat }}" | \
-            openssl enc -e -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 \
-            -pass pass:"$ENCRYPTION_KEY" -base64 -A)
-
-          echo "encrypted_secret=$encrypted" >> $GITHUB_OUTPUT
           
   mlc-run:
-    needs: [fetch-secret]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -45,6 +19,7 @@ jobs:
         python-version: [ "3.12" ]
         backend: [ "onnxruntime", "pytorch" ]
         implementation: [ "python", "cpp" ]
+        compiler-string: [ "", "--adr.compiler.tags=aocc --env.MLC_AOCC_ACCEPT_EULA=yes" ]
         exclude:
           - backend: pytorch
             implementation: cpp
@@ -52,6 +27,8 @@ jobs:
             implementation: cpp
           - os: macos-latest
             implementation: cpp
+          - implementation: python
+            compiler-string: "--adr.compiler.tags=aocc --env.MLC_AOCC_ACCEPT_EULA=yes"
 
     steps:
     - uses: actions/checkout@v3
@@ -78,57 +55,4 @@ jobs:
     - name: Test MLPerf Inference Retinanet using ${{ matrix.backend }} on ${{ matrix.os }}
       if: matrix.os != 'windows-latest'
       run: |
-        mlcr run,mlperf,inference,generate-run-cmds,_submission,_short --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name=gh_${{ matrix.os }}_x86 --model=retinanet --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --scenario=Offline --test_query_count=5  --quiet  -v --target_qps=1
-
-    # Step for Linux/MacOS
-    - name: Randomly Execute Step (Linux/MacOS)
-      if: runner.os != 'Windows'
-      run: |
-        RANDOM_NUMBER=$((RANDOM % 10))
-        echo "Random number is $RANDOM_NUMBER"
-        if [ "$RANDOM_NUMBER" -eq 0 ]; then
-          echo "run_step=true" >> $GITHUB_ENV
-        else
-          echo "run_step=false" >> $GITHUB_ENV
-        fi
-
-    # Step for Windows
-    - name: Randomly Execute Step (Windows)
-      if: runner.os == 'Windows'
-      run: |
-        $RANDOM_NUMBER = Get-Random -Maximum 10
-        Write-Host "Random number is $RANDOM_NUMBER"
-        if ($RANDOM_NUMBER -eq 0) {
-          Write-Host "run_step=true" | Out-File -FilePath $Env:GITHUB_ENV -Append
-        } else {
-          Write-Host "run_step=false" | Out-File -FilePath $Env:GITHUB_ENV -Append
-        }
-
-    - name: Decrypt secret
-      id: decrypt-secret
-      shell: bash
-      env:
-        ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
-        encrypted_secret: ${{ needs.fetch-secret.outputs.encrypted_secret }}
-      run: |
-        echo "Running on OS: ${{ matrix.os }}"
-
-        # Decrypt
-        decrypted=$(echo "$encrypted_secret" | \
-          openssl enc -d -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 \
-          -pass pass:"$ENCRYPTION_KEY" -base64 -A)
-          
-        echo "::add-mask::$decrypted"
-        echo "DECRYPTED_SECRET=$decrypted" >> $GITHUB_OUTPUT
-    - name: Push Results
-      env:
-        GITHUB_TOKEN: ${{ steps.decrypt-secret.outputs.decrypted_secret }}
-      if: github.repository_owner == 'mlcommons' && env.run_step == 'true'
-      run: |
-        git config --global user.name "mlcommons-bot"
-        git config --global user.email "mlcommons-bot@users.noreply.github.com"
-        git config --global credential.https://github.com.helper ""
-        git config --global credential.https://github.com.helper "!gh auth git-credential"
-        git config --global credential.https://gist.github.com.helper ""
-        git config --global credential.https://gist.github.com.helper "!gh auth git-credential"
-        mlcr push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from R50 GH action on ${{ matrix.os }}" --quiet
+        mlcr run,mlperf,inference,generate-run-cmds,_submission,_short --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name=gh_${{ matrix.os }}_x86 --model=retinanet --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --scenario=Offline --test_query_count=5  --quiet  -v --target_qps=1 ${{ matrix.compiler-string }}

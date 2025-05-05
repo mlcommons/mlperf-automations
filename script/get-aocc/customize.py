@@ -71,6 +71,8 @@ def preprocess(i):
 
 
 def detect_version(i):
+    logger = i['automation'].logger
+
     r = i['automation'].parse_version({'match_text': r'CLANG:\sAOCC_([\d.]+-Build#[\d]+)',
                                        'group_number': 1,
                                        'env_key': 'MLC_AOCC_VERSION',
@@ -79,7 +81,8 @@ def detect_version(i):
         return r
     version = r['version']
 
-    print(i['recursion_spaces'] + '    Detected version: {}'.format(version))
+    logger.info(
+        f"{i['recursion_spaces']}    Detected version: {version}")
 
     return {'return': 0, 'version': version}
 

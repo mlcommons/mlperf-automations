@@ -102,7 +102,11 @@ def detect_version_nvcc(i):
 
     version = r['version']
 
-    print(i['recursion_spaces'] + '    Detected version: {}'.format(version))
+    logger = i['automation'].logger
+
+    logger.info(
+        i['recursion_spaces'] +
+        '    Detected version: {}'.format(version))
 
     return {'return': 0, 'version': version}
 
@@ -110,7 +114,8 @@ def detect_version_nvcc(i):
 def detect_version_cuda_lib(i):
 
     env = i['env']
-    print(env)
+    logger = i['automation'].logger
+    logger.info(env)
     cuda_rt_file_path = env['MLC_CUDA_RT_WITH_PATH']
     cuda_lib_path = os.path.dirname(cuda_rt_file_path)
     cuda_path = os.path.abspath(os.path.join(cuda_lib_path, os.pardir))
@@ -128,7 +133,9 @@ def detect_version_cuda_lib(i):
     env['MLC_CUDA_VERSION'] = cuda_version
     version = cuda_version
 
-    print(i['recursion_spaces'] + '    Detected version: {}'.format(version))
+    logger.info(
+        i['recursion_spaces'] +
+        '    Detected version: {}'.format(version))
 
     return {'return': 0, 'version': version}
 
@@ -138,6 +145,7 @@ def postprocess(i):
     os_info = i['os_info']
 
     env = i['env']
+    logger = i['automation'].logger
 
     r = detect_version(i)
     if r['return'] > 0:
@@ -164,7 +172,7 @@ def postprocess(i):
         parent_path = os.path.dirname(parent_path)
         while os.path.isdir(parent_path):
             if os.path.exists(os.path.join(parent_path, "include")):
-                print("Path is " + parent_path)
+                logger.info("Path is " + parent_path)
                 found_path = parent_path
                 cuda_path = found_path
                 env['MLC_CUDA_INSTALLED_PATH'] = cuda_path

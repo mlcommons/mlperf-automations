@@ -43,11 +43,9 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [ "3.12" ]
-        llvm-version: [ "15.0.6", "16.0.4", "17.0.6" ]
+        compiler-string: [ "--adr.compiler.tags=gcc", "--adr.compiler.tags=aocc --env.MLC_AOCC_ACCEPT_EULA=yes", "--adr.compiler.tags=llvm --adr.compiler.version=17.0.6" ]
         os: [ubuntu-latest, windows-latest, macos-latest]
         exclude:
-          - llvm-version: "15.0.6"
-          - llvm-version: "16.0.4"
           - os: windows-latest
           - os: macos-latest
 
@@ -63,8 +61,7 @@ jobs:
     - name: Pull MLOps repository
       run: |
         mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
-        mlcr --quiet --tags=get,sys-utils-cm
-        mlcr --quiet --tags=install,prebuilt,llvm --version=${{ matrix.llvm-version }}
+        mlcr --quiet --tags=get,sys-utils-mlc
     - name: Test MLPerf Inference MLCommons C++ ResNet50 on ${{ matrix.os }}
       if: matrix.os == 'windows-latest'
       run: |
@@ -72,7 +69,7 @@ jobs:
     - name: Test MLPerf Inference MLCommons C++ ResNet50 on ${{ matrix.os }}
       if: matrix.os != 'windows-latest'
       run: |
-        mlcr app,mlperf,inference,mlcommons,cpp --submitter="MLCommons" --hw_name=gh_${{ matrix.os }} -v --quiet
+        mlcr app,mlperf,inference,mlcommons,cpp --submitter="MLCommons" --hw_name=gh_${{ matrix.os }} -v --quiet ${{ matrix.compiler-string }}
     - name: Randomly Execute Step
       id: random-check
       run: |

@@ -7,10 +7,10 @@ def preprocess(i):
 
     # CM script internal variables
     env = i['env']
-
+    logger = i['automation'].logger
     extra_cache_tags = []
     if env.get('MLC_EXTRA_CACHE_TAGS', '').strip() == '':
-        print('')
+        logger.info('')
         extra_cache_tags_str = input(
             'Enter extra tags for the custom CACHE entry separated by comma: ')
 
