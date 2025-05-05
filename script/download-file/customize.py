@@ -241,8 +241,8 @@ def preprocess(i):
                 logger.warning(
                     "MLC_RCLONE_VERSION not set, was get-rclone called as dependency?")
             else:
-                ref_version = list(map(int, "1.60.0".split('.'))
-                rclone_version=list(map(int, tmp_rclone_version.split('.'))
+                ref_version = list(map(int, "1.60.0".split('.')))
+                rclone_version=list(map(int, tmp_rclone_version.split('.')))
                 if rclone_version >= ref_version:
                     extra_download_options += " --multi-thread-streams=0 "
             if env["MLC_HOST_OS_TYPE"] == "windows":
