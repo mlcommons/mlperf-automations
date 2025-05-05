@@ -159,7 +159,8 @@ def preprocess(i):
                             "return": 1, "error": f"Permission denied to delete file {env['MLC_DOWNLOAD_FILENAME']}."}
                     mlcutil_require_download = 1
                 elif "no such file" in checksum_result.stderr.lower():
-                    # print(f"No file {env['MLC_DOWNLOAD_FILENAME']}. Downloading through mlcutil.")
+                    # print(f"No file {env['MLC_DOWNLOAD_FILENAME']}.
+                    # Downloading through mlcutil.")
                     mlcutil_require_download = 1
                 elif checksum_result.returncode > 0:
                     return {
@@ -241,37 +242,37 @@ def preprocess(i):
                     "MLC_RCLONE_VERSION not set, was get-rclone called as dependency?")
             else:
                 ref_version = list(map(int, "1.60.0".split('.'))
-                rclone_version = list(map(int, tmp_rclone_version.split('.'))
+                rclone_version=list(map(int, tmp_rclone_version.split('.'))
                 if rclone_version >= ref_version:
                     extra_download_options += " --multi-thread-streams=0 "
             if env["MLC_HOST_OS_TYPE"] == "windows":
                 # have to modify the variable from url to temp_url if it is
                 # going to be used anywhere after this point
-                url = url.replace("%", "%%")
-                temp_download_file = env['MLC_DOWNLOAD_FILENAME'].replace(
+                url=url.replace("%", "%%")
+                temp_download_file=env['MLC_DOWNLOAD_FILENAME'].replace(
                     "%", "%%")
-                env['MLC_DOWNLOAD_CMD'] = f"rclone {rclone_copy_using} {q}{url}{q} {q}{os.path.join(os.getcwd(), temp_download_file)}{q} -P --error-on-no-transfer {extra_download_options}"
+                env['MLC_DOWNLOAD_CMD']=f"rclone {rclone_copy_using} {q}{url}{q} {q}{os.path.join(os.getcwd(), temp_download_file)}{q} -P --error-on-no-transfer {extra_download_options}"
             else:
-                env['MLC_DOWNLOAD_CMD'] = f"rclone {rclone_copy_using} {q}{url}{q} {q}{os.path.join(os.getcwd(), env['MLC_DOWNLOAD_FILENAME'])}{q} -P --error-on-no-transfer {extra_download_options}"
+                env['MLC_DOWNLOAD_CMD']=f"rclone {rclone_copy_using} {q}{url}{q} {q}{os.path.join(os.getcwd(), env['MLC_DOWNLOAD_FILENAME'])}{q} -P --error-on-no-transfer {extra_download_options}"
 
-        filename = env['MLC_DOWNLOAD_FILENAME']
-        env['MLC_DOWNLOAD_DOWNLOADED_FILENAME'] = filename
+        filename=env['MLC_DOWNLOAD_FILENAME']
+        env['MLC_DOWNLOAD_DOWNLOADED_FILENAME']=filename
 
-        filename = os.path.basename(env['MLC_DOWNLOAD_FILENAME'])
-        filepath = os.path.join(os.getcwd(), filename)
+        filename=os.path.basename(env['MLC_DOWNLOAD_FILENAME'])
+        filepath=os.path.join(os.getcwd(), filename)
 
-    env['MLC_DOWNLOAD_DOWNLOADED_PATH'] = filepath
+    env['MLC_DOWNLOAD_DOWNLOADED_PATH']=filepath
 
     # verify checksum if file already present
     if env.get('MLC_DOWNLOAD_CHECKSUM_FILE', '') != '':
-        env['MLC_DOWNLOAD_CHECKSUM_CMD'] = f"cd {q}{filepath}{q} {xsep}  md5sum -c {x_c} {x}{q}{env['MLC_DOWNLOAD_CHECKSUM_FILE']}{q}"
+        env['MLC_DOWNLOAD_CHECKSUM_CMD']=f"cd {q}{filepath}{q} {xsep}  md5sum -c {x_c} {x}{q}{env['MLC_DOWNLOAD_CHECKSUM_FILE']}{q}"
     elif env.get('MLC_DOWNLOAD_CHECKSUM', '') != '':
         if os_info['platform'] == 'windows':
-            env['MLC_DOWNLOAD_CHECKSUM_CMD'] = "echo {} {}{} | md5sum {} -c -".format(
+            env['MLC_DOWNLOAD_CHECKSUM_CMD']="echo {} {}{} | md5sum {} -c -".format(
                 env.get('MLC_DOWNLOAD_CHECKSUM'), x, escape_special_chars(
                     env['MLC_DOWNLOAD_FILENAME']), x_c)
         else:
-            env['MLC_DOWNLOAD_CHECKSUM_CMD'] = "echo {} {}{}{}{} | md5sum {} -c -".format(
+            env['MLC_DOWNLOAD_CHECKSUM_CMD']="echo {} {}{}{}{} | md5sum {} -c -".format(
                 env.get('MLC_DOWNLOAD_CHECKSUM'), x, q, env['MLC_DOWNLOAD_FILENAME'], q, x_c)
         for i in range(1, 5):
             if env.get('MLC_DOWNLOAD_CHECKSUM' + str(i), '') == '':
@@ -299,22 +300,22 @@ def preprocess(i):
                     x_c)
         # print(env['MLC_DOWNLOAD_CHECKSUM_CMD'])
     else:
-        env['MLC_DOWNLOAD_CHECKSUM_CMD'] = ""
+        env['MLC_DOWNLOAD_CHECKSUM_CMD']=""
 
     if not pre_clean:
-        env['MLC_PRE_DOWNLOAD_CMD'] = ''
+        env['MLC_PRE_DOWNLOAD_CMD']=''
 
     if os_info['platform'] == 'windows' and env.get(
             'MLC_DOWNLOAD_CMD', '') != '':
-        env['MLC_DOWNLOAD_CMD'] = escape_special_chars(
+        env['MLC_DOWNLOAD_CMD']=escape_special_chars(
             env['MLC_DOWNLOAD_CMD'], tool)
         if pre_clean:
-            env['MLC_PRE_DOWNLOAD_CLEAN_CMD'] = "del /Q %MLC_DOWNLOAD_FILENAME%"
+            env['MLC_PRE_DOWNLOAD_CLEAN_CMD']="del /Q %MLC_DOWNLOAD_FILENAME%"
         # Check that if empty CMD, should add ""
         for x in ['MLC_DOWNLOAD_CMD', 'MLC_DOWNLOAD_CHECKSUM_CMD']:
-            env[x + '_USED'] = 'YES' if env.get(x, '') != '' else 'NO'
+            env[x + '_USED']='YES' if env.get(x, '') != '' else 'NO'
     else:
-        env['MLC_PRE_DOWNLOAD_CLEAN_CMD'] = "rm -f {}".format(
+        env['MLC_PRE_DOWNLOAD_CLEAN_CMD']="rm -f {}".format(
             env['MLC_DOWNLOAD_FILENAME'])
 
     return {'return': 0}
@@ -322,30 +323,30 @@ def preprocess(i):
 
 def postprocess(i):
 
-    automation = i['automation']
+    automation=i['automation']
 
-    env = i['env']
+    env=i['env']
 
     if env.get('MLC_DOWNLOAD_MODE') == "dry":
         return {'return': 0}
 
-    filepath = env['MLC_DOWNLOAD_DOWNLOADED_PATH']
+    filepath=env['MLC_DOWNLOAD_DOWNLOADED_PATH']
 
     if not os.path.exists(filepath):
         return {
             'return': 1, 'error': 'Downloaded path {} does not exist. Probably MLC_DOWNLOAD_FILENAME is not set and MLC_DOWNLOAD_URL given is not pointing to a file'.format(filepath)}
 
     if env.get('MLC_DOWNLOAD_RENAME_FILE', '') != '':
-        file_dir = os.path.dirname(filepath)
-        new_file_name = env['MLC_DOWNLOAD_RENAME_FILE']
-        new_file_path = os.path.join(file_dir, new_file_name)
+        file_dir=os.path.dirname(filepath)
+        new_file_name=env['MLC_DOWNLOAD_RENAME_FILE']
+        new_file_path=os.path.join(file_dir, new_file_name)
         os.rename(filepath, new_file_path)
-        filepath = new_file_path
+        filepath=new_file_path
 
     if env.get('MLC_DOWNLOAD_FINAL_ENV_NAME', '') != '':
-        env[env['MLC_DOWNLOAD_FINAL_ENV_NAME']] = filepath
+        env[env['MLC_DOWNLOAD_FINAL_ENV_NAME']]=filepath
 
-    env['MLC_GET_DEPENDENT_CACHED_PATH'] = filepath
+    env['MLC_GET_DEPENDENT_CACHED_PATH']=filepath
 
     # Since may change directory, check if need to clean some temporal files
     automation.clean_some_tmp_files({'env': env})
