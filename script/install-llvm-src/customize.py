@@ -17,14 +17,15 @@ def preprocess(i):
     clang_file_name = "clang"
     extra_cmake_options = ''
 
-
-    if env.get('MLC_LLVM_INSTALLED_PATH', '') != '' and os.path.exists(env.get('MLC_LLVM_INSTALLED_PATH')):
+    if env.get('MLC_LLVM_INSTALLED_PATH', '') != '' and os.path.exists(
+            env.get('MLC_LLVM_INSTALLED_PATH')):
         install_prefix = env['MLC_LLVM_INSTALLED_PATH']
     else:
         install_prefix = os.path.join(os.getcwd(), "install")
 
-    if os.path.exists(os.path.join(install_prefix, "bin", "clang")) and is_true(env.get('MLC_LLVM_USE_INSTALLED_DIR')):
-        i['run_script_input']['script_name'] = "no-install" #skip install
+    if os.path.exists(os.path.join(install_prefix, "bin", "clang")) and is_true(
+            env.get('MLC_LLVM_USE_INSTALLED_DIR')):
+        i['run_script_input']['script_name'] = "no-install"  # skip install
     else:
         if env.get('MLC_LLVM_CONDA_ENV', '') == "yes":
             install_prefix = env['MLC_CONDA_PREFIX']
