@@ -22,6 +22,9 @@ deps:
   names:
   - llvm-src-repo
   tags: get,git,repo
+  skip_if_env:
+    MLC_LLVM_INSTALLED_PATH:
+      - on
   update_tags_from_env_with_prefix:
     _branch.:
     - MLC_GIT_CHECKOUT
@@ -46,6 +49,9 @@ post_deps:
     MLC_REQUIRE_INSTALL:
     - 'yes'
   tags: get,llvm
+  update_tags_from_env_with_prefix:
+    _path.:
+      - MLC_LLVM_INSTALLED_PATH
 prehook_deps: []
 sort: 1000
 tags:
@@ -97,6 +103,10 @@ variations:
     env:
       MLC_LLVM_BUILD_TYPE: debug
     group: build-type
+  path.#:
+    env:
+       MLC_LLVM_INSTALLED_PATH: '#'
+       MLC_LLVM_USE_INSTALLED_DIR: yes
   for-intel-mlperf-inference-v3.1-bert:
     adr:
       conda-package:

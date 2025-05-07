@@ -21,7 +21,7 @@ def preprocess(i):
             if os.path.exists(os.path.join(llvm_path, 'bin', 'clang')):
                 env['MLC_TMP_PATH'] = os.path.join(llvm_path, 'bin')
             else:
-                for l in os.listdir(aocc_path):
+                for l in os.listdir(llvm_path):
                     if os.path.exists(os.path.join(
                             llvm_path, l, 'bin', 'clang')):
                         llvm_path = os.path.join(llvm_path, l)
