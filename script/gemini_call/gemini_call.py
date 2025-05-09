@@ -5,6 +5,7 @@ import yaml
 
 import yaml
 
+
 def extract_prompts(yaml_path):
     with open(yaml_path, 'r', encoding='utf-8') as f:
         data = yaml.safe_load(f)
@@ -36,7 +37,7 @@ def gemini_call(message=None):
                     data = yaml.safe_load(file)
             except Exception as e:
                 return {"error": f"Error reading config file: {str(e)}"}
-            
+
             if os.environ.get('MLC_GEMINI_CONFIG_MODIFY', '') == 'yes':
                 try:
                     data['messages'][1]['content'] = data['messages'][1]['content'].replace(
