@@ -32,7 +32,7 @@ def gemini_call(message=None):
         # Load config if it exists
         if config_path and os.path.exists(config_path):
             try:
-                with open(config_path, 'r') as file:
+                with open(config_path, 'r', encoding="utf-8") as file:
                     data = yaml.safe_load(file)
             except Exception as e:
                 return {"error": f"Error reading config file: {str(e)}"}
