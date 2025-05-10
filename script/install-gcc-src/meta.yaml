@@ -5,6 +5,7 @@ cache: true
 category: Compiler automation
 deps:
 - tags: detect,os
+- tags: detect,cpu
 - tags: get,generic-sys-util,_flex
 - env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_GCC_SRC_REPO_PATH
