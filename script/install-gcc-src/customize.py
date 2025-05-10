@@ -17,7 +17,6 @@ def preprocess(i):
 
     recursion_spaces = i['recursion_spaces']
 
-
     env['MLC_GCC_INSTALLED_PATH'] = os.path.join(os.getcwd(), 'install', 'bin')
 
     return {'return': 0}
