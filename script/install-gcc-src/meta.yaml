@@ -37,6 +37,8 @@ tags:
 - gcc
 - src-gcc
 uid: faae0ebd6e1242db
+tests:
+- {}
 variations:
   master:
     group: version
