@@ -38,7 +38,8 @@ tags:
 - src-gcc
 uid: faae0ebd6e1242db
 tests:
-- {}
+  run_inputs:
+    - {}
 variations:
   master:
     group: version
