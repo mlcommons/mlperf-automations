@@ -3188,7 +3188,7 @@ class ScriptAutomation(Automation):
                                     item_value[i] = l_item.replace(
                                         "#", variation_tag_dynamic_suffix)
                         else:
-                            value[item] = value[item].replace(
+                            value[item] = str(value[item]).replace(
                                 "#", variation_tag_dynamic_suffix)
 
             else:  # scalar value, never used?

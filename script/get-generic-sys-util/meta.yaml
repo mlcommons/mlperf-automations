@@ -97,6 +97,20 @@ variations:
         brew: ''
         dnf: dmidecode
         yum: dmidecode
+  flex:
+    env:
+      MLC_SYS_UTIL_NAME: flex
+      MLC_SYS_UTIL_VERSION_CMD: flex --version # tbd: regular expression for version
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+    - MLC_FLEX_VERSION
+    state:
+      flex: # tbd: complete for other flavours of linux
+        apt: flex
+        brew: flex
+        dnf: flex
+        yum: flex
+  
   ffmpeg:
     env:
       MLC_SYS_UTIL_NAME: ffmpeg
