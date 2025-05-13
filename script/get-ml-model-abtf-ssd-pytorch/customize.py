@@ -40,7 +40,8 @@ def postprocess(i):
         if env.get('MLC_ML_MODEL_SSD_PATH', '') == '':
             env['MLC_ML_MODEL_FILE_WITH_PATH'] = 'model-weights-skipped'
         else:
-            env['MLC_ML_MODEL_SSD_PATH'] = os.path.join(env['MLC_ML_MODEL_SSD_PATH'], env['MLC_ML_MODEL_FILENAME'])
+            env['MLC_ML_MODEL_SSD_PATH'] = os.path.join(
+                env['MLC_ML_MODEL_SSD_PATH'], env['MLC_ML_MODEL_FILENAME'])
             env['MLC_ML_MODEL_FILE_WITH_PATH'] = env['MLC_ML_MODEL_SSD_PATH']
 
     env['MLC_ML_MODEL_FILE'] = os.path.basename(
