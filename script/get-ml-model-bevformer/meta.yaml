@@ -1,4 +1,4 @@
-alias: get-ml-model-deeplabv3-plus
+alias: get-ml-model-bevformer
 automation_alias: script
 automation_uid: 5b4e0237da074764
 cache: true
