@@ -26,6 +26,8 @@ def preprocess(i):
                     'error': 'ML model {} is not found'.format(ml_model)}
 
         env['MLC_ML_MODEL_FILE_WITH_PATH'] = ml_model
+    elif env['MLC_DOWNLOAD_SRC'] == "mlcommons":
+        env['MLC_TMP_REQUIRE_DOWNLOAD'] = 'yes'
 
     return {'return': 0}
 
@@ -35,7 +37,11 @@ def postprocess(i):
     env = i['env']
 
     if env.get('MLC_ML_MODEL_FILE_WITH_PATH', '') == '':
-        env['MLC_ML_MODEL_FILE_WITH_PATH'] = 'model-weights-skipped'
+        if env.get('MLC_ML_MODEL_SSD_PATH', '') == '':
+            env['MLC_ML_MODEL_FILE_WITH_PATH'] = 'model-weights-skipped'
+        else:
+            env['MLC_ML_MODEL_SSD_PATH'] = os.path.join(env['MLC_ML_MODEL_SSD_PATH'], env['MLC_ML_MODEL_FILENAME'])
+            env['MLC_ML_MODEL_FILE_WITH_PATH'] = env['MLC_ML_MODEL_SSD_PATH']
 
     env['MLC_ML_MODEL_FILE'] = os.path.basename(
         env['MLC_ML_MODEL_FILE_WITH_PATH'])

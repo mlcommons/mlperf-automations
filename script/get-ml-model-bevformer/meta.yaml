@@ -46,7 +46,7 @@ variations:
         env:
           MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_BEVFORMER_PATH
           MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_MODEL_BEVFORMER_PATH
-          MLC_DOWNLOAD_URL: 'mlc-nuscenes:nuscenes_dataset/<<<MLC_MODEL_RCLONE_FILEPATH>>>'
+          MLC_DOWNLOAD_URL: 'mlc-nuscenes:<<<MLC_MODEL_RCLONE_FILEPATH>>>'
           MLC_DOWNLOAD_EXTRA_OPTIONS: ' --include '
         extra_cache_tags: ml,model,bevformer
         force_cache: true

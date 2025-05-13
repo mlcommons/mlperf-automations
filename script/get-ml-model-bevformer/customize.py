@@ -11,6 +11,8 @@ def preprocess(i):
     if os_info['platform'] == "windows":
         return {'return': 1, 'error': 'Script not supported in windows yet!'}
 
+    env['MLC_TMP_REQUIRE_DOWNLOAD'] = "yes"
+    
     return {'return': 0}
 
 
