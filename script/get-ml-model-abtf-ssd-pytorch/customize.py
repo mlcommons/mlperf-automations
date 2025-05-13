@@ -26,7 +26,7 @@ def preprocess(i):
                     'error': 'ML model {} is not found'.format(ml_model)}
 
         env['MLC_ML_MODEL_FILE_WITH_PATH'] = ml_model
-    # handle download from mlcommons gdrive
+    # handles download from mlcommons gdrive
     elif env.get('MLC_DOWNLOAD_SRC', '') == "mlcommons":
         env['MLC_TMP_REQUIRE_DOWNLOAD'] = 'yes'
 
