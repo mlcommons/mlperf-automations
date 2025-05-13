@@ -1,0 +1,77 @@
+alias: get-ml-model-ssd-resnet50
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+tags:
+- get
+- ml-model
+- ssd
+- resnet50
+- ssd-resnet50
+uid: acaa4c330a5a42c5
+new_env_keys:
+  - MLC_ML_MODEL_SSD_PATH
+print_env_at_the_end:
+  MLC_ML_MODEL_SSD_PATH: SSD checkpoint path
+variations:
+  onnx:
+    group: model-format
+    default: true
+    env:
+      MLC_MODEL_FORMAT: onnx
+      MLC_MODEL_RCLONE_FILEPATH: model_checkpoint_ssd/ssd_resnet50.onnx
+      MLC_ML_MODEL_FILENAME: ssd_resnet50.onnx
+  pytorch:
+    group: model-format
+    env:
+      MLC_MODEL_FORMAT: pth
+      MLC_MODEL_RCLONE_FILEPATH: model_checkpoint_ssd/baseline_8MP_ss_scales_fm1_5x5_all_ep60.pth
+      MLC_ML_MODEL_FILENAME: baseline_8MP_ss_scales_fm1_5x5_all_ep60.pth
+  mlc:
+    group: download-src
+    default: true
+    prehook_deps:
+      - tags: get,rclone
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+      - tags: get,rclone-config,_config-name.cognata
+        force_cache: true
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+        env:
+          MLC_RCLONE_DRIVE_FOLDER_ID: 1u5FDoeXHVtDrd4zClE47Gmyr7iLFidz1
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - 'yes'
+        env:
+          MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_SSD_PATH
+          MLC_EXTRACT_FINAL_ENV_NAME: MLC_MLC_MODEL_SSD_PATH
+          MLC_DOWNLOAD_URL: 'mlc-cognata:mlc_cognata_dataset/<<<MLC_MODEL_RCLONE_FILEPATH>>>'
+          MLC_DOWNLOAD_EXTRA_OPTIONS: ' --include '
+        extra_cache_tags: ml,model,ssd,resnet50
+        force_cache: true
+        names:
+          - dae
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+  rclone:
+    group: download-tool
+    add_deps_recursive:
+      dae:
+        tags: _rclone
+    default: true
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
