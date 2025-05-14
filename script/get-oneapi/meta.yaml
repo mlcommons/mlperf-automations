@@ -41,3 +41,6 @@ variations:
   path.#:
     env:
       MLC_ONEAPI_DIR_PATH: "#"
+  fortran:
+    env:
+      MLC_ONEAPI_FORTRAN: 'yes'
