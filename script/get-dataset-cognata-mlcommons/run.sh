@@ -12,9 +12,5 @@ if [[ "$MLC_DOWNLOAD_MODE" != "dry" && "$MLC_TMP_REQUIRE_DOWNLOAD" == "true" && 
   for f in *.tar.gz; do 
     tar -xzvf "$f" || { echo "Failed to extract $f"; exit 1; }
   done
-  cd "${MLC_DATASET_MLCOMMONS_COGNATA_PATH}/nuscenes" || exit
-  for f in *.tar.gz; do 
-    tar -xzvf "$f" || { echo "Failed to extract $f"; exit 1; }
-  done
   cd - || exit
 fi
