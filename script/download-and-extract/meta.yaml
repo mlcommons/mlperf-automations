@@ -85,11 +85,19 @@ variations:
     default: 'true'
     env:
       MLC_EXTRACT_REMOVE_EXTRACTED: 'no'
+    adr:
+      extract-script:
+        tags:
+          _keep
     group: keep
-  no-remove-extracted:
+  remove-extracted:
     env:
-      MLC_EXTRACT_REMOVE_EXTRACTED: 'no'
+      MLC_EXTRACT_REMOVE_EXTRACTED: 'yes'
     group: keep
+    adr:
+      extract-script:
+        tags:
+          _remove-extracted
   rclone:
     add_deps:
       download-script:
