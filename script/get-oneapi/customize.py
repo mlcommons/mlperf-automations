@@ -29,25 +29,23 @@ def preprocess(i):
                                            'recursion_spaces': recursion_spaces})
         if r['return'] > 0:
             r = i['automation'].run_native_script(
-            {'run_script_input': i['run_script_input'], 'env': env, 'script_name': 'install'})
+                {'run_script_input': i['run_script_input'], 'env': env, 'script_name': 'install'})
             if r['return'] > 0:
                 return r
             version_prefix = env['MLC_ONEAPI_INSTALL_VERSION_PREFIX']
-            env['MLC_TMP_PATH'] = os.path.join(os.getcwd(), "install", version_prefix, "bin")
-            
+            env['MLC_TMP_PATH'] = os.path.join(
+                os.getcwd(), "install", version_prefix, "bin")
 
             r = i['automation'].find_artifact({'file_name': file_name_c,
-                                           'env': env,
-                                           'os_info': os_info,
-                                           'default_path_env_key': 'PATH',
-                                           'detect_version': True,
-                                           'env_path_key': 'MLC_ICX_BIN_WITH_PATH',
-                                           'run_script_input': i['run_script_input'],
-                                           'recursion_spaces': recursion_spaces})
+                                               'env': env,
+                                               'os_info': os_info,
+                                               'default_path_env_key': 'PATH',
+                                               'detect_version': True,
+                                               'env_path_key': 'MLC_ICX_BIN_WITH_PATH',
+                                               'run_script_input': i['run_script_input'],
+                                               'recursion_spaces': recursion_spaces})
             if r['return'] > 0:
                 return r
-
-
 
     return {'return': 0}
 
@@ -102,9 +100,10 @@ def postprocess(i):
     for key in list_keys:
         if not env.get(key):
             env[key] = []
-    
-    env['+LD_LIBRARY_PATH'].append(os.path.join(env['MLC_ONEAPI_INSTALLED_PATH'], "lib"))
-    
+
+    env['+LD_LIBRARY_PATH'].append(os.path.join(
+        env['MLC_ONEAPI_INSTALLED_PATH'], "lib"))
+
     # env['MLC_COMPILER_FLAGS_FAST'] = "-O3"
     # env['MLC_LINKER_FLAGS_FAST'] = "-O3"
     # env['MLC_COMPILER_FLAGS_DEBUG'] = "-O0"
