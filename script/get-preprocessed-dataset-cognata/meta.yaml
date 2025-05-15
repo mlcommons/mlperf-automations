@@ -1,0 +1,101 @@
+alias: get-preprocessed-dataset-cognata
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+category: AI/ML datasets
+default_env:
+  MLC_DATASET: cognata
+new_env_keys:
+- MLC_PREPROCESSED_DATASET_*
+tags:
+- get
+- dataset
+- cognata
+- preprocessed
+uid: 29b3a984ff444de9
+print_env_at_the_end:
+  MLC_PREPROCESSED_DATASET_COGNATA_PATH: Preprocessed Cognata dataset path
+variations:
+  validation:
+    default: true
+    group: dataset-type
+    env:
+      MLC_DATASET_COGNATA_TYPE: validation
+  calibration:
+    group: dataset-type
+    env:
+      MLC_DATASET_COGNATA_TYPE: calibration
+  2d_obj_det:
+    default: true
+    group: task
+    env:
+      MLC_DATASET_COGNATA_TASK: 2d_object_detection
+  segmentation:
+    group: task
+    env:
+      MLC_DATASET_COGNATA_TASK: segmentation
+  validation,2d_obj_det:
+    env:
+      MLC_DATASET_COGNATA_TAR_FILENAME: val_2d.tar.gz
+      MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/preprocessed_2d/<<<MLC_DATASET_COGNATA_TAR_FILENAME>>>
+  calibration,2d_obj_det:
+    env:
+      MLC_DATASET_COGNATA_TAR_FILENAME: calib_2d.tar.gz
+      MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/preprocessed_2d/<<<MLC_DATASET_COGNATA_TAR_FILENAME>>>
+  validation,segmentation:
+    env:
+      MLC_DATASET_COGNATA_TAR_FILENAME: val_seg.tar.gz
+      MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/preprocessed_seg/<<<MLC_DATASET_COGNATA_TAR_FILENAME>>>
+  calibration,segmentation:
+    env:
+      MLC_DATASET_COGNATA_TAR_FILENAME: calib_seg.tar.gz
+      MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/preprocessed_seg/<<<MLC_DATASET_COGNATA_TAR_FILENAME>>>
+  prebuilt:
+    default: true
+    group: dataset-src
+    env:
+      MLC_NUSCENES_DATASET_TYPE: prebuilt
+      MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_COGNATA_PATH
+      MLC_EXTRACT_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_COGNATA_PATH
+      MLC_DOWNLOAD_EXTRA_OPTIONS: ' --include '
+  mlc:
+    group: download-src
+    default: true
+    prehook_deps:
+      - tags: get,rclone
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+      - tags: get,rclone-config,_waymo
+        force_cache: true
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - 'yes'
+        extra_cache_tags: nuscenes,dataset
+        force_cache: true
+        names:
+          - dae
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+  rclone:
+    group: download-tool
+    add_deps_recursive:
+      dae:
+        tags: _rclone
+    default: true
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
