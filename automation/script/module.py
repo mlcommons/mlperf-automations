@@ -3401,6 +3401,12 @@ class ScriptAutomation(Automation):
                 for t in update_tags_from_env:
                     if env.get(t, '').strip() != '':
                         d['tags'] += "," + env[t]
+                
+                update_tags_if_env = d.get("update_tags_if_env", [])
+                for t in update_tags_if_env:
+                    if not is_dep_tobe_skipped(update_tags_if_env[t], env):
+                        d['tags'] += "," + t
+
 
                 inherit_variation_tags = d.get("inherit_variation_tags", False)
                 skip_inherit_variation_groups = d.get(
@@ -5772,10 +5778,16 @@ def update_state_from_meta(meta, env, state, const, const_state, deps, post_deps
     for c_meta in run_state['update_meta_if_env']:
         if is_dep_tobe_skipped(c_meta, env):
             continue
+        utils.merge_dicts({'dict1': default_env, 'dict2': c_meta.get(
+            'default_env', {}), 'append_lists': True, 'append_unique': True})
         utils.merge_dicts({'dict1': env, 'dict2': c_meta.get(
             'env', {}), 'append_lists': True, 'append_unique': True})
+        utils.merge_dicts({'dict1': const, 'dict2': c_meta.get(
+            'const', {}), 'append_lists': True, 'append_unique': True})
         utils.merge_dicts({'dict1': state, 'dict2': c_meta.get(
             'state', {}), 'append_lists': True, 'append_unique': True})
+        utils.merge_dicts({'dict1': const_state, 'dict2': c_meta.get(
+            'const_state', {}), 'append_lists': True, 'append_unique': True})
         if c_meta.get('docker', {}):
             if not state.get('docker', {}):
                 state['docker'] = {}
@@ -5783,6 +5795,11 @@ def update_state_from_meta(meta, env, state, const, const_state, deps, post_deps
                                'dict2': c_meta['docker'],
                                'append_lists': True,
                                'append_unique': True})
+
+    
+    #Updating again in case update_meta_if_env happened
+    for key in default_env:
+        env.setdefault(key, default_env[key])
 
     update_const = meta.get('const', {})
     if update_const:
