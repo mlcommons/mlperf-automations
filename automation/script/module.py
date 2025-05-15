@@ -3401,12 +3401,11 @@ class ScriptAutomation(Automation):
                 for t in update_tags_from_env:
                     if env.get(t, '').strip() != '':
                         d['tags'] += "," + env[t]
-                
+
                 update_tags_if_env = d.get("update_tags_if_env", [])
                 for t in update_tags_if_env:
                     if not is_dep_tobe_skipped(update_tags_if_env[t], env):
                         d['tags'] += "," + t
-
 
                 inherit_variation_tags = d.get("inherit_variation_tags", False)
                 skip_inherit_variation_groups = d.get(
@@ -5796,8 +5795,7 @@ def update_state_from_meta(meta, env, state, const, const_state, deps, post_deps
                                'append_lists': True,
                                'append_unique': True})
 
-    
-    #Updating again in case update_meta_if_env happened
+    # Updating again in case update_meta_if_env happened
     for key in default_env:
         env.setdefault(key, default_env[key])
 
