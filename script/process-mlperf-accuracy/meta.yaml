@@ -273,3 +273,15 @@ variations:
     env:
       MLC_DATASET: waymo
     group: dataset
+  nuscenes:
+    env:
+      MLC_DATASET: nuscenes
+    group: dataset
+  cognata_ssd:
+    env:
+      MLC_DATASET: cognata_ssd
+    group: dataset
+  cognata_deeplab:
+    env:
+      MLC_DATASET: cognata_deeplab
+    group: dataset

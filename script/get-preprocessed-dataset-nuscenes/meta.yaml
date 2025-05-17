@@ -1,0 +1,78 @@
+alias: get-preprocessed-dataset-nuscenes
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+category: AI/ML datasets
+default_env:
+  MLC_DATASET: nuscenes
+new_env_keys:
+- MLC_PREPROCESSED_DATASET_*
+tags:
+- get
+- dataset
+- nuscenes
+- preprocessed
+uid: 0e403a2861984a4e
+print_env_at_the_end:
+  MLC_PREPROCESSED_DATASET_NUSCENES_PATH: Preprocessed Nuscenes dataset path
+variations:
+  validation:
+    default: true
+    group: dataset-type
+    env:
+      MLC_DATASET_NUSCENES_TAR_FILENAME: val_3d.tar.gz
+      MLC_DOWNLOAD_URL: mlc-nuscenes:nuscenes_dataset/preprocessed/<<<MLC_DATASET_NUSCENES_TAR_FILENAME>>>
+  calibration:
+    group: dataset-type
+    env:
+      MLC_DATASET_NUSCENES_TAR_FILENAME: calib_3d.tar.gz
+      MLC_DOWNLOAD_URL: mlc-nuscenes:nuscenes_dataset/preprocessed/<<<MLC_DATASET_NUSCENES_TAR_FILENAME>>>
+  prebuilt:
+    default: true
+    group: dataset-src
+    env:
+      MLC_NUSCENES_DATASET_TYPE: prebuilt
+      MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_PATH
+      MLC_EXTRACT_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_PATH
+      MLC_DOWNLOAD_EXTRA_OPTIONS: ' --include '
+  mlc:
+    group: download-src
+    default: true
+    prehook_deps:
+      - tags: get,rclone
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+      - tags: get,rclone-config,_waymo
+        force_cache: true
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - 'yes'
+        extra_cache_tags: nuscenes,dataset
+        force_cache: true
+        names:
+          - dae
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+  rclone:
+    group: download-tool
+    add_deps_recursive:
+      dae:
+        tags: _rclone
+    default: true
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
