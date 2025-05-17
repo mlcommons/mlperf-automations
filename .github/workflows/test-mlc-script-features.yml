@@ -50,7 +50,7 @@ jobs:
         mlcr get,wkhtmltopdf --quiet
 
     - name: Test versions
-      if: runner.os == 'linux' && matrix.python-version == "3.8"
+      if: runner.os == 'linux' && matrix.python-version == '3.8'
       run: |
         mlcr get,generic-python-lib,_package.scipy --version=1.9.3 --quiet
         test $? -eq 0 || exit $?
