@@ -937,32 +937,32 @@ class ScriptAutomation(Automation):
         #           VERSIONS SHOULD NOT BE USED INSIDE VARIATIONS (in meta)!
 
         # First, take version from input
-        version = i.get('version', '').strip()
-        version_min = i.get('version_min', '').strip()
-        version_max = i.get('version_max', '').strip()
-        version_max_usable = i.get('version_max_usable', '').strip()
+        version = str(i.get('version', '')).strip()
+        version_min = str(i.get('version_min', '')).strip()
+        version_max = str(i.get('version_max', '')).strip()
+        version_max_usable = str(i.get('version_max_usable', '')).strip()
 
         # Second, take from env
         if version == '':
-            version = env.get('MLC_VERSION', '')
+            version = str(env.get('MLC_VERSION', ''))
         if version_min == '':
-            version_min = env.get('MLC_VERSION_MIN', '')
+            version_min = str(env.get('MLC_VERSION_MIN', ''))
         if version_max == '':
-            version_max = env.get('MLC_VERSION_MAX', '')
+            version_max = str(env.get('MLC_VERSION_MAX', ''))
         if version_max_usable == '':
-            version_max_usable = env.get(
-                'MLC_VERSION_MAX_USABLE', '')
+            version_max_usable = str(env.get(
+                'MLC_VERSION_MAX_USABLE', ''))
 
         # Third, take from meta
         if version == '':
-            version = meta.get('version', '')
+            version = str(meta.get('version', ''))
         if version_min == '':
-            version_min = meta.get('version_min', '')
+            version_min = str(meta.get('version_min', ''))
         if version_max == '':
-            version_max = meta.get('version_max', '')
+            version_max = str(meta.get('version_max', ''))
         if version_max_usable == '':
-            version_max_usable = meta.get(
-                'version_max_usable', '')
+            version_max_usable = str(meta.get(
+                'version_max_usable', ''))
 
         # Update env with resolved versions
         notes = []
