@@ -87,11 +87,11 @@ def experiment_run(self_module, i):
             experiment_meta = {}
             exp_tags = tags
             ii = {'action': 'update',
-                      'target': 'experiment',
-                      'script_alias': meta['alias'],
-                      'tags': ','.join(exp_tags),
-                      'meta': experiment_meta,
-                      'force': True}
+                  'target': 'experiment',
+                  'script_alias': meta['alias'],
+                  'tags': ','.join(exp_tags),
+                  'meta': experiment_meta,
+                  'force': True}
             r = experiment_action.access(ii)
             if r['return'] > 0:
                 return r
