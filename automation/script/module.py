@@ -1388,6 +1388,7 @@ class ScriptAutomation(Automation):
                       'target': 'cache',
                       'search_tags': tmp_tags,
                       'script_alias': meta['alias'],
+                      'extra_tags': extra_cache_tags,
                       'tags': ','.join(tmp_tags),
                       'meta': cached_meta,
                       'force': True}
