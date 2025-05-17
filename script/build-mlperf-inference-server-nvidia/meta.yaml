@@ -123,6 +123,9 @@ deps:
 
   # Detect nvidia-dali
   - tags: get,generic-python-lib,_nvidia-dali
+    enable_if_env:
+      MLC_NVIDIA_MLPERF_NEEDS_DALI:
+      - on
 
   # Get Nvidia scratch space where data and models get downloaded
   - tags: get,mlperf,inference,nvidia,scratch,space
