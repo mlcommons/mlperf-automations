@@ -4475,11 +4475,9 @@ pip install mlcflow
         return docker_run(self, i)
 
     ############################################################
-    # portion for experiment action.
-    # as of now, the experiment action directly calls the run action.
-    # in the future, we will add more functionality to the experiment action.
     def experiment(self, i):
-        return self.run(i)
+        from script.experiment import experiment_run
+        return experiment_run(self, i)
 
     ##########################################################################
 
