@@ -6,6 +6,7 @@ from mlc import utils
 from utils import *
 import logging
 from pathlib import PureWindowsPath, PurePosixPath
+import time
 import copy
 
 
@@ -29,6 +30,7 @@ def experiment_run(self_module, i):
     logger = self_module.logger
     env = i.get('env', {})
     experiment_action = ExperimentAction(self_module.action_object.parent)
+    skip_state_save = i.get('exp_skip_state_save', False)
 
     prune_result = prune_input(
         {'input': i, 'extra_keys_starts_with': ['exp.']})
@@ -72,7 +74,7 @@ def experiment_run(self_module, i):
                 if isinstance(exp[key], list):
                     for val in exp[key]:
                         ii[key] = val
-                        r = self_module.action_object.access(ii)
+                        r = run_script_and_tag_experiment(ii, self_module.action_object, experiment_action, tags, meta, skip_state_save, logger)
                         if r['return'] > 0:
                             return r
                 elif isinstance(exp[key], dict):
@@ -80,24 +82,93 @@ def experiment_run(self_module, i):
                         'return': 1, 'error': 'Dictionary inputs are not supported for mlc experiment script'}
                 else:
                     ii[key] = exp[key]
-                    r = self_module.action_object.access(ii)
+                    r = run_script_and_tag_experiment(ii, self_module.action_object, experiment_action, tags, meta, skip_state_save, logger)
                     if r['return'] > 0:
                         return r
 
-            experiment_meta = {}
-            exp_tags = tags
-            ii = {'action': 'update',
-                  'target': 'experiment',
-                  'script_alias': meta['alias'],
-                  'tags': ','.join(exp_tags),
-                  'meta': experiment_meta,
-                  'force': True}
-            r = experiment_action.access(ii)
-            if r['return'] > 0:
-                return r
-
     return {'return': 0}
 
+def run_script_and_tag_experiment(ii, script_action, experiment_action, tags, meta, skip_state_save, logger):
+   
+    current_path = os.path.abspath(os.getcwd())
+    experiment_meta = {}
+    recursion_spaces = ''
+    tmp_tags = tags
+    tmp_tags.append("tmp")
+    ii = {'action': 'update',
+            'target': 'experiment',
+            'script_alias': meta['alias'],
+            'tags': ','.join(tmp_tags),
+            'meta': experiment_meta,
+            'force': True}
+
+    r = experiment_action.access(ii)
+    if r['return'] > 0:
+        return r
+    
+    experiment = r['list'][0]
+
+    logger.debug(
+        recursion_spaces +
+            '  - Changing to {}'.format(experiment.path))
+
+    os.chdir(experiment.path)
+                    
+    if not skip_state_save:
+        ssi = {'action': 'run',
+                'target': 'script',
+                'tags': 'save,system,state',
+                'outfile': 'system_state_before.json',
+                'quiet': True
+                }
+        r = script_action.access(ssi)
+        if r['return'] > 0:
+            return r
+
+    start_time = time.time()
+    r = script_action.access(ii)
+    if r['return'] > 0:
+        return r
+    
+    end_time = time.time()
+    elapsed = end_time - start_time
+    time_taken_string = format_elapsed(elapsed)
+    logger.info(f"Time taken: {time_taken_string}")
+
+    if not skip_state_save:
+        ssi['outfile'] = 'system_state_after.json'
+        r = script_action.access(ssi)
+        if r['return'] > 0:
+            return r
+
+    exp_tags = tags
+    ii = {'action': 'update',
+            'target': 'experiment',
+            'uid': experiment.meta['uid'],
+            'meta': experiment.meta,
+            'script_alias': meta['alias'],
+            'replace_lists': True,  # To replace tags
+            'tags': ','.join(exp_tags)}
+
+    r = experiment_action.access(ii)
+    if r['return'] > 0:
+        return r
+   
+    os.chdir(current_path)
+    logger.info(f"Experiment entry saved at: {experiment.path}")
+    
+    return {'return': 0, 'experiment': experiment}
+
+def format_elapsed(seconds):
+    if seconds < 60:
+        return f"{seconds:.3f} seconds"
+    elif seconds < 3600:
+        mins, secs = divmod(seconds, 60)
+        return f"{int(mins)} minutes {secs:.1f} seconds"
+    else:
+        hours, remainder = divmod(seconds, 3600)
+        mins, secs = divmod(remainder, 60)
+        return f"{int(hours)} hours {int(mins)} minutes {secs:.1f} seconds"
 
 def parse_value(val):
     if isinstance(val, list):

@@ -63,5 +63,7 @@ tags:
 - machine-state
 - save
 - machine
+- system
+- system-state
 - state
 uid: 2f62820ed7294659
