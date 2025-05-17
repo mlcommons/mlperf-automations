@@ -211,15 +211,15 @@ def preprocess(i):
         elif dataset == "nuscenes":
             CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_AUTOMOTIVE_BEVFORMER_PATH'], "accuracy_nuscenes_cpu.py") + "' --mlperf-accuracy-file '" + os.path.join(
                 result_dir, "mlperf_log_accuracy.json") + "' --nuscenes-dir '" + env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'] + "' --config '" + os.path.join(env['MLC_MLPERF_AUTOMOTIVE_BEVFORMER_PATH'], "projects" + "configs" + "bevformer" + "bevformer_tiny.py") + "' > '" + out_file + "'"
-        
+
         elif dataset == "cognata_ssd":
             CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_AUTOMOTIVE_SSD_RESNET50_PATH'], "accuracy_cognata.py") + "' --mlperf-accuracy-file '" + os.path.join(
                 result_dir, "mlperf_log_accuracy.json") + "' --dataset-path '" + env['MLC_PREPROCESSED_DATASET_COGNATA_PATH'] + "' --dataset cognata --config '" + "baseline_8MP_ss_scales_fm1_5x5_all" + "' > '" + out_file + "'"
-            
+
         elif dataset == "cognata_deeplab":
             CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_AUTOMOTIVE_DEEPLABV3PLUS_PATH'], "accuracy_cognata.py") + "' --mlperf-accuracy-file '" + os.path.join(
-                result_dir, "mlperf_log_accuracy.json") +  "' --dataset-path '" + env['MLC_PREPROCESSED_DATASET_COGNATA_PATH'] + "' > '" + out_file + "'"
-    
+                result_dir, "mlperf_log_accuracy.json") + "' --dataset-path '" + env['MLC_PREPROCESSED_DATASET_COGNATA_PATH'] + "' > '" + out_file + "'"
+
         else:
             return {'return': 1, 'error': 'Unsupported dataset'}
 
