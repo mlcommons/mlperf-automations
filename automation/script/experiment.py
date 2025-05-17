@@ -10,6 +10,7 @@ import time
 import copy
 from datetime import datetime
 
+
 def experiment_run(self_module, i):
     """
     Automates the exploration runs of MLC scripts.
@@ -31,7 +32,7 @@ def experiment_run(self_module, i):
     env = i.get('env', {})
     experiment_action = ExperimentAction(self_module.action_object.parent)
     skip_state_save = i.get('exp_skip_state_save', False)
-    extra_exp_tags = i.get('exp_tags','').split(",")
+    extra_exp_tags = i.get('exp_tags', '').split(",")
 
     prune_result = prune_input(
         {'input': i, 'extra_keys_starts_with': ['exp.']})
@@ -75,7 +76,15 @@ def experiment_run(self_module, i):
                 if isinstance(exp[key], list):
                     for val in exp[key]:
                         ii[key] = val
-                        r = run_script_and_tag_experiment(ii, self_module.action_object, experiment_action, tags, extra_exp_tags, meta, skip_state_save, logger)
+                        r = run_script_and_tag_experiment(
+                            ii,
+                            self_module.action_object,
+                            experiment_action,
+                            tags,
+                            extra_exp_tags,
+                            meta,
+                            skip_state_save,
+                            logger)
                         if r['return'] > 0:
                             return r
                 elif isinstance(exp[key], dict):
@@ -83,26 +92,36 @@ def experiment_run(self_module, i):
                         'return': 1, 'error': 'Dictionary inputs are not supported for mlc experiment script'}
                 else:
                     ii[key] = exp[key]
-                    r = run_script_and_tag_experiment(ii, self_module.action_object, experiment_action, tags, extra_exp_tags, meta, skip_state_save, logger)
+                    r = run_script_and_tag_experiment(
+                        ii,
+                        self_module.action_object,
+                        experiment_action,
+                        tags,
+                        extra_exp_tags,
+                        meta,
+                        skip_state_save,
+                        logger)
                     if r['return'] > 0:
                         return r
 
     return {'return': 0}
 
-def run_script_and_tag_experiment(ii, script_action, experiment_action, tags, extra_exp_tags, script_meta, skip_state_save, logger):
-   
+
+def run_script_and_tag_experiment(
+        ii, script_action, experiment_action, tags, extra_exp_tags, script_meta, skip_state_save, logger):
+
     current_path = os.path.abspath(os.getcwd())
     experiment_meta = {}
     recursion_spaces = ''
     exp_tags = tags + extra_exp_tags
     ii = {'action': 'update',
-            'target': 'experiment',
-            'script_alias': script_meta['alias'],
-            'script_uid': script_meta['uid'],
-            'tags': ','.join(exp_tags),
-            'extra_tags': ",".join(extra_exp_tags),
-            'meta': experiment_meta,
-            'force': True}
+          'target': 'experiment',
+          'script_alias': script_meta['alias'],
+          'script_uid': script_meta['uid'],
+          'tags': ','.join(exp_tags),
+          'extra_tags': ",".join(extra_exp_tags),
+          'meta': experiment_meta,
+          'force': True}
 
     r = experiment_action.access(ii)
     if r['return'] > 0:
@@ -114,7 +133,6 @@ def run_script_and_tag_experiment(ii, script_action, experiment_action, tags, ex
         recursion_spaces +
         '  - Changing to {}'.format(experiment.path))
 
-    
     os.chdir(experiment.path)
     # Get current datetime in YYYY-MM-DD_HH-MM-SS format
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -125,7 +143,7 @@ def run_script_and_tag_experiment(ii, script_action, experiment_action, tags, ex
     # Create the directory
     os.makedirs(folder_name, exist_ok=True)
     os.chdir(folder_name)
-                    
+
     if not skip_state_save:
         ssi = {'action': 'run',
                'target': 'script',
@@ -168,7 +186,8 @@ def run_script_and_tag_experiment(ii, script_action, experiment_action, tags, ex
         return r
    '''
     os.chdir(current_path)
-    logger.info(f"Experiment entry saved at: {os.path.join(experiment.path, folder_name)}")
+    logger.info(
+        f"Experiment entry saved at: {os.path.join(experiment.path, folder_name)}")
 
     return {'return': 0, 'experiment': experiment, 'folder_name': folder_name}
 
