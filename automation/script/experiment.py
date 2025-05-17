@@ -1,3 +1,4 @@
+from collections import defaultdict
 import os
 from mlc import utils
 from utils import *
@@ -32,14 +33,14 @@ def experiment_run(self_module, i):
 
     run_input = prune_result['new_input']
     if run_input.get('exp'):
-        del(run_input['exp'])
-    
+        del (run_input['exp'])
+
     r = convert_input(i)
     if r.get('exp'):
         exp = r['exp']
     else:
         exp = {}
-    
+
     cur_dir = os.getcwd()
     r = self_module.search(i.copy())
     if r['return'] > 0:
@@ -49,7 +50,6 @@ def experiment_run(self_module, i):
     if not lst:
         return {'return': 1, 'error': 'No scripts were found'}
 
-
     # Process each artifact
     for artifact in sorted(lst, key=lambda x: x.meta.get('alias', '')):
         meta, script_path = artifact.meta, artifact.path
@@ -58,11 +58,10 @@ def experiment_run(self_module, i):
             'alias', ''), meta.get(
             'uid', '')
 
-
         # Execute the experiment script
         mlc_script_input = {
             'action': 'run', 'target': 'script'
-            }
+        }
         if exp:
             for key in exp:
                 ii = {**mlc_script_input, **run_input}
@@ -73,7 +72,8 @@ def experiment_run(self_module, i):
                         if r['return'] > 0:
                             return r
                 elif isinstance(exp[key], dict):
-                    return {'return': 1, 'error': 'Dictionary inputs are not supported for mlc experiment script'}
+                    return {
+                        'return': 1, 'error': 'Dictionary inputs are not supported for mlc experiment script'}
                 else:
                     ii[key] = exp[key]
                     r = self_module.action_object.access(ii)
@@ -82,7 +82,6 @@ def experiment_run(self_module, i):
 
     return {'return': 0}
 
-from collections import defaultdict
 
 def parse_value(val):
     if isinstance(val, list):
@@ -108,6 +107,7 @@ def parse_value(val):
 
     return val
 
+
 def convert_input(input_dict):
     output = defaultdict(dict)
 
@@ -119,4 +119,3 @@ def convert_input(input_dict):
             output[key].update({k: parse_value(v) for k, v in value.items()})
 
     return dict(output)
-
