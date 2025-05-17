@@ -93,31 +93,31 @@ jobs:
 
   test_experiment:
     runs-on: ${{ matrix.os }}
-      strategy:
-        fail-fast: false
-        matrix:
-          python-version: ["3.12", "3.8"]
-          os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.8"]
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
-      steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Configure git longpaths (Windows)
-        if: matrix.os == 'windows-latest'
-        run: |
-          git config --system core.longpaths true
-      - name: Pull MLOps repository
-        run: |
-          pip install mlcflow
-          mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Configure git longpaths (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        git config --system core.longpaths true
+    - name: Pull MLOps repository
+      run: |
+        pip install mlcflow
+        mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
 
-      - name: Test mlc experiment script
-        run: |
-          mlc experiment script --tags=detect,os --quiet --exp.repeat,=1,2,3
-          mlc experiment script --tags=detect,cpu --quiet --exp.explore=2:10:2
+    - name: Test mlc experiment script
+      run: |
+        mlc experiment script --tags=detect,os --quiet --exp.repeat,=1,2,3
+        mlc experiment script --tags=detect,cpu --quiet --exp.explore=2:10:2
 
   test_mlperf_retinanet_cpp_venv:
     runs-on: ubuntu-latest
