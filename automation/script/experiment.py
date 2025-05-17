@@ -1,5 +1,7 @@
 from collections import defaultdict
 import os
+from mlc.main import ExperimentAction
+import mlc.utils as utils
 from mlc import utils
 from utils import *
 import logging
@@ -26,6 +28,8 @@ def experiment_run(self_module, i):
     show_time = i.get('show_time', False)
     logger = self_module.logger
     env = i.get('env', {})
+    experiment_action = ExperimentAction(self_module.action_object.parent)
+
     prune_result = prune_input(
         {'input': i, 'extra_keys_starts_with': ['exp.']})
     if prune_result['return'] > 0:
@@ -79,6 +83,18 @@ def experiment_run(self_module, i):
                     r = self_module.action_object.access(ii)
                     if r['return'] > 0:
                         return r
+
+            experiment_meta = {}
+            exp_tags = tags
+            ii = {'action': 'update',
+                      'target': 'experiment',
+                      'script_alias': meta['alias'],
+                      'tags': ','.join(exp_tags),
+                      'meta': experiment_meta,
+                      'force': True}
+            r = experiment_action.access(ii)
+            if r['return'] > 0:
+                return r
 
     return {'return': 0}
 
