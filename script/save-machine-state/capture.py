@@ -5,12 +5,14 @@ import platform
 import subprocess
 from datetime import datetime
 
+
 def read_file_safe(path):
     try:
         with open(path, 'r') as f:
             return f.read().strip()
     except Exception:
         return None
+
 
 def run_command_safe(command, require_sudo=False):
     if require_sudo and os.geteuid() != 0:
@@ -20,6 +22,7 @@ def run_command_safe(command, require_sudo=False):
         return output.strip()
     except subprocess.CalledProcessError:
         return "Error running command"
+
 
 def detect_container_context():
     context = {
@@ -33,12 +36,14 @@ def detect_container_context():
                 context["cgroup_indicators"].append(line)
     return context
 
+
 def get_mounted_file_systems():
     try:
         with open("/proc/mounts", "r") as f:
             return [line.strip() for line in f.readlines()]
-    except:
+    except BaseException:
         return []
+
 
 def capture_machine_state():
     state = {
@@ -85,6 +90,7 @@ def capture_machine_state():
     }
     return state
 
+
 def save_state_to_file(state, filename):
     with open(filename, "w") as f:
         json.dump(state, f, indent=4)
@@ -92,8 +98,9 @@ def save_state_to_file(state, filename):
 
 # Example usage
 if __name__ == "__main__":
-    
-    state = capture_machine_state()
-    save_file = os.environ.get('MLC_SYSTEM_STATE_SAVE_FILENAME', 'machine_state.json')
-    save_state_to_file(state, save_file)
 
+    state = capture_machine_state()
+    save_file = os.environ.get(
+        'MLC_SYSTEM_STATE_SAVE_FILENAME',
+        'machine_state.json')
+    save_state_to_file(state, save_file)
