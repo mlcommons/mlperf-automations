@@ -1,0 +1,67 @@
+alias: save-machine-state
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: false
+category: Platform information
+deps:
+- tags: detect,os
+- skip_if_env:
+    MLC_HOST_OS_TYPE:
+    - windows
+  tags: detect,sudo
+- names:
+  - python
+  - python3
+  tags: get,python
+- skip_if_any_env:
+    MLC_HOST_OS_TYPE:
+    - windows
+  skip_if_env:
+    MLC_SUDO_USER:
+    - 'no'
+  tags: get,sys-util,generic,_psmisc
+- enable_if_env:
+    MLC_HOST_OS_TYPE:
+    - linux
+  skip_if_env:
+    MLC_SUDO_USER:
+    - 'no'
+  tags: get,sys-util,generic,_systemd
+- enable_if_env:
+    MLC_HOST_OS_TYPE:
+    - linux
+  skip_if_env:
+    MLC_SUDO_USER:
+    - 'no'
+  tags: get,sys-util,generic,_dmidecode
+- tags: get,generic-python-lib,_package.psutil
+input_mapping:
+  outfile: MLC_SYSTEM_STATE_SAVE_FILENAME
+prehook_deps:
+- enable_if_env:
+    MLC_HOST_OS_TYPE:
+    - linux
+    MLC_INSTALL_NUMACTL:
+    - 'True'
+  skip_if_env:
+    MLC_SUDO_USER:
+    - 'no'
+  tags: get,sys-util,generic,_numactl
+- enable_if_env:
+    MLC_HOST_OS_TYPE:
+    - linux
+    MLC_INSTALL_CPUPOWER:
+    - 'True'
+  env:
+    MLC_TMP_FAIL_SAFE: 'yes'
+  ignore_missing: true
+  skip_if_env:
+    MLC_SUDO_USER:
+    - 'no'
+  tags: get,sys-util,generic,_linux-tools
+tags:
+- machine-state
+- save
+- machine
+- state
+uid: 2f62820ed7294659
