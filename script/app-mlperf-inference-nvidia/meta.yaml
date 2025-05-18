@@ -366,8 +366,7 @@ variations:
         version_min: "2024.1"
         version: ""
       nvidia-inference-server:
-        version: r5.0
-        tags: _mlcommons
+        tags: _mlcommons,_r5.0
   v4.1:
     group: version
     env:
