@@ -18,6 +18,7 @@ deps:
   extra_cache_tags: nvidia,mitten,src
   force_env_keys:
   - MLC_GIT_CHECKOUT
+  - MLC_GIT_PATCH_FILEPATHS
   names:
   - nvidia-mitten-git-src
   tags: get,git,_repo.https://github.com/NVIDIA/mitten
@@ -32,3 +33,14 @@ tags:
 - mitten
 - nvidia-mitten
 uid: 1c045f2902374de9
+variations:
+  patched:
+    group: numpy-patch
+    default: true
+    adr:
+      nvidia-mitten-git-src:
+        tags: _patch
+    env: 
+      MLC_GIT_PATCH_FILEPATHS: <<<MLC_TMP_CURRENT_SCRIPT_PATH>>>/patch/numpy-mitten-v5.0.patch
+  default:
+    group: numpy-patch
