@@ -1863,6 +1863,8 @@ variations:
          version: r5.0
       nvidia-scratch-space:
         tags: _version.5.0
+      pycuda:
+        version: "2024.1"
     default_env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
