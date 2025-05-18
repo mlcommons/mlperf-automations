@@ -276,6 +276,7 @@ def preprocess(i):
             docker_user +
             ' ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers' +
             EOL)
+        f.write('RUN usermod -g sudo mlcuser' + EOL)
         f.write('USER ' + docker_user + ":" + docker_group + EOL)
         f.write(f"""ENV HOME=/home/{docker_user}""" + EOL)
 
