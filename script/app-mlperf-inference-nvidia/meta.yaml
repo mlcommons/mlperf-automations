@@ -432,9 +432,19 @@ variations:
     deps:
     - tags: get,generic-python-lib,_onnx-graphsurgeon
       version: 0.3.27
+
+  resnet50,v4.0:
     - tags: get,generic-python-lib,_package.onnx
       version: 1.13.1
 
+  resnet50,v4.1:
+    - tags: get,generic-python-lib,_package.onnx
+      version: 1.13.1
+
+  resnet50,v5.0:
+    - tags: get,generic-python-lib,_package.onnx
+      version: 1.13.1
+      
   retinanet:
     group: model
     env:
