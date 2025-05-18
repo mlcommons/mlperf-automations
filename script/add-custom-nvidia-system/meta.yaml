@@ -105,7 +105,10 @@ variations:
     add_deps_recursive:
       nvidia-inference-common-code:
         tags: _go
-
+  v5.0:
+    add_deps_recursive:
+      nvidia-inference-common-code:
+        tags: _v5.0
 
 
 
