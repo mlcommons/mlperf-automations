@@ -274,7 +274,7 @@ def preprocess(i):
         f.write(
             'RUN echo "' +
             docker_user +
-            ' ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers' +
+            ' ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers' +
             EOL)
         f.write('RUN usermod -g sudo mlcuser' + EOL)
         f.write('USER ' + docker_user + ":" + docker_group + EOL)
