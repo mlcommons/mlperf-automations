@@ -365,6 +365,9 @@ variations:
       pycuda:
         version_min: "2024.1"
         version: ""
+      nvidia-inference-server:
+        version: r5.0
+        tags: _mlcommons
   v4.1:
     group: version
     env:
