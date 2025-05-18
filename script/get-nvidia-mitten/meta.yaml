@@ -11,7 +11,8 @@ deps:
   - python
   tags: get,python3
 - tags: get,generic-python-lib,_pycuda
-  version: "2023.1"
+  names:
+    - pycuda
 - env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_NVIDIA_MITTEN_SRC
   extra_cache_tags: nvidia,mitten,src
