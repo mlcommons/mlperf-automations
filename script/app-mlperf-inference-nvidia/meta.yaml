@@ -443,7 +443,7 @@ variations:
 
   resnet50,v5.0:
     - tags: get,generic-python-lib,_package.onnx
-      version: 1.13.1
+      version: 1.17.0
       
   retinanet:
     group: model
