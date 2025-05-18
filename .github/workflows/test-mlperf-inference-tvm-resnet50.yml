@@ -46,17 +46,18 @@ jobs:
           else
             echo "run_step=false" >> $GITHUB_ENV
           fi
-    - name: Retrieve secrets from Keeper
+    - name: Load secret
       if: github.repository_owner == 'mlcommons' && env.run_step == 'true'
-      id: ksecrets
-      uses: Keeper-Security/ksm-action@master
+      id: op-load-secret
+      uses: 1password/load-secrets-action@v2
       with:
-        keeper-secret-config: ${{ secrets.KSM_CONFIG }}
-        secrets: |-
-          ubwkjh-Ii8UJDpG2EoU6GQ/field/Access Token > env:PAT
+        export-env: false
+      env:
+        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        PAT: op://7basd2jirojjckncf6qnq3azai/bzbaco3uxoqs2rcyu42rvuccga/credential
     - name: Push Results
       env:
-        GITHUB_TOKEN: ${{ env.PAT }}
+        GITHUB_TOKEN: ${{ steps.op-load-secret.outputs.PAT }}
         USER: mlcommons-bot
         EMAIL: mlcommons-bot@users.noreply.github.com
       if: github.repository_owner == 'mlcommons' && env.run_step == 'true'

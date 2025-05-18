@@ -36,7 +36,7 @@ variations:
         env:
           MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_WAYMO_PATH
           MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_WAYMO_PATH
-          MLC_DOWNLOAD_URL: mlc-waymo:waymo_preprocessed_dataset/kitti_format
+          MLC_DOWNLOAD_URL: mlc_waymo:waymo_preprocessed_dataset/kitti_format
         extra_cache_tags: waymo,dataset
         force_cache: true
         names:

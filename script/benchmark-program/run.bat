@@ -5,7 +5,7 @@ if "%MLC_RUN_DIR%" == "" (
   exit 1
 )
 
-cd %MLC_RUN_DIR%
+cd "%MLC_RUN_DIR%"
 
 if "%MLC_DEBUG_SCRIPT_BENCHMARK_PROGRAM%" == "True" (
   echo *****************************************************

@@ -15,14 +15,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-20.04, ubuntu-24.04, macos-latest, macos-13, windows-latest]
+        os: [ubuntu-22.04, ubuntu-latest, macos-latest, macos-13, windows-latest]
         python-version: [ "3.8", "3.12" ]
         backend: [ "pytorch" ]
         implementation: [ "python" ]
         docker: [ "", " --docker --docker_mlc_repo=${{ github.event.pull_request.head.repo.html_url }} --docker_mlc_repo_branch=${{ github.event.pull_request.head.ref }} --docker_dt" ]
         extra-args: [ "--adr.compiler.tags=gcc", "--env.MLC_MLPERF_LOADGEN_BUILD_FROM_SRC=off" ]
         exclude:
-        - os: ubuntu-24.04
+        - os: ubuntu-latest
           python-version: "3.8"
         - os: windows-latest
           python-version: "3.8"

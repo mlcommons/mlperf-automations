@@ -5,6 +5,8 @@ import os
 def preprocess(i):
     os_info = i['os_info']
 
+    q = '"' if os_info['platform'] == 'windows' else "'"
+    logger = i['automation'].logger
     env = i['env']
     CPPFLAGS = env.get('+ CPPFLAGS', [])
     env['MLC_C_COMPILER_FLAGS'] = " ".join(env.get('+ CFLAGS', []) + CPPFLAGS)
@@ -13,19 +15,23 @@ def preprocess(i):
     env['MLC_F_COMPILER_FLAGS'] = " ".join(env.get('+ FFLAGS', []))
 
     CPATH = env.get('+CPATH', [])
-    env['MLC_C_INCLUDE_PATH'] = " -I".join([" "] +
-                                           env.get('+C_INCLUDE_PATH', []) +
-                                           CPATH)
-    env['MLC_CPLUS_INCLUDE_PATH'] = " -I".join(
-        [" "] + env.get('+CPLUS_INCLUDE_PATH', []) + CPATH)
-    env['MLC_F_INCLUDE_PATH'] = " -I".join([" "] +
-                                           env.get('+F_INCLUDE_PATH', []) +
-                                           CPATH)
+    env['MLC_C_INCLUDE_PATH'] = " ".join(
+        [f"""-I{q}{path}{q}""" for path in env.get('+C_INCLUDE_PATH', []) + CPATH])
+
+    env['MLC_C_INCLUDE_PATH'] = " ".join(
+        f"""-I{q}{path}{q}""" for path in env.get('+C_INCLUDE_PATH', []) + CPATH)
+
+    env['MLC_CPLUS_INCLUDE_PATH'] = " ".join(
+        f"""-I{q}{path}{q}""" for path in env.get('+CPLUS_INCLUDE_PATH', []) + CPATH)
+
+    env['MLC_F_INCLUDE_PATH'] = " ".join(
+        f"""-I{q}{path}{q}""" for path in env.get('+F_INCLUDE_PATH', []) + CPATH)
 
     # If windows, need to extend it more ...
     if os_info['platform'] == 'windows' and env.get(
             'MLC_COMPILER_FAMILY', '') != 'LLVM':
-        print("WARNING: compile-program script should be extended to support flags for non-LLVM compilers on Windows")
+        logger.warning(
+            "Compile-program script should be extended to support flags for non-LLVM compilers on Windows")
         return {'return': 0}
 
     LDFLAGS = env.get('+ LDFLAGS', [])
@@ -53,8 +59,9 @@ def preprocess(i):
         env['MLC_LINKER_COMPILE_FLAGS'] = env['MLC_F_COMPILER_FLAGS']
         env['MLC_LINKER_FLAGS'] = env['MLC_F_LINKER_FLAGS']
 
-    env['MLC_LD_LIBRARY_PATH'] = " -L".join([" "] +
-                                            env.get('+LD_LIBRARY_PATH', []))
+    env['MLC_LD_LIBRARY_PATH'] = " ".join(
+        f"""-L{q}{path}{q}""" for path in env.get('+LD_LIBRARY_PATH', []))
+
     env['MLC_SOURCE_FOLDER_PATH'] = env['MLC_SOURCE_FOLDER_PATH'] if 'MLC_SOURCE_FOLDER_PATH' in env else env[
         'MLC_TMP_CURRENT_SCRIPT_PATH'] if 'MLC_TMP_CURRENT_SCRIPT_PATH' in env else ''
 

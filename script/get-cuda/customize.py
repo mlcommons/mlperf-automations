@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 import json
 
@@ -9,7 +10,7 @@ def preprocess(i):
 
     env = i['env']
 
-    if str(env.get('CUDA_SKIP_SUDO', '')).lower() == 'true':
+    if is_true(env.get('CUDA_SKIP_SUDO', '')):
         env['MLC_SUDO'] = ''
 
     recursion_spaces = i['recursion_spaces']
@@ -52,7 +53,7 @@ def preprocess(i):
                 '/usr/local/cuda/bin:/usr/cuda/bin:/usr/local/cuda-11/bin:/usr/cuda-11/bin:/usr/local/cuda-12/bin:/usr/cuda-12/bin:/usr/local/packages/cuda'
             env['MLC_TMP_PATH_IGNORE_NON_EXISTANT'] = 'yes'
 
-    if env['MLC_CUDA_FULL_TOOLKIT_INSTALL'] == "yes":
+    if is_true(env['MLC_CUDA_FULL_TOOLKIT_INSTALL']):
         env_key = 'MLC_NVCC_BIN_WITH_PATH'
         path_env_key = 'PATH'
     else:
@@ -73,7 +74,8 @@ def preprocess(i):
             if os_info['platform'] == 'windows':
                 return r
 
-            if r['return'] == 16 and env['MLC_CUDA_FULL_TOOLKIT_INSTALL'] == "yes":
+            if r['return'] == 16 and is_true(
+                    env['MLC_CUDA_FULL_TOOLKIT_INSTALL']):
                 env['MLC_REQUIRE_INSTALL'] = "yes"
                 return {'return': 0}
             else:
@@ -84,7 +86,7 @@ def preprocess(i):
 
 def detect_version(i):
     env = i['env']
-    if env['MLC_CUDA_FULL_TOOLKIT_INSTALL'] == "yes":
+    if is_true(env['MLC_CUDA_FULL_TOOLKIT_INSTALL']):
         return detect_version_nvcc(i)
     else:
         return detect_version_cuda_lib(i)
@@ -100,7 +102,11 @@ def detect_version_nvcc(i):
 
     version = r['version']
 
-    print(i['recursion_spaces'] + '    Detected version: {}'.format(version))
+    logger = i['automation'].logger
+
+    logger.info(
+        i['recursion_spaces'] +
+        '    Detected version: {}'.format(version))
 
     return {'return': 0, 'version': version}
 
@@ -108,7 +114,8 @@ def detect_version_nvcc(i):
 def detect_version_cuda_lib(i):
 
     env = i['env']
-    print(env)
+    logger = i['automation'].logger
+    logger.info(env)
     cuda_rt_file_path = env['MLC_CUDA_RT_WITH_PATH']
     cuda_lib_path = os.path.dirname(cuda_rt_file_path)
     cuda_path = os.path.abspath(os.path.join(cuda_lib_path, os.pardir))
@@ -126,7 +133,9 @@ def detect_version_cuda_lib(i):
     env['MLC_CUDA_VERSION'] = cuda_version
     version = cuda_version
 
-    print(i['recursion_spaces'] + '    Detected version: {}'.format(version))
+    logger.info(
+        i['recursion_spaces'] +
+        '    Detected version: {}'.format(version))
 
     return {'return': 0, 'version': version}
 
@@ -136,6 +145,7 @@ def postprocess(i):
     os_info = i['os_info']
 
     env = i['env']
+    logger = i['automation'].logger
 
     r = detect_version(i)
     if r['return'] > 0:
@@ -146,7 +156,7 @@ def postprocess(i):
 
     found_file_path = env[env['MLC_TMP_ENV_KEY']]
 
-    if env['MLC_CUDA_FULL_TOOLKIT_INSTALL'] == "yes":
+    if is_true(env['MLC_CUDA_FULL_TOOLKIT_INSTALL']):
 
         cuda_path_bin = os.path.dirname(found_file_path)
         env['MLC_CUDA_PATH_BIN'] = cuda_path_bin
@@ -162,7 +172,7 @@ def postprocess(i):
         parent_path = os.path.dirname(parent_path)
         while os.path.isdir(parent_path):
             if os.path.exists(os.path.join(parent_path, "include")):
-                print("Path is " + parent_path)
+                logger.info("Path is " + parent_path)
                 found_path = parent_path
                 cuda_path = found_path
                 env['MLC_CUDA_INSTALLED_PATH'] = cuda_path

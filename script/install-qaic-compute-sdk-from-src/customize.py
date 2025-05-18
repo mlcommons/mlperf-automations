@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -23,7 +24,7 @@ def preprocess(i):
         env['+LD_LIBRARY_PATH'] = []
     env['+LD_LIBRARY_PATH'].append(os.path.join(env['MLC_LLVM_INSTALLED_PATH'], "..", "lib"))
     '''
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     return {'return': 0}
 

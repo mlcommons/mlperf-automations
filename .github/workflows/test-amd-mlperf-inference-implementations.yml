@@ -13,6 +13,7 @@ jobs:
         matrix:
           python-version: [ "3.12" ]
           model: [ "llama2-70b-99.9" ]
+          
       steps:
       - name: Test MLPerf Inference AMD (build only) ${{ matrix.model }}
         run: |

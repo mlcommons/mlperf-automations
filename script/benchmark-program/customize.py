@@ -6,7 +6,7 @@ from utils import *
 def preprocess(i):
     os_info = i['os_info']
     env = i['env']
-
+    logger = i['automation'].logger
     q = '"' if os_info['platform'] == 'windows' else "'"
 
     if env.get('MLC_RUN_CMD', '') == '':
@@ -43,8 +43,7 @@ def preprocess(i):
             if env.get('MLC_RUN_DIR', '') == '':
                 env['MLC_RUN_DIR'] = os.getcwd()
 
-            env['MLC_RUN_CMD'] = MLC_RUN_PREFIX + ' ' + os.path.join(
-                env['MLC_RUN_DIR'], env['MLC_BIN_NAME']) + ' ' + env['MLC_RUN_SUFFIX']
+            env['MLC_RUN_CMD'] = f"""{MLC_RUN_PREFIX} {q}{os.path.join(env['MLC_RUN_DIR'], env['MLC_BIN_NAME'])}{q} {env['MLC_RUN_SUFFIX']}"""
 
     x = env.get('MLC_RUN_PREFIX0', '')
     if x != '':
@@ -105,15 +104,16 @@ def preprocess(i):
     env['MLC_POST_RUN_CMD'] = post_run_cmd
 
     # Print info
-    print('***************************************************************************')
-    print('CM script::benchmark-program/run.sh')
-    print('')
-    print('Run Directory: {}'.format(env.get('MLC_RUN_DIR', '')))
+    logger.info(
+        '***************************************************************************')
+    logger.info('CM script::benchmark-program/run.sh')
+    logger.info('')
+    logger.info('Run Directory: {}'.format(env.get('MLC_RUN_DIR', '')))
 
-    print('')
-    print('CMD: {}'.format(env.get('MLC_RUN_CMD', '')))
+    logger.info('')
+    logger.info('CMD: {}'.format(env.get('MLC_RUN_CMD', '')))
 
-    print('')
+    logger.info('')
 
     return {'return': 0}
 

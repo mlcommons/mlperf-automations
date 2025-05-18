@@ -10,6 +10,8 @@ def preprocess(i):
 
     automation = i['automation']
 
+    logger = automation.logger
+
     recursion_spaces = i['recursion_spaces']
 
     need_version = env.get('MLC_VERSION', '')
@@ -17,7 +19,7 @@ def preprocess(i):
         return {'return': 1,
                 'error': 'internal problem - MLC_VERSION is not defined in env'}
 
-    print(recursion_spaces + '    # Requested version: {}'.format(need_version))
+    logger.info(f"{recursion_spaces}    # Requested version: {need_version}")
 
 #    if 'MLC_GIT_CHECKOUT' not in env:
 #        env['MLC_GIT_CHECKOUT'] = 'releases/gcc-' + need_version

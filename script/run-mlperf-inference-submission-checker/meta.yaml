@@ -6,6 +6,10 @@ category: MLPerf benchmark support
 clean_files: []
 default_env:
   MLC_MLPERF_SHORT_RUN: 'no'
+file_path_env_keys:
+  - MLPERF_INFERENCE_SUBMISSION_TAR_FILE
+folder_path_env_keys:
+  - MLC_MLPERF_INFERENCE_SUBMISSION_DIR
 default_version: master
 deps:
 - names:
@@ -40,6 +44,34 @@ deps:
     MLC_TMP_MLPERF_INFERENCE_PREPROCESS_SUBMISSION:
     - 'on'
   tags: preprocess,mlperf,inference,submission
+docker:
+  mlc_repo: mlcommons@mlperf-automations
+  mlc_repo_branch: dev
+  extra_run_args: ' --cap-add SYS_ADMIN'
+  os: ubuntu
+  os_version: '22.04'
+  pre_run_cmds:
+    - mlc pull repo
+  real_run: false
+  use_host_group_id: true
+  use_host_user_id: true
+  deps:
+    - names:
+      - get-mlperf-submission-dir
+      skip_if_env:
+        MLC_MLPERF_INFERENCE_SUBMISSION_DIR:
+        - 'on'
+      tags: get,mlperf,submission,dir
+    - enable_if_env:
+        MLC_TMP_MLPERF_INFERENCE_PREPROCESS_SUBMISSION:
+        - 'on'
+      tags: preprocess,mlperf,inference,submission
+  input_mapping:
+    submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
+    submission_tar_file: MLPERF_INFERENCE_SUBMISSION_TAR_FILE
+  mounts:
+  - ${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}:${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}
+  - ${{ MLPERF_INFERENCE_SUBMISSION_TAR_FILE }}:${{ MLPERF_INFERENCE_SUBMISSION_TAR_FILE }}
 input_mapping:
   extra_args: MLC_MLPERF_SUBMISSION_CHECKER_EXTRA_ARGS
   extra_checker_args: MLC_MLPERF_SUBMISSION_CHECKER_EXTRA_ARGS
@@ -60,6 +92,7 @@ input_mapping:
   submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
   submitter: MLC_MLPERF_SUBMITTER
   submitter_id: MLC_MLPERF_SUBMITTER_ID
+  submission_tar_file: MLPERF_INFERENCE_SUBMISSION_TAR_FILE
   tar: MLC_TAR_SUBMISSION_DIR
 post_deps:
 - enable_if_env:

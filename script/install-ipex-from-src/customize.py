@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -13,7 +14,7 @@ def preprocess(i):
 
     env['IPEX_DIR'] = env['MLC_IPEX_SRC_REPO_PATH']
 
-    if env.get('MLC_USE_LLVM_FOR_IPEX', '') == 'yes':
+    if is_true(env.get('MLC_USE_LLVM_FOR_IPEX', '')):
         env['DNNL_GRAPH_BUILD_COMPILER_BACKEND'] = 1
         env['USE_LLVM'] = env['MLC_LLVM_INSTALLED_PATH']
         env['LLVM_DIR'] = os.path.join(

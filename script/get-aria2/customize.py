@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -7,6 +8,7 @@ def preprocess(i):
     # Pre-set by CM
     os_info = i['os_info']
     env = i['env']
+    logger = i['automation'].logger
     recursion_spaces = i['recursion_spaces']
     automation = i['automation']
     run_script_input = i['run_script_input']
@@ -16,7 +18,7 @@ def preprocess(i):
     file_name = file_name_core + \
         '.exe' if os_info['platform'] == 'windows' else file_name_core
 
-    force_install = env.get('MLC_FORCE_INSTALL', False) == True
+    force_install = is_true(env.get('MLC_FORCE_INSTALL', False))
 
     if not force_install:
         r = i['automation'].find_artifact({'file_name': file_name,
@@ -63,15 +65,15 @@ def preprocess(i):
             version, archive_with_ext)
         env['MLC_ARIA2_DOWNLOAD_URL'] = url
 
-        print('URL to download ARIA2: {}'.format(url))
+        logger.info('URL to download ARIA2: {}'.format(url))
 
         r = automation.run_native_script(
             {'run_script_input': run_script_input, 'env': env, 'script_name': 'install'})
         if r['return'] > 0:
             return r
 
-        if os_info['platform'] == 'windows' or env.get(
-                'MLC_ARIA2_BUILD_FROM_SRC', '').lower() == 'true':
+        if os_info['platform'] == 'windows' or is_true(env.get(
+                'MLC_ARIA2_BUILD_FROM_SRC', '')):
             install_path = os.path.join(os.getcwd(), archive)
 
             path_to_file = os.path.join(install_path, file_name)
@@ -101,7 +103,7 @@ def preprocess(i):
 
 def detect_version(i):
     env = i['env']
-
+    logger = i['automation'].logger
     r = i['automation'].parse_version({'match_text': r'aria2 version\s*([\d.]+)',
                                        'group_number': 1,
                                        'env_key': 'MLC_ARIA2_VERSION',
@@ -110,7 +112,9 @@ def detect_version(i):
         return r
 
     version = r['version']
-    print(i['recursion_spaces'] + '    Detected version: {}'.format(version))
+    logger.info(
+        i['recursion_spaces'] +
+        '    Detected version: {}'.format(version))
 
     return {'return': 0, 'version': version}
 
@@ -129,7 +133,7 @@ def postprocess(i):
 
     env['MLC_ARIA2_INSTALLED_PATH'] = found_path
 
-    if env.get('MLC_ARIA2_INSTALLED_TO_CACHE', '') == 'yes':
+    if is_true(env.get('MLC_ARIA2_INSTALLED_TO_CACHE', '')):
         env['+PATH'] = [env['MLC_ARIA2_INSTALLED_PATH']]
 
     return {'return': 0, 'version': version}

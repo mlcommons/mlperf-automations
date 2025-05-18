@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -24,7 +25,7 @@ def postprocess(i):
 
     env = i['env']
 
-    if env.get('MLC_TMP_REQUIRE_DOWNLOAD', '') == "yes":
+    if is_true(env.get('MLC_TMP_REQUIRE_DOWNLOAD', '')):
         env['MLC_DATASET_LLAMA3_PATH'] = os.path.join(
             env['MLC_DATASET_LLAMA3_PATH'], env['MLC_DATASET_FILE_NAME'])
 

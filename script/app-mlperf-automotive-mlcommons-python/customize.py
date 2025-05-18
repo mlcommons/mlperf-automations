@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 import json
 import shutil
@@ -12,13 +13,13 @@ def preprocess(i):
     state = i['state']
     script_path = i['run_script_input']['path']
 
-    if env.get('MLC_MLPERF_SKIP_RUN', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_SKIP_RUN', '')):
         return {'return': 0}
 
-    if env.get('MLC_RUN_DOCKER_CONTAINER', '') == "yes":
+    if is_true(env.get('MLC_RUN_DOCKER_CONTAINER', '')):
         return {'return': 0}
 
-    if env.get('MLC_MLPERF_POWER', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_POWER', '')):
         power = "yes"
     else:
         power = "no"

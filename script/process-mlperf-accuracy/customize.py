@@ -9,10 +9,12 @@ def preprocess(i):
     xsep = ';' if os_info['platform'] == 'windows' else ':'
 
     env = i['env']
+    logger = i['automation'].logger
+
     results_dir = env.get("MLC_MLPERF_ACCURACY_RESULTS_DIR", "")
 
     if results_dir == "":
-        print("Please set MLC_MLPERF_ACCURACY_RESULTS_DIR")
+        logger.error("Please set MLC_MLPERF_ACCURACY_RESULTS_DIR")
         return {'return': -1}
 
     # In fact, we expect only 1 command line here
@@ -229,7 +231,7 @@ def postprocess(i):
     os_info = i['os_info']
     env = i['env']
     state = i['state']
-
+    logger = i['automation'].logger
     xsep = ';' if os_info['platform'] == 'windows' else ':'
 
     results_dir = env.get("MLC_MLPERF_ACCURACY_RESULTS_DIR", "")
@@ -240,16 +242,16 @@ def postprocess(i):
         accuracy_file = os.path.join(result_dir, "accuracy.txt")
 
         if os.path.exists(accuracy_file):
-            print('')
-            print('Accuracy file: {}'.format(accuracy_file))
-            print('')
+            logger.info('')
+            logger.info('Accuracy file: {}'.format(accuracy_file))
+            logger.info('')
 
             x = ''
             with open(accuracy_file, "r") as fp:
                 x = fp.read()
 
             if x != '':
-                print(x)
+                logger.info(f"{x}")
 
                 # Trying to extract accuracy dict
                 for y in x.split('\n'):
@@ -265,5 +267,5 @@ def postprocess(i):
                         except ValueError as e:
                             pass
 
-            print('')
+            logger.info('')
     return {'return': 0}

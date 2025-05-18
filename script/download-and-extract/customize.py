@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 import hashlib
 
@@ -13,7 +14,7 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     if i['input'].get('force_cache'):
         extra_cache_tags = i['input'].get('extra_cache_tags', '')
@@ -42,8 +43,7 @@ def preprocess(i):
 
         env['MLC_EXTRACT_REMOVE_EXTRACTED'] = 'no'
 
-    if str(env.get('MLC_DAE_EXTRACT_DOWNLOADED')
-           ).lower() in ["yes", "1", "true"]:
+    if is_true(env.get('MLC_DAE_EXTRACT_DOWNLOADED')):
         if (env.get('MLC_EXTRACT_FINAL_ENV_NAME', '') == '') and (
                 env.get('MLC_DAE_FINAL_ENV_NAME', '') != ''):
             env['MLC_EXTRACT_FINAL_ENV_NAME'] = env['MLC_DAE_FINAL_ENV_NAME']

@@ -13,6 +13,8 @@ def preprocess(i):
     state = i['state']
     script_path = i['run_script_input']['path']
 
+    logger = i['automation'].logger
+
     if env.get('MLC_MLPERF_SKIP_RUN', '') == "yes":
         return {'return': 0}
 
@@ -82,7 +84,7 @@ def preprocess(i):
         env['MLC_MLPERF_CONF'] = os.path.join(
             env['MLC_MLPERF_INFERENCE_SOURCE'], "mlperf.conf")
 
-    x = "" if os_info['platform'] == 'windows' else "'"
+    x = '"' if os_info['platform'] == 'windows' else "'"
 
     inference_src_version = env.get('MLC_MLPERF_INFERENCE_SOURCE_VERSION', '')
     version_tuple = None
@@ -121,6 +123,8 @@ def preprocess(i):
     if int(
             NUM_THREADS) > 2 and env['MLC_MLPERF_DEVICE'] == "gpu" and env['MLC_MODEL'] != "rgat":
         NUM_THREADS = "2"  # Don't use more than 2 threads when run on GPU
+        if env['MLC_MODEL'] in ['retinanet']:
+            NUM_THREADS = "1"
 
     if env['MLC_MODEL'] in ['resnet50', 'retinanet',
                             'stable-diffusion-xl', 'rgat']:
@@ -129,11 +133,10 @@ def preprocess(i):
     ml_model_name = env['MLC_MODEL']
     if 'MLC_MLPERF_USER_CONF' in env:
         user_conf_path = env['MLC_MLPERF_USER_CONF']
-        x = "" if os_info['platform'] == 'windows' else "'"
         if 'llama2-70b' in env['MLC_MODEL'] or "mixtral-8x7b" in env["MLC_MODEL"] or "llama3" in env["MLC_MODEL"]:
-            scenario_extra_options += " --user-conf " + x + user_conf_path + x
+            scenario_extra_options += f""" --user-conf {x}{user_conf_path}{x} """
         else:
-            scenario_extra_options += " --user_conf " + x + user_conf_path + x
+            scenario_extra_options += f""" --user_conf {x}{user_conf_path}{x} """
 
     mode = env['MLC_MLPERF_LOADGEN_MODE']
     mode_extra_options = ""
@@ -142,16 +145,13 @@ def preprocess(i):
             'resnet50', 'retinanet']:
         # dataset_options = " --use_preprocessed_dataset --preprocessed_dir "+env['MLC_DATASET_PREPROCESSED_PATH']
         if env.get('MLC_MLPERF_LAST_RELEASE') not in ["v2.0", "v2.1"]:
-            dataset_options = " --use_preprocessed_dataset --cache_dir " + \
-                env['MLC_DATASET_PREPROCESSED_PATH']
+            dataset_options = f""" --use_preprocessed_dataset --cache_dir {x}{env['MLC_DATASET_PREPROCESSED_PATH']}{x}"""
         else:
             dataset_options = ""
         if env['MLC_MODEL'] == "retinanet":
-            dataset_options += " --dataset-list " + \
-                env['MLC_DATASET_ANNOTATIONS_FILE_PATH']
+            dataset_options += f""" --dataset-list {x}{env['MLC_DATASET_ANNOTATIONS_FILE_PATH']}{x}"""
         elif env['MLC_MODEL'] == "resnet50":
-            dataset_options += " --dataset-list " + \
-                os.path.join(env['MLC_DATASET_AUX_PATH'], "val.txt")
+            dataset_options += f""" --dataset-list {x}{os.path.join(env['MLC_DATASET_AUX_PATH'], "val.txt")}{x}"""
         env['DATA_DIR'] = env.get('MLC_DATASET_PREPROCESSED_PATH')
     else:
         if 'MLC_DATASET_PREPROCESSED_PATH' in env:
@@ -176,14 +176,14 @@ def preprocess(i):
     elif mode == "compliance":
 
         audit_full_path = env['MLC_MLPERF_INFERENCE_AUDIT_PATH']
-        mode_extra_options = " --audit '" + audit_full_path + "'"
+        mode_extra_options = f""" --audit {x}{audit_full_path}{x} """
 
     if env.get('MLC_MLPERF_OUTPUT_DIR', '') == '':
         env['MLC_MLPERF_OUTPUT_DIR'] = os.getcwd()
 
     mlperf_implementation = env.get('MLC_MLPERF_IMPLEMENTATION', 'reference')
     cmd, run_dir = get_run_cmd(os_info, env, scenario_extra_options,
-                               mode_extra_options, dataset_options, mlperf_implementation)
+                               mode_extra_options, dataset_options, logger, mlperf_implementation)
 
     if env.get('MLC_NETWORK_LOADGEN', '') == "lon":
 
@@ -206,10 +206,10 @@ def preprocess(i):
 
 
 def get_run_cmd(os_info, env, scenario_extra_options,
-                mode_extra_options, dataset_options, implementation="reference"):
+                mode_extra_options, dataset_options, logger, implementation="reference"):
     if implementation == "reference":
         return get_run_cmd_reference(
-            os_info, env, scenario_extra_options, mode_extra_options, dataset_options)
+            os_info, env, scenario_extra_options, mode_extra_options, dataset_options, logger)
     if implementation == "nvidia":
         return get_run_cmd_nvidia(
             os_info, env, scenario_extra_options, mode_extra_options, dataset_options)
@@ -217,25 +217,21 @@ def get_run_cmd(os_info, env, scenario_extra_options,
 
 
 def get_run_cmd_reference(
-        os_info, env, scenario_extra_options, mode_extra_options, dataset_options):
+        os_info, env, scenario_extra_options, mode_extra_options, dataset_options, logger):
 
     device = env['MLC_MLPERF_DEVICE'] if env['MLC_MLPERF_DEVICE'] not in [
         "gpu", "rocm"] else "cuda"
+
+    x = '"' if os_info['platform'] == 'windows' else "'"
 
     if env['MLC_MODEL'] in ["gptj-99", "gptj-99.9"]:
 
         env['RUN_DIR'] = os.path.join(
             env['MLC_MLPERF_INFERENCE_SOURCE'], "language", "gpt-j")
         if env.get('MLC_NETWORK_LOADGEN', '') != "lon":
-            cmd = env['MLC_PYTHON_BIN_WITH_PATH'] +  \
-                " main.py --model-path=" + env['MLC_ML_MODEL_FILE_WITH_PATH'] + ' --dataset-path=' + env['MLC_DATASET_EVAL_PATH'] + " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + " " + env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + \
-                ' --dtype ' + env['MLC_MLPERF_MODEL_PRECISION'] + \
-                scenario_extra_options + mode_extra_options + dataset_options
+            cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} main.py --model-path {x}{env['MLC_ML_MODEL_FILE_WITH_PATH']}{x} --dataset-path {x}{env['MLC_DATASET_EVAL_PATH']}{x} --scenario={env['MLC_MLPERF_LOADGEN_SCENARIO']} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} --dtype {env['MLC_MLPERF_MODEL_PRECISION']} {scenario_extra_options} {mode_extra_options} {dataset_options} """
         else:
-            cmd = env['MLC_PYTHON_BIN_WITH_PATH'] +  \
-                " main.py" + ' --dataset-path=' + env['MLC_DATASET_EVAL_PATH'] + " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + " " + env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + \
-                ' --dtype ' + env['MLC_MLPERF_MODEL_PRECISION'] + \
-                scenario_extra_options + mode_extra_options + dataset_options
+            cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} main.py --dataset-path {x}{env['MLC_DATASET_EVAL_PATH']}{x} --scenario={env['MLC_MLPERF_LOADGEN_SCENARIO']} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} --dtype {env['MLC_MLPERF_MODEL_PRECISION']} {scenario_extra_options} {mode_extra_options} {dataset_options} """
         cmd = cmd.replace("--count", "--max_examples")
         if env['MLC_MLPERF_DEVICE'] == "gpu":
             gpu_options = " --gpu"
@@ -282,20 +278,13 @@ def get_run_cmd_reference(
 
         env['LOG_PATH'] = env['MLC_MLPERF_OUTPUT_DIR']
 
-        extra_options = " --output " + env['MLC_MLPERF_OUTPUT_DIR'] + " --model-name resnet50  --dataset " + env['MLC_MLPERF_VISION_DATASET_OPTION'] + f""" --max-batchsize {env.get('MLC_MLPERF_LOADGEN_MAX_BATCHSIZE', '1')}""" + \
-            " --dataset-path " + env['MLC_DATASET_PREPROCESSED_PATH'] + " --model " + env['MODEL_FILE'] + \
-            " --preprocessed_dir " + env['MLC_DATASET_PREPROCESSED_PATH']
+        extra_options = f""" --output {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} --model-name resnet50 --dataset {env['MLC_MLPERF_VISION_DATASET_OPTION']} --max-batchsize {env.get('MLC_MLPERF_LOADGEN_MAX_BATCHSIZE', '1')} --dataset-path {x}{env['MLC_DATASET_PREPROCESSED_PATH']}{x} --model {x}{env['MODEL_FILE']}{x} --preprocessed_dir {x}{env['MLC_DATASET_PREPROCESSED_PATH']}{x}"""
 
         if env.get('MLC_MLPERF_DEVICE') == "tpu":
-            cmd = "cd '" + os.path.join(env['RUN_DIR'], "python") + "' && " + env.get('MLC_SUDO', "") + " " + env['MLC_PYTHON_BIN_WITH_PATH'] + " main.py " +\
-                "--backend " + env['MLC_MLPERF_BACKEND'] + " --scenario=" + env['MLC_MLPERF_LOADGEN_SCENARIO'] + " --device tpu " + \
-                env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + scenario_extra_options + \
-                mode_extra_options + dataset_options + extra_options
+            cmd = f"""cd {x}{os.path.join(env['RUN_DIR'], 'python')}{x} && {env.get('MLC_SUDO', '')} {x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} main.py --backend {env['MLC_MLPERF_BACKEND']} --scenario={env['MLC_MLPERF_LOADGEN_SCENARIO']} --device tpu {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']}{scenario_extra_options}{mode_extra_options}{dataset_options}{extra_options}"""
         else:
-            cmd = "cd '" + os.path.join(env['RUN_DIR'], "python") + "' && " + env['MLC_PYTHON_BIN_WITH_PATH'] + " main.py " +\
-                "--backend " + env['MLC_MLPERF_BACKEND'] + " --scenario=" + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \
-                env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + scenario_extra_options + \
-                mode_extra_options + dataset_options + extra_options
+            cmd = f"""cd {x}{os.path.join(env['RUN_DIR'], 'python')}{x} && {x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} main.py --backend {env['MLC_MLPERF_BACKEND']} --scenario={env['MLC_MLPERF_LOADGEN_SCENARIO']}{env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']}{scenario_extra_options}{mode_extra_options}{dataset_options}{extra_options}"""
+
         env['SKIP_VERIFY_ACCURACY'] = True
 
     elif "bert" in env['MLC_MODEL']:
@@ -311,13 +300,11 @@ def get_run_cmd_reference(
             quantization_options = " --quantized"
         else:
             quantization_options = ""
-        cmd = env['MLC_PYTHON_BIN_WITH_PATH'] + " run.py --backend=" + env['MLC_MLPERF_BACKEND'] + " --scenario=" + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \
-            env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + scenario_extra_options + \
-            mode_extra_options + dataset_options + quantization_options
+
+        cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} run.py --backend={env['MLC_MLPERF_BACKEND']} --scenario={env['MLC_MLPERF_LOADGEN_SCENARIO']}{env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']}{scenario_extra_options}{mode_extra_options}{dataset_options}{quantization_options}"""
+
         if env['MLC_MLPERF_BACKEND'] == "deepsparse":
-            cmd += " --batch_size=" + \
-                env.get('MLC_MLPERF_LOADGEN_MAX_BATCHSIZE', '1') + \
-                " --model_path=" + env['MODEL_FILE']
+            cmd += f""" --batch_size={env.get('MLC_MLPERF_LOADGEN_MAX_BATCHSIZE', '1')} --model_path={x}{env['MODEL_FILE']}{x}"""
 
         if env.get('MLC_MLPERF_CUSTOM_MODEL_PATH', '') != '':
             env['MLC_ML_MODEL_FILE_WITH_PATH'] = env['MODEL_FILE']
@@ -331,15 +318,15 @@ def get_run_cmd_reference(
     elif "rnnt" in env['MLC_MODEL']:
 
         env['RUN_DIR'] = env['MLC_MLPERF_INFERENCE_RNNT_PATH']
-        cmd = env['MLC_PYTHON_BIN_WITH_PATH'] + " run.py --backend " + env['MLC_MLPERF_BACKEND'] + \
-            " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \
-            " --manifest " + env['MLC_DATASET_PREPROCESSED_JSON'] + \
-            " --dataset_dir " + os.path.join(env['MLC_DATASET_PREPROCESSED_PATH'], "..") + \
-            " --pytorch_config_toml " + os.path.join("pytorch", "configs", "rnnt.toml") + \
-            " --pytorch_checkpoint " + env['MLC_ML_MODEL_FILE_WITH_PATH'] + \
-            " --log_dir " + env['MLC_MLPERF_OUTPUT_DIR'] + \
-            env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + \
-            scenario_extra_options + mode_extra_options + dataset_options
+        cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} run.py --backend {env['MLC_MLPERF_BACKEND']} \
+        --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} \
+        --manifest {x}{env['MLC_DATASET_PREPROCESSED_JSON']}{x} \
+        --dataset_dir {x}{os.path.join(env['MLC_DATASET_PREPROCESSED_PATH'], '..')}{x} \
+        --pytorch_config_toml {x}{os.path.join('pytorch', 'configs', 'rnnt.toml')}{x} \
+        --pytorch_checkpoint {x}{env['MLC_ML_MODEL_FILE_WITH_PATH']}{x} \
+        --log_dir {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
+        {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
+
         env['SKIP_VERIFY_ACCURACY'] = True
 
     elif "stable-diffusion-xl" in env['MLC_MODEL']:
@@ -356,21 +343,24 @@ def get_run_cmd_reference(
 
         backend = env['MLC_MLPERF_BACKEND']
         max_batchsize = env.get('MLC_MLPERF_LOADGEN_MAX_BATCHSIZE', '1')
-        cmd = env['MLC_PYTHON_BIN_WITH_PATH'] + " main.py " \
-            " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \
-            " --profile " + 'stable-diffusion-xl-pytorch ' + \
-            " --dataset " + 'coco-1024' +  \
-            " --dataset-path " + env['MLC_DATASET_PATH_ROOT'] + \
-            ' --dtype ' + env['MLC_MLPERF_MODEL_PRECISION'].replace("bfloat", "bf").replace("float", "fp") + \
-            " --device " + device + \
-            env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + \
-            scenario_extra_options + mode_extra_options + \
-            " --output " + env['MLC_MLPERF_OUTPUT_DIR'] + \
-            " --model-path " + env['MLC_ML_MODEL_PATH']
+
+        cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} main.py \
+        --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} \
+        --profile stable-diffusion-xl-pytorch \
+        --dataset coco-1024 \
+        --dataset-path {x}{env['MLC_DATASET_PATH_ROOT']}{x} \
+        --dtype {env['MLC_MLPERF_MODEL_PRECISION'].replace("bfloat", "bf").replace("float", "fp")} \
+        --device {device} \
+        {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} \
+        {scenario_extra_options} {mode_extra_options} \
+        --output {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
+        --model-path {x}{env['MLC_ML_MODEL_PATH']}{x}"""
+
         if "--max-batchsize" not in cmd:
-            cmd += " --max-batchsize " + max_batchsize
+            cmd += f" --max-batchsize {max_batchsize}"
+
         if env.get('MLC_COCO2014_SAMPLE_ID_PATH', '') != '':
-            cmd += " --ids-path " + env['MLC_COCO2014_SAMPLE_ID_PATH']
+            cmd += f""" --ids-path {x}{env['MLC_COCO2014_SAMPLE_ID_PATH']}{x}"""
 
     elif "llama2-70b" in env['MLC_MODEL']:
         env['RUN_DIR'] = os.path.join(
@@ -379,14 +369,14 @@ def get_run_cmd_reference(
             "llama2-70b")
         backend = env['MLC_MLPERF_BACKEND']
 
-        cmd = env['MLC_PYTHON_BIN_WITH_PATH'] + " main.py " \
-            " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \
-            " --dataset-path " + env['MLC_DATASET_PREPROCESSED_PATH'] + \
-            " --device " + device.replace("cuda", "cuda:0") + \
-            env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + \
-            scenario_extra_options + mode_extra_options + \
-            " --output-log-dir " + env['MLC_MLPERF_OUTPUT_DIR'] + \
-            ' --dtype ' + env['MLC_MLPERF_MODEL_PRECISION']
+        cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} main.py \
+        --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} \
+        --dataset-path {x}{env['MLC_DATASET_PREPROCESSED_PATH']}{x} \
+        --device {device.replace("cuda", "cuda:0")} \
+        {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} \
+        {scenario_extra_options} {mode_extra_options} \
+        --output-log-dir {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
+        --dtype {env['MLC_MLPERF_MODEL_PRECISION']}"""
 
         if env.get('MLC_MLPERF_INFERENCE_API_SERVER', '') != '':
             env['MLC_VLLM_SERVER_MODEL_NAME'] = env.get(
@@ -396,7 +386,7 @@ def get_run_cmd_reference(
                     --model-path {env['MLC_VLLM_SERVER_MODEL_NAME']} \
                     --api-model-name {env['MLC_VLLM_SERVER_MODEL_NAME']} --vllm """
         else:
-            cmd += f" --model-path {env['LLAMA2_CHECKPOINT_PATH']}"
+            cmd += f""" --model-path {x}{env['LLAMA2_CHECKPOINT_PATH']}{x}"""
 
         if env.get('MLC_MLPERF_INFERENCE_NUM_WORKERS', '') != '':
             cmd += f" --num-workers {env['MLC_MLPERF_INFERENCE_NUM_WORKERS']}"
@@ -410,15 +400,16 @@ def get_run_cmd_reference(
             "language",
             "mixtral-8x7b")
         backend = env['MLC_MLPERF_BACKEND']
-        cmd = env['MLC_PYTHON_BIN_WITH_PATH'] + " main.py " \
-            " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \
-            " --dataset-path " + env['MLC_DATASET_MIXTRAL_PREPROCESSED_PATH'] + \
-            " --device " + device.replace("cuda", "cuda:0") + \
-            env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + \
-            scenario_extra_options + mode_extra_options + \
-            " --output-log-dir " + env['MLC_MLPERF_OUTPUT_DIR'] + \
-            ' --dtype ' + env['MLC_MLPERF_MODEL_PRECISION'] + \
-            " --model-path " + env['MIXTRAL_CHECKPOINT_PATH']
+        cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} main.py \
+        --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} \
+        --dataset-path {x}{env['MLC_DATASET_MIXTRAL_PREPROCESSED_PATH']}{x} \
+        --device {device.replace('cuda', 'cuda:0')} \
+        {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} \
+        {scenario_extra_options} {mode_extra_options} \
+        --output-log-dir {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
+        --dtype {env['MLC_MLPERF_MODEL_PRECISION']} \
+        --model-path {x}{env['MIXTRAL_CHECKPOINT_PATH']}{x}"""
+
         cmd = cmd.replace("--count", "--total-sample-count")
         cmd = cmd.replace("--max-batchsize", "--batch-size")
 
@@ -426,11 +417,11 @@ def get_run_cmd_reference(
 
         env['RUN_DIR'] = env['MLC_MLPERF_INFERENCE_3DUNET_PATH']
         backend = env['MLC_MLPERF_BACKEND'] if env['MLC_MLPERF_BACKEND'] != 'tf' else 'tensorflow'
-        cmd = env['MLC_PYTHON_BIN_WITH_PATH'] + " run.py --backend=" + backend + " --scenario=" + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \
-            env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + \
-            " --model=" + env['MLC_ML_MODEL_FILE_WITH_PATH'] + \
-            " --preprocessed_data_dir=" + env['MLC_DATASET_KITS19_PREPROCESSED_PATH'] + \
-            scenario_extra_options + mode_extra_options + dataset_options
+        cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} run.py --backend={backend} --scenario={env['MLC_MLPERF_LOADGEN_SCENARIO']} \
+        {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} \
+        --model={x}{env['MLC_ML_MODEL_FILE_WITH_PATH']}{x} \
+        --preprocessed_data_dir={x}{env['MLC_DATASET_KITS19_PREPROCESSED_PATH']}{x} \
+        {scenario_extra_options} {mode_extra_options} {dataset_options}"""
 
         env['LOG_PATH'] = env['MLC_MLPERF_OUTPUT_DIR']
         env['SKIP_VERIFY_ACCURACY'] = True
@@ -465,12 +456,11 @@ def get_run_cmd_reference(
         if env['MLC_MLPERF_LOADGEN_MODE'] == "accuracy" and env['MLC_MLPERF_LOADGEN_SCENARIO'] == "Offline":
             mode_extra_options += " --samples-per-query-offline=1"
 
-        cmd = " ./run_local.sh " + env['MLC_MLPERF_BACKEND'] + \
-            ' dlrm ' + dataset + ' ' + env['MLC_MLPERF_DEVICE'] + " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + " " + \
-            env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + \
-            config + mlperf_bin_loader_string + \
-            ' --samples-to-aggregate-quantile-file=./tools/dist_quantile.txt ' + \
-            scenario_extra_options + mode_extra_options + dataset_options + gpu_options
+        cmd = f""" ./run_local.sh {env['MLC_MLPERF_BACKEND']} dlrm {dataset} {env['MLC_MLPERF_DEVICE']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} \
+        {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} \
+        {config} {mlperf_bin_loader_string} \
+        --samples-to-aggregate-quantile-file=./tools/dist_quantile.txt {scenario_extra_options} {mode_extra_options} {dataset_options} {gpu_options}"""
+
         cmd = cmd.replace("--count", "--count-queries")
         env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
 
@@ -489,15 +479,16 @@ def get_run_cmd_reference(
             mode_extra_options += " --dataset igbh-dgl-tiny --profile debug-dgl "
 
         # have to add the condition for running in debug mode or real run mode
-        cmd = env['MLC_PYTHON_BIN_WITH_PATH'] + " main.py " \
-            " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \
-            " --dataset-path " + env['MLC_DATASET_IGBH_PATH'] + \
-            " --device " + device.replace("cuda", "gpu") + \
-            env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + \
-            scenario_extra_options + mode_extra_options + \
-            " --output " + env['MLC_MLPERF_OUTPUT_DIR'] + \
-            ' --dtype ' + dtype_rgat + \
-            " --model-path " + env['RGAT_CHECKPOINT_PATH']
+
+        cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} main.py \
+            --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} \
+            --dataset-path {x}{env['MLC_DATASET_IGBH_PATH']}{x} \
+            --device {device.replace("cuda", "gpu")} \
+            {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} \
+            {scenario_extra_options} {mode_extra_options} \
+            --output {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
+            --dtype {dtype_rgat} \
+            --model-path {x}{env['RGAT_CHECKPOINT_PATH']}{x}"""
 
         if env.get('MLC_ACTIVATE_RGAT_IN_MEMORY', '') == "yes":
             cmd += " --in-memory "
@@ -511,14 +502,14 @@ def get_run_cmd_reference(
         if int(env.get('MLC_MLPERF_INFERENCE_TP_SIZE', '')) > 1:
             env['VLLM_WORKER_MULTIPROC_METHOD'] = "spawn"
 
-        cmd = env['MLC_PYTHON_BIN_WITH_PATH'] + " main.py " \
-            " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \
-            " --dataset-path " + env['MLC_DATASET_LLAMA3_PATH'] + \
-            " --output-log-dir " + env['MLC_MLPERF_OUTPUT_DIR'] + \
-            ' --dtype ' + env['MLC_MLPERF_MODEL_PRECISION'] + \
-            " --model-path " + env['MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH'] + \
-            " --tensor-parallel-size " + env['MLC_MLPERF_INFERENCE_TP_SIZE'] + \
-            " --vllm "
+        cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} main.py \
+            --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} \
+            --dataset-path {x}{env['MLC_DATASET_LLAMA3_PATH']}{x} \
+            --output-log-dir {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
+            --dtype {env['MLC_MLPERF_MODEL_PRECISION']} \
+            --model-path {x}{env['MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH']}{x} \
+            --tensor-parallel-size {env['MLC_MLPERF_INFERENCE_TP_SIZE']} \
+            --vllm"""
 
         if env.get('MLC_MLPERF_INFERENCE_NUM_WORKERS', '') != '':
             cmd += f" --num-workers {env['MLC_MLPERF_INFERENCE_NUM_WORKERS']}"
@@ -532,21 +523,21 @@ def get_run_cmd_reference(
             "automotive",
             "3d-object-detection")
 
-        cmd = env['MLC_PYTHON_BIN_WITH_PATH'] + " main.py " \
-            " --dataset waymo" + \
-            " --dataset-path " + env['MLC_DATASET_WAYMO_PATH'] + \
-            " --lidar-path " + env['MLC_ML_MODEL_POINT_PAINTING_PATH'] + \
-            " --segmentor-path " + env['MLC_ML_MODEL_DPLAB_RESNET50_PATH'] + \
-            " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + \
-            " --output " + env['MLC_MLPERF_OUTPUT_DIR'] + \
-            " --dtype " + env['MLC_MLPERF_MODEL_PRECISION'].replace("float", "fp") + \
-            scenario_extra_options + \
-            env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + mode_extra_options
+        cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} main.py \
+            --dataset waymo \
+            --dataset-path {x}{env['MLC_DATASET_WAYMO_PATH']}{x} \
+            --lidar-path {x}{env['MLC_ML_MODEL_POINT_PAINTING_PATH']}{x} \
+            --segmentor-path {x}{env['MLC_ML_MODEL_DPLAB_RESNET50_PATH']}{x} \
+            --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} \
+            --output {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
+            --dtype {env['MLC_MLPERF_MODEL_PRECISION'].replace('float', 'fp')} \
+            {scenario_extra_options} \
+            {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {mode_extra_options}"""
 
         if env.get('MLC_MLPERF_POINTPAINTING_TIME', '') != '':
             cmd += f" --time {env['MLC_MLPERF_POINTPAINTING_TIME']}"
 
-        print(cmd)
+        logger.info(fcmd)
 
     if env.get('MLC_NETWORK_LOADGEN', '') in ["lon", "sut"]:
         cmd = cmd + " " + "--network " + env['MLC_NETWORK_LOADGEN']

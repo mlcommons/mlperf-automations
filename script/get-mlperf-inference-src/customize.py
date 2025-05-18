@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 import shutil
 
@@ -71,7 +72,7 @@ def preprocess(i):
     }
     for submodule in possible_submodules:
         env_name = submodule.upper().replace("-", "_")
-        if env.get("MLC_SUBMODULE_" + env_name) == "yes":
+        if is_true(env.get("MLC_SUBMODULE_" + env_name)):
             submodules.append(possible_submodules[submodule])
 
     env['MLC_GIT_SUBMODULES'] = ",".join(submodules)
@@ -132,7 +133,7 @@ def postprocess(i):
             version_info = f.read().strip()
         env['MLC_MLPERF_INFERENCE_SOURCE_VERSION'] = version_info
 
-    if env.get('MLC_GET_MLPERF_IMPLEMENTATION_ONLY', '') == "yes":
+    if is_true(env.get('MLC_GET_MLPERF_IMPLEMENTATION_ONLY', '')):
         return {'return': 0}
 
     env['MLC_MLPERF_INFERENCE_CONF_PATH'] = os.path.join(

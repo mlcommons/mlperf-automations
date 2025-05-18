@@ -3,9 +3,27 @@ automation_alias: script
 automation_uid: 5b4e0237da074764
 cache: true
 category: Compiler automation
-default_version: '12'
 deps:
 - tags: detect,os
+- tags: detect,cpu
+- tags: get,generic-sys-util,_flex
+- env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_GCC_SRC_REPO_PATH
+  extra_cache_tags: gcc,src,gcc-src,gcc-src-repo
+  force_env_keys:
+  - MLC_GIT_*
+  names:
+  - gcc-src-repo
+  tags: get,git,repo
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_URL
+    _sha.:
+    - MLC_GIT_CHECKOUT_SHA
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
 env:
   MLC_GIT_URL: git://gcc.gnu.org/git/gcc.git
 post_deps:
@@ -19,7 +37,24 @@ tags:
 - gcc
 - src-gcc
 uid: faae0ebd6e1242db
-versions:
+tests:
+  run_inputs:
+    - {}
+variations:
   master:
+    group: version
+    default: true
     env:
       MLC_GIT_CHECKOUT: master
+  version.#:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT: releases/gcc-#
+  branch.#:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT: '#'
+  lang.#:
+    env:
+      +MLC_GCC_ENABLED_LANGUAGES:
+        - '#'

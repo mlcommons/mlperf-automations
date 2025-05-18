@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 import shutil
 
@@ -13,7 +14,7 @@ def preprocess(i):
     env = i['env']
     meta = i['meta']
 
-    if env.get('NVIDIA_ONLY', '') == 'yes':
+    if is_true(env.get('NVIDIA_ONLY', '')):
         env['MLC_GIT_URL'] = "https://github.com/GATEOverflow/nvidia-inference-code.git"
 
     if 'GITHUB_REPO_OWNER' in env and '<<<GITHUB_REPO_OWNER>>>' in env['MLC_GIT_URL']:

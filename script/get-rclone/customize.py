@@ -1,6 +1,7 @@
 from mlc import utils
 import os
 import configparser
+from utils import is_true
 
 
 def preprocess(i):
@@ -31,8 +32,8 @@ def preprocess(i):
     if r['return'] > 0:
         if r['return'] == 16:
             install_script = 'install'
-            if os_info['platform'] != 'windows' and env.get(
-                    'MLC_RCLONE_SYSTEM', '') == 'yes':
+            if os_info['platform'] != 'windows' and is_true(env.get(
+                    'MLC_RCLONE_SYSTEM', '')):
                 install_script += '-system'
             else:
                 if os_info['platform'] != 'windows':
@@ -90,7 +91,10 @@ def detect_version(i):
 
     version = r['version']
 
-    print(i['recursion_spaces'] + '    Detected version: {}'.format(version))
+    logger = i['automation'].logger
+    logger.info(
+        i['recursion_spaces'] +
+        '    Detected version: {}'.format(version))
 
     return {'return': 0, 'version': version}
 
@@ -99,6 +103,8 @@ def postprocess(i):
 
     os_info = i['os_info']
     env = i['env']
+
+    logger = i['automation'].logger
 
     gdrive = env.get('MLC_RCLONE_GDRIVE', '')
     if gdrive == "yes":
@@ -121,8 +127,8 @@ def postprocess(i):
 
         with open(default_config_path, 'w') as configfile:
             default_config.write(configfile)
-        print({section: dict(default_config[section])
-              for section in default_config.sections()})
+        logger.info(
+            f"{section: dict(default_config[section]) for section in default_config.sections()}")
 
     r = detect_version(i)
 
@@ -135,8 +141,8 @@ def postprocess(i):
 
     file_name = 'rclone.exe' if os_info['platform'] == 'windows' else 'rclone'
 
-    if os_info['platform'] == 'windows' or env.get(
-            'MLC_RCLONE_SYSTEM', '') != 'yes':
+    if os_info['platform'] == 'windows' or not is_true(env.get(
+            'MLC_RCLONE_SYSTEM', '')):
         cur_dir = os.getcwd()
         path_bin = os.path.join(cur_dir, file_name)
         if os.path.isfile(path_bin):

@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -12,9 +13,9 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
-    if env.get("MLC_CALIBRATE_FILTER", "") == "yes":
+    if is_true(env.get("MLC_CALIBRATE_FILTER", "")):
         i['run_script_input']['script_name'] = "run-filter"
         env['MLC_MLPERF_OPENIMAGES_CALIBRATION_FILTERED_LIST'] = os.path.join(
             os.getcwd(), "filtered.txt")

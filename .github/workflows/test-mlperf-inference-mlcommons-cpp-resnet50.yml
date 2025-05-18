@@ -9,18 +9,43 @@ on:
       - '!**.md'
 
 jobs:
+  fetch-secret:
+    runs-on: ubuntu-latest
+    outputs:
+      encrypted_secret: ${{ steps.encrypt-secret.outputs.encrypted_secret }}
+    steps:
+      - name: Load secret
+        id: op-load-secret
+        uses: 1password/load-secrets-action@v2
+        with:
+          export-env: false
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          PAT: op://7basd2jirojjckncf6qnq3azai/bzbaco3uxoqs2rcyu42rvuccga/credential
+
+      - name: Encrypt secret
+        id: encrypt-secret
+        env:
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+        run: |
+          # AES-256 encrypt
+          encrypted=$(echo "${{ steps.op-load-secret.outputs.pat }}" | \
+            openssl enc -e -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 \
+            -pass pass:"$ENCRYPTION_KEY" -base64 -A)
+
+          echo "encrypted_secret=$encrypted" >> $GITHUB_OUTPUT
+          
   build:
     name: MLPerf inference MLCommons C++ ResNet50
+    needs: [fetch-secret]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         python-version: [ "3.12" ]
-        llvm-version: [ "15.0.6", "16.0.4", "17.0.6" ]
+        compiler-string: [ "--adr.compiler.tags=gcc", "--adr.compiler.tags=aocc --env.MLC_AOCC_ACCEPT_EULA=yes", "--adr.compiler.tags=llvm --adr.compiler.version=17.0.6" ]
         os: [ubuntu-latest, windows-latest, macos-latest]
         exclude:
-          - llvm-version: "15.0.6"
-          - llvm-version: "16.0.4"
           - os: windows-latest
           - os: macos-latest
 
@@ -36,8 +61,7 @@ jobs:
     - name: Pull MLOps repository
       run: |
         mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
-        mlcr --quiet --tags=get,sys-utils-cm
-        mlcr --quiet --tags=install,prebuilt,llvm --version=${{ matrix.llvm-version }}
+        mlcr --quiet --tags=get,sys-utils-mlc
     - name: Test MLPerf Inference MLCommons C++ ResNet50 on ${{ matrix.os }}
       if: matrix.os == 'windows-latest'
       run: |
@@ -45,7 +69,7 @@ jobs:
     - name: Test MLPerf Inference MLCommons C++ ResNet50 on ${{ matrix.os }}
       if: matrix.os != 'windows-latest'
       run: |
-        mlcr app,mlperf,inference,mlcommons,cpp --submitter="MLCommons" --hw_name=gh_${{ matrix.os }} -v --quiet
+        mlcr app,mlperf,inference,mlcommons,cpp --submitter="MLCommons" --hw_name=gh_${{ matrix.os }} -v --quiet ${{ matrix.compiler-string }}
     - name: Randomly Execute Step
       id: random-check
       run: |
@@ -56,17 +80,25 @@ jobs:
           else
             echo "run_step=false" >> $GITHUB_ENV
           fi
-    - name: Retrieve secrets from Keeper
-      if: github.repository_owner == 'mlcommons' && env.run_step == 'true'
-      id: ksecrets
-      uses: Keeper-Security/ksm-action@master
-      with:
-        keeper-secret-config: ${{ secrets.KSM_CONFIG }}
-        secrets: |-
-          ubwkjh-Ii8UJDpG2EoU6GQ/field/Access Token > env:PAT
+    - name: Decrypt secret
+      id: decrypt-secret
+      shell: bash
+      env:
+        ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+        encrypted_secret: ${{ needs.fetch-secret.outputs.encrypted_secret }}
+      run: |
+        echo "Running on OS: ${{ matrix.os }}"
+
+        # Decrypt
+        decrypted=$(echo "$encrypted_secret" | \
+          openssl enc -d -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 \
+          -pass pass:"$ENCRYPTION_KEY" -base64 -A)
+          
+        echo "::add-mask::$decrypted"
+        echo "DECRYPTED_SECRET=$decrypted" >> $GITHUB_OUTPUT
     - name: Push Results
       env:
-        GITHUB_TOKEN: ${{ env.PAT }}
+        GITHUB_TOKEN: ${{ steps.decrypt-secret.outputs.decrypted_secret }}
         USER: mlcommons-bot
         EMAIL: mlcommons-bot@users.noreply.github.com
       if: github.repository_owner == 'mlcommons' && env.run_step == 'true'

@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -16,7 +17,7 @@ def preprocess(i):
         env['MLC_DUMP_RAW_PIP_FREEZE_FILE_PATH'] = os.path.join(
             os.getcwd(), "tmp-pip-freeze")
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     return {'return': 0}
 

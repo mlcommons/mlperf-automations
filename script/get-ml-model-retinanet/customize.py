@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -8,7 +9,7 @@ def preprocess(i):
 
     env = i['env']
 
-    if env.get('MLC_TMP_ML_MODEL_RETINANET_NO_NMS', '') == 'yes':
+    if is_true(env.get('MLC_TMP_ML_MODEL_RETINANET_NO_NMS', '')):
         i['run_script_input']['script_name'] = "run-no-nms"
         env['MLC_ML_MODEL_FILE_WITH_PATH'] = os.path.join(
             os.getcwd(), "retinanet.onnx")
@@ -26,7 +27,7 @@ def postprocess(i):
         env[env['MLC_ENV_NAME_ML_MODEL_FILE']
             ] = env['MLC_ML_MODEL_FILE_WITH_PATH']
 
-    if env.get("MLC_QAIC_PRINT_NODE_PRECISION_INFO", '') == 'yes':
+    if is_true(env.get("MLC_QAIC_PRINT_NODE_PRECISION_INFO", '')):
         env['MLC_ML_MODEL_RETINANET_QAIC_NODE_PRECISION_INFO_FILE_PATH'] = os.path.join(
             os.getcwd(), 'node-precision-info.yaml')
 

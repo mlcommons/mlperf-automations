@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -10,9 +11,11 @@ def preprocess(i):
 
     meta = i['meta']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     automation = i['automation']
+
+    logger = automation.logger
 
     recursion_spaces = i['recursion_spaces']
 
@@ -22,7 +25,7 @@ def preprocess(i):
 
     name = env.get('MLC_NAME', '')
     if not quiet and name == '':
-        print('')
+        logger.info('')
         x = input(
             'Enter some tag to describe this virtual env (mlperf-inf,octoml-bench,etc): ')
         x = x.strip()

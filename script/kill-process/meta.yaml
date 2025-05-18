@@ -18,5 +18,6 @@ input_mapping:
   group: MLC_KILL_PROCESS_GROUP
   pid: MLC_KILL_PROCESS_ID
   pname: MLC_KILL_PROCESS_NAME
+  busy_group: MLC_KILL_BUSIEST_PROCESS_GROUP
   
 

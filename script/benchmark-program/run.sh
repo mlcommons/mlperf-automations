@@ -20,12 +20,12 @@ if [[ ${MLC_MLPERF_POWER} == "yes" && ${MLC_MLPERF_LOADGEN_MODE} == "performance
 fi
 
 # Run
-if [ -z ${MLC_RUN_DIR} ]; then
+if [ -z "${MLC_RUN_DIR}" ]; then
   echo "MLC_RUN_DIR is not set"
   exit 1
 fi
 
-cd ${MLC_RUN_DIR}
+cd "${MLC_RUN_DIR}"
 
 if [[ "${MLC_DEBUG_SCRIPT_BENCHMARK_PROGRAM}" == "True" ]]; then
   echo "*****************************************************"

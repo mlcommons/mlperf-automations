@@ -1,5 +1,6 @@
 from mlc import utils
 import os
+from utils import is_true
 
 
 def preprocess(i):
@@ -12,7 +13,7 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     clean_cmd = ''
     cache_rm_tags = ''
@@ -36,8 +37,11 @@ def preprocess(i):
     if cache_rm_tags:
         r = mlc_cache.access({'action': 'rm', 'target': 'cache',
                               'tags': cache_rm_tags, 'f': True})
-        print(r)
-        if r['return'] != 0 and r['return'] != 16:  # ignore missing ones
+        logger.info(r)
+        # Check if return code is 0 (success)
+        # currently, the warning code is not being checked as the possibility
+        # arises only for missing cache entry
+        if r['return'] != 0:
             return r
         if r['return'] == 0:  # cache entry found
             if clean_cmd != '':

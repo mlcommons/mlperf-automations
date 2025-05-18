@@ -19,7 +19,6 @@ def postprocess(i):
     os_info = i['os_info']
     env = i['env']
     state = i['state']
-
     automation = i['automation']
     logger = automation.action_object.logger
 
@@ -47,6 +46,7 @@ def postprocess(i):
         with open(fjson, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
     except Exception as e:
+        logger.warning('CM warning: {}'.format(e))
         logger.warning('CM warning: {}'.format(e))
 
     try:

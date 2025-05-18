@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -12,10 +13,10 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     # Checking conditions
-    if env.get('MLC_FAIL_WINDOWS', '').lower() == 'true':
+    if is_true(env.get('MLC_FAIL_WINDOWS', '')):
         if os_info['platform'] == 'windows':
             return {'return': 1,
                     'error': 'CM detected fail condition: running on Windows'}

@@ -8,7 +8,7 @@ def preprocess(i):
 
     os_info = i['os_info']
     env = i['env']
-
+    logger = i['automation'].logger
     dockerfile_path = env.get('MLC_DOCKERFILE_WITH_PATH', '')
     if dockerfile_path != '' and os.path.exists(dockerfile_path):
         build_dockerfile = False
@@ -83,7 +83,7 @@ def preprocess(i):
 
     CMD = ''.join(XCMD)
 
-    print(CMD)
+    logger.info(CMD)
 
     env['MLC_DOCKER_BUILD_CMD'] = CMD
 
@@ -102,6 +102,7 @@ def get_image_name(env):
 def postprocess(i):
 
     env = i['env']
+    logger = i['automation'].logger
 
     # Check if need to push docker image to the Docker Hub
     if is_true(env.get('MLC_DOCKER_PUSH_IMAGE', '')):
@@ -118,12 +119,12 @@ def postprocess(i):
             with open(dockerfile_path + '.build.bat', 'w') as f:
                 f.write(PCMD + '\n')
 
-        print(PCMD)
+        logger.info(PCMD)
 
-        print('')
+        logger.info('')
 
         r = os.system(PCMD)
-        print('')
+        logger.info('')
 
         if r > 0:
             return {'return': 1, 'error': 'pushing to Docker Hub failed'}

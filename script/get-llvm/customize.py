@@ -21,7 +21,7 @@ def preprocess(i):
             if os.path.exists(os.path.join(llvm_path, 'bin', 'clang')):
                 env['MLC_TMP_PATH'] = os.path.join(llvm_path, 'bin')
             else:
-                for l in os.listdir(aocc_path):
+                for l in os.listdir(llvm_path):
                     if os.path.exists(os.path.join(
                             llvm_path, l, 'bin', 'clang')):
                         llvm_path = os.path.join(llvm_path, l)
@@ -56,8 +56,11 @@ def detect_version(i):
         return r
 
     version = r['version']
+    logger = i['automation'].logger
 
-    print(i['recursion_spaces'] + '    Detected version: {}'.format(version))
+    logger.info(
+        i['recursion_spaces'] +
+        '    Detected version: {}'.format(version))
 
     return {'return': 0, 'version': version}
 

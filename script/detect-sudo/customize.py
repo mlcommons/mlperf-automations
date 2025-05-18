@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 import subprocess
 import select
@@ -18,13 +19,16 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    logger = automation.logger
+
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     if os.geteuid() == 0:
         env['MLC_SUDO'] = ''  # root user does not need sudo
         env['MLC_SUDO_USER'] = "yes"
     else:
-        if can_execute_sudo_without_password() or prompt_sudo() == 0:
+        if can_execute_sudo_without_password(
+                logger) or prompt_sudo(logger) == 0:
             env['MLC_SUDO_USER'] = "yes"
             env['MLC_SUDO'] = 'sudo'
 
@@ -35,7 +39,7 @@ def preprocess(i):
     return {'return': 0}
 
 
-def can_execute_sudo_without_password():
+def can_execute_sudo_without_password(logger):
     try:
         # Run a harmless command using sudo
         result = subprocess.run(
@@ -52,7 +56,7 @@ def can_execute_sudo_without_password():
         else:
             return False
     except Exception as e:
-        print(f"An error occurred: {e}")
+        logger.error(f"An error occurred: {e}")
         return False
 
 
@@ -61,15 +65,17 @@ def reset_terminal():
     subprocess.run(['stty', 'sane'])
 
 
-def prompt_retry(timeout=10, default_retry=False):
+def prompt_retry(logger, timeout=10, default_retry=False):
     """Prompt the user with a yes/no question to retry the command, with a 10-second timeout."""
 
     # Check if we're in an interactive terminal
     if not sys.stdin.isatty():
         if default_retry:
-            print(f"Non-interactive environment detected. Automatically retrying.")
+            logger.info(
+                f"Non-interactive environment detected. Automatically retrying.")
         else:
-            print(f"Non-interactive environment detected. Skipping retry.")
+            logger.warning(
+                f"Non-interactive environment detected. Skipping retry.")
         return default_retry  # Automatically use the default in non-interactive terminals
 
     print(
@@ -84,14 +90,14 @@ def prompt_retry(timeout=10, default_retry=False):
         answer = sys.stdin.readline().strip().lower()
         if answer in ['y', 'n']:
             return answer == 'y'  # Return True if 'y', False if 'n'
-        print("\nInvalid input. Please enter 'y' or 'n'.")
-        return prompt_retry(timeout)  # Re-prompt on invalid input
+        logger.error("\nInvalid input. Please enter 'y' or 'n'.")
+        return prompt_retry(logger, timeout)  # Re-prompt on invalid input
     else:
-        print("\nNo input received in 10 seconds. Exiting.")
+        logger.info("\nNo input received in 10 seconds. Exiting.")
         return False  # No input within the timeout, so don't retry
 
 
-def is_user_in_sudo_group():
+def is_user_in_sudo_group(logger):
     """Check if the current user is in the 'sudo' group."""
     try:
         sudo_group = grp.getgrnam('sudo').gr_mem
@@ -100,7 +106,7 @@ def is_user_in_sudo_group():
         # 'sudo' group doesn't exist (might be different on some systems)
         return False
     except Exception as e:
-        print(f"Error checking sudo group: {str(e)}")
+        logger.error(f"Error checking sudo group: {str(e)}")
         return False
 
 
@@ -122,13 +128,15 @@ def timeout_input(prompt, timeout=15, default=""):
     return result[0]  # Return user input or default
 
 
-def prompt_sudo():
-    if os.geteuid() != 0 and not is_user_in_sudo_group():  # No sudo required for root user
+def prompt_sudo(logger):
+    if os.geteuid() != 0 and not is_user_in_sudo_group(
+            logger):  # No sudo required for root user
 
         # Prompt for the password
 
         if not os.isatty(sys.stdin.fileno()):
-            print("Skipping password prompt - non-interactive terminal detected!")
+            logger.warning(
+                "Skipping password prompt - non-interactive terminal detected!")
             password = None
         else:
             # password = getpass.getpass("Enter password (-1 to skip): ")
@@ -139,7 +147,7 @@ def prompt_sudo():
 
         # Check if the input is -1
         if password == "-1":
-            print("Skipping sudo command.")
+            logger.warning("Skipping sudo command.")
             return -1
 
         # Run the command with sudo, passing the password
@@ -161,16 +169,16 @@ def prompt_sudo():
                 )
             return 0
         except subprocess.TimeoutExpired:
-            print("Timedout")
+            logger.info("Timedout")
             reset_terminal()  # Reset terminal to sane state
             if not prompt_retry():  # If the user chooses not to retry or times out
                 return -1
         except subprocess.CalledProcessError as e:
-            print(f"Command failed: {e.output.decode('utf-8')}")
+            logger.error(f"Command failed: {e.output.decode('utf-8')}")
             reset_terminal()  # Reset terminal in case of failure
             return -1
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
+            logger.error(f"An error occurred: {str(e)}")
             reset_terminal()  # Always reset terminal after error
             return -1
 

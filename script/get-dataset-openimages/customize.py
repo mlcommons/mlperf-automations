@@ -1,17 +1,18 @@
 from mlc import utils
 import os
 import shutil
+from utils import is_true, is_false
 
 
 def preprocess(i):
 
     os_info = i['os_info']
     env = i['env']
-
-    print("")
+    logger = i['automation'].logger
+    logger.info("")
     print("Using MLCommons Inference source from '" +
           env['MLC_MLPERF_INFERENCE_SOURCE'] + "'")
-    print("")
+    logger.info("")
 
     if os_info['platform'] == 'windows':
         MLPERF_CLASSES = ['Airplane', 'Antelope', 'Apple', 'Backpack', 'Balloon', 'Banana',
@@ -69,7 +70,7 @@ def postprocess(i):
     env['MLC_DATASET_ANNOTATIONS_DIR_PATH'] = os.path.join(
         os.getcwd(), 'install', 'annotations')
 
-    if env.get('MLC_DATASET_CALIBRATION', '') == "no":
+    if is_false(env.get('MLC_DATASET_CALIBRATION', '')):
         env['MLC_DATASET_PATH_ROOT'] = os.path.join(os.getcwd(), 'install')
         env['MLC_DATASET_PATH'] = os.path.join(
             os.getcwd(), 'install', 'validation', 'data')
@@ -79,7 +80,7 @@ def postprocess(i):
         env['MLC_DATASET_VALIDATION_ANNOTATIONS_FILE_PATH'] = annotations_file_path
         env['MLC_DATASET_ANNOTATIONS_FILE_PATH'] = annotations_file_path
         env['MLC_DATASET_OPENIMAGES_VALIDATION_ANNOTATIONS_FILE_PATH'] = annotations_file_path
-        if env.get("MLC_DATASET_OPENIMAGES_CUSTOM_ANNOTATIONS", '') == "yes":
+        if is_true(env.get("MLC_DATASET_OPENIMAGES_CUSTOM_ANNOTATIONS", '')):
             annotations_file_src = env['MLC_DATASET_OPENIMAGES_ANNOTATIONS_FILE_PATH']
             shutil.copy(
                 annotations_file_src,

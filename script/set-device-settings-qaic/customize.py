@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -12,9 +13,9 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
-    if env.get('MLC_QAIC_ECC', '') == 'yes':
+    if is_true(env.get('MLC_QAIC_ECC', '')):
         import json
         for device in env['MLC_QAIC_DEVICES'].split(","):
             ecc_template = {}

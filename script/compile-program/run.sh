@@ -3,16 +3,16 @@
 # Compile
 
 BIN_NAME=${MLC_BIN_NAME:-run.out}
-RUN_DIR=${MLC_RUN_DIR:-.}
+RUN_DIR="${MLC_RUN_DIR:-.}"
 echo "RUN_DIR=$RUN_DIR"
 
 if [[ ${MLC_SKIP_RECOMPILE} == "yes" ]]; then
-  if [ -f ${RUN_DIR}/${BIN_NAME} ]; then
+  if [ -f "${RUN_DIR}/${BIN_NAME}" ]; then
     exit 0
   fi
 fi
 
-rm -f ${RUN_DIR}/${BIN_NAME}
+rm -f "${RUN_DIR}/${BIN_NAME}"
 
 if [ -z "${MLC_SOURCE_FOLDER_PATH}" ]; then
   echo "No source directory (MLC_SOURCE_FOLDER_PATH} specified"
@@ -28,13 +28,13 @@ echo ""
 echo "Checking compiler version ..."
 echo ""
 
-${MLC_C_COMPILER_WITH_PATH} ${MLC_C_COMPILER_FLAG_VERSION}
+"${MLC_C_COMPILER_WITH_PATH}" ${MLC_C_COMPILER_FLAG_VERSION}
 
 echo ""
 echo "Compiling source files ..."
 echo ""
 
-cd ${MLC_SOURCE_FOLDER_PATH}
+cd "${MLC_SOURCE_FOLDER_PATH}"
 test $? -eq 0 || exit 1
 
 IFS=';' read -ra FILES <<< "${MLC_C_SOURCE_FILES}"
@@ -65,7 +65,7 @@ done
 echo ""
 echo "Linking ..."
 echo ""
-CMD="${MLC_LINKER_WITH_PATH} ${MLC_LINKER_COMPILE_FLAGS}  *.o -o ${RUN_DIR}/${BIN_NAME} ${MLC_LD_LIBRARY_PATH} ${MLC_LINKER_FLAGS}"
+CMD="${MLC_LINKER_WITH_PATH} ${MLC_LINKER_COMPILE_FLAGS}  *.o -o \"${RUN_DIR}/${BIN_NAME}\" ${MLC_LD_LIBRARY_PATH} ${MLC_LINKER_FLAGS}"
 echo $CMD
 eval $CMD
 

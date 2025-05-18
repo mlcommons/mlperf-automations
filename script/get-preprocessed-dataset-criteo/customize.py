@@ -32,7 +32,7 @@ def preprocess(i):
             "recommendation_v2",
             "torchrec_dlrm",
             "scripts")
-        env['MLC_RUN_CMD'] = f'cd {run_dir} && bash ./process_Criteo_1TB_Click_Logs_dataset.sh {dataset_path} {tmp_dir} {output_dir} '
+        env['MLC_RUN_CMD'] = f"""cd '{run_dir}' && bash ./process_Criteo_1TB_Click_Logs_dataset.sh '{dataset_path}' '{tmp_dir}' '{output_dir}' """
 
         print("Using MLCommons Training source from '" +
               env['MLC_MLPERF_TRAINING_SOURCE'] + "'")

@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -11,6 +12,8 @@ def preprocess(i):
     run_script_input = i['run_script_input']
 
     recursion_spaces = i['recursion_spaces']
+
+    logger = i['automation'].logger
 
     conda_prefix_name = env.get('MLC_CONDA_PREFIX_NAME', '')
     r = None
@@ -45,10 +48,10 @@ def preprocess(i):
     if conda_prefix_name != '' or r['return'] > 0:
         if conda_prefix_name != '' or r['return'] == 16:
             if conda_prefix_name == '':
-                if env.get('MLC_TMP_FAIL_IF_NOT_FOUND', '').lower() == 'yes':
+                if is_true(env.get('MLC_TMP_FAIL_IF_NOT_FOUND', '')):
                     return r
 
-                print(recursion_spaces + '    # {}'.format(r['error']))
+                logger.error(recursion_spaces + '    # {}'.format(r['error']))
 
             # Attempt to run installer
             r = automation.run_native_script(
@@ -83,7 +86,7 @@ def detect_version(i):
 
 def postprocess(i):
     env = i['env']
-
+    logger = i['automation'].logger
     r = detect_version(i)
     if r['return'] > 0:
         return r
@@ -106,6 +109,8 @@ def postprocess(i):
 
     version = r['version']
 
-    print(i['recursion_spaces'] + '    Detected version: {}'.format(version))
+    logger.info(
+        i['recursion_spaces'] +
+        '    Detected version: {}'.format(version))
 
     return {'return': 0, 'version': version}

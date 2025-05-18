@@ -1,5 +1,6 @@
 from mlc import utils
 import os
+from utils import is_true
 
 
 def preprocess(i):
@@ -8,7 +9,7 @@ def preprocess(i):
 
     env = i['env']
 
-    if env.get('MLC_PYTHON_CONDA', '') == 'yes' and env.get(
+    if is_true(env.get('MLC_PYTHON_CONDA', '')) and env.get(
             'MLC_CONDA_BIN_PATH', '') != '':
         env['MLC_PYTHON_BIN_WITH_PATH'] = os.path.join(
             env['MLC_CONDA_BIN_PATH'], "python")
@@ -64,7 +65,10 @@ def detect_version(i):
 
     version = r['version']
 
-    print(i['recursion_spaces'] + '      Detected version: {}'.format(version))
+    logger = i['automation'].logger
+    logger.info(
+        i['recursion_spaces'] +
+        '      Detected version: {}'.format(version))
 
     return {'return': 0, 'version': version}
 

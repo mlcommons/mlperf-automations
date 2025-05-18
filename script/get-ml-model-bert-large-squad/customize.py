@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -7,7 +8,7 @@ def preprocess(i):
     os_info = i['os_info']
 
     env = i['env']
-    if env.get('MLC_ML_MODEL_BERT_PACKED', '') == 'yes':
+    if is_true(env.get('MLC_ML_MODEL_BERT_PACKED', '')):
         i['run_script_input']['script_name'] = "run-packed"
         env['MLC_BERT_CONFIG_PATH'] = os.path.join(
             env['MLC_MLPERF_INFERENCE_BERT_PATH'], "bert_config.json")

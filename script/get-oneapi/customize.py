@@ -28,26 +28,30 @@ def preprocess(i):
                                            'run_script_input': i['run_script_input'],
                                            'recursion_spaces': recursion_spaces})
         if r['return'] > 0:
-            # Uncomment when MLC script for installing oneapi compiler is integrated
-            # Initial finding suggests that oneapi could be installed without
-            # hastle in linux using apt, but is tricky in windows
+            r = i['automation'].run_native_script(
+                {'run_script_input': i['run_script_input'], 'env': env, 'script_name': 'install'})
+            if r['return'] > 0:
+                return r
+            version_prefix = env['MLC_ONEAPI_INSTALL_VERSION_PREFIX']
+            env['MLC_TMP_PATH'] = os.path.join(
+                os.getcwd(), "install", version_prefix, "bin")
 
-            #           if r['return'] == 16:
-            #               if env.get('MLC_TMP_FAIL_IF_NOT_FOUND','').lower() == 'yes':
-            #                   return r
-            #
-            #               print (recursion_spaces+'    # {}'.format(r['error']))
-            #
-            #               # Attempt to run installer
-            #               r = {'return':0, 'skip':True, 'script':{'tags':'install,gcc,src'}}
-
-            return r
+            r = i['automation'].find_artifact({'file_name': file_name_c,
+                                               'env': env,
+                                               'os_info': os_info,
+                                               'default_path_env_key': 'PATH',
+                                               'detect_version': True,
+                                               'env_path_key': 'MLC_ICX_BIN_WITH_PATH',
+                                               'run_script_input': i['run_script_input'],
+                                               'recursion_spaces': recursion_spaces})
+            if r['return'] > 0:
+                return r
 
     return {'return': 0}
 
 
 def detect_version(i):
-    r = i['automation'].parse_version({'match_text': r'oneAPI\s+.*\(([\d.]+)\)',
+    r = i['automation'].parse_version({'match_text': r'oneAPI\s+.* Compiler\s+([\d+.]+)',
                                        'group_number': 1,
                                        'env_key': 'MLC_ONEAPI_VERSION',
                                        'which_env': i['env']})
@@ -89,6 +93,16 @@ def postprocess(i):
     env['MLC_ONEAPI_COMPILER_FLAG_OUTPUT'] = ''
     env['MLC_ONEAPI_COMPILER_WITH_PATH'] = found_file_path
     env['MLC_ONEAPI_COMPILER_FLAG_VERSION'] = 'version'
+
+    env['MLC_DEPENDENT_CACHED_PATH'] = found_file_path
+
+    list_keys = ['+LD_LIBRARY_PATH']
+    for key in list_keys:
+        if not env.get(key):
+            env[key] = []
+
+    env['+LD_LIBRARY_PATH'].append(os.path.join(
+        env['MLC_ONEAPI_INSTALLED_PATH'], "lib"))
 
     # env['MLC_COMPILER_FLAGS_FAST'] = "-O3"
     # env['MLC_LINKER_FLAGS_FAST'] = "-O3"

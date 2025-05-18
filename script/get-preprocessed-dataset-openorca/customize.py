@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import *
 import os
 import shutil
 
@@ -7,10 +8,9 @@ def preprocess(i):
 
     env = i['env']
 
-    if str(env.get('MLC_DATASET_PREPROCESSED_BY_MLC', '')
-           ).lower() in ["yes", "1", "true"]:
+    if is_true(str(env.get('MLC_DATASET_PREPROCESSED_BY_MLC', ''))):
         run_dir = os.getcwd()
-        if env.get('MLC_DATASET_CALIBRATION', '') == "yes":
+        if is_true(env.get('MLC_DATASET_CALIBRATION', '')):
             env['MLC_DATASET_CALIBRATION_PATH'] = os.path.join(
                 env['MLC_OPENORCA_PREPROCESSED_ROOT'],
                 "open_orca_gpt4_tokenized_llama.calibration_1000.pkl.gz")
@@ -28,7 +28,7 @@ def preprocess(i):
         inference_src = env['MLC_MLPERF_INFERENCE_SOURCE']
         run_dir = os.path.join(inference_src, 'language', 'llama2-70b')
         model_dir = env['MLC_ML_MODEL_PATH']
-        if env.get('MLC_DATASET_CALIBRATION', '') == "yes":
+        if is_true(env.get('MLC_DATASET_CALIBRATION', '')):
             return {'return': 1, 'error': 'No raw preprocessing information is available for openorca calibration. Please use _mlcommons variation to use the MLCommons shared calibration dataset'}
         else:
             env['MLC_DATASET_PREPROCESSED_PATH'] = os.path.join(

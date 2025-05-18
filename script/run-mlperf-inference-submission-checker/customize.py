@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 import subprocess
 
@@ -7,6 +8,7 @@ def preprocess(i):
 
     os_info = i['os_info']
     env = i['env']
+    logger = i['automation'].logger
     q = '"' if os_info['platform'] == 'windows' else "'"
 
     submission_dir = env.get("MLC_MLPERF_INFERENCE_SUBMISSION_DIR", "")
@@ -30,7 +32,7 @@ def preprocess(i):
     submission_checker_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission",
                                            "submission_checker.py")
 
-    if env['MLC_MLPERF_SHORT_RUN'] == "yes":
+    if is_true(env['MLC_MLPERF_SHORT_RUN']):
         import shutil
         new_submission_checker_file = os.path.join(
             os.path.dirname(submission_checker_file),
@@ -51,7 +53,7 @@ def preprocess(i):
     else:
         extra_map = ""
 
-    if env.get('MLC_MLPERF_SKIP_POWER_CHECK', 'no') == "yes":
+    if is_true(env.get('MLC_MLPERF_SKIP_POWER_CHECK', 'no')):
         power_check = " --skip-power-check"
     else:
         power_check = ""
@@ -83,7 +85,7 @@ def preprocess(i):
     report_generator_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission",
                                          "generate_final_report.py")
     env['MLC_RUN_CMD'] = CMD
-    print(CMD)
+    logger.info(f"{CMD}")
     env['MLC_POST_RUN_CMD'] = env['MLC_PYTHON_BIN_WITH_PATH'] + ' ' + q + report_generator_file + q + ' --input summary.csv ' + \
         x_version + \
         x_submission_repo_name + \

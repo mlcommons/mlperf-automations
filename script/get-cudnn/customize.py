@@ -12,6 +12,8 @@ def preprocess(i):
 
     env = i['env']
 
+    logger = i['automation'].logger
+
     env['MLC_TMP_RUN_COPY_SCRIPT'] = "no"
 
     # If TAR file is not explicitly specified, search
@@ -106,7 +108,7 @@ def preprocess(i):
         return {
             'return': 1, 'error': 'Please envoke mlcr get,cudnn --tar_file={full path to the cuDNN tar file}'}
 
-    print('Untaring file - can take some time ...')
+    logger.info('Untaring file - can take some time ...')
 
     my_tar = tarfile.open(os.path.expanduser(env['MLC_CUDNN_TAR_FILE_PATH']))
     folder_name = my_tar.getnames()[0]
@@ -133,7 +135,8 @@ def preprocess(i):
         print(
             "Copying cudnn include files to {}(CUDA_INCLUDE_PATH)".format(cuda_inc_path))
         shutil.copytree(inc_path, cuda_inc_path, dirs_exist_ok=True)
-        print("Copying cudnn lib files to {}CUDA_LIB_PATH".format(cuda_lib_path))
+        logger.info(
+            "Copying cudnn lib files to {}CUDA_LIB_PATH".format(cuda_lib_path))
         shutil.copytree(lib_path, cuda_lib_path, dirs_exist_ok=True)
     except BaseException:
         # Need to copy to system path via run.sh

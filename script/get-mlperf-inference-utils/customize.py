@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 import sys
 
@@ -13,7 +14,7 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     utils_path = env['MLC_TMP_CURRENT_SCRIPT_PATH']
 
