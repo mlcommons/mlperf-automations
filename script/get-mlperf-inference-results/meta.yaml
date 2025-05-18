@@ -7,7 +7,6 @@ default_env:
   MLC_GIT_CHECKOUT: master
   MLC_GIT_DEPTH: --depth 1
   MLC_GIT_PATCH: 'no'
-default_version: v4.0
 deps: []
 new_env_keys:
 - MLC_MLPERF_INFERENCE_RESULTS_*

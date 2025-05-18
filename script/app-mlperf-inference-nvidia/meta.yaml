@@ -363,8 +363,7 @@ variations:
       pytorch:
         tags: _for-nvidia-mlperf-inference-v5.0
       pycuda:
-        version_min: "2024.1"
-        version: ""
+        version: "2024.1"
       nvidia-inference-server:
         tags: _mlcommons,_v5.0
   v4.1:
