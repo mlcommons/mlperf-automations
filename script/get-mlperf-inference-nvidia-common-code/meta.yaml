@@ -32,7 +32,7 @@ variations:
     group: repo-owner
   nvidia-only:
     group: repo-owner
-  r5.0:
+  v5.0:
     add_deps_recursive:
       mlperf-inference-results:
         tags: _code-only,_v5.0
