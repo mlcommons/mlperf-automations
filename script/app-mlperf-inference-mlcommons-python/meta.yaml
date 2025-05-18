@@ -1326,6 +1326,8 @@ variations:
           _find_links_url.:
             - MLC_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL
       - tags: get,generic-python-lib,_package.dgl
+        version_max: '2.4.0'
+        version_max_usable: '2.4.0'
         update_tags_from_env_with_prefix:
           _find_links_url.:
             - MLC_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL_DGL

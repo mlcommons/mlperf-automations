@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -46,7 +47,7 @@ def preprocess(i):
             env['MLC_DATASET_IGBH_SIZE']} {env.get('MLC_IGBH_CALIBRATION_FLAG', '')} """
 
     # compress graph(for glt implementation)
-    if env.get('MLC_IGBH_GRAPH_COMPRESS', '') == "yes":
+    if is_true(env.get('MLC_IGBH_GRAPH_COMPRESS', '')):
         run_cmd += x_sep + \
             f"""{env['MLC_PYTHON_BIN_WITH_PATH']} tools/compress_graph.py --path {download_loc} --dataset_size {env['MLC_DATASET_IGBH_SIZE']} --layout {env['MLC_IGBH_GRAPH_COMPRESS_LAYOUT']}
             """

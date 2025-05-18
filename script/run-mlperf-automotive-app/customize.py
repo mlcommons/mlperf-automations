@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import copy
 from tabulate import tabulate
+from utils import *
 
 summary_ext = ['.csv', '.json', '.xlsx']
 
@@ -20,8 +21,9 @@ def preprocess(i):
     state = i['state']
     script_path = i['run_script_input']['path']
     mlc = i['automation'].action_object
+    logger = i['automation'].logger
 
-    if env.get('MLC_RUN_DOCKER_CONTAINER', '') == "yes":
+    if is_true(env.get('MLC_RUN_DOCKER_CONTAINER', '')):
         return {'return': 0}
 
     dump_version_info = env.get('MLC_DUMP_VERSION_INFO', True)
@@ -65,8 +67,8 @@ def preprocess(i):
         if 'MLC_RERUN' not in env:
             env['MLC_RERUN'] = "yes"
 
-    if str(env.get('MLC_SYSTEM_POWER', 'no')).lower(
-    ) != "no" or env.get('MLC_MLPERF_POWER', '') == "yes":
+    if not is_false(env.get('MLC_SYSTEM_POWER', 'no')) or is_true(
+            env.get('MLC_MLPERF_POWER', '')):
         power_variation = ",_power"
         env['MLC_MLPERF_POWER'] = "yes"
     else:
@@ -92,7 +94,7 @@ def preprocess(i):
         if 'MLC_MLPERF_LOADGEN_SCENARIO' not in env:
             env['MLC_MLPERF_LOADGEN_SCENARIO'] = "Offline"
 
-    if env.get('MLC_MLPERF_LOADGEN_ALL_SCENARIOS', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_LOADGEN_ALL_SCENARIOS', '')):
         env['MLC_MLPERF_LOADGEN_SCENARIOS'] = get_valid_scenarios(
             env['MLC_MODEL'],
             system_meta['system_type'],
@@ -103,7 +105,7 @@ def preprocess(i):
         env['MLC_MLPERF_LOADGEN_SCENARIOS'] = [
             env['MLC_MLPERF_LOADGEN_SCENARIO']]
 
-    if env.get('MLC_MLPERF_LOADGEN_ALL_MODES', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_LOADGEN_ALL_MODES', '')):
         env['MLC_MLPERF_LOADGEN_MODES'] = ["performance", "accuracy"]
     else:
         env['MLC_MLPERF_LOADGEN_MODES'] = [env['MLC_MLPERF_LOADGEN_MODE']]
@@ -190,15 +192,14 @@ def preprocess(i):
     if clean:
         path_to_clean = output_dir
 
-        print('=========================================================')
-        print('Cleaning results in {}'.format(path_to_clean))
+        logger.info('=========================================================')
+        logger.info('Cleaning results in {}'.format(path_to_clean))
         if os.path.exists(path_to_clean):
             shutil.rmtree(path_to_clean)
 
-        print('=========================================================')
+        logger.info('=========================================================')
 
-    if str(env.get('MLC_MLPERF_USE_DOCKER', '')
-           ).lower() in ["1", "true", "yes"]:
+    if is_true(str(env.get('MLC_MLPERF_USE_DOCKER', ''))):
         action = "docker"
         del (env['OUTPUT_BASE_DIR'])
         state = {}
@@ -242,7 +243,8 @@ def preprocess(i):
                         "MLC_TMP_"):
                     del env_copy[key]
 
-            print(f"\nRunning loadgen scenario: {scenario} and mode: {mode}")
+            logger.info(
+                f"\nRunning loadgen scenario: {scenario} and mode: {mode}")
             ii = {'action': action, 'automation': 'script', 'tags': scenario_tags, 'quiet': 'true',
                   'env': env_copy, 'input': inp, 'state': state, 'add_deps': copy.deepcopy(add_deps), 'add_deps_recursive':
                   copy.deepcopy(add_deps_recursive), 'ad': ad, 'adr': copy.deepcopy(adr), 'v': verbose, 'print_env': print_env, 'print_deps': print_deps, 'dump_version_info': dump_version_info}
@@ -264,7 +266,7 @@ def preprocess(i):
             if state.get('docker', {}):
                 del (state['docker'])
 
-        if env.get("MLC_MLPERF_LOADGEN_COMPLIANCE", "") == "yes":
+        if is_true(env.get("MLC_MLPERF_LOADGEN_COMPLIANCE", "")):
             for test in test_list:
                 env_copy = copy.deepcopy(env)
                 for key in env_copy:
@@ -293,10 +295,11 @@ def preprocess(i):
             # executing CM
             import mlperf_utils  # noqa
 
-            print(sut)
+            logger.info(f"{sut}")
             result_table, headers = mlperf_utils.get_result_table(
                 state["mlc-mlperf-inference-results"][sut])
-            print(tabulate(result_table, headers=headers, tablefmt="pretty"))
+            logger.info(
+                f"{tabulate(result_table, headers=headers, tablefmt='pretty')}")
 
             print(
                 f"\nThe MLPerf inference results are stored at {output_dir}\n")
@@ -348,18 +351,18 @@ def postprocess(i):
 
     env = i['env']
     state = i['state']
-
+    logger = i['automation'].logger
     if env.get('MLC_MLPERF_IMPLEMENTATION', '') == 'reference':
         x1 = env.get('MLC_MLPERF_INFERENCE_SOURCE', '')
         x2 = env.get('MLC_MLPERF_INFERENCE_CONF_PATH', '')
 
         if x1 != '' and x2 != '':
-            print('')
+            logger.info('')
             print(
                 'Path to the MLPerf inference benchmark reference sources: {}'.format(x1))
             print(
                 'Path to the MLPerf inference reference configuration file: {}'.format(x2))
-            print('')
+            logger.info('')
 
     return {'return': 0}
 

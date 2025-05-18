@@ -1,14 +1,14 @@
 from mlc import utils
 import os
 import subprocess
+from utils import *
 
 
 def preprocess(i):
 
     env = i['env']
 
-    if str(env.get('MLC_DETECT_USING_HIP-PYTHON', '')
-           ).lower() in ["1", "yes", "true"]:
+    if is_true(str(env.get('MLC_DETECT_USING_HIP-PYTHON', ''))):
         i['run_script_input']['script_name'] = 'detect'
 
     return {'return': 0}

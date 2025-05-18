@@ -1,6 +1,7 @@
 from mlc import utils
 import os
 import re
+from utils import *
 
 
 def preprocess(i):
@@ -10,14 +11,14 @@ def preprocess(i):
     env = i['env']
     state = i['state']
     automation = i['automation']
-
+    logger = automation.logger
     # Use VERSION_CMD as CHECK_CMD if no CHECK_CMD is set
     if env.get('MLC_SYS_UTIL_VERSION_CMD', '') != '' and env.get(
             'MLC_SYS_UTIL_CHECK_CMD', '') == '':
         env['MLC_SYS_UTIL_CHECK_CMD'] = env['MLC_SYS_UTIL_VERSION_CMD']
 
     if env.get('MLC_GENERIC_SYS_UTIL_RUN_MODE', '') == "install":
-        if env.get('MLC_SYS_UTIL_INSTALL_WITH_RETRY', '') == "yes":
+        if is_true(env.get('MLC_SYS_UTIL_INSTALL_WITH_RETRY', '')):
             i['run_script_input']['script_name'] = "install-with-retry"
         else:
             i['run_script_input']['script_name'] = "install"
@@ -28,7 +29,7 @@ def preprocess(i):
             r = automation.run_native_script(
                 {'run_script_input': i['run_script_input'], 'env': env, 'script_name': 'detect'})
             if r['return'] != 0:  # detection failed, do install via prehook_deps
-                print("detection failed, going for installation")
+                logger.warning("detection failed, going for installation")
                 env['MLC_GENERIC_SYS_UTIL_INSTALL_NEEDED'] = "yes"
                 return {'return': 0}
             else:  # detection is successful, no need to install
@@ -53,9 +54,9 @@ def preprocess(i):
         package_name = package.get(pm)
 
     if os_info['platform'] == 'windows' and not package_name:
-        print('')
-        print('WARNING: for now skipping get-generic-sys-util on Windows ...')
-        print('')
+        logger.info('')
+        logger.warning('For now skipping get-generic-sys-util on Windows ...')
+        logger.info('')
 
         return {'return': 0}
 
@@ -69,8 +70,8 @@ def preprocess(i):
     if not package_name:
         if str(env.get('MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE', '')
                ).lower() in ["1", "true", "yes"]:
-            print(
-                f"WARNING: No package name specified for {pm} and util name {util}. Ignoring it...")
+            logger.warning(
+                f"No package name specified for {pm} and util name {util}. Ignoring it...")
             env['MLC_TMP_GENERIC_SYS_UTIL_PACKAGE_INSTALL_IGNORED'] = 'yes'
             return {'return': 0}
         else:
@@ -130,7 +131,7 @@ def detect_version(i):
     version_env_key = f"MLC_{env['MLC_SYS_UTIL_NAME'].upper()}_VERSION"
     version_check_re = env.get('MLC_SYS_UTIL_VERSION_RE', '')
     group_number = env.get('MLC_TMP_VERSION_DETECT_GROUP_NUMBER', 1)
-
+    logger = i['automation'].logger
     # Confirm that the regex pattern and file are present
     if version_check_re == '' or not os.path.exists("tmp-ver.out"):
         version = "undetected"
@@ -144,7 +145,7 @@ def detect_version(i):
             return r
 
         version = r['version']
-        print(
+        logger.info(
             i['recursion_spaces'] +
             '    Detected version: {}'.format(version))
 
@@ -156,14 +157,14 @@ def postprocess(i):
 
     version_env_key = f"MLC_{env['MLC_SYS_UTIL_NAME'].upper()}_VERSION"
 
-    if (env.get('MLC_SYS_UTIL_VERSION_CMD', '') != '' or env.get('MLC_SYS_UTIL_VERSION_CMD_OVERRIDE', '') != '') and env.get(version_env_key, '') == '' and str(env.get(
-            'MLC_TMP_GENERIC_SYS_UTIL_PACKAGE_INSTALL_IGNORED', '')).lower() not in ["yes", "1", "true"] and env.get('MLC_GET_GENERIC_SYS_UTIL_INSTALL_FAILED', '') != 'yes':
+    if (env.get('MLC_SYS_UTIL_VERSION_CMD', '') != '' or env.get('MLC_SYS_UTIL_VERSION_CMD_OVERRIDE', '') != '') and env.get(version_env_key, '') == '' and not is_true(
+            env.get('MLC_TMP_GENERIC_SYS_UTIL_PACKAGE_INSTALL_IGNORED', '')) and not is_true(env.get('MLC_GET_GENERIC_SYS_UTIL_INSTALL_FAILED', '')):
         automation = i['automation']
 
         r = automation.run_native_script(
             {'run_script_input': i['run_script_input'], 'env': env, 'script_name': 'detect'})
-        if r['return'] > 0 and str(env.get(
-                'MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE', '')).lower() not in ["1", "yes", "true"]:
+        if r['return'] > 0 and not is_true(
+                env.get('MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE', False)):
             return {'return': 1, 'error': 'Version detection failed after installation. Please check the provided version command or use env.MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE=yes to ignore the error.'}
 
         elif r['return'] == 0:

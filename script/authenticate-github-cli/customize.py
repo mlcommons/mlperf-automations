@@ -1,5 +1,6 @@
 from mlc import utils
 import os
+from utils import is_true
 
 
 def preprocess(i):
@@ -22,7 +23,7 @@ def preprocess(i):
             cmd = f" echo {env['MLC_GH_AUTH_TOKEN']} | {cmd} --with-token"
 
     env['MLC_RUN_CMD'] = cmd
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     return {'return': 0}
 

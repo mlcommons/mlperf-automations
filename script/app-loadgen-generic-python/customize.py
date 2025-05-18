@@ -11,6 +11,8 @@ def preprocess(i):
 
     env = i['env']
 
+    logger = i['automation'].logger
+
     if 'MLC_ML_MODEL_FILE_WITH_PATH' not in env:
         return {
             'return': 1, 'error': 'Please select a variation specifying the model to run'}
@@ -87,9 +89,9 @@ def preprocess(i):
 
     env['MLC_RUN_OPTS'] = run_opts
 
-    print('')
-    print('Assembled flags: {}'.format(run_opts))
-    print('')
+    logger.info('')
+    logger.info('Assembled flags: {}'.format(run_opts))
+    logger.info('')
 
     return {'return': 0}
 

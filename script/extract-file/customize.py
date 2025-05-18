@@ -22,7 +22,9 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    logger = automation.logger
+
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     filename = env.get('MLC_EXTRACT_FILEPATH', '')
     if filename == '':
@@ -91,12 +93,12 @@ def preprocess(i):
             ' > ' + q + extracted_filename + q + ' < '
 
         env['MLC_EXTRACT_TOOL'] = 'gzip '
-    elif env.get('MLC_EXTRACT_UNZIP', '') == 'yes':
+    elif is_true(env.get('MLC_EXTRACT_UNZIP', '')):
         env['MLC_EXTRACT_TOOL'] = 'unzip '
-    elif env.get('MLC_EXTRACT_UNTAR', '') == 'yes':
+    elif is_true(env.get('MLC_EXTRACT_UNTAR', '')):
         env['MLC_EXTRACT_TOOL_OPTIONS'] = ' -xvf'
         env['MLC_EXTRACT_TOOL'] = 'tar '
-    elif env.get('MLC_EXTRACT_GZIP', '') == 'yes':
+    elif is_true(env.get('MLC_EXTRACT_GZIP', '')):
         env['MLC_EXTRACT_CMD'] = 'gzip '
         env['MLC_EXTRACT_TOOL_OPTIONS'] = ' -d ' + \
             ('-k ' if not remove_extracted else '')
@@ -133,10 +135,10 @@ def preprocess(i):
         env.get('MLC_EXTRACT_TOOL_EXTRA_OPTIONS', '') + \
         ' ' + env.get('MLC_EXTRACT_TOOL_OPTIONS', '') + ' ' + x + filename + x
 
-    print('')
-    print('Current directory: {}'.format(os.getcwd()))
-    print('Command line: "{}"'.format(env['MLC_EXTRACT_CMD']))
-    print('')
+    logger.info('')
+    logger.info('Current directory: {}'.format(os.getcwd()))
+    logger.info('Command line: "{}"'.format(env['MLC_EXTRACT_CMD']))
+    logger.info('')
 
     final_file = env.get('MLC_EXTRACT_EXTRACTED_FILENAME', '')
 

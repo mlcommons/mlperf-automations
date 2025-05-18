@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 import shutil
 
@@ -11,7 +12,7 @@ def preprocess(i):
         return {'return': 1, 'error': 'Windows is not supported in this script yet'}
     env = i['env']
 
-    if env.get('MLC_MLPERF_SKIP_RUN', '') == "yes":
+    if is_true(env.get('MLC_MLPERF_SKIP_RUN', '')):
         return {'return': 0}
 
     env['MLC_MLPERF_AMD_SCRIPT_PATH'] = env['MLC_TMP_CURRENT_SCRIPT_PATH']

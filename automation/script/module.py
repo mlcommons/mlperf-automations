@@ -937,32 +937,32 @@ class ScriptAutomation(Automation):
         #           VERSIONS SHOULD NOT BE USED INSIDE VARIATIONS (in meta)!
 
         # First, take version from input
-        version = i.get('version', '').strip()
-        version_min = i.get('version_min', '').strip()
-        version_max = i.get('version_max', '').strip()
-        version_max_usable = i.get('version_max_usable', '').strip()
+        version = str(i.get('version', '')).strip()
+        version_min = str(i.get('version_min', '')).strip()
+        version_max = str(i.get('version_max', '')).strip()
+        version_max_usable = str(i.get('version_max_usable', '')).strip()
 
         # Second, take from env
         if version == '':
-            version = env.get('MLC_VERSION', '')
+            version = str(env.get('MLC_VERSION', ''))
         if version_min == '':
-            version_min = env.get('MLC_VERSION_MIN', '')
+            version_min = str(env.get('MLC_VERSION_MIN', ''))
         if version_max == '':
-            version_max = env.get('MLC_VERSION_MAX', '')
+            version_max = str(env.get('MLC_VERSION_MAX', ''))
         if version_max_usable == '':
-            version_max_usable = env.get(
-                'MLC_VERSION_MAX_USABLE', '')
+            version_max_usable = str(env.get(
+                'MLC_VERSION_MAX_USABLE', ''))
 
         # Third, take from meta
         if version == '':
-            version = meta.get('version', '')
+            version = str(meta.get('version', ''))
         if version_min == '':
-            version_min = meta.get('version_min', '')
+            version_min = str(meta.get('version_min', ''))
         if version_max == '':
-            version_max = meta.get('version_max', '')
+            version_max = str(meta.get('version_max', ''))
         if version_max_usable == '':
-            version_max_usable = meta.get(
-                'version_max_usable', '')
+            version_max_usable = str(meta.get(
+                'version_max_usable', ''))
 
         # Update env with resolved versions
         notes = []
@@ -1388,6 +1388,7 @@ class ScriptAutomation(Automation):
                       'target': 'cache',
                       'search_tags': tmp_tags,
                       'script_alias': meta['alias'],
+                      'extra_tags': ",".join(extra_cache_tags),
                       'tags': ','.join(tmp_tags),
                       'meta': cached_meta,
                       'force': True}
@@ -3188,7 +3189,7 @@ class ScriptAutomation(Automation):
                                     item_value[i] = l_item.replace(
                                         "#", variation_tag_dynamic_suffix)
                         else:
-                            value[item] = value[item].replace(
+                            value[item] = str(value[item]).replace(
                                 "#", variation_tag_dynamic_suffix)
 
             else:  # scalar value, never used?
@@ -3401,6 +3402,11 @@ class ScriptAutomation(Automation):
                 for t in update_tags_from_env:
                     if env.get(t, '').strip() != '':
                         d['tags'] += "," + env[t]
+
+                update_tags_if_env = d.get("update_tags_if_env", [])
+                for t in update_tags_if_env:
+                    if not is_dep_tobe_skipped(update_tags_if_env[t], env):
+                        d['tags'] += "," + t
 
                 inherit_variation_tags = d.get("inherit_variation_tags", False)
                 skip_inherit_variation_groups = d.get(
@@ -4468,6 +4474,11 @@ pip install mlcflow
     def docker(self, i):
         from script.docker import docker_run
         return docker_run(self, i)
+
+    ############################################################
+    def experiment(self, i):
+        from script.experiment import experiment_run
+        return experiment_run(self, i)
 
     ##########################################################################
 
@@ -5765,10 +5776,16 @@ def update_state_from_meta(meta, env, state, const, const_state, deps, post_deps
     for c_meta in run_state['update_meta_if_env']:
         if is_dep_tobe_skipped(c_meta, env):
             continue
+        utils.merge_dicts({'dict1': default_env, 'dict2': c_meta.get(
+            'default_env', {}), 'append_lists': True, 'append_unique': True})
         utils.merge_dicts({'dict1': env, 'dict2': c_meta.get(
             'env', {}), 'append_lists': True, 'append_unique': True})
+        utils.merge_dicts({'dict1': const, 'dict2': c_meta.get(
+            'const', {}), 'append_lists': True, 'append_unique': True})
         utils.merge_dicts({'dict1': state, 'dict2': c_meta.get(
             'state', {}), 'append_lists': True, 'append_unique': True})
+        utils.merge_dicts({'dict1': const_state, 'dict2': c_meta.get(
+            'const_state', {}), 'append_lists': True, 'append_unique': True})
         if c_meta.get('docker', {}):
             if not state.get('docker', {}):
                 state['docker'] = {}
@@ -5776,6 +5793,10 @@ def update_state_from_meta(meta, env, state, const, const_state, deps, post_deps
                                'dict2': c_meta['docker'],
                                'append_lists': True,
                                'append_unique': True})
+
+    # Updating again in case update_meta_if_env happened
+    for key in default_env:
+        env.setdefault(key, default_env[key])
 
     update_const = meta.get('const', {})
     if update_const:

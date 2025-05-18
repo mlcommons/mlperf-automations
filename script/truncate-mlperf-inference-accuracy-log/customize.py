@@ -8,10 +8,11 @@ def preprocess(i):
 
     os_info = i['os_info']
     env = i['env']
+    logger = i['automation'].logger
     submission_dir = env.get("MLC_MLPERF_INFERENCE_SUBMISSION_DIR", "")
 
     if submission_dir == "":
-        print("Please set MLC_MLPERF_INFERENCE_SUBMISSION_DIR")
+        logger.error("Please set MLC_MLPERF_INFERENCE_SUBMISSION_DIR")
         return {'return': 1, 'error': 'MLC_MLPERF_INFERENCE_SUBMISSION_DIR is not specified in env in run-mlperf-accuracy-log-truncator'}
 
     submitter = env.get("MLC_MLPERF_SUBMITTER", "CTuning")

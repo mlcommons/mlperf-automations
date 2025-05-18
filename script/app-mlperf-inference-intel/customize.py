@@ -11,6 +11,8 @@ def preprocess(i):
         return {'return': 1, 'error': 'Windows is not supported in this script yet'}
     env = i['env']
 
+    logger = i['automation'].logger
+
     if env.get('MLC_MLPERF_SKIP_RUN', '') == "yes":
         return {'return': 0}
 
@@ -104,7 +106,7 @@ def preprocess(i):
                 os.path.dirname(env['MLC_ML_MODEL_FILE_WITH_PATH']), 'retinanet-int8-model.pth')
 
     elif env['MLC_LOCAL_MLPERF_INFERENCE_INTEL_RUN_MODE'] == "build_harness":
-        print(f"Harness Root: {harness_root}")
+        logger.info(f"Harness Root: {harness_root}")
         if "bert" in env['MLC_MODEL']:
             i['run_script_input']['script_name'] = "build_bert_harness"
             env['MLC_MLPERF_INFERENCE_INTEL_HARNESS_PATH'] = os.path.join(
@@ -162,7 +164,7 @@ def preprocess(i):
                     env[model_dir_name])
 
     elif env['MLC_LOCAL_MLPERF_INFERENCE_INTEL_RUN_MODE'] == "run_harness":
-        print(f"Harness Root: {harness_root}")
+        logger.info(f"Harness Root: {harness_root}")
         if env.get('MLC_MLPERF_LOADGEN_MODE', '') == "compliance":
             audit_path = env['MLC_MLPERF_INFERENCE_AUDIT_PATH']
             shutil.copy(audit_path, env['MLC_RUN_DIR'])

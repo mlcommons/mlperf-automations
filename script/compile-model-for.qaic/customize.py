@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -12,7 +13,9 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    logger = automation.logger
+
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     if env.get('MLC_REGISTER_CACHE', '') == '':
 
@@ -21,7 +24,7 @@ def preprocess(i):
             return r
         cmd = r['cmd']
 
-        print("Compiling from " + os.getcwd())
+        logger.info("Compiling from " + os.getcwd())
 
         env['MLC_QAIC_MODEL_FINAL_COMPILATION_CMD'] = cmd
 
@@ -38,7 +41,7 @@ def preprocess(i):
             os.path.join(
                 os.getcwd(),
                 "elfs"))
-        print(r)
+        logger.info(r)
 
     return {'return': 0}
 
@@ -49,7 +52,7 @@ def construct_compilation_cmd(env):
         ' ' + env.get('MLC_QAIC_MODEL_COMPILER_ARGS_SUT', '')
     batchsize = env.get('MLC_QAIC_MODEL_BATCH_SIZE')
 
-    if env.get('MLC_QAIC_MODEL_QUANTIZATION', '') == 'yes':
+    if is_true(env.get('MLC_QAIC_MODEL_QUANTIZATION', '')):
         profile_string = " -load-profile=" + \
             env['MLC_QAIC_MODEL_PROFILE_WITH_PATH']
     else:

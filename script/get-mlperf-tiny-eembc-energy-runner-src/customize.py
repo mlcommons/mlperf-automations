@@ -25,6 +25,8 @@ def postprocess(i):
     env = i['env']
     state = i['state']
 
+    logger = i['automation'].logger
+
     env['MLC_EEMBC_ENERGY_RUNNER_SRC'] = os.path.join(os.getcwd(), 'src')
     datasets_src_path = os.path.join(os.getcwd(), 'src', 'datasets')
     env['MLC_EEMBC_ENERGY_RUNNER_SRC_DATASETS'] = datasets_src_path
@@ -34,8 +36,8 @@ def postprocess(i):
 
     sessions_path = os.path.join(home_directory, 'eembc', 'runner', 'sessions')
 
-    print('')
-    print('Path to EEMBC runner sessions: {}'.format(sessions_path))
+    logger.info('')
+    logger.info('Path to EEMBC runner sessions: {}'.format(sessions_path))
 
     env['MLC_EEMBC_ENERGY_RUNNER_SESSIONS'] = sessions_path
 
@@ -50,16 +52,16 @@ def postprocess(i):
         'ulp-mlperf',
         'datasets')
 
-    print('')
-    print('Path to EEMBC runner datasets: {}'.format(datasets_path))
+    logger.info('')
+    logger.info('Path to EEMBC runner datasets: {}'.format(datasets_path))
 
     if not os.path.isdir(datasets_path):
         os.makedirs(datasets_path)
 
     env['MLC_EEMBC_ENERGY_RUNNER_DATASETS'] = datasets_path
 
-    print('')
-    print('Copying datasets to EEMBC user space ...')
+    logger.info('')
+    logger.info('Copying datasets to EEMBC user space ...')
 
     shutil.copytree(datasets_src_path, datasets_path, dirs_exist_ok=True)
 

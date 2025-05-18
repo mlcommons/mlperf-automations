@@ -12,8 +12,7 @@ def preprocess(i):
         return {'return': 1, 'error': 'Windows is not supported in this script yet'}
     env = i['env']
 
-    if str(env.get('MLC_RUN_STATE_DOCKER', '')
-           ).lower() in ['1', 'true', 'yes']:
+    if is_true(env.get('MLC_RUN_STATE_DOCKER', '')):
         return {'return': 0}
 
     if env.get('MLC_MODEL', '') == '':
@@ -26,8 +25,8 @@ def preprocess(i):
         return {
             'return': 1, 'error': 'Please select a variation specifying the device to run on'}
 
-    if env.get('MLC_MLPERF_SKIP_RUN',
-               '') == "yes" and make_command == "run_harness":
+    if is_true(env.get('MLC_MLPERF_SKIP_RUN', '')
+               ) and make_command == "run_harness":
         return {'return': 0}
 
     env['MLPERF_SCRATCH_PATH'] = env['MLC_NVIDIA_MLPERF_SCRATCH_PATH']
@@ -641,7 +640,7 @@ def preprocess(i):
             run_config += f" --audio_buffer_num_lines={audio_buffer_num_lines}"
 
         use_fp8 = str(env.get('MLC_MLPERF_NVIDIA_HARNESS_USE_FP8', ''))
-        if use_fp8 and use_fp8.lower() not in ["no", "false", "0", ""]:
+        if use_fp8 and not is_false(use_fp8):
             run_config += f" --use_fp8"
 
         if "llama2" in env["MLC_MODEL"]:
@@ -649,7 +648,7 @@ def preprocess(i):
             run_config += f" --tensor_parallelism={tmp_tp_size}"
 
         enable_sort = env.get('MLC_MLPERF_NVIDIA_HARNESS_ENABLE_SORT')
-        if enable_sort and enable_sort.lower() not in ["no", "false", "0"]:
+        if enable_sort and not is_false(enable_sort):
             run_config += f" --enable_sort"
 
         sdxl_server_batcher_time_limit = env.get(
@@ -675,8 +674,7 @@ def preprocess(i):
             env.get(
                 'MLC_MLPERF_NVIDIA_HARNESS_SKIP_POSTPROCESS',
                 ''))
-        if skip_postprocess and skip_postprocess.lower() not in [
-                "no", "false", "0", ""]:
+        if skip_postprocess and not is_false(skip_postprocess):
             run_config += f" --skip_postprocess"
 
         if test_mode:

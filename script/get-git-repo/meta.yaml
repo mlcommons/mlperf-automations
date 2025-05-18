@@ -36,7 +36,7 @@ post_deps:
   - pull-git-repo
   tags: pull,git,repo
 print_env_at_the_end:
-  MLC_GIT_CHECKOUT_PATH: CM cache path to the Git repo
+  MLC_GIT_CHECKOUT_PATH: MLC cache path to the Git repo
 tags:
 - get
 - git

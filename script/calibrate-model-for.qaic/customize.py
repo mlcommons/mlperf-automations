@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 import sys
 import yaml
@@ -14,9 +15,11 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    logger = automation.logger
 
-    if env.get('MLC_CREATE_INPUT_BATCH', '') == 'yes':
+    quiet = is_true(env.get('MLC_QUIET', False))
+
+    if is_true(env.get('MLC_CREATE_INPUT_BATCH', '')):
         r = create_batched_inputs(env)
         if r['return'] > 0:
             return r
@@ -26,7 +29,7 @@ def preprocess(i):
         return r
     cmd = r['cmd']
 
-    print("Profiling from " + os.getcwd())
+    logger.info("Profiling from " + os.getcwd())
 
     env['MLC_RUN_CMD'] = cmd
 
@@ -74,7 +77,7 @@ def construct_calibration_cmd(env):
     compiler_params = env['MLC_QAIC_COMPILER_PARAMS']
     batchsize = env.get('MLC_QAIC_MODEL_BATCH_SIZE', "1")
     cmd = env['MLC_QAIC_EXEC_PATH'] + " "
-    if env.get('MLC_CREATE_INPUT_BATCH', '') == 'yes':
+    if is_true(env.get('MLC_CREATE_INPUT_BATCH', '')):
         cmd += " -input-list-file=batched_input_files  -batchsize=" + batchsize + " "
     cmd += compiler_params + " -dump-profile=profile.yaml -model=" + \
         env['MLC_ML_MODEL_FILE_WITH_PATH']
@@ -213,8 +216,3 @@ if isinstance(doc,                     if )
     return {'return': 0}
 
 
-def get_scale_offset(min_val, max_val):
-    total_range = max_val - min_val
-    scale = total_range /256.0
-    offset = round(-min_val / scale)
-    return scale, offset

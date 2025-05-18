@@ -11,6 +11,8 @@ def preprocess(i):
 
     automation = i['automation']
 
+    logger = automation.logger
+
     recursion_spaces = i['recursion_spaces']
 
     run_script_input = i['run_script_input']
@@ -42,7 +44,7 @@ def preprocess(i):
 
     sdk_manager_file = 'sdkmanager' + ext
 
-    print('')
+    logger.info('')
 
     found = False
 
@@ -76,8 +78,8 @@ def preprocess(i):
 
         env['MLC_ANDROID_CMDLINE_TOOLS_URL'] = package_url
 
-        print('')
-        print('Downloading from {} ...'.format(package_url))
+        logger.info('')
+        logger.info('Downloading from {} ...'.format(package_url))
 
         cm = automation.action_object
 
@@ -89,7 +91,7 @@ def preprocess(i):
 
         filename = r['filename']
 
-        print('Unzipping file {}'.format(filename))
+        logger.info('Unzipping file {}'.format(filename))
 
         r = cm.access({'action': 'unzip_file',
                        'automation': 'utils,dc2743f8450541e3',
@@ -123,7 +125,7 @@ def preprocess(i):
     paths.append(sdk_manager_dir)
 
     # Prepare SDK
-    print('Preparing Android SDK manager ...')
+    logger.info('Preparing Android SDK manager ...')
 
     r = automation.run_native_script(
         {'run_script_input': run_script_input, 'env': env, 'script_name': 'prepare-sdk-manager'})

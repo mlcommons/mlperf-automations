@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -12,7 +13,7 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     csv_file = env.get('MLC_CSV_FILE', '')
     md_file = env.get('MLC_MD_FILE', '')

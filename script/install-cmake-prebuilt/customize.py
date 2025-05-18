@@ -11,6 +11,8 @@ def preprocess(i):
 
     automation = i['automation']
 
+    logger = automation.logger
+
     recursion_spaces = i['recursion_spaces']
 
     need_version = env.get('MLC_VERSION', '')
@@ -18,7 +20,7 @@ def preprocess(i):
         return {'return': 1,
                 'error': 'internal problem - MLC_VERSION is not defined in env'}
 
-    print(recursion_spaces + '    # Requested version: {}'.format(need_version))
+    logger.info(f"{recursion_spaces}    # Requested version: {need_version}")
 
     version_split = need_version.split(".")
     while len(version_split) < 3:
@@ -66,10 +68,10 @@ def preprocess(i):
     package_url = 'https://github.com/Kitware/CMake/releases/download/v' + \
         need_version + '/' + package_name
 
-    print(recursion_spaces + '    # Prepared package URL: {}'.format(package_url))
+    logger.info(f"{recursion_spaces}    # Prepared package URL: {package_url}")
 
-    print('')
-    print('Downloading from {} ...'.format(package_url))
+    logger.info('')
+    logger.info(f"Downloading from {package_url} ...")
 
     r = download_file({
         'url': package_url})
@@ -80,7 +82,7 @@ def preprocess(i):
 
     # Check what to do with this file depending on OS
     if os_info['platform'] == 'windows':
-        print('Unzipping file {}'.format(filename))
+        logger.info(f"Unzipping file {filename}")
 
         r = unzip_file({
             'strip_folders': 1,
@@ -89,7 +91,7 @@ def preprocess(i):
             return r
 
         if os.path.isfile(filename):
-            print('Removing file {}'.format(filename))
+            logger.info(f"Removing file {filename}")
             os.remove(filename)
 
         path_bin = os.path.join(os.getcwd(), 'bin')

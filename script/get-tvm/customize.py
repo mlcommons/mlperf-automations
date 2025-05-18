@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -16,7 +17,7 @@ def postprocess(i):
     os_info = i['os_info']
 
     env = i['env']
-    if env.get('MLC_TVM_PIP_INSTALL', '') == "yes":
+    if is_true(env.get('MLC_TVM_PIP_INSTALL', '')):
         return {'return': 0}
 
     tvm_home = env['TVM_HOME']

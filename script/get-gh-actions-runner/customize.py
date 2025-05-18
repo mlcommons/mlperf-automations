@@ -1,5 +1,6 @@
 from mlc import utils
 import os
+from utils import is_true
 
 
 def preprocess(i):
@@ -12,8 +13,8 @@ def preprocess(i):
 
     automation = i['automation']
     mlc = automation.action_object
-
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    logger = automation.logger
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     cmd = env.get('MLC_GH_ACTIONS_RUNNER_COMMAND', '')
     if cmd == "config":
@@ -27,7 +28,7 @@ def preprocess(i):
         cache_rm_tags = "gh,runner,_install"
         r = mlc.access({'action': 'rm', 'automation': 'cache',
                         'tags': cache_rm_tags, 'f': True})
-        print(r)
+        logger.info(r)
         if r['return'] != 0 and r['return'] != 16:  # ignore missing ones
             return r
     elif cmd == "start":

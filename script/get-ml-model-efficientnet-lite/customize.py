@@ -10,6 +10,8 @@ def preprocess(i):
 
     automation = i['automation']
 
+    logger = automation.logger
+
     cm = automation.action_object
 
     path = os.getcwd()
@@ -17,7 +19,7 @@ def preprocess(i):
     url = env['MLC_PACKAGE_URL']
     env['MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME'] = url
 
-    print('Downloading from {}'.format(url))
+    logger.info('Downloading from {}'.format(url))
 
     r = download_file({'url': url})
     if r['return'] > 0:
@@ -25,10 +27,10 @@ def preprocess(i):
 
     filename = r['filename']
 
-    if env.get('MLC_UNZIP') == "yes" or env.get('MLC_UNTAR') == "yes":
-        if env.get('MLC_UNZIP') == "yes":
+    if is_true(env.get('MLC_UNZIP')) or is_true(env.get('MLC_UNTAR')):
+        if is_true(env.get('MLC_UNZIP')):
             cmd = "unzip "
-        elif env.get('MLC_UNTAR') == "yes":
+        elif is_true(env.get('MLC_UNTAR')):
             cmd = "tar -xvzf "
         os.system(cmd + filename)
 

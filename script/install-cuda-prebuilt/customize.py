@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -8,7 +9,7 @@ def preprocess(i):
 
     env = i['env']
 
-    if str(env.get('CUDA_SKIP_SUDO', '')).lower() == 'true':
+    if is_true(env.get('CUDA_SKIP_SUDO', '')):
         env['MLC_SUDO'] = ''
 
     meta = i['meta']
@@ -37,7 +38,7 @@ def preprocess(i):
         env['MLC_CUDA_LINUX_FILENAME']
 
     extra_options = env.get('CUDA_ADDITIONAL_INSTALL_OPTIONS', '')
-    if env.get('MLC_CUDA_INSTALL_DRIVER', '') == "yes":
+    if is_true(env.get('MLC_CUDA_INSTALL_DRIVER', '')):
         extra_options += " --driver"
     env['CUDA_ADDITIONAL_INSTALL_OPTIONS'] = extra_options
 

@@ -9,6 +9,7 @@ on:
       - '!**.md'
 
 jobs:
+          
   mlc-run:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -18,6 +19,7 @@ jobs:
         python-version: [ "3.12" ]
         backend: [ "onnxruntime", "pytorch" ]
         implementation: [ "python", "cpp" ]
+        compiler-string: [ "", "--adr.compiler.tags=aocc --env.MLC_AOCC_ACCEPT_EULA=yes" ]
         exclude:
           - backend: pytorch
             implementation: cpp
@@ -25,6 +27,8 @@ jobs:
             implementation: cpp
           - os: macos-latest
             implementation: cpp
+          - implementation: python
+            compiler-string: "--adr.compiler.tags=aocc --env.MLC_AOCC_ACCEPT_EULA=yes"
 
     steps:
     - uses: actions/checkout@v3
@@ -51,49 +55,4 @@ jobs:
     - name: Test MLPerf Inference Retinanet using ${{ matrix.backend }} on ${{ matrix.os }}
       if: matrix.os != 'windows-latest'
       run: |
-        mlcr run,mlperf,inference,generate-run-cmds,_submission,_short --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name=gh_${{ matrix.os }}_x86 --model=retinanet --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --scenario=Offline --test_query_count=5  --quiet  -v --target_qps=1
-
-    # Step for Linux/MacOS
-    - name: Randomly Execute Step (Linux/MacOS)
-      if: runner.os != 'Windows'
-      run: |
-        RANDOM_NUMBER=$((RANDOM % 10))
-        echo "Random number is $RANDOM_NUMBER"
-        if [ "$RANDOM_NUMBER" -eq 0 ]; then
-          echo "run_step=true" >> $GITHUB_ENV
-        else
-          echo "run_step=false" >> $GITHUB_ENV
-        fi
-
-    # Step for Windows
-    - name: Randomly Execute Step (Windows)
-      if: runner.os == 'Windows'
-      run: |
-        $RANDOM_NUMBER = Get-Random -Maximum 10
-        Write-Host "Random number is $RANDOM_NUMBER"
-        if ($RANDOM_NUMBER -eq 0) {
-          Write-Host "run_step=true" | Out-File -FilePath $Env:GITHUB_ENV -Append
-        } else {
-          Write-Host "run_step=false" | Out-File -FilePath $Env:GITHUB_ENV -Append
-        }
-
-    - name: Retrieve secrets from Keeper
-      if: github.repository_owner == 'mlcommons' && env.run_step == 'true'
-      id: ksecrets
-      uses: Keeper-Security/ksm-action@master
-      with:
-        keeper-secret-config: ${{ secrets.KSM_CONFIG }}
-        secrets: |-
-          ubwkjh-Ii8UJDpG2EoU6GQ/field/Access Token > env:PAT
-    - name: Push Results
-      env:
-        GITHUB_TOKEN: ${{ env.PAT }}
-      if: github.repository_owner == 'mlcommons' && env.run_step == 'true'
-      run: |
-        git config --global user.name "mlcommons-bot"
-        git config --global user.email "mlcommons-bot@users.noreply.github.com"
-        git config --global credential.https://github.com.helper ""
-        git config --global credential.https://github.com.helper "!gh auth git-credential"
-        git config --global credential.https://gist.github.com.helper ""
-        git config --global credential.https://gist.github.com.helper "!gh auth git-credential"
-        mlcr push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from R50 GH action on ${{ matrix.os }}" --quiet
+        mlcr run,mlperf,inference,generate-run-cmds,_submission,_short --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name=gh_${{ matrix.os }}_x86 --model=retinanet --implementation=${{ matrix.implementation }} --backend=${{ matrix.backend }} --device=cpu --scenario=Offline --test_query_count=5  --quiet  -v --target_qps=1 ${{ matrix.compiler-string }}

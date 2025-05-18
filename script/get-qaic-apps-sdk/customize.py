@@ -1,6 +1,7 @@
 from mlc import utils
 import os
 import xml.etree.ElementTree as et
+from utils import is_true
 
 
 def preprocess(i):
@@ -34,7 +35,7 @@ def preprocess(i):
     env['MLC_QAIC_APPS_SDK_PATH'] = path
     env['MLC_QAIC_EXEC_PATH'] = os.path.join(path, "exec", "qaic-exec")
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     return {'return': 0}
 
@@ -42,6 +43,9 @@ def preprocess(i):
 def detect_version(i):
 
     env = i['env']
+
+    logger = i['automation'].logger
+
     sdk_path = env['MLC_QAIC_APPS_SDK_PATH']
     version = None
     version_xml_path = os.path.join(sdk_path, "versions", "apps.xml")
@@ -63,7 +67,9 @@ def detect_version(i):
     if not version:
         return {'return': 1, 'error': f'qaic apps sdk version info not found'}
 
-    print(i['recursion_spaces'] + '    Detected version: {}'.format(version))
+    logger.info(
+        i['recursion_spaces'] +
+        '    Detected version: {}'.format(version))
     return {'return': 0, 'version': version}
 
 

@@ -7,7 +7,7 @@ set "SCRIPT_DIR=%MLC_TMP_CURRENT_SCRIPT_PATH%"
 
 REM Change to the specified path
 set "path=%MLC_GIT_CHECKOUT_PATH%"
-echo cd %path%
+echo cd "%path%"
 
 cd /d "%path%"
 if errorlevel 1 (

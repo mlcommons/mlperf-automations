@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -8,6 +9,8 @@ def preprocess(i):
 
     env = i['env']
 
+    logger = i['automation'].logger
+
     automation = i['automation']
     cm = automation.action_object
 
@@ -16,7 +19,7 @@ def preprocess(i):
         i['run_script_input']['script_name'] = "run-rhel"
 
     # Test (not needed - will be removed)
-    if str(env.get('MLC_SKIP_SYS_UTILS', '')).lower() in [True, 'yes', 'on']:
+    if is_true(str(env.get('MLC_SKIP_SYS_UTILS', ''))):
         return {'return': 0, 'skip': True}
 
 
@@ -24,9 +27,9 @@ def preprocess(i):
 # "detect,os"!
 
     if os_info['platform'] == 'windows':
-        print('')
-        print('This script is not used on Windows')
-        print('')
+        logger.info('')
+        logger.warning('This script is not used on Windows')
+        logger.info('')
 
    # If windows, download here otherwise use run.sh
 
@@ -80,10 +83,13 @@ def preprocess(i):
 #        env['+PATH']=[os.path.join(path, 'bin')]
 #
     else:
-        print('')
-        print('***********************************************************************')
-        print('This script will attempt to install minimal system dependencies for CM.')
-        print('Note that you may be asked for your SUDO password ...')
-        print('***********************************************************************')
+        logger.info('')
+        logger.info(
+            '***********************************************************************')
+        logger.info(
+            'This script will attempt to install minimal system dependencies for CM.')
+        logger.info('Note that you may be asked for your SUDO password ...')
+        logger.info(
+            '***********************************************************************')
 
     return {'return': 0}

@@ -1,6 +1,7 @@
 from mlc import utils
 import os
 import shutil
+from utils import is_false
 
 
 def preprocess(i):
@@ -12,7 +13,7 @@ def preprocess(i):
 
 def postprocess(i):
     env = i['env']
-    if env.get('MLC_DATASET_CALIBRATION', '') == "no":
+    if is_false(env.get('MLC_DATASET_CALIBRATION', '')):
         env['MLC_DATASET_PATH_ROOT'] = env['MLC_DATASET_OPENORCA_PATH']
         env['MLC_DATASET_PATH'] = env['MLC_DATASET_OPENORCA_PATH']
         env['MLC_DATASET_OPENORCA_PARQUET'] = os.path.join(

@@ -1,5 +1,6 @@
 from mlc import utils
 import os
+from utils import is_true
 
 
 def preprocess(i):
@@ -12,7 +13,7 @@ def preprocess(i):
 
     automation = i['automation']
 
-    quiet = (env.get('MLC_QUIET', False) == 'yes')
+    quiet = is_true(env.get('MLC_QUIET', False))
 
     if env.get('MLC_DATASET_SQUAD_CALIBRATION_SET', '') == "one":
         env['DATASET_CALIBRATION_FILE'] = os.path.join(
@@ -34,7 +35,7 @@ def preprocess(i):
 
     env['CK_ENV_MLPERF_INFERENCE'] = env['MLC_MLPERF_INFERENCE_SOURCE']
 
-    if env.get('MLC_DATASET_SQUAD_PACKED', '') == "yes":
+    if is_true(env.get('MLC_DATASET_SQUAD_PACKED', '')):
         i['run_script_input']['script_name'] = "run-packed"
         if env.get('+PYTHONPATH', '') == '':
             env['+PYTHONPATH'] = []
@@ -49,9 +50,9 @@ def postprocess(i):
     env = i['env']
     cur = os.getcwd()
 
-    if env.get('MLC_DATASET_SQUAD_PACKED', '') != "yes":
+    if not is_true(env.get('MLC_DATASET_SQUAD_PACKED', '')):
         env['MLC_DATASET_SQUAD_TOKENIZED_ROOT'] = cur
-        if env.get('MLC_DATASET_RAW', '') == "yes":
+        if is_true(env.get('MLC_DATASET_RAW', '')):
             env['MLC_DATASET_SQUAD_TOKENIZED_INPUT_IDS'] = os.path.join(
                 cur, 'bert_tokenized_squad_v1_1_input_ids.raw')
             env['MLC_DATASET_SQUAD_TOKENIZED_SEGMENT_IDS'] = os.path.join(

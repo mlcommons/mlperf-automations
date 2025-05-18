@@ -1,0 +1,35 @@
+alias: openai-call
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: MLC Script Template
+deps:
+  - tags: get,python3
+    names:
+    - python
+    - python3
+new_env_keys: []
+new_state_keys:
+- MLC_OPENAI_RESPONSE
+post_deps: []
+posthook_deps: []
+prehook_deps: []
+tags:
+- query
+- openai
+- openai-call
+- call
+input_mapping:
+  api_key: MLC_OPENAI_API_KEY
+  config_path: MLC_OPENAI_CONFIG_PATH
+  system_prompt: MLC_OPENAI_SYSTEM_PROMPT
+  user_prompt: MLC_OPENAI_USER_PROMPT
+  model: MLC_OPENAI_MODEL
+tests:
+  run_inputs: []
+uid: 8d341b0a14a64d94
+variations:
+  openai:
+    group: api_provider
+    default: true
+    env:
+      MLC_OPENAI_API_URL: 'https://api.openai.com/v1/chat/completions'

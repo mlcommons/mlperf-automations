@@ -41,10 +41,10 @@ variations:
     default: true
     env:
       MLC_EXTRACT_REMOVE_EXTRACTED: 'no'
-  no-remove-extracted:
+  remove-extracted:
     group: keep
     env:
-      MLC_EXTRACT_REMOVE_EXTRACTED: 'no'
+      MLC_EXTRACT_REMOVE_EXTRACTED: 'yes'
   path.#:
     env:
       MLC_EXTRACT_FILEPATH: '#'
