@@ -274,7 +274,7 @@ deps:
   - tags: get,generic-python-lib,_package.pycuda
     names:
     - pycuda
-    version: "2023.1"
+    version: "2022.2.2"
 
   - tags: get,generic-python-lib,_package.nvmitten
     update_tags_from_env_with_prefix:
