@@ -386,10 +386,14 @@ variations:
     env:
       MLC_NVIDIA_MITTEN_FROM_SRC: 'yes'
     docker:
+      os_version: "24.04"
       user: 'ubuntu'
       build_deps:
         - tags: detect,os
       image_name: mlperf-inference-nvidia-v5.0-common
+      build_env:
+        ENV: release
+        
     update_meta_if_env:
       - enable_if_env:
           MLC_HOST_PLATFORM_FLAVOR:
@@ -1310,7 +1314,7 @@ variations:
       mounts:
         - "${{ MLC_ML_MODEL_FILE_WITH_PATH }}:${{ MLC_ML_MODEL_FILE_WITH_PATH }}"
         - "${{ DLRM_DATA_PATH }}:${{ DLRM_DATA_PATH }}"
-      dockerfile_env:
+      env:
         MLC_ML_MODEL_FILE_WITH_PATH: "on"
 
 
