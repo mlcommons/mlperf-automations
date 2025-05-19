@@ -246,7 +246,7 @@ def preprocess(i):
 
     for key, value in config['ENV'].items():
         f.write('ENV ' + key + "=\"" + value + "\"" + EOL)
-    
+
     dockerfile_build_env = env.get('MLC_DOCKERFILE_BUILD_ENV', {})
     for key in dockerfile_build_env:
         value = dockerfile_build_env[key]
