@@ -386,6 +386,7 @@ variations:
     env:
       MLC_NVIDIA_MITTEN_FROM_SRC: 'yes'
     docker:
+      user: 'ubuntu'
       build_deps:
         - tags: detect,os
       image_name: mlperf-inference-nvidia-v5.0-common

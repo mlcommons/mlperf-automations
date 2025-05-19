@@ -249,9 +249,6 @@ def preprocess(i):
     for cmd in config['RUN_CMDS']:
         f.write('RUN ' + cmd + EOL)
 
-    if env.get('MLC_MLPERF_IMPLEMENTATION', '') == "nvidia" and env.get(
-            'MLC_MLPERF_INFERENCE_VERSION', '') == "5.0":
-        f.write('ENV ' + 'ENV' + "=\"" + 'release' + "\"" + EOL)
 
     f.write(EOL + '# Setup docker user' + EOL)
     docker_user = get_value(env, config, 'USER', 'MLC_DOCKER_USER')
@@ -261,7 +258,7 @@ def preprocess(i):
             'MLC_DOCKER_USE_DEFAULT_USER', '') == '':
         env['MLC_DOCKER_USE_DEFAULT_USER'] = 'yes'
 
-    if docker_user and not is_true(env.get('MLC_DOCKER_USE_DEFAULT_USER', '')):
+    if docker_user and not is_true(env.get('MLC_DOCKER_USE_DEFAULT_USER', '') and docker_user != 'root'):
 
         f.write('RUN groupadd -g $GID -o ' + docker_group + EOL)
 
@@ -271,15 +268,13 @@ def preprocess(i):
         user_shell = json.loads(shell)
         f.write(f"""RUN (id -u {docker_user} > /dev/null 2>&1 && usermod -u $UID {docker_user}) || useradd """ + DOCKER_USER_ID + DOCKER_GROUP + ' --create-home --shell ' + user_shell[0] + ' '
                 + docker_user + EOL)
-        f.write(f'RUN usermod -aG sudo {docker_user}' + EOL)
+        #f.write(f'RUN usermod -aG sudo {docker_user}' + EOL)
 
         f.write(
             # create the file with both lines and a trailing newline
             f"RUN printf '{docker_user} ALL=(ALL) NOPASSWD: ALL\\n"
             f"Defaults:{docker_user} !requiretty\\n' "
-            f"> /etc/sudoers.d/{docker_user} \\\n"
-            # lock down permissions
-            f"    && chmod 0440 /etc/sudoers.d/{docker_user}{EOL}"
+            f">> /etc/sudoers "+ EOL
         )
 
         f.write('USER ' + docker_user + ":" + docker_group + EOL)
