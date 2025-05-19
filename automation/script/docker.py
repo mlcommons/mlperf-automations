@@ -377,6 +377,9 @@ def docker_run(self_module, i):
             env.update({docker_input_mapping[key]: i[key]
                        for key in docker_input_mapping if key in i})
 
+        if docker_inputs.get('user'):
+            docker_settings['user'] = docker_inputs['user']
+
         # Handle environment variable-based mounts
         res = process_mounts(
             mounts,
@@ -412,6 +415,7 @@ def docker_run(self_module, i):
             'quiet': True, 'real_run': True, 'add_deps_recursive': {'build-docker-image': {'dockerfile': dockerfile_path}},
             **docker_inputs
         }
+        
         r = self_module.action_object.access(mlc_docker_input)
         if r['return'] > 0:
             return r

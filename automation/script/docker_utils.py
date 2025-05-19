@@ -452,7 +452,10 @@ def get_container_path(value, username="mlcuser", extract_parent_folder=False):
 
     new_value = ''
     if "cache" in path_split and "local" in path_split:
-        new_path_split = ["", "home", username, "MLC", "repos"]
+        if username == "root":
+            new_path_split = ["", "root", "MLC", "repos"]
+        else:
+            new_path_split = ["", "home", username, "MLC", "repos"]
         repo_entry_index = path_split.index("local")
         if len(path_split) >= repo_entry_index + 3:
             new_path_split1 = new_path_split + \
