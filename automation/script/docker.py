@@ -415,7 +415,7 @@ def docker_run(self_module, i):
             'quiet': True, 'real_run': True, 'add_deps_recursive': {'build-docker-image': {'dockerfile': dockerfile_path}},
             **docker_inputs
         }
-        
+
         r = self_module.action_object.access(mlc_docker_input)
         if r['return'] > 0:
             return r
