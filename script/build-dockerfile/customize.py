@@ -275,7 +275,7 @@ def preprocess(i):
 
         f.write(
             # create the file with both lines and a trailing newline
-            f"RUN printf '{docker_user} ALL=(ALL) NOPASSWD:ALL\\n"
+            f"RUN printf '{docker_user} ALL=(ALL) NOPASSWD: ALL\\n"
             f"Defaults:{docker_user} !requiretty\\n' "
             f"> /etc/sudoers.d/{docker_user} \\\n"
             # lock down permissions
