@@ -21,7 +21,7 @@ def preprocess(i):
     logger = i['automation'].logger
 
     if env.get('MLC_MLPERF_IMPLEMENTATION', '') == 'nvidia':
-        if "nvidia" in env.get('MLC_CUDA_DEVICE_PROP_GPU_NAME', '') and env.get(
+        if "nvidia" in env.get('MLC_CUDA_DEVICE_PROP_GPU_NAME', '').lower() and env.get(
                 'MLC_NVIDIA_GPU_NAME', '') == '':
             # extract the Nvidia GPU model name automatically
             env['MLC_NVIDIA_GPU_NAME'] = env['MLC_CUDA_DEVICE_PROP_GPU_NAME'].lower(
