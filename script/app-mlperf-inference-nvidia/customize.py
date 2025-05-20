@@ -520,19 +520,23 @@ def preprocess(i):
             run_config += f" --dla_inference_streams={dla_inference_streams}"
 
         if env.get('MLC_MLPERF_INFERENCE_VERSION', '') == "5.0":
-            gpu_batch_size = state.get('batch_size', env.get('MLC_MLPERF_NVIDIA_HARNESS_GPU_BATCH_SIZE'))
-            dla_batch_size = state.get('dla_batch_size', env.get('MLC_MLPERF_NVIDIA_HARNESS_DLA_BATCH_SIZE'))
+            gpu_batch_size = state.get('batch_size', env.get(
+                'MLC_MLPERF_NVIDIA_HARNESS_GPU_BATCH_SIZE'))
+            dla_batch_size = state.get('dla_batch_size', env.get(
+                'MLC_MLPERF_NVIDIA_HARNESS_DLA_BATCH_SIZE'))
         else:
-            gpu_batch_size = env.get('MLC_MLPERF_NVIDIA_HARNESS_GPU_BATCH_SIZE')
-            dla_batch_size = env.get('MLC_MLPERF_NVIDIA_HARNESS_DLA_BATCH_SIZE')
-            
+            gpu_batch_size = env.get(
+                'MLC_MLPERF_NVIDIA_HARNESS_GPU_BATCH_SIZE')
+            dla_batch_size = env.get(
+                'MLC_MLPERF_NVIDIA_HARNESS_DLA_BATCH_SIZE')
+
         if gpu_batch_size:
             if env.get('MLC_MLPERF_INFERENCE_VERSION', '') == "5.0":
                 gpu_batch_size = ",".join(
                     f"{key}:{value}" for key,
                     value in gpu_batch_size.items())
             run_config += f" --gpu_batch_size={gpu_batch_size}"
-            
+
         if dla_batch_size:
             if env.get('MLC_MLPERF_INFERENCE_VERSION', '') == "5.0":
                 dla_batch_size = ",".join(
