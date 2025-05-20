@@ -363,8 +363,6 @@ variations:
         tags: _for-nvidia-mlperf-inference-v5.0
       pycuda:
         version: "2024.1"
-      nvidia-inference-server:
-        tags: _mlcommons,_v5.0
   v4.1:
     group: version
     env:
