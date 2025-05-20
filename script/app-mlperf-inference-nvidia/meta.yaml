@@ -586,15 +586,19 @@ variations:
   sdxl,v5.0: 
     # nvidia-ammo is decommisioned and model-opt is being used which is built with TRTLLM
     deps:
+    - tags: get,generic-python-lib,_package.torch
+      version: "2.7.0"
     - tags: get,generic-python-lib,_package.torchrec
-      version: "0.6.0"
+      version: "1.1.0"
     - tags: get,generic-python-lib,_package.torchmetrics
-      version: "1.0.3"
+      version: "1.7.1"
     - tags: get,generic-python-lib,_package.typeguard
     - tags: get,generic-python-lib,_package.onnx
       names:
         - onnx
       version: "1.17.0"
+    - tags: get,generic-python-lib,_package.onnx-graphsurgeon
+      version: "0.5.2"
     - tags: get,generic-python-lib,_package.numpy
       names:
         - numpy
