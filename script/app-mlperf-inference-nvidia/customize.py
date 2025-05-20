@@ -523,14 +523,18 @@ def preprocess(i):
             'MLC_MLPERF_NVIDIA_HARNESS_GPU_BATCH_SIZE'))
         if gpu_batch_size:
             if env.get('MLC_MLPERF_INFERENCE_VERSION', '') == "5.0":
-                gpu_batch_size = ",".join(f"{key}:{value}" for key, value in gpu_batch_size.items())
+                gpu_batch_size = ",".join(
+                    f"{key}:{value}" for key,
+                    value in gpu_batch_size.items())
             run_config += f" --gpu_batch_size={gpu_batch_size}"
 
         dla_batch_size = state.get('dla_batch_size', env.get(
             'MLC_MLPERF_NVIDIA_HARNESS_DLA_BATCH_SIZE'))
         if dla_batch_size:
             if env.get('MLC_MLPERF_INFERENCE_VERSION', '') == "5.0":
-                dla_batch_size = ",".join(f"{key}:{value}" for key, value in dla_batch_size.items())
+                dla_batch_size = ",".join(
+                    f"{key}:{value}" for key,
+                    value in dla_batch_size.items())
             run_config += f" --dla_batch_size={dla_batch_size}"
 
         input_format = env.get('MLC_MLPERF_NVIDIA_HARNESS_INPUT_FORMAT')
