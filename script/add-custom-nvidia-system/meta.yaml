@@ -74,6 +74,11 @@ deps:
   # Detect pycuda
   - tags: get,generic-python-lib,_pycuda
 
+  - tags: get,generic-python-lib,_package.typeguard
+    enable_if_env:
+      MLC_MLPERF_INFERENCE_VERSION:
+      - "5.0"
+
 variations:
   nvidia-only:
     group: code
@@ -100,7 +105,10 @@ variations:
     add_deps_recursive:
       nvidia-inference-common-code:
         tags: _go
-
+  v5.0:
+    add_deps_recursive:
+      nvidia-inference-common-code:
+        tags: _v5.0
 
 
 
@@ -124,3 +132,8 @@ versions:
     add_deps_recursive:
       nvidia-inference-common-code:
         version: r4.0
+
+  r5.0:
+    add_deps_recursive:
+      nvidia-inference-common-code:
+        version: r5.0

@@ -705,7 +705,16 @@ def preprocess(i):
     env['MLC_RUN_CMD'] = run_cmd
     env['MLC_RUN_DIR'] = env['MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH']
 
-#    print(env)
+    if '+LD_LIBRARY_PATH' not in env:
+        env['+LD_LIBRARY_PATH'] = []
+
+    if os.path.exists("/opt/hpcx/ucx/lib"):
+        env['+LD_LIBRARY_PATH'].append("/opt/hpcx/ucx/lib")
+
+    if os.path.exists("/opt/hpcx/ucc/lib"):
+        env['+LD_LIBRARY_PATH'].append("/opt/hpcx/ucc/lib")
+
+    #    print(env)
 
     return {'return': 0}
 

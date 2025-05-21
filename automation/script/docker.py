@@ -36,7 +36,6 @@ def dockerfile(self_module, input_params):
     state_data = input_params.get('state', {})
     constant_vars = input_params.get('const', {})
     constant_state = input_params.get('const_state', {})
-    dockerfile_env = input_params.get('dockerfile_env', {})
     tag_values = input_params.get('tags', '').split(",")
     variation_tags = [tag[1:] for tag in tag_values if tag.startswith("_")]
 
@@ -56,7 +55,6 @@ def dockerfile(self_module, input_params):
             'script_variation_tags': variation_tags
         }
         docker_settings = metadata.get('docker', {})
-        docker_settings['dockerfile_env'] = dockerfile_env
         state_data['docker'] = docker_settings
         add_deps_recursive = input_params.get('add_deps_recursive', {})
 
@@ -94,8 +92,6 @@ def dockerfile(self_module, input_params):
 
         # Set Docker-specific configurations
         docker_settings = state_data['docker']
-        docker_settings['dockerfile_env'] = dockerfile_env
-        dockerfile_env['MLC_RUN_STATE_DOCKER'] = True
 
         if not docker_settings.get('run', True) and not input_params.get(
                 'docker_run_override', False):
@@ -171,6 +167,10 @@ def dockerfile(self_module, input_params):
         if input_params.get('docker_push_image') in [True, 'True', 'yes']:
             env['MLC_DOCKER_PUSH_IMAGE'] = 'yes'
 
+        dockerfile_env = docker_inputs.get('env', {})
+        dockerfile_build_env = docker_inputs.get('build_env', {})
+
+        dockerfile_env['MLC_RUN_STATE_DOCKER'] = True
         # Generate Dockerfile
         mlc_docker_input = {
             'action': 'run', 'automation': 'script', 'tags': 'build,dockerfile',
@@ -178,6 +178,7 @@ def dockerfile(self_module, input_params):
             'comments': comments, 'run_cmd': f"{run_command_string} --quiet",
             'script_tags': input_params.get('tags'), 'env': env,
             'dockerfile_env': dockerfile_env,
+            'dockerfile_build_env': dockerfile_build_env,
             'quiet': True, 'real_run': True
         }
 
@@ -377,6 +378,9 @@ def docker_run(self_module, i):
             env.update({docker_input_mapping[key]: i[key]
                        for key in docker_input_mapping if key in i})
 
+        if docker_inputs.get('user'):
+            docker_settings['user'] = docker_inputs['user']
+
         # Handle environment variable-based mounts
         res = process_mounts(
             mounts,
@@ -412,6 +416,7 @@ def docker_run(self_module, i):
             'quiet': True, 'real_run': True, 'add_deps_recursive': {'build-docker-image': {'dockerfile': dockerfile_path}},
             **docker_inputs
         }
+
         r = self_module.action_object.access(mlc_docker_input)
         if r['return'] > 0:
             return r
