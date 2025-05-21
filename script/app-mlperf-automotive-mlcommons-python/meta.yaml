@@ -471,7 +471,7 @@ variations:
         version_max_usable: "1.26.4"
       - tags: get,generic-python-lib,_package.onnx
       - tags: get,generic-python-lib,_package.pillow
-      - tags: get,generic-python-lib,_package.pyquarternion
+      - tags: get,generic-python-lib,_package.pyquaternion
       - tags: get,generic-python-lib,_package.tqdm
       - tags: get,generic-python-lib,_package.nuscenes-devkit
       - tags: get,preprocessed,dataset,nuscenes
