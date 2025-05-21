@@ -241,7 +241,7 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
             " --output " + q + env['OUTPUT_DIR'] + q + " " + \
             env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + \
             scenario_extra_options + mode_extra_options + dataset_options
-    
+
     elif env['MLC_MODEL'] in ['bevformer']:
         run_dir = env['MLC_MLPERF_AUTOMOTIVE_BEVFORMER_PATH']
 
@@ -250,10 +250,16 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
         env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
 
         if env['MLC_MLPERF_BACKEND'] != "onnx":
-            logger.warning("Unsupported backend {MLC_MLPERF_BACKEND}, defaulting to onnx")
+            logger.warning(
+                "Unsupported backend {MLC_MLPERF_BACKEND}, defaulting to onnx")
             env['MLC_MLPERF_BACKEND'] = "onnx"
-        
-        config_path = os.path.join(run_dir, "projects", "configs", "bevformer", "bevformer_tiny.py")
+
+        config_path = os.path.join(
+            run_dir,
+            "projects",
+            "configs",
+            "bevformer",
+            "bevformer_tiny.py")
 
         cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --backend {env['MLC_MLPERF_BACKEND']} --dataset nuscenes --dataset-path {env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH']} --checkpoint {env['MLC_ML_MODEL_BEVFORMER_PATH']} --config {config_path}"""
 
@@ -263,7 +269,7 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
         env['RUN_DIR'] = run_dir
 
         env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
-        
+
         config_path = "baseline_8MP_ss_scales_fm1_5x5_all"
 
         cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --backend {env['MLC_MLPERF_BACKEND']} --dataset cognata --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_SSD_PATH']} --config {config_path}"""
