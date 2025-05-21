@@ -20,5 +20,7 @@ tags:
 - freq
 - frequency
 tests:
-  run_inputs: []
+  run_inputs:
+    - freq: 1GHz
+    - freq: ''
 uid: 1fe0500d7a2e4c6a
