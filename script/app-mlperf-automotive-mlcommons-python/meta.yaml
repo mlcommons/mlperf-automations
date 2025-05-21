@@ -177,26 +177,19 @@ deps:
     names:
     - ml-engine-pytorch
     - pytorch
-    enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - pytorch
-      - tvm-pytorch
+    skip_if_env:
       MLC_MLPERF_DEVICE:
-      - cpu
-      - rocm
+        - gpu
 
   ## Pytorch (CUDA)
   - tags: get,generic-python-lib,_torch_cuda
     names:
     - ml-engine-pytorch
     - pytorch
-    enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - pytorch
-      - tvm-pytorch
-      - ray
+    skip_if_env:
       MLC_MLPERF_DEVICE:
-      - gpu
+      - cpu
+      - rocm
 
   ## Torchvision (CPU)
   - tags: get,generic-python-lib,_torchvision
