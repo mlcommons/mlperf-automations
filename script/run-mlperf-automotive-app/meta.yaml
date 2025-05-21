@@ -218,7 +218,7 @@ variations:
   v0.5:
     group: benchmark-version
     env:
-      MLC_MLPERF_AUTOMOTIVE_VERSION: v0.5
+      MLC_MLPERF_INFERENCE_VERSION: v0.5
 
   performance-and-accuracy:
     default: true
