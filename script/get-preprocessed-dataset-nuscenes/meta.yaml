@@ -20,12 +20,12 @@ variations:
     default: true
     group: dataset-type
     env:
-      MLC_DATASET_NUSCENES_TAR_FILENAME: val_3d.tar.gz
+      MLC_DATASET_NUSCENES_EXTRACTED_FOLDER_NAME: val_3d
       MLC_DOWNLOAD_URL: mlc-nuscenes:nuscenes_dataset/preprocessed/<<<MLC_DATASET_NUSCENES_TAR_FILENAME>>>
   calibration:
     group: dataset-type
     env:
-      MLC_DATASET_NUSCENES_TAR_FILENAME: calib_3d.tar.gz
+      MLC_DATASET_NUSCENES_EXTRACTED_FOLDER_NAME: calib_3d
       MLC_DOWNLOAD_URL: mlc-nuscenes:nuscenes_dataset/preprocessed/<<<MLC_DATASET_NUSCENES_TAR_FILENAME>>>
   prebuilt:
     default: true

@@ -16,4 +16,6 @@ def preprocess(i):
 def postprocess(i):
     env = i['env']
 
+    env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'] = os.path.join(env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'], env['MLC_DATASET_NUSCENES_EXTRACTED_FOLDER_NAME'])
+
     return {'return': 0}
