@@ -378,6 +378,7 @@ variations:
     docker:
       all_gpus: 'yes'
       base_image: nvcr.io/nvidia/pytorch:24.03-py3
+      os_version: 24.03
 
   v0.5: {}
 
@@ -388,6 +389,7 @@ variations:
   v0.5,mlcommons-python,cpu:
     docker:
       base_image: ubuntu:22.04
+      os_version: 22.04
 
   # Loadgen scenarios
   offline:
