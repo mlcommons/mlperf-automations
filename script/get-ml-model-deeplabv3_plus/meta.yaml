@@ -11,7 +11,7 @@ tags:
 uid: cfb2d53b9dbc4dc0
 new_env_keys:
   - MLC_ML_MODEL_DEEPLABV3_PLUS_PATH
-  - MLC_ML_MODEL_DEEPLABV3_PLUS_PATH
+  - MLC_ML_MODEL_FILE_WITH_PATH
 print_env_at_the_end:
   MLC_ML_MODEL_DEEPLABV3_PLUS_PATH: DeepLabV3+ checkpoint path
 variations:
