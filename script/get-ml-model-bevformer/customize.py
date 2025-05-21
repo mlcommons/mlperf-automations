@@ -22,5 +22,7 @@ def postprocess(i):
 
     env['MLC_ML_MODEL_BEVFORMER_PATH'] = os.path.join(
         env['MLC_ML_MODEL_BEVFORMER_PATH'], env['MLC_ML_MODEL_FILENAME'])
+    
+    env['MLC_ML_MODEL_DEEPLABV3_PLUS_PATH'] = env['MLC_ML_MODEL_BEVFORMER_PATH']
 
     return {'return': 0}

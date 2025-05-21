@@ -9,6 +9,7 @@ tags:
 uid: 438a053f666443bd
 new_env_keys:
   - MLC_ML_MODEL_BEVFORMER_PATH
+  - MLC_ML_MODEL_DEEPLABV3_PLUS_PATH
 print_env_at_the_end:
   MLC_ML_MODEL_BEVFORMER_PATH: BevFormer checkpoint path
 variations:

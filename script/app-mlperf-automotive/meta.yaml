@@ -107,6 +107,7 @@ docker:
     - tags: get,abtf,scratch,space
   mounts:
     - "${{ MLC_ABTF_SCRATCH_PATH_DATASETS }}:${{ MLC_ABTF_SCRATCH_PATH_DATASETS }}"
+    - "${{ MLC_ML_MODEL_FILE_WITH_PATH }}:${{ MLC_ML_MODEL_FILE_WITH_PATH }}"
 
 
 # Variations to customize dependencies

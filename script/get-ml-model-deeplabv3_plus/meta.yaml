@@ -11,6 +11,7 @@ tags:
 uid: cfb2d53b9dbc4dc0
 new_env_keys:
   - MLC_ML_MODEL_DEEPLABV3_PLUS_PATH
+  - MLC_ML_MODEL_DEEPLABV3_PLUS_PATH
 print_env_at_the_end:
   MLC_ML_MODEL_DEEPLABV3_PLUS_PATH: DeepLabV3+ checkpoint path
 variations:
@@ -21,7 +22,8 @@ variations:
       MLC_MODEL_FORMAT: onnx
       MLC_MODEL_RCLONE_FILEPATH: model_checkpoint_deeplab/deeplabv3+_8mp.onnx
       MLC_ML_MODEL_FILENAME: deeplabv3+_8mp.onnx
-  onnx_dynamic:
+  dynamic: {}
+  onnx,dynamic:
     group: model-format
     env:
       MLC_MODEL_FORMAT: onnx
