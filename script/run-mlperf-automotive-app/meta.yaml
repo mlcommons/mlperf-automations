@@ -43,6 +43,7 @@ input_mapping:
   save_console_log: MLC_SAVE_CONSOLE_LOG
   execution_mode: MLC_MLPERF_RUN_STYLE
   find_performance: MLC_MLPERF_FIND_PERFORMANCE_MODE
+  framework: MLC_MLPERF_BACKEND
   gh_token: MLC_GH_TOKEN
   gpu_name: MLC_NVIDIA_GPU_NAME
   hw_name: MLC_HW_NAME

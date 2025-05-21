@@ -162,6 +162,12 @@ variations:
     add_deps_recursive:
       abtf-inference-implementation:
         tags: _onnxruntime
+      ml-model-bevformer:
+        tags: _onnx
+      ml-model-ssd-resnet50:
+        tags: _onnx
+      ml-model-deeplab-v3+:
+        tags: _onnx
 
   onnx_dynamic:
     base:
