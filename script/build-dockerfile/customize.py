@@ -228,7 +228,7 @@ def preprocess(i):
         f.write('RUN ' + env['MLC_DOCKER_EXTRA_SYS_DEPS'] + EOL)
 
     if env['MLC_DOCKER_OS'] == "ubuntu":
-        if int(env['MLC_DOCKER_OS_VERSION'].split('.')[0]) >= 23:
+        if int(str(env['MLC_DOCKER_OS_VERSION']).split('.')[0]) >= 23:
             if "--break-system-packages" not in env.get(
                     'MLC_DOCKER_PIP_INSTALL_EXTRA_FLAGS', ''):
                 env['MLC_DOCKER_PIP_INSTALL_EXTRA_FLAGS'] = " --break-system-packages"
