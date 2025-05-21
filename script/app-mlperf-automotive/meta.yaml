@@ -385,7 +385,7 @@ variations:
     docker:
       all_gpus: 'yes'
       base_image: nvcr.io/nvidia/pytorch:24.03-py3
-      os_version: 22.02
+      os_version: 22.04
 
   v0.5: {}
 
