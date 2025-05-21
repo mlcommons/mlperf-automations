@@ -290,7 +290,7 @@ def postprocess(i):
             cmd = ""
             xcmd = ""
 
-        readme_init = "*Check [CM MLPerf docs](https://docs.mlcommons.org/inference) for more details.*\n\n"
+        readme_init = "*Check [MLC MLPerf docs](https://docs.mlcommons.org/automotive) for more details.*\n\n"
 
         readme_body = "## Host platform\n\n* OS version: {}\n* CPU version: {}\n* Python version: {}\n* MLC version: {}\n\n".format(platform.platform(),
                                                                                                                                     platform.processor(), sys.version, mlc_version)
@@ -299,7 +299,7 @@ def postprocess(i):
         if repo_hash != '':
             x += ' --checkout=' + str(repo_hash)
 
-        readme_body += "## CM Run Command\n\nSee [CM installation guide](https://docs.mlcommons.org/inference/install/).\n\n" + \
+        readme_body += "## MLC Run Command\n\nSee [MLC installation guide](https://docs.mlcommons.org/mlcflow/install/).\n\n" + \
             "```bash\npip install -U mlcflow\n\nmlc rm cache -f\n\nmlc pull repo {}\n\n{}\n```".format(
                 x, xcmd)
 
@@ -339,7 +339,7 @@ def postprocess(i):
             if state.get(
                     'mlperf-inference-implementation') and state['mlperf-inference-implementation'].get('print_deps'):
 
-                extra_readme_body += "\n## Dependent automation scripts for the MLPerf Inference Implementation\n"
+                extra_readme_body += "\n## Dependent automation scripts for the MLPerf Automotive Implementation\n"
 
                 print_deps = state['mlperf-inference-implementation']['print_deps']
                 count = 1

@@ -8,7 +8,7 @@ def preprocess(i):
     os_info = i['os_info']
     env = i['env']
 
-    if env.get('MLC_INFERENCE_AUTOMOTIVE_REPO', '') == "YES":
+    if is_true(env.get('MLC_INFERENCE_AUTOMOTIVE_REPO', '')):
         env['MLC_MLPERF_INFERENCE_SOURCE'] = env['MLC_MLPERF_AUTOMOTIVE_SOURCE']
 
     if is_true(env.get('MLC_TMP_MLPERF_INFERENCE_LOADGEN_INSTALL_FROM_PIP',
