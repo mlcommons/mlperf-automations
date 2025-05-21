@@ -15,7 +15,6 @@ def preprocess(i):
         except ValueError as e:
             return {'return': 1, 'error': sys.stderr}
 
-
     os_info = i['os_info']
 
     return {'return': 0}
@@ -29,7 +28,8 @@ def parse_target_freq(raw: str) -> int | None:
     if not raw:
         return None
 
-    # match <number>[.<fraction>][unit], unit = k/M/G (case-insensitive), optional "Hz"
+    # match <number>[.<fraction>][unit], unit = k/M/G (case-insensitive),
+    # optional "Hz"
     m = re.fullmatch(r"([0-9]+(?:\.[0-9]+)?)([KMGkmg])(?:[Hh][Zz])?", raw)
     if m:
         val, unit = m.group(1), m.group(2).lower()
@@ -47,7 +47,6 @@ def parse_target_freq(raw: str) -> int | None:
         return int(raw)
 
     raise ValueError(f"Invalid frequency format: '{raw}'")
-
 
 
 def postprocess(i):
