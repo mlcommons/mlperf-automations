@@ -12,9 +12,10 @@ tags:
 - automotive
 - mlcommons
 - reference
-- run-mlperf-automotive-inference
+- run-mlperf-inference
 - object-detection
 - abtf-model
+- demo
 
 
 # Default environment
