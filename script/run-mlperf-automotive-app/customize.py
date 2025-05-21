@@ -116,7 +116,8 @@ def preprocess(i):
 
     test_list = []
 
-    variation_implementation = "_" + \
+    variation_benchmark_version = "_" + env["MLC_MLPERF_INFERENCE_VERSION"]
+    variation_implementation = ",_" + \
         env.get("MLC_MLPERF_IMPLEMENTATION", "reference")
     variation_model = ",_" + env["MLC_MLPERF_MODEL"]
     variation_backend = ",_" + \
@@ -135,7 +136,7 @@ def preprocess(i):
     else:
         variation_quantization_string = ""
 
-    tags = "app,abtf-inference," + variation_implementation + variation_model + variation_backend + variation_device + \
+    tags = "app,abtf-inference," + variation_benchmark_version + variation_implementation + variation_model + variation_backend + variation_device + \
         variation_run_style + variation_reproducibility + \
         variation_quantization_string + power_variation
     verbose = inp.get('v', False)
@@ -290,9 +291,9 @@ def preprocess(i):
     if state.get("mlc-mlperf-inference-results"):
         # print(state["mlc-mlperf-inference-results"])
         for sut in state["mlc-mlperf-inference-results"]:  # only one sut will be there
-            # Better to do this in a stand alone CM script with proper deps but
+            # Better to do this in a stand alone MLC script with proper deps but
             # currently we manage this by modifying the sys path of the python
-            # executing CM
+            # executing MLC
             import mlperf_utils  # noqa
 
             logger.info(f"{sut}")

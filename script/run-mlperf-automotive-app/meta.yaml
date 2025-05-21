@@ -214,6 +214,11 @@ variations:
       compiler:
         tags: gcc
     group: benchmark-version
+  
+  v0.5:
+    group: benchmark-version
+    env:
+      MLC_MLPERF_AUTOMOTIVE_VERSION: v0.5
 
   performance-and-accuracy:
     default: true
