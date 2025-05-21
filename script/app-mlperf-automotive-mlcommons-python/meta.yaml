@@ -276,7 +276,7 @@ deps:
     - loadgen
     - mlperf-inference-loadgen
 
-  - tags: get,loadgen
+  - tags: get,loadgen,_automotive
     enable_if_any_env:
       MLC_MLPERF_LOADGEN_BUILD_FROM_SRC:
         - "on"
