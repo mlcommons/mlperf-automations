@@ -252,3 +252,8 @@ variations:
             - MLC_DOWNLOAD_URL
     env:
       MLC_DOWNLOAD_SRC: mlcommons
+tests:
+  run_inputs:
+  - variations_list:
+      - onnx,rclone,mlc,dry-run
+      - pytorch,rclone,mlc,dry-run
