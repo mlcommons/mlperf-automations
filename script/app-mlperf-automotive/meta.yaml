@@ -4,14 +4,16 @@ uid: f7488ce376484fd2
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
-category: "Modular MLPerf inference benchmark pipeline for ABTF model"
+category: "Modular MLPerf automotive benchmark pipeline for ABTF models"
 
 
 # User-friendly tags to find this CM script
 tags:
 - app
 - app-mlperf-inference
+- app-mlperf-inference-automotive
 - mlperf-inference
+- mlperf-inference-automotive
 - abtf-inference
 
 predeps: no
@@ -90,12 +92,12 @@ deps:
   # Use mlc inside scripts
   #- tags: get,generic-python-lib,_package.mlcflow
 
-  - tags: get,mlperf,inference,utils
+  - tags: get,mlperf,automotive,utils
 
 
 docker:
-  mlc_repo: gateoverflow@mlperf-automations
-  mlc_repo_branch: dev
+  mlc_repo: anandhu-eng@mlperf-automations
+  mlc_repo_branch: automotive
   use_host_group_id: True
   use_host_user_id: True
   real_run: false
@@ -121,7 +123,7 @@ variations:
       - names:
          - python-reference-abtf-inference
          - abtf-inference-implementation
-        tags: run-mlperf-inference,demo,abtf-model
+        tags: run-mlperf-inference,abtf-model
         skip_if_env:
           MLC_SKIP_RUN:
             - yes
@@ -158,6 +160,12 @@ variations:
       abtf-inference-implementation:
         tags: _onnxruntime
 
+  onnx_dynamic:
+    base:
+      - onnxruntime
+    add_deps_recursive:
+      ml-model-deeplab-v3+:
+        tags: _onnx_dynamic
 
   onnxruntime,cpu:
     env:
@@ -177,6 +185,12 @@ variations:
       MLC_MLPERF_BACKEND_VERSION: <<<MLC_TORCH_VERSION>>>
     add_deps_recursive:
       abtf-inference-implementation:
+        tags: _pytorch
+      ml-model-bevformer:
+        tags: _pytorch
+      ml-model-ssd-resnet50:
+        tags: _pytorch
+      ml-model-deeplab-v3+:
         tags: _pytorch
 
 
@@ -204,10 +218,137 @@ variations:
           enable_if_env:
             MLC_DATASET_MLCOMMONS_COGNATA_DOWNLOAD_IN_HOST:
               - yes
-
       mounts:
         - "${{ MLC_DATASET_MLCOMMONS_COGNATA_PATH }}:${{ MLC_DATASET_MLCOMMONS_COGNATA_PATH }}"
-
+  
+  bevformer:
+    group:
+      models
+    default_env:
+      MLC_USE_DATASET_FROM_HOST: yes
+    env:
+      MLC_MODEL: bevformer
+    deps:
+      - tags: get,preprocessed,dataset,nuscenes
+        skip_if_env:
+          MLC_PREPROCESSED_DATASET_NUSCENES_PATH:
+            - yes
+        enable_if_env:
+          MLC_USE_DATASET_FROM_HOST:
+            - "yes"
+      - tags: get,ml-model,bevformer
+        skip_if_env:
+          MLC_ML_MODEL_BEVFORMER_PATH:
+            - yes
+        enable_if_env:
+          MLC_USE_MODEL_FROM_HOST:
+            - "yes"
+        names:
+          - ml-model-bevformer
+    add_deps_recursive:
+      abtf-inference-implementation:
+        tags: _beformer
+    docker:
+      mounts:
+      - "${{ MLC_PREPROCESSED_DATASET_NUSCENES_PATH }}:${{ MLC_PREPROCESSED_DATASET_NUSCENES_PATH }}"
+      - "${{ MLC_ML_MODEL_BEVFORMER_PATH }}:${{ MLC_ML_MODEL_BEVFORMER_PATH }}"
+    posthook_deps:
+    - enable_if_env:
+        MLC_MLPERF_LOADGEN_MODE:
+        - accuracy
+        - all
+        MLC_MLPERF_ACCURACY_RESULTS_DIR:
+        - 'on'
+      names:
+      - mlperf-accuracy-script
+      - nuscenes-accuracy-script
+      tags: run,accuracy,mlperf,_nuscenes
+  
+  ssd-resnet50:
+    group:
+      models
+    default_env:
+      MLC_USE_DATASET_FROM_HOST: yes
+    env:
+      MLC_MODEL: ssd-resnet50
+    deps:
+      - tags: get,preprocessed,dataset,cognata
+        skip_if_env:
+          MLC_PREPROCESSED_DATASET_COGNATA_PATH:
+            - yes
+        enable_if_env:
+          MLC_USE_DATASET_FROM_HOST:
+            - "yes"
+      - tags: get,ml-model,ssd,resnet50,_mlc,_rclone
+        skip_if_env:
+          MLC_ML_MODEL_SSD_PATH:
+            - yes
+        enable_if_env:
+          MLC_USE_MODEL_FROM_HOST:
+            - "yes"
+        names:
+          - ml-model-ssd-resnet50
+    add_deps_recursive:
+      mlperf-automotive-implementation:
+        tags: _ssd-resnet50
+    docker:
+      mounts:
+      - "${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}:${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}"
+      - "${{ MLC_ML_MODEL_SSD_PATH }}:${{ MLC_ML_MODEL_SSD_PATH }}"
+    posthook_deps:
+    - enable_if_env:
+        MLC_MLPERF_LOADGEN_MODE:
+        - accuracy
+        - all
+        MLC_MLPERF_ACCURACY_RESULTS_DIR:
+        - 'on'
+      names:
+      - mlperf-accuracy-script
+      - cognata-ssd-accuracy-script
+      tags: run,accuracy,mlperf,_cognata_ssd
+  
+  deeplab-v3+:
+    group:
+      models
+    default_env:
+      MLC_USE_DATASET_FROM_HOST: yes
+    env:
+      MLC_MODEL: deeplab-v3+
+    deps:
+      - tags: get,preprocessed,dataset,cognata,_segmentation
+        skip_if_env:
+          MLC_PREPROCESSED_DATASET_COGNATA_PATH:
+            - yes
+        enable_if_env:
+          MLC_USE_DATASET_FROM_HOST:
+            - "yes"
+      - tags: get,ml-model,ssd,resnet50,_mlc,_rclone
+        skip_if_env:
+          MLC_ML_MODEL_DEEPLABV3_PLUS_PATH:
+            - yes
+        enable_if_env:
+          MLC_USE_MODEL_FROM_HOST:
+            - "yes"
+        names:
+          - ml-model-deeplab-v3+
+    add_deps_recursive:
+      mlperf-automotive-implementation:
+        tags: _deeplab-v3+
+    docker:
+      mounts:
+      - "${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}:${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}"
+      - "${{ MLC_ML_MODEL_DEEPLABV3_PLUS_PATH }}:${{ MLC_ML_MODEL_DEEPLABV3_PLUS_PATH }}"
+    posthook_deps:
+    - enable_if_env:
+        MLC_MLPERF_LOADGEN_MODE:
+        - accuracy
+        - all
+        MLC_MLPERF_ACCURACY_RESULTS_DIR:
+        - 'on'
+      names:
+      - mlperf-accuracy-script
+      - cognata-deeplab-accuracy-script
+      tags: run,accuracy,mlperf,_cognata_deeplab
 
   # Target devices
   cpu:
@@ -235,7 +376,15 @@ variations:
       all_gpus: 'yes'
       base_image: nvcr.io/nvidia/pytorch:24.03-py3
 
+  v0.5: {}
 
+  mvp-demo: {}
+
+  poc-demo: {}
+
+  v0.5,mlcommons-python,cpu:
+    docker:
+      base_image: ubuntu:22.04
 
   # Loadgen scenarios
   offline:
