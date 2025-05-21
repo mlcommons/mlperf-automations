@@ -112,6 +112,9 @@ docker:
 # Variations to customize dependencies
 variations:
 
+  reference:
+    alias: mlcommons-python
+
   # Implementation
   mlcommons-python:
     group: implementation
