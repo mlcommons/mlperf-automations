@@ -9,8 +9,10 @@ category: "Modular MLPerf inference benchmark pipeline for ABTF model"
 
 # User-friendly tags to find this CM script
 tags:
-- demo
-- run-mlperf-inference
+- automotive
+- mlcommons
+- reference
+- run-mlperf-automotive-inference
 - object-detection
 - abtf-model
 
@@ -340,6 +342,9 @@ variations:
     group: framework
     env:
       MLC_MLPERF_BACKEND: onnxruntime
+    add_deps_recursive:
+      ml-model-bevformer:
+        tags: _onnx
 
   onnxruntime,cpu:
     env:
@@ -361,10 +366,27 @@ variations:
         tags: _NCHW
       ml-model:
         tags: raw,_pytorch
+      ml-model-bevformer:
+        tags: _pytorch
+      ml-model-ssd-resnet50:
+        tags: _pytorch
+      ml-model-deeplabv3-plus:
+        tags: _pytorch
     env:
       MLC_MLPERF_BACKEND: pytorch
       MLC_MLPERF_BACKEND_VERSION: <<<MLC_TORCH_VERSION>>>
-
+  
+  pytorch,cpu:
+    add_deps_recursive:
+      pytorch:
+        env:
+          MLC_GENERIC_PYTHON_PIP_EXTRA_INDEX_URL: https://download.pytorch.org/whl/cpu/torch_stable.html
+      torchvision:
+        env:
+          MLC_GENERIC_PYTHON_PIP_EXTRA_INDEX_URL: https://download.pytorch.org/whl/cpu/torch_stable.html
+      torchaudio:
+        env:
+          MLC_GENERIC_PYTHON_PIP_EXTRA_INDEX_URL: https://download.pytorch.org/whl/cpu/torch_stable.html
 
 
 
@@ -399,7 +421,6 @@ variations:
       - tags: get,ml-model,abtf-ssd-pytorch,_abtf-mvp
         names:
         - ml-model-abtf
-
     env:
       MLC_MODEL: retinanet
 
@@ -427,9 +448,126 @@ variations:
       - tags: get,ml-model,abtf-ssd-pytorch,_abtf-poc
         names:
         - ml-model-abtf
-
     env:
       MLC_MODEL: retinanet
+
+  bevformer:
+    group: models
+    add_deps_recursive:
+      pytorch:
+        version_max: "2.5.1"
+        version_max_usable: "2.5.1"
+      torchvision:
+        version_max: "0.20.1"
+        version_max_usable": "0.20.1"
+      torchaudio:
+        version_max: "2.5.1"
+        version_max_usable": "2.5.1"
+    deps:
+      - tags: get,generic-python-lib,_package.opencv-python
+      - tags: get,generic-python-lib,_package.numpy
+        version_max: "1.26.4"
+        version_max_usable: "1.26.4"
+      - tags: get,generic-python-lib,_package.onnx
+      - tags: get,generic-python-lib,_package.pillow
+      - tags: get,generic-python-lib,_package.pyquarternion
+      - tags: get,generic-python-lib,_package.tqdm
+      - tags: get,generic-python-lib,_package.nuscenes-devkit
+      - tags: get,preprocessed,dataset,nuscenes
+        skip_if_env:
+          MLC_PREPROCESSED_DATASET_NUSCENES_PATH:
+            - yes
+          MLC_USE_DATASET_FROM_HOST:
+            - "yes"
+        names:
+          - preprocessed-dataset-mlcommons-nuscenes
+      - tags: get,ml-model,bevformer
+        skip_if_env:
+          MLC_ML_MODEL_BEVFORMER_PATH:
+            - yes
+          MLC_USE_MODEL_FROM_HOST:
+            - "yes"
+        names:
+          - ml-model-bevformer
+
+  ssd-resnet50:
+    group: models
+    add_deps_recursive:
+      pytorch:
+        version_max: "2.3.1"
+        version_max_usable: "2.3.1"
+      torchvision:
+        version_max: "0.18.1"
+        version_max_usable": "0.18.1"
+      torchaudio:
+        version_max: "2.3.1"
+        version_max_usable": "2.3.1"
+    deps:
+      - tags: get,generic-python-lib,_package.Cython
+      - tags: get,generic-python-lib,_package.scikit-image
+      - tags: get,generic-python-lib,_package.faster-coco-eval
+      - tags: get,generic-python-lib,_package.torchinfo
+      - tags: get,generic-python-lib,_package.torchmetrics
+      - tags: get,generic-sys-util,_libgl1-mesa-glx
+      - tags: get,generic-python-lib,_package.onnx
+      - tags: get,generic-python-lib,_package.onnxruntime
+      - tags: get,generic-python-lib,_package.tqdm
+      - tags: get,preprocessed,dataset,cognata,_mlc
+        skip_if_env:
+          MLC_PREPROCESSED_DATASET_COGNATA_PATH:
+            - yes
+          MLC_USE_DATASET_FROM_HOST:
+            - "yes"
+        names:
+          - preprocessed-dataset-mlcommons-cognata-ssd-resnet50
+      - tags: get,ml-model,ssd,resnet50,_mlc,_rclone
+        skip_if_env:
+          MLC_ML_MODEL_SSD_PATH:
+            - yes
+          MLC_USE_MODEL_FROM_HOST:
+            - "yes"
+        names:
+          - ml-model-ssd-resnet50
+
+  deeplab-v3+:
+    group: models
+    add_deps_recursive:
+      pytorch:
+        version_max: "2.3.1"
+        version_max_usable: "2.3.1"
+      torchvision:
+        version_max: "0.18.1"
+        version_max_usable": "0.18.1"
+      torchaudio:
+        version_max: "2.3.1"
+        version_max_usable": "2.3.1"
+    deps:
+      - tags: get,generic-python-lib,_package.Cython
+      - tags: get,generic-python-lib,_package.scikit-image
+      - tags: get,generic-python-lib,_package.scikit-learn
+      - tags: get,generic-python-lib,_package.torchinfo
+      - tags: get,generic-python-lib,_package.torchmetrics
+      - tags: get,generic-sys-util,_libgl1-mesa-glx
+      - tags: get,generic-python-lib,_package.onnx
+      - tags: get,generic-python-lib,_package.onnxruntime
+      - tags: get,generic-python-lib,_package.tqdm
+      - tags: get,generic-python-lib,_package.ijson
+      - tags: get,preprocessed,dataset,cognata,_mlc,_segmentation
+        skip_if_env:
+          MLC_PREPROCESSED_DATASET_COGNATA_PATH:
+            - yes
+          MLC_USE_DATASET_FROM_HOST:
+            - "yes"
+        names:
+          - preprocessed-dataset-mlcommons-cognata-deeplabv3-plus
+      - tags: get,ml-model,deeplabv3-plus
+        skip_if_env:
+          MLC_ML_MODEL_DEEPLABV3_PLUS_PATH:
+            - yes
+          MLC_USE_MODEL_FROM_HOST:
+            - "yes"
+        names:
+          - ml-model-deeplabv3-plus
 
   # Target devices
   cpu:

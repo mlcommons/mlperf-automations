@@ -13,6 +13,8 @@ def preprocess(i):
     state = i['state']
     script_path = i['run_script_input']['path']
 
+    logger = i['automation'].logger
+
     if is_true(env.get('MLC_MLPERF_SKIP_RUN', '')):
         return {'return': 0}
 
@@ -151,11 +153,12 @@ def preprocess(i):
 
     if mode == "accuracy":
         mode_extra_options += " --accuracy"
-        env['MLC_OUTPUT_PREDICTIONS_PATH'] = os.path.join(
-            env['MLC_DATASET_MLCOMMONS_COGNATA_PATH'],
-            env['MLC_DATASET_MLCOMMONS_COGNATA_SERIAL_NUMBERS'],
-            'Cognata_Camera_01_8M_png',
-            'output')
+        if env.get('MLC_MODEL', '') == "retinanet":
+            env['MLC_OUTPUT_PREDICTIONS_PATH'] = os.path.join(
+                env['MLC_DATASET_MLCOMMONS_COGNATA_PATH'],
+                env['MLC_DATASET_MLCOMMONS_COGNATA_SERIAL_NUMBERS'],
+                'Cognata_Camera_01_8M_png',
+                'output')
 
     elif mode == "performance":
         pass
@@ -175,7 +178,7 @@ def preprocess(i):
     # Grigori updated for ABTF demo
 #    cmd, run_dir = get_run_cmd(os_info, env, scenario_extra_options, mode_extra_options, dataset_options, mlperf_implementation)
     cmd, run_dir = get_run_cmd_reference(
-        os_info, env, scenario_extra_options, mode_extra_options, dataset_options, script_path)
+        os_info, env, scenario_extra_options, mode_extra_options, dataset_options, logger, script_path)
 
     if env.get('MLC_NETWORK_LOADGEN', '') == "lon":
 
@@ -194,15 +197,16 @@ def preprocess(i):
     if env.get('MLC_HOST_PLATFORM_FLAVOR', '') == "arm64":
         env['MLC_HOST_PLATFORM_FLAVOR'] = "aarch64"
 
-    if not env.get('MLC_COGNATA_ACCURACY_DUMP_FILE'):
-        env['MLC_COGNATA_ACCURACY_DUMP_FILE'] = os.path.join(
-            env['OUTPUT_DIR'], "accuracy.txt")
+    if env.get('MLC_MODEL', '') == "retinanet":
+        if not env.get('MLC_COGNATA_ACCURACY_DUMP_FILE'):
+            env['MLC_COGNATA_ACCURACY_DUMP_FILE'] = os.path.join(
+                env['OUTPUT_DIR'], "accuracy.txt")
 
     return {'return': 0}
 
 
 def get_run_cmd_reference(os_info, env, scenario_extra_options,
-                          mode_extra_options, dataset_options, script_path=None):
+                          mode_extra_options, dataset_options, logger, script_path=None):
 
     q = '"' if os_info['platform'] == 'windows' else "'"
 
@@ -237,6 +241,41 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
             " --output " + q + env['OUTPUT_DIR'] + q + " " + \
             env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + \
             scenario_extra_options + mode_extra_options + dataset_options
+    
+    elif env['MLC_MODEL'] in ['bevformer']:
+        run_dir = env['MLC_MLPERF_AUTOMOTIVE_BEVFORMER_PATH']
+
+        env['RUN_DIR'] = run_dir
+
+        env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
+
+        if env['MLC_MLPERF_BACKEND'] != "onnx":
+            logger.warning("Unsupported backend {MLC_MLPERF_BACKEND}, defaulting to onnx")
+            env['MLC_MLPERF_BACKEND'] = "onnx"
+        
+        config_path = os.path.join(run_dir, "projects", "configs", "bevformer", "bevformer_tiny.py")
+
+        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --backend {env['MLC_MLPERF_BACKEND']} --dataset nuscenes --dataset-path {env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH']} --checkpoint {env['MLC_ML_MODEL_BEVFORMER_PATH']} --config {config_path}"""
+
+    elif env['MLC_MODEL'] in ['ssd-resnet50']:
+        run_dir = env['MLC_MLPERF_AUTOMOTIVE_SSD_RESNET50_PATH']
+
+        env['RUN_DIR'] = run_dir
+
+        env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
+        
+        config_path = "baseline_8MP_ss_scales_fm1_5x5_all"
+
+        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --backend {env['MLC_MLPERF_BACKEND']} --dataset cognata --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_SSD_PATH']} --config {config_path}"""
+
+    elif env['MLC_MODEL'] in ['deeplab_v3+']:
+        run_dir = env['MLC_MLPERF_AUTOMOTIVE_DEEPLABV3PLUS_PATH']
+
+        env['RUN_DIR'] = run_dir
+
+        env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
+
+        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --backend {env['MLC_MLPERF_BACKEND']} --dataset cognata --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_DEEPLABV3_PLUS_PATH']} --config {config_path}"""
 
     ##########################################################################
 
