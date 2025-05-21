@@ -134,7 +134,7 @@ def prepare_docker_inputs(input_params, docker_settings,
     keys = [
         "mlc_repo", "mlc_repo_branch", "base_image", "os", "os_version",
         "mlc_repos", "skip_mlc_sys_upgrade", "extra_sys_deps", "image_name",
-        "gh_token", "fake_run_deps", "run_final_cmds", "real_run", "copy_files", "path", "user"
+        "gh_token", "fake_run_deps", "run_final_cmds", "real_run", "copy_files", "path", "user", "env", "build_env"
     ]
 
     if run_stage:
@@ -452,7 +452,10 @@ def get_container_path(value, username="mlcuser", extract_parent_folder=False):
 
     new_value = ''
     if "cache" in path_split and "local" in path_split:
-        new_path_split = ["", "home", username, "MLC", "repos"]
+        if username == "root":
+            new_path_split = ["", "root", "MLC", "repos"]
+        else:
+            new_path_split = ["", "home", username, "MLC", "repos"]
         repo_entry_index = path_split.index("local")
         if len(path_split) >= repo_entry_index + 3:
             new_path_split1 = new_path_split + \

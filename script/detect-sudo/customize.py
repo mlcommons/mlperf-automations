@@ -174,7 +174,7 @@ def prompt_sudo(logger):
             if not prompt_retry():  # If the user chooses not to retry or times out
                 return -1
         except subprocess.CalledProcessError as e:
-            logger.error(f"Command failed: {e.output.decode('utf-8')}")
+            logger.error(f"Command failed: {e.output}")
             reset_terminal()  # Reset terminal in case of failure
             return -1
         except Exception as e:

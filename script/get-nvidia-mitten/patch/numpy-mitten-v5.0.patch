@@ -1,0 +1,13 @@
+diff --git a/setup.cfg b/setup.cfg
+index 4976354..798175e 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -21,7 +21,7 @@ install_requires =
+     graphlib_backport >=1.0.3;python_version<'3.9'
+     requests >=2.28.1
+     tqdm >=4.65.0
+-    numpy >=1.22.0, <1.24.0
++    numpy >=1.26.4
+     GitPython >=3.1.31
+     pandas
+     opencv-python

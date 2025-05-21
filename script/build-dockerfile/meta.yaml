@@ -37,6 +37,7 @@ input_mapping:
   docker_os: MLC_DOCKER_OS
   docker_os_version: MLC_DOCKER_OS_VERSION
   dockerfile_env: MLC_DOCKERFILE_ENV
+  dockerfile_build_env: MLC_DOCKERFILE_BUILD_ENV
   extra_sys_deps: MLC_DOCKER_EXTRA_SYS_DEPS
   fake_docker_deps: MLC_DOCKER_FAKE_DEPS
   fake_run_option: MLC_DOCKER_FAKE_RUN_OPTION

@@ -111,18 +111,20 @@ deps:
 
   # Detect pycuda
   - tags: get,generic-python-lib,_pycuda
+    names:
+    - pycuda
     version: "2022.2.2"
     skip_if_env:
       MLC_RUN_STATE_DOCKER:
         - 'yes'
-        - True
-        - 'True'
 
   # Detect opencv-python
   - tags: get,generic-python-lib,_opencv-python
 
   # Detect nvidia-dali
   - tags: get,generic-python-lib,_nvidia-dali
+    version_max: 1.48
+    version_max_usable: 1.48
 
   # Get Nvidia scratch space where data and models get downloaded
   - tags: get,mlperf,inference,nvidia,scratch,space
@@ -224,6 +226,11 @@ variations:
             - x86_64
           MLC_PYTHON_MINOR_VERSION:
             - 8
+    
+  r5.0:
+    add_deps_recursive:
+      pycuda:
+        version: "2024.1"
 
 versions:
   r2.1: {}
@@ -333,7 +340,7 @@ versions:
   r4.1:
     default_env:
       BUILD_TRTLLM: 1
-
+  
 docker:
   skip_run_cmd: 'no'
   all_gpus: 'yes'
