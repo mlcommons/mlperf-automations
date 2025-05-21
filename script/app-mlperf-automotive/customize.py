@@ -10,6 +10,7 @@ import copy
 import platform
 import sys
 
+
 def preprocess(i):
 
     os_info = i['os_info']
@@ -91,11 +92,12 @@ def postprocess(i):
         logger.info(f"New config stored in {sut_config_path}")
     elif mode == "accuracy":
         acc = ""
-        if env.get('MLC_MLPERF_INFERENCE_VERSION', '') == "mvp-demo" and env.get('MLC_MLPERF_INFERENCE_VERSION') == "poc-demo":
+        if env.get('MLC_MLPERF_INFERENCE_VERSION', '') == "mvp-demo" and env.get(
+                'MLC_MLPERF_INFERENCE_VERSION') == "poc-demo":
             if not env.get(
                     'MLC_COGNATA_ACCURACY_DUMP_FILE'):  # can happen while reusing old runs
-                    env['MLC_COGNATA_ACCURACY_DUMP_FILE'] = os.path.join(
-                        output_dir, "accuracy.txt")
+                env['MLC_COGNATA_ACCURACY_DUMP_FILE'] = os.path.join(
+                    output_dir, "accuracy.txt")
             if os.path.exists(env['MLC_COGNATA_ACCURACY_DUMP_FILE']):
                 with open(env['MLC_COGNATA_ACCURACY_DUMP_FILE'], "r") as f:
                     acc = f.readline()
@@ -131,8 +133,9 @@ def postprocess(i):
     state['mlc-mlperf-inference-results-last'][mode] = result
     state['mlc-mlperf-inference-results-last'][mode +
                                                '_valid'] = valid.get(mode, False)
-    
-    if mode in ["performance", "accuracy"] and env.get('MLC_MLPERF_INFERENCE_VERSION', '') not in ["", "mvp-demo", "poc-demo"]:
+
+    if mode in ["performance", "accuracy"] and env.get(
+            'MLC_MLPERF_INFERENCE_VERSION', '') not in ["", "mvp-demo", "poc-demo"]:
         # if measurements file exist read it
         if os.path.exists("measurements.json"):
             with open("measurements.json", "r") as file:
@@ -216,7 +219,7 @@ def postprocess(i):
 
         result, valid, power_result = mlperf_utils.get_result_from_log(
             env['MLC_MLPERF_LAST_RELEASE'], model, scenario, output_dir, mode, env.get('MLC_MLPERF_INFERENCE_SOURCE_VERSION'))
-        
+
         state['mlc-mlperf-inference-results'][state['MLC_SUT_CONFIG_NAME']
                                               ][model][scenario][mode] = result
         state['mlc-mlperf-inference-results'][state['MLC_SUT_CONFIG_NAME']
@@ -225,7 +228,7 @@ def postprocess(i):
         state['mlc-mlperf-inference-results-last'][mode] = result
         state['mlc-mlperf-inference-results-last'][mode +
                                                    '_valid'] = valid.get(mode, False)
-        
+
         # Power not included in v0.5, code should be added in future
 
         # Record basic host info
