@@ -16,6 +16,8 @@ def preprocess(i):
 def postprocess(i):
     env = i['env']
 
-    env['MLC_PREPROCESSED_DATASET_COGNATA_PATH'] = os.path.join(env['MLC_PREPROCESSED_DATASET_COGNATA_PATH'], env['MLC_DATASET_COGNATA_EXTRACTED_FOLDER_NAME'])
-    
+    env['MLC_PREPROCESSED_DATASET_COGNATA_PATH'] = os.path.join(
+        env['MLC_PREPROCESSED_DATASET_COGNATA_PATH'],
+        env['MLC_DATASET_COGNATA_EXTRACTED_FOLDER_NAME'])
+
     return {'return': 0}
