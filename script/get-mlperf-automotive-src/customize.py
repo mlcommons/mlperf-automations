@@ -91,11 +91,11 @@ def postprocess(i):
 
     automotive_root = env['MLC_MLPERF_AUTOMOTIVE_SOURCE']
     env['MLC_MLPERF_AUTOMOTIVE_BEVFORMER_PATH'] = os.path.join(
-        automotive_root, 'camera-3d-detection')
+        automotive_root, 'automotive', 'camera-3d-detection')
     env['MLC_MLPERF_AUTOMOTIVE_SSD_RESNET50_PATH'] = os.path.join(
-        automotive_root, '2d-object-detection')
+        automotive_root, 'automotive', '2d-object-detection')
     env['MLC_MLPERF_AUTOMOTIVE_DEEPLABV3PLUS_PATH'] = os.path.join(
-        automotive_root, 'semantic-segmentation')
+        automotive_root, 'automotive', 'semantic-segmentation')
 
     env['MLC_GET_DEPENDENT_CACHED_PATH'] = automotive_root
 
