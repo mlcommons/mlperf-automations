@@ -12,7 +12,21 @@ jobs:
     outputs:
       processed_files: ${{ steps.filter-modified-files.outputs.processed_files }}
     steps:
-      # … your checkout, fetch, get-diff, etc …
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch base branch
+        run: |
+          git fetch origin +refs/heads/${{ github.event.pull_request.base.ref }}:refs/remotes/origin/${{ github.event.pull_request.base.ref }}
+
+      - name: Get list of changed files
+        id: modified-files
+        run: |
+          git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD > changed_files.txt
+          files=$(paste -sd, changed_files.txt)
+          echo "files=$files" >> $GITHUB_OUTPUT
 
       - name: Filter changed files
         id: filter-modified-files
@@ -20,6 +34,7 @@ jobs:
           FILES: ${{ steps.modified-files.outputs.files }}
         run: |
           processed=$(echo "$FILES" | python3 .github/scripts/list_modified_files.py)
+          # Ensure valid JSON even if empty
           processed=${processed:-[]}
           echo "processed_files<<EOF" >> $GITHUB_OUTPUT
           printf '%s\n' "$processed" >> $GITHUB_OUTPUT
@@ -30,9 +45,8 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.get_modified_files.outputs.processed_files != '[]'
     strategy:
-      fail-fast: false
       matrix:
-        file_info: ${{ needs.get_modified_files.outputs.processed_files != '' && fromJSON(needs.get_modified_files.outputs.processed_files) ||  [] }}
+        file_info: ${{ fromJSON(needs.get_modified_files.outputs.processed_files) }}
 
     steps:
       - name: Checkout repository
