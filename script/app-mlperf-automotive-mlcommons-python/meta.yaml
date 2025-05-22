@@ -468,21 +468,13 @@ variations:
       - tags: get,generic-python-lib,_package.tqdm
       - tags: get,generic-python-lib,_package.nuscenes-devkit
       - tags: get,preprocessed,dataset,nuscenes
-        skip_if_any_env:
-          MLC_PREPROCESSED_DATASET_NUSCENES_PATH:
-            - yes
-          MLC_USE_DATASET_FROM_HOST:
-            - "yes"
+        skip_if_env:
           MLC_RUN_STATE_DOCKER:
             - "yes"
         names:
           - preprocessed-dataset-mlcommons-nuscenes
       - tags: get,ml-model,bevformer
-        skip_if_any_env:
-          MLC_ML_MODEL_BEVFORMER_PATH:
-            - yes
-          MLC_USE_MODEL_FROM_HOST:
-            - "yes"
+        skip_if_env:
           MLC_RUN_STATE_DOCKER:
             - "yes"
         names:
@@ -511,9 +503,7 @@ variations:
       - tags: get,generic-python-lib,_package.onnxruntime
       - tags: get,generic-python-lib,_package.tqdm
       - tags: get,preprocessed,dataset,cognata,_mlc
-        skip_if_any_env:
-          MLC_USE_DATASET_FROM_HOST:
-            - "yes"
+        skip_if_env:
           MLC_RUN_STATE_DOCKER:
             - "yes"
         names:
@@ -551,17 +541,13 @@ variations:
       - tags: get,generic-python-lib,_package.tqdm
       - tags: get,generic-python-lib,_package.ijson
       - tags: get,preprocessed,dataset,cognata,_mlc,_segmentation
-        skip_if_any_env:
-          MLC_USE_DATASET_FROM_HOST:
-            - "yes"
+        skip_if_env:
           MLC_RUN_STATE_DOCKER:
             - "yes"
         names:
           - preprocessed-dataset-mlcommons-cognata-deeplabv3-plus
       - tags: get,ml-model,deeplabv3-plus
-        skip_if_any_env:
-          MLC_USE_MODEL_FROM_HOST:
-            - "yes"
+        skip_if_env:
           MLC_RUN_STATE_DOCKER:
             - "yes"
         names:

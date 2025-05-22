@@ -263,16 +263,10 @@ variations:
     docker:
       deps:
         - tags: get,preprocessed,dataset,nuscenes
-          skip_if_env:
-            MLC_PREPROCESSED_DATASET_NUSCENES_PATH:
-              - yes
           enable_if_env:
             MLC_USE_DATASET_FROM_HOST:
               - "yes"
         - tags: get,ml-model,bevformer
-          skip_if_env:
-            MLC_ML_MODEL_BEVFORMER_PATH:
-              - yes
           enable_if_env:
             MLC_USE_MODEL_FROM_HOST:
               - "yes"
@@ -306,16 +300,10 @@ variations:
     docker:
       deps:
         - tags: get,preprocessed,dataset,cognata
-          skip_if_env:
-            MLC_PREPROCESSED_DATASET_COGNATA_PATH:
-              - yes
           enable_if_env:
             MLC_USE_DATASET_FROM_HOST:
               - "yes"
         - tags: get,ml-model,ssd,resnet50,_mlc,_rclone
-          skip_if_env:
-            MLC_ML_MODEL_SSD_PATH:
-              - yes
           enable_if_env:
             MLC_USE_MODEL_FROM_HOST:
               - "yes"
@@ -349,16 +337,10 @@ variations:
     docker:
       deps:
         - tags: get,preprocessed,dataset,cognata,_segmentation
-          skip_if_env:
-            MLC_PREPROCESSED_DATASET_COGNATA_PATH:
-              - yes
           enable_if_env:
             MLC_USE_DATASET_FROM_HOST:
               - "yes"
         - tags: get,ml-model,ssd,resnet50,_mlc,_rclone
-          skip_if_env:
-            MLC_ML_MODEL_DEEPLABV3_PLUS_PATH:
-              - yes
           enable_if_env:
             MLC_USE_MODEL_FROM_HOST:
               - "yes"
