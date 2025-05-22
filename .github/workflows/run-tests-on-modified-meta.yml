@@ -12,33 +12,32 @@ jobs:
     outputs:
       processed_files: ${{ steps.filter-modified-files.outputs.processed_files }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    - name: 'Checkout'
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
 
-      - name: Fetch base branch
-        run: |
-          git fetch origin +refs/heads/${{ github.event.pull_request.base.ref }}:refs/remotes/origin/${{ github.event.pull_request.base.ref }}
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
 
-      - name: Get list of changed files
-        id: modified-files
-        run: |
-          git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD > changed_files.txt
-          files=$(paste -sd, changed_files.txt)
-          echo "files=$files" >> $GITHUB_OUTPUT
+    - name: Install dependencies
+      run: |
+        pip install pyyaml
 
-      - name: Filter changed files
-        id: filter-modified-files
-        env:
-          FILES: ${{ steps.modified-files.outputs.files }}
-        run: |
-          processed=$(echo "$FILES" | python3 .github/scripts/list_modified_files.py)
-          # Ensure valid JSON even if empty
-          processed=${processed:-[]}
-          echo "processed_files<<EOF" >> $GITHUB_OUTPUT
-          printf '%s\n' "$processed" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+    - name: Get changed files
+      id: modified-files
+      run: |
+        git remote add upstream ${{ github.event.pull_request.base.repo.clone_url }}
+        git fetch upstream
+        changed_files=$(git diff upstream/${{ github.event.pull_request.base.ref }} --name-only)
+        echo "$changed_files" | python3 .github/scripts/list_modified_files.py
+    
+    - name: Debug Show processed_files
+      run: |
+        echo "Processed files: '${{ steps.filter-modified-files.outputs.processed_files }}'"
+
 
   process_modified_files:
     needs: get_modified_files
