@@ -67,6 +67,26 @@ variations:
             - MLC_DOWNLOAD_URL
     env:
       MLC_DOWNLOAD_SRC: mlcommons
+  mlc,validation:
+    prehook_deps:
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - 'yes'
+        extra_cache_tags: nuscenes,dataset,scene_lengths
+        force_cache: true
+        names:
+          - dae
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        env:
+          MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_SCENE_LENGTHS_PATH
+          MLC_EXTRACT_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_SCENE_LENGTHS_PATH
+          MLC_DATASET_NUSCENES_SCENE_PICKLE_FILENAME: scene_lengths.pkl
+          MLC_DOWNLOAD_URL: mlc-nuscenes:nuscenes_dataset/scene_lengths.pkl
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
   rclone:
     group: download-tool
     add_deps_recursive:
