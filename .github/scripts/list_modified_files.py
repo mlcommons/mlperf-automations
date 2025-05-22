@@ -17,7 +17,7 @@ def get_file_info(filepath):
 
 
 def process_files(files):
-    filenames = files.split()
+    filenames = files.split(",")
     return [
         {
             "file": file,
