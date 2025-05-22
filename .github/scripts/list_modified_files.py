@@ -17,7 +17,7 @@ def get_file_info(filepath):
 
 
 def process_files(files):
-    filenames = files.split()
+    filenames = files.split(",")
     return [
         {
             "file": file,
@@ -34,4 +34,4 @@ if __name__ == "__main__":
     changed_files = sys.stdin.read().strip()
     processed_files = process_files(changed_files)
     json_processed_files = json.dumps(processed_files)
-    print(f"::set-output name=processed_files::{json_processed_files}")
+    print(json_processed_files)
