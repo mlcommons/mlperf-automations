@@ -8,7 +8,8 @@ def get_file_info(filepath):
     with open(filepath, 'r') as file:
         content = yaml.safe_load(file)
         tests = content.get('tests', [])
-        if tests:
+        needs_pat = content.get('needs_pat', False)
+        if tests and not needs_pat:
             num_tests = len(tests.get('run_inputs', []))
         else:
             num_tests = 0
