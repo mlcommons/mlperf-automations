@@ -582,7 +582,8 @@ variations:
   singlestream:
     env:
       MLC_MLPERF_LOADGEN_SCENARIO: SingleStream
-      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 1
+    default_variations:
+      batch-size: batch_size.1
   server:
     env:
       MLC_MLPERF_LOADGEN_SCENARIO: Server
