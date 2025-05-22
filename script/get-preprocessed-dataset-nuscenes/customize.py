@@ -8,7 +8,8 @@ def preprocess(i):
 
     env = i['env']
 
-    if env.get('MLC_NUSCENES_DATASET_TYPE', '') == "prebuilt" and env.get('MLC_PREPROCESSED_DATASET_NUSCENES_PATH', '') == '':
+    if env.get('MLC_NUSCENES_DATASET_TYPE', '') == "prebuilt" and env.get(
+            'MLC_PREPROCESSED_DATASET_NUSCENES_PATH', '') == '':
         env['MLC_TMP_REQUIRE_DOWNLOAD'] = "yes"
 
     return {'return': 0}
@@ -21,7 +22,8 @@ def postprocess(i):
         env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'] = os.path.join(
             env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'],
             env['MLC_DATASET_NUSCENES_EXTRACTED_FOLDER_NAME'])
-        if env.get('MLC_PREPROCESSED_DATASET_NUSCENES_SCENE_LENGTHS_PATH', '') != '':
+        if env.get(
+                'MLC_PREPROCESSED_DATASET_NUSCENES_SCENE_LENGTHS_PATH', '') != '':
             shutil.copy(
                 os.path.join(
                     env['MLC_PREPROCESSED_DATASET_NUSCENES_SCENE_LENGTHS_PATH'],
@@ -30,5 +32,5 @@ def postprocess(i):
                     os.path.dirname(
                         env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'].rstrip("/")),
                     env['MLC_DATASET_NUSCENES_SCENE_PICKLE_FILENAME']))
-            
+
     return {'return': 0}
