@@ -43,7 +43,6 @@ jobs:
           FILES: ${{ steps.modified-files.outputs.files }}
         run: |
           processed=$(echo "$FILES" | python3 .github/scripts/list_modified_files.py)
-          processed=${processed:-[]}
           echo "processed_files<<EOF" >> $GITHUB_OUTPUT
           echo "$processed" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
