@@ -94,6 +94,28 @@ deps:
 
   - tags: get,mlperf,automotive,utils
 
+posthook_deps:
+  - tags: get,mlperf,sut,description #populate system meta information like framework
+  - tags: get,platform,details
+    enable_if_env:
+      MLC_GET_PLATFORM_DETAILS:
+        - yes
+    skip_if_env:
+      MLC_MLPERF_LOADGEN_MODE:
+      - accuracy
+    env: 
+      MLC_PLATFORM_DETAILS_FILE_PATH: '<<<MLC_MLPERF_OUTPUT_DIR>>>/system_info.txt'
+
+post_deps:
+  - tags: draw,graph,from-json
+    enable_if_env:
+      MLC_MLPERF_RUN_JSON_VERSION_INFO_FILE:
+        - on
+    env:
+      MLC_JSON_INPUT_FILE: <<<MLC_MLPERF_RUN_JSON_VERSION_INFO_FILE>>>
+      MLC_OUTPUT_IMAGE_PATH: <<<MLC_MLPERF_RUN_DEPS_GRAPH>>>
+      MLC_OUTPUT_MERMAID_PATH: <<<MLC_MLPERF_RUN_DEPS_MERMAID>>>
+
 
 docker:
   mlc_repo: anandhu-eng@mlperf-automations
