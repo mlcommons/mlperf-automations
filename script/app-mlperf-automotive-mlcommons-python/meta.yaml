@@ -510,8 +510,6 @@ variations:
           - preprocessed-dataset-mlcommons-cognata-ssd-resnet50
       - tags: get,ml-model,ssd,resnet50,_mlc,_rclone
         skip_if_any_env:
-          MLC_USE_MODEL_FROM_HOST:
-            - "yes"
           MLC_RUN_STATE_DOCKER:
             - "yes"
         names:

@@ -274,14 +274,53 @@ variations:
       MLC_DATASET: waymo
     group: dataset
   nuscenes:
+    deps:
+      - tags: get,preprocessed,dataset,nuscenes
+        skip_if_env:
+          MLC_RUN_STATE_DOCKER:
+            - "yes"
+        names:
+          - preprocessed-dataset-mlcommons-nuscenes
+      - tags: get,ml-model,bevformer
+        skip_if_env:
+          MLC_RUN_STATE_DOCKER:
+            - "yes"
+        names:
+          - ml-model-bevformer
     env:
       MLC_DATASET: nuscenes
     group: dataset
   cognata_ssd:
+    deps:
+      - tags: get,preprocessed,dataset,cognata,_mlc
+        skip_if_env:
+          MLC_RUN_STATE_DOCKER:
+            - "yes"
+        names:
+          - preprocessed-dataset-mlcommons-cognata-ssd-resnet50
+      - tags: get,ml-model,ssd,resnet50,_mlc,_rclone
+        skip_if_any_env:
+          MLC_RUN_STATE_DOCKER:
+            - "yes"
+        names:
+          - ml-model-ssd-resnet50
     env:
       MLC_DATASET: cognata_ssd
     group: dataset
   cognata_deeplab:
+    deps:
+      - tags: get,preprocessed,dataset,cognata,_mlc,_segmentation
+        skip_if_env:
+          MLC_RUN_STATE_DOCKER:
+            - "yes"
+        names:
+          - preprocessed-dataset-mlcommons-cognata-deeplabv3-plus
+      - tags: get,ml-model,deeplabv3-plus
+        skip_if_env:
+          MLC_RUN_STATE_DOCKER:
+            - "yes"
+        names:
+          - ml-model-deeplabv3-plus
     env:
       MLC_DATASET: cognata_deeplab
     group: dataset
