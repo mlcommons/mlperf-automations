@@ -1,0 +1,43 @@
+alias: get-lib-jemalloc
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: MLC Script Template
+deps:
+  - tags: get,git,repo
+    env:
+      MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_JEMALLOC_SRC_PATH
+    force_env_keys:
+      - MLC_GIT_*
+    update_tags_from_env_with_prefix:
+      _branch.:
+        - MLC_GIT_CHECKOUT
+      _repo.:
+        - MLC_GIT_URL
+      _sha.:
+        - MLC_GIT_SHA
+      _submodules.:
+        - MLC_GIT_SUBMODULES
+    names:
+      - jemalloc-repo
+    extra_cache_tags: jemalloc,repo,jemalloc-repo
+new_env_keys:
+  - MLC_JEMALLOC_LIB_PATH
+  - +LD_LIBRARY_PATH
+new_state_keys: []
+post_deps: []
+posthook_deps: []
+prehook_deps: []
+tags:
+- get
+- lib
+- lib-jemalloc
+- jemalloc
+tests:
+  run_inputs: []
+uid: 406439a446e04fb7
+variations:
+  version.official:
+    group: version
+    default: true
+    env:
+      MLC_GIT_URL: https://github.com/jemalloc/jemalloc.git
