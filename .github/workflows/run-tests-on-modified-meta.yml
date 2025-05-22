@@ -1,4 +1,3 @@
-# This workflow will run configured tests for any updated MLC script
 name: Test script on modified meta
 
 on:
@@ -24,37 +23,54 @@ jobs:
   get_modified_files:
     runs-on: ubuntu-latest
     outputs:
-      processed_files: ${{ steps.modified-files.outputs.processed_files }}
+      processed_files: ${{ steps.filter-modified-files.outputs.processed_files }}
 
     steps:
-    - name: 'Checkout'
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 2
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Setup Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
 
-    - name: Install dependencies
-      run: |
-        pip install pyyaml
+      - name: Install dependencies
+        run: pip install pyyaml
 
-    - name: Get changed files
-      id: modified-files
-      run: |
-        git remote add upstream ${{ github.event.pull_request.base.repo.clone_url }}
-        git fetch upstream
-        changed_files=$(git diff upstream/${{ github.event.pull_request.base.ref }} --name-only)
-        echo "$changed_files" | python3 .github/scripts/list_modified_files.py
+      - name: Fetch base branch
+        run: |
+          git fetch origin +refs/heads/${{ github.event.pull_request.base.ref }}:refs/remotes/origin/${{ github.event.pull_request.base.ref }}
+
+      - name: Get list of changed files
+        id: modified-files
+        run: |
+          git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD > changed_files.txt
+          files=$(paste -sd, changed_files.txt)
+          echo "files=$files" >> $GITHUB_OUTPUT
+
+      - name: Filter changed files
+        id: filter-modified-files
+        env:
+          FILES: ${{ steps.modified-files.outputs.files }}
+        run: |
+          processed=$(echo "$FILES" | python3 .github/scripts/list_modified_files.py)
+          echo "processed_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$processed" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Debug processed_files output
+        run: |
+          echo "Processed files output:"
+          echo "${{ steps.filter-modified-files.outputs.processed_files }}"
 
   process_modified_files:
     runs-on: ubuntu-latest
     needs: 
       - get_modified_files
       - fetch-secret
-    if: needs.determine_modified_files.outputs.processed_files != '[]' && needs.determine_modified_files.outputs.processed_files != ''
+    if: needs.determine_modified_files.outputs.processed_files != '[]'
     strategy:
       fail-fast: false
       matrix:
@@ -74,8 +90,7 @@ jobs:
           echo "RCLONE_CONFIG_MLC_WAYMO_SERVICE_ACCOUNT_CREDENTIALS=${{ needs.fetch-secret.outputs.gdrive_secret }}" >> $GITHUB_ENV
       - name: Process meta.yaml file
         run: |
-          echo "Processing ${{ matrix.file_info.file }} with run number ${{ matrix.file_info.num_run }}"
-
+          echo "Processing ${{ matrix.file_info.file }} (run #${{ matrix.file_info.num_run }})"
           pip install mlcflow
           mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
-          mlc test script ${{ matrix.file_info.uid}} --test_input_index=${{ matrix.file_info.num_run }} --docker_mlc_repo=${{ github.event.pull_request.head.repo.html_url }} --docker_mlc_repo_branch=${{ github.event.pull_request.head.ref }} --quiet
+          mlc test script ${{ matrix.file_info.uid }} --test_input_index=${{ matrix.file_info.num_run }} --docker_mlc_repo=${{ github.event.pull_request.head.repo.html_url }} --docker_mlc_repo_branch=${{ github.event.pull_request.head.ref }}  --quiet
