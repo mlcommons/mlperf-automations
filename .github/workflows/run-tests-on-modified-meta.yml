@@ -52,7 +52,6 @@ jobs:
           processed=$(echo "$FILES" | python3 .github/scripts/list_modified_files.py)
           # expose that JSON for the job output
           echo "processed_files=$processed" >> $GITHUB_OUTPUT
-          echo $processed
 
   process_modified_files:
     needs: get_modified_files
