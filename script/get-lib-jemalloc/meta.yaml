@@ -33,7 +33,8 @@ tags:
 - lib-jemalloc
 - jemalloc
 tests:
-  run_inputs: []
+  run_inputs:
+  - quiet: true
 uid: 406439a446e04fb7
 variations:
   version.official:
