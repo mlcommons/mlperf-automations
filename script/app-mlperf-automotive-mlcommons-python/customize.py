@@ -237,7 +237,7 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
 
         env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
 
-        if env['MLC_MLPERF_BACKEND'] != "onnx":
+        if env['MLC_MLPERF_BACKEND'] != "onnxruntime":
             logger.warning(
                 "Unsupported backend {MLC_MLPERF_BACKEND}, defaulting to onnx")
             env['MLC_MLPERF_BACKEND'] = "onnx"
@@ -249,8 +249,8 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
             "bevformer",
             "bevformer_tiny.py")
 
-        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {env['MLC_MLPERF_BACKEND']} --dataset nuscenes --nuscenes-root {os.path.dirname(env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'].rstrip("/"))} --dataset-path {env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH']} --checkpoint {env['MLC_ML_MODEL_BEVFORMER_PATH']} --config {config_path} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
-
+        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend onnx --dataset nuscenes --nuscenes-root {os.path.dirname(env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'].rstrip("/"))} --dataset-path {env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH']} --checkpoint {env['MLC_ML_MODEL_BEVFORMER_PATH']} --config {config_path} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
+        print(cmd)
     elif env['MLC_MODEL'] in ['ssd-resnet50']:
         run_dir = env['MLC_MLPERF_AUTOMOTIVE_SSD_RESNET50_PATH']
 
@@ -258,9 +258,11 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
 
         env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
 
+        backend = "onnx" if env.get('MLC_MLPERF_BACKEND') == "onnxruntime" else env.get('MLC_MLPERF_BACKEND')
+
         config_path = "baseline_8MP_ss_scales_fm1_5x5_all"
 
-        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {env['MLC_MLPERF_BACKEND']} --dataset cognata --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_SSD_PATH']} --config {config_path} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
+        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {backend} --dataset cognata --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_SSD_PATH']} --config {config_path} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
 
     elif env['MLC_MODEL'] in ['deeplab_v3+']:
         run_dir = env['MLC_MLPERF_AUTOMOTIVE_DEEPLABV3PLUS_PATH']
@@ -269,7 +271,9 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
 
         env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
 
-        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {env['MLC_MLPERF_BACKEND']} --dataset cognata --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_DEEPLABV3_PLUS_PATH']} --config {config_path} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
+        backend = "onnx" if env.get('MLC_MLPERF_BACKEND') == "onnxruntime" else env.get('MLC_MLPERF_BACKEND')
+
+        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {backend} --dataset cognata --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_DEEPLABV3_PLUS_PATH']} --config {config_path} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
 
     ##########################################################################
 
