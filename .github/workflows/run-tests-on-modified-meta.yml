@@ -9,60 +9,30 @@ on:
 jobs:
   get_modified_files:
     runs-on: ubuntu-latest
-
-    # expose the final processed_files JSON to downstream jobs
     outputs:
       processed_files: ${{ steps.filter-modified-files.outputs.processed_files }}
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-
-      - name: Install dependencies
-        run: |
-          pip install pyyaml
-
-      - name: Fetch base branch
-        run: |
-          git fetch origin +refs/heads/${{ github.event.pull_request.base.ref }}:refs/remotes/origin/${{ github.event.pull_request.base.ref }}
-
-      - name: Get list of changed files
-        id: modified-files
-        run: |
-          git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD > changed_files.txt
-          files=$(paste -sd, changed_files.txt)
-          # set as a step output
-          echo "files=$files" >> $GITHUB_OUTPUT
+      # … your checkout, fetch, get-diff, etc …
 
       - name: Filter changed files
         id: filter-modified-files
-        # pull in the raw file list via env
         env:
           FILES: ${{ steps.modified-files.outputs.files }}
         run: |
-          # list_modified_files.py should emit a JSON array on stdout,
-          # e.g. '[{"file":"script/foo/meta.yaml","uid":"foo","num_run":1}, …]'
           processed=$(echo "$FILES" | python3 .github/scripts/list_modified_files.py)
-          # expose that JSON for the job output
-          echo "processed_files=$processed" >> $GITHUB_OUTPUT
+          processed=${processed:-[]}
+          echo "processed_files<<EOF" >> $GITHUB_OUTPUT
+          printf '%s\n' "$processed" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
   process_modified_files:
     needs: get_modified_files
     runs-on: ubuntu-latest
-    # only run if there is at least one file to process
-    if: ${{ needs.get_modified_files.outputs.processed_files != '[]' && needs.get_modified_files.outputs.processed_files != '' }}
-
+    if: needs.get_modified_files.outputs.processed_files != '[]'
     strategy:
       fail-fast: false
       matrix:
-        file_info: ${{ fromJSON(needs.get_modified_files.outputs.processed_files) }}
+        file_info: ${{ needs.get_modified_files.outputs.processed_files != '' && fromJSON(needs.get_modified_files.outputs.processed_files) ||  [] }}
 
     steps:
       - name: Checkout repository
