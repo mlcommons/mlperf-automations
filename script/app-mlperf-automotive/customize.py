@@ -22,10 +22,10 @@ def preprocess(i):
         state['mlperf_inference_run_cmd'] = "mlcr " + \
             " ".join(i['input']['cmd'])
 
-    state['mlperf-inference-implementation'] = {}
+    state['abtf-inference-implementation'] = {}
 
     run_state = i['run_script_input']['run_state']
-    state['mlperf-inference-implementation']['script_id'] = run_state['script_id'] + \
+    state['abtf-inference-implementation']['script_id'] = run_state['script_id'] + \
         ":" + ",".join(run_state['script_variation_tags'])
 
     return {'return': 0}
@@ -337,11 +337,11 @@ def postprocess(i):
                 count = count + 1
 
             if state.get(
-                    'mlperf-inference-implementation') and state['mlperf-inference-implementation'].get('print_deps'):
+                    'abtfabtf-inference-implementation') and state['abtfabtf-inference-implementation'].get('print_deps'):
 
                 extra_readme_body += "\n## Dependent automation scripts for the MLPerf Automotive Implementation\n"
 
-                print_deps = state['mlperf-inference-implementation']['print_deps']
+                print_deps = state['abtfabtf-inference-implementation']['print_deps']
                 count = 1
                 for dep in print_deps:
                     extra_readme_body += "\n\n" + \
@@ -358,7 +358,7 @@ def postprocess(i):
                 fp.write(extra_readme)
 
     if state.get(
-            'mlperf-inference-implementation') and state['mlperf-inference-implementation'].get('version_info'):
+            'abtf-inference-implementation') and state['abtf-inference-implementation'].get('version_info'):
         env['MLC_MLPERF_RUN_JSON_VERSION_INFO_FILE'] = os.path.join(
             output_dir, "mlc-version-info.json")
         env['MLC_MLPERF_RUN_DEPS_GRAPH'] = os.path.join(
@@ -368,7 +368,7 @@ def postprocess(i):
         with open(os.path.join(output_dir, "mlc-version-info.json"), "w") as f:
             f.write(
                 json.dumps(
-                    state['mlperf-inference-implementation']['version_info'],
+                    state['abtf-inference-implementation']['version_info'],
                     indent=2))
 
     if env.get('MLC_DUMP_SYSTEM_INFO', True):

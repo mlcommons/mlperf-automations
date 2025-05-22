@@ -152,37 +152,37 @@ def preprocess(i):
         add_deps_recursive[key] = adr_from_meta[key]
 
     if env.get('MLC_MLPERF_LOADGEN_MAX_BATCHSIZE', '') != '':
-        if not add_deps_recursive.get('mlperf-inference-implementation', {}):
-            add_deps_recursive['mlperf-inference-implementation'] = {}
-        if add_deps_recursive['mlperf-inference-implementation'].get(
+        if not add_deps_recursive.get('abtf-inference-implementation', {}):
+            add_deps_recursive['abtf-inference-implementation'] = {}
+        if add_deps_recursive['abtf-inference-implementation'].get(
                 'tags', '') == '':
-            add_deps_recursive['mlperf-inference-implementation']['tags'] = ''
+            add_deps_recursive['abtf-inference-implementation']['tags'] = ''
         else:
-            add_deps_recursive['mlperf-inference-implementation']['tags'] += ','
-        add_deps_recursive['mlperf-inference-implementation']['tags'] += "_batch_size." + \
+            add_deps_recursive['abtf-inference-implementation']['tags'] += ','
+        add_deps_recursive['abtf-inference-implementation']['tags'] += "_batch_size." + \
             env['MLC_MLPERF_LOADGEN_MAX_BATCHSIZE']
 
     if env.get('MLC_MLPERF_INFERENCE_SUT_VARIATION', '') != '':
-        if not add_deps_recursive.get('mlperf-inference-implementation', {}):
-            add_deps_recursive['mlperf-inference-implementation'] = {}
-        if add_deps_recursive['mlperf-inference-implementation'].get(
+        if not add_deps_recursive.get('abtf-inference-implementation', {}):
+            add_deps_recursive['abtf-inference-implementation'] = {}
+        if add_deps_recursive['abtf-inference-implementation'].get(
                 'tags', '') == '':
-            add_deps_recursive['mlperf-inference-implementation']['tags'] = ''
+            add_deps_recursive['abtf-inference-implementation']['tags'] = ''
         else:
-            add_deps_recursive['mlperf-inference-implementation']['tags'] += ','
-        add_deps_recursive['mlperf-inference-implementation']['tags'] += "_" + \
+            add_deps_recursive['abtf-inference-implementation']['tags'] += ','
+        add_deps_recursive['abtf-inference-implementation']['tags'] += "_" + \
             env['MLC_MLPERF_INFERENCE_SUT_VARIATION']
 
     if env.get('MLC_NETWORK_LOADGEN', '') != '':
-        if not add_deps_recursive.get('mlperf-inference-implementation', {}):
-            add_deps_recursive['mlperf-inference-implementation'] = {}
+        if not add_deps_recursive.get('abtf-inference-implementation', {}):
+            add_deps_recursive['abtf-inference-implementation'] = {}
         network_variation_tag = f"_network-{env['MLC_NETWORK_LOADGEN']}"
-        if add_deps_recursive['mlperf-inference-implementation'].get(
+        if add_deps_recursive['abtf-inference-implementation'].get(
                 'tags', '') == '':
-            add_deps_recursive['mlperf-inference-implementation']['tags'] = ''
+            add_deps_recursive['abtf-inference-implementation']['tags'] = ''
         else:
-            add_deps_recursive['mlperf-inference-implementation']['tags'] += ','
-        add_deps_recursive['mlperf-inference-implementation']['tags'] += network_variation_tag
+            add_deps_recursive['abtf-inference-implementation']['tags'] += ','
+        add_deps_recursive['abtf-inference-implementation']['tags'] += network_variation_tag
 
     if env.get('MLC_OUTPUT_FOLDER_NAME', '') == '':
         env['MLC_OUTPUT_FOLDER_NAME'] = env['MLC_MLPERF_RUN_STYLE'] + "_results"
