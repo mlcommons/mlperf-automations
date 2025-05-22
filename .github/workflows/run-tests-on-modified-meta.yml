@@ -17,7 +17,7 @@ jobs:
     - name: 'Checkout'
       uses: actions/checkout@v4
       with:
-        fetch-depth: 2
+        fetch-depth: 0
 
     - name: Setup Python
       uses: actions/setup-python@v2
@@ -28,13 +28,20 @@ jobs:
       run: |
         pip install pyyaml
 
-    - name: Get changed files
+    - name: Fetch base branch
+      run: |
+          git fetch origin +refs/heads/${{ github.event.pull_request.base.ref }}:refs/remotes/origin/${{ github.event.pull_request.base.ref }}
+
+    - name: Get list of changed files
       id: modified-files
       run: |
-        git remote add upstream ${{ github.event.pull_request.base.repo.clone_url }}
-        git fetch upstream
-        changed_files=$(git diff upstream/${{ github.event.pull_request.base.ref }} --name-only)
-        echo "$changed_files" | python3 .github/scripts/list_modified_files.py
+          git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD > changed_files.txt
+          echo "::set-output name=files::$(paste -sd, changed_files.txt)"
+
+    - name: Filter changed files
+      id: filter-modified-files
+      run: |
+          echo "${{ steps.modified-files.outputs.files }}" | python3 .github/scripts/list_modified_files.py
 
   process_modified_files:
     runs-on: ubuntu-latest
