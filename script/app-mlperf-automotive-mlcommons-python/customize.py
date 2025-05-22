@@ -258,7 +258,8 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
 
         env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
 
-        backend = "onnx" if env.get('MLC_MLPERF_BACKEND') == "onnxruntime" else env.get('MLC_MLPERF_BACKEND')
+        backend = "onnx" if env.get(
+            'MLC_MLPERF_BACKEND') == "onnxruntime" else env.get('MLC_MLPERF_BACKEND')
 
         config_path = "baseline_8MP_ss_scales_fm1_5x5_all"
 
@@ -271,7 +272,8 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
 
         env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
 
-        backend = "onnx" if env.get('MLC_MLPERF_BACKEND') == "onnxruntime" else env.get('MLC_MLPERF_BACKEND')
+        backend = "onnx" if env.get(
+            'MLC_MLPERF_BACKEND') == "onnxruntime" else env.get('MLC_MLPERF_BACKEND')
 
         cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {backend} --dataset cognata --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_DEEPLABV3_PLUS_PATH']} --config {config_path} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
 
