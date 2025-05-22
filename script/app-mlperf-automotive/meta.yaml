@@ -303,7 +303,7 @@ variations:
         - "${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}:${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}"
         - "${{ MLC_ML_MODEL_SSD_PATH }}:${{ MLC_ML_MODEL_SSD_PATH }}"
     add_deps_recursive:
-      mlperf-automotive-implementation:
+      abtf-inference-implementation:
         tags: _ssd-resnet50
     posthook_deps:
     - enable_if_env:
@@ -346,7 +346,7 @@ variations:
         - "${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}:${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}"
         - "${{ MLC_ML_MODEL_DEEPLABV3_PLUS_PATH }}:${{ MLC_ML_MODEL_DEEPLABV3_PLUS_PATH }}"
     add_deps_recursive:
-      mlperf-automotive-implementation:
+      abtf-inference-implementation:
         tags: _deeplab-v3+
     posthook_deps:
     - enable_if_env:
@@ -447,3 +447,11 @@ variations:
       MLC_DATASET_MLCOMMONS_COGNATA_GROUP_NAMES: Cognata_Camera_01_8M
       MLC_ABTF_ML_MODEL_TRAINING_FORCE_COGNATA_LABELS: 'yes'
       MLC_ABTF_ML_MODEL_SKIP_WARMUP: 'yes'
+
+  batch_size.#:
+    group: batch_size
+    env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: '#'
+    add_deps_recursive:
+      abtf-inference-implementation:
+        tags: _batch_size.#

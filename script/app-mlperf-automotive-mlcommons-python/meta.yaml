@@ -611,3 +611,8 @@ variations:
 
   mvp_demo:
     env:
+
+  batch_size.#:
+    group: batch-size
+    env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: "#"
