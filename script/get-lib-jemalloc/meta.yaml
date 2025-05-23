@@ -22,6 +22,7 @@ deps:
       - jemalloc-repo
     extra_cache_tags: jemalloc,repo,jemalloc-repo
 new_env_keys:
+  - MLC_JEMALLOC_PATH
   - MLC_JEMALLOC_LIB_PATH
   - +LD_LIBRARY_PATH
 new_state_keys: []
