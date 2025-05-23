@@ -52,6 +52,20 @@ tests:
     docker_prune: 'yes'
 uid: bb0393afa8404a11
 variations:
+  autoconf:
+    env:
+      MLC_SYS_UTIL_NAME: autoconf
+      MLC_SYS_UTIL_VERSION_CMD: autoconf --version
+      MLC_SYS_UTIL_VERSION_RE: autoconf \(.*\) ([\d.]+)
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 1
+    new_env_keys:
+    - MLC_AUTOCONF_VERSION
+    state:
+      autoconf:
+        apt: autoconf
+        brew: autoconf
+        dnf: autoconf
+        yum: autoconf
   cmake:
     env:
       MLC_SYS_UTIL_NAME: cmake
