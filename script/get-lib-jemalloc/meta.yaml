@@ -21,6 +21,7 @@ deps:
     names:
       - jemalloc-repo
     extra_cache_tags: jemalloc,repo,jemalloc-repo
+  - tags: get,generic-sys-util,_autoconf
 new_env_keys:
   - MLC_JEMALLOC_PATH
   - MLC_JEMALLOC_LIB_PATH
