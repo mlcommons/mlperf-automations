@@ -81,12 +81,6 @@ def preprocess(i):
             env['MLC_MLPERF_INFERENCE_SOURCE'], "mlperf.conf")
 
     x = "" if os_info['platform'] == 'windows' else "'"
-    if "llama2-70b" in env['MLC_MODEL']:
-        env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] += " --mlperf-conf " + \
-            x + env['MLC_MLPERF_CONF'] + x
-    else:
-        env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] += " --mlperf_conf " + \
-            x + env['MLC_MLPERF_CONF'] + x
 
     env['MODEL_DIR'] = env.get('MLC_ML_MODEL_PATH')
     if not env['MODEL_DIR']:
