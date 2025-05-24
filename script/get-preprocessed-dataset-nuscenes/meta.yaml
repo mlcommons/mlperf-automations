@@ -15,6 +15,7 @@ tags:
 uid: 0e403a2861984a4e
 print_env_at_the_end:
   MLC_PREPROCESSED_DATASET_NUSCENES_PATH: Preprocessed Nuscenes dataset path
+  MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH: Path containing minimum files for accuracy checker
 variations:
   validation:
     default: true
