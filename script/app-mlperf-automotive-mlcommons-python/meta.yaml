@@ -255,7 +255,7 @@ deps:
 
 
   # Creates user conf for given SUT
-  - tags: generate,user-conf,mlperf,inference
+  - tags: generate,user-conf,mlperf,inference,_automotive
     names:
     - user-conf-generator
 

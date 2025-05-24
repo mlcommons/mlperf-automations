@@ -21,7 +21,7 @@ def preprocess(i):
     env['+PYTHONPATH'] = [utils_path]
 
     submission_checker_dir = os.path.join(
-        env['MLC_MLPERF_AUTOMOTIVE_SOURCE'], "tools", "submission")
+        env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission")
 
     sys.path.append(submission_checker_dir)
     sys.path.append(utils_path)

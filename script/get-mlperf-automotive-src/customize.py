@@ -89,12 +89,12 @@ def postprocess(i):
     env = i['env']
     state = i['state']
 
-    automotive_root = env['MLC_MLPERF_AUTOMOTIVE_SOURCE']
-    env['MLC_MLPERF_AUTOMOTIVE_BEVFORMER_PATH'] = os.path.join(
+    automotive_root = env['MLC_MLPERF_INFERENCE_SOURCE']
+    env['MLC_MLPERF_INFERENCE_BEVFORMER_PATH'] = os.path.join(
         automotive_root, 'automotive', 'camera-3d-detection')
-    env['MLC_MLPERF_AUTOMOTIVE_SSD_RESNET50_PATH'] = os.path.join(
+    env['MLC_MLPERF_INFERENCE_SSD_RESNET50_PATH'] = os.path.join(
         automotive_root, 'automotive', '2d-object-detection')
-    env['MLC_MLPERF_AUTOMOTIVE_DEEPLABV3PLUS_PATH'] = os.path.join(
+    env['MLC_MLPERF_INFERENCE_DEEPLABV3PLUS_PATH'] = os.path.join(
         automotive_root, 'automotive', 'semantic-segmentation')
 
     env['MLC_GET_DEPENDENT_CACHED_PATH'] = automotive_root
@@ -106,23 +106,23 @@ def postprocess(i):
     if os.path.exists(os.path.join(automotive_root, "loadgen", "VERSION.txt")):
         with open(os.path.join(automotive_root, "loadgen", "VERSION.txt")) as f:
             version_info = f.read().strip()
-        env['MLC_MLPERF_AUTOMOTIVE_SOURCE_VERSION'] = version_info
+        env['MLC_MLPERF_INFERENCE_SOURCE_VERSION'] = version_info
 
     if is_true(env.get('MLC_GET_MLPERF_IMPLEMENTATION_ONLY', '')):
         return {'return': 0}
 
-    env['MLC_MLPERF_AUTOMOTIVE_CONF_PATH'] = os.path.join(
+    env['MLC_MLPERF_INFERENCE_CONF_PATH'] = os.path.join(
         automotive_root, 'mlperf.conf')
     env['+PYTHONPATH'].append(
         os.path.join(
-            env['MLC_MLPERF_AUTOMOTIVE_SOURCE'],
+            env['MLC_MLPERF_INFERENCE_SOURCE'],
             'tools',
             'submission'))
 
     # To be uncommented after Pablo's PR is merged: https://github.com/mlcommons/mlperf_automotive/pull/14
     # valid_models = get_valid_models(
     #     env['MLC_MLPERF_LAST_RELEASE'],
-    #     env['MLC_MLPERF_AUTOMOTIVE_SOURCE'])
+    #     env['MLC_MLPERF_INFERENCE_SOURCE'])
 
     # state['MLC_MLPERF_AUTOMOTIVE_MODELS'] = valid_models
 

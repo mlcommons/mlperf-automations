@@ -94,3 +94,18 @@ deps:
 
   # Get SUT configs (System Under Test)
   - tags: get,sut,configs
+
+variations:
+  inference:
+    default: true
+    group: benchmark_wg
+    deps:
+      - tags: get,mlcommons,inference,src
+        names:
+        - inference-src
+  automotive:
+    group: automotive_wg
+    deps:
+      - tags: get,mlcommons,automotive,src
+        names:
+        - automotive-src
