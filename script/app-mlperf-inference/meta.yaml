@@ -1715,6 +1715,8 @@ variations:
       nvidia-inference-server:
         version: r2.1
         tags: _custom
+      nvidia-original-mlperf-inference:
+        tags: _pre5.0
     env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_TEST_QUERY_COUNT: '100'
@@ -1733,6 +1735,8 @@ variations:
       nvidia-inference-server:
         version: r2.1
         tags: _custom
+      nvidia-original-mlperf-inference:
+        tags: _pre5.0
     env:
       MLC_SKIP_SYS_UTILS: 'yes'
 
@@ -1746,6 +1750,8 @@ variations:
       nvidia-inference-server:
         version: r3.0
         tags: _nvidia-only
+      nvidia-original-mlperf-inference:
+        tags: _pre5.0
     default_env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
@@ -1766,6 +1772,8 @@ variations:
         tags: _v3.1
       nvidia-scratch-space:
         tags: _version.4_0-dev
+      nvidia-original-mlperf-inference:
+        tags: _pre5.0
     default_env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
@@ -1784,6 +1792,8 @@ variations:
         tags: _ctuning
       intel-harness:
         tags: _v3.1
+      nvidia-original-mlperf-inference:
+        tags: _pre5.0
     default_env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
@@ -1806,6 +1816,8 @@ variations:
         tags: _v4.0
       nvidia-scratch-space:
         tags: _version.4_1-dev
+      nvidia-original-mlperf-inference:
+        tags: _pre5.0
     default_env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
@@ -1824,6 +1836,8 @@ variations:
         tags: _v4.1
       nvidia-scratch-space:
         tags: _version.4_1
+      nvidia-original-mlperf-inference:
+        tags: _pre5.0
     default_env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
@@ -1844,7 +1858,9 @@ variations:
       intel-harness:
         tags: _v4.1
       inference-src:
-         version: r5.0
+        version: r5.0
+      nvidia-original-mlperf-inference:
+        tags: _pre5.0
       nvidia-scratch-space:
         tags: _version.5.0-dev
     default_env:
