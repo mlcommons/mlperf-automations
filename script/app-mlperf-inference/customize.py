@@ -18,7 +18,16 @@ def preprocess(i):
     env = i['env']
     state = i['state']
 
+    logger = i['automation'].logger
+
     if env.get('MLC_MLPERF_IMPLEMENTATION', '') == 'nvidia':
+        if "nvidia" in env.get('MLC_CUDA_DEVICE_PROP_GPU_NAME', '').lower() and env.get(
+                'MLC_NVIDIA_GPU_NAME', '') == '':
+            # extract the Nvidia GPU model name automatically
+            env['MLC_NVIDIA_GPU_NAME'] = env['MLC_CUDA_DEVICE_PROP_GPU_NAME'].lower(
+            ).split()[-1].strip()
+            logger.info(
+                f"Extracted Nvidia GPU name: {env['MLC_NVIDIA_GPU_NAME']}")
         if env.get('MLC_NVIDIA_GPU_NAME', '') in [
                 "rtx_4090", "a100", "t4", "l4", "orin", "custom"]:
             env['MLC_NVIDIA_HARNESS_GPU_VARIATION'] = "_" + \

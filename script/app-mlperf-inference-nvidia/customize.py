@@ -11,6 +11,7 @@ def preprocess(i):
     if os_info['platform'] == 'windows':
         return {'return': 1, 'error': 'Windows is not supported in this script yet'}
     env = i['env']
+    state = i['state']
 
     if is_true(env.get('MLC_RUN_STATE_DOCKER', '')):
         return {'return': 0}
@@ -518,12 +519,29 @@ def preprocess(i):
         if dla_inference_streams:
             run_config += f" --dla_inference_streams={dla_inference_streams}"
 
-        gpu_batch_size = env.get('MLC_MLPERF_NVIDIA_HARNESS_GPU_BATCH_SIZE')
+        if env.get('MLC_MLPERF_INFERENCE_VERSION', '') == "5.0":
+            gpu_batch_size = state.get('batch_size', env.get(
+                'MLC_MLPERF_NVIDIA_HARNESS_GPU_BATCH_SIZE'))
+            dla_batch_size = state.get('dla_batch_size', env.get(
+                'MLC_MLPERF_NVIDIA_HARNESS_DLA_BATCH_SIZE'))
+        else:
+            gpu_batch_size = env.get(
+                'MLC_MLPERF_NVIDIA_HARNESS_GPU_BATCH_SIZE')
+            dla_batch_size = env.get(
+                'MLC_MLPERF_NVIDIA_HARNESS_DLA_BATCH_SIZE')
+
         if gpu_batch_size:
+            if env.get('MLC_MLPERF_INFERENCE_VERSION', '') == "5.0":
+                gpu_batch_size = ",".join(
+                    f"{key}:{value}" for key,
+                    value in gpu_batch_size.items())
             run_config += f" --gpu_batch_size={gpu_batch_size}"
 
-        dla_batch_size = env.get('MLC_MLPERF_NVIDIA_HARNESS_DLA_BATCH_SIZE')
         if dla_batch_size:
+            if env.get('MLC_MLPERF_INFERENCE_VERSION', '') == "5.0":
+                dla_batch_size = ",".join(
+                    f"{key}:{value}" for key,
+                    value in dla_batch_size.items())
             run_config += f" --dla_batch_size={dla_batch_size}"
 
         input_format = env.get('MLC_MLPERF_NVIDIA_HARNESS_INPUT_FORMAT')
