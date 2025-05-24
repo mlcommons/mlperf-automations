@@ -17,6 +17,8 @@ tags:
 - get
 - ml-model
 - abtf-ssd-pytorch
+- ssd
+- resnet50
 - cmc
 
 
@@ -38,9 +40,11 @@ deps:
   names:
   - abtf-ssd-pytorch-git-repo
   - abtf-ml-model-code-git-repo
-  skip_if_env:
+  skip_if_any_env:
     MLC_SKIP_MODEL_CODE_DOWNLOAD:
     - 'yes'
+    MLC_DOWNLOAD_SRC: 
+    - 'mlcommons'
   env:
     MLC_GIT_AUTH: 'yes'
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_ABTF_SSD_PYTORCH
@@ -62,9 +66,11 @@ deps:
   names:
   - abtf-ml-model-weights
   - abtf-ml-model-weights-download
-  skip_if_env:
+  skip_if_any_env:
     MLC_SKIP_MODEL_WEIGHTS_DOWNLOAD:
     - 'yes'
+    MLC_DOWNLOAD_SRC: 
+    - 'mlcommons'
   update_tags_from_env_with_prefix:
     _url.:
       - MLC_ML_MODEL_URL
@@ -77,6 +83,7 @@ new_env_keys:
 print_env_at_the_end:
   MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model weights
   MLC_ML_MODEL_CODE_WITH_PATH: Path to the ML model code
+  MLC_ML_MODEL_SSD_PATH: Path to ssd resnet50 model
 
 
 variations:
@@ -172,3 +179,81 @@ variations:
     adr:
       abtf-ml-model-weights-download:
         tags: _gdown
+
+  onnx:
+    group: model-format
+    default: true
+    env:
+      MLC_MODEL_FORMAT: onnx
+  
+  onnx,mlc:
+    env:
+      MLC_MODEL_RCLONE_FILEPATH: model_checkpoint_ssd/ssd_resnet50.onnx
+      MLC_ML_MODEL_FILENAME: ssd_resnet50.onnx
+  
+  pytorch:
+    group: model-format
+    env:
+      MLC_MODEL_FORMAT: pth
+  
+  pytorch,mlc:
+    env:
+      MLC_MODEL_RCLONE_FILEPATH: model_checkpoint_ssd/baseline_8MP_ss_scales_fm1_5x5_all_ep60.pth
+      MLC_ML_MODEL_FILENAME: baseline_8MP_ss_scales_fm1_5x5_all_ep60.pth
+  
+  rclone,mlc:
+    group: download-tool
+    add_deps_recursive:
+      dae:
+        tags: _rclone
+    env:
+      MLC_RCLONE_COPY_USING: sync
+  
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
+
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  
+  mlc:
+    group: download-src
+    prehook_deps:
+      - tags: get,rclone
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+      - tags: get,rclone-config,_config-name.cognata
+        force_cache: true
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+        env:
+          MLC_RCLONE_DRIVE_FOLDER_ID: 1u5FDoeXHVtDrd4zClE47Gmyr7iLFidz1
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - 'yes'
+        env:
+          MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_SSD_PATH
+          MLC_EXTRACT_FINAL_ENV_NAME: MLC_MLC_MODEL_SSD_PATH
+          MLC_DOWNLOAD_URL: 'mlc-cognata:mlc_cognata_dataset/<<<MLC_MODEL_RCLONE_FILEPATH>>>'
+          MLC_DOWNLOAD_EXTRA_OPTIONS: ' --include '
+        extra_cache_tags: ml,model,ssd,resnet50
+        force_cache: true
+        names:
+          - dae
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+tests:
+  run_inputs:
+  - variations_list:
+      - onnx,rclone,mlc,dry-run
+      - pytorch,rclone,mlc,dry-run
