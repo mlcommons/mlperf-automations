@@ -22,6 +22,9 @@ def postprocess(i):
         env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'] = os.path.join(
             env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'],
             env['MLC_DATASET_NUSCENES_EXTRACTED_FOLDER_NAME'])
+        env['MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH'] = os.path.join(
+            env['MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH'],
+            env['MLC_DATASET_NUSCENES_ACC_REQ_FILE_EXTRACTED_FOLDER_NAME'])
         if env.get(
                 'MLC_PREPROCESSED_DATASET_NUSCENES_SCENE_LENGTHS_PATH', '') != '':
             shutil.copy(
@@ -32,5 +35,15 @@ def postprocess(i):
                     os.path.dirname(
                         env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'].rstrip("/")),
                     env['MLC_DATASET_NUSCENES_SCENE_PICKLE_FILENAME']))
+        if env.get(
+                'MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH', '') != '':
+            shutil.copy(
+                os.path.join(
+                    env['MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH'],
+                    env['MLC_DATASET_NUSCENES_ACC_CHECKER_DEP_FILES_TAR_NAME']),
+                os.path.join(
+                    os.path.dirname(
+                        env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'].rstrip("/")),
+                    env['MLC_DATASET_NUSCENES_ACC_CHECKER_DEP_FILES_TAR_NAME']))
 
     return {'return': 0}

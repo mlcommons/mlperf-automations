@@ -276,6 +276,7 @@ variations:
       mounts:
         - "${{ MLC_PREPROCESSED_DATASET_NUSCENES_PATH }}:${{ MLC_PREPROCESSED_DATASET_NUSCENES_PATH }}"
         - "${{ MLC_ML_MODEL_BEVFORMER_PATH }}:${{ MLC_ML_MODEL_BEVFORMER_PATH }}"
+        - "${{ MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH }}:${{ MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH }}"
     add_deps_recursive:
       abtf-inference-implementation:
         tags: _bevformer

@@ -70,6 +70,8 @@ variations:
   mlc,validation:
     env:
       MLC_DATASET_NUSCENES_SCENE_PICKLE_FILENAME: scene_lengths.pkl
+      MLC_DATASET_NUSCENES_ACC_CHECKER_DEP_FILES_TAR_NAME: nuscenes_min.tar.gz
+      MLC_DATASET_NUSCENES_ACC_REQ_FILE_EXTRACTED_FOLDER_NAME: nuscenes
     prehook_deps:
       - enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
@@ -85,6 +87,23 @@ variations:
           MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_SCENE_LENGTHS_PATH
           MLC_EXTRACT_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_SCENE_LENGTHS_PATH
           MLC_DOWNLOAD_URL: mlc-nuscenes:nuscenes_dataset/scene_lengths.pkl
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - 'yes'
+        extra_cache_tags: nuscenes,dataset,accuracy_checker
+        force_cache: true
+        names:
+          - dae_ac
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        env:
+          MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH
+          MLC_EXTRACT_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH
+          MLC_DOWNLOAD_URL: mlc-nuscenes:nuscenes_dataset/nuscenes_min.tar.gz
         update_tags_from_env_with_prefix:
           _url.:
             - MLC_DOWNLOAD_URL
