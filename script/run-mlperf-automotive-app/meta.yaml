@@ -106,8 +106,8 @@ deps:
   skip_if_env:
     MLC_MLPERF_USE_DOCKER: [ on ]
 - names:
-  - inference-src
-  tags: get,mlcommons,inference,src
+  - automotive-src
+  tags: get,mlcommons,automotive,src
   skip_if_env:
     MLC_MLPERF_USE_DOCKER: [ on ]
 - tags: get,sut,description
@@ -122,7 +122,7 @@ deps:
   skip_if_env:
     OUTPUT_BASE_DIR: [ on ]
 - tags: install,pip-package,for-mlc-python,_package.tabulate
-- tags: get,mlperf,inference,utils
+- tags: get,mlperf,automotive,utils
   skip_if_env:
     MLC_MLPERF_USE_DOCKER: [ on ]
 
