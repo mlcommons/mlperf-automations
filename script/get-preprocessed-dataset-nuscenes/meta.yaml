@@ -112,6 +112,10 @@ variations:
     add_deps_recursive:
       dae:
         tags: _rclone
+      dae_sl:
+        tags: _rclone
+      dae_ac:
+        tags: _rclone
     default: true
   dry-run:
     group: run-mode

@@ -35,15 +35,5 @@ def postprocess(i):
                     os.path.dirname(
                         env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'].rstrip("/")),
                     env['MLC_DATASET_NUSCENES_SCENE_PICKLE_FILENAME']))
-        if env.get(
-                'MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH', '') != '':
-            shutil.copy(
-                os.path.join(
-                    env['MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH'],
-                    env['MLC_DATASET_NUSCENES_ACC_CHECKER_DEP_FILES_TAR_NAME']),
-                os.path.join(
-                    os.path.dirname(
-                        env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'].rstrip("/")),
-                    env['MLC_DATASET_NUSCENES_ACC_CHECKER_DEP_FILES_TAR_NAME']))
 
     return {'return': 0}
