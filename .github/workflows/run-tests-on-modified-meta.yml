@@ -33,7 +33,7 @@ jobs:
       run: |
         git remote add upstream ${{ github.event.pull_request.base.repo.clone_url }}
         git fetch upstream
-        changed_files=$(git diff upstream/${{ github.event.pull_request.base.ref }} --name-only)
+        changed_files=$(git diff upstream/${{ github.event.pull_request.base.ref }} --name-only | paste -sd, -)
         echo "$changed_files" | python3 .github/scripts/list_modified_files.py
 
   process_modified_files:
