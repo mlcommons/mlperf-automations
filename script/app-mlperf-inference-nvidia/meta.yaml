@@ -350,7 +350,7 @@ post_deps:
 
 # Variations to customize dependencies
 variations:
-  _pre5.0: {}
+  pre5.0: {}
   # MLPerf inference version
   v5.0:
     group: version
@@ -585,16 +585,10 @@ variations:
   sdxl,v5.0: 
     # nvidia-ammo is decommisioned and model-opt is being used which is built with TRTLLM
     deps:
-    - tags: get,generic-python-lib,_package.torch
-      version: "2.7.0"
     - tags: get,generic-python-lib,_package.torchrec
-      version: "1.1.0"
+      version: "0.6.0"
     - tags: get,generic-python-lib,_package.torchmetrics
       version: "1.0.3"
-    - tags: get,generic-python-lib,_package.torchvision
-      version: "0.22.0"
-    - tags: get,generic-python-lib,_package.torch-tensorrt
-      version: "2.7.0"
     - tags: get,generic-python-lib,_package.typeguard
     - tags: get,generic-python-lib,_package.onnx
       names:
