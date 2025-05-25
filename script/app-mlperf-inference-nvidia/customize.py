@@ -111,7 +111,8 @@ def preprocess(i):
                     shutil.rmtree(target_data_path)
         if not os.path.exists(tsv_file):
             os.makedirs(target_data_path, exist_ok=True)
-            # cmds.append("make download_data BENCHMARKS='stable-diffusion-xl'")
+            # cmds.append("make download_data
+            # BENCHMARKS='stable-diffusion-xl'")
             env['MLC_REQUIRE_COCO2014_DOWNLOAD'] = 'yes'
             cmds.append(
                 f"""cp -r \\$MLC_DATASET_PATH_ROOT/captions/captions.tsv {target_data_path}/captions_5k_final.tsv""")
@@ -155,7 +156,8 @@ def preprocess(i):
 
         if not os.path.exists(target_data_path) or not os.path.exists(
                 inference_cases_json_path) or not os.path.exists(calibration_cases_json_path):
-            # cmds.append(f"ln -sf {env['MLC_DATASET_PATH']} {target_data_path}")
+            # cmds.append(f"ln -sf {env['MLC_DATASET_PATH']}
+            # {target_data_path}")
             cmds.append("make download_data BENCHMARKS='3d-unet'")
 
         model_path = os.path.join(
@@ -175,7 +177,8 @@ def preprocess(i):
         if not os.path.exists(target_data_path_base_dir):
             cmds.append(f"mkdir -p {target_data_path_base_dir}")
         if not os.path.exists(target_data_path):
-            # cmds.append(f"ln -sf {env['MLC_DATASET_LIBRISPEECH_PATH']} {target_data_path}")
+            # cmds.append(f"ln -sf {env['MLC_DATASET_LIBRISPEECH_PATH']}
+            # {target_data_path}")
             cmds.append("make download_data BENCHMARKS='rnnt'")
 
         model_path = os.path.join(
@@ -518,7 +521,7 @@ def preprocess(i):
             'MLC_MLPERF_NVIDIA_HARNESS_DLA_INFERENCE_STREAMS')
         if dla_inference_streams:
             run_config += f" --dla_inference_streams={dla_inference_streams}"
-            
+
         gpu_batch_size = env.get('MLC_MLPERF_NVIDIA_HARNESS_GPU_BATCH_SIZE')
         if gpu_batch_size:
             run_config += f" --gpu_batch_size={gpu_batch_size}"
@@ -527,75 +530,75 @@ def preprocess(i):
         if dla_batch_size:
             run_config += f" --dla_batch_size={dla_batch_size}"
 
-        input_format = env.get('MLC_MLPERF_NVIDIA_HARNESS_INPUT_FORMAT')
+        input_format=env.get('MLC_MLPERF_NVIDIA_HARNESS_INPUT_FORMAT')
         if input_format:
             run_config += f" --input_format={input_format}"
 
-        performance_sample_count = env.get(
+        performance_sample_count=env.get(
             'MLC_MLPERF_LOADGEN_PERFORMANCE_SAMPLE_COUNT')
         if performance_sample_count:
             run_config += f" --performance_sample_count={performance_sample_count}"
 
-        devices = env.get('MLC_MLPERF_NVIDIA_HARNESS_DEVICES')
+        devices=env.get('MLC_MLPERF_NVIDIA_HARNESS_DEVICES')
         if devices:
             run_config += f" --devices={devices}"
 
-        audio_batch_size = env.get(
+        audio_batch_size=env.get(
             'MLC_MLPERF_NVIDIA_HARNESS_AUDIO_BATCH_SIZE')
         if audio_batch_size:
             run_config += f" --audio_batch_size={audio_batch_size}"
 
-        disable_encoder_plugin = str(
+        disable_encoder_plugin=str(
             env.get('MLC_MLPERF_NVIDIA_HARNESS_DISABLE_ENCODER_PLUGIN', ''))
         if disable_encoder_plugin and disable_encoder_plugin.lower() not in [
                 "no", "false", "0", ""]:
             run_config += " --disable_encoder_plugin"
 
-        disable_beta1_smallk = str(
+        disable_beta1_smallk=str(
             env.get('MLC_MLPERF_NVIDIA_HARNESS_DISABLE_BETA1_SMALLK', ''))
         if disable_beta1_smallk and disable_beta1_smallk.lower() in [
                 "yes", "true", "1"]:
             run_config += " --disable_beta1_smallk"
 
-        workspace_size = env.get('MLC_MLPERF_NVIDIA_HARNESS_WORKSPACE_SIZE')
+        workspace_size=env.get('MLC_MLPERF_NVIDIA_HARNESS_WORKSPACE_SIZE')
         if workspace_size:
             run_config += f" --workspace_size={workspace_size}"
 
         if env.get('MLC_MLPERF_LOADGEN_LOGS_DIR'):
-            env['MLPERF_LOADGEN_LOGS_DIR'] = env['MLC_MLPERF_LOADGEN_LOGS_DIR']
+            env['MLPERF_LOADGEN_LOGS_DIR']=env['MLC_MLPERF_LOADGEN_LOGS_DIR']
 
-        log_dir = env.get('MLC_MLPERF_NVIDIA_HARNESS_LOG_DIR')
+        log_dir=env.get('MLC_MLPERF_NVIDIA_HARNESS_LOG_DIR')
         if log_dir:
             run_config += f" --log_dir={log_dir}"
 
-        use_graphs = str(env.get('MLC_MLPERF_NVIDIA_HARNESS_USE_GRAPHS', ''))
+        use_graphs=str(env.get('MLC_MLPERF_NVIDIA_HARNESS_USE_GRAPHS', ''))
         if use_graphs and use_graphs.lower() not in ["no", "false", "0", ""]:
             run_config += " --use_graphs"
 
-        use_deque_limit = str(
+        use_deque_limit=str(
             env.get('MLC_MLPERF_NVIDIA_HARNESS_USE_DEQUE_LIMIT'))
         if use_deque_limit and use_deque_limit.lower() not in [
                 "no", "false", "0"]:
             run_config += " --use_deque_limit"
 
-            deque_timeout_usec = env.get(
+            deque_timeout_usec=env.get(
                 'MLC_MLPERF_NVIDIA_HARNESS_DEQUE_TIMEOUT_USEC')
             if deque_timeout_usec:
                 run_config += f" --deque_timeout_usec={deque_timeout_usec}"
 
-        use_cuda_thread_per_device = str(
+        use_cuda_thread_per_device=str(
             env.get('MLC_MLPERF_NVIDIA_HARNESS_USE_CUDA_THREAD_PER_DEVICE', ''))
         if use_cuda_thread_per_device and use_cuda_thread_per_device.lower() not in [
                 "no", "false", "0", ""]:
             run_config += " --use_cuda_thread_per_device"
 
-        run_infer_on_copy_streams = str(
+        run_infer_on_copy_streams=str(
             env.get('MLC_MLPERF_NVIDIA_HARNESS_RUN_INFER_ON_COPY_STREAMS', ''))
         if run_infer_on_copy_streams and not is_false(
                 run_infer_on_copy_streams):
             run_config += " --run_infer_on_copy_streams"
 
-        start_from_device = str(
+        start_from_device=str(
             env.get(
                 'MLC_MLPERF_NVIDIA_HARNESS_START_FROM_DEVICE',
                 ''))
@@ -603,7 +606,7 @@ def preprocess(i):
                 "no", "false", "0", ""]:
             run_config += " --start_from_device"
 
-        end_on_device = str(
+        end_on_device=str(
             env.get(
                 'MLC_MLPERF_NVIDIA_HARNESS_END_ON_DEVICE',
                 ''))
@@ -611,36 +614,36 @@ def preprocess(i):
                 "no", "false", "0", ""]:
             run_config += " --end_on_device"
 
-        max_dlas = env.get('MLC_MLPERF_NVIDIA_HARNESS_MAX_DLAS')
+        max_dlas=env.get('MLC_MLPERF_NVIDIA_HARNESS_MAX_DLAS')
         if max_dlas:
             run_config += f" --max_dlas={max_dlas}"
 
-        graphs_max_seqlen = env.get(
+        graphs_max_seqlen=env.get(
             'MLC_MLPERF_NVIDIA_HARNESS_GRAPHS_MAX_SEQLEN')
         if graphs_max_seqlen:
             run_config += f" --graphs_max_seqlen={graphs_max_seqlen}"
 
-        num_issue_query_threads = env.get(
+        num_issue_query_threads=env.get(
             'MLC_MLPERF_NVIDIA_HARNESS_NUM_ISSUE_QUERY_THREADS')
         if num_issue_query_threads:
             run_config += f" --num_issue_query_threads={num_issue_query_threads}"
 
-        soft_drop = env.get('MLC_MLPERF_NVIDIA_HARNESS_SOFT_DROP')
+        soft_drop=env.get('MLC_MLPERF_NVIDIA_HARNESS_SOFT_DROP')
         if soft_drop:
             run_config += f" --soft_drop={soft_drop}"
 
-        use_small_tile_gemm_plugin = str(
+        use_small_tile_gemm_plugin=str(
             env.get('MLC_MLPERF_NVIDIA_HARNESS_USE_SMALL_TILE_GEMM_PLUGIN', ''))
         if use_small_tile_gemm_plugin and use_small_tile_gemm_plugin.lower() not in [
                 "no", "false", "0", ""]:
             run_config += f" --use_small_tile_gemm_plugin"
 
-        audio_buffer_num_lines = env.get(
+        audio_buffer_num_lines=env.get(
             'MLC_MLPERF_NVIDIA_HARNESS_AUDIO_BUFFER_NUM_LINES')
         if audio_buffer_num_lines:
             run_config += f" --audio_buffer_num_lines={audio_buffer_num_lines}"
 
-        use_fp8 = str(env.get('MLC_MLPERF_NVIDIA_HARNESS_USE_FP8', ''))
+        use_fp8=str(env.get('MLC_MLPERF_NVIDIA_HARNESS_USE_FP8', ''))
         if use_fp8 and not is_false(use_fp8):
             run_config += f" --use_fp8"
 
@@ -648,30 +651,30 @@ def preprocess(i):
             run_config += f" --fp8_quant_model_path={fp8_model_path}"
             run_config += f" --tensor_parallelism={tmp_tp_size}"
 
-        enable_sort = env.get('MLC_MLPERF_NVIDIA_HARNESS_ENABLE_SORT')
+        enable_sort=env.get('MLC_MLPERF_NVIDIA_HARNESS_ENABLE_SORT')
         if enable_sort and not is_false(enable_sort):
             run_config += f" --enable_sort"
 
-        sdxl_server_batcher_time_limit = env.get(
+        sdxl_server_batcher_time_limit=env.get(
             'MLC_MLPERF_NVIDIA_HARNESS_ENABLE_SORT')
         if sdxl_server_batcher_time_limit:
             run_config += f" --sdxl_batcher_time_limit {sdxl_server_batcher_time_limit}"
 
-        num_sort_segments = env.get(
+        num_sort_segments=env.get(
             'MLC_MLPERF_NVIDIA_HARNESS_NUM_SORT_SEGMENTS')
         if num_sort_segments:
             run_config += f" --num_sort_segments={num_sort_segments}"
 
-        embedding_weights_on_gpu_part = env.get(
+        embedding_weights_on_gpu_part=env.get(
             'MLC_MLPERF_NVIDIA_HARNESS_EMBEDDING_WEIGHTS_ON_GPU_PART', '')
         if embedding_weights_on_gpu_part != '':
             run_config += f" --embedding_weights_on_gpu_part={embedding_weights_on_gpu_part}"
 
-        num_warmups = env.get('MLC_MLPERF_NVIDIA_HARNESS_NUM_WARMUPS', '')
+        num_warmups=env.get('MLC_MLPERF_NVIDIA_HARNESS_NUM_WARMUPS', '')
         if num_warmups != '':
             run_config += f" --num_warmups={num_warmups}"
 
-        skip_postprocess = str(
+        skip_postprocess=str(
             env.get(
                 'MLC_MLPERF_NVIDIA_HARNESS_SKIP_POSTPROCESS',
                 ''))
@@ -679,14 +682,14 @@ def preprocess(i):
             run_config += f" --skip_postprocess"
 
         if test_mode:
-            test_mode_string = " --test_mode={}".format(test_mode)
+            test_mode_string=" --test_mode={}".format(test_mode)
         else:
-            test_mode_string = ""
+            test_mode_string=""
 
-        extra_build_engine_options_string = env.get(
+        extra_build_engine_options_string=env.get(
             'MLC_MLPERF_NVIDIA_HARNESS_EXTRA_BUILD_ENGINE_OPTIONS', '')
 
-        extra_run_options_string = env.get(
+        extra_run_options_string=env.get(
             'MLC_MLPERF_NVIDIA_HARNESS_EXTRA_RUN_OPTIONS',
             '')  # will be ignored during build engine
 
@@ -701,13 +704,13 @@ def preprocess(i):
 
         cmds.append(f"""make {make_command} RUN_ARGS=' --benchmarks={model_name} --scenarios={scenario} {test_mode_string} {run_config} {extra_build_engine_options_string} {extra_run_options_string}'""")
 
-    run_cmd = " && ".join(cmds)
-    env['MLC_MLPERF_RUN_CMD'] = run_cmd
-    env['MLC_RUN_CMD'] = run_cmd
-    env['MLC_RUN_DIR'] = env['MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH']
+    run_cmd=" && ".join(cmds)
+    env['MLC_MLPERF_RUN_CMD']=run_cmd
+    env['MLC_RUN_CMD']=run_cmd
+    env['MLC_RUN_DIR']=env['MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH']
 
     if '+LD_LIBRARY_PATH' not in env:
-        env['+LD_LIBRARY_PATH'] = []
+        env['+LD_LIBRARY_PATH']=[]
 
     if os.path.exists("/opt/hpcx/ucx/lib"):
         env['+LD_LIBRARY_PATH'].append("/opt/hpcx/ucx/lib")
@@ -722,7 +725,7 @@ def preprocess(i):
 
 def postprocess(i):
 
-    env = i['env']
-    state = i['state']
+    env=i['env']
+    state=i['state']
 
     return {'return': 0}
