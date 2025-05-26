@@ -13,6 +13,8 @@ def preprocess(i):
     state = i['state']
     script_path = i['run_script_input']['path']
 
+    logger = i['automation'].logger
+
     if is_true(env.get('MLC_MLPERF_SKIP_RUN', '')):
         return {'return': 0}
 
@@ -75,18 +77,6 @@ def preprocess(i):
 
     print("Using MLCommons Inference source from '" +
           env['MLC_MLPERF_INFERENCE_SOURCE'] + "'")
-
-    if 'MLC_MLPERF_CONF' not in env:
-        env['MLC_MLPERF_CONF'] = os.path.join(
-            env['MLC_MLPERF_INFERENCE_SOURCE'], "mlperf.conf")
-
-    x = "" if os_info['platform'] == 'windows' else "'"
-    if "llama2-70b" in env['MLC_MODEL']:
-        env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] += " --mlperf-conf " + \
-            x + env['MLC_MLPERF_CONF'] + x
-    else:
-        env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] += " --mlperf_conf " + \
-            x + env['MLC_MLPERF_CONF'] + x
 
     env['MODEL_DIR'] = env.get('MLC_ML_MODEL_PATH')
     if not env['MODEL_DIR']:
@@ -151,11 +141,12 @@ def preprocess(i):
 
     if mode == "accuracy":
         mode_extra_options += " --accuracy"
-        env['MLC_OUTPUT_PREDICTIONS_PATH'] = os.path.join(
-            env['MLC_DATASET_MLCOMMONS_COGNATA_PATH'],
-            env['MLC_DATASET_MLCOMMONS_COGNATA_SERIAL_NUMBERS'],
-            'Cognata_Camera_01_8M_png',
-            'output')
+        if env.get('MLC_MODEL', '') == "retinanet":
+            env['MLC_OUTPUT_PREDICTIONS_PATH'] = os.path.join(
+                env['MLC_DATASET_MLCOMMONS_COGNATA_PATH'],
+                env['MLC_DATASET_MLCOMMONS_COGNATA_SERIAL_NUMBERS'],
+                'Cognata_Camera_01_8M_png',
+                'output')
 
     elif mode == "performance":
         pass
@@ -175,7 +166,7 @@ def preprocess(i):
     # Grigori updated for ABTF demo
 #    cmd, run_dir = get_run_cmd(os_info, env, scenario_extra_options, mode_extra_options, dataset_options, mlperf_implementation)
     cmd, run_dir = get_run_cmd_reference(
-        os_info, env, scenario_extra_options, mode_extra_options, dataset_options, script_path)
+        os_info, env, scenario_extra_options, mode_extra_options, dataset_options, logger, script_path)
 
     if env.get('MLC_NETWORK_LOADGEN', '') == "lon":
 
@@ -194,15 +185,16 @@ def preprocess(i):
     if env.get('MLC_HOST_PLATFORM_FLAVOR', '') == "arm64":
         env['MLC_HOST_PLATFORM_FLAVOR'] = "aarch64"
 
-    if not env.get('MLC_COGNATA_ACCURACY_DUMP_FILE'):
-        env['MLC_COGNATA_ACCURACY_DUMP_FILE'] = os.path.join(
-            env['OUTPUT_DIR'], "accuracy.txt")
+    if env.get('MLC_MODEL', '') == "retinanet":
+        if not env.get('MLC_COGNATA_ACCURACY_DUMP_FILE'):
+            env['MLC_COGNATA_ACCURACY_DUMP_FILE'] = os.path.join(
+                env['OUTPUT_DIR'], "accuracy.txt")
 
     return {'return': 0}
 
 
 def get_run_cmd_reference(os_info, env, scenario_extra_options,
-                          mode_extra_options, dataset_options, script_path=None):
+                          mode_extra_options, dataset_options, logger, script_path=None):
 
     q = '"' if os_info['platform'] == 'windows' else "'"
 
@@ -237,6 +229,53 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
             " --output " + q + env['OUTPUT_DIR'] + q + " " + \
             env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + \
             scenario_extra_options + mode_extra_options + dataset_options
+
+    elif env['MLC_MODEL'] in ['bevformer']:
+        run_dir = env['MLC_MLPERF_INFERENCE_BEVFORMER_PATH']
+
+        env['RUN_DIR'] = run_dir
+
+        env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
+
+        if env['MLC_MLPERF_BACKEND'] != "onnxruntime":
+            logger.warning(
+                "Unsupported backend {MLC_MLPERF_BACKEND}, defaulting to onnx")
+            env['MLC_MLPERF_BACKEND'] = "onnx"
+
+        config_path = os.path.join(
+            run_dir,
+            "projects",
+            "configs",
+            "bevformer",
+            "bevformer_tiny.py")
+        print(env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'])
+        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend onnx --dataset nuscenes --nuscenes-root {os.path.dirname(env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'].rstrip("/"))} --dataset-path {env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH']} --checkpoint {env['MLC_ML_MODEL_BEVFORMER_PATH']} --config {config_path} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
+        print(cmd)
+    elif env['MLC_MODEL'] in ['ssd-resnet50']:
+        run_dir = env['MLC_MLPERF_INFERENCE_SSD_RESNET50_PATH']
+
+        env['RUN_DIR'] = run_dir
+
+        env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
+
+        backend = "onnx" if env.get(
+            'MLC_MLPERF_BACKEND') == "onnxruntime" else env.get('MLC_MLPERF_BACKEND')
+
+        config_path = "baseline_8MP_ss_scales_fm1_5x5_all"
+
+        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {backend} --dataset cognata --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_SSD_PATH']} --config {config_path} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
+
+    elif env['MLC_MODEL'] in ['deeplab_v3+']:
+        run_dir = env['MLC_MLPERF_INFERENCE_DEEPLABV3PLUS_PATH']
+
+        env['RUN_DIR'] = run_dir
+
+        env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
+
+        backend = "onnx" if env.get(
+            'MLC_MLPERF_BACKEND') == "onnxruntime" else env.get('MLC_MLPERF_BACKEND')
+
+        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {backend} --dataset cognata --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_DEEPLABV3_PLUS_PATH']} --config {config_path} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
 
     ##########################################################################
 

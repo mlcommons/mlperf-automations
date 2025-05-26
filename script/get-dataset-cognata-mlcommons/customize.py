@@ -8,6 +8,10 @@ def preprocess(i):
 
     env = i['env']
 
+    if env.get('MLC_COGNATA_DATASET_TYPE', '') == "release":
+        env['MLC_TMP_REQUIRE_DOWNLOAD'] = "yes"
+        return {'return': 0}
+
     mlc_cache_dataset_path = env.get(
         'MLC_CUSTOM_CACHE_ENTRY_DATASET_MLCOMMONS_COGNATA_PATH', '').strip()
 
@@ -60,6 +64,9 @@ def postprocess(i):
     mlc = automation.action_object
 
     logger = automation.logger
+
+    if env.get('MLC_COGNATA_DATASET_TYPE', '') == "release":
+        return {'return': 0}
 
     cur_dir = os.getcwd()
 

@@ -1,0 +1,132 @@
+alias: get-preprocessed-dataset-nuscenes
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+category: AI/ML datasets
+default_env:
+  MLC_DATASET: nuscenes
+new_env_keys:
+- MLC_PREPROCESSED_DATASET_*
+tags:
+- get
+- dataset
+- nuscenes
+- preprocessed
+uid: 0e403a2861984a4e
+print_env_at_the_end:
+  MLC_PREPROCESSED_DATASET_NUSCENES_PATH: Preprocessed Nuscenes dataset path
+  MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH: Path containing minimum files for accuracy checker
+variations:
+  validation:
+    default: true
+    group: dataset-type
+    env:
+      MLC_DATASET_NUSCENES_EXTRACTED_FOLDER_NAME: val_3d
+      MLC_DATASET_NUSCENES_TAR_FILENAME: val_3d.tar.gz
+      MLC_DOWNLOAD_URL: mlc-nuscenes:nuscenes_dataset/preprocessed/<<<MLC_DATASET_NUSCENES_TAR_FILENAME>>>
+  calibration:
+    group: dataset-type
+    env:
+      MLC_DATASET_NUSCENES_EXTRACTED_FOLDER_NAME: calib_3d
+      MLC_DATASET_NUSCENES_TAR_FILENAME: calib_3d.tar.gz
+      MLC_DOWNLOAD_URL: mlc-nuscenes:nuscenes_dataset/preprocessed/<<<MLC_DATASET_NUSCENES_TAR_FILENAME>>>
+  prebuilt:
+    default: true
+    group: dataset-src
+    env:
+      MLC_NUSCENES_DATASET_TYPE: prebuilt
+      MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_PATH
+      MLC_EXTRACT_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_PATH
+      MLC_DOWNLOAD_EXTRA_OPTIONS: ' --include '
+  mlc:
+    group: download-src
+    default: true
+    prehook_deps:
+      - tags: get,rclone
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+      - tags: get,rclone-config,_config-name.mlc-nuscenes
+        force_cache: true
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+        env:
+          MLC_RCLONE_DRIVE_FOLDER_ID: 17CpM5eU8tjrxh_LpH_BTNTeT37PhzcnC
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - 'yes'
+        extra_cache_tags: nuscenes,dataset
+        force_cache: true
+        names:
+          - dae
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+  mlc,validation:
+    env:
+      MLC_DATASET_NUSCENES_SCENE_PICKLE_FILENAME: scene_lengths.pkl
+      MLC_DATASET_NUSCENES_ACC_CHECKER_DEP_FILES_TAR_NAME: nuscenes_min.tar.gz
+      MLC_DATASET_NUSCENES_ACC_REQ_FILE_EXTRACTED_FOLDER_NAME: nuscenes
+    prehook_deps:
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - 'yes'
+        extra_cache_tags: nuscenes,dataset,scene_lengths
+        force_cache: true
+        names:
+          - dae_sl
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        env:
+          MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_SCENE_LENGTHS_PATH
+          MLC_EXTRACT_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_SCENE_LENGTHS_PATH
+          MLC_DOWNLOAD_URL: mlc-nuscenes:nuscenes_dataset/scene_lengths.pkl
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - 'yes'
+        extra_cache_tags: nuscenes,dataset,accuracy_checker
+        force_cache: true
+        names:
+          - dae_ac
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        env:
+          MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH
+          MLC_EXTRACT_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH
+          MLC_DOWNLOAD_URL: mlc-nuscenes:nuscenes_dataset/nuscenes_min.tar.gz
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
+  rclone:
+    group: download-tool
+    add_deps_recursive:
+      dae:
+        tags: _rclone
+      dae_sl:
+        tags: _rclone
+      dae_ac:
+        tags: _rclone
+    default: true
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+tests:
+  run_inputs:
+  - variations_list:
+      - validation,prebuilt,rclone,mlc,dry-run
+      - calibration,prebuilt,rclone,mlc,dry-run
