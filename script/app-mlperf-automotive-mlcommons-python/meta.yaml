@@ -399,6 +399,11 @@ variations:
 
   abtf-demo-model:
     group: models
+    add_deps_recursive:
+      automotive-src:
+        env:
+          MLC_GIT_SHA:
+            - "ee526dc63d9ca2636000343c5d2d16132145719e"
     deps:
       - tags: get,generic-python-lib,_opencv-python
       - tags: get,generic-python-lib,_numpy
@@ -421,6 +426,11 @@ variations:
   abtf-poc-model:
     group: models
     default: true
+    add_deps_recursive:
+      automotive-src:
+        env:
+          MLC_GIT_SHA:
+            - "ee526dc63d9ca2636000343c5d2d16132145719e"
     deps:
       - tags: get,generic-python-lib,_opencv-python
       - tags: get,generic-python-lib,_numpy
