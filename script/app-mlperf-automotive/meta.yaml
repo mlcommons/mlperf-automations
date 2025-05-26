@@ -119,13 +119,15 @@ post_deps:
 
 docker:
   mlc_repo: anandhu-eng@mlperf-automations
-  mlc_repo_branch: automotive
+  mlc_repo_branch: automotive2
   use_host_group_id: True
   use_host_user_id: True
   real_run: false
   user: mlcuser
   interactive: True
   mlc_repos_off: 'mlc pull repo mlcommons@cm4abtf --branch=poc'
+  pre_run_cmds:
+    - mlc pull repo
   deps:
     - tags: get,abtf,scratch,space
   mounts:
