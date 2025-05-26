@@ -201,7 +201,7 @@ deps:
       - tvm-pytorch
       MLC_MLPERF_DEVICE:
       - cpu
-    enable_if_env
+    enable_if_env:
       MLC_MODEL:
       - deeplabv3plus
 
