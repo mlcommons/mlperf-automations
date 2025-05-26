@@ -265,7 +265,7 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
 
         cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {backend} --dataset cognata --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_SSD_PATH']} --config {config_path} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
 
-    elif env['MLC_MODEL'] in ['deeplab_v3+']:
+    elif env['MLC_MODEL'] in ['deeplab-v3+']:
         run_dir = env['MLC_MLPERF_INFERENCE_DEEPLABV3PLUS_PATH']
 
         env['RUN_DIR'] = run_dir
