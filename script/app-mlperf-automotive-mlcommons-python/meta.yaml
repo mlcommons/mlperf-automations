@@ -378,7 +378,7 @@ variations:
       pytorch:
         env:
           MLC_GENERIC_PYTHON_PIP_EXTRA_INDEX_URL: https://download.pytorch.org/whl/cpu/torch_stable.html
-      torchvision:
+      ml-engine-torchvision:
         env:
           MLC_GENERIC_PYTHON_PIP_EXTRA_INDEX_URL: https://download.pytorch.org/whl/cpu/torch_stable.html
       torchaudio:
@@ -460,7 +460,7 @@ variations:
       pytorch:
         version_max: "2.5.1"
         version_max_usable: "2.5.1"
-      torchvision:
+      ml-engine-torchvision:
         version_max: "0.20.1"
         version_max_usable": "0.20.1"
       torchaudio:
@@ -495,7 +495,7 @@ variations:
       pytorch:
         version_max: "2.3.1"
         version_max_usable: "2.3.1"
-      torchvision:
+      ml-engine-torchvision:
         version_max: "0.18.1"
         version_max_usable": "0.18.1"
       torchaudio:
@@ -530,7 +530,7 @@ variations:
       pytorch:
         version_max: "2.3.1"
         version_max_usable: "2.3.1"
-      torchvision:
+      ml-engine-torchvision:
         version_max: "0.18.1"
         version_max_usable": "0.18.1"
       torchaudio:
