@@ -8,7 +8,7 @@ def preprocess(i):
 
     env = i['env']
 
-    if env.get('MLC_NUSCENES_DATASET_TYPE', '') == "prebuilt":
+    if env.get('MLC_NUSCENES_DATASET_TYPE', '') == "prebuilt" and env.get('MLC_PREPROCESSED_DATASET_COGNATA_PATH', '') != '':
         env['MLC_TMP_REQUIRE_DOWNLOAD'] = "yes"
 
     return {'return': 0}
