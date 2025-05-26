@@ -297,13 +297,13 @@ variations:
           MLC_RUN_STATE_DOCKER:
             - "yes"
         names:
-          - preprocessed-dataset-mlcommons-cognata-ssd-resnet50
+          - preprocessed-dataset-mlcommons-cognata-ssd
       - tags: get,ml-model,ssd,resnet50,_mlc,_rclone
         skip_if_any_env:
           MLC_RUN_STATE_DOCKER:
             - "yes"
         names:
-          - ml-model-ssd-resnet50
+          - ml-model-ssd
     env:
       MLC_DATASET: cognata_ssd
     group: dataset
