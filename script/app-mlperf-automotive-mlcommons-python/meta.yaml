@@ -201,6 +201,8 @@ deps:
       - tvm-pytorch
       MLC_MLPERF_DEVICE:
       - cpu
+      MLC_MODEL:
+      - deeplab-v3+
 
   ## Torchvision (CUDA)
   - tags: get,generic-python-lib,_torchvision_cuda
@@ -539,7 +541,6 @@ variations:
       - tags: get,generic-python-lib,_package.scikit-learn
       - tags: get,generic-python-lib,_package.torchinfo
       - tags: get,generic-python-lib,_package.torchmetrics
-      - tags: get,generic-python-lib,_package.torchvision
       - tags: get,generic-sys-util,_libgl1-mesa-glx
       - tags: get,generic-python-lib,_package.onnx
       - tags: get,generic-python-lib,_package.onnxruntime
