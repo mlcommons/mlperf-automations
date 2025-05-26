@@ -162,7 +162,7 @@ variations:
     new_env_keys:
     - MLC_LIBGLX_VERSION
     state:
-      libgl: # tbd: complete for other flavours of linux
+      libgl1-mesa-glx: # tbd: complete for other flavours of linux
         apt: libgl1-mesa-glx
         brew: ''
         dnf: ''
