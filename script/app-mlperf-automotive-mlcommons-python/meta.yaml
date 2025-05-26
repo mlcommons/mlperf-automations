@@ -204,6 +204,7 @@ deps:
     enable_if_env:
       MLC_MODEL:
       - deeplabv3plus
+      - ssd
 
   ## Torchvision (CUDA)
   - tags: get,generic-python-lib,_torchvision_cuda
