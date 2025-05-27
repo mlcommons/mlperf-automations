@@ -13,6 +13,20 @@ deps:
   - inference-src
   - accuracy-check-src
   tags: get,mlcommons,inference,src
+  skip_if_env:
+    MLC_DATASET:
+      - nuscenes
+      - cognata_deeplab
+      - cognata_ssd
+- names:
+  - automotive-src
+  - accuracy-check-src
+  tags: get,mlcommons,automotive,src
+  enable_if_env:
+    MLC_DATASET:
+      - nuscenes
+      - cognata_deeplab
+      - cognata_ssd
 input_mapping:
   rerun: MLC_RERUN
   result_dir: MLC_MLPERF_ACCURACY_RESULTS_DIR
