@@ -139,6 +139,20 @@ variations:
         dnf: ''   
         yum: ''
   
+  ipmitool:
+    env:
+      MLC_SYS_UTIL_NAME: ipmitool
+      MLC_SYS_UTIL_VERSION_CMD: ipmitool -V
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+    - MLC_IPMITOOL_VERSION
+    state:
+      ipmitool: # tbd: complete for other flavours of linux
+        apt: ipmitool
+        brew: ''
+        dnf: ''   
+        yum: ''
+  
   libgl:
     env:
       MLC_SYS_UTIL_NAME: libgl # tbd: regular expression for version as well as whether its installed?
