@@ -458,7 +458,8 @@ variations:
   bevformer:
     group: models
     default_env:
-      MLC_MLPERF_MAX_QUERY_COUNT: 6636
+      MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: 99.9
+      MLC_DEFAULT_MLPERF_MAX_QUERY_COUNT: 6636
     add_deps_recursive:
       pytorch:
         version_max: "2.5.1"
@@ -495,7 +496,8 @@ variations:
   ssd:
     group: models
     default_env:
-      MLC_MLPERF_MAX_QUERY_COUNT: 6636
+      MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: 99.9
+      MLC_DEFAULT_MLPERF_MAX_QUERY_COUNT: 6636
     add_deps_recursive:
       pytorch:
         version_max: "2.3.1"
@@ -535,7 +537,8 @@ variations:
   deeplabv3plus:
     group: models
     default_env:
-      MLC_MLPERF_MAX_QUERY_COUNT: 6636
+      MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: 99.9
+      MLC_DEFAULT_MLPERF_MAX_QUERY_COUNT: 6636
     add_deps_recursive:
       pytorch:
         version_max: "2.3.1"

@@ -368,11 +368,11 @@ def preprocess(i):
                 user_conf += ml_model_name + "." + scenario + ".min_duration = " + \
                     env['MLC_MLPERF_INFERENCE_MIN_DURATION'] + " \n"
             elif not is_false(env.get('MLC_MLPERF_USE_MAX_DURATION', 'yes')) and not is_true(env.get(
-                    'MLC_MLPERF_MODEL_EQUAL_ISSUE_MODE', 'no')) and env.get('MLC_BENCHMARK_GROUP') != 'automotive':
+                    'MLC_MLPERF_MODEL_EQUAL_ISSUE_MODE', 'no')) and env.get('MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE') != '99.9':
                 user_conf += ml_model_name + "." + scenario + \
                     f".max_duration = {max_duration_valid}" + "\n"
-            if scenario == "SingleStream" and env.get('MLC_BENCHMARK_GROUP') == 'automotive' and env.get(
-                    'MLC_MLPERF_MAX_QUERY_COUNT', '') != '' and env.get('MLC_MLPERF_TARGET_LATENCY', '') == '':
+            if scenario == "SingleStream" and env.get('MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE') == '99.9' and env.get(
+                    'MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT', '') != '' and env.get('MLC_MLPERF_TARGET_LATENCY', '') == '':
                 user_conf += ml_model_name + "." + scenario + \
                     f".max_query_count = {env.get('MLC_MLPERF_MAX_QUERY_COUNT')}" + "\n"
             if scenario == "MultiStream":
