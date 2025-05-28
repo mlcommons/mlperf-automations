@@ -129,8 +129,7 @@ def timeout_input(prompt, timeout=15, default=""):
 
 
 def prompt_sudo(logger):
-    if os.geteuid() != 0 and not is_user_in_sudo_group(
-            logger):  # No sudo required for root user
+    if os.geteuid() != 0:  # No sudo required for root user
 
         # Prompt for the password
 
@@ -171,7 +170,7 @@ def prompt_sudo(logger):
         except subprocess.TimeoutExpired:
             logger.info("Timedout")
             reset_terminal()  # Reset terminal to sane state
-            if not prompt_retry():  # If the user chooses not to retry or times out
+            if not prompt_retry(logger):  # If the user chooses not to retry or times out
                 return -1
         except subprocess.CalledProcessError as e:
             logger.error(f"Command failed: {e.output}")
