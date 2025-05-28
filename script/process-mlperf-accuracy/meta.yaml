@@ -13,6 +13,20 @@ deps:
   - inference-src
   - accuracy-check-src
   tags: get,mlcommons,inference,src
+  skip_if_env:
+    MLC_DATASET:
+      - nuscenes
+      - cognata_deeplab
+      - cognata_ssd
+- names:
+  - automotive-src
+  - accuracy-check-src
+  tags: get,mlcommons,automotive,src
+  enable_if_env:
+    MLC_DATASET:
+      - nuscenes
+      - cognata_deeplab
+      - cognata_ssd
 input_mapping:
   rerun: MLC_RERUN
   result_dir: MLC_MLPERF_ACCURACY_RESULTS_DIR
@@ -297,13 +311,13 @@ variations:
           MLC_RUN_STATE_DOCKER:
             - "yes"
         names:
-          - preprocessed-dataset-mlcommons-cognata-ssd-resnet50
+          - preprocessed-dataset-mlcommons-cognata-ssd
       - tags: get,ml-model,ssd,resnet50,_mlc,_rclone
         skip_if_any_env:
           MLC_RUN_STATE_DOCKER:
             - "yes"
         names:
-          - ml-model-ssd-resnet50
+          - ml-model-ssd
     env:
       MLC_DATASET: cognata_ssd
     group: dataset

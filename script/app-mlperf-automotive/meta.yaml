@@ -119,13 +119,15 @@ post_deps:
 
 docker:
   mlc_repo: anandhu-eng@mlperf-automations
-  mlc_repo_branch: automotive
+  mlc_repo_branch: automotive2
   use_host_group_id: True
   use_host_user_id: True
   real_run: false
   user: mlcuser
   interactive: True
   mlc_repos_off: 'mlc pull repo mlcommons@cm4abtf --branch=poc'
+  pre_run_cmds:
+    - mlc pull repo
   deps:
     - tags: get,abtf,scratch,space
   mounts:
@@ -188,16 +190,16 @@ variations:
         tags: _onnxruntime
       ml-model-bevformer:
         tags: _onnx
-      ml-model-ssd-resnet50:
+      ml-model-ssd:
         tags: _onnx
-      ml-model-deeplab-v3+:
+      ml-model-deeplabv3plus:
         tags: _onnx
 
   onnx_dynamic:
     base:
       - onnxruntime
     add_deps_recursive:
-      ml-model-deeplab-v3+:
+      ml-model-deeplabv3plus:
         tags: _onnx_dynamic
 
   onnxruntime,cpu:
@@ -221,9 +223,9 @@ variations:
         tags: _pytorch
       ml-model-bevformer:
         tags: _pytorch
-      ml-model-ssd-resnet50:
+      ml-model-ssd:
         tags: _pytorch
-      ml-model-deeplab-v3+:
+      ml-model-deeplabv3plus:
         tags: _pytorch
 
 
@@ -263,11 +265,11 @@ variations:
       MLC_MODEL: bevformer
     docker:
       deps:
-        - tags: get,preprocessed,dataset,nuscenes
+        - tags: get,preprocessed,dataset,nuscenes,_mlc,_validation
           enable_if_env:
             MLC_USE_DATASET_FROM_HOST:
               - "yes"
-        - tags: get,ml-model,bevformer
+        - tags: get,ml-model,bevformer,_mlc,_rclone
           enable_if_env:
             MLC_USE_MODEL_FROM_HOST:
               - "yes"
@@ -292,16 +294,16 @@ variations:
       - nuscenes-accuracy-script
       tags: run,accuracy,mlperf,_nuscenes
   
-  ssd-resnet50:
+  ssd:
     group:
       models
     default_env:
       MLC_USE_DATASET_FROM_HOST: yes
     env:
-      MLC_MODEL: ssd-resnet50
+      MLC_MODEL: ssd
     docker:
       deps:
-        - tags: get,preprocessed,dataset,cognata
+        - tags: get,preprocessed,dataset,cognata,_mlc,_2d_object_det,_validation
           enable_if_env:
             MLC_USE_DATASET_FROM_HOST:
               - "yes"
@@ -310,13 +312,13 @@ variations:
             MLC_USE_MODEL_FROM_HOST:
               - "yes"
           names:
-            - ml-model-ssd-resnet50
+            - ml-model-ssd
       mounts:
         - "${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}:${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}"
         - "${{ MLC_ML_MODEL_SSD_PATH }}:${{ MLC_ML_MODEL_SSD_PATH }}"
     add_deps_recursive:
       abtf-inference-implementation:
-        tags: _ssd-resnet50
+        tags: _ssd
     posthook_deps:
     - enable_if_env:
         MLC_MLPERF_LOADGEN_MODE:
@@ -329,31 +331,31 @@ variations:
       - cognata-ssd-accuracy-script
       tags: run,accuracy,mlperf,_cognata_ssd
   
-  deeplab-v3+:
+  deeplabv3plus:
     group:
       models
     default_env:
       MLC_USE_DATASET_FROM_HOST: yes
     env:
-      MLC_MODEL: deeplab-v3+
+      MLC_MODEL: deeplabv3plus
     docker:
       deps:
-        - tags: get,preprocessed,dataset,cognata,_segmentation
+        - tags: get,preprocessed,dataset,cognata,_mlc,_segmentation,_validation
           enable_if_env:
             MLC_USE_DATASET_FROM_HOST:
               - "yes"
-        - tags: get,ml-model,ssd,resnet50,_mlc,_rclone
+        - tags:  get,ml-model,deeplabv3-plus,_mlc,_rclone
           enable_if_env:
             MLC_USE_MODEL_FROM_HOST:
               - "yes"
           names:
-            - ml-model-deeplab-v3+
+            - ml-model-deeplabv3plus
       mounts:
         - "${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}:${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}"
         - "${{ MLC_ML_MODEL_DEEPLABV3_PLUS_PATH }}:${{ MLC_ML_MODEL_DEEPLABV3_PLUS_PATH }}"
     add_deps_recursive:
       abtf-inference-implementation:
-        tags: _deeplab-v3+
+        tags: _deeplabv3plus
     posthook_deps:
     - enable_if_env:
         MLC_MLPERF_LOADGEN_MODE:

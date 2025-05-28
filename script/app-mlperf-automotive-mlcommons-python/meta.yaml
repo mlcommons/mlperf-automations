@@ -339,6 +339,10 @@ variations:
     add_deps_recursive:
       ml-model-bevformer:
         tags: _onnx
+      ml-model-ssd:
+        tags: _onnx
+      ml-model-deeplabv3-plus:
+        tags: _onnx
 
   onnxruntime,cpu:
     env:
@@ -362,7 +366,7 @@ variations:
         tags: raw,_pytorch
       ml-model-bevformer:
         tags: _pytorch
-      ml-model-ssd-resnet50:
+      ml-model-ssd:
         tags: _pytorch
       ml-model-deeplabv3-plus:
         tags: _pytorch
@@ -375,7 +379,7 @@ variations:
       pytorch:
         env:
           MLC_GENERIC_PYTHON_PIP_EXTRA_INDEX_URL: https://download.pytorch.org/whl/cpu/torch_stable.html
-      torchvision:
+      ml-engine-torchvision:
         env:
           MLC_GENERIC_PYTHON_PIP_EXTRA_INDEX_URL: https://download.pytorch.org/whl/cpu/torch_stable.html
       torchaudio:
@@ -457,7 +461,7 @@ variations:
       pytorch:
         version_max: "2.5.1"
         version_max_usable: "2.5.1"
-      torchvision:
+      ml-engine-torchvision:
         version_max: "0.20.1"
         version_max_usable": "0.20.1"
       torchaudio:
@@ -473,26 +477,26 @@ variations:
       - tags: get,generic-python-lib,_package.pyquaternion
       - tags: get,generic-python-lib,_package.tqdm
       - tags: get,generic-python-lib,_package.nuscenes-devkit
-      - tags: get,preprocessed,dataset,nuscenes
+      - tags: get,preprocessed,dataset,nuscenes,_mlc,_validation
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
             - "yes"
         names:
           - preprocessed-dataset-mlcommons-nuscenes
-      - tags: get,ml-model,bevformer
+      - tags: get,ml-model,bevformer,_mlc,_rclone
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
             - "yes"
         names:
           - ml-model-bevformer
 
-  ssd-resnet50:
+  ssd:
     group: models
     add_deps_recursive:
       pytorch:
         version_max: "2.3.1"
         version_max_usable: "2.3.1"
-      torchvision:
+      ml-engine-torchvision:
         version_max: "0.18.1"
         version_max_usable": "0.18.1"
       torchaudio:
@@ -502,32 +506,35 @@ variations:
       - tags: get,generic-python-lib,_package.Cython
       - tags: get,generic-python-lib,_package.scikit-image
       - tags: get,generic-python-lib,_package.faster-coco-eval
+      - tags: get,generic-python-lib,_torchvision
+        names:
+          - ml-engine-torchvision
       - tags: get,generic-python-lib,_package.torchinfo
       - tags: get,generic-python-lib,_package.torchmetrics
       - tags: get,generic-sys-util,_libgl1-mesa-glx
       - tags: get,generic-python-lib,_package.onnx
       - tags: get,generic-python-lib,_package.onnxruntime
       - tags: get,generic-python-lib,_package.tqdm
-      - tags: get,preprocessed,dataset,cognata,_mlc
+      - tags: get,preprocessed,dataset,cognata,_mlc,_2d_object_det,_validation
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
             - "yes"
         names:
-          - preprocessed-dataset-mlcommons-cognata-ssd-resnet50
+          - preprocessed-dataset-mlcommons-cognata-ssd
       - tags: get,ml-model,ssd,resnet50,_mlc,_rclone
         skip_if_any_env:
           MLC_RUN_STATE_DOCKER:
             - "yes"
         names:
-          - ml-model-ssd-resnet50
+          - ml-model-ssd
 
-  deeplab-v3+:
+  deeplabv3plus:
     group: models
     add_deps_recursive:
       pytorch:
         version_max: "2.3.1"
         version_max_usable: "2.3.1"
-      torchvision:
+      ml-engine-torchvision:
         version_max: "0.18.1"
         version_max_usable": "0.18.1"
       torchaudio:
@@ -537,6 +544,9 @@ variations:
       - tags: get,generic-python-lib,_package.Cython
       - tags: get,generic-python-lib,_package.scikit-image
       - tags: get,generic-python-lib,_package.scikit-learn
+      - tags: get,generic-python-lib,_torchvision
+        names:
+          - ml-engine-torchvision
       - tags: get,generic-python-lib,_package.torchinfo
       - tags: get,generic-python-lib,_package.torchmetrics
       - tags: get,generic-sys-util,_libgl1-mesa-glx
@@ -544,13 +554,13 @@ variations:
       - tags: get,generic-python-lib,_package.onnxruntime
       - tags: get,generic-python-lib,_package.tqdm
       - tags: get,generic-python-lib,_package.ijson
-      - tags: get,preprocessed,dataset,cognata,_mlc,_segmentation
+      - tags: get,preprocessed,dataset,cognata,_mlc,_segmentation,_validation
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
             - "yes"
         names:
           - preprocessed-dataset-mlcommons-cognata-deeplabv3-plus
-      - tags: get,ml-model,deeplabv3-plus
+      - tags: get,ml-model,deeplabv3-plus,_mlc,_rclone
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
             - "yes"

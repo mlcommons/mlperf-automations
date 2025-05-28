@@ -251,7 +251,7 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
         print(env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'])
         cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend onnx --dataset nuscenes --nuscenes-root {os.path.dirname(env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'].rstrip("/"))} --dataset-path {env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH']} --checkpoint {env['MLC_ML_MODEL_BEVFORMER_PATH']} --config {config_path} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
         print(cmd)
-    elif env['MLC_MODEL'] in ['ssd-resnet50']:
+    elif env['MLC_MODEL'] in ['ssd']:
         run_dir = env['MLC_MLPERF_INFERENCE_SSD_RESNET50_PATH']
 
         env['RUN_DIR'] = run_dir
@@ -265,7 +265,7 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
 
         cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {backend} --dataset cognata --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_SSD_PATH']} --config {config_path} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
 
-    elif env['MLC_MODEL'] in ['deeplab_v3+']:
+    elif env['MLC_MODEL'] in ['deeplabv3plus']:
         run_dir = env['MLC_MLPERF_INFERENCE_DEEPLABV3PLUS_PATH']
 
         env['RUN_DIR'] = run_dir
@@ -275,7 +275,7 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
         backend = "onnx" if env.get(
             'MLC_MLPERF_BACKEND') == "onnxruntime" else env.get('MLC_MLPERF_BACKEND')
 
-        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {backend} --dataset cognata --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_DEEPLABV3_PLUS_PATH']} --config {config_path} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
+        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {backend} --dataset cognata --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_DEEPLABV3_PLUS_PATH']} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
 
     ##########################################################################
 
