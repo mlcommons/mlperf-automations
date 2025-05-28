@@ -91,12 +91,16 @@ variations:
   inference:
     default: true
     group: benchmark_wg
+    env:
+      MLC_BENCHMARK_GROUP: inference
     deps:
       - tags: get,mlcommons,inference,src
         names:
         - inference-src
   automotive:
     group: benchmark_wg
+    env:
+      MLC_BENCHMARK_GROUP: automotive
     deps:
       - tags: get,mlcommons,automotive,src
         names:
