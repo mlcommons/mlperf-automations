@@ -36,7 +36,7 @@ variations:
       MLC_DATASET_COGNATA_TASK: segmentation
   validation,2d_obj_det:
     env:
-      MLC_DATASET_COGNATA_EXTRACTED_FOLDER_NAMEE: val_2d
+      MLC_DATASET_COGNATA_EXTRACTED_FOLDER_NAME: val_2d
       MLC_DATASET_COGNATA_TAR_FILENAME: val_2d.tar.gz
       MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/preprocessed_2d/<<<MLC_DATASET_COGNATA_TAR_FILENAME>>>
   calibration,2d_obj_det:
