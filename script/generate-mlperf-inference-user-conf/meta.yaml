@@ -84,13 +84,20 @@ deps:
       OUTPUT_BASE_DIR:
         - "on"
 
-  ########################################################################
-  # Install MLPerf inference dependencies
-
-  # Download MLPerf inference source
-  - tags: get,mlcommons,inference,src
-    names:
-    - inference-src
-
   # Get SUT configs (System Under Test)
   - tags: get,sut,configs
+
+variations:
+  inference:
+    default: true
+    group: benchmark_wg
+    deps:
+      - tags: get,mlcommons,inference,src
+        names:
+        - inference-src
+  automotive:
+    group: benchmark_wg
+    deps:
+      - tags: get,mlcommons,automotive,src
+        names:
+        - automotive-src

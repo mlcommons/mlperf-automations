@@ -79,7 +79,7 @@ variations:
       git-history: full-history
     env:
       MLC_GIT_SHA: '#'
-    group: checkout
+    group: post-checkout
   short-history:
     default: true
     env:

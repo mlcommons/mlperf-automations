@@ -48,9 +48,11 @@ deps:
   - custom-cache-entry-mlcommons-cognata-dataset
   tags: create,custom,cache,entry
   extra_cache_tags: dataset,cognata,mlcommons-cognata
-  skip_if_env:
+  skip_if_any_env:
     MLC_DATASET_MLCOMMONS_COGNATA_FILE_NAMES:
     - 'off'
+    MLC_DOWNLOAD_SRC: 
+    - mlcommons
   env_key: DATASET_MLCOMMONS_COGNATA
   # this script will prepare env MLC_CUSTOM_CACHE_ENTRY_{env_key}_PATH
 
@@ -58,9 +60,11 @@ deps:
 prehook_deps:
 - names:
   - gdrive-downloader-cognata
-  skip_if_env:
+  skip_if_any_env:
     MLC_DATASET_MLCOMMONS_COGNATA_FILE_NAMES:
     - 'on'
+    MLC_DOWNLOAD_SRC: 
+    - mlcommons
   enable_if_env:
     MLC_DATASET_MLCOMMONS_COGNATA_IMPORTED:
     - 'no'
@@ -76,9 +80,11 @@ prehook_deps:
 
 - names:
   - rclone-downloader-cognata
-  skip_if_env:
+  skip_if_any_env:
     MLC_DATASET_MLCOMMONS_COGNATA_FILE_NAMES:
     - 'on'
+    MLC_DOWNLOAD_SRC: 
+    - mlcommons
   enable_if_env:
     MLC_DATASET_MLCOMMONS_COGNATA_IMPORTED:
     - 'no'
@@ -101,27 +107,33 @@ prehook_deps:
   - python
   - python3
   tags: get,python3
-  skip_if_env:
+  skip_if_any_env:
     MLC_DATASET_MLCOMMONS_COGNATA_IMPORTED:
     - 'yes'
+    MLC_DOWNLOAD_SRC: 
+    - mlcommons
   enable_if_env:
     MLC_DATASET_MLCOMMONS_COGNATA_FILE_NAMES:
       - 'on'
 
 # Python package to read/write Excel files
 - tags: get,generic-python-lib,_package.openpyxl
-  skip_if_env:
+  skip_if_any_env:
     MLC_DATASET_MLCOMMONS_COGNATA_IMPORTED:
     - 'yes'
+    MLC_DOWNLOAD_SRC: 
+    - mlcommons
   enable_if_env:
     MLC_DATASET_MLCOMMONS_COGNATA_FILE_NAMES:
       - 'on'
 
 # Tool to download large files
 - tags: get,aria2
-  skip_if_env:
+  skip_if_any_env:
     MLC_DATASET_MLCOMMONS_COGNATA_IMPORTED:
     - 'yes'
+    MLC_DOWNLOAD_SRC: 
+    - mlcommons
   enable_if_env:
     MLC_DATASET_MLCOMMONS_COGNATA_FILE_NAMES:
     - 'on'
@@ -143,6 +155,11 @@ variations:
       MLC_DATASET_MLCOMMONS_COGNATA_GROUP_NAMES: "Cognata_Camera_01_8M"
       MLC_DATASET_MLCOMMONS_COGNATA_FILE_NAMES: ""
 
+  release:
+    group: dataset-type
+    env:
+      MLC_COGNATA_DATASET_TYPE: "release"
+
   rclone:
     group: download-tool
     default: true
@@ -153,6 +170,57 @@ variations:
     group: download-tool
     env:
       MLC_DATASET_MLCOMMONS_COGNATA_DOWNLOAD_TOOL: gdrive
+  
+  mlc:
+    group: download-src
+    prehook_deps:
+      - tags: get,rclone
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+      - tags: get,rclone-config,_config-name.cognata
+        force_cache: true
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+        env:
+          MLC_RCLONE_DRIVE_FOLDER_ID: 1u5FDoeXHVtDrd4zClE47Gmyr7iLFidz1
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - 'yes'
+        env:
+          MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_MLCOMMONS_COGNATA_PATH
+          MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_MLCOMMONS_COGNATA_PATH
+          MLC_DOWNLOAD_URL: 'mlc-cognata:mlc_cognata_dataset/unprocessed'
+        extra_cache_tags: dataset,cognata,release
+        force_cache: true
+        names:
+          - dae
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+  
+  rclone,mlc:
+    add_deps_recursive:
+      dae:
+        tags: _rclone
+    env:
+      MLC_RCLONE_COPY_USING: sync
+
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
+
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  
 
 new_env_keys:
 - MLC_DATASET_MLCOMMONS_COGNATA*
