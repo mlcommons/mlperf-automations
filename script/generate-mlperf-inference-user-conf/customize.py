@@ -371,7 +371,8 @@ def preprocess(i):
                     'MLC_MLPERF_MODEL_EQUAL_ISSUE_MODE', 'no')) and env.get('MLC_BENCHMARK_GROUP') != 'automotive':
                 user_conf += ml_model_name + "." + scenario + \
                     f".max_duration = {max_duration_valid}" + "\n"
-            if scenario == "SingleStream" and env.get('MLC_BENCHMARK_GROUP') == 'automotive' and env.get('MLC_MLPERF_MAX_QUERY_COUNT', '') != '' and env.get('MLC_MLPERF_TARGET_LATENCY', '') == '':
+            if scenario == "SingleStream" and env.get('MLC_BENCHMARK_GROUP') == 'automotive' and env.get(
+                    'MLC_MLPERF_MAX_QUERY_COUNT', '') != '' and env.get('MLC_MLPERF_TARGET_LATENCY', '') == '':
                 user_conf += ml_model_name + "." + scenario + \
                     f".max_query_count = {env.get('MLC_MLPERF_MAX_QUERY_COUNT')}" + "\n"
             if scenario == "MultiStream":
