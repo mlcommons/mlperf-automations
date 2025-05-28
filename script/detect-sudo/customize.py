@@ -170,7 +170,8 @@ def prompt_sudo(logger):
         except subprocess.TimeoutExpired:
             logger.info("Timedout")
             reset_terminal()  # Reset terminal to sane state
-            if not prompt_retry(logger):  # If the user chooses not to retry or times out
+            if not prompt_retry(
+                    logger):  # If the user chooses not to retry or times out
                 return -1
         except subprocess.CalledProcessError as e:
             logger.error(f"Command failed: {e.output}")
