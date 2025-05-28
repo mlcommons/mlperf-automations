@@ -143,6 +143,7 @@ variations:
     env:
       MLC_SYS_UTIL_NAME: ipmitool
       MLC_SYS_UTIL_VERSION_CMD: ipmitool -V
+      MLC_SYS_UTIL_VERSION_RE: 'ipmitool version ([\d.]+)'
       MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
     new_env_keys:
     - MLC_IPMITOOL_VERSION
