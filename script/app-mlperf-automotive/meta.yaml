@@ -265,11 +265,11 @@ variations:
       MLC_MODEL: bevformer
     docker:
       deps:
-        - tags: get,preprocessed,dataset,nuscenes
+        - tags: get,preprocessed,dataset,nuscenes,_mlc,_validation
           enable_if_env:
             MLC_USE_DATASET_FROM_HOST:
               - "yes"
-        - tags: get,ml-model,bevformer
+        - tags: get,ml-model,bevformer,_mlc,_rclone
           enable_if_env:
             MLC_USE_MODEL_FROM_HOST:
               - "yes"
@@ -303,7 +303,7 @@ variations:
       MLC_MODEL: ssd
     docker:
       deps:
-        - tags: get,preprocessed,dataset,cognata,_2d_obj_det
+        - tags: get,preprocessed,dataset,cognata,_mlc,_2d_object_det,_validation
           enable_if_env:
             MLC_USE_DATASET_FROM_HOST:
               - "yes"
@@ -340,11 +340,11 @@ variations:
       MLC_MODEL: deeplabv3plus
     docker:
       deps:
-        - tags: get,preprocessed,dataset,cognata,_segmentation
+        - tags: get,preprocessed,dataset,cognata,_mlc,_segmentation,_validation
           enable_if_env:
             MLC_USE_DATASET_FROM_HOST:
               - "yes"
-        - tags:  get,ml-model,deeplabv3-plus
+        - tags:  get,ml-model,deeplabv3-plus,_mlc,_rclone
           enable_if_env:
             MLC_USE_MODEL_FROM_HOST:
               - "yes"
