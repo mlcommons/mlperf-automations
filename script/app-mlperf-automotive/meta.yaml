@@ -303,7 +303,7 @@ variations:
       MLC_MODEL: ssd
     docker:
       deps:
-        - tags: get,preprocessed,dataset,cognata,_mlc,_2d_object_det,_validation
+        - tags: get,preprocessed,dataset,cognata,_mlc,_2d_obj_det,_validation
           enable_if_env:
             MLC_USE_DATASET_FROM_HOST:
               - "yes"
