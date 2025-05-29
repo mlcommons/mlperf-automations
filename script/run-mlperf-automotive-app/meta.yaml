@@ -73,6 +73,7 @@ input_mapping:
   run_style: MLC_MLPERF_RUN_STYLE
   scenario: MLC_MLPERF_LOADGEN_SCENARIO
   server_target_qps: MLC_MLPERF_LOADGEN_SERVER_TARGET_QPS
+  constantstream_target_qps: MLC_MLPERF_LOADGEN_CONSTANTSTREAM_TARGET_QPS
   singlestream_target_latency: MLC_MLPERF_LOADGEN_SINGLESTREAM_TARGET_LATENCY
   skip_submission_generation: MLC_MLPERF_SKIP_SUBMISSION_GENERATION
   skip_truncation: MLC_SKIP_TRUNCATE_ACCURACY

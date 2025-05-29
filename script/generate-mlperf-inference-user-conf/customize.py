@@ -100,7 +100,7 @@ def preprocess(i):
     query_count = None
 
     value = None
-    if scenario in ['Offline', 'Server']:
+    if scenario in ['Offline', 'Server', 'ConstantStream']:
         metric = "target_qps"
         tolerance = 1.01
         # value = env.get('MLC_MLPERF_LOADGEN_SERVER_TARGET_QPS') if scenario == "Server" else env.get('MLC_MLPERF_LOADGEN_OFFLINE_TARGET_QPS')
@@ -343,7 +343,7 @@ def preprocess(i):
             ".sample_concatenate_permutation = 0" + "\n"
         max_duration_fast_s = int(env.get('MLC_MLPERF_MAX_DURATION_FAST', 120))
         max_duration_fast = str(max_duration_fast_s * 1000)  # in milliseconds
-        if scenario == "Server":
+        if scenario == "Server" or scenario == "ConstantStream":
             user_conf += ml_model_name + "." + scenario + \
                 f".max_duration = {max_duration_fast}" + "\n"
             target_qps = conf['target_qps']
@@ -371,7 +371,7 @@ def preprocess(i):
                     'MLC_MLPERF_MODEL_EQUAL_ISSUE_MODE', 'no')) and env.get('MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE') != '99.9':
                 user_conf += ml_model_name + "." + scenario + \
                     f".max_duration = {max_duration_valid}" + "\n"
-            if scenario == "SingleStream" and env.get('MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE') == '99.9' and env.get(
+            if scenario in ["SingleStream", "ConstantStream"] and env.get('MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE') == '99.9' and env.get(
                     'MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT', '') != '' and env.get('MLC_MLPERF_TARGET_LATENCY', '') == '':
                 user_conf += ml_model_name + "." + scenario + \
                     f".max_query_count = {env.get('MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT')}" + "\n"

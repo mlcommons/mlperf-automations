@@ -68,7 +68,7 @@ def postprocess(i):
 
     mlperf_log = MLPerfLog(os.path.join(output_dir, "mlperf_log_detail.txt"))
     if mode == "performance":
-        if scenario in ["Offline", "Server"]:
+        if scenario in ["Offline", "Server", "ConstantStream"]:
             metric = "target_qps"
             result = mlperf_log['result_mean_latency_ns'] / 1000000
         elif scenario.endswith("Stream"):

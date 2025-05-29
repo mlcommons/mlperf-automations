@@ -59,6 +59,7 @@ input_mapping:
   target_latency: MLC_MLPERF_LOADGEN_TARGET_LATENCY
   offline_target_qps: MLC_MLPERF_LOADGEN_OFFLINE_TARGET_QPS
   server_target_qps: MLC_MLPERF_LOADGEN_SERVER_TARGET_QPS
+  constantstream_target_qps: MLC_MLPERF_LOADGEN_CONSTANTSTREAM_TARGET_QPS
   singlestream_target_latency: MLC_MLPERF_LOADGEN_SINGLESTREAM_TARGET_LATENCY
   multistream_target_latency: MLC_MLPERF_LOADGEN_MULTISTREAM_TARGET_LATENCY
   output: MLC_MLPERF_OUTPUT_DIR
@@ -383,7 +384,7 @@ variations:
 
   gpu:
     alias: cuda
-    
+
   cuda:
     group: device
     env:
@@ -416,12 +417,14 @@ variations:
     add_deps_recursive:
       abtf-inference-implementation:
         tags: _offline
+
   multistream:
     env:
       MLC_MLPERF_LOADGEN_SCENARIO: MultiStream
     add_deps_recursive:
       abtf-inference-implementation:
         tags: _multistream
+
   singlestream:
     group: loadgen-scenario
     default: true
@@ -430,6 +433,14 @@ variations:
     add_deps_recursive:
       abtf-inference-implementation:
         tags: _singlestream
+
+  constantstream:
+    env:
+      MLC_MLPERF_LOADGEN_SCENARIO: ConstantStream
+    add_deps_recursive:
+      abtf-inference-implementation:
+        tags: _constantstream
+
   server:
     env:
       MLC_MLPERF_LOADGEN_SCENARIO: Server
