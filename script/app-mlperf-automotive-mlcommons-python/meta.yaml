@@ -521,7 +521,7 @@ variations:
       - tags: get,generic-python-lib,_package.onnx
       - tags: get,generic-python-lib,_package.onnxruntime
       - tags: get,generic-python-lib,_package.tqdm
-      - tags: get,preprocessed,dataset,cognata,_mlc,_2d_object_det,_validation
+      - tags: get,preprocessed,dataset,cognata,_mlc,_2d_obj_det,_validation
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
             - "yes"
