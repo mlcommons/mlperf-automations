@@ -381,6 +381,9 @@ variations:
       abtf-inference-implementation:
         tags: _cpu
 
+  gpu:
+    alias: cuda
+    
   cuda:
     group: device
     env:
