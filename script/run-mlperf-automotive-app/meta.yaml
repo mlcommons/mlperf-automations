@@ -252,4 +252,4 @@ variations:
         - 'false'
         - 'False'
         - '0'
-      tags: generate,mlperf,inference,submission
+      tags: generate,mlperf,inference,submission,_automotive

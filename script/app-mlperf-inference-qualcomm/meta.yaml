@@ -111,12 +111,12 @@ deps:
     - inference-src
 
   # Download MLPerf inference loadgen
-  - tags: get,mlcommons,inference,loadgen
+  - tags: get,mlcommons,inference,loadgen,_inference
     names:
     - inference-loadgen
 
   # Creates user conf for given SUT
-  - tags: generate,user-conf,mlperf,inference
+  - tags: generate,user-conf,mlperf,inference,_inference
     names:
     - user-conf-generator
 

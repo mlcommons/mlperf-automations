@@ -13,12 +13,8 @@ deps:
   - python
   - python3
   tags: get,python3
-- names:
-  - inference-src
-  tags: mlcommons,inference,src
 - tags: get,sut,system-description
 - tags: install,pip-package,for-mlc-python,_package.tabulate
-- tags: get,mlperf,inference,utils
 - names:
   - get-mlperf-results-dir
   skip_if_env:
@@ -109,6 +105,20 @@ post_deps:
   - mlperf-inference-submission-checker
   - submission-checker
   tags: submission,inference,checker,mlc
+variations:
+  inference:
+    default: true
+    deps:
+      - names:
+        - inference-src
+        tags: mlcommons,inference,src
+      - tags: get,mlperf,inference,utils
+  automotive:
+    deps:
+      - names:
+        - automotive-src
+        tags: mlcommons,automotive,src
+      - tags: get,mlperf,automotive,utils
 tags:
 - generate
 - submission
