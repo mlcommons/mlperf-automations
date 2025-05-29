@@ -169,6 +169,9 @@ variations:
   automotive:
     env:
       MLC_INFERENCE_AUTOMOTIVE_REPO: 'YES'
+  inference:
+    env:
+      MLC_INFERENCE_AUTOMOTIVE_REPO: 'YES'
 versions:
   custom:
     add_deps:
