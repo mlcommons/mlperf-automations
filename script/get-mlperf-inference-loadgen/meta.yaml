@@ -170,8 +170,9 @@ variations:
     env:
       MLC_INFERENCE_AUTOMOTIVE_REPO: 'YES'
   inference:
+    default: true
     env:
-      MLC_INFERENCE_AUTOMOTIVE_REPO: 'YES'
+      MLC_INFERENCE_AUTOMOTIVE_REPO: 'NO'
 versions:
   custom:
     add_deps:
