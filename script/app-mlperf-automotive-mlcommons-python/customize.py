@@ -238,7 +238,8 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
         env['RUN_DIR'] = run_dir
 
         if device == "gpu":
-            logger.warning("Bevformer reference implementation is not supported on GPU, defaulting to CPU")
+            logger.warning(
+                "Bevformer reference implementation is not supported on GPU, defaulting to CPU")
             device = "cpu"
 
         env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
