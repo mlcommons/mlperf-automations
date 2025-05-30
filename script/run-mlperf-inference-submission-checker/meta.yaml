@@ -42,24 +42,6 @@ deps:
   names:
     - preprocess-mlperf-submission
   tags: preprocess,mlperf,inference,submission
-variations:
-  inference:
-    default: true
-    add_deps_recursive:
-      preprocess-mlperf-submission:
-        tags: _inference
-    deps:
-      - names:
-        - inference-src
-        tags: mlcommons,inference,src
-  automotive:
-    add_deps_recursive:
-      preprocess-mlperf-submission:
-        tags: _automotive
-    deps:
-      - names:
-        - automotive-src
-        tags: mlcommons,automotive,src
 docker:
   mlc_repo: mlcommons@mlperf-automations
   mlc_repo_branch: dev
@@ -153,6 +135,23 @@ variations:
   short-run:
     env:
       MLC_MLPERF_SHORT_RUN: 'yes'
+  inference:
+    default: true
+    add_deps_recursive:
+      preprocess-mlperf-submission:
+        tags: _inference
+    deps:
+      - names:
+        - inference-src
+        tags: mlcommons,inference,src
+  automotive:
+    add_deps_recursive:
+      preprocess-mlperf-submission:
+        tags: _automotive
+    deps:
+      - names:
+        - automotive-src
+        tags: mlcommons,automotive,src
 versions:
   master:
     adr:
