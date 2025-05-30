@@ -119,8 +119,8 @@ post_deps:
 
 
 docker:
-  mlc_repo: anandhu-eng@mlperf-automations
-  mlc_repo_branch: automotive2
+  mlc_repo: mlcommons@mlperf-automations
+  mlc_repo_branch: dev
   use_host_group_id: True
   use_host_user_id: True
   real_run: false
