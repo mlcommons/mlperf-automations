@@ -10,16 +10,25 @@ deps:
   - python3
   tags: get,python3
 - names:
-  - inference-src
-  - submission-checker-src
-  tags: get,mlcommons,inference,src,_branch.dev
-  version: custom
-- names:
   - get-mlperf-submission-dir
   skip_if_env:
     MLC_MLPERF_INFERENCE_SUBMISSION_DIR:
     - 'on'
   tags: get,mlperf,submission,dir
+variations:
+  inference:
+    default: true
+    deps:
+      - names:
+        - inference-src
+        - submission-checker-src
+        tags: mlcommons,inference,src,_branch.dev
+        version: custom
+  automotive:
+    deps:
+      - names:
+        - automotive-src
+        tags: mlcommons,automotive,src
 input_mapping:
   input: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
   submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
