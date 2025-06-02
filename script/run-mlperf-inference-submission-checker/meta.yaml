@@ -16,10 +16,6 @@ deps:
   - python
   - python3
   tags: get,python3
-- names:
-  - inference-src
-  - submission-checker-src
-  tags: get,mlcommons,inference,src
 - tags: pull,git,repo
   env:
     MLC_GIT_CHECKOUT_PATH: '<<<MLC_MLPERF_INFERENCE_SOURCE>>>'
@@ -43,6 +39,8 @@ deps:
 - enable_if_env:
     MLC_TMP_MLPERF_INFERENCE_PREPROCESS_SUBMISSION:
     - 'on'
+  names:
+    - preprocess-mlperf-submission
   tags: preprocess,mlperf,inference,submission
 docker:
   mlc_repo: mlcommons@mlperf-automations
@@ -137,6 +135,23 @@ variations:
   short-run:
     env:
       MLC_MLPERF_SHORT_RUN: 'yes'
+  inference:
+    default: true
+    add_deps_recursive:
+      preprocess-mlperf-submission:
+        tags: _inference
+    deps:
+      - names:
+        - inference-src
+        tags: mlcommons,inference,src
+  automotive:
+    add_deps_recursive:
+      preprocess-mlperf-submission:
+        tags: _automotive
+    deps:
+      - names:
+        - automotive-src
+        tags: mlcommons,automotive,src
 versions:
   master:
     adr:

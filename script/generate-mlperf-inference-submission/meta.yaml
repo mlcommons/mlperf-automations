@@ -13,12 +13,8 @@ deps:
   - python
   - python3
   tags: get,python3
-- names:
-  - inference-src
-  tags: mlcommons,inference,src
 - tags: get,sut,system-description
 - tags: install,pip-package,for-mlc-python,_package.tabulate
-- tags: get,mlperf,inference,utils
 - names:
   - get-mlperf-results-dir
   skip_if_env:
@@ -97,18 +93,51 @@ post_deps:
   skip_if_env:
     MLC_SKIP_TRUNCATE_ACCURACY:
     - 'yes'
+  names:
+    - truncate-mlperf-accuracy-log
   tags: accuracy,truncate,mlc
 - enable_if_env:
     MLC_RUN_MLPERF_SUBMISSION_PREPROCESSOR:
     - 'yes'
+  names:
+    - preprocess-mlperf-submission
   tags: preprocess,mlperf,submission
 - skip_if_env:
     MLC_RUN_SUBMISSION_CHECKER:
     - 'no'
   names:
   - mlperf-inference-submission-checker
+  - mlperf-submission-checker
   - submission-checker
   tags: submission,inference,checker,mlc
+variations:
+  inference:
+    default: true
+    add_deps_recursive:
+      truncate-mlperf-accuracy-log:
+        tags: _inference
+      preprocess-mlperf-submission:
+        tags: _inference
+      mlperf-inference-submission-checker:
+        tags: _inference
+    deps:
+      - names:
+        - inference-src
+        tags: mlcommons,inference,src
+      - tags: get,mlperf,inference,utils
+  automotive:
+    add_deps_recursive:
+      truncate-mlperf-accuracy-log:
+        tags: _automotive
+      preprocess-mlperf-submission:
+        tags: _automotive
+      mlperf-inference-submission-checker:
+        tags: _automotive
+    deps:
+      - names:
+        - automotive-src
+        tags: mlcommons,automotive,src
+      - tags: get,mlperf,automotive,utils
 tags:
 - generate
 - submission

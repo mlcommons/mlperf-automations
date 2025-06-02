@@ -198,6 +198,8 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
 
     q = '"' if os_info['platform'] == 'windows' else "'"
 
+    device = env['MLC_MLPERF_DEVICE']
+
     ##########################################################################
     # Grigori added for ABTF demo
 
@@ -235,6 +237,11 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
 
         env['RUN_DIR'] = run_dir
 
+        if device == "gpu":
+            logger.warning(
+                "Bevformer reference implementation is not supported on GPU, defaulting to CPU")
+            device = "cpu"
+
         env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
 
         if env['MLC_MLPERF_BACKEND'] != "onnxruntime":
@@ -249,7 +256,7 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
             "bevformer",
             "bevformer_tiny.py")
         print(env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'])
-        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend onnx --dataset nuscenes --nuscenes-root {os.path.dirname(env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'].rstrip("/"))} --dataset-path {env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH']} --checkpoint {env['MLC_ML_MODEL_BEVFORMER_PATH']} --config {config_path} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
+        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend onnx --dataset nuscenes --device {"cuda" if device == "gpu" else "cpu"}  --nuscenes-root {os.path.dirname(env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'].rstrip("/"))} --dataset-path {env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH']} --checkpoint {env['MLC_ML_MODEL_BEVFORMER_PATH']} --config {config_path} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
         print(cmd)
     elif env['MLC_MODEL'] in ['ssd']:
         run_dir = env['MLC_MLPERF_INFERENCE_SSD_RESNET50_PATH']
@@ -263,7 +270,7 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
 
         config_path = "baseline_8MP_ss_scales_fm1_5x5_all"
 
-        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {backend} --dataset cognata --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_SSD_PATH']} --config {config_path} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
+        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {backend} --cognata-root-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_SSD_PATH']} --config {config_path} --device {"cuda" if device == "gpu" else "cpu"} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
 
     elif env['MLC_MODEL'] in ['deeplabv3plus']:
         run_dir = env['MLC_MLPERF_INFERENCE_DEEPLABV3PLUS_PATH']
@@ -275,7 +282,7 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
         backend = "onnx" if env.get(
             'MLC_MLPERF_BACKEND') == "onnxruntime" else env.get('MLC_MLPERF_BACKEND')
 
-        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {backend} --dataset cognata --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_DEEPLABV3_PLUS_PATH']} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
+        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {backend} --dataset cognata --device {"cuda" if device == "gpu" else "cpu"} --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_DEEPLABV3_PLUS_PATH']} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
 
     ##########################################################################
 

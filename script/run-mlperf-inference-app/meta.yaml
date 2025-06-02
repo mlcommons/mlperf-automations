@@ -433,7 +433,7 @@ variations:
       skip_if_env:
         MLC_MLPERF_SKIP_SUBMISSION_GENERATION:
         - 'yes'
-      tags: generate,mlperf,inference,submission
+      tags: generate,mlperf,inference,submission,_inference
 
 versions:
   master: {}

@@ -60,6 +60,7 @@ input_mapping:
   target_latency: MLC_MLPERF_LOADGEN_TARGET_LATENCY
   offline_target_qps: MLC_MLPERF_LOADGEN_OFFLINE_TARGET_QPS
   server_target_qps: MLC_MLPERF_LOADGEN_SERVER_TARGET_QPS
+  constantstream_target_qps: MLC_MLPERF_LOADGEN_CONSTANTSTREAM_TARGET_QPS
   singlestream_target_latency: MLC_MLPERF_LOADGEN_SINGLESTREAM_TARGET_LATENCY
   multistream_target_latency: MLC_MLPERF_LOADGEN_MULTISTREAM_TARGET_LATENCY
   output: MLC_MLPERF_OUTPUT_DIR
@@ -457,6 +458,9 @@ variations:
 
   bevformer:
     group: models
+    default_env:
+      MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: "99.9"
+      MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT: 6636
     add_deps_recursive:
       pytorch:
         version_max: "2.5.1"
@@ -492,6 +496,9 @@ variations:
 
   ssd:
     group: models
+    default_env:
+      MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: "99.9"
+      MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT: 6636
     add_deps_recursive:
       pytorch:
         version_max: "2.3.1"
@@ -515,7 +522,7 @@ variations:
       - tags: get,generic-python-lib,_package.onnx
       - tags: get,generic-python-lib,_package.onnxruntime
       - tags: get,generic-python-lib,_package.tqdm
-      - tags: get,preprocessed,dataset,cognata,_mlc,_2d_object_det,_validation
+      - tags: get,preprocessed,dataset,cognata,_mlc,_2d_obj_det,_validation
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
             - "yes"
@@ -530,6 +537,9 @@ variations:
 
   deeplabv3plus:
     group: models
+    default_env:
+      MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: "99.9"
+      MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT: 6636
     add_deps_recursive:
       pytorch:
         version_max: "2.3.1"
@@ -601,6 +611,9 @@ variations:
   server:
     env:
       MLC_MLPERF_LOADGEN_SCENARIO: Server
+  constantstream:
+    env:
+      MLC_MLPERF_LOADGEN_SCENARIO: ConstantStream
 
   mvp_demo:
     env:

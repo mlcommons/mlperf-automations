@@ -229,6 +229,9 @@ def preprocess(i):
         elif scenario == "Server":
             if env.get('MLC_MLPERF_LOADGEN_SERVER_TARGET_QPS'):
                 env['MLC_MLPERF_LOADGEN_TARGET_QPS'] = env['MLC_MLPERF_LOADGEN_SERVER_TARGET_QPS']
+        elif scenario == "ConstantStream":
+            if env.get('MLC_MLPERF_LOADGEN_CONSTANTSTREAM_TARGET_QPS'):
+                env['MLC_MLPERF_LOADGEN_TARGET_QPS'] = env['MLC_MLPERF_LOADGEN_CONSTANTSTREAM_TARGET_QPS']
         elif scenario == "SingleStream":
             if env.get('MLC_MLPERF_LOADGEN_SINGLESTREAM_TARGET_LATENCY'):
                 env['MLC_MLPERF_LOADGEN_TARGET_LATENCY'] = env['MLC_MLPERF_LOADGEN_SINGLESTREAM_TARGET_LATENCY']
