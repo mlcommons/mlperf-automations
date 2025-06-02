@@ -80,7 +80,7 @@ variations:
       - enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - 'yes'
-        extra_cache_tags: nuscenes,dataset
+        extra_cache_tags: cognata,dataset
         force_cache: true
         names:
           - dae
