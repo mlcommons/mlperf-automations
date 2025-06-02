@@ -350,6 +350,7 @@ post_deps:
 
 # Variations to customize dependencies
 variations:
+  pre5.0: {}
   # MLPerf inference version
   v5.0:
     group: version
@@ -363,8 +364,6 @@ variations:
         tags: _for-nvidia-mlperf-inference-v5.0
       pycuda:
         version: "2024.1"
-      nvidia-inference-server:
-        tags: _mlcommons,_v5.0
   v4.1:
     group: version
     env:
@@ -595,6 +594,8 @@ variations:
       names:
         - onnx
       version: "1.17.0"
+    - tags: get,generic-python-lib,_package.onnx-graphsurgeon
+      version: "0.5.2"
     - tags: get,generic-python-lib,_package.numpy
       names:
         - numpy
@@ -1595,21 +1596,41 @@ variations:
     env:
       MLC_NVIDIA_CUSTOM_GPU: "yes"
 
-  rtx_a6000,resnet50,offline,run_harness:
+  rtx_a6000,v5.0,sdxl,offline,run_harness,batch_size.1:
+    default_variations:
+      batch-size: batch_size."clip1:2,clip2:2,unet:2,vae:1"
+
+  rtx_a6000,pre5.0,resnet50,offline,run_harness:
     default_variations:
       batch-size: batch_size.64
+  
+  rtx_a6000,v5.0,resnet50,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."resnet50:64"
 
-  rtx_a6000,resnet50,server,run_harness:
+  rtx_a6000,pre5.0,resnet50,server,run_harness:
     default_variations:
       batch-size: batch_size.32
 
-  rtx_a6000,retinanet,offline,run_harness:
+  rtx_a6000,v5.0,resnet50,server,run_harness:
+    default_variations:
+      batch-size: batch_size."resnet50:32"
+
+  rtx_a6000,pre5.0,retinanet,offline,run_harness:
     default_variations:
       batch-size: batch_size.2
 
-  rtx_a6000,retinanet,server,run_harness:
+  rtx_a6000,v5.0,retinanet,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."retinanet:2"
+
+  rtx_a6000,pre5.0,retinanet,server,run_harness:
     default_variations:
       batch-size: batch_size.2
+
+  rtx_a6000,v5.0,retinanet,server,run_harness:
+    default_variations:
+      batch-size: batch_size."retinanet:2"
 
   rtx_a6000,bert_,offline,run_harness:
     default_variations:
@@ -1619,13 +1640,21 @@ variations:
     default_variations:
       batch-size: batch_size.256
 
-  rtx_a6000,3d-unet_,offline,run_harness:
+  rtx_a6000,pre5.0,3d-unet_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size.8
+  
+  rtx_a6000,v5.0,3d-unet_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."3d-unet:8"
+
+  rtx_a6000,pre5.0,3d-unet_,server,run_harness:
     default_variations:
       batch-size: batch_size.8
 
-  rtx_a6000,3d-unet_,server,run_harness:
+  rtx_a6000,v5.0,3d-unet_,server,run_harness:
     default_variations:
-      batch-size: batch_size.8
+      batch-size: batch_size."3d-unet:8"
 
   rtx_a6000,rnnt,offline,run_harness:
     default_variations:
@@ -1635,30 +1664,50 @@ variations:
     default_variations:
       batch-size: batch_size.512
 
-  rtx_a6000,dlrm_,offline,run_harness:
+  rtx_a6000,pre5.0,dlrm_,offline,run_harness:
     default_variations:
       batch-size: batch_size.1400
+  
+  rtx_a6000,v5.0,dlrm_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."dlrm-v2:1400"
 
   rtx_6000_ada:
     group: gpu-name
     env:
       MLC_NVIDIA_CUSTOM_GPU: "yes"
 
-  rtx_6000_ada,resnet50,offline,run_harness:
+  rtx_6000_ada,pre5.0,resnet50,offline,run_harness:
     default_variations:
       batch-size: batch_size.64
+  
+  rtx_a6000_ada,v5.0,resnet50,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."resnet50:64"
 
-  rtx_6000_ada,resnet50,server,run_harness:
+  rtx_6000_ada,pre5.0,resnet50,server,run_harness:
     default_variations:
       batch-size: batch_size.32
+  
+  rtx_a6000_ada,v5.0,resnet50,server,run_harness:
+    default_variations:
+      batch-size: batch_size."resnet50:32"
 
-  rtx_6000_ada,retinanet,offline,run_harness:
+  rtx_6000_ada,pre5.0,retinanet,offline,run_harness:
     default_variations:
       batch-size: batch_size.2
 
-  rtx_6000_ada,retinanet,server,run_harness:
+  rtx_a6000_ada,v5.0,retinanet,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."retinanet:2"
+
+  rtx_6000_ada,pre5.0,retinanet,server,run_harness:
     default_variations:
       batch-size: batch_size.2
+
+  rtx_a6000_ada,v5.0,retinanet,server,run_harness:
+    default_variations:
+      batch-size: batch_size."retinanet:2"
 
   rtx_6000_ada,bert_,offline,run_harness:
     default_variations:
@@ -1668,13 +1717,21 @@ variations:
     default_variations:
       batch-size: batch_size.256
 
-  rtx_6000_ada,3d-unet_,offline,run_harness:
+  rtx_6000_ada,pre5.0,3d-unet_,offline,run_harness:
     default_variations:
       batch-size: batch_size.8
 
-  rtx_6000_ada,3d-unet_,server,run_harness:
+  rtx_a6000_ada,v5.0,3d-unet_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."3d-unet:8"
+
+  rtx_6000_ada,pre5.0,3d-unet_,server,run_harness:
     default_variations:
       batch-size: batch_size.8
+
+  rtx_a6000_ada,v5.0,3d-unet_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."3d-unet:8"
 
   rtx_6000_ada,rnnt,offline,run_harness:
     default_variations:
@@ -1684,9 +1741,13 @@ variations:
     default_variations:
       batch-size: batch_size.512
 
-  rtx_6000_ada,dlrm_,offline,run_harness:
+  rtx_6000_ada,pre5.0,dlrm_,offline,run_harness:
     default_variations:
       batch-size: batch_size.1400
+
+  rtx_a6000_ada,v5.0,dlrm_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."dlrm-v2:1400"
 
   l4:
     group: gpu-name
@@ -1694,34 +1755,58 @@ variations:
       MLC_NVIDIA_CUSTOM_GPU: "yes"
 
   l4,sdxl,offline,run_harness:
-    default_variations:
-      batch-size: batch_size.1
     env:
       MLC_MLPERF_NVIDIA_HARNESS_USE_GRAPHS: 'True'
       MLC_MLPERF_LOADGEN_OFFLINE_TARGET_QPS: 0.6
-    
-  l4,sdxl,offline,run_harness,num-gpu.8:
+  
+  l4,pre5.0,sdxl,offline,run_harness:
     default_variations:
       batch-size: batch_size.1
+
+  l4,v5.0,sdxl,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."clip1:2,clip2:2,unet:2,vae:1"
+    
+  l4,sdxl,offline,run_harness,num-gpu.8:
     env:
       MLC_MLPERF_NVIDIA_HARNESS_USE_GRAPHS: 'True'
       MLC_MLPERF_LOADGEN_OFFLINE_TARGET_QPS: 4.8
-    
-  l4,sdxl,server,run_harness,num-gpu.1:
+  
+  l4,pre5.0,sdxl,offline,run_harness,num-gpu.8:
     default_variations:
       batch-size: batch_size.1
+
+  l4,v5.0,sdxl,offline,run_harness,num-gpu.8:
+    default_variations:
+      batch-size: batch_size."clip1:2,clip2:2,unet:2,vae:1"
+    
+  l4,sdxl,server,run_harness,num-gpu.1:
     env:
       MLC_MLPERF_NVIDIA_HARNESS_USE_GRAPHS: 'True'
       MLC_MLPERF_LOADGEN_SERVER_TARGET_QPS: 0.55
       MLC_MLPERF_NVIDIA_HARNESS_SDXL_SERVER_BATCHER_TIME_LIMIT: 0
-  
-  l4,sdxl,server,run_harness,num-gpu.8:
+
+  l4,pre5.0,sdxl,server,run_harness,num-gpu.1:
     default_variations:
       batch-size: batch_size.1
+
+  l4,v5.0,sdxl,server,run_harness,num-gpu.1:
+    default_variations:
+      batch-size: batch_size."clip1:2,clip2:2,unet:2,vae:1"
+  
+  l4,sdxl,server,run_harness,num-gpu.8:
     env:
       MLC_MLPERF_NVIDIA_HARNESS_USE_GRAPHS: 'True'
       MLC_MLPERF_LOADGEN_SERVER_TARGET_QPS: 5.05
       MLC_MLPERF_NVIDIA_HARNESS_SDXL_SERVER_BATCHER_TIME_LIMIT: 0
+
+  l4,pre5.0,sdxl,server,run_harness,num-gpu.8:
+    default_variations:
+      batch-size: batch_size.1
+
+  l4,v5.0,sdxl,server,run_harness,num-gpu.8:
+    default_variations:
+      batch-size: batch_size."clip1:2,clip2:2,unet:2,vae:1"
 
   l4,resnet50:
     default_env:
@@ -1731,16 +1816,20 @@ variations:
       MLC_MLPERF_LOADGEN_MULTISTREAM_TARGET_LATENCY: 1
 
   l4,resnet50,offline,run_harness:
-    default_variations:
-      batch-size: batch_size.32
     env:
       MLC_MLPERF_NVIDIA_HARNESS_GPU_COPY_STREAMS: "2"
       MLC_MLPERF_NVIDIA_HARNESS_GPU_INFERENCE_STREAMS: "1"
       MLC_MLPERF_NVIDIA_HARNESS_USE_GRAPHS: 'True'
 
-  l4,resnet50,server,run_harness:
+  l4,pre5.0,resnet50,offline,run_harness:
     default_variations:
-      batch-size: batch_size.16
+      batch-size: batch_size.32
+
+  l4,v5.0,resnet50,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."resnet50:32"
+
+  l4,resnet50,server,run_harness:
     env:
       MLC_MLPERF_NVIDIA_HARNESS_GPU_COPY_STREAMS: "9"
       MLC_MLPERF_NVIDIA_HARNESS_GPU_INFERENCE_STREAMS: "2"
@@ -1749,19 +1838,37 @@ variations:
       MLC_MLPERF_NVIDIA_HARNESS_DEQUE_TIMEOUT_USEC: 2000
       MLC_MLPERF_NVIDIA_HARNESS_USE_CUDA_THREAD_PER_DEVICE: 'True'
 
-  l4,retinanet,offline,run_harness:
+  l4,pre5.0,resnet50,server,run_harness:
+    default_variations:
+      batch-size: batch_size.16
+
+  l4,v5.0,resnet50,server,run_harness:
+    default_variations:
+      batch-size: batch_size."resnet50:16"
+
+  l4,pre5.0,retinanet,offline,run_harness:
     default_variations:
       batch-size: batch_size.2
 
-  l4,retinanet,server,run_harness:
+  l4,v5.0,retinanet,offline,run_harness:
     default_variations:
-      batch-size: batch_size.2
+      batch-size: batch_size."retinanet:2"
+
+  l4,retinanet,server,run_harness:
     env:
       MLC_MLPERF_NVIDIA_HARNESS_GPU_INFERENCE_STREAMS: "2"
       MLC_MLPERF_NVIDIA_HARNESS_GPU_COPY_STREAMS: "2"
       MLC_MLPERF_NVIDIA_HARNESS_USE_DEQUE_LIMIT: 'True'
       MLC_MLPERF_NVIDIA_HARNESS_DEQUE_TIMEOUT_USEC: 30000
       MLC_MLPERF_NVIDIA_HARNESS_WORKSPACE_SIZE: 20000000000
+
+  l4,pre5.0,retinanet,server,run_harness:
+    default_variations:
+      batch-size: batch_size.2
+
+  l4,v5.0,retinanet,server,run_harness:
+    default_variations:
+      batch-size: batch_size."retinanet:2"
 
   l4,bert_,offline,run_harness:
     default_variations:
@@ -1776,9 +1883,13 @@ variations:
       MLC_MLPERF_NVIDIA_HARNESS_SOFT_DROP: "1.0"
       MLC_MLPERF_NVIDIA_HARNESS_USE_SMALL_TILE_GEMM_PLUGIN: "True"
 
-  l4,3d-unet_,offline,run_harness:
+  l4,pre5.0,3d-unet_,offline,run_harness:
     default_variations:
       batch-size: batch_size.1
+
+  l4,v5.0,3d-unet_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."3d-unet:1"
 
   l4,rnnt,offline,run_harness:
     default_variations:
@@ -1792,9 +1903,14 @@ variations:
       MLC_MLPERF_NVIDIA_HARNESS_AUDIO_BUFFER_NUM_LINES: "1024"
       MLC_MLPERF_NVIDIA_HARNESS_NUM_WARMUPS: "1024"
 
-  l4,dlrm_,offline,run_harness:
+  l4,pre5.0,dlrm_,offline,run_harness:
     default_variations:
       batch-size: batch_size.1400
+
+  l4,v5.0,dlrm_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."dlrm-v2:1400"
+        
   t4:
     group: gpu-name
     env:
