@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ "master", "dev" ]
     paths:
-      - '.github/workflows/mlperf-submission.yml'
+      - '.github/workflows/test-mlperf-inference-submission-generation.yml'
       - '**'
       - '!**.md'
   workflow_call:
