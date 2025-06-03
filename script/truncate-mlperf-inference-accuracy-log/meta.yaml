@@ -16,14 +16,14 @@ deps:
     - 'on'
   tags: get,mlperf,submission,dir
 variations:
-  wg_inference:
+  wg-inference:
     group: benchmark_wg
     default: true
     deps:
       - names:
         - inference-src
         tags: mlcommons,inference,src
-  wg_automotive:
+  wg-automotive:
     group: benchmark_wg
     deps:
       - names:
