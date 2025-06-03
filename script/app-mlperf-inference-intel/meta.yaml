@@ -392,7 +392,7 @@ variations:
       - tags: get,mlcommons,inference,src
         names:
         - inference-src
-      - tags: get,mlcommons,inference,loadgen,_custom-python,_keep-build,_inference
+      - tags: get,mlcommons,inference,loadgen,_custom-python,_keep-build,_wg_inference
         names:
         - inference-loadgen
 
@@ -510,7 +510,7 @@ variations:
       - tags: get,mlcommons,inference,src
         names:
         - inference-src
-      - tags: get,mlcommons,inference,loadgen,_custom-python,_keep-build,_inference
+      - tags: get,mlcommons,inference,loadgen,_custom-python,_keep-build,_wg_inference
         names:
         - inference-loadgen
  
@@ -627,7 +627,7 @@ variations:
       - tags: get,mlcommons,inference,src
         names:
         - inference-src
-      - tags: get,mlcommons,inference,loadgen,_custom-python,_keep-build,_inference
+      - tags: get,mlcommons,inference,loadgen,_custom-python,_keep-build,_wg_inference
         names:
         - inference-loadgen
  
@@ -699,7 +699,7 @@ variations:
       - tags: get,mlcommons,inference,src
         names:
         - inference-src
-      - tags: get,mlcommons,inference,loadgen,_custom-python,_keep-build,_inference
+      - tags: get,mlcommons,inference,loadgen,_custom-python,_keep-build,_wg_inference
         names:
         - inference-loadgen
  
@@ -924,7 +924,7 @@ variations:
       - tags: get,mlcommons,inference,src
         names:
         - inference-src
-      - tags: get,mlcommons,inference,loadgen,_custom-python,_inference
+      - tags: get,mlcommons,inference,loadgen,_custom-python,_wg_inference
         names:
         - inference-loadgen
       - tags: get,ml-model,dlrm,_pytorch
@@ -1074,7 +1074,7 @@ variations:
         - inference-src
 
       # Creates user conf for given SUT
-      - tags: generate,user-conf,mlperf,inference,_inference
+      - tags: generate,user-conf,mlperf,inference,_wg_inference
         names:
         - user-conf-generator
       - tags: get,generic-sys-util,_rsync

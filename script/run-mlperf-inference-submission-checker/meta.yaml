@@ -135,19 +135,21 @@ variations:
   short-run:
     env:
       MLC_MLPERF_SHORT_RUN: 'yes'
-  inference:
+  wg_inference:
     default: true
+    group: benchmark_wg
     add_deps_recursive:
       preprocess-mlperf-submission:
-        tags: _inference
+        tags: _wg_inference
     deps:
       - names:
         - inference-src
         tags: mlcommons,inference,src
-  automotive:
+  wg_automotive:
+    group: benchmark_wg
     add_deps_recursive:
       preprocess-mlperf-submission:
-        tags: _automotive
+        tags: _wg_automotive
     deps:
       - names:
         - automotive-src

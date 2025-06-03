@@ -71,7 +71,7 @@ deps:
   # Install MLPerf inference dependencies
   
   # Install MLPerf loadgen
-  - tags: get,loadgen,_inference
+  - tags: get,loadgen,_wg_inference
     names:
     - loadgen
     
@@ -129,7 +129,7 @@ deps:
     tags: get,ml-model,retinanet,_onnx,_fp32
 
   # Creates user conf for given SUT
-  - tags: generate,user-conf,mlperf,inference,_inference
+  - tags: generate,user-conf,mlperf,inference,_wg_inference
     names:
     - user-conf-generator
   

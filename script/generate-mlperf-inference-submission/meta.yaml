@@ -111,28 +111,30 @@ post_deps:
   - submission-checker
   tags: submission,inference,checker,mlc
 variations:
-  inference:
+  wg_inference:
+    group: benchmark_wg
     default: true
     add_deps_recursive:
       truncate-mlperf-accuracy-log:
-        tags: _inference
+        tags: _wg_inference
       preprocess-mlperf-submission:
-        tags: _inference
+        tags: _wg_inference
       mlperf-inference-submission-checker:
-        tags: _inference
+        tags: _wg_inference
     deps:
       - names:
         - inference-src
         tags: mlcommons,inference,src
       - tags: get,mlperf,inference,utils
-  automotive:
+  wg_automotive:
+    group: benchmark_wg
     add_deps_recursive:
       truncate-mlperf-accuracy-log:
-        tags: _automotive
+        tags: _wg_automotive
       preprocess-mlperf-submission:
-        tags: _automotive
+        tags: _wg_automotive
       mlperf-inference-submission-checker:
-        tags: _automotive
+        tags: _wg_automotive
     deps:
       - names:
         - automotive-src
