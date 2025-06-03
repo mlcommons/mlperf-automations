@@ -58,6 +58,11 @@ def preprocess(i):
     else:
         power_check = ""
 
+    if is_true(env.get('MLC_MLPERF_SKIP_CALIBRATION_CHECK', 'no')):
+        calibration_check = " --skip-calibration-check"
+    else:
+        calibration_check = ""
+
     extra_args = ' ' + env.get('MLC_MLPERF_SUBMISSION_CHECKER_EXTRA_ARGS', '')
 
     x_submitter = ' --submitter ' + q + submitter + q if submitter != '' else ''
