@@ -605,6 +605,7 @@ variations:
     env:
       MLC_MLPERF_LOADGEN_SCENARIO: MultiStream
   singlestream:
+    group: loadgen-scenario
     env:
       MLC_MLPERF_LOADGEN_SCENARIO: SingleStream
     default_variations:
@@ -613,6 +614,7 @@ variations:
     env:
       MLC_MLPERF_LOADGEN_SCENARIO: Server
   constantstream:
+    group: loadgen-scenario
     env:
       MLC_MLPERF_LOADGEN_SCENARIO: ConstantStream
 
