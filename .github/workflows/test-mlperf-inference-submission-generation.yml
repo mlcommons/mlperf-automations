@@ -4,7 +4,7 @@ name: MLC based MLPerf Inference Submission Generation
 
 on:
   pull_request:
-    branches: [ "master", "dev" ]
+    branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlperf-inference-submission-generation.yml'
       - '**'
