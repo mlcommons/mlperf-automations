@@ -50,7 +50,7 @@ jobs:
         if [ -z "${{ inputs.repo-url }}" ]; then
           mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
         else
-          mlc pull repo ${{ inputs.repo-url }} --branch=${{ inputs.ref }}
+          mlc pull repo mlcommons@mlperf-automations --branch=dev
         fi
     - name: Pull repo where test cases are uploaded
       run: |
@@ -65,6 +65,10 @@ jobs:
         fi
         # Dynamically set the log group to simulate a dynamic step name
         echo "::group::$description"
-        mlc ${{ matrix.action }} script --tags=generate,inference,submission  --adr.compiler.tags=gcc --version=v5.0 --clean --preprocess_submission=yes --submission_base_dir=mysubmissions --results_dir=$PWD/submission_generation_tests/${{ matrix.case }}/ --run-checker --submitter=MLCommons --tar=yes --division=${{ matrix.division }} --env.MLC_DETERMINE_MEMORY_CONFIGURATION=yes --quiet
-        mlc ${{ matrix.action }} script --tags=run,submission,checker --submitter_id_off=mysubmitter_id --tar=yes --submission_dir=mysubmissions/submissions --submission_tar_file=mysubmission.tar.gz
-
+        if [ -z "${{ inputs.repo-url }}" ]; then
+          mlc ${{ matrix.action }} script --tags=generate,inference,submission --adr.compiler.tags=gcc --version=v5.0 --clean --preprocess_submission=yes --submission_base_dir=mysubmissions --results_dir=$PWD/submission_generation_tests/${{ matrix.case }}/ --run-checker --submitter=MLCommons --tar=yes --division=${{ matrix.division }} --env.MLC_DETERMINE_MEMORY_CONFIGURATION=yes --quiet --adr.inference-src.tags=_repo.${{ inputs.repo-url }},_branch.${{ inputs.ref }}
+          mlc ${{ matrix.action }} script --tags=run,submission,checker --submitter_id_off=mysubmitter_id --tar=yes --submission_dir=mysubmissions/submissions --submission_tar_file=mysubmission.tar.gz --adr.inference-src.tags=_repo.${{ inputs.repo-url }},_branch.${{ inputs.ref }}
+        else
+          mlc ${{ matrix.action }} script --tags=generate,inference,submission --adr.compiler.tags=gcc --version=v5.0 --clean --preprocess_submission=yes --submission_base_dir=mysubmissions --results_dir=$PWD/submission_generation_tests/${{ matrix.case }}/ --run-checker --submitter=MLCommons --tar=yes --division=${{ matrix.division }} --env.MLC_DETERMINE_MEMORY_CONFIGURATION=yes --quiet
+          mlc ${{ matrix.action }} script --tags=run,submission,checker --submitter_id_off=mysubmitter_id --tar=yes --submission_dir=mysubmissions/submissions --submission_tar_file=mysubmission.tar.gz
+        fi
