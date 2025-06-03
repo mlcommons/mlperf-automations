@@ -256,7 +256,7 @@ deps:
 
 
   # Creates user conf for given SUT
-  - tags: generate,user-conf,mlperf,inference,_automotive
+  - tags: generate,user-conf,mlperf,inference,_wg_automotive
     names:
     - user-conf-generator
 
@@ -270,7 +270,7 @@ deps:
     - loadgen
     - mlperf-inference-loadgen
 
-  - tags: get,loadgen,_automotive
+  - tags: get,loadgen,_wg_automotive
     enable_if_any_env:
       MLC_MLPERF_LOADGEN_BUILD_FROM_SRC:
         - "on"
