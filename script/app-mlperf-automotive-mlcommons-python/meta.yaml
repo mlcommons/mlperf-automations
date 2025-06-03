@@ -613,11 +613,6 @@ variations:
     default_env:
       MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: "99.9"
       MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT: 6636
-
-  bevformer,constantstream:
-    default_env:
-      MLC_MLPERF_CONSTANTSTREAM_TARGET_LATENCY_PERCENTILE: "99.9"
-      MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT: 100
   
   ssd,singlestream:
     default_env:
