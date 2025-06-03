@@ -6,9 +6,18 @@ on:
   pull_request:
     branches: [ "master", "dev" ]
     paths:
-      - '.github/workflows/test-mlperf-inference-submission-generation.yml'
-      - '**'  
+      - '.github/workflows/mlperf-submission.yml'
+      - '**'
       - '!**.md'
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+      repo-url:
+        required: true
+        type: string
+
 jobs:
   submission_generation:
     runs-on: ${{ matrix.os }}
@@ -38,7 +47,11 @@ jobs:
         pip install tabulate
     - name: Pull MLOps repository
       run: |
-        mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
+        if [ -z "${{ inputs.repo-url }}" ]; then
+          mlc pull repo ${{ github.repositoryUrl }} --branch=${{ github.head_ref }}
+        else
+          mlc pull repo ${{ inputs.repo-url }} --branch=${{ inputs.ref }}
+        fi
     - name: Pull repo where test cases are uploaded
       run: |
         git clone -b submission-generation-examples https://github.com/mlcommons/inference.git submission_generation_examples
