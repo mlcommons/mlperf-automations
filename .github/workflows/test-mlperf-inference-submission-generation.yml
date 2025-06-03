@@ -34,6 +34,37 @@ jobs:
           - os: macos-latest
           - os: windows-latest
           - category: "edge"
+          - round: "4.1"
+          - case: "closed-edge"
+        include:
+          - os: ubuntu-latest
+            python-version: "3.12"
+            division: "closed"
+            category: "edge"
+            round: "5.0"
+            case: "closed-edge"
+            action: "run"
+          - os: ubuntu-latest
+            python-version: "3.12"
+            division: "closed"
+            category: "edge"
+            round: "5.0"
+            case: "closed-edge"
+            action: "docker"
+          - os: ubuntu-latest
+            python-version: "3.12"
+            division: "open"
+            category: "edge"
+            round: "5.0"
+            case: "closed-edge"
+            action: "run"
+          - os: ubuntu-latest
+            python-version: "3.12"
+            division: "open"
+            category: "edge"
+            round: "5.0"
+            case: "closed-edge"
+            action: "docker"
 
     steps:
     - uses: actions/checkout@v3
@@ -55,8 +86,7 @@ jobs:
     - name: Pull repo where test cases are uploaded
       run: |
         git clone -b submission-generation-examples https://github.com/mlcommons/inference.git submission_generation_examples
-    - name: Run Submission Generation - ${{ matrix.case }} ${{ matrix.action }} ${{ matrix.category }} ${{ matrix.division }} 
-      continue-on-error: true
+    - name: Run Submission Generation - round-${{ matrix.round }}${{ matrix.case }} ${{ matrix.action }} ${{ matrix.category }} ${{ matrix.division }} 
       run: |
         if [ "${{ matrix.case }}" == "closed" ]; then
           description="Test submission - contains closed edge and datacenter"
@@ -66,9 +96,9 @@ jobs:
         # Dynamically set the log group to simulate a dynamic step name
         echo "::group::$description"
         if [ -z "${{ inputs.repo-url }}" ]; then
-          mlc ${{ matrix.action }} script --tags=generate,inference,submission --adr.compiler.tags=gcc --version=v5.0 --clean --preprocess_submission=yes --submission_base_dir=mysubmissions --results_dir=$PWD/submission_generation_tests/${{ matrix.case }}/ --run-checker --submitter=MLCommons --tar=yes --division=${{ matrix.division }} --env.MLC_DETERMINE_MEMORY_CONFIGURATION=yes --quiet --adr.inference-src.tags=_repo.${{ inputs.repo-url }},_branch.${{ inputs.ref }}
-          mlc ${{ matrix.action }} script --tags=run,submission,checker --submitter_id_off=mysubmitter_id --tar=yes --submission_dir=mysubmissions/submissions --submission_tar_file=mysubmission.tar.gz --adr.inference-src.tags=_repo.${{ inputs.repo-url }},_branch.${{ inputs.ref }}
+          mlc ${{ matrix.action }} script --tags=generate,inference,submission  --adr.compiler.tags=gcc --version=v${{ matrix.round }} --clean --preprocess_submission=yes --submission_base_dir=mysubmissions --results_dir=$PWD/submission_generation_examples/submission_round_${{ matrix.round }}/${{ matrix.case }}/ --run_checker --submitter=MLCommons --tar=yes --division=${{ matrix.division }} --env.MLC_DETERMINE_MEMORY_CONFIGURATION=yes --quiet --adr.inference-src.tags=_repo.${{ inputs.repo-url }},_branch.${{ inputs.ref }}
+          mlc ${{ matrix.action }} script --tags=run,inference,submission,checker --submitter_id_off=mysubmitter_id --tar=yes --submission_dir=mysubmissions/mlperf_submission --submission_tar_file=mysubmission.tar.gz --quiet --src_version=v${{ matrix.round }} --adr.inference-src.tags=_repo.${{ inputs.repo-url }},_branch.${{ inputs.ref }}
         else
-          mlc ${{ matrix.action }} script --tags=generate,inference,submission --adr.compiler.tags=gcc --version=v5.0 --clean --preprocess_submission=yes --submission_base_dir=mysubmissions --results_dir=$PWD/submission_generation_tests/${{ matrix.case }}/ --run-checker --submitter=MLCommons --tar=yes --division=${{ matrix.division }} --env.MLC_DETERMINE_MEMORY_CONFIGURATION=yes --quiet
-          mlc ${{ matrix.action }} script --tags=run,submission,checker --submitter_id_off=mysubmitter_id --tar=yes --submission_dir=mysubmissions/submissions --submission_tar_file=mysubmission.tar.gz
+          mlc ${{ matrix.action }} script --tags=generate,inference,submission  --adr.compiler.tags=gcc --version=v${{ matrix.round }} --clean --preprocess_submission=yes --submission_base_dir=mysubmissions --results_dir=$PWD/submission_generation_examples/submission_round_${{ matrix.round }}/${{ matrix.case }}/ --run_checker --submitter=MLCommons --tar=yes --division=${{ matrix.division }} --env.MLC_DETERMINE_MEMORY_CONFIGURATION=yes --quiet
+          mlc ${{ matrix.action }} script --tags=run,inference,submission,checker --submitter_id_off=mysubmitter_id --tar=yes --submission_dir=mysubmissions/mlperf_submission --submission_tar_file=mysubmission.tar.gz --quiet --src_version=v${{ matrix.round }}
         fi
