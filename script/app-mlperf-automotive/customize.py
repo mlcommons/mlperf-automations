@@ -67,19 +67,22 @@ def postprocess(i):
 
         if model == "ssd":
             accuracy_filename = "accuracy_cognata.py"
-            accuracy_file_path = os.path.join(env['MLC_MLPERF_INFERENCE_SSD_RESNET50_PATH'], accuracy_filename)
+            accuracy_file_path = os.path.join(
+                env['MLC_MLPERF_INFERENCE_SSD_RESNET50_PATH'], accuracy_filename)
             dataset_args = f""" --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --config baseline_8MP_ss_scales_fm1_5x5_all """
             accuracy_log_file_option_name = " --mlperf-accuracy-file "
-        
+
         if model == "bevformer":
             accuracy_filename = "accuracy_nuscenes_cpu.py"
-            accuracy_file_path = os.path.join(env['MLC_MLPERF_INFERENCE_BEVFORMER_PATH'], accuracy_filename)
+            accuracy_file_path = os.path.join(
+                env['MLC_MLPERF_INFERENCE_BEVFORMER_PATH'], accuracy_filename)
             dataset_args = f""" --nuscenes-dir {env['MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH']} --config {os.path.join(env['MLC_MLPERF_INFERENCE_BEVFORMER_PATH'], "projects" + "configs" + "bevformer" + "bevformer_tiny.py")} """
             accuracy_log_file_option_name = " --mlperf-accuracy-file "
-        
+
         if model == "deeplabv3plus":
             accuracy_filename = "accuracy_cognata.py"
-            accuracy_file_path = os.path.join(env['MLC_MLPERF_INFERENCE_DEEPLABV3PLUS_PATH'], accuracy_filename)
+            accuracy_file_path = os.path.join(
+                env['MLC_MLPERF_INFERENCE_DEEPLABV3PLUS_PATH'], accuracy_filename)
             dataset_args = f""" --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} """
             accuracy_log_file_option_name = " --mlperf-accuracy-file "
 
