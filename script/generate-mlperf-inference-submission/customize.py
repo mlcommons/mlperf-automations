@@ -218,6 +218,11 @@ def generate_submission(env, state, inp, submission_division, logger):
             with open(os.path.join(result_path, "model_mapping.json"), 'r') as f:
                 model_mapping_combined = json.load(f)
 
+        # Save empty calibration.md file in the root directory and make it
+        # available for the submitters to fill
+        with open(os.path.join(path_submission, "calibration.md"), "w") as fp:
+            fp.write("MLPerf Inference Calibration and Quantization Details\n")
+
         # Preprocessing part.
         # Even the model mapping json file is present in root directory, the folders are traversed
         # and the data is updated provided not duplicated.
@@ -309,11 +314,6 @@ def generate_submission(env, state, inp, submission_division, logger):
         if model_mapping_combined:
             with open(os.path.join(path_submission, "model_mapping.json"), "w") as fp:
                 json.dump(model_mapping_combined, fp, indent=2)
-
-        # Save empty calibration.md file in the root directory and make it
-        # available for the submitters to fill
-        with open(os.path.join(path_submission, "calibration.md"), "w") as fp:
-            fp.write("MLPerf Inference Calibration and Quantization Details\n")
 
         models = [
             f for f in os.listdir(result_path) if not os.path.isfile(
