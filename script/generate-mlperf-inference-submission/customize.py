@@ -169,8 +169,10 @@ def generate_submission(env, state, inp, submission_division, logger):
     # Save empty calibration.md file in the root directory and make it
     # available for the submitters to fill
     try:
-        with open(os.path.join(path_submission, "calibration.md"), "w") as fp:
+        calibration_readme_path = os.path.join(path_submission, "calibration.md")
+        with open(calibration_readme_path, "w") as fp:
             fp.write("MLPerf Inference Calibration and Quantization Details\n")
+        logger.info(f"Created calibration.md file at {calibration_readme_path}")
     except Exception as e:
         logger.error(f"Error creating calibration.md file: {e}")
         return {'return': 1, 'error': f"Error creating calibration.md file: {e}"}
