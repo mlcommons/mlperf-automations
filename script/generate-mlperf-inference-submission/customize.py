@@ -179,6 +179,8 @@ def generate_submission(env, state, inp, submission_division, logger):
         logger.error(f"Error creating calibration.md file: {e}")
         return {'return': 1, 'error': f"Error creating calibration.md file: {e}"}
 
+    logger.info(
+        f"Created calibration.md file at {calibration_readme_path}")
     # SUT base
     system = env.get('MLC_HW_NAME', 'default').replace(' ', '_')
 
