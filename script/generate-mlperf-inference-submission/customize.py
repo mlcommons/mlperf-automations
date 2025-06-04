@@ -166,6 +166,11 @@ def generate_submission(env, state, inp, submission_division, logger):
     if not os.path.isdir(path_submission):
         os.makedirs(path_submission)
 
+    # Save empty calibration.md file in the root directory and make it
+    # available for the submitters to fill
+    with open(os.path.join(path_submission, "calibration.md"), "w") as fp:
+        fp.write("MLPerf Inference Calibration and Quantization Details\n")
+
     # SUT base
     system = env.get('MLC_HW_NAME', 'default').replace(' ', '_')
 
@@ -217,11 +222,6 @@ def generate_submission(env, state, inp, submission_division, logger):
         if "model_mapping.json" in os.listdir(result_path):
             with open(os.path.join(result_path, "model_mapping.json"), 'r') as f:
                 model_mapping_combined = json.load(f)
-
-        # Save empty calibration.md file in the root directory and make it
-        # available for the submitters to fill
-        with open(os.path.join(path_submission, "calibration.md"), "w") as fp:
-            fp.write("MLPerf Inference Calibration and Quantization Details\n")
 
         # Preprocessing part.
         # Even the model mapping json file is present in root directory, the folders are traversed
