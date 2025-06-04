@@ -119,7 +119,7 @@ def preprocess(i):
     # Add the compliance tests required for the models
     if env['MLC_MODEL'] in ['ssd', 'bevformer', 'deeplabv3plus']:
         test_list.append('TEST01')
-    if env['MLC_MODEL'] in ['ssd', 'bevformer', 'deeplabv3plus']:
+    if env['MLC_MODEL'] in ['bevformer', 'deeplabv3plus']:
         test_list.append('TEST04')
 
     variation_benchmark_version = "_" + env["MLC_MLPERF_INFERENCE_VERSION"]
