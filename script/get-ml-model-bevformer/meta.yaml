@@ -25,7 +25,7 @@ variations:
     env:
       MLC_MODEL_FORMAT: pth
       MLC_MODEL_RCLONE_FILEPATH: model_checkpoint_bevformer/bevformer_tiny_epoch_24.pth
-      MLC_ML_MODEL_FILENAME: bevformer_tiny_epoch_24.onnx
+      MLC_ML_MODEL_FILENAME: bevformer_tiny_epoch_24.pth
   mlc:
     group: download-src
     default: true

@@ -274,7 +274,7 @@ def docker_run(self_module, i):
         env.setdefault('MLC_DOCKER_CACHE', docker_cache)
 
     image_repo = i.get('docker_image_repo', '')
-    add_deps_recursive = i.get('add_deps_recursive')
+    add_deps_recursive = i.get('add_deps_recursive', {})
 
     # Ensure Docker is available
     r = self_module.action_object.access(
