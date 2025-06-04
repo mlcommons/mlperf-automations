@@ -528,17 +528,17 @@ def run_files_exist(mode, OUTPUT_DIR, run_files, env, logger):
 
         if env['MLC_BENCHMARK_GROUP'] == "automotive":
             SCRIPT_PATH = os.path.join(
-            env['MLC_MLPERF_INFERENCE_SOURCE'],
-            "compliance",
-            test,
-            "run_verification.py")
+                env['MLC_MLPERF_INFERENCE_SOURCE'],
+                "compliance",
+                test,
+                "run_verification.py")
         else:
             SCRIPT_PATH = os.path.join(
-            env['MLC_MLPERF_INFERENCE_SOURCE'],
-            "compliance",
-            "nvidia",
-            test,
-            "run_verification.py")
+                env['MLC_MLPERF_INFERENCE_SOURCE'],
+                "compliance",
+                "nvidia",
+                test,
+                "run_verification.py")
 
         if test == "TEST06":
             cmd = f"{env['MLC_PYTHON_BIN_WITH_PATH']}  {SCRIPT_PATH}  -c  {COMPLIANCE_DIR}  -o  {OUTPUT_DIR} --scenario {scenario} --dtype int32"
