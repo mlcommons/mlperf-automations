@@ -2,6 +2,7 @@
 
 name: MLC based MLPerf Inference Submission Generation
 
+
 on:
   pull_request:
     branches: [ "main", "dev" ]
