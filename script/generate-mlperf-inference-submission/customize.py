@@ -168,8 +168,12 @@ def generate_submission(env, state, inp, submission_division, logger):
 
     # Save empty calibration.md file in the root directory and make it
     # available for the submitters to fill
-    with open(os.path.join(path_submission, "calibration.md"), "w") as fp:
-        fp.write("MLPerf Inference Calibration and Quantization Details\n")
+    try:
+        with open(os.path.join(path_submission, "calibration.md"), "w") as fp:
+            fp.write("MLPerf Inference Calibration and Quantization Details\n")
+    except Exception as e:
+        logger.error(f"Error creating calibration.md file: {e}")
+        return {'return': 1, 'error': f"Error creating calibration.md file: {e}"}
 
     # SUT base
     system = env.get('MLC_HW_NAME', 'default').replace(' ', '_')
