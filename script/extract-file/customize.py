@@ -77,9 +77,39 @@ def preprocess(i):
         else:
             env['MLC_EXTRACT_TOOL_OPTIONS'] = ' -xvJf'
             env['MLC_EXTRACT_TOOL'] = 'tar '
+    elif filename.endswith(".tar.bz2"):
+        if windows:
+            x = '"' if ' ' in filename else ''
+            env['MLC_EXTRACT_CMD0'] = 'bzip2 -d ' + x + filename + x
+            filename = filename[:-4]  # leave only .tar
+            env['MLC_EXTRACT_TOOL_OPTIONS'] = ' -xvf'
+            env['MLC_EXTRACT_TOOL'] = 'tar '
+        elif os_info['platform'] == 'darwin':
+            env['MLC_EXTRACT_TOOL_OPTIONS'] = ' -xvjf '
+            env['MLC_EXTRACT_TOOL'] = 'tar '
+        else:
+            env['MLC_EXTRACT_TOOL_OPTIONS'] = ' --skip-old-files -xvjf '
+            env['MLC_EXTRACT_TOOL'] = 'tar '
     elif filename.endswith(".tar"):
         env['MLC_EXTRACT_TOOL_OPTIONS'] = ' -xvf'
         env['MLC_EXTRACT_TOOL'] = 'tar '
+    elif filename.endswith(".7z"):
+        if windows:
+            env['MLC_EXTRACT_TOOL'] = '7z'
+            env['MLC_EXTRACT_TOOL_OPTIONS'] = ' x -y '
+        else:
+            # Assumes p7zip is installed and provides the `7z` or `7zr` binary
+            env['MLC_EXTRACT_TOOL'] = '7z'
+            env['MLC_EXTRACT_TOOL_OPTIONS'] = ' x -y '
+
+    elif filename.endswith(".rar"):
+        if windows:
+            env['MLC_EXTRACT_TOOL'] = 'unrar'
+            env['MLC_EXTRACT_TOOL_OPTIONS'] = ' x -y '
+        else:
+            # unrar or unar may be available on Unix-like systems
+            env['MLC_EXTRACT_TOOL'] = 'unrar'
+            env['MLC_EXTRACT_TOOL_OPTIONS'] = ' x -y '
     elif filename.endswith(".gz"):
         # Check target filename
         extracted_filename = env.get('MLC_EXTRACT_EXTRACTED_FILENAME', '')
