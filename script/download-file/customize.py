@@ -229,6 +229,8 @@ def preprocess(i):
             # via get,rclone-config script
             if env.get('MLC_RCLONE_CONFIG_CMD', '') != '':
                 env['MLC_DOWNLOAD_CONFIG_CMD'] = env['MLC_RCLONE_CONFIG_CMD']
+            if is_true(env.get('MLC_RCLONE_SKIP_BUCKET_CHECK')):
+                extra_download_options += " --s3-no-check-bucket "
             rclone_copy_using = env.get('MLC_RCLONE_COPY_USING', 'sync')
             if rclone_copy_using == "sync":
                 pre_clean = False
