@@ -16,7 +16,8 @@ deps:
     - 'on'
   tags: get,mlperf,submission,dir
 variations:
-  inference:
+  wg-inference:
+    group: benchmark_wg
     default: true
     deps:
       - names:
@@ -24,7 +25,8 @@ variations:
         - submission-checker-src
         tags: mlcommons,inference,src,_branch.dev
         version: custom
-  automotive:
+  wg-automotive:
+    group: benchmark_wg
     deps:
       - names:
         - automotive-src

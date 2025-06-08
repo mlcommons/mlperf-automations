@@ -363,7 +363,7 @@ def preprocess(i):
         max_duration_ranging = str(
             max_duration_ranging_s *
             1000)  # in milliseconds
-        if scenario == "MultiStream" or scenario == "SingleStream":
+        if scenario in ["MultiStream", "SingleStream"]:
             if env.get('MLC_MLPERF_INFERENCE_MIN_DURATION', '') != '':
                 user_conf += ml_model_name + "." + scenario + ".min_duration = " + \
                     env['MLC_MLPERF_INFERENCE_MIN_DURATION'] + " \n"
@@ -371,7 +371,7 @@ def preprocess(i):
                     'MLC_MLPERF_MODEL_EQUAL_ISSUE_MODE', 'no')) and env.get('MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE') != '99.9':
                 user_conf += ml_model_name + "." + scenario + \
                     f".max_duration = {max_duration_valid}" + "\n"
-            if scenario in ["SingleStream", "ConstantStream"] and env.get('MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE') == '99.9' and env.get(
+            if scenario in ["SingleStream"] and env.get('MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE') == '99.9' and env.get(
                     'MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT', '') != '' and env.get('MLC_MLPERF_TARGET_LATENCY', '') == '':
                 user_conf += ml_model_name + "." + scenario + \
                     f".max_query_count = {env.get('MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT')}" + "\n"

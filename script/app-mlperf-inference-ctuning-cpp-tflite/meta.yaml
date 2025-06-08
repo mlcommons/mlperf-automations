@@ -28,7 +28,7 @@ deps:
   tags: get,cuda
 - names:
   - loadgen
-  tags: get,loadgen,_inference
+  tags: get,loadgen,_wg-inference
 - names:
   - inference-src
   tags: get,mlcommons,inference,src
@@ -121,7 +121,7 @@ post_deps:
 prehook_deps:
 - names:
   - user-conf-generator
-  tags: generate,user-conf,mlperf,inference,_inference
+  tags: generate,user-conf,mlperf,inference,_wg-inference
 - enable_if_env:
     MLC_MLPERF_SKIP_RUN:
     - 'no'
