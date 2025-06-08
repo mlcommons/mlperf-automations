@@ -68,7 +68,7 @@ def preprocess(i):
             logger.info(
                 '         when LLVM installer asks you about the "Destination Folder":')
             logger.info('')
-            logger.info(fos.getcwd())
+            logger.info(os.getcwd())
             logger.info('')
             input('Press Enter to continue!')
 
