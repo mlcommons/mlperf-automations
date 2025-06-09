@@ -25,9 +25,10 @@ def postprocess(i):
 
     env = i['env']
 
-    if env.get('MLC_PREPROCESSED_DATASET_TYPE', '') == 'validation':
-        env['MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_VALIDATION_PATH'] = env['MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH']
-    elif env.get('MLC_PREPROCESSED_DATASET_TYPE', '') == 'calibration':
-        env['MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_CALIBRATION_PATH'] = env['MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH']
+    if env.get('MLC_DOWNLOAD_MODE', '') != "dry":
+        if env.get('MLC_PREPROCESSED_DATASET_TYPE', '') == 'validation':
+            env['MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_VALIDATION_PATH'] = env['MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH']
+        elif env.get('MLC_PREPROCESSED_DATASET_TYPE', '') == 'calibration':
+            env['MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_CALIBRATION_PATH'] = env['MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH']
 
     return {'return': 0}
