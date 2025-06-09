@@ -36,3 +36,5 @@ if __name__ == "__main__":
     processed_files = process_files(changed_files)
     json_processed_files = json.dumps(processed_files)
     print(json_processed_files)
+    with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+        f.write(f"processed_files={json.dumps(processed)}\n")
