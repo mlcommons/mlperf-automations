@@ -16,6 +16,9 @@ new_env_keys:
   - MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_CALIBRATION_PATH
 input_mapping:
   deepseek_path: MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH
+print_env_at_the_end:
+  MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_VALIDATION_PATH: DeepSeek-R1 validation dataset path
+  MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_CALIBRATION_PATH: DeepSeek-R1 calibration dataset path
 variations:
   validation:
     default: true
