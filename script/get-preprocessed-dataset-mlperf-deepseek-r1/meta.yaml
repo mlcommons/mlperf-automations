@@ -71,3 +71,8 @@ variations:
   dry-run,rclone:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+tests:
+  run_inputs:
+  - variations_list:
+      - validation,rclone,mlc,dry-run
+      - calibration,rclone,mlc,dry-run
