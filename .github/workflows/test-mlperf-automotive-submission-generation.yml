@@ -1,0 +1,85 @@
+# This workflow will test the MLPerf Automotive Submission Generation using MLPerf Automation 
+
+name: MLC based MLPerf Automotive Submission Generation
+
+
+on:
+  pull_request:
+    branches: [ "main", "dev" ]
+    paths:
+      - '.github/workflows/test-mlperf-automotive-submission-generation.yml'
+      - '**'
+      - '!**.md'
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+      repo-url:
+        required: true
+        type: string
+
+jobs:
+  submission_generation:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [ "3.12" ]
+        division: ["closed", "open", "closed-open"]
+        category: ["edge"]
+        round: ["0.5"]
+        case: ["closed"]
+        action: ["run", "docker"]
+        exclude:
+          - os: macos-latest
+          - os: windows-latest
+          - case: "closed-edge"
+          - division: "closed-open"
+          - division: "closed"
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install mlcflow
+      run: |
+        pip install mlcflow
+        pip install tabulate
+    - name: Pull MLOps repository
+      run: |
+        if [ -z "${{ inputs.repo-url }}" ]; then
+          mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
+        else
+          mlc pull repo mlcommons@mlperf-automations --branch=dev
+        fi
+    - name: Pull repo where test cases are uploaded
+      run: |
+        git clone -b submission-generation-examples https://github.com/mlcommons/mlperf_automotive.git submission_generation_examples
+    - name: Run Submission Generation - round-${{ matrix.round }}${{ matrix.case }} ${{ matrix.action }} ${{ matrix.category }} ${{ matrix.division }} 
+      run: |
+        if [ "${{ matrix.case }}" == "closed" ]; then
+          description="Test submission - contains closed edge"
+        elif [ "${{ matrix.case }}" == "closed-power" ]; then
+          description="Test submission - contains closed-power edge results"
+        fi
+        # Dynamically set the log group to simulate a dynamic step name
+        echo "::group::$description"
+
+        docker_tags=""
+        if [ "${{ matrix.action }}" == "docker" ] && [ -z "${{ inputs.repo-url }}" ]; then
+          docker_tags="--docker_mlc_repo=${{ github.event.pull_request.head.repo.html_url }} --docker_mlc_repo_branch=${{ github.event.pull_request.head.ref }}"
+        fi
+
+        if [ -n "${{ inputs.repo-url }}" ]; then
+          mlc ${{ matrix.action }} script --tags=generate,inference,submission,_wg-automotive --adr.compiler.tags=gcc --version=v${{ matrix.round }} --clean --preprocess_submission=yes --submission_base_dir=mysubmissions --results_dir=$PWD/submission_generation_examples/r${{ matrix.round }}/ --run_checker --submitter=MLCommons --tar=yes --division=${{ matrix.division }} --env.MLC_DETERMINE_MEMORY_CONFIGURATION=yes --quiet --adr.inference-src.tags=_repo.${{ inputs.repo-url }},_branch.${{ inputs.ref }} $docker_tags
+          mlc ${{ matrix.action }} script --tags=run,inference,submission,checker,_wg-automotive --submitter_id_off=mysubmitter_id --tar=yes --submission_dir=mysubmissions/mlperf_submission --submission_tar_file=mysubmission.tar.gz --quiet --src_version=v${{ matrix.round }} --adr.inference-src.tags=_repo.${{ inputs.repo-url }},_branch.${{ inputs.ref }} $docker_tags
+        else
+          mlc ${{ matrix.action }} script --tags=generate,inference,submission,_wg-automotive --adr.compiler.tags=gcc --version=v${{ matrix.round }} --clean --preprocess_submission=yes --submission_base_dir=mysubmissions --results_dir=$PWD/submission_generation_examples/r${{ matrix.round }}/ --run_checker --submitter=MLCommons --tar=yes --division=${{ matrix.division }} --env.MLC_DETERMINE_MEMORY_CONFIGURATION=yes --quiet $docker_tags
+          mlc ${{ matrix.action }} script --tags=run,inference,submission,checker,_wg-automotive --submitter_id_off=mysubmitter_id --tar=yes --submission_dir=mysubmissions/mlperf_submission --submission_tar_file=mysubmission.tar.gz --quiet --src_version=v${{ matrix.round }} $docker_tags
+        fi
+
+        echo "::endgroup::"
