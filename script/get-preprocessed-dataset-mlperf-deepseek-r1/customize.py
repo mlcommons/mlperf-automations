@@ -12,7 +12,8 @@ def preprocess(i):
         return {'return': 1, 'error': 'Script not supported in windows yet!'}
 
     if env.get('MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH', '') != '':
-        if not os.path.exists(env['MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH']):
+        if not os.path.exists(
+                env['MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH']):
             return {
                 'return': 1, 'error': f"Path {env['MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH']} does not exists!"}
     else:
