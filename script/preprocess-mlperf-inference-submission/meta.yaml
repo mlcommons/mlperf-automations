@@ -23,7 +23,7 @@ variations:
       - names:
         - inference-src
         - submission-checker-src
-        tags: mlcommons,inference,src,_branch.dev
+        tags: mlcommons,inference,src
         version: custom
   wg-automotive:
     group: benchmark_wg
