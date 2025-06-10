@@ -24,6 +24,9 @@ variations:
         - inference-src
         - submission-checker-src
         tags: mlcommons,inference,src
+        update_tags_from_env_with_prefix:
+          _branch.: 
+            - MLC_GIT_CHECKOUT 
         version: custom
   wg-automotive:
     group: benchmark_wg
@@ -31,6 +34,8 @@ variations:
       - names:
         - automotive-src
         tags: mlcommons,automotive,src
+    env:
+      MLC_GIT_CHECKOUT: master
 input_mapping:
   input: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
   submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
@@ -40,6 +45,7 @@ input_mapping:
 default_env:
   MLC_MLPERF_NOINFER_LOW_ACCURACY_RESULTS: True
   MLC_MLPERF_NOINFER_SCENARIO_RESULTS: True
+  MLC_GIT_CHECKOUT: dev
 tags:
 - run
 - mlc
