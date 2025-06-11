@@ -1601,7 +1601,7 @@ variations:
 
   rtx_a6000,v5.0,sdxl,offline,run_harness,batch_size.1:
     default_variations:
-      batch-size: batch_size."clip1:2,clip2:2,unet:2,vae:1"
+      batch-size: batch_size."clip1:2;clip2:2;unet:2;vae:1"
 
   rtx_a6000,pre5.0,resnet50,offline,run_harness:
     default_variations:
@@ -1768,7 +1768,7 @@ variations:
 
   l4,v5.0,sdxl,offline,run_harness:
     default_variations:
-      batch-size: batch_size.\"clip1:2,clip2:2,unet:2,vae:1\"
+      batch-size: batch_size."clip1:2;clip2:2;unet:2;vae:1"
     
   l4,sdxl,offline,run_harness,num-gpu.8:
     env:
@@ -1781,7 +1781,7 @@ variations:
 
   l4,v5.0,sdxl,offline,run_harness,num-gpu.8:
     default_variations:
-      batch-size: batch_size.\"clip1:2,clip2:2,unet:2,vae:1\"
+      batch-size: batch_size."clip1:2;clip2:2;unet:2;vae:1"
     
   l4,sdxl,server,run_harness,num-gpu.1:
     env:
@@ -1795,7 +1795,7 @@ variations:
 
   l4,v5.0,sdxl,server,run_harness,num-gpu.1:
     default_variations:
-      batch-size: batch_size.\"clip1:2,clip2:2,unet:2,vae:1\"
+      batch-size: batch_size."clip1:2;clip2:2;unet:2;vae:1"
   
   l4,sdxl,server,run_harness,num-gpu.8:
     env:
@@ -1809,7 +1809,7 @@ variations:
 
   l4,v5.0,sdxl,server,run_harness,num-gpu.8:
     default_variations:
-      batch-size: batch_size.\"clip1:2,clip2:2,unet:2,vae:1\"
+      batch-size: batch_size."clip1:2;clip2:2;unet:2;vae:1"
 
   l4,resnet50:
     default_env:
