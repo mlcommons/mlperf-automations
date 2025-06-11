@@ -712,11 +712,13 @@ def preprocess(i):
     if '+LD_LIBRARY_PATH' not in env:
         env['+LD_LIBRARY_PATH'] = []
 
+    hpcx_paths = []
     if os.path.exists("/opt/hpcx/ucx/lib"):
-        env['+LD_LIBRARY_PATH'].append("/opt/hpcx/ucx/lib")
-
+        hpcx_paths.append("/opt/hpcx/ucx/lib")
     if os.path.exists("/opt/hpcx/ucc/lib"):
-        env['+LD_LIBRARY_PATH'].append("/opt/hpcx/ucc/lib")
+        hpcx_paths.append("/opt/hpcx/ucc/lib")
+
+    env['+LD_LIBRARY_PATH'] = hpcx_paths + env['+LD_LIBRARY_PATH']
 
     #    print(env)
 
