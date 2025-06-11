@@ -242,7 +242,7 @@ def preprocess(i):
             'data',
             'open-images-v6-mlperf',
             'calibration',
-            'train')
+            'calibraion')
         if not os.path.exists(target_data_path_dir):
             cmds.append(f"mkdir -p {target_data_path_dir}")
         target_data_path = os.path.join(target_data_path_dir, 'data')
