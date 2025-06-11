@@ -662,6 +662,9 @@ variations:
   postfix:
     env:
       MLC_SYS_UTIL_NAME: postfix
+      MLC_SYS_UTIL_VERSION_CMD: postconf mail_version
+      MLC_SYS_UTIL_VERSION_RE: mail_version = \b(\d+\.\d+(?:\.\d+)?)\b
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 1
     new_env_keys:
     - MLC_POSTFIX_VERSION
     state:

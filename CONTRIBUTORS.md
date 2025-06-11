@@ -18,6 +18,16 @@ Please see [here](CONTRIBUTING.md) for further guidelines for official contribut
 
 ---
 
+## Branching Strategy
+
+- Pull Requests (PRs) must be made against the `dev` branch.
+- Once the `dev` branch is stable and tested, it will be merged into `main`.
+- The `main` branch always reflects the latest stable release.
+
+Please ensure that your PR title and description are meaningful and linked to an issue if applicable.
+
+---
+
 ## Contributor Recognition
 
 Once your contribution exceeds 50 lines of code (in total), we will:  

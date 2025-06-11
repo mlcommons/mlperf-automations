@@ -1832,6 +1832,8 @@ variations:
       nvidia-inference-server:
         version: r4.1
         tags: _go
+      nvidia-harness:   
+        tags: _v4.0
       intel-harness:
         tags: _v4.1
       nvidia-scratch-space:
@@ -1855,6 +1857,8 @@ variations:
       nvidia-inference-server:
         version: r4.0
         tags: _mlcommons
+      nvidia-harness:   
+        tags: _v4.0
       intel-harness:
         tags: _v4.1
       inference-src:
@@ -1878,6 +1882,8 @@ variations:
       nvidia-inference-server:
         version: r5.0
         tags: _mlcommons
+      nvidia-harness:   
+        tags: _v5.0
       intel-harness:
         tags: _v4.1
       inference-src:

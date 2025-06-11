@@ -27,6 +27,9 @@ prehook_deps:
     - 'yes'
   names: llvm-install
   reuse_version: true
+  inherit_variation_tags: true
+  skip_inherit_variation_groups:
+    - install-src
   tags: install,llvm
 sort: 100
 tags:
@@ -39,13 +42,24 @@ tags:
 uid: 99832a103ed04eb8
 variations:
   from-prebuilt:
+    group: install-src
+    default: true
     ad:
       llvm-install:
         tags: prebuilt
   from-src:
+    group: install-src
     ad:
       llvm-install:
         tags: src,_clang
   path.#:
     env:
       MLC_LLVM_DIR_PATH: '#'
+  release: {}
+  version.#: {}
+  branch.#: {}
+  runtimes.#: {}
+  flang: {}
+  sha.#: {}
+  tag.#: {}
+
