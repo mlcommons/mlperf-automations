@@ -647,10 +647,22 @@ variations:
     - tags: get,generic-python-lib,_package.nibabel
     - tags: get,generic-python-lib,_pandas
       version_max: "1.5.3"
-    - tags: get,generic-python-lib,_onnx-graphsurgeon
-      version: 0.3.27
-    - tags: get,generic-python-lib,_package.onnx
-      version: 1.13.1
+
+  3d-unet_,pre5.0:
+    deps:
+      - tags: get,generic-python-lib,_onnx-graphsurgeon
+        version: 0.3.27
+      - tags: get,generic-python-lib,_package.onnx
+        version: 1.13.1
+  
+  3d-unet_,v5.0:
+    deps:
+      - tags: get,generic-python-lib,_package.onnx
+        names:
+          - onnx
+        version: "1.17.0"
+      - tags: get,generic-python-lib,_package.onnx-graphsurgeon
+        version: "0.5.2"
 
   3d-unet-99:
     group: model
