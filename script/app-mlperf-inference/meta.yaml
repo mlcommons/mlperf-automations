@@ -297,6 +297,10 @@ variations:
   reference,bert_:
     default_variations:
       backend: onnxruntime
+  
+  reference,deepseek-r1:
+    default_variations:
+      backend: pytorch
 
   all-models,nvidia-original:
     docker:
@@ -948,7 +952,52 @@ variations:
         names:
           - llama3_1-405b
           - llama3-405b
+  
+  deepseek-r1:
+    group:
+      model
+    add_deps_recursive:
+      mlperf-inference-implementation:
+        tags: _deepseek-r1
+    env:
+      MLC_MODEL:
+        deepseek-r1
+    posthook_deps:
+    - enable_if_env:
+        MLC_MLPERF_LOADGEN_MODE:
+        - accuracy
+        - all
+        MLC_MLPERF_ACCURACY_RESULTS_DIR:
+        - 'on'
+      skip_if_env:
+        MLC_MLPERF_IMPLEMENTATION:
+        - nvidia
+      names:
+      - mlperf-accuracy-script
+      - deepseek-r1-accuracy-script
+      tags: run,accuracy,mlperf,_dataset_deepseek-r1
+    docker:
+      deps:
+      - tags: get,mlperf,preprocessed,dataset,deepseek-r1
+        enable_if_env:
+          MLC_USE_DATASET_FROM_HOST:
+          - 'yes'
+        names:
+          - deepseek-r1-preprocessed-dataset
+      mounts:
+        - "${{ MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_VALIDATION_PATH }}:${{ MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_VALIDATION_PATH }}"
 
+  deepseek-r1,pytorch:
+    docker:
+      image_name: nvcr.io/nvidia/pytorch:25.04-py3
+
+  deepseek-r1,sglang:
+    docker:
+      image_name: nvidia/cuda:12.6.0-devel-ubuntu22.04
+  
+  deepseek-r1,vllm:
+    docker:
+      image_name: nvidia/cuda:12.6.0-devel-ubuntu22.04
 
   sdxl:
     group:
@@ -981,6 +1030,8 @@ variations:
             - 'yes'
             MLC_USE_MODEL_FROM_HOST:
             - 'yes'
+            MLC_MLPERF_INFERENCE_VERSION:
+            - '5.0'
           tags: get,ml-model,sdxl,_fp16,_rclone
 
   sdxl,reference,float16:
@@ -1403,6 +1454,24 @@ variations:
       mlperf-inference-implementation:
         tags: _pytorch
 
+  vllm:
+    group: backend
+    env:
+      MLC_MLPERF_BACKEND:
+        vllm
+    add_deps_recursive:
+      mlperf-inference-implementation:
+        tags: _vllm
+  
+  sglang:
+    group: backend
+    env:
+      MLC_MLPERF_BACKEND:
+        sglang
+    add_deps_recursive:
+      mlperf-inference-implementation:
+        tags: _sglang
+
   openshift:
     group: backend
     env:
@@ -1715,8 +1784,6 @@ variations:
       nvidia-inference-server:
         version: r2.1
         tags: _custom
-      nvidia-original-mlperf-inference:
-        tags: _pre5.0
     env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_TEST_QUERY_COUNT: '100'
@@ -1735,8 +1802,6 @@ variations:
       nvidia-inference-server:
         version: r2.1
         tags: _custom
-      nvidia-original-mlperf-inference:
-        tags: _pre5.0
     env:
       MLC_SKIP_SYS_UTILS: 'yes'
 
@@ -1750,8 +1815,6 @@ variations:
       nvidia-inference-server:
         version: r3.0
         tags: _nvidia-only
-      nvidia-original-mlperf-inference:
-        tags: _pre5.0
     default_env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
@@ -1772,8 +1835,6 @@ variations:
         tags: _v3.1
       nvidia-scratch-space:
         tags: _version.4_0-dev
-      nvidia-original-mlperf-inference:
-        tags: _pre5.0
     default_env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
@@ -1792,8 +1853,6 @@ variations:
         tags: _ctuning
       intel-harness:
         tags: _v3.1
-      nvidia-original-mlperf-inference:
-        tags: _pre5.0
     default_env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
@@ -1816,8 +1875,6 @@ variations:
         tags: _v4.0
       nvidia-scratch-space:
         tags: _version.4_1-dev
-      nvidia-original-mlperf-inference:
-        tags: _pre5.0
     default_env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
@@ -1838,8 +1895,6 @@ variations:
         tags: _v4.1
       nvidia-scratch-space:
         tags: _version.4_1
-      nvidia-original-mlperf-inference:
-        tags: _pre5.0
     default_env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
@@ -1862,9 +1917,7 @@ variations:
       intel-harness:
         tags: _v4.1
       inference-src:
-        version: r5.0
-      nvidia-original-mlperf-inference:
-        tags: _pre5.0
+         version: r5.0
       nvidia-scratch-space:
         tags: _version.5.0-dev
     default_env:
@@ -1892,8 +1945,6 @@ variations:
         tags: _version.5.0
       pycuda:
         version: "2024.1"
-      nvidia-harness:
-        tags: _v5.0
     default_env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
