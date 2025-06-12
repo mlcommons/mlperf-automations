@@ -366,20 +366,50 @@ def preprocess(i):
             else:
                 cmds.append(f"make download_model BENCHMARKS='{model_name}'")
         elif "stable-diffusion" in env['MLC_MODEL']:
-            folders = ["clip1", "clip2", "unetxl", "vae"]
-            for folder in folders:
-                onnx_model_path = os.path.join(
-                    env['MLPERF_SCRATCH_PATH'],
-                    'models',
-                    'SDXL',
-                    'onnx_models',
-                    folder,
-                    'model.onnx')
-                if not os.path.exists(onnx_model_path):
+            if env.get('MLC_MLPERF_INFERENCE_CODE_VERSION') == '5.0':
+                # Define folder mappings for each model type
+                model_folders = {
+                    'onnx_models': ["clip1", "clip2", "unetxl", "vae"],
+                    'modelopt_models': ["unetxl.fp8", "vae.int8"]
+                }
+    
+                model_found = True
+    
+                # Check all required models across both directories
+                for model_type, folders in model_folders.items():
+                    for folder in folders:
+                        onnx_model_path = os.path.join(
+                            env['MLPERF_SCRATCH_PATH'],
+                            'models',
+                            'SDXL',
+                            model_type,
+                            folder,
+                            'model.onnx'
+                        )
+                        if not os.path.exists(onnx_model_path):
+                            model_found = False
+                            break
+                    if not model_found:
+                        break
+                if not model_found:
                     env['MLC_REQUIRE_SDXL_MODEL_DOWNLOAD'] = 'yes'
-                    cmds.append(
-                        f"make download_model BENCHMARKS='{model_name}'")
-                    break
+                    cmds.append(f"make download_model BENCHMARKS='{model_name}'")
+            else:
+                folders = ["clip1", "clip2", "unetxl", "vae"]
+                for folder in folders:
+                    onnx_model_path = os.path.join(
+                        env['MLPERF_SCRATCH_PATH'],
+                        'models',
+                        'SDXL',
+                        'onnx_models',
+                        folder,
+                        'model.onnx')
+                    if not os.path.exists(onnx_model_path):
+                        env['MLC_REQUIRE_SDXL_MODEL_DOWNLOAD'] = 'yes'
+                        cmds.append(
+                            f"make download_model BENCHMARKS='{model_name}'")
+                        break
+                    
             if scenario.lower() == "singlestream":
                 ammo_model_path = os.path.join(
                     env['MLPERF_SCRATCH_PATH'],
