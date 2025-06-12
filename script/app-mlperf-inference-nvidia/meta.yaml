@@ -314,10 +314,8 @@ prehook_deps:
       - sdxl-model
       - ml-model
     tags: get,ml-model,sdxl,_fp16,_rclone
-    skip_if_env:
+    skip_if_any_env:
       MLC_RUN_STATE_DOCKER:
-      - 'yes'
-      MLC_MLPERF_MODEL_SDXL_DOWNLOAD_TO_HOST:
       - 'yes'
       MLC_MLPERF_INFERENCE_CODE_VERSION:
       - "v5.0"
