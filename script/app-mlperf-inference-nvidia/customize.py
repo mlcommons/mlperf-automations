@@ -261,11 +261,18 @@ def preprocess(i):
         model_path = os.path.join(
             target_model_path_dir,
             'retinanet-fpn-torch2.1-postprocessed.onnx')
+        alt_model_versions = ["2.2", "2.6"]
         alt_model_path = os.path.join(
             target_model_path_dir,
             'retinanet-fpn-torch2.2-postprocessed.onnx')
-        if not os.path.exists(model_path) and os.path.exists(alt_model_path):
-            cmds.append(f"ln -s {alt_model_path} {model_path}")
+        if not os.path.exists(model_path):
+            for alt_model_version in alt_model_versions:
+                alt_model_path = os.path.join(
+                    target_model_path_dir,
+                    f'retinanet-fpn-torch{alt_model_version}-postprocessed.onnx')
+                if os.path.exists(alt_model_path):
+                    cmds.append(f"ln -s {alt_model_path} {model_path}")
+                    break
 
         model_name = "retinanet"
 
