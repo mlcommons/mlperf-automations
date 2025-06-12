@@ -1030,6 +1030,7 @@ variations:
             - 'yes'
             MLC_USE_MODEL_FROM_HOST:
             - 'yes'
+        - skip_if_env:
             MLC_MLPERF_INFERENCE_VERSION:
             - '5.0'
           tags: get,ml-model,sdxl,_fp16,_rclone
