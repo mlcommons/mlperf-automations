@@ -372,9 +372,9 @@ def preprocess(i):
                     'onnx_models': ["clip1", "clip2", "unetxl", "vae"],
                     'modelopt_models': ["unetxl.fp8", "vae.int8"]
                 }
-    
+
                 model_found = True
-    
+
                 # Check all required models across both directories
                 for model_type, folders in model_folders.items():
                     for folder in folders:
@@ -393,7 +393,8 @@ def preprocess(i):
                         break
                 if not model_found:
                     env['MLC_REQUIRE_SDXL_MODEL_DOWNLOAD'] = 'yes'
-                    cmds.append(f"make download_model BENCHMARKS='{model_name}'")
+                    cmds.append(
+                        f"make download_model BENCHMARKS='{model_name}'")
             else:
                 folders = ["clip1", "clip2", "unetxl", "vae"]
                 for folder in folders:
@@ -409,7 +410,7 @@ def preprocess(i):
                         cmds.append(
                             f"make download_model BENCHMARKS='{model_name}'")
                         break
-                    
+
             if scenario.lower() == "singlestream":
                 ammo_model_path = os.path.join(
                     env['MLPERF_SCRATCH_PATH'],
