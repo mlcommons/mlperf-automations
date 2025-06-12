@@ -366,7 +366,7 @@ def preprocess(i):
             else:
                 cmds.append(f"make download_model BENCHMARKS='{model_name}'")
         elif "stable-diffusion" in env['MLC_MODEL']:
-            if env.get('MLC_MLPERF_INFERENCE_CODE_VERSION') == '5.0':
+            if env.get('MLC_MLPERF_INFERENCE_CODE_VERSION') == 'v5.0':
                 # Define folder mappings for each model type
                 model_folders = {
                     'onnx_models': ["clip1", "clip2", "unetxl", "vae"],
