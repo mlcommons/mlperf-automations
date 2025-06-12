@@ -567,8 +567,6 @@ variations:
       version: "0.4.0"
     - tags: get,generic-python-lib,_package.torchmetrics
       version: "1.0.3"
-    - tags: get,generic-python-lib,_package.nvidia-modelopt
-      version: "0.19.0"
     - tags: get,generic-python-lib,_package.typeguard
     - tags: get,generic-python-lib,_package.onnx
       names:
@@ -598,6 +596,8 @@ variations:
       version: "0.6.0"
     - tags: get,generic-python-lib,_package.torchmetrics
       version: "1.0.3"
+    - tags: get,generic-python-lib,_package.nvidia-modelopt
+      version: "0.19.0"
     - tags: get,generic-python-lib,_package.typeguard
     - tags: get,generic-python-lib,_package.onnx
       names:
