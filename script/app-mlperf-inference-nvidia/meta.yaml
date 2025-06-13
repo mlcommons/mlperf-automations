@@ -1248,65 +1248,125 @@ variations:
       MLC_MLPERF_NVIDIA_HARNESS_NUM_SORT_SEGMENTS: '2'
       MLC_MLPERF_NVIDIA_HARNESS_SKIP_POSTPROCESS: True
 
-  gpu_memory.80,num-gpus.2,llama2-70b,offline,run_harness:
+  gpu_memory.80,pre5.0,num-gpus.2,llama2-70b,offline,run_harness:
     default_variations:
       batch-size: batch_size.896
+
+  gpu_memory.80,v5.0,num-gpus.2,llama2-70b,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."llama2-70b:1024"
       
-  gpu_memory.16,gptj_,offline,run_harness:
+  gpu_memory.16,pre5.0,gptj_,offline,run_harness:
     default_variations:
       batch-size: batch_size.4
 
-  gpu_memory.24,gptj_,offline,run_harness:
+  gpu_memory.16,v5.0,gptj_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."gptj:4"
+
+  gpu_memory.24,pre5.0,gptj_,offline,run_harness:
     default_variations:
       batch-size: batch_size.7
 
-  gpu_memory.32,gptj_,offline,run_harness:
+  gpu_memory.24,v5.0,gptj_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."gptj:7"
+
+  gpu_memory.32,pre5.0,gptj_,offline,run_harness:
     default_variations:
       batch-size: batch_size.8
+  
+  gpu_memory.32,v5.0,gptj_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."gptj:8"
 
-  gpu_memory.48,gptj_,offline,run_harness:
+  gpu_memory.48,pre5.0,gptj_,offline,run_harness:
     default_variations:
       batch-size: batch_size.14
 
-  gpu_memory.40,gptj_,offline,run_harness:
+  gpu_memory.48,v5.0,gptj_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."gptj:14"
+
+  gpu_memory.40,pre5.0,gptj_,offline,run_harness:
     default_variations:
       batch-size: batch_size.10
 
-  gpu_memory.80,gptj_,offline,run_harness:
+  gpu_memory.40,v5.0,gptj_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."gptj:10"
+
+  gpu_memory.80,pre5.0,gptj_,offline,run_harness:
     default_variations:
       batch-size: batch_size.32
+
+  gpu_memory.80,v5.0,gptj_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."gptj:80"
   
-  gpu_memory.16,sdxl,offline,run_harness:
+  gpu_memory.16,pre5.0,sdxl,offline,run_harness:
+  default_variations:
+    batch-size: batch_size.2
+
+  gpu_memory.16,v5.0,sdxl,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."clip1:2##clip2:2##unet:2##vae:1"
+
+  gpu_memory.24,pre5.0,sdxl,offline,run_harness:
     default_variations:
       batch-size: batch_size.2
 
-  gpu_memory.24,sdxl,offline,run_harness:
+  gpu_memory.24,v5.0,sdxl,offline,run_harness:
     default_variations:
-      batch-size: batch_size.2
-  
-  gpu_memory.32,sdxl,offline,run_harness:
+      batch-size: batch_size."clip1:2##clip2:2##unet:2##vae:1"
+
+  gpu_memory.32,pre5.0,sdxl,offline,run_harness:
     default_variations:
       batch-size: batch_size.3
   
-  gpu_memory.80,sdxl,offline,run_harness:
+  gpu_memory.32,v5.0,sdxl,offline,run_harness:
     default_variations:
-      batch-size: batch_size.8
-  
-  gpu_memory.96,sdxl,offline,run_harness:
-    default_variations:
-      batch-size: batch_size.8
-  
-  gpu_memory.96,sdxl,server,run_harness:
+      batch-size: batch_size."clip1:1##clip2:2##unet:2##vae:1"
+
+  gpu_memory.80,pre5.0,sdxl,offline,run_harness:
     default_variations:
       batch-size: batch_size.8
 
-  gpu_memory.80,sdxl,server,run_harness:
+  gpu_memory.80,v5.0,sdxl,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."clip1:64##clip2:64##unet:64##vae:8"
+
+  gpu_memory.96,pre5.0,sdxl,offline,run_harness:
     default_variations:
       batch-size: batch_size.8
-  
-  gpu_memory.140,sdxl,offline,run_harness:
+
+  gpu_memory.96,v5.0,sdxl,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."clip1:64##clip2:64##unet:64##vae:8"
+
+  gpu_memory.96,pre5.0,sdxl,server,run_harness:
     default_variations:
       batch-size: batch_size.8
+
+  gpu_memory.96,v5.0,sdxl,server,run_harness:
+    default_variations:
+      batch-size: batch_size."clip1:64##clip2:64##unet:64##vae:8"
+
+  gpu_memory.80,pre5.0,sdxl,server,run_harness:
+    default_variations:
+      batch-size: batch_size.8
+
+  gpu_memory.80,v5.0,sdxl,server,run_harness:
+    default_variations:
+      batch-size: batch_size."clip1:64##clip2:64##unet:64##vae:8"
+
+  gpu_memory.140,pre5.0,sdxl,offline,run_harness:
+    default_variations:
+      batch-size: batch_size.8
+
+  gpu_memory.140,v5.0,sdxl,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."clip1:64##clip2:64##unet:64##vae:8"
 
   gpu_memory.8,bert_,offline,run_harness:
     default_variations:
@@ -1336,37 +1396,69 @@ variations:
     default_variations:
       batch-size: batch_size.64
 
-  gpu_memory.8,resnet50,offline,run_harness:
+  gpu_memory.8,pre5.0,resnet50,offline,run_harness:
+  default_variations:
+    batch-size: batch_size.64
+  env:
+    MLC_MLPERF_NVIDIA_HARNESS_GPU_COPY_STREAMS: "4"
+
+  gpu_memory.8,v5.0,resnet50,offline,run_harness:
     default_variations:
-      batch-size: batch_size.64
+      batch-size: batch_size."resnet50:64"
     env:
       MLC_MLPERF_NVIDIA_HARNESS_GPU_COPY_STREAMS: "4"
 
-  gpu_memory.16,resnet50,offline,run_harness:
+  gpu_memory.16,pre5.0,resnet50,offline,run_harness:
     default_variations:
       batch-size: batch_size.1024
     env:
       MLC_MLPERF_NVIDIA_HARNESS_GPU_COPY_STREAMS: "4"
 
-  gpu_memory.40,resnet50,offline,run_harness:
+  gpu_memory.16,v5.0,resnet50,offline,run_harness:
     default_variations:
-      batch-size: batch_size.2048
+      batch-size: batch_size."resnet50:1024"
+    env:
+      MLC_MLPERF_NVIDIA_HARNESS_GPU_COPY_STREAMS: "4"
 
-  gpu_memory.24,resnet50,offline,run_harness:
+  gpu_memory.24,pre5.0,resnet50,offline,run_harness:
     default_variations:
       batch-size: batch_size.64
 
-  gpu_memory.32,resnet50,offline,run_harness:
+  gpu_memory.24,v5.0,resnet50,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."resnet50:64"
+
+  gpu_memory.32,pre5.0,resnet50,offline,run_harness:
     default_variations:
       batch-size: batch_size.2048
 
-  gpu_memory.48,resnet50,offline,run_harness:
+  gpu_memory.32,v5.0,resnet50,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."resnet50:2048"
+
+  gpu_memory.40,pre5.0,resnet50,offline,run_harness:
     default_variations:
       batch-size: batch_size.2048
 
-  gpu_memory.80,resnet50,offline,run_harness:
+  gpu_memory.40,v5.0,resnet50,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."resnet50:2048"
+
+  gpu_memory.48,pre5.0,resnet50,offline,run_harness:
     default_variations:
       batch-size: batch_size.2048
+
+  gpu_memory.48,v5.0,resnet50,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."resnet50:2048"
+
+  gpu_memory.80,pre5.0,resnet50,offline,run_harness:
+    default_variations:
+      batch-size: batch_size.2048
+
+  gpu_memory.80,v5.0,resnet50,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."resnet50:2048"
 
   num-gpus.#:
     group: num-gpus
@@ -1395,36 +1487,68 @@ variations:
     default_variations:
       batch-size: batch_size.2
 
-  gpu_memory.8,retinanet,offline,run_harness:
+  gpu_memory.8,pre5.0,retinanet,offline,run_harness:
     default_variations:
       batch-size: batch_size.2
-
-  gpu_memory.16,retinanet,offline,run_harness:
+  
+  gpu_memory.8,v5.0,retinanet,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."retinanet:2"
+  
+  gpu_memory.16,pre5.0,retinanet,offline,run_harness:
     default_variations:
       batch-size: batch_size.2
-
-  gpu_memory.40,retinanet,offline,run_harness:
+  
+  gpu_memory.16,v5.0,retinanet,offline,run_harness:
     default_variations:
-      batch-size: batch_size.4
-
-  gpu_memory.32,retinanet,offline,run_harness:
-    default_variations:
-      batch-size: batch_size.4
-
-  gpu_memory.48,retinanet,offline,run_harness:
-    default_variations:
-      batch-size: batch_size.4
-
-  gpu_memory.24,retinanet,offline,run_harness:
+      batch-size: batch_size."retinanet:2"
+  
+  gpu_memory.24,pre5.0,retinanet,offline,run_harness:
     default_variations:
       batch-size: batch_size.2
     env:
       MLC_MLPERF_NVIDIA_HARNESS_GPU_COPY_STREAMS: "2"
       MLC_MLPERF_NVIDIA_HARNESS_GPU_INFERENCE_STREAMS: "2"
-
-  gpu_memory.80,retinanet,offline,run_harness:
+  
+  gpu_memory.24,v5.0,retinanet,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."retinanet:2"
+    env:
+      MLC_MLPERF_NVIDIA_HARNESS_GPU_COPY_STREAMS: "2"
+      MLC_MLPERF_NVIDIA_HARNESS_GPU_INFERENCE_STREAMS: "2"
+  
+  gpu_memory.32,pre5.0,retinanet,offline,run_harness:
+    default_variations:
+      batch-size: batch_size.4
+  
+  gpu_memory.32,v5.0,retinanet,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."retinanet:4"
+  
+  gpu_memory.40,pre5.0,retinanet,offline,run_harness:
+    default_variations:
+      batch-size: batch_size.4
+  
+  gpu_memory.40,v5.0,retinanet,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."retinanet:4"
+  
+  
+  gpu_memory.48,pre5.0,retinanet,offline,run_harness:
+    default_variations:
+      batch-size: batch_size.4
+  
+  gpu_memory.48,v5.0,retinanet,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."retinanet:4"
+  
+  gpu_memory.80,pre5.0,retinanet,offline,run_harness:
     default_variations:
       batch-size: batch_size.8
+  
+  gpu_memory.80,v5.0,retinanet,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."retinanet:8"
 
   retinanet,server,run_harness:
     default_variations:
@@ -1461,63 +1585,121 @@ variations:
     default_variations:
       batch-size: batch_size.2048
 
-  gpu_memory.8,3d-unet_,offline,run_harness:
+  gpu_memory.8,pre5.0,3d-unet_,offline,run_harness:
     default_variations:
       batch-size: batch_size.4
-
-  gpu_memory.16,3d-unet_,offline,run_harness:
+  
+  gpu_memory.8,v5.0,3d-unet_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."3d-unet:4"
+  
+  gpu_memory.16,pre5.0,3d-unet_,offline,run_harness:
     default_variations:
       batch-size: batch_size.4
-
-  gpu_memory.40,3d-unet_,offline,run_harness:
+  
+  gpu_memory.16,v5.0,3d-unet_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."3d-unet:4"
+  
+  gpu_memory.24,pre5.0,3d-unet_,offline,run_harness:
     default_variations:
       batch-size: batch_size.8
-
-  gpu_memory.24,3d-unet_,offline,run_harness:
+  
+  gpu_memory.24,v5.0,3d-unet_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."3d-unet:8"
+  
+  gpu_memory.32,pre5.0,3d-unet_,offline,run_harness:
     default_variations:
       batch-size: batch_size.8
-
-  gpu_memory.80,3d-unet_,offline,run_harness:
+  
+  gpu_memory.32,v5.0,3d-unet_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."3d-unet:8"
+  
+  gpu_memory.40,pre5.0,3d-unet_,offline,run_harness:
     default_variations:
       batch-size: batch_size.8
-
-  gpu_memory.32,3d-unet_,offline,run_harness:
+  
+  gpu_memory.40,v5.0,3d-unet_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."3d-unet:8"
+  
+  gpu_memory.48,pre5.0,3d-unet_,offline,run_harness:
     default_variations:
       batch-size: batch_size.8
-
-  gpu_memory.48,3d-unet_,offline,run_harness:
+  
+  gpu_memory.48,v5.0,3d-unet_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."3d-unet:8"
+  
+  gpu_memory.80,pre5.0,3d-unet_,offline,run_harness:
     default_variations:
       batch-size: batch_size.8
+  
+  gpu_memory.80,v5.0,3d-unet_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."3d-unet:8"
 
-  gpu_memory.16,dlrm_,offline,run_harness:
+  gpu_memory.16,pre5.0,dlrm_,offline,run_harness:
     default_variations:
       batch-size: batch_size.1400
-
-  gpu_memory.40,dlrm_,offline,run_harness:
+  
+  gpu_memory.16,v5.0,dlrm_,offline,run_harness:
     default_variations:
-      batch-size: batch_size.1400
-    env:
-      MLC_MLPERF_NVIDIA_HARNESS_EMBEDDING_WEIGHTS_ON_GPU_PART: "0.40"
-
-  gpu_memory.24,dlrm_,offline,run_harness:
+      batch-size: batch_size."dlrm:1400"
+  
+  gpu_memory.24,pre5.0,dlrm_,offline,run_harness:
     default_variations:
       batch-size: batch_size.1400
     env:
       MLC_MLPERF_NVIDIA_HARNESS_EMBEDDING_WEIGHTS_ON_GPU_PART: "0.30"
-
-  gpu_memory.32,dlrm_,offline,run_harness:
+  
+  gpu_memory.24,v5.0,dlrm_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."dlrm:1400"
+    env:
+      MLC_MLPERF_NVIDIA_HARNESS_EMBEDDING_WEIGHTS_ON_GPU_PART: "0.30"
+  
+  gpu_memory.32,pre5.0,dlrm_,offline,run_harness:
     default_variations:
       batch-size: batch_size.1400
-
-  gpu_memory.48,dlrm_,offline,run_harness:
+  
+  gpu_memory.32,v5.0,dlrm_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."dlrm:1400"
+  
+  gpu_memory.40,pre5.0,dlrm_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size.1400
+    env:
+      MLC_MLPERF_NVIDIA_HARNESS_EMBEDDING_WEIGHTS_ON_GPU_PART: "0.40"
+  
+  gpu_memory.40,v5.0,dlrm_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."dlrm:1400"
+    env:
+      MLC_MLPERF_NVIDIA_HARNESS_EMBEDDING_WEIGHTS_ON_GPU_PART: "0.40"
+  
+  gpu_memory.48,pre5.0,dlrm_,offline,run_harness:
     default_variations:
       batch-size: batch_size.1400
     env:
       MLC_MLPERF_NVIDIA_HARNESS_EMBEDDING_WEIGHTS_ON_GPU_PART: "0.50"
-
-  gpu_memory.80,dlrm_,offline,run_harness:
+  
+  gpu_memory.48,v5.0,dlrm_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."dlrm:1400"
+    env:
+      MLC_MLPERF_NVIDIA_HARNESS_EMBEDDING_WEIGHTS_ON_GPU_PART: "0.50"
+  
+  gpu_memory.80,pre5.0,dlrm_,offline,run_harness:
     default_variations:
       batch-size: batch_size.1400
+  
+  gpu_memory.80,v5.0,dlrm_,offline,run_harness:
+    default_variations:
+      batch-size: batch_size."dlrm:1400"
 
   orin:
     group: gpu-name
@@ -1617,7 +1799,7 @@ variations:
 
   rtx_a6000,v5.0,sdxl,offline,run_harness,batch_size.1:
     default_variations:
-      batch-size: batch_size."clip1:2;clip2:2;unet:2;vae:1"
+      batch-size: batch_size."clip1:2##clip2:2##unet:2##vae:1"
 
   rtx_a6000,pre5.0,resnet50,offline,run_harness:
     default_variations:
@@ -1784,7 +1966,7 @@ variations:
 
   l4,v5.0,sdxl,offline,run_harness:
     default_variations:
-      batch-size: batch_size."clip1:2;clip2:2;unet:2;vae:1"
+      batch-size: batch_size."clip1:2##clip2:2##unet:2##vae:1"
     
   l4,sdxl,offline,run_harness,num-gpu.8:
     env:
@@ -1797,7 +1979,7 @@ variations:
 
   l4,v5.0,sdxl,offline,run_harness,num-gpu.8:
     default_variations:
-      batch-size: batch_size."clip1:2;clip2:2;unet:2;vae:1"
+      batch-size: batch_size."clip1:2##clip2:2##unet:2##vae:1"
     
   l4,sdxl,server,run_harness,num-gpu.1:
     env:
@@ -1825,7 +2007,7 @@ variations:
 
   l4,v5.0,sdxl,server,run_harness,num-gpu.8:
     default_variations:
-      batch-size: batch_size."clip1:2;clip2:2;unet:2;vae:1"
+      batch-size: batch_size."clip1:2##clip2:2##unet:2##vae:1"
 
   l4,resnet50:
     default_env:

@@ -563,12 +563,12 @@ def preprocess(i):
         gpu_batch_size = env.get('MLC_MLPERF_NVIDIA_HARNESS_GPU_BATCH_SIZE')
         if gpu_batch_size:
             run_config += f" --gpu_batch_size={gpu_batch_size}".replace(
-                ";", ",")
+                "##", ",")
 
         dla_batch_size = env.get('MLC_MLPERF_NVIDIA_HARNESS_DLA_BATCH_SIZE')
         if dla_batch_size:
             run_config += f" --dla_batch_size={dla_batch_size}".replace(
-                ";", ",")
+                "##", ",")
 
         input_format = env.get('MLC_MLPERF_NVIDIA_HARNESS_INPUT_FORMAT')
         if input_format:
