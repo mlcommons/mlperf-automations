@@ -66,8 +66,8 @@ jobs:
         fi
     - name: Pull repo where test cases are uploaded
       run: |
-        examples_repo_url="${{ inputs.examples-repo-url }}"
-        examples_repo_branch="${{ inputs.examples-repo-branch }}"
+        examples_repo_url="${{ inputs.examples-repo-url || 'https://github.com/mlcommons/mlperf_automotive.git' }}"
+        examples_repo_branch="${{ inputs.examples-repo-branch || 'submission-generation-examples' }}"
         
         echo "Cloning examples from: $examples_repo_url (branch: $examples_repo_branch)"
         git clone -b $examples_repo_branch $examples_repo_url submission_generation_examples    
