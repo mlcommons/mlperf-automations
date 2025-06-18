@@ -18,6 +18,14 @@ on:
       repo-url:
         required: true
         type: string
+      examples-repo-url:
+        required: false
+        type: string
+        default: 'https://github.com/mlcommons/mlperf_automotive.git'
+      examples-repo-branch:
+        required: false
+        type: string
+        default: 'submission-generation-examples'
 
 jobs:
   submission_generation:
@@ -58,7 +66,11 @@ jobs:
         fi
     - name: Pull repo where test cases are uploaded
       run: |
-        git clone -b submission-generation-examples https://github.com/mlcommons/mlperf_automotive.git submission_generation_examples
+        examples_repo_url="${{ inputs.examples-repo-url }}"
+        examples_repo_branch="${{ inputs.examples-repo-branch }}"
+        
+        echo "Cloning examples from: $examples_repo_url (branch: $examples_repo_branch)"
+        git clone -b $examples_repo_branch $examples_repo_url submission_generation_examples    
     - name: Run Submission Generation - round-${{ matrix.round }}${{ matrix.case }} ${{ matrix.action }} ${{ matrix.category }} ${{ matrix.division }} 
       run: |
         if [ "${{ matrix.case }}" == "closed" ]; then
