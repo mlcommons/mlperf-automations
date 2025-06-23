@@ -1,0 +1,82 @@
+alias: get-preprocessed-dataset-mlperf-deepseek-r1
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+tags:
+- get
+- preprocessed
+- dataset
+- mlperf
+- deepseek-r1
+- mlperf-deepseek-r1
+uid: 4f95da01a8244833
+new_env_keys:
+  - MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH
+  - MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_VALIDATION_PATH
+  - MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_CALIBRATION_PATH
+input_mapping:
+  deepseek_path: MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH
+print_env_at_the_end:
+  MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_VALIDATION_PATH: DeepSeek-R1 validation dataset path
+  MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_CALIBRATION_PATH: DeepSeek-R1 calibration dataset path
+variations:
+  validation:
+    default: true
+    group: dataset-type
+    env:
+      MLC_PREPROCESSED_DATASET_TYPE: validation
+      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/deepseek_r1/mlperf_deepseek_r1_dataset_4388_fp8_eval.pkl
+  calibration:
+    group: dataset-type
+    env:
+      MLC_PREPROCESSED_DATASET_TYPE: calibration
+      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/deepseek_r1/mlperf_deepseek_r1_calibration_dataset_500_fp8_eval.pkl
+  mlc:
+    group: download-src
+    default: true
+    prehook_deps:
+      - tags: get,rclone
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+      - tags: get,rclone-config,_mlc-inference
+        force_cache: true
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - 'yes'
+        env:
+          MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH
+          MLC_EXTRACT_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH
+        extra_cache_tags: deepseek-r1,dataset
+        force_cache: true
+        names:
+          - dae
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+  rclone:
+    group: download-tool
+    add_deps_recursive:
+      dae:
+        tags: _rclone
+    default: true
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+tests:
+  run_inputs:
+  - variations_list:
+      - validation,rclone,mlc,dry-run
+      - calibration,rclone,mlc,dry-run

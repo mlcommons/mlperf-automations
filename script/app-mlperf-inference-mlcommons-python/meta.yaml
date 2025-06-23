@@ -684,7 +684,7 @@ deps:
   # Install MLPerf inference dependencies
 
   # Creates user conf for given SUT
-  - tags: generate,user-conf,mlperf,inference,_inference
+  - tags: generate,user-conf,mlperf,inference,_wg-inference
     names:
       - user-conf-generator
     skip_if_env:
@@ -692,7 +692,7 @@ deps:
         - "yes"
 
   # Install MLPerf loadgen
-  - tags: get,loadgen,_inference
+  - tags: get,loadgen,_wg-inference
     names:
       - loadgen
       - mlperf-inference-loadgen

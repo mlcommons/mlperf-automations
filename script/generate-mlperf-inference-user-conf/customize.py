@@ -265,12 +265,20 @@ def preprocess(i):
         else:
             audit_path = test
 
-        audit_full_path = os.path.join(
-            env['MLC_MLPERF_INFERENCE_SOURCE'],
-            "compliance",
-            "nvidia",
-            audit_path,
-            "audit.config")
+        if env['MLC_BENCHMARK_GROUP'] == "automotive":
+            audit_full_path = os.path.join(
+                env['MLC_MLPERF_INFERENCE_SOURCE'],
+                "compliance",
+                audit_path,
+                "audit.config")
+        else:
+            audit_full_path = os.path.join(
+                env['MLC_MLPERF_INFERENCE_SOURCE'],
+                "compliance",
+                "nvidia",
+                audit_path,
+                "audit.config")
+
         env['MLC_MLPERF_INFERENCE_AUDIT_PATH'] = audit_full_path
         # copy the audit conf to the run directory incase the implementation is
         # not supporting the audit-conf path
@@ -363,7 +371,7 @@ def preprocess(i):
         max_duration_ranging = str(
             max_duration_ranging_s *
             1000)  # in milliseconds
-        if scenario == "MultiStream" or scenario == "SingleStream":
+        if scenario in ["MultiStream", "SingleStream"]:
             if env.get('MLC_MLPERF_INFERENCE_MIN_DURATION', '') != '':
                 user_conf += ml_model_name + "." + scenario + ".min_duration = " + \
                     env['MLC_MLPERF_INFERENCE_MIN_DURATION'] + " \n"
@@ -371,7 +379,7 @@ def preprocess(i):
                     'MLC_MLPERF_MODEL_EQUAL_ISSUE_MODE', 'no')) and env.get('MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE') != '99.9':
                 user_conf += ml_model_name + "." + scenario + \
                     f".max_duration = {max_duration_valid}" + "\n"
-            if scenario in ["SingleStream", "ConstantStream"] and env.get('MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE') == '99.9' and env.get(
+            if scenario in ["SingleStream"] and env.get('MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE') == '99.9' and env.get(
                     'MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT', '') != '' and env.get('MLC_MLPERF_TARGET_LATENCY', '') == '':
                 user_conf += ml_model_name + "." + scenario + \
                     f".max_query_count = {env.get('MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT')}" + "\n"
@@ -518,12 +526,20 @@ def run_files_exist(mode, OUTPUT_DIR, run_files, env, logger):
 
         test = env['MLC_MLPERF_LOADGEN_COMPLIANCE_TEST']
 
-        SCRIPT_PATH = os.path.join(
-            env['MLC_MLPERF_INFERENCE_SOURCE'],
-            "compliance",
-            "nvidia",
-            test,
-            "run_verification.py")
+        if env['MLC_BENCHMARK_GROUP'] == "automotive":
+            SCRIPT_PATH = os.path.join(
+                env['MLC_MLPERF_INFERENCE_SOURCE'],
+                "compliance",
+                test,
+                "run_verification.py")
+        else:
+            SCRIPT_PATH = os.path.join(
+                env['MLC_MLPERF_INFERENCE_SOURCE'],
+                "compliance",
+                "nvidia",
+                test,
+                "run_verification.py")
+
         if test == "TEST06":
             cmd = f"{env['MLC_PYTHON_BIN_WITH_PATH']}  {SCRIPT_PATH}  -c  {COMPLIANCE_DIR}  -o  {OUTPUT_DIR} --scenario {scenario} --dtype int32"
         else:

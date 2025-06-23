@@ -86,6 +86,7 @@ input_mapping:
   repo_owner: MLC_MLPERF_RESULTS_GIT_REPO_OWNER
   skip_compliance: MLC_MLPERF_SKIP_COMPLIANCE
   skip_power_check: MLC_MLPERF_SKIP_POWER_CHECK
+  skip_calibration_check: MLC_MLPERF_SKIP_CALIBRATION_CHECK
   src_version: MLC_MLPERF_SUBMISSION_CHECKER_VERSION
   submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
   submitter: MLC_MLPERF_SUBMITTER
@@ -135,19 +136,21 @@ variations:
   short-run:
     env:
       MLC_MLPERF_SHORT_RUN: 'yes'
-  inference:
+  wg-inference:
     default: true
+    group: benchmark_wg
     add_deps_recursive:
       preprocess-mlperf-submission:
-        tags: _inference
+        tags: _wg-inference
     deps:
       - names:
         - inference-src
         tags: mlcommons,inference,src
-  automotive:
+  wg-automotive:
+    group: benchmark_wg
     add_deps_recursive:
       preprocess-mlperf-submission:
-        tags: _automotive
+        tags: _wg-automotive
     deps:
       - names:
         - automotive-src

@@ -59,6 +59,33 @@ def postprocess(i):
     model = env['MLC_MODEL']
     model_full_name = env.get('MLC_ML_MODEL_FULL_NAME', model)
 
+    if mode == "accuracy" or mode == "compliance" and env[
+            'MLC_MLPERF_LOADGEN_COMPLIANCE_TEST'] == "TEST01":
+
+        out_baseline_accuracy_string = f"""> {q}{os.path.join(output_dir, "accuracy", "baseline_accuracy.txt")}{q} """
+        out_compliance_accuracy_string = f"""> {q}{os.path.join(output_dir, "accuracy", "compliance_accuracy.txt")}{q} """
+
+        if model == "ssd":
+            accuracy_filename = "accuracy_cognata.py"
+            accuracy_file_path = os.path.join(
+                env['MLC_MLPERF_INFERENCE_SSD_RESNET50_PATH'], accuracy_filename)
+            dataset_args = f""" --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --config baseline_8MP_ss_scales_fm1_5x5_all """
+            accuracy_log_file_option_name = " --mlperf-accuracy-file "
+
+        if model == "bevformer":
+            accuracy_filename = "accuracy_nuscenes_cpu.py"
+            accuracy_file_path = os.path.join(
+                env['MLC_MLPERF_INFERENCE_BEVFORMER_PATH'], accuracy_filename)
+            dataset_args = f""" --nuscenes-dir {env['MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH']} --config {os.path.join(env['MLC_MLPERF_INFERENCE_BEVFORMER_PATH'], "projects" + "configs" + "bevformer" + "bevformer_tiny.py")} """
+            accuracy_log_file_option_name = " --mlperf-accuracy-file "
+
+        if model == "deeplabv3plus":
+            accuracy_filename = "accuracy_cognata.py"
+            accuracy_file_path = os.path.join(
+                env['MLC_MLPERF_INFERENCE_DEEPLABV3PLUS_PATH'], accuracy_filename)
+            dataset_args = f""" --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} """
+            accuracy_log_file_option_name = " --mlperf-accuracy-file "
+
     scenario = env['MLC_MLPERF_LOADGEN_SCENARIO']
 
     if not os.path.exists(output_dir) or not os.path.exists(
@@ -356,6 +383,92 @@ def postprocess(i):
         if extra_readme:
             with open("README-extra.md", "w") as fp:
                 fp.write(extra_readme)
+
+    elif mode == "compliance":
+        test = env.get("MLC_MLPERF_LOADGEN_COMPLIANCE_TEST", "TEST01")
+
+        RESULT_DIR = os.path.split(output_dir)[0]
+        COMPLIANCE_DIR = output_dir
+        OUTPUT_DIR = os.path.dirname(COMPLIANCE_DIR)
+
+        SCRIPT_PATH = os.path.join(
+            env['MLC_MLPERF_INFERENCE_SOURCE'],
+            "compliance",
+            test,
+            "run_verification.py")
+        if test == "TEST06":
+            cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']}  {q}{SCRIPT_PATH}{q}  -c  {q}{COMPLIANCE_DIR}{q}  -o  {q}{OUTPUT_DIR}{q} --scenario {scenario} --dtype int32"""
+        else:
+            cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']}  {q}{SCRIPT_PATH}{q}  -r {q}{RESULT_DIR}{q} -c  {q}{COMPLIANCE_DIR}{q}  -o  {q}{OUTPUT_DIR}{q}"""
+
+        logger.info(cmd)
+        os.system(cmd)
+
+        if test == "TEST01":
+
+            run_script_input = i['run_script_input']
+            automation = i['automation']
+
+            SCRIPT_PATH = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "compliance", test,
+                                       "create_accuracy_baseline.sh")
+            TEST01_DIR = os.path.join(OUTPUT_DIR, "TEST01")
+            OUTPUT_DIR = os.path.join(OUTPUT_DIR, "TEST01", "accuracy")
+            if not os.path.exists(OUTPUT_DIR):
+                os.makedirs(OUTPUT_DIR)
+
+            ACCURACY_DIR = os.path.join(RESULT_DIR, "accuracy")
+            if not os.path.exists(ACCURACY_DIR):
+                logger.warning("Accuracy run not yet completed")
+                return {
+                    'return': 1, 'error': 'TEST01 needs accuracy run to be completed first'}
+
+            cmd = f"""cd {q}{TEST01_DIR}{q} &&  bash {q}{SCRIPT_PATH}{q} {q}{os.path.join(ACCURACY_DIR, "mlperf_log_accuracy.json")}{q} {q}{os.path.join(COMPLIANCE_DIR, "mlperf_log_accuracy.json")}{q} """
+            env['CMD'] = cmd
+            logger.info(cmd)
+            r = automation.run_native_script(
+                {'run_script_input': run_script_input, 'env': env, 'script_name': 'verify_accuracy'})
+            if r['return'] > 0:
+                return r
+
+            verify_accuracy_file = os.path.join(
+                TEST01_DIR, "verify_accuracy.txt")
+            with open(verify_accuracy_file, 'r') as file:
+                data = file.read().replace('\n', '\t')
+
+            if 'TEST PASS' not in data:
+                logger.warning(
+                    "\nDeterministic TEST01 failed... Trying with non-determinism.\n")
+            # #Normal test failed, trying the check with non-determinism
+
+                baseline_accuracy_file = os.path.join(
+                    TEST01_DIR, "mlperf_log_accuracy_baseline.json")
+                CMD = f"""cd {q}{ACCURACY_DIR}{q} && {q}{env['MLC_PYTHON_BIN_WITH_PATH']}{q} {q}{accuracy_filepath}{q} \
+{accuracy_log_file_option_name} {q}{baseline_accuracy_file}{q} {dataset_args} {datatype_option} {out_baseline_accuracy_string} """
+
+                env['CMD'] = CMD
+                r = automation.run_native_script(
+                    {'run_script_input': run_script_input, 'env': env, 'script_name': 'verify_accuracy'})
+                if r['return'] > 0:
+                    return r
+
+                if os.stat(baseline_accuracy_file).st_size == 0:
+                    return {'return': 1,
+                            'error': f"{baseline_accuracy_file} is empty"}
+
+                CMD = f"""cd {q}{ACCURACY_DIR}{q} && {q}{env['MLC_PYTHON_BIN_WITH_PATH']}{q} {q}{accuracy_filepath}{q} \
+{accuracy_log_file_option_name} {q}{os.path.join(TEST01_DIR, "mlperf_log_accuracy.json")}{q} {dataset_args} {datatype_option} \
+{out_compliance_accuracy_string} """
+
+                env['CMD'] = CMD
+                r = automation.run_native_script(
+                    {'run_script_input': run_script_input, 'env': env, 'script_name': 'verify_accuracy'})
+                if r['return'] > 0:
+                    return r
+        import submission_checker as checker
+        is_valid = checker.check_compliance_perf_dir(
+            COMPLIANCE_DIR) if test != "TEST06" else True
+        state['mlc-mlperf-inference-results'][state['MLC_SUT_CONFIG_NAME']
+                                              ][model][scenario][test] = "passed" if is_valid else "failed"
 
     if state.get(
             'abtf-inference-implementation') and state['abtf-inference-implementation'].get('version_info'):
