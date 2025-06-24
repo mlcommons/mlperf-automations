@@ -69,7 +69,6 @@ variations:
           - 'yes'
         env:
           MLC_RCLONE_COPY_USING: copy
-        extra_cache_tags: ,dataset
         force_cache: true
         names:
           - dae
