@@ -528,7 +528,7 @@ def get_run_cmd_reference(
 
         cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} main.py \
             --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} \
-            --dataset-path {x}{env['MLC_DATASET_LLAMA3_PATH']}{x} \
+            --dataset-path {x}{env['MLC_DATASET_CNNDM_EVAL_PATH']}{x} \
             --output-log-dir {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
             --dtype {env['MLC_MLPERF_MODEL_PRECISION']} \
             --model-path {x}{env['MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH']}{x} \
