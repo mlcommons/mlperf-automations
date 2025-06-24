@@ -493,13 +493,37 @@ def get_run_cmd_reference(
         if env.get('MLC_ACTIVATE_RGAT_IN_MEMORY', '') == "yes":
             cmd += " --in-memory "
 
-    elif "llama3" in env['MLC_MODEL']:
+    elif "llama3_1-405b" in env['MLC_MODEL']:
         env['RUN_DIR'] = os.path.join(
             env['MLC_MLPERF_INFERENCE_SOURCE'],
             "language",
             "llama3.1-405b")
 
         if int(env.get('MLC_MLPERF_INFERENCE_TP_SIZE', '')) > 1:
+            env['VLLM_WORKER_MULTIPROC_METHOD'] = "spawn"
+
+        cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} main.py \
+            --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} \
+            --dataset-path {x}{env['MLC_DATASET_LLAMA3_PATH']}{x} \
+            --output-log-dir {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
+            --dtype {env['MLC_MLPERF_MODEL_PRECISION']} \
+            --model-path {x}{env['MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH']}{x} \
+            --tensor-parallel-size {env['MLC_MLPERF_INFERENCE_TP_SIZE']} \
+            --vllm"""
+
+        if env.get('MLC_MLPERF_INFERENCE_NUM_WORKERS', '') != '':
+            cmd += f" --num-workers {env['MLC_MLPERF_INFERENCE_NUM_WORKERS']}"
+
+        cmd = cmd.replace("--count", "--total-sample-count")
+        cmd = cmd.replace("--max-batchsize", "--batch-size")
+
+    elif "llama3_1-8b" in env['MLC_MODEL']:
+        env['RUN_DIR'] = os.path.join(
+            env['MLC_MLPERF_INFERENCE_SOURCE'],
+            "language",
+            "llama3.1-8b")
+
+        if int(env.get('MLC_MLPERF_INFERENCE_TP_SIZE', '1')) > 1:
             env['VLLM_WORKER_MULTIPROC_METHOD'] = "spawn"
 
         cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} main.py \

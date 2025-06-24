@@ -33,6 +33,54 @@ tags:
 - original
 uid: aed298c156e24257
 variations:
+  llama3:
+    env:
+      MLC_TMP_ML_MODEL: llama3_1-8b
+  edge:
+    group: category
+  datacenter:
+    group: category
+  rclone:
+    group: download-tool
+    add_deps_recursive:
+      dae:
+        tags: _rclone
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  mlc:
+    group: download-src
+    prehook_deps:
+      - tags: get,rclone
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+      - tags: get,rclone-config,_mlc-inference
+        force_cache: true
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - 'yes'
+        env:
+          MLC_RCLONE_COPY_USING: copy
+        extra_cache_tags: ,dataset
+        force_cache: true
+        names:
+          - dae
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
   calibration:
     env:
       MLC_DATASET_CALIBRATION: 'yes'
@@ -53,3 +101,31 @@ variations:
     - MLC_DATASET_PATH
     - MLC_DATASET_EVAL_PATH
     - MLC_DATASET_CNNDM_EVAL_PATH
+  validation,edge,llama3,mlc,rclone:
+    adr:
+      dae:
+        extra_cache_tags: cnndm,dataset,llama3,val,edge
+    env:
+      MLC_DATASET_CNNDM_FILENAME: sample_cnn_eval_5000.json
+      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/llama3.1_8b/<<<MLC_DATASET_CNNDM_FILENAME>>>
+      MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
+      MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
+  validation,datacenter,llama3,mlc,rclone:
+    adr:
+      dae:
+        extra_cache_tags: cnndm,dataset,llama3,val,datacenter
+    env:
+      MLC_DATASET_CNNDM_FILENAME: cnn_eval.json
+      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/llama3.1_8b/<<<MLC_DATASET_CNNDM_FILENAME>>>
+      MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
+      MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
+  calibation,llama3,mlc,rclone:
+    adr:
+      dae:
+        extra_cache_tags: cnndm,dataset,llama3,calib
+    env:
+      MLC_DATASET_CNNDM_FILENAME: cnn_dailymail_calibration.json
+      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/llama3.1_8b/<<<MLC_DATASET_CNNDM_FILENAME>>>
+      MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_CALIBRATION_DATASET_CNNDM_PATH
+      MLC_EXTRACT_FINAL_ENV_NAME: MLC_CALIBRATION_DATASET_CNNDM_PATH
+          

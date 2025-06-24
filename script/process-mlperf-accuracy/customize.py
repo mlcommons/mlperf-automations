@@ -219,6 +219,10 @@ def preprocess(i):
         elif dataset == "cognata_deeplab":
             CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_DEEPLABV3PLUS_PATH'], "accuracy_cognata.py") + "' --mlperf-accuracy-file '" + os.path.join(
                 result_dir, "mlperf_log_accuracy.json") + "' --dataset-path '" + env['MLC_PREPROCESSED_DATASET_COGNATA_PATH'] + "' > '" + out_file + "'"
+        
+        elif dataset == "cnndm_llama_3":
+            CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "language", "llama3.1-8b", "evaluation.py") + "' --model-name '" + env['MLC_ML_MODEL_FULL_NAME'] + "' --mlperf-accuracy-file '" + os.path.join(
+                result_dir, "mlperf_log_accuracy.json") + "' --dtype '" + env['MLC_ACCURACY_DTYPE'] + "' --dataset-file '" + env['MLC_DATASET_LLAMA3_PATH'] + "' > '" + out_file + "'"
 
         else:
             return {'return': 1, 'error': 'Unsupported dataset'}
