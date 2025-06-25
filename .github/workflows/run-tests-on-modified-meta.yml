@@ -46,11 +46,6 @@ jobs:
         file_info: ${{ fromJSON(needs.get_modified_files.outputs.processed_files).file_info }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-
       - name: Process meta.yaml file
         run: |
           echo "Processing ${{ matrix.file_info.file }} with run number ${{ matrix.file_info.num_run }}"

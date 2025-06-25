@@ -1314,6 +1314,8 @@ variations:
       - tags: get,generic-python-lib,_package.tqdm
       - tags: get,generic-python-lib,_package.requests
       - tags: get,generic-python-lib,_package.torchdata
+        names: 
+          - torchdata
       - tags: get,generic-python-lib,_package.pybind11
       - tags: get,generic-python-lib,_package.PyYAML
       - tags: get,generic-python-lib,_package.numpy

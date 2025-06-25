@@ -6,6 +6,7 @@ automation_uid: 5b4e0237da074764
 
 category: Modular MLPerf inference benchmark pipeline
 
+
 developers: "[Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Grigori Fursin](https://cKnowledge.org/gfursin)"
 
 clean_output_files:
@@ -31,6 +32,9 @@ predeps: False
 default_env:
   MLC_MLPERF_IMPLEMENTATION: reference
   MLC_MLPERF_MODEL: resnet50
+  MLC_MLPERF_BACKEND: onnxruntime
+  MLC_MLPERF_DEVICE: cpu
+  MLC_MLPERF_LOADGEN_SCENARIO: Offline
   MLC_MLPERF_RUN_STYLE: test
   MLC_MLPERF_SKIP_SUBMISSION_GENERATION: no
   MLC_DOCKER_PRIVILEGED_MODE: yes
@@ -458,7 +462,6 @@ input_description:
     choices:
     - 'open'
     - 'closed'
-    default: 'open'
     desc: MLPerf division
     sort: 50
   category:
@@ -475,7 +478,6 @@ input_description:
     - cuda
     - rocm
     - qaic
-    default: cpu
     desc: MLPerf device
     sort: 100
   model:
@@ -500,7 +502,6 @@ input_description:
     - rgat
     - llama3_1-405b
     - pointpainting
-    default: resnet50
     desc: MLPerf model
     sort: 200
   precision:
@@ -510,7 +511,6 @@ input_description:
     - bfloat16
     - int8
     - uint8
-    default: ''
     desc: MLPerf model precision
     sort: 250
   implementation:
@@ -521,7 +521,6 @@ input_description:
     - intel
     - qualcomm
     - ctuning-cpp-tflite
-    default: mlcommons-python
     desc: MLPerf implementation
     sort: 300
   backend:
@@ -533,7 +532,6 @@ input_description:
     - tensorrt
     - glow
     - tvm-onnx
-    default: onnxruntime
     desc: MLPerf framework (backend)
     sort: 400
   scenario:
@@ -542,7 +540,6 @@ input_description:
     - Server
     - SingleStream
     - MultiStream
-    default: Offline
     desc: MLPerf scenario
     sort: 500
   mode:
@@ -550,7 +547,6 @@ input_description:
     - ''
     - accuracy
     - performance
-    default: ''
     desc: MLPerf benchmark mode
     sort: 600
   execution_mode:
@@ -558,24 +554,20 @@ input_description:
     - test
     - fast
     - valid
-    default: test
     desc: MLPerf execution mode
     sort: 700
   sut:
-    default: ''
     desc: SUT configuration (if known)
     sort: 750
   submitter:
-    default: CTuning
+    default: MLCommons
     desc: Submitter name (without space)
     sort: 800
   results_dir:
     desc: Folder path to store results (defaults to the current working directory)
-    default: ''
     sort: 900
   submission_dir:
     desc: Folder path to store MLPerf submission tree 
-    default: ''
     sort: 1000
 
   adr.compiler.tags:
@@ -624,10 +616,6 @@ input_description:
     - 'no'
     default: 'no'
     desc: Whether to run compliance tests (applicable only for closed division)
-  dashboard_wb_project:
-    desc: W&B dashboard project
-  dashboard_wb_user:
-    desc: W&B dashboard user
   hw_name:
     desc: MLPerf hardware name (for example "gcp.c3_standard_8", "nvidia_orin", "lenovo_p14s_gen_4_windows_11", "macbook_pro_m1_2", "thundercomm_rb6" ...)
   multistream_target_latency:
@@ -646,10 +634,6 @@ input_description:
     desc: Set Target latency
   target_qps:
     desc: Set LoadGen target QPS
-  j:
-    desc: Print results dictionary to console at the end of the run
-    boolean: true
-    default: false
   repro:
     desc: Record input/output/state/info files to make it easier to reproduce results
     boolean: true
