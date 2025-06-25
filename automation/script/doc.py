@@ -80,12 +80,14 @@ def generate_docs(metadata, script_path, generic_inputs):
         tags_string = script_tags_help
 
     script_input_mapping = metadata.get('input_mapping', {})
+    script_default_env = metadata.get('default_env', {})
     script_input_description = metadata.get('input_description', {})
 
     r = get_run_readme(
         tags_string,
         script_input_mapping,
         script_input_description,
+        script_default_env,
         generic_inputs)
     if r['return'] > 0:
         return r
@@ -102,7 +104,7 @@ def generate_docs(metadata, script_path, generic_inputs):
     return {'return': 0}
 
 
-def get_run_readme(tags, input_mapping, input_description, generic_inputs):
+def get_run_readme(tags, input_mapping, input_description, default_env, generic_inputs):
     run_readme = f"""## Run Commands
 
 ```bash
@@ -111,7 +113,12 @@ mlcr {tags}
 
 """
 
+    
     if input_description:
+        for i in input_description:
+            if i in input_mapping and input_mapping[i] in default_env:
+                input_description[i]['default'] = default_env[input_mapping[i]]
+
         input_description_string = generate_markdown(
             "Script Inputs", input_description)
     else:
