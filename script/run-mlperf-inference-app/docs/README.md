@@ -38,8 +38,6 @@ mlcr run-mlperf,inference
 | `--adr.python.version_min` | Minimal Python version |  | `3.8` |
 | `--clean` | Clean run |  | `False` |
 | `--compliance` | Whether to run compliance tests (applicable only for closed division) | ['yes', 'no'] | `no` |
-| `--dashboard_wb_project` | W&B dashboard project |  | `` |
-| `--dashboard_wb_user` | W&B dashboard user |  | `` |
 | `--hw_name` | MLPerf hardware name (for example "gcp.c3_standard_8", "nvidia_orin", "lenovo_p14s_gen_4_windows_11", "macbook_pro_m1_2", "thundercomm_rb6" ...) |  | `` |
 | `--multistream_target_latency` | Set MultiStream target latency |  | `` |
 | `--offline_target_qps` | Set LoadGen Offline target QPS |  | `` |
