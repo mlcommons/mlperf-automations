@@ -148,13 +148,14 @@ def infer_type(field):
 def generate_markdown(heading, input_dict):
     lines = [
         f"### {heading}\n",
-        "| Name | Description | Default | Type |",
+        "| Name | Description | Choices | Default |",
         "|------|-------------|---------|------|"]
     for key in sorted(
             input_dict, key=lambda k: input_dict[k].get("sort", 9999)):
         field = input_dict[key]
         desc = field.get("desc", "")
+        choices = field.get("choices", "")
         default = field.get("default", "")
         dtype = infer_type(field)
-        lines.append(f"| `--{key}` | {desc} | `{default}` | {dtype} |")
+        lines.append(f"| `--{key}` | {desc} | {choices} | `{default}` |")
     return "\n".join(lines)
