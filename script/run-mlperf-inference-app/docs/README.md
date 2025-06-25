@@ -4,7 +4,7 @@ This README is automatically generated. Please follow the [script execution docu
 ## Run Commands
 
 ```bash
-    mlcr run-mlperf,inference
+mlcr run-mlperf,inference
 ```
 ### Script Inputs
 
