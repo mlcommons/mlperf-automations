@@ -105,8 +105,10 @@ def generate_docs(metadata, script_path, generic_inputs):
 def get_run_readme(tags, input_mapping, input_description, generic_inputs):
     run_readme = f"""## Run Commands
 
-```mlcr {tags}
+```bash
+mlcr {tags}
 ```
+
 """
 
     if input_description:
@@ -120,7 +122,9 @@ def get_run_readme(tags, input_mapping, input_description, generic_inputs):
     generic_input_string = generate_markdown(
         "Generic Script Inputs", generic_inputs)
 
-    run_readme += generic_input_string
+    run_readme += f"""
+{generic_input_string}
+"""
 
     return {'return': 0, 'run_readme': run_readme}
 
@@ -145,5 +149,5 @@ def generate_markdown(heading, input_dict):
         desc = field.get("desc", "")
         default = field.get("default", "")
         dtype = infer_type(field)
-        lines.append(f"| `{key}` | {desc} | `{default}` | {dtype} |")
+        lines.append(f"| `--{key}` | {desc} | `{default}` | {dtype} |")
     return "\n".join(lines)
