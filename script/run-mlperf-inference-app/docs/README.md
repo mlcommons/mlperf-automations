@@ -3,7 +3,8 @@ This README is automatically generated. Please follow the [script execution docu
 
 ## Run Commands
 
-```mlcr run-mlperf,inference
+```bash
+    mlcr run-mlperf,inference
 ```
 ### Script Inputs
 
