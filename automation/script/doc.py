@@ -104,7 +104,8 @@ def generate_docs(metadata, script_path, generic_inputs):
     return {'return': 0}
 
 
-def get_run_readme(tags, input_mapping, input_description, default_env, generic_inputs):
+def get_run_readme(tags, input_mapping, input_description,
+                   default_env, generic_inputs):
     run_readme = f"""## Run Commands
 
 ```bash
@@ -113,7 +114,6 @@ mlcr {tags}
 
 """
 
-    
     if input_description:
         for i in input_description:
             if i in input_mapping and input_mapping[i] in default_env:
