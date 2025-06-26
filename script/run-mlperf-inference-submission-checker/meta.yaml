@@ -179,4 +179,9 @@ versions:
   r5.0:
     adr:
       submission-checker-src:
+        version: r5.0
+  r5.1:
+    adr:
+      submission-checker-src:
         version: master
+

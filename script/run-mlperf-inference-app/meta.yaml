@@ -370,7 +370,6 @@ variations:
     group: benchmark-version
   
   r5.0-dev:
-    default: true
     env:
       MLC_MLPERF_INFERENCE_VERSION: '5.0-dev'
       MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r5.0-dev_default
@@ -397,8 +396,9 @@ variations:
         tags: _version.r5.0
       mlperf-inference-nvidia-scratch-space:
         tags: _version.r5.0
-  
+        
   r5.1-dev:
+    default: true
     env:
       MLC_MLPERF_INFERENCE_VERSION: '5.1-dev'
       MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r5.1-dev_default
