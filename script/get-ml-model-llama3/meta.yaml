@@ -68,7 +68,7 @@ variations:
           MLC_DOWNLOAD_FINAL_ENV_NAME: LLAMA3_CHECKPOINT_PATH
           MLC_EXTRACT_FINAL_ENV_NAME: LLAMA3_CHECKPOINT_PATH
           MLC_DOWNLOAD_URL: mlc-llama3-1:inference/<<<MLC_ML_MODEL_NAME>>>
-        extra_cache_tags: waymo,dataset
+        extra_cache_tags: llama3,dataset
         force_cache: true
         names:
           - dae
@@ -110,6 +110,7 @@ variations:
       MLC_ML_MODEL_NAME: Llama-3.1-405B-Instruct
       MLC_MODEL_ZOO_ENV_KEY: LLAMA3
     group: huggingface-stub
+
   meta-llama/Llama-3.1-8B-Instruct:
     base:
       - 8b
@@ -120,11 +121,13 @@ variations:
       MLC_ML_MODEL_NAME: Llama-3.1-8b-Instruct
       MLC_MODEL_ZOO_ENV_KEY: LLAMA3
     group: huggingface-stub
+
   vllm:
     default: true
     env:
       MLC_ML_MODEL_FRAMEWORK: vllm
     group: framework
+    
   stub.#:
     adr:
       hf-zoo:

@@ -338,3 +338,28 @@ variations:
     env:
       MLC_DATASET: cognata_deeplab
     group: dataset
+  cnndm_llama_3:
+    env:
+      MLC_DATASET: cnndm_llama3
+      MLC_ML_MODEL_FULL_NAME: meta-llama/Meta-Llama-3.1-8B-Instruct
+    group: dataset
+  cnndm_llama_3,edge:
+    deps:
+      - tags: get,dataset,cnndm,_validation,_edge,_llama3,_mlc,_rclone
+        names:
+          - cnndm-llama3-edge
+        skip_if_env:
+          MLC_RUN_STATE_DOCKER:
+          - "yes"
+  cnndm_llama_3,datacenter:
+    deps:
+      - tags: get,dataset,cnndm,_validation,_datacenter,_llama3,_mlc,_rclone
+        names:
+          - cnndm-llama3-datacenter
+        skip_if_env:
+          MLC_RUN_STATE_DOCKER:
+          - "yes"
+  edge:
+    group: category
+  datacenter:
+    group: category
