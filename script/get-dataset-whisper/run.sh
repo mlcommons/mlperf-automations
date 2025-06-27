@@ -28,6 +28,6 @@ if [ "${MLC_TMP_DATASET_TYPE}" != "preprocessed" ]; then
       --manifest "${MLC_TMP_DATA_DIR}/dev-all.json" \
       --data_dir "${MLC_TMP_DATA_DIR}" \
       --output_dir "${MLC_TMP_DATA_DIR}/dev-all-repack" \
-      --output_json "/data/dev-all-repack.json"
+      --output_json "${MLC_TMP_DATA_DIR}/dev-all-repack.json"
 
 fi
