@@ -30,6 +30,7 @@ variations:
     - tags: get,generic-python-lib,_package.pandas
     - tags: get,generic-python-lib,_package.requests
     - tags: get,generic-python-lib,_package.tqdm
+    - tags: get,generic-python-lib,_package.sox
     env:
       MLC_TMP_DATASET_TYPE: unprocessed
   dry-run:
