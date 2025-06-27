@@ -25,11 +25,11 @@ def preprocess(i):
             env['MLC_MLPERF_INFERENCE_SOURCE'],
             'speech2text',
             'utils')
-        
+
         # create directories if not exist
         os.makedirs(data_dir, exist_ok=True)
         os.makedirs(librispeech_dir, exist_ok=True)
-        
+
         env['MLC_TMP_DATA_DIR'] = data_dir
         env['MLC_TMP_LIBRISPEECH_DIR'] = librispeech_dir
         env['MLC_TMP_UTILS_DIR'] = utils_dir
