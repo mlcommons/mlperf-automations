@@ -31,6 +31,7 @@ variations:
     - tags: get,generic-python-lib,_package.requests
     - tags: get,generic-python-lib,_package.tqdm
     - tags: get,generic-python-lib,_package.sox
+    - tags: get,generic-python-lib,_package.librosa
     - tags: get,generic-sys-util,_sox
     env:
       MLC_TMP_DATASET_TYPE: unprocessed
