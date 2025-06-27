@@ -1,0 +1,81 @@
+alias: get-dataset-whisper
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+new_env_keys:
+- MLC_DATASET_WHISPER_PATH
+tags:
+- get-dataset-whisper
+- get
+- dataset
+- whisper
+uid: 2cc955c795d44978
+variations:
+  preprocessed:
+    group: dataset-type
+    default: true
+    base:
+      - mlc
+    env:
+      MLC_TMP_DATASET_TYPE: preprocessed
+  unprocessed:
+    group: dataset-type
+    deps:
+    - tags: get,mlperf,inference,src
+      names:
+        - inference-src
+    - tags: get,python
+      names:
+        - python
+    - tags: get,generic-python-lib,_package.pandas
+    - tags: get,generic-python-lib,_package.requests
+    - tags: get,generic-python-lib,_package.tqdm
+    env:
+      MLC_TMP_DATASET_TYPE: unprocessed
+  dry-run:
+    env:
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  mlc:
+    default: true
+    base:
+      - rclone
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+    group: download-src
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+      tags: get,rclone
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+      force_cache: true
+      tags: get,rclone-config,_mlc-inference
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      env:
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_WHISPER_PATH
+        MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/Whisper/dataset/
+        MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_WHISPER_PATH
+      extra_cache_tags: whisper,dataset
+      force_cache: true
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      names:
+      - dae
+      tags: download-and-extract
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
+  rclone:
+    add_deps_recursive:
+      dae:
+        tags: _rclone
+    default: true
+    group: download-tool
