@@ -540,6 +540,42 @@ def get_run_cmd_reference(
 
         cmd = cmd.replace("--count", "--total-sample-count")
         cmd = cmd.replace("--max-batchsize", "--batch-size")
+    
+    elif "whisper" in env['MLC_MODEL']:
+        tmp_scenario = env['MLC_MLPERF_LOADGEN_SCENARIO']
+
+        if device != "cpu":
+            logger.warning(f"{device} run is not supported for Whisper reference implementation! Will be defaulted to CPU")
+
+        if tmp_scenario.lower() not in ["offline", "server"]:
+            logger.warning(f"{tmp_scenario} scenario is no supported for Whisper! Defaulting to Offline")
+            tmp_scenario = "Offline"
+            env['MLC_MLPERF_LOADGEN_SCENARIO'] = tmp_scenario
+
+        env['RUN_DIR'] = os.path.join(
+            env['MLC_MLPERF_INFERENCE_SOURCE'],
+            "speech2text")
+
+        if int(env.get('MLC_MLPERF_INFERENCE_TP_SIZE', '1')) > 1:
+            env['VLLM_WORKER_MULTIPROC_METHOD'] = "spawn"
+
+        env['NUM_CORES'] = env.get('MLC_HOST_CPU_NUM_CORES', '1')
+        env['NUM_NUMA_NODES'] = env.get('MLC_HOST_CPU_NUMA_NODES', '1')
+        env['CORES_PER_INST'] = int(env['NUM_CORES'])*int(env['NUM_NUMA_NODES'])
+        env['OMP_NUM_THREADS'] = env['CORES_PER_INST']
+        env['NUM_INSTS'] = int(env.get('MLC_INST_PER_NODE', '1'))*int(env['NUM_NUMA_NODES'])
+        env['START_CORES'] = env.get('MLC_HOST_CPU_START_CORES', 0)
+
+        cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} reference_mlperf.py \
+            --scenario {tmp_scenario} \
+            --dataset_dir {x}{env['MLC_DATASET_WHISPER_PATH']}{x} \
+            --manifest {x}{os.path.join(env['MLC_DATASET_WHISPER_PATH'], "dev-all-repack.json")}{x}
+            --log_dir {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
+            --model-path {x}{env['MLC_ML_MODEL_WHISPER_PATH']}{x} \
+            --vllm"""
+
+        if env.get('MLC_MLPERF_INFERENCE_NUM_WORKERS', '') != '':
+            cmd += f" --num-workers {env['MLC_MLPERF_INFERENCE_NUM_WORKERS']}"
 
     elif "pointpainting" in env['MLC_MODEL']:
         env['RUN_DIR'] = os.path.join(

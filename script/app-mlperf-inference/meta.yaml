@@ -306,6 +306,10 @@ variations:
     default_variations:
       backend: vllm
 
+  reference,llama3_1-8b:
+    default_variations:
+      backend: vllm
+
   all-models,nvidia-original:
     docker:
       deps:
@@ -971,6 +975,44 @@ variations:
         enable_if_env:
           MLC_MLPERF_SUBMISSION_SYSTEM_TYPE: 
             - datacenter
+          MLC_USE_DATASET_FROM_HOST:
+          - 'yes'
+  
+  whisper:
+    group:
+      model
+    add_deps_recursive:
+      mlperf-inference-implementation:
+        tags: _whisper
+    env:
+      MLC_MODEL:
+        whisper
+    posthook_deps:
+    - enable_if_env:
+        MLC_MLPERF_LOADGEN_MODE:
+        - accuracy
+        - all
+        MLC_MLPERF_ACCURACY_RESULTS_DIR:
+        - 'on'
+      skip_if_env:
+        MLC_MLPERF_IMPLEMENTATION:
+        - nvidia
+      names:
+      - mlperf-accuracy-script
+      - whisper-accuracy-script
+      tags: run,accuracy,mlperf,_dataset_whisper
+    docker:
+      deps:
+      - tags: get,ml-model,whisper,_rclone,_mlc
+        enable_if_env:
+          MLC_USE_ML_MODEL_FROM_HOST:
+          - 'yes'
+        names:
+          - whisper-model
+      - tags: get,dataset,whisper,_preprocessed,_mlc,_rclone
+        names:
+          - whisper-dataset
+        enable_if_env:
           MLC_USE_DATASET_FROM_HOST:
           - 'yes'
 

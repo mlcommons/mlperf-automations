@@ -1469,6 +1469,37 @@ variations:
           MLC_USE_DATASET_FROM_HOST:
           - 'yes'
         
+  whisper:
+    group: models
+    env:
+      MLC_MODEL: whisper
+    deps:
+      - tags: get,generic-python-lib,_package.vllm
+      # - tags: get,generic-python-lib,_package.sentencepiece
+      # - tags: get,generic-python-lib,_package.accelerate
+      # - tags: get,generic-python-lib,_package.vllm
+      # - tags: get,generic-python-lib,_package.pybind11
+      # - tags: get,generic-python-lib,_package.nltk
+      # - tags: get,generic-python-lib,_package.evaluate
+      # - tags: get,generic-python-lib,_package.absl-py
+      # - tags: get,generic-python-lib,_package.rouge-score
+      - tags: get,ml-model,whisper,_rclone,_mlc
+        skip_if_env:
+          MLC_RUN_STATE_DOCKER:
+          - "yes"
+          MLC_USE_ML_MODEL_FROM_HOST:
+          - 'yes'
+        names:
+          - whisper-model
+      - tags: get,dataset,whisper,_preprocessed,_mlc,_rclone
+        names:
+          - whisper-dataset
+        skip_if_env:
+          MLC_RUN_STATE_DOCKER:
+          - "yes"
+          MLC_USE_DATASET_FROM_HOST:
+          - 'yes'
+
   # Target devices
   cpu:
     group: device

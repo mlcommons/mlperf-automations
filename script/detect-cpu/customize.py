@@ -1,5 +1,6 @@
 from mlc import utils
 import os
+import re
 
 lscpu_out = 'tmp-lscpu.out'
 
@@ -171,6 +172,17 @@ def postprocess(i):
                     env[unified_env[env_key]] = v[1].strip()
                 else:
                     env[env_key] = v[1].strip()
+        
+    # get start cores
+    matches = re.findall(r"NUMA node\d+ CPU\(s\):\s+([\d,-]+)", ss)
+    start_cores = []
+    for cpu_range in matches:
+        # Example: '0-15,32-47' or '0-15'
+        for part in cpu_range.split(','):
+            start = part.split('-')[0]
+            start_cores.append(start)
+    if start_cores:
+        env['MLC_HOST_CPU_START_CORES'] = ','.join(start_cores)
 
     if env.get('MLC_HOST_CPU_SOCKETS', '') in ['-', '']:  # assume as 1
         env['MLC_HOST_CPU_SOCKETS'] = '1'
