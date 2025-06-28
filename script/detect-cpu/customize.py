@@ -172,7 +172,7 @@ def postprocess(i):
                     env[unified_env[env_key]] = v[1].strip()
                 else:
                     env[env_key] = v[1].strip()
-        
+
     # get start cores
     matches = re.findall(r"NUMA node\d+ CPU\(s\):\s+([\d,-]+)", ss)
     start_cores = []

@@ -540,15 +540,17 @@ def get_run_cmd_reference(
 
         cmd = cmd.replace("--count", "--total-sample-count")
         cmd = cmd.replace("--max-batchsize", "--batch-size")
-    
+
     elif "whisper" in env['MLC_MODEL']:
         tmp_scenario = env['MLC_MLPERF_LOADGEN_SCENARIO']
 
         if device != "cpu":
-            logger.warning(f"{device} run is not supported for Whisper reference implementation! Will be defaulted to CPU")
+            logger.warning(
+                f"{device} run is not supported for Whisper reference implementation! Will be defaulted to CPU")
 
         if tmp_scenario.lower() not in ["offline", "server"]:
-            logger.warning(f"{tmp_scenario} scenario is no supported for Whisper! Defaulting to Offline")
+            logger.warning(
+                f"{tmp_scenario} scenario is no supported for Whisper! Defaulting to Offline")
             tmp_scenario = "Offline"
             env['MLC_MLPERF_LOADGEN_SCENARIO'] = tmp_scenario
 
@@ -561,9 +563,11 @@ def get_run_cmd_reference(
 
         env['NUM_CORES'] = env.get('MLC_HOST_CPU_NUM_CORES', '1')
         env['NUM_NUMA_NODES'] = env.get('MLC_HOST_CPU_NUMA_NODES', '1')
-        env['CORES_PER_INST'] = int(env['NUM_CORES'])*int(env['NUM_NUMA_NODES'])
+        env['CORES_PER_INST'] = int(
+            env['NUM_CORES']) * int(env['NUM_NUMA_NODES'])
         env['OMP_NUM_THREADS'] = env['CORES_PER_INST']
-        env['NUM_INSTS'] = int(env.get('MLC_INST_PER_NODE', '1'))*int(env['NUM_NUMA_NODES'])
+        env['NUM_INSTS'] = int(
+            env.get('MLC_INST_PER_NODE', '1')) * int(env['NUM_NUMA_NODES'])
         env['START_CORES'] = env.get('MLC_HOST_CPU_START_CORES', 0)
 
         cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} reference_mlperf.py \
