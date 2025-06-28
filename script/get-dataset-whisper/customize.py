@@ -49,7 +49,7 @@ def postprocess(i):
         # copy files to data folder
         tmp_src_dir = env["MLC_DATASET_WHISPER_PATH"]
         tmp_dest_dir = os.path.join(tmp_src_dir, "data")
-        
+
         os.makedirs(tmp_dest_dir, exist_ok=True)
 
         items_to_copy = [
@@ -66,6 +66,5 @@ def postprocess(i):
                 shutil.copytree(src_path, dst_path, dirs_exist_ok=True)
             elif os.path.isfile(src_path):
                 shutil.copy2(src_path, dst_path)
-
 
     return {'return': 0}
