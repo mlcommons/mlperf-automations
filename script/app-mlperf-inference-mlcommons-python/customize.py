@@ -576,8 +576,7 @@ def get_run_cmd_reference(
             --dataset_dir {x}{env['MLC_DATASET_WHISPER_PATH']}{x} \
             --manifest {x}{os.path.join(env['MLC_DATASET_WHISPER_PATH'], "dev-all-repack.json")}{x} \
             --log_dir {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
-            --model-path {x}{env['MLC_ML_MODEL_WHISPER_PATH']}{x} \
-            --vllm"""
+            --model-path {x}{env['MLC_ML_MODEL_WHISPER_PATH']}{x}"""
 
         if env.get('MLC_MLPERF_INFERENCE_NUM_WORKERS', '') != '':
             cmd += f" --num-workers {env['MLC_MLPERF_INFERENCE_NUM_WORKERS']}"
