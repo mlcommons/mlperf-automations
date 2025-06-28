@@ -197,6 +197,14 @@ deps:
       MLC_MLPERF_DEVICE:
         - cpu
         - rocm
+  
+  ## vLLM
+  - tags: get,generic-python-lib,_package.vllm
+    names:
+      - vllm
+    enable_if_env:
+      MLC_MLPERF_BACKEND:
+        - vllm
 
   ## Pytorch (CUDA)
   - tags: get,generic-python-lib,_torch_cuda
@@ -805,6 +813,11 @@ variations:
         tags: _rocm
       torchvision:
         tags: _rocm
+  
+  vllm:
+    group: framework
+    env:
+      MLC_MLPERF_BACKEND: vllm
 
   ray:
     group: framework
@@ -1398,6 +1411,9 @@ variations:
     adr:
       pytorch:
         version_max: 2.5.1
+      vllm:
+        env:
+          MLC_GENERIC_PYTHON_PIP_EXTRA: "--upgrade"
       MLC_MODEL: llama3-402b
     deps:
       - tags: get,generic-python-lib,_package.torchvision
@@ -1406,9 +1422,6 @@ variations:
       - tags: get,generic-python-lib,_package.transformers
       - tags: get,generic-python-lib,_package.sentencepiece
       - tags: get,generic-python-lib,_package.accelerate
-      - tags: get,generic-python-lib,_package.vllm
-        env:
-          MLC_GENERIC_PYTHON_PIP_EXTRA: "--upgrade"
       - tags: get,generic-python-lib,_package.pybind11
       - tags: get,generic-python-lib,_package.pandas
         version_max: 2.2.1
@@ -1429,7 +1442,6 @@ variations:
       - tags: get,generic-python-lib,_package.transformers
       - tags: get,generic-python-lib,_package.sentencepiece
       - tags: get,generic-python-lib,_package.accelerate
-      - tags: get,generic-python-lib,_package.vllm
       - tags: get,generic-python-lib,_package.pybind11
       - tags: get,generic-python-lib,_package.nltk
       - tags: get,generic-python-lib,_package.evaluate
@@ -1474,7 +1486,6 @@ variations:
     env:
       MLC_MODEL: whisper
     deps:
-      - tags: get,generic-python-lib,_package.vllm
       # - tags: get,generic-python-lib,_package.sentencepiece
       # - tags: get,generic-python-lib,_package.accelerate
       # - tags: get,generic-python-lib,_package.vllm
