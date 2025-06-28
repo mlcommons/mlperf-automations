@@ -574,7 +574,7 @@ def get_run_cmd_reference(
         cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} reference_mlperf.py \
             --scenario {tmp_scenario} \
             --dataset_dir {x}{env['MLC_DATASET_WHISPER_PATH']}{x} \
-            --manifest {x}{os.path.join(env['MLC_DATASET_WHISPER_PATH'], "dev-all-repack.json")}{x} \
+            --manifest {x}{os.path.join(env['MLC_DATASET_WHISPER_PATH'], "data", "dev-all-repack.json")}{x} \
             --log_dir {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
             --model-path {x}{env['MLC_ML_MODEL_WHISPER_PATH']}{x}"""
 
