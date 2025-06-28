@@ -1486,7 +1486,8 @@ variations:
     env:
       MLC_MODEL: whisper
     deps:
-      # - tags: get,generic-python-lib,_package.sentencepiece
+      - tags: get,generic-python-lib,_package.py-libnuma
+      - tags: get,generic-sys-util,_libnuma-dev
       # - tags: get,generic-python-lib,_package.accelerate
       # - tags: get,generic-python-lib,_package.vllm
       # - tags: get,generic-python-lib,_package.pybind11
