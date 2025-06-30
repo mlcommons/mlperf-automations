@@ -1015,6 +1015,10 @@ variations:
         enable_if_env:
           MLC_USE_DATASET_FROM_HOST:
           - 'yes'
+      mounts:
+        - "${{ MLC_DATASET_WHISPER_PATH }}:${{ MLC_DATASET_WHISPER_PATH }}" 
+        - "${{ MLC_ML_MODEL_WHISPER_PATH }}:${{ MLC_ML_MODEL_WHISPER_PATH }}" 
+      base_image: ubuntu:24.04
 
   llama3_1-405b:
     group:
