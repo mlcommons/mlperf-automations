@@ -2064,8 +2064,6 @@ variations:
         tags: _v5.0
       intel-harness:
         tags: _v4.1
-      inference-src:
-         version: r5.1
       nvidia-scratch-space:
         tags: _version.5.1-dev
     default_env:
