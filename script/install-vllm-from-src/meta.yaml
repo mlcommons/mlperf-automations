@@ -63,6 +63,9 @@ variations:
     default: true
     env:
       MLC_TMP_DEVICE: cpu
+    deps:
+      - tags: get,generic-python-lib,_package.setuptools_scm
+      - tags: get,generic-sys-util,_libnuma-dev
   cuda:
     deps:
     - names:
