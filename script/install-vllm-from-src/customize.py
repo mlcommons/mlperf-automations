@@ -33,7 +33,7 @@ def preprocess(i):
         extra += " --break-system-packages"
 
     if env.get('MLC_TMP_DEVICE', '') == "cpu":
-        cmd = f"""'pip3 install -r requirements/cpu.txt {extra} && VLLM_TARGET_DEVICE=cpu pip install {extra} . --no-build-isolation'"""
+        cmd = f"""'{env['MLC_PYTHON_BIN_WITH_PATH']} pip install -r requirements/cpu.txt {extra} && VLLM_TARGET_DEVICE=cpu {env['MLC_PYTHON_BIN_WITH_PATH']} pip install {extra} . --no-build-isolation'"""
 
     env['MLC_RUN_CMD'] = cmd
 
