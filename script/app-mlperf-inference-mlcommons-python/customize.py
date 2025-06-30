@@ -563,8 +563,8 @@ def get_run_cmd_reference(
 
         env['NUM_CORES'] = env.get('MLC_HOST_CPU_TOTAL_CORES', '1')
         env['NUM_NUMA_NODES'] = env.get('MLC_HOST_CPU_NUMA_NODES', '1')
-        env['CORES_PER_INST'] = int(
-            env['NUM_CORES']) / int(env['NUM_NUMA_NODES'])
+        env['CORES_PER_INST'] = int(int(
+            env['NUM_CORES']) / int(env['NUM_NUMA_NODES']))
         env['OMP_NUM_THREADS'] = env['CORES_PER_INST']
         env['INSTS_PER_NODE'] = env.get('MLC_INST_PER_NODE', '1')
         env['NUM_INSTS'] = int(
