@@ -509,6 +509,8 @@ def get_run_cmd_reference(
             --dtype {env['MLC_MLPERF_MODEL_PRECISION']} \
             --model-path {x}{env['MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH']}{x} \
             --tensor-parallel-size {env['MLC_MLPERF_INFERENCE_TP_SIZE']} \
+            {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} \
+            {scenario_extra_options} {mode_extra_options}"""
             --vllm"""
 
         if env.get('MLC_MLPERF_INFERENCE_NUM_WORKERS', '') != '':
@@ -533,6 +535,8 @@ def get_run_cmd_reference(
             --dtype {env['MLC_MLPERF_MODEL_PRECISION']} \
             --model-path {x}{env['MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH']}{x} \
             --tensor-parallel-size {env['MLC_MLPERF_INFERENCE_TP_SIZE']} \
+            {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} \
+            {scenario_extra_options} {mode_extra_options}"""
             --vllm"""
 
         if env.get('MLC_MLPERF_INFERENCE_NUM_WORKERS', '') != '':
@@ -576,7 +580,9 @@ def get_run_cmd_reference(
             --dataset_dir {x}{env['MLC_DATASET_WHISPER_PATH']}{x} \
             --manifest {x}{os.path.join(env['MLC_DATASET_WHISPER_PATH'], "data", "dev-all-repack.json")}{x} \
             --log_dir {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
-            --model-path {x}{env['MLC_ML_MODEL_WHISPER_PATH']}{x}"""
+            --model-path {x}{env['MLC_ML_MODEL_WHISPER_PATH']}{x}\
+            {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} \
+            {scenario_extra_options} {mode_extra_options}"""
 
         if env.get('MLC_MLPERF_INFERENCE_NUM_WORKERS', '') != '':
             cmd += f" --num_workers {env['MLC_MLPERF_INFERENCE_NUM_WORKERS']}"
