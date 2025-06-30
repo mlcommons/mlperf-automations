@@ -27,6 +27,8 @@ def preprocess(i):
 
     extra = ""
 
+    pip_version = env['MLC_PIP_VERSION']
+
     if (pip_version and len(pip_version) > 1 and int(pip_version[0]) >= 23):
         extra += " --break-system-packages"
 
