@@ -359,6 +359,11 @@ variations:
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
           - "yes"
+  librispeech_whisper:
+    env:
+      MLC_DATASET: librispeech_whisper
+    deps:
+      - tags: get,generic-python-lib,_package.openai-whisper
   edge:
     group: category
   datacenter:

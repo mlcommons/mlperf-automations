@@ -1000,7 +1000,7 @@ variations:
       names:
       - mlperf-accuracy-script
       - whisper-accuracy-script
-      tags: run,accuracy,mlperf,_dataset_whisper
+      tags: run,accuracy,mlperf,_librispeech_whisper,_int64
     docker:
       deps:
       - tags: get,ml-model,whisper,_rclone,_mlc
@@ -1018,6 +1018,9 @@ variations:
       mounts:
         - "${{ MLC_DATASET_WHISPER_PATH }}:${{ MLC_DATASET_WHISPER_PATH }}" 
         - "${{ MLC_ML_MODEL_WHISPER_PATH }}:${{ MLC_ML_MODEL_WHISPER_PATH }}" 
+  
+  whisper,cpu:
+    docker:
       base_image: ubuntu:24.04
 
   llama3_1-405b:
