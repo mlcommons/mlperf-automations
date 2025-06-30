@@ -24,7 +24,7 @@ def preprocess(i):
     automation = i['automation']
 
     recursion_spaces = i['recursion_spaces']
-    
+
     extra = ""
 
     if (pip_version and len(pip_version) > 1 and int(pip_version[0]) >= 23):
@@ -32,7 +32,7 @@ def preprocess(i):
 
     if env.get('MLC_TMP_DEVICE', '') == "cpu":
         cmd = f"""pip3 install -r requirements/cpu.txt {extra} && VLLM_TARGET_DEVICE=cpu pip install {extra} . --no-build-isolation"""
-    
+
     env['MLC_RUN_CMD'] = cmd
-    
+
     return {'return': 0}
