@@ -1502,7 +1502,7 @@ variations:
       - tags: get,generic-python-lib,_package.librosa
       - tags: get,generic-python-lib,_package.transformers
         version_max: "4.52.4"
-      # - tags: get,generic-python-lib,_package.nltk
+      - tags: get,generic-python-lib,_package.openai-whisper
       # - tags: get,generic-python-lib,_package.evaluate
       # - tags: get,generic-python-lib,_package.absl-py
       # - tags: get,generic-python-lib,_package.rouge-score
