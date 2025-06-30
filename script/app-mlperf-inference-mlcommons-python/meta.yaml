@@ -205,6 +205,16 @@ deps:
     enable_if_env:
       MLC_MLPERF_BACKEND:
         - vllm
+    skip_if_env:
+      MLC_MLPERF_DEVICE:
+        - cpu
+
+  - tags: install-vllm-from-src,_cpu
+    enable_if_env:
+      MLC_MLPERF_BACKEND:
+        - vllm
+      MLC_MLPERF_DEVICE:
+        - cpu
 
   ## Pytorch (CUDA)
   - tags: get,generic-python-lib,_torch_cuda
@@ -1489,8 +1499,9 @@ variations:
       - tags: get,generic-python-lib,_package.py-libnuma
       - tags: get,generic-sys-util,_libnuma-dev
       - tags: get,generic-python-lib,_package.setuptools-scm
-      # - tags: get,generic-python-lib,_package.vllm
-      # - tags: get,generic-python-lib,_package.pybind11
+      - tags: get,generic-python-lib,_package.librosa
+      - tags: get,generic-python-lib,_package.transformers
+        version_max: "4.52.4"
       # - tags: get,generic-python-lib,_package.nltk
       # - tags: get,generic-python-lib,_package.evaluate
       # - tags: get,generic-python-lib,_package.absl-py
