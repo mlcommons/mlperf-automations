@@ -1511,6 +1511,10 @@ variations:
           - "yes"
           MLC_USE_DATASET_FROM_HOST:
           - 'yes'
+  
+  whisper,cpu:
+    deps:
+      - tags: install-vllm-from-src,_cpu
 
   # Target devices
   cpu:
