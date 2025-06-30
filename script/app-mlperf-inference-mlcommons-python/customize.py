@@ -579,7 +579,7 @@ def get_run_cmd_reference(
             --model-path {x}{env['MLC_ML_MODEL_WHISPER_PATH']}{x}"""
 
         if env.get('MLC_MLPERF_INFERENCE_NUM_WORKERS', '') != '':
-            cmd += f" --num_workers {env['MLC_MLPERF_INFERENCE_NUM_WORKERS']}"
+            cmd += f" --num_workers {env['NUM_INST']}"
         else:
             cmd += f" --num_workers {env['NUM_CORES']}"
 
