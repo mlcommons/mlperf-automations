@@ -581,7 +581,7 @@ def get_run_cmd_reference(
         if env.get('MLC_MLPERF_INFERENCE_NUM_WORKERS', '') != '':
             cmd += f" --num_workers {env['MLC_MLPERF_INFERENCE_NUM_WORKERS']}"
         else:
-            cmd += f" --num_workers {env['NUM_INST']}"
+            cmd += f" --num_workers {env['NUM_INSTS']}"
 
     elif "pointpainting" in env['MLC_MODEL']:
         env['RUN_DIR'] = os.path.join(
