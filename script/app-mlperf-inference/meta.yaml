@@ -2065,13 +2065,13 @@ variations:
       intel-harness:
         tags: _v4.1
       inference-src:
-         version: r5.0
+         version: r5.1
       nvidia-scratch-space:
         tags: _version.5.1-dev
     default_env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
-      MLC_MLPERF_INFERENCE_VERSION: '5.1'
+      MLC_MLPERF_INFERENCE_VERSION: '5.1-dev'
 
 invalid_variation_combinations:
   -
