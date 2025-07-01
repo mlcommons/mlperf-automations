@@ -12,16 +12,33 @@ deps:
   - python3
   tags: get,python3
   version_max: 3.9.999
+  skip_if_env:
+    MLC_TMP_ML_MODEL: 
+      - llama3_1-8b
 - names:
   - inference-src
   skip_if_env:
     MLC_CNNDM_INTEL_VARIATION:
-    - 'yes'
+      - 'yes'
+    MLC_TMP_ML_MODEL: 
+      - llama3_1-8b
   tags: mlperf,inference,source
 - tags: get,generic-python-lib,_package.simplejson
+  skip_if_env:
+    MLC_TMP_ML_MODEL: 
+      - llama3_1-8b
 - tags: get,generic-python-lib,_datasets
+  skip_if_env:
+    MLC_TMP_ML_MODEL: 
+      - llama3_1-8b
 - tags: get,generic-python-lib,_package.tokenizers
+  skip_if_env:
+    MLC_TMP_ML_MODEL: 
+      - llama3_1-8b
 - tags: get,generic-python-lib,_numpy
+  skip_if_env:
+    MLC_TMP_ML_MODEL: 
+      - llama3_1-8b
 env:
   MLC_DATASET: CNNDM
 tags:

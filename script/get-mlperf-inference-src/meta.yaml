@@ -133,7 +133,7 @@ variations:
 versions:
   custom:
     env:
-      MLC_MLPERF_LAST_RELEASE: v5.0
+      MLC_MLPERF_LAST_RELEASE: v5.1
   deepsparse:
     env:
       MLC_MLPERF_LAST_RELEASE: v5.0
