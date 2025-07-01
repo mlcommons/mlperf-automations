@@ -30,8 +30,9 @@ tags:
 uid: 1af872e81ef54742
 
 tests:
-  - variations_list:
-    - fortran
+  run_inputs:
+    - variations_list:
+      - fortran
 
 versions:
   2025.1.1:
