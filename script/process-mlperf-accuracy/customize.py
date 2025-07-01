@@ -228,7 +228,7 @@ def preprocess(i):
             CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(
                 env['MLC_MLPERF_INFERENCE_SOURCE'],
                 "speech2text",
-                "accuracy_eval.py") + "' --log_dir '" + result_dir + "' --output_dtype '" + env['MLC_ACCURACY_DTYPE'] + "' --dataset_dir '" + env['MLC_DATASET_WHISPER_PATH'] + "' --manifest '" + os.path.join(env['MLC_DATASET_WHISPER_PATH'],"data","dev-all-repack.json") + "' > '" + out_file + "'"
+                "accuracy_eval.py") + "' --log_dir '" + result_dir + "' --output_dtype '" + env['MLC_ACCURACY_DTYPE'] + "' --dataset_dir '" + env['MLC_DATASET_WHISPER_PATH'] + "' --manifest '" + os.path.join(env['MLC_DATASET_WHISPER_PATH'], "data", "dev-all-repack.json") + "' > '" + out_file + "'"
 
         else:
             return {'return': 1, 'error': 'Unsupported dataset'}
