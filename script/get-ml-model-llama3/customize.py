@@ -33,6 +33,6 @@ def postprocess(i):
         if env.get('MLC_ML_MODEL_PATH', '')!='':
             env['LLAMA3_CHECKPOINT_PATH'] = env['MLC_ML_MODEL_PATH']
         env['MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH'] = env['LLAMA3_CHECKPOINT_PATH']
-        env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_ML_MODEL_PATH']
+        env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH']
 
     return {'return': 0}
