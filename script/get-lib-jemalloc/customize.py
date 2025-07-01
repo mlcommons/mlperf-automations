@@ -32,7 +32,7 @@ def postprocess(i):
 
     lib_path = os.path.join(os.getcwd(), "obj", "lib")
 
-    env['+LD_LIBRARY_PATH'] =  [ lib_path ]
+    env['+LD_LIBRARY_PATH'] = [lib_path]
     env['MLC_JEMALLOC_PATH'] = os.path.dirname(lib_path)
     env['MLC_JEMALLOC_LIB_PATH'] = lib_path
     env['MLC_DEPENDENT_CACHED_PATH'] = os.path.join(lib_path, "libjemalloc.so")
