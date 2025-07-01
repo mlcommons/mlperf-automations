@@ -951,6 +951,9 @@ variations:
       - llama3_1-8b-accuracy-script
       tags: run,accuracy,mlperf,_dataset_llama3
     docker:
+      mounts:
+        - "${{ MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH }}:${{ MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH }}" 
+        - "${{ MLC_DATASET_CNNDM_EVAL_PATH }}:${{ MLC_DATASET_CNNDM_EVAL_PATH }}"
       deps:
       - tags: get,ml-model,llama3,_hf,_meta-llama/Llama-3.1-8B-Instruct
         enable_if_env:
