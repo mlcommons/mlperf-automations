@@ -17,7 +17,7 @@ def preprocess(i):
         configure_command += f""" --with-lg-page={env['MLC_JEMALLOC_LG_PAGE']} """
     if env.get('MLC_JEMALLOC_CONFIG', '') != '':
         configure_command += f""" {env['MLC_JEMALLOC_CONFIG']} """
-    
+
     env['MLC_JEMALLOC_CONFIGURE_COMMAND'] = configure_command
 
     return {'return': 0}
