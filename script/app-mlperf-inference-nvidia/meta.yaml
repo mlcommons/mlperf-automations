@@ -364,7 +364,8 @@ variations:
         version: "2024.1"
   v4.1:
     group: version
-    base: pre5.0
+    base: 
+      - pre5.0
     env:
       MLC_MLPERF_INFERENCE_CODE_VERSION: "v4.1"
       MLC_MLPERF_GPTJ_MODEL_FP8_PATH_SUFFIX: GPTJ-FP8-quantized
@@ -374,7 +375,8 @@ variations:
  
   v4.1-dev:
     group: version
-    base: pre5.0
+    base: 
+      - pre5.0
     default: true
     env:
       MLC_MLPERF_INFERENCE_CODE_VERSION: "v4.0"
@@ -384,7 +386,8 @@ variations:
         tags: _for-nvidia-mlperf-inference-v4.0
 
   v4.0:
-    base: pre5.0
+    base: 
+      - pre5.0
     group: version
     env:
       MLC_MLPERF_INFERENCE_CODE_VERSION: "v4.0"
@@ -393,7 +396,8 @@ variations:
       pytorch:
         tags: _for-nvidia-mlperf-inference-v4.0
   v3.1:
-    base: pre5.0
+    base: 
+      - pre5.0
     env:
       MLC_MLPERF_INFERENCE_CODE_VERSION: "v3.1"
       MLC_MLPERF_GPTJ_MODEL_FP8_PATH_SUFFIX: GPTJ-07142023.pth
