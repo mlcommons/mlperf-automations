@@ -40,5 +40,7 @@ def postprocess(i):
             env['MLC_CALIBRATION_DATASET_CNNDM_PATH'] = os.path.join(
                 os.getcwd(), 'install', 'cnn_dailymail_calibration.json')
             env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_CALIBRATION_DATASET_PATH']
+    else:
+        env['MLC_DATASET_CNNDM_EVAL_PATH'] = os.path.join(env['MLC_DATASET_CNNDM_EVAL_PATH'], env['MLC_DATASET_CNNDM_FILENAME'])
 
     return {'return': 0}
