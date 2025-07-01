@@ -38,11 +38,9 @@ tags:
 tests:
   run_inputs:
   - variations_list:
-    - branch.dev
-    - lg-page.21
-    - lg-quantum.3
+    - branch.dev,lg-page.21,lg-quantum.3
   - variations_list:
-    - config." --with-lg-page=21 --with-lg-quantum=3" 
+    - config.'--with-lg-page=21 --with-lg-quantum=3'
    
 uid: 406439a446e04fb7
 variations:
