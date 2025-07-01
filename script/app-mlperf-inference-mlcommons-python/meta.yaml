@@ -1461,8 +1461,6 @@ variations:
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
           - "yes"
-          MLC_USE_ML_MODEL_FROM_HOST:
-          - 'yes'
         names:
           - llama3_1-8b
           - llama3-8b
@@ -1476,8 +1474,6 @@ variations:
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
           - "yes"
-          MLC_USE_DATASET_FROM_HOST:
-          - 'yes'
       ## CNNDM for Llama3 8B model - datacenter
       - tags: get,dataset,cnndm,_validation,_datacenter,_llama3,_mlc,_rclone
         names:
@@ -1488,8 +1484,6 @@ variations:
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
           - "yes"
-          MLC_USE_DATASET_FROM_HOST:
-          - 'yes'
         
   whisper:
     group: models
