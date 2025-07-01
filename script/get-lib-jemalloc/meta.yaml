@@ -37,11 +37,40 @@ tags:
 - jemalloc
 tests:
   run_inputs:
-  - quiet: true
+  - variations_list:
+    - branch.dev
+    - lg-page.21
+    - lg-quantum.3
+  - variations_list:
+    - config." --with-lg-page=21 --with-lg-quantum=3" 
+   
 uid: 406439a446e04fb7
 variations:
   version.official:
+    base:
+      - url.official
+  url.#:
+    group: version
+    env:
+      MLC_GIT_URL: '#'
+  url.official:
     group: version
     default: true
     env:
       MLC_GIT_URL: https://github.com/jemalloc/jemalloc.git
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+  sha.#:
+    env:
+      MLC_GIT_SHA: '#'
+  config.#:
+    env:
+      MLC_JEMALLOC_CONFIG: '#'
+  lg-page.#:
+    env:
+      MLC_JEMALLOC_LG_PAGE: '#'
+  lg-quantum.#:
+    env:
+      MLC_JEMALLOC_LG_QUANTUM: '#'
+
