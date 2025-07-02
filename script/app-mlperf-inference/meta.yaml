@@ -949,7 +949,7 @@ variations:
       names:
       - mlperf-accuracy-script
       - llama3_1-8b-accuracy-script
-      tags: run,accuracy,mlperf,_dataset_llama3
+      tags: run,accuracy,mlperf,_cnndm_llama_3
     docker:
       mounts:
         - "${{ MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH }}:${{ MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH }}" 
