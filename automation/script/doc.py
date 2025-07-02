@@ -261,10 +261,24 @@ mlcr {tags}
 
 """
 
+    reverse_map = defaultdict(list)
+    for k, v in input_mapping.items():
+        reverse_map[v].append(k)
+
     if input_description:
         for i in input_description:
             if i in input_mapping and input_mapping[i] in default_env:
                 input_description[i]['default'] = default_env[input_mapping[i]]
+
+        # Add alias entries
+        for mapped_env, keys in reverse_map.items():
+            if len(keys) > 1:
+                canonical = keys[0]
+                for alias in keys[1:]:
+                    if alias in input_description:
+                        input_description[alias] = {}
+                        input_description[alias]['alias'] = canonical
+                        input_description[alias]['desc'] = f"""Alias for {canonical}"""
 
         input_description_string = generate_markdown(
             "Script Inputs", input_description)
