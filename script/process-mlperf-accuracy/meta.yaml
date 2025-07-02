@@ -340,7 +340,7 @@ variations:
     group: dataset
   cnndm_llama_3:
     env:
-      MLC_DATASET: cnndm_llama3
+      MLC_DATASET: cnndm_llama_3
       MLC_ML_MODEL_FULL_NAME: meta-llama/Meta-Llama-3.1-8B-Instruct
     group: dataset
   cnndm_llama_3,edge:
