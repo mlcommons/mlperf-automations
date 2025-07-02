@@ -10,6 +10,7 @@ on:
 jobs:
   get_modified_files:
     runs-on: ubuntu-latest
+    if: github.repository_owner == 'mlcommons'
     outputs:
       processed_files: ${{ steps.modified-files.outputs.processed_files }}
 

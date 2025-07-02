@@ -1,13 +1,12 @@
-# This file is originally created for CM Script automations and is now
-# modified to make it work for MLC automation.
+# This file was originally created for CM Script automations and is now
+# modified to make it work for MLCFlow automation.
 
-# CM "script" automation helps users to encode their MLOps, DevOps and other knowledge
-# as portable and reusable automation recipes with simple tags, native scripts
-# and a unified CLI, Python API and JSON/YAML meta descriptions.
+# This file contains the CM/MLC script execution logic which includes processing the script meta,
+# running the dependencies and finally preparing the required environment and running the specified script.
 #
-# This is a stable prototype of the MLC script automation being developed by Grigori Fursin and Arjun Suresh
+# Developed by Grigori Fursin and Arjun Suresh for CM and modified for MLCFlow by Arjun Suresh and Anandhu Sooraj
 #
-#
+
 import os
 import logging
 
@@ -2344,6 +2343,9 @@ class ScriptAutomation(Automation):
         # Save current explicit variations
         import copy
         explicit_variation_tags = copy.deepcopy(variation_tags)
+
+        if add_deps_recursive is None:
+            add_deps_recursive = {}
 
         # Calculate space
         required_disk_space = {}

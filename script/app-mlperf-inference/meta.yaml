@@ -2076,7 +2076,7 @@ variations:
       reproducibility
     add_deps_recursive:
       nvidia-inference-common-code:
-        tags: _mlcommons,_v5.0
+        tags: _mlcommons,_v5.1
       nvidia-inference-server:
         version: r5.0
         tags: _mlcommons
@@ -2084,12 +2084,14 @@ variations:
         tags: _v5.0
       intel-harness:
         tags: _v4.1
+      inference-src:
+         tags: _branch.master
       nvidia-scratch-space:
         tags: _version.5.1-dev
     default_env:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
-      MLC_MLPERF_INFERENCE_VERSION: '5.1-dev'
+      MLC_MLPERF_INFERENCE_VERSION: '5.1'
 
 invalid_variation_combinations:
   -
@@ -2143,7 +2145,7 @@ input_description:
   num_threads: 
     desc: "Number of CPU threads to launch the application with"
   hw_name: 
-    desc: "Valid value - any system description which has a config file (under same name) defined [here](https://github.com/mlcommons/cm4mlops/tree/main/script/get-configs-sut-mlperf-inference/configs)"
+    desc: "Hardware part of the SUT name"
   output_dir: 
     desc: "Location where the outputs are produced"
   rerun: 

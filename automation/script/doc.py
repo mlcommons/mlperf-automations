@@ -61,13 +61,18 @@ def generate_doc(self_module, input_params):
 
 def generate_docs(metadata, script_path, generic_inputs):
     script_name = metadata.get('alias', metadata['uid'])
-    readme_prefix = f"""This README is automatically generated. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
+    info_doc_exists = os.path.exists(os.path.join(script_path, 'info.md'))
+    if info_doc_exists:
+        readme_line = "Edit [info.txt](info.txt) to add custom contents."
+    else:
+        readme_line = "Add custom content in [info.txt](info.txt)."
+    readme_prefix = f"""This README is automatically generated. {readme_line} Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 """
     doc_content = f"""# README for {script_name}
 {readme_prefix}
 """
 
-    readme_dir = os.path.join(script_path, "docs")
+    readme_dir = script_path
 
     if not os.path.exists(readme_dir):
         os.makedirs(readme_dir)
