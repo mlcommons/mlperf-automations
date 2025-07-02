@@ -52,27 +52,71 @@ def generate_doc(self_module, input_params):
         script_uid = metadata.get('uid', '')
         script_input_mapping = metadata.get('input_mapping', {})
         script_input_description = metadata.get('input_description', {})
-
-        r = generate_docs(metadata, script_directory, generic_inputs)
+        script_repo = script.repo
+        r = generate_docs(script_repo, metadata, script_directory, generic_inputs)
         if r['return'] > 0:
             continue
 
     return {'return': 0}
 
+def get_setup_readme(script_repo):
+    repo_alias = os.path.basename(script_repo.meta.get('alias'))
+    repo_name = repo_alias
+    if '@' in repo_name:
+        repo_name = repo_name.split('@')[1]
+    
+    setup_readme = f"""`mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/user`, you can do
+```
+mkdir /mnt/user/MLC
+ln -s /mnt/user/MLC $HOME/MLC
+```
+You can also use the `ENV` variable `MLC_REPOS` to control this location but this will need a set after every system reboot.
 
-def generate_docs(metadata, script_path, generic_inputs):
+## Setup
+
+If you are not on a Python development environment please refer to the [official docs](https://docs.mlcommons.org/mlcflow/install/) for the installation.
+
+```bash
+python3 -m venv mlcflow
+. mlcflow/bin/activate
+pip install mlcflow
+```
+
+- Using a virtual environment is recommended (per `pip` best practices), but you may skip it or use `--break-system-packages` if needed.
+
+### Pull {repo_name}
+
+Once `mlcflow` is installed:
+
+```bash
+mlc pull repo {repo_alias} --pat=<Your Private Access Token>
+```
+- `--pat` or `--ssh` is only needed if the repo is PRIVATE
+- If `--pat` is avoided, you'll be asked to enter the password where you can enter your Private Access Token
+- `--ssh` option can be used instead of `--pat=<>` option if you prefer to use SSH for accessing the github repository.
+"""
+    return {'return': 0, 'setup_readme': setup_readme}
+
+def generate_docs(script_repo, metadata, script_path, generic_inputs):
     script_name = metadata.get('alias', metadata['uid'])
     info_doc_exists = os.path.exists(os.path.join(script_path, 'info.md'))
     if info_doc_exists:
-        readme_line = "Edit [info.txt](info.txt) to add custom contents."
+        readme_line = "Edit [info.md](info.md) to add custom contents."
     else:
-        readme_line = "Add custom content in [info.txt](info.txt)."
+        readme_line = "Add custom content in [info.md](info.md)."
     readme_prefix = f"""This README is automatically generated. {readme_line} Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 """
     doc_content = f"""# README for {script_name}
 {readme_prefix}
 """
 
+    r = get_setup_readme(script_repo) 
+    if r['return'] > 0:
+        return r
+
+    setup_readme = r['setup_readme']
+    doc_content += setup_readme
+    
     readme_dir = script_path
 
     if not os.path.exists(readme_dir):
@@ -170,7 +214,7 @@ def get_variations_readme(variations):
         line = f"- `{var}`"
 
         if var.endswith(".#"):
-            line += " _(dynamic)_"
+            line += " _(# can be substituted dynamically)_"
 
         if alias_reverse.get(var):
             alias_str = ", ".join(sorted(alias_reverse[var]))
@@ -179,6 +223,10 @@ def get_variations_readme(variations):
         if bases.get(var):
             base_str = ", ".join(bases[var])
             line += f" (base: {base_str})"
+
+        if group != "ungrouped":
+            if main_variations[var].get("default", False):
+                line += f" (default)"
 
         grouped_output[group].append(line)
 
