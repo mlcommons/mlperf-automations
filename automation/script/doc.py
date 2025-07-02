@@ -4,6 +4,7 @@ from utils import *
 import logging
 from pathlib import PureWindowsPath, PurePosixPath
 import copy
+from collections import defaultdict
 
 
 def generate_doc(self_module, input_params):
@@ -87,6 +88,8 @@ def generate_docs(metadata, script_path, generic_inputs):
     script_input_mapping = metadata.get('input_mapping', {})
     script_default_env = metadata.get('default_env', {})
     script_input_description = metadata.get('input_description', {})
+    script_variations = metadata.get('variations', {})
+    default_version = metadata.get('default_version')
 
     r = get_run_readme(
         tags_string,
@@ -101,12 +104,96 @@ def generate_docs(metadata, script_path, generic_inputs):
 
     doc_content += run_readme
 
+    r = get_variations_readme(script_variations)
+    if r['return'] > 0:
+        return r
+    variations_readme = r['variations_readme']
+    doc_content += variations_readme
+
+    example_commands_file = os.path.join(script_path, 'example-commands.md')
+
+    # Read the file content if it exists
+    if os.path.exists(example_commands_file):
+        with open(example_commands_file, "r") as f:
+            commands_readme = f.read()
+    else:
+        commands_readme = ''
+
+    # Append the content to doc_content
+    doc_content += commands_readme
+
+
     readme_path = os.path.join(readme_dir, "README.md")
     with open(readme_path, "w") as f:
         f.write(doc_content)
     print(f"Readme generated at {readme_path}")
 
     return {'return': 0}
+
+
+def get_variations_readme(variations):
+
+
+    # Data structures
+    aliases = {}                # alias name -> real target
+    alias_reverse = defaultdict(list)  # real target -> [aliases]
+    bases = defaultdict(list)   # variation -> list of base variations
+    variation_groups = {}       # variation -> group
+    main_variations = {}        # all actual variations to process
+
+    # First pass: classify and build maps
+    for name, attrs in variations.items():
+        if "," in name:
+            continue  # ⛔ Skip composite variations
+        if not isinstance(attrs, dict):
+            main_variations[name] = {}
+            continue
+        if "alias" in attrs:
+            aliases[name] = attrs["alias"]
+            alias_reverse[attrs["alias"]].append(name)
+        else:
+            main_variations[name] = attrs
+            # group
+            group = attrs.get("group", "ungrouped")
+            if isinstance(group, list):
+                group = group[0] if group else "ungrouped"
+            variation_groups[name] = group
+            # base
+            base = attrs.get("base", [])
+            if isinstance(base, str):
+                base = [base]
+            bases[name] = base
+
+    # Build grouped markdown output
+    grouped_output = defaultdict(list)
+
+    for var in sorted(main_variations.keys()):
+        group = variation_groups.get(var, "ungrouped")
+        line = f"- `{var}`"
+
+        if var.endswith(".#"):
+            line += " _(dynamic)_"
+
+        if alias_reverse.get(var):
+            alias_str = ", ".join(sorted(alias_reverse[var]))
+            line += f" (alias: {alias_str})"
+
+        if bases.get(var):
+            base_str = ", ".join(bases[var])
+            line += f" (base: {base_str})"
+
+        grouped_output[group].append(line)
+
+    # Write Markdown
+    md_lines = ["## Variations\n"]
+
+    for group in sorted(grouped_output):
+        md_lines.append(f"### {group.capitalize()}\n")
+        md_lines.extend(grouped_output[group])
+        md_lines.append("")  # blank line between groups
+
+    return {'return': 0, 'variations_readme': "\n".join(md_lines)}
+
 
 
 def get_run_readme(tags, input_mapping, input_description,
