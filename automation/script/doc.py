@@ -53,18 +53,23 @@ def generate_doc(self_module, input_params):
         script_input_mapping = metadata.get('input_mapping', {})
         script_input_description = metadata.get('input_description', {})
         script_repo = script.repo
-        r = generate_docs(script_repo, metadata, script_directory, generic_inputs)
+        r = generate_docs(
+            script_repo,
+            metadata,
+            script_directory,
+            generic_inputs)
         if r['return'] > 0:
             continue
 
     return {'return': 0}
+
 
 def get_setup_readme(script_repo):
     repo_alias = os.path.basename(script_repo.meta.get('alias'))
     repo_name = repo_alias
     if '@' in repo_name:
         repo_name = repo_name.split('@')[1]
-    
+
     setup_readme = f"""`mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/user`, you can do
 ```
 mkdir /mnt/user/MLC
@@ -97,6 +102,7 @@ mlc pull repo {repo_alias} --pat=<Your Private Access Token>
 """
     return {'return': 0, 'setup_readme': setup_readme}
 
+
 def generate_docs(script_repo, metadata, script_path, generic_inputs):
     script_name = metadata.get('alias', metadata['uid'])
     info_doc_exists = os.path.exists(os.path.join(script_path, 'info.md'))
@@ -110,13 +116,13 @@ def generate_docs(script_repo, metadata, script_path, generic_inputs):
 {readme_prefix}
 """
 
-    r = get_setup_readme(script_repo) 
+    r = get_setup_readme(script_repo)
     if r['return'] > 0:
         return r
 
     setup_readme = r['setup_readme']
     doc_content += setup_readme
-    
+
     readme_dir = script_path
 
     if not os.path.exists(readme_dir):
