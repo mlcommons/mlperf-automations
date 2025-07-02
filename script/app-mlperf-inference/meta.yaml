@@ -943,13 +943,30 @@ variations:
         - all
         MLC_MLPERF_ACCURACY_RESULTS_DIR:
         - 'on'
+        MLC_MLPERF_SUBMISSION_SYSTEM_TYPE: 
+        - edge
       skip_if_env:
         MLC_MLPERF_IMPLEMENTATION:
         - nvidia
       names:
       - mlperf-accuracy-script
       - llama3_1-8b-accuracy-script
-      tags: run,accuracy,mlperf,_cnndm_llama_3
+      tags: run,accuracy,mlperf,_cnndm_llama_3,_edge
+    - enable_if_env:
+        MLC_MLPERF_LOADGEN_MODE:
+        - accuracy
+        - all
+        MLC_MLPERF_ACCURACY_RESULTS_DIR:
+        - 'on'
+        MLC_MLPERF_SUBMISSION_SYSTEM_TYPE: 
+        - datacenter
+      skip_if_env:
+        MLC_MLPERF_IMPLEMENTATION:
+        - nvidia
+      names:
+      - mlperf-accuracy-script
+      - llama3_1-8b-accuracy-script
+      tags: run,accuracy,mlperf,_cnndm_llama_3,_datacenter
     docker:
       mounts:
         - "${{ MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH }}:${{ MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH }}" 
