@@ -122,7 +122,6 @@ def generate_docs(metadata, script_path, generic_inputs):
     # Append the content to doc_content
     doc_content += commands_readme
 
-
     readme_path = os.path.join(readme_dir, "README.md")
     with open(readme_path, "w") as f:
         f.write(doc_content)
@@ -132,7 +131,6 @@ def generate_docs(metadata, script_path, generic_inputs):
 
 
 def get_variations_readme(variations):
-
 
     # Data structures
     aliases = {}                # alias name -> real target
@@ -193,7 +191,6 @@ def get_variations_readme(variations):
         md_lines.append("")  # blank line between groups
 
     return {'return': 0, 'variations_readme': "\n".join(md_lines)}
-
 
 
 def get_run_readme(tags, input_mapping, input_description,
