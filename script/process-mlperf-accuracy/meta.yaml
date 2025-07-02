@@ -339,6 +339,14 @@ variations:
       MLC_DATASET: cognata_deeplab
     group: dataset
   cnndm_llama_3:
+    deps:
+    - tags: get,ml-model,llama3,_hf,_meta-llama/Llama-3.1-8B-Instruct
+      names:
+        - llama3_1-8b
+        - llama3-8b
+      skip_if_env:
+        MLC_SKIP_MODEL_DOWNLOAD_FOR_ACCURACY_EVAL:
+          - "yes"
     env:
       MLC_DATASET: cnndm_llama_3
       MLC_ML_MODEL_FULL_NAME: meta-llama/Meta-Llama-3.1-8B-Instruct

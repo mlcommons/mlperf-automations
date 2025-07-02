@@ -221,8 +221,12 @@ def preprocess(i):
                 result_dir, "mlperf_log_accuracy.json") + "' --dataset-path '" + env['MLC_PREPROCESSED_DATASET_COGNATA_PATH'] + "' > '" + out_file + "'"
 
         elif dataset == "cnndm_llama_3":
-            CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "language", "llama3.1-8b", "evaluation.py") + "' --model-name '" + env['MLC_ML_MODEL_FULL_NAME'] + "' --mlperf-accuracy-file '" + os.path.join(
-                result_dir, "mlperf_log_accuracy.json") + "' --dtype '" + env['MLC_ACCURACY_DTYPE'] + "' --dataset-file '" + env['MLC_DATASET_CNNDM_EVAL_PATH'] + "' > '" + out_file + "'"
+            tmp_acc_dtype = env['MLC_ACCURACY_DTYPE']
+            if tmp_acc_dtype not in ["int32", "int64"]:
+                logger.warning(f"{tmp_acc_dtype} is not in valid datatypes for accuracy checker - int32,int64. Defaulting to int64")
+                tmp_acc_dtype = "int64"
+            CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "language", "llama3.1-8b", "evaluation.py") + "' --model-name '" + env.get(env['MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH'], env['MLC_ML_MODEL_FULL_NAME']) + "' --mlperf-accuracy-file '" + os.path.join(
+                result_dir, "mlperf_log_accuracy.json") + "' --dtype '" + tmp_acc_dtype + "' --dataset-file '" + env['MLC_DATASET_CNNDM_EVAL_PATH'] + "' > '" + out_file + "'"
 
         elif dataset == "librispeech_whisper":
             CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(
