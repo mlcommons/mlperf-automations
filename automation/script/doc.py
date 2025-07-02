@@ -143,7 +143,7 @@ def generate_docs(script_repo, metadata, script_path, generic_inputs):
 
     for k in script_input_mapping:
         if k not in script_input_description:
-            script_input_description[k] = ''
+            script_input_description[k] = {}
 
     r = get_run_readme(
         tags_string,
