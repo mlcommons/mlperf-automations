@@ -22,7 +22,7 @@ def postprocess(i):
 
     env = i['env']
 
-    if env.get('MLC_DOWNLOAD_MODE', '') == "dry":
+    if env.get('MLC_DOWNLOAD_MODE', '') != "dry":
         env['MLC_ML_MODEL_FILE_WITH_PATH'] = env['MLC_ML_MODEL_WHISPER_PATH']
 
     return {'return': 0}
