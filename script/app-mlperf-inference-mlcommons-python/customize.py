@@ -624,7 +624,7 @@ def get_run_cmd_reference(
 
         cmd = f"""{base_cmd} \
             --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} \
-            --input-file {x}{env['MLC_DATASET_PREPROCESSED_PATH']}{x} \
+            --input-file {x}{env['MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_VALIDATION_PATH']}{x} \
             --output-dir {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
             {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} \
             {scenario_extra_options} {mode_extra_options}"""
