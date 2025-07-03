@@ -1101,7 +1101,7 @@ variations:
       tags: run,accuracy,mlperf,_dataset_deepseek-r1
     docker:
       deps:
-      - tags: get,mlperf,preprocessed,dataset,deepseek-r1
+      - tags: get,preprocessed,dataset,deepseek-r1,_validation,_mlc,_rclone
         enable_if_env:
           MLC_USE_DATASET_FROM_HOST:
           - 'yes'

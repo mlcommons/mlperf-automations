@@ -1504,8 +1504,6 @@ variations:
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
           - "yes"
-          MLC_USE_ML_MODEL_FROM_HOST:
-          - 'yes'
         names:
           - whisper-model
       - tags: get,dataset,whisper,_preprocessed,_mlc,_rclone
@@ -1514,13 +1512,51 @@ variations:
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
           - "yes"
-          MLC_USE_DATASET_FROM_HOST:
-          - 'yes'
   
   whisper,cpu:
     deps:
       - tags: install-vllm-from-src,_cpu
+  
+  deepseek-r1:
+    group: models
+    env:
+      MLC_MODEL: deepseek-r1
+    deps:
+      - tags: get,preprocessed,dataset,deepseek-r1,_validation,_mlc,_rclone
+        names:
+          - deepseek-r1-preprocessed-dataset
+        skip_if_env:
+          MLC_RUN_STATE_DOCKER:
+          - "yes"
 
+  deepseek-r1,pytorch:
+    deps:
+      - tags: get,generic-python-lib,_package.triton
+      - tags: get,generic-python-lib,_package.tansformers
+      - tags: get,generic-python-lib,_package.accelerate
+      - tags: get,generic-python-lib,_package.pandas
+      - tags: get,generic-python-lib,_package.numpy
+      - tags: get,generic-python-lib,_package.huggingface-hub[hf_transfer]
+      - tags: get,generic-python-lib,_package.safetensors
+
+  deepseek-r1,vllm:
+    deps:
+      - tags: get,generic-python-lib,_package.tqdm
+      - tags: get,generic-python-lib,_package.vllm
+      - tags: get,generic-python-lib,_package.accelerate
+      - tags: get,generic-python-lib,_package.pandas
+      - tags: get,generic-python-lib,_package.numpy
+      - tags: get,generic-python-lib,_package.huggingface-hub[hf_transfer]
+
+  deepseek-r1,sglang:
+    deps:
+      - tags: get,generic-python-lib,_package.tqdm
+      - tags: get,generic-python-lib,_package.tansformers
+      - tags: get,generic-python-lib,_package.accelerate
+      - tags: get,generic-python-lib,_package.pandas
+      - tags: get,generic-python-lib,_package.numpy
+      - tags: get,generic-python-lib,_package.setuptools
+      
   # Target devices
   cpu:
     group: device
