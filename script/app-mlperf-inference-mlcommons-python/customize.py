@@ -610,25 +610,25 @@ def get_run_cmd_reference(
             cmd += f" --time {env['MLC_MLPERF_POINTPAINTING_TIME']}"
 
         logger.info(fcmd)
-    
+
     elif "deepseek-r1" in env['MLC_MODEL']:
         env['RUN_DIR'] = os.path.join(
             env['MLC_MLPERF_INFERENCE_SOURCE'],
             "language",
             "deepseek-r1")
-        
+
         if env['MLC_MLPERF_BACKEND'] in ["vllm", "sglang"]:
             base_cmd = f"""torchrun --nproc_per_node={env.get('MLC_MLPERF_INFERENCE_TP_SIZE', env['MLC_CUDA_NUM_DEVICES'])} {x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} run_mlperf_mpi.py"""
         else:
             base_cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} run_mlperf.py"""
-        
+
         cmd = f"""{base_cmd} \
             --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} \
             --input-file {x}{env['MLC_DATASET_PREPROCESSED_PATH']}{x} \
             --output-dir {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
             {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} \
             {scenario_extra_options} {mode_extra_options}"""
-        
+
     if env.get('MLC_NETWORK_LOADGEN', '') in ["lon", "sut"]:
         cmd = cmd + " " + "--network " + env['MLC_NETWORK_LOADGEN']
         if env.get('MLC_NETWORK_LOADGEN_SUT_SERVERS', []):

@@ -602,6 +602,6 @@ def get_required_min_queries_offline(model, version):
     mlperf_model = mlperf_model.replace("resnet50", "resnet")
 
     if "llama3_1" in mlperf_model:
-       mlperf_model = mlperf_model.replace("_", ".")
+        mlperf_model = mlperf_model.replace("_", ".")
 
     return REQUIRED_MIN_QUERIES[mlperf_model]
