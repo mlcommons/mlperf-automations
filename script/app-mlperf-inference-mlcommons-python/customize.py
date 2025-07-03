@@ -629,6 +629,8 @@ def get_run_cmd_reference(
             {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} \
             {scenario_extra_options} {mode_extra_options}"""
 
+        cmd = cmd.replace("--user_conf", "--user-conf")
+
     if env.get('MLC_NETWORK_LOADGEN', '') in ["lon", "sut"]:
         cmd = cmd + " " + "--network " + env['MLC_NETWORK_LOADGEN']
         if env.get('MLC_NETWORK_LOADGEN_SUT_SERVERS', []):
