@@ -1532,7 +1532,7 @@ variations:
   deepseek-r1,pytorch:
     deps:
       - tags: get,generic-python-lib,_package.triton
-      - tags: get,generic-python-lib,_package.tansformers
+      - tags: get,generic-python-lib,_package.transformers
       - tags: get,generic-python-lib,_package.accelerate
       - tags: get,generic-python-lib,_package.pandas
       - tags: get,generic-python-lib,_package.numpy
