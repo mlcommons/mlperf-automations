@@ -4,6 +4,7 @@ from utils import *
 import logging
 from pathlib import PureWindowsPath, PurePosixPath
 import copy
+from collections import defaultdict
 
 
 def generate_doc(self_module, input_params):
@@ -51,26 +52,76 @@ def generate_doc(self_module, input_params):
         script_uid = metadata.get('uid', '')
         script_input_mapping = metadata.get('input_mapping', {})
         script_input_description = metadata.get('input_description', {})
-
-        r = generate_docs(metadata, script_directory, generic_inputs)
+        script_repo = script.repo
+        r = generate_docs(
+            script_repo,
+            metadata,
+            script_directory,
+            generic_inputs)
         if r['return'] > 0:
             continue
 
     return {'return': 0}
 
 
-def generate_docs(metadata, script_path, generic_inputs):
+def get_setup_readme(script_repo):
+    repo_alias = os.path.basename(script_repo.meta.get('alias'))
+    repo_name = repo_alias
+    if '@' in repo_name:
+        repo_name = repo_name.split('@')[1]
+
+    setup_readme = f"""`mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/user`, you can do
+```
+mkdir /mnt/user/MLC
+ln -s /mnt/user/MLC $HOME/MLC
+```
+You can also use the `ENV` variable `MLC_REPOS` to control this location but this will need a set after every system reboot.
+
+## Setup
+
+If you are not on a Python development environment please refer to the [official docs](https://docs.mlcommons.org/mlcflow/install/) for the installation.
+
+```bash
+python3 -m venv mlcflow
+. mlcflow/bin/activate
+pip install mlcflow
+```
+
+- Using a virtual environment is recommended (per `pip` best practices), but you may skip it or use `--break-system-packages` if needed.
+
+### Pull {repo_name}
+
+Once `mlcflow` is installed:
+
+```bash
+mlc pull repo {repo_alias} --pat=<Your Private Access Token>
+```
+- `--pat` or `--ssh` is only needed if the repo is PRIVATE
+- If `--pat` is avoided, you'll be asked to enter the password where you can enter your Private Access Token
+- `--ssh` option can be used instead of `--pat=<>` option if you prefer to use SSH for accessing the github repository.
+"""
+    return {'return': 0, 'setup_readme': setup_readme}
+
+
+def generate_docs(script_repo, metadata, script_path, generic_inputs):
     script_name = metadata.get('alias', metadata['uid'])
     info_doc_exists = os.path.exists(os.path.join(script_path, 'info.md'))
     if info_doc_exists:
-        readme_line = "Edit [info.txt](info.txt) to add custom contents."
+        readme_line = "Edit [info.md](info.md) to add custom contents."
     else:
-        readme_line = "Add custom content in [info.txt](info.txt)."
+        readme_line = "Add custom content in [info.md](info.md)."
     readme_prefix = f"""This README is automatically generated. {readme_line} Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 """
     doc_content = f"""# README for {script_name}
 {readme_prefix}
 """
+
+    r = get_setup_readme(script_repo)
+    if r['return'] > 0:
+        return r
+
+    setup_readme = r['setup_readme']
+    doc_content += setup_readme
 
     readme_dir = script_path
 
@@ -87,6 +138,12 @@ def generate_docs(metadata, script_path, generic_inputs):
     script_input_mapping = metadata.get('input_mapping', {})
     script_default_env = metadata.get('default_env', {})
     script_input_description = metadata.get('input_description', {})
+    script_variations = metadata.get('variations', {})
+    default_version = metadata.get('default_version')
+
+    for k in script_input_mapping:
+        if k not in script_input_description:
+            script_input_description[k] = {}
 
     r = get_run_readme(
         tags_string,
@@ -101,12 +158,97 @@ def generate_docs(metadata, script_path, generic_inputs):
 
     doc_content += run_readme
 
+    r = get_variations_readme(script_variations)
+    if r['return'] > 0:
+        return r
+    variations_readme = r['variations_readme']
+    doc_content += variations_readme
+
+    example_commands_file = os.path.join(script_path, 'example-commands.md')
+
+    # Read the file content if it exists
+    if os.path.exists(example_commands_file):
+        with open(example_commands_file, "r") as f:
+            commands_readme = f.read()
+    else:
+        commands_readme = ''
+
+    # Append the content to doc_content
+    doc_content += commands_readme
+
     readme_path = os.path.join(readme_dir, "README.md")
     with open(readme_path, "w") as f:
         f.write(doc_content)
     print(f"Readme generated at {readme_path}")
 
     return {'return': 0}
+
+
+def get_variations_readme(variations):
+
+    # Data structures
+    aliases = {}                # alias name -> real target
+    alias_reverse = defaultdict(list)  # real target -> [aliases]
+    bases = defaultdict(list)   # variation -> list of base variations
+    variation_groups = {}       # variation -> group
+    main_variations = {}        # all actual variations to process
+
+    # First pass: classify and build maps
+    for name, attrs in variations.items():
+        if "," in name:
+            continue  # ⛔ Skip composite variations
+        if not isinstance(attrs, dict):
+            main_variations[name] = {}
+            continue
+        if "alias" in attrs:
+            aliases[name] = attrs["alias"]
+            alias_reverse[attrs["alias"]].append(name)
+        else:
+            main_variations[name] = attrs
+            # group
+            group = attrs.get("group", "ungrouped")
+            if isinstance(group, list):
+                group = group[0] if group else "ungrouped"
+            variation_groups[name] = group
+            # base
+            base = attrs.get("base", [])
+            if isinstance(base, str):
+                base = [base]
+            bases[name] = base
+
+    # Build grouped markdown output
+    grouped_output = defaultdict(list)
+
+    for var in sorted(main_variations.keys()):
+        group = variation_groups.get(var, "ungrouped")
+        line = f"- `{var}`"
+
+        if var.endswith(".#"):
+            line += " _(# can be substituted dynamically)_"
+
+        if alias_reverse.get(var):
+            alias_str = ", ".join(sorted(alias_reverse[var]))
+            line += f" (alias: {alias_str})"
+
+        if bases.get(var):
+            base_str = ", ".join(bases[var])
+            line += f" (base: {base_str})"
+
+        if group != "ungrouped":
+            if main_variations[var].get("default", False):
+                line += f" (default)"
+
+        grouped_output[group].append(line)
+
+    # Write Markdown
+    md_lines = ["## Variations\n"]
+
+    for group in sorted(grouped_output):
+        md_lines.append(f"### {group.capitalize()}\n")
+        md_lines.extend(grouped_output[group])
+        md_lines.append("")  # blank line between groups
+
+    return {'return': 0, 'variations_readme': "\n".join(md_lines)}
 
 
 def get_run_readme(tags, input_mapping, input_description,
@@ -119,10 +261,24 @@ mlcr {tags}
 
 """
 
+    reverse_map = defaultdict(list)
+    for k, v in input_mapping.items():
+        reverse_map[v].append(k)
+
     if input_description:
         for i in input_description:
             if i in input_mapping and input_mapping[i] in default_env:
                 input_description[i]['default'] = default_env[input_mapping[i]]
+
+        # Add alias entries
+        for mapped_env, keys in reverse_map.items():
+            if len(keys) > 1:
+                canonical = keys[0]
+                for alias in keys[1:]:
+                    if alias in input_description:
+                        input_description[alias] = {}
+                        input_description[alias]['alias'] = canonical
+                        input_description[alias]['desc'] = f"""Alias for {canonical}"""
 
         input_description_string = generate_markdown(
             "Script Inputs", input_description)

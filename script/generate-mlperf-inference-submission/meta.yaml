@@ -114,6 +114,8 @@ variations:
   wg-inference:
     group: benchmark_wg
     default: true
+    env:
+      MLC_MLPERF_WG: inference
     add_deps_recursive:
       truncate-mlperf-accuracy-log:
         tags: _wg-inference
@@ -128,6 +130,8 @@ variations:
       - tags: get,mlperf,inference,utils
   wg-automotive:
     group: benchmark_wg
+    env:
+      MLC_MLPERF_WG: automotive
     add_deps_recursive:
       truncate-mlperf-accuracy-log:
         tags: _wg-automotive
