@@ -25,6 +25,9 @@ variations:
   dry-run,rclone:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  dry-run,r2_downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -t
   mlc:
     default: true
     env:
