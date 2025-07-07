@@ -49,16 +49,8 @@ variations:
     env:
       MLC_DOWNLOAD_SRC: mlcommons
     group: download-src
+  mlc,rclone,preprocessed:
     prehook_deps:
-    - enable_if_env:
-        MLC_TMP_REQUIRE_DOWNLOAD:
-        - true
-      tags: get,rclone
-    - enable_if_env:
-        MLC_TMP_REQUIRE_DOWNLOAD:
-        - true
-      force_cache: true
-      tags: get,rclone-config,_mlc-inference
     - enable_if_env:
         MLC_TMP_REQUIRE_DOWNLOAD:
         - 'yes'
@@ -76,6 +68,17 @@ variations:
       update_tags_from_env_with_prefix:
         _url.:
         - MLC_DOWNLOAD_URL
+  rclone,preprocessed:
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+      tags: get,rclone
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+      force_cache: true
+      tags: get,rclone-config,_mlc-inference
   rclone:
     add_deps_recursive:
       dae:

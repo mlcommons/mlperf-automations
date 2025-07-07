@@ -205,7 +205,7 @@ def preprocess(i):
 
         elif tool == "r2_downloader":
             env['MLC_DOWNLOAD_CMD'] = f"bash <(curl -s https://raw.githubusercontent.com/mlcommons/r2-downloader/refs/heads/main/mlc-r2-downloader.sh) "
-            env['MLC_DOWNLOAD_CMD'] += f" {url} {env['MLC_DOWNLOAD_FILENAME']}"
+            env['MLC_DOWNLOAD_CMD'] += f" {url} "
             if env["MLC_HOST_OS_TYPE"] == "windows":
                 # have to modify the variable from url to temp_url if it is
                 # going to be used anywhere after this point
