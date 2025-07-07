@@ -6,6 +6,7 @@ tags:
 - get
 - ml-model
 - bevformer
+- get-ml-model-bevformer
 uid: 438a053f666443bd
 new_env_keys:
   - MLC_ML_MODEL_BEVFORMER_PATH
