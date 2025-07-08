@@ -14,8 +14,6 @@ variations:
   preprocessed:
     group: dataset-type
     default: true
-    base:
-      - mlc
     env:
       MLC_TMP_DATASET_TYPE: preprocessed
   unprocessed:
@@ -47,8 +45,6 @@ variations:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   mlc:
     default: true
-    base:
-      - rclone
     env:
       MLC_DOWNLOAD_SRC: mlcommons
     group: download-src
