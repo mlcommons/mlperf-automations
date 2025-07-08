@@ -214,7 +214,7 @@ def preprocess(i):
             else:
                 temp_download_file = env['MLC_DOWNLOAD_FILENAME']
             env['MLC_DOWNLOAD_CMD'] += f" -d {q}{os.path.join(os.getcwd(), temp_download_file)}{q} {extra_download_options} {url}"
-            
+
         elif tool == "curl":
             if env.get('MLC_DOWNLOAD_FILENAME', '') != '':
                 extra_download_options += f" --output {q}{env['MLC_DOWNLOAD_FILENAME']}{q} "
