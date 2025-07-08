@@ -7,7 +7,7 @@ import os
 def get_file_info(filepath):
     with open(filepath, 'r') as file:
         content = yaml.safe_load(file)
-        tests = content.get('tests', [])
+        tests = content.get('tests', {})
         needs_pat = tests.get('needs_pat', False)
         if tests and not needs_pat:
             num_tests = len(tests.get('run_inputs', []))
