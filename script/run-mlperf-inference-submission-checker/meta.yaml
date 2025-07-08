@@ -16,12 +16,6 @@ deps:
   - python
   - python3
   tags: get,python3
-- tags: pull,git,repo
-  env:
-    MLC_GIT_CHECKOUT_PATH: '<<<MLC_MLPERF_INFERENCE_SOURCE>>>'
-  enable_if_env:
-    MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES:
-    - 'yes'
 - tags: get,generic-python-lib,_xlsxwriter
 - names:
   - pyarrow
@@ -145,7 +139,14 @@ variations:
     deps:
       - names:
         - inference-src
+        - submission-checker-src
         tags: mlcommons,inference,src
+      - tags: pull,git,repo
+        env:
+          MLC_GIT_CHECKOUT_PATH: '<<<MLC_MLPERF_INFERENCE_SOURCE>>>'
+        enable_if_env:
+          MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES:
+          - 'yes'
   wg-automotive:
     group: benchmark_wg
     add_deps_recursive:
@@ -154,7 +155,14 @@ variations:
     deps:
       - names:
         - automotive-src
+        - submission-checker-src
         tags: mlcommons,automotive,src
+      - tags: pull,git,repo
+        env:
+          MLC_GIT_CHECKOUT_PATH: '<<<MLC_MLPERF_INFERENCE_SOURCE>>>'
+        enable_if_env:
+          MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES:
+          - 'yes'
 versions:
   master:
     adr:
