@@ -1307,6 +1307,7 @@ variations:
       MLC_MLPERF_USE_MLCOMMONS_RUN_SCRIPT: "yes"
     deps:
       - tags: get,generic-python-lib,_opencv-python
+        version_max: "4.10.0.82"
       - tags: get,generic-sys-util,_libgl
       - tags: get,generic-python-lib,_numpy
         names:
