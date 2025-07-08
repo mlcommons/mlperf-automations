@@ -6,6 +6,7 @@ tags:
 - get
 - ml-model
 - bevformer
+- get-ml-model-bevformer
 uid: 438a053f666443bd
 new_env_keys:
   - MLC_ML_MODEL_BEVFORMER_PATH
@@ -75,6 +76,7 @@ variations:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
 tests:
+  needs_pat: true
   run_inputs:
   - variations_list:
       - onnx,rclone,mlc,dry-run
