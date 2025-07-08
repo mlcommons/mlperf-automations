@@ -29,12 +29,13 @@ jobs:
       run: |
         pip install pyyaml
 
+        
     - name: Get changed files
       id: modified-files
       env:
         filter: ${{ github.event.before }}
       run: |
-        changed_files=$(git diff --name-only $filter | grep -E '.*\.yaml$')
+        changed_files=$(git diff --name-only $filter | grep -E '.*\.yaml$' | paste -sd, -)
         echo "$changed_files" | python3 .github/scripts/list_modified_files.py
 
   document_modified_scripts:
