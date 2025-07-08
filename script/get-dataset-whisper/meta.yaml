@@ -54,7 +54,7 @@ variations:
         MLC_TMP_REQUIRE_DOWNLOAD:
         - 'yes'
       env:
-        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_WHISPER_PAT
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_WHISPER_PATH
         MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_WHISPER_PATH
       extra_cache_tags: whisper,dataset
       force_cache: true
