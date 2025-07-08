@@ -16,6 +16,7 @@ tests:
   run_inputs:
   - variations_list:
     - rclone,mlc,dry-run
+    - r2_downloader,mlc,dry-run
 uid: 3bea2356e97f47b1
 variations:
   dry-run:
@@ -27,7 +28,7 @@ variations:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
   dry-run,r2_downloader:
     env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: -t
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   mlc:
     default: true
     env:

@@ -42,6 +42,9 @@ variations:
   dry-run,rclone:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  dry-run,r2_downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   mlc:
     default: true
     base:
@@ -49,14 +52,13 @@ variations:
     env:
       MLC_DOWNLOAD_SRC: mlcommons
     group: download-src
-  mlc,rclone,preprocessed:
+  mlc,preprocessed:
     prehook_deps:
     - enable_if_env:
         MLC_TMP_REQUIRE_DOWNLOAD:
         - 'yes'
       env:
-        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_WHISPER_PATH
-        MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/Whisper/dataset/
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_WHISPER_PAT
         MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_WHISPER_PATH
       extra_cache_tags: whisper,dataset
       force_cache: true
@@ -69,6 +71,8 @@ variations:
         _url.:
         - MLC_DOWNLOAD_URL
   rclone,preprocessed:
+    env:
+      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/Whisper/dataset/
     prehook_deps:
     - enable_if_env:
         MLC_TMP_REQUIRE_DOWNLOAD:
@@ -79,9 +83,17 @@ variations:
         - true
       force_cache: true
       tags: get,rclone-config,_mlc-inference
+  r2_downloader,preprocessed:
+    env:
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/whisper-dataset.uri
   rclone:
     add_deps_recursive:
       dae:
         tags: _rclone
     default: true
+    group: download-tool
+  r2_downloader:
+    add_deps_recursive:
+      dae:
+        tags: _r2_downloader
     group: download-tool
