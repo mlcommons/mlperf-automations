@@ -30,6 +30,7 @@ def process_files(files):
         for i in range(1, num_tests + 1)
     ]
 
+
 def get_modified_metas(files):
     filenames = files.split(",")
     return [
@@ -40,6 +41,7 @@ def get_modified_metas(files):
         for file in filenames if os.path.basename(file) == 'meta.yaml'
         for uid, num_tests in [get_file_info(file)]
     ]
+
 
 if __name__ == "__main__":
     changed_files = sys.stdin.read().strip()
