@@ -253,6 +253,7 @@ variations:
     env:
       MLC_DOWNLOAD_SRC: mlcommons
 tests:
+  needs_pat: true
   run_inputs:
   - variations_list:
       - onnx,rclone,mlc,dry-run
