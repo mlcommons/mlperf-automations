@@ -33,6 +33,12 @@ tags:
 - llama3
 - llama3-405b
 uid: 2f8cef2acc334e80
+tests:
+  run_inputs:
+  - variations_list:
+    - rclone,405b,mlc,dry-run
+    - r2_downloader,405b,mlc,dry-run
+    - r2_downloader,8b,mlc,dry-run
 variations:
   fp16:
     default: true

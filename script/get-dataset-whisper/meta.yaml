@@ -10,6 +10,11 @@ tags:
 - dataset
 - whisper
 uid: 2cc955c795d44978
+tests:
+  run_inputs:
+  - variations_list:
+    - rclone,preprocessed,mlc,dry-run
+    - r2_downloader,preprocessed,mlc,dry-run
 variations:
   preprocessed:
     group: dataset-type
