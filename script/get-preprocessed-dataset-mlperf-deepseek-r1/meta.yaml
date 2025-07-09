@@ -35,34 +35,6 @@ variations:
     group: dataset-type
     env:
       MLC_PREPROCESSED_DATASET_TYPE: calibration
-  calibration,rclone:
-    env:
-      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/deepseek_r1/mlperf_deepseek_r1_calibration_dataset_500_fp8_eval.pkl
-  calibration,r2_downloader:
-    env:
-      MLC_DOWNLOAD_URL:  ""
-  mlc:
-    group: download-src
-    default: true
-    prehook_deps:
-      - enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - 'yes'
-        env:
-          MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH
-          MLC_EXTRACT_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH
-        extra_cache_tags: deepseek-r1,dataset
-        force_cache: true
-        names:
-          - dae
-        tags: download-and-extract
-        force_env_keys:
-          - MLC_OUTDIRNAME  
-        update_tags_from_env_with_prefix:
-          _url.:
-            - MLC_DOWNLOAD_URL
-    env:
-      MLC_DOWNLOAD_SRC: mlcommons
   r2_downloader:
     group: download-tool
     add_deps_recursive:
@@ -91,6 +63,34 @@ variations:
   dry-run,rclone:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  calibration,rclone:
+    env:
+      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/deepseek_r1/mlperf_deepseek_r1_calibration_dataset_500_fp8_eval.pkl
+  calibration,r2_downloader:
+    env:
+      MLC_DOWNLOAD_URL:  ""
+  mlc:
+    group: download-src
+    default: true
+    prehook_deps:
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - 'yes'
+        env:
+          MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH
+          MLC_EXTRACT_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH
+        extra_cache_tags: deepseek-r1,dataset
+        force_cache: true
+        names:
+          - dae
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
 tests:
   run_inputs:
   - variations_list:
