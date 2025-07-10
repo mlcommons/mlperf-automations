@@ -82,6 +82,13 @@ variations:
   dry-run,r2_downloader:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  mlc,rclone:
+    prehook_deps:
+      - tags: get,rclone-config,_mlc-inference
+        force_cache: true
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
   mlc:
     group: download-src
     prehook_deps:
@@ -101,13 +108,6 @@ variations:
             - MLC_DOWNLOAD_URL
     env:
       MLC_DOWNLOAD_SRC: mlcommons
-  mlc,rclone:
-    prehook_deps:
-      - tags: get,rclone-config,_mlc-inference
-        force_cache: true
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
   calibration:
     env:
       MLC_DATASET_CALIBRATION: 'yes'
