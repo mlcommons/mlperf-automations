@@ -65,34 +65,6 @@ jobs:
             round: "5.0"
             folder_name: "closed-edge"
             action: "docker"
-          - os: ubuntu-latest
-            python-version: "3.12"
-            division: "closed"
-            category: "edge"
-            round: "5.1"
-            folder_name: "closed-edge"
-            action: "run"
-          - os: ubuntu-latest
-            python-version: "3.12"
-            division: "closed"
-            category: "edge"
-            round: "5.1"
-            folder_name: "closed-edge"
-            action: "docker"
-          - os: ubuntu-latest
-            python-version: "3.12"
-            division: "open"
-            category: "edge"
-            round: "5.1"
-            folder_name: "closed-edge"
-            action: "run"
-          - os: ubuntu-latest
-            python-version: "3.12"
-            division: "open"
-            category: "edge"
-            round: "5.1"
-            folder_name: "closed-edge"
-            action: "docker"
 
     steps:
     - uses: actions/checkout@v3
