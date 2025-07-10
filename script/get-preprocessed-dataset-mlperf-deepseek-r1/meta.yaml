@@ -30,7 +30,7 @@ variations:
       MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/deepseek_r1/mlperf_deepseek_r1_dataset_4388_fp8_eval.pkl
   validation,r2_downloader:
     env:
-      MLC_DOWNLOAD_URL:  ""
+      MLC_DOWNLOAD_URL:  "https://inference.mlcommons-storage.org/metadata/deepseek-r1-dataset-4388-fp8-eval.uri"
   calibration:
     group: dataset-type
     env:
@@ -40,7 +40,7 @@ variations:
       MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/deepseek_r1/mlperf_deepseek_r1_calibration_dataset_500_fp8_eval.pkl
   calibration,r2_downloader:
     env:
-      MLC_DOWNLOAD_URL:  ""
+      MLC_DOWNLOAD_URL:  "https://inference.mlcommons-storage.org/metadata/deepseek-r1-calibration-dataset-500-fp8-eval.uri"
   mlc:
     group: download-src
     default: true
@@ -95,4 +95,6 @@ tests:
   run_inputs:
   - variations_list:
       - validation,rclone,mlc,dry-run
+      - validation,r2_downloader,mlc,dry-run
       - calibration,rclone,mlc,dry-run
+      - calibration,r2_downloader,mlc,dry-run

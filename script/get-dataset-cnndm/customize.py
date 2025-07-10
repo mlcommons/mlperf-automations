@@ -26,22 +26,23 @@ def preprocess(i):
 def postprocess(i):
     env = i['env']
 
-    if env.get('MLC_TMP_ML_MODEL', '') != "llama3_1-8b":
-        if is_false(env.get('MLC_DATASET_CALIBRATION', '')):
-            env['MLC_DATASET_PATH'] = os.path.join(os.getcwd(), 'install')
-            env['MLC_DATASET_EVAL_PATH'] = os.path.join(
-                os.getcwd(), 'install', 'cnn_eval.json')
-            env['MLC_DATASET_CNNDM_EVAL_PATH'] = os.path.join(
-                os.getcwd(), 'install', 'cnn_eval.json')
-            env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_DATASET_PATH']
+    if env.get('MLC_DOWNLOAD_MODE', '') != "dry":
+        if env.get('MLC_TMP_ML_MODEL', '') != "llama3_1-8b":
+            if is_false(env.get('MLC_DATASET_CALIBRATION', '')):
+                env['MLC_DATASET_PATH'] = os.path.join(os.getcwd(), 'install')
+                env['MLC_DATASET_EVAL_PATH'] = os.path.join(
+                    os.getcwd(), 'install', 'cnn_eval.json')
+                env['MLC_DATASET_CNNDM_EVAL_PATH'] = os.path.join(
+                    os.getcwd(), 'install', 'cnn_eval.json')
+                env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_DATASET_PATH']
+            else:
+                env['MLC_CALIBRATION_DATASET_PATH'] = os.path.join(
+                    os.getcwd(), 'install', 'cnn_dailymail_calibration.json')
+                env['MLC_CALIBRATION_DATASET_CNNDM_PATH'] = os.path.join(
+                    os.getcwd(), 'install', 'cnn_dailymail_calibration.json')
+                env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_CALIBRATION_DATASET_PATH']
         else:
-            env['MLC_CALIBRATION_DATASET_PATH'] = os.path.join(
-                os.getcwd(), 'install', 'cnn_dailymail_calibration.json')
-            env['MLC_CALIBRATION_DATASET_CNNDM_PATH'] = os.path.join(
-                os.getcwd(), 'install', 'cnn_dailymail_calibration.json')
-            env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_CALIBRATION_DATASET_PATH']
-    else:
-        env['MLC_DATASET_CNNDM_EVAL_PATH'] = os.path.join(
-            env['MLC_DATASET_CNNDM_EVAL_PATH'], env['MLC_DATASET_CNNDM_FILENAME'])
+            env['MLC_DATASET_CNNDM_EVAL_PATH'] = os.path.join(
+                env['MLC_DATASET_CNNDM_EVAL_PATH'], env['MLC_DATASET_CNNDM_FILENAME'])
 
     return {'return': 0}
