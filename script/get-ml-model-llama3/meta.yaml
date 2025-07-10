@@ -34,6 +34,7 @@ tags:
 - llama3-405b
 uid: 2f8cef2acc334e80
 tests:
+  needs_pat: true
   run_inputs:
   - variations_list:
     - rclone,405b,mlc,dry-run
