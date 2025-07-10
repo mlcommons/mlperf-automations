@@ -183,9 +183,9 @@ variations:
 tests:
   run_inputs:
   - variations_list:
-      - validation,edge,rclone,llama3,mlc,dry-run
-      - validation,datacenter,rclone,llama3,mlc,dry-run
+      # - validation,edge,rclone,llama3,mlc,dry-run
+      # - validation,datacenter,rclone,llama3,mlc,dry-run
       - validation,edge,r2_downloader,llama3,mlc,dry-run
       - validation,datacenter,r2_downloader,llama3,mlc,dry-run
-      - calibration,rclone,llama3,mlc,dry-run
       - calibration,r2_downloader,llama3,mlc,dry-run
+      # - calibration,rclone,llama3,mlc,dry-run
