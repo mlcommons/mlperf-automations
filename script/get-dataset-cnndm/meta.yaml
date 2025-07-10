@@ -63,6 +63,11 @@ variations:
         enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - yes
+      - tags: get,rclone-config,_mlc-inference
+        force_cache: true
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
     group: download-tool
     add_deps_recursive:
       dae:
@@ -82,13 +87,6 @@ variations:
   dry-run,r2_downloader:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
-  mlc,rclone:
-    prehook_deps:
-      - tags: get,rclone-config,_mlc-inference
-        force_cache: true
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
   mlc:
     group: download-src
     prehook_deps:
