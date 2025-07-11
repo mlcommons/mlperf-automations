@@ -4,7 +4,7 @@ from utils import *
 import logging
 from pathlib import PureWindowsPath, PurePosixPath
 import copy
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 import json
 
 
@@ -151,7 +151,7 @@ def sort_meta_yaml_file(script_directory, quiet=False):
             print(without_group)
 
             # Combine them: with_group first, then without_group
-            sorted_variations = OrderedDict()
+            sorted_variations = {}
             for key, value in with_group + without_group:
                 sorted_variations[key] = value
 
@@ -170,7 +170,7 @@ def sort_meta_yaml_file(script_directory, quiet=False):
         # Write the sorted YAML back to file
         with open(meta_yaml_path, 'w', encoding='utf-8') as file:
             yaml.dump(data, file, default_flow_style=False, sort_keys=False,
-                      allow_unicode=True, width=1000)
+                      allow_unicode=True, width=1000, indent=2)
 
         if not quiet:
             print(f"Sorted YAML keys in {meta_yaml_path}")
