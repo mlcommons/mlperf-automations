@@ -64,6 +64,7 @@ def generate_doc(self_module, input_params):
             if not quiet:
                 logger.info(f"Sorted YAML keys for {script_alias}")
 
+        print(sort_result)
         if sort_result['return'] == 0 and sort_result.get('modified', False):
             metadata = sort_result['sorted_data']
             print(metadata)
