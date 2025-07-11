@@ -66,6 +66,7 @@ def generate_doc(self_module, input_params):
 
         if sort_result['return'] == 0 and sort_result.get('modified', False):
             metadata = sort_result['sorted_data']
+            print(metadata)
 
         r = generate_docs(
             script_repo,
