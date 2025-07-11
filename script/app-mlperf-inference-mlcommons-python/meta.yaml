@@ -155,6 +155,7 @@ deps:
       MLC_MODEL:
         - 3d-unet-99
         - 3d-unet-99.9
+        - resnet50
 
   ## resnet50 and 3d-unet need both onnxruntime and onnxruntime_gpu on cuda
   - tags: get,generic-python-lib,_onnxruntime
@@ -166,6 +167,7 @@ deps:
       MLC_MODEL:
         - 3d-unet-99
         - 3d-unet-99.9
+        - resnet50
   - tags: get,generic-python-lib,_onnxruntime_gpu
     env:
       MLC_GENERIC_PYTHON_PIP_UNINSTALL_DEPS: ""
