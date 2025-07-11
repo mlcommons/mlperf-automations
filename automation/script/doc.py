@@ -66,10 +66,8 @@ def generate_doc(self_module, input_params):
             if not quiet:
                 logger.info(f"Sorted YAML keys for {script_alias}")
 
-        print(sort_result)
         if sort_result['return'] == 0 and sort_result.get('modified', False):
             metadata = sort_result['sorted_data']
-            print(metadata)
 
         r = generate_docs(
             script_repo,
@@ -120,14 +118,10 @@ def sort_meta_yaml_file(script_directory, quiet=False):
         original_data = copy.deepcopy(data)
 
         # Sort input_mapping alphabetically
-        print(isinstance(data['input_mapping'], dict))
         if 'input_mapping' in data and isinstance(data['input_mapping'], dict):
             data['input_mapping'] = dict(sorted(data['input_mapping'].items()))
-            print("data from input mapping:")
-            print(data["input_mapping"])
 
         # Sort variations: with 'group' first, then without 'group'
-        print(isinstance(data['variations'], dict))
         if 'variations' in data and isinstance(data['variations'], dict):
             variations = data['variations']
 
@@ -144,11 +138,6 @@ def sort_meta_yaml_file(script_directory, quiet=False):
             # Sort both lists alphabetically by key
             with_group.sort(key=lambda x: x[0])
             without_group.sort(key=lambda x: x[0])
-
-            print("with group")
-            print(with_group)
-            print("without group")
-            print(without_group)
 
             # Combine them: with_group first, then without_group
             sorted_variations = {}
