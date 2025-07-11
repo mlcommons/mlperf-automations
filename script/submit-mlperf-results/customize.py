@@ -37,8 +37,6 @@ def preprocess(i):
     signed_url = r['signed_url']
     submission_id = r['submission_id']
 
-    # print(signed_url)
-    # print(submission_id)
     r = upload_file_to_signed_url(file_path, signed_url, logger)
     if r['return'] > 0:
         return r
@@ -77,16 +75,14 @@ def get_signed_url(server, benchmark, submitter_id, submitter_name, file_path):
             # print("Response:", response.json())
             pass
         else:
-            # print(f"Request failed with status code {response.status_code}")
-            # print("Response:", response.text)
-            pass
+            return {"return": 1,
+                "error": f"HTTP status code: {response.status_code}"}
 
     except requests.exceptions.RequestException as e:
         return {"return": 1,
                 "error": f"An error occurred in connecting to the server: {e}"}
 
     response_json = response.json()
-    # response = json.loads(response_json)
     try:
         signed_url = response_json['signed_url']
         submission_id = response_json['submission_id']

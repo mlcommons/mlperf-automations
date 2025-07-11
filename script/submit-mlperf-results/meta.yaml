@@ -17,6 +17,9 @@ tags:
 - submission
 uid: cc01f0a82bef4216
 variations:
-  inference:
+  wg-inference:
     env:
-      MLC_MLPERF_BENCHMARK: "Inference"
+      MLC_MLPERF_BENCHMARK: Inference
+  wg-automotive:
+    env:
+      MLC_MLPERF_BENCHMARK: Automotive

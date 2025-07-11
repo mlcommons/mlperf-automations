@@ -59,6 +59,7 @@ docker:
   use_host_user_id: true
 input_mapping:
   analyzer_settings_file: MLC_MLPERF_POWER_ANALYZER_SETTINGS_FILE_PATH
+  status: MLC_MLPERF_SUBMISSION_SYSTEM_STATUS
   category: MLC_MLPERF_SUBMISSION_CATEGORY
   clean: MLC_MLPERF_CLEAN_SUBMISSION_DIR
   dashboard: MLC_MLPERF_DASHBOARD
