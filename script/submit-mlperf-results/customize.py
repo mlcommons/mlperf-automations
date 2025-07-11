@@ -76,7 +76,7 @@ def get_signed_url(server, benchmark, submitter_id, submitter_name, file_path):
             pass
         else:
             return {"return": 1,
-                "error": f"HTTP status code: {response.status_code}"}
+                    "error": f"HTTP status code: {response.status_code}"}
 
     except requests.exceptions.RequestException as e:
         return {"return": 1,

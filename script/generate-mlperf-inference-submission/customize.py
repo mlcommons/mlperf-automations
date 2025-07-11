@@ -118,7 +118,7 @@ def generate_submission(env, state, inp, submission_division, logger):
 
     if 'MLC_MLPERF_SUBMISSION_SYSTEM_STATUS' in env:
         system_meta_tmp['status'] = env['MLC_MLPERF_SUBMISSION_SYSTEM_STATUS']
-    
+
     if submission_division != "":
         system_meta_tmp['division'] = submission_division
         division = submission_division
