@@ -7,6 +7,7 @@ import copy
 from collections import defaultdict, OrderedDict
 import json
 
+
 def generate_doc(self_module, input_params):
     """
     Generates the documentation of MLC scripts.
@@ -156,7 +157,10 @@ def sort_meta_yaml_file(script_directory, quiet=False):
             data['variations'] = sorted_variations
 
         # Check if anything changed (including order)
-        original_yaml = yaml.dump(original_data, default_flow_style=False, sort_keys=False)
+        original_yaml = yaml.dump(
+            original_data,
+            default_flow_style=False,
+            sort_keys=False)
         new_yaml = yaml.dump(data, default_flow_style=False, sort_keys=False)
 
         if original_yaml == new_yaml:
