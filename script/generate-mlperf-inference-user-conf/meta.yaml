@@ -89,7 +89,7 @@ deps:
   - tags: get,sut,configs
 
 variations:
-  inference:
+  wg-inference:
     default: true
     group: benchmark_wg
     env:
@@ -98,7 +98,7 @@ variations:
       - tags: get,mlcommons,inference,src
         names:
         - inference-src
-  automotive:
+  wg-automotive:
     group: benchmark_wg
     env:
       MLC_BENCHMARK_GROUP: automotive

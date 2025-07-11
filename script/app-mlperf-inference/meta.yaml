@@ -297,6 +297,18 @@ variations:
   reference,bert_:
     default_variations:
       backend: onnxruntime
+  
+  reference,deepseek-r1:
+    default_variations:
+      backend: pytorch
+
+  reference,llama3_1-8b:
+    default_variations:
+      backend: vllm
+
+  reference,llama3_1-8b:
+    default_variations:
+      backend: vllm
 
   all-models,nvidia-original:
     docker:
@@ -915,6 +927,121 @@ variations:
       - waymo-accuracy-script
       tags: run,accuracy,mlperf,_waymo
     
+  llama3_1-8b:
+    group:
+      model
+    add_deps_recursive:
+      mlperf-inference-implementation:
+        tags: _llama3_1-8b
+    env:
+      MLC_MODEL:
+        llama3_1-8b
+    posthook_deps:
+    - enable_if_env:
+        MLC_MLPERF_LOADGEN_MODE:
+        - accuracy
+        - all
+        MLC_MLPERF_ACCURACY_RESULTS_DIR:
+        - 'on'
+        MLC_MLPERF_SUBMISSION_SYSTEM_TYPE: 
+        - edge
+      skip_if_env:
+        MLC_MLPERF_IMPLEMENTATION:
+        - nvidia
+      names:
+      - mlperf-accuracy-script
+      - llama3_1-8b-accuracy-script
+      tags: run,accuracy,mlperf,_cnndm_llama_3,_edge
+    - enable_if_env:
+        MLC_MLPERF_LOADGEN_MODE:
+        - accuracy
+        - all
+        MLC_MLPERF_ACCURACY_RESULTS_DIR:
+        - 'on'
+        MLC_MLPERF_SUBMISSION_SYSTEM_TYPE: 
+        - datacenter
+      skip_if_env:
+        MLC_MLPERF_IMPLEMENTATION:
+        - nvidia
+      names:
+      - mlperf-accuracy-script
+      - llama3_1-8b-accuracy-script
+      tags: run,accuracy,mlperf,_cnndm_llama_3,_datacenter
+    docker:
+      mounts:
+        - "${{ MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH }}:${{ MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH }}" 
+        - "${{ MLC_DATASET_CNNDM_EVAL_PATH }}:${{ MLC_DATASET_CNNDM_EVAL_PATH }}"
+      deps:
+      - tags: get,ml-model,llama3,_hf,_meta-llama/Llama-3.1-8B-Instruct
+        enable_if_env:
+          MLC_USE_ML_MODEL_FROM_HOST:
+          - 'yes'
+        names:
+          - llama3_1-8b
+          - llama3-8b
+      ## CNNDM for Llama3 8B model - edge
+      - tags: get,dataset,cnndm,_validation,_edge,_llama3,_mlc,_rclone
+        names:
+          - cnndm-llama3-edge
+        enable_if_env:
+          MLC_MLPERF_SUBMISSION_SYSTEM_TYPE: 
+            - edge
+          MLC_USE_DATASET_FROM_HOST:
+          - 'yes'
+      ## CNNDM for Llama3 8B model - datacenter
+      - tags: get,dataset,cnndm,_validation,_datacenter,_llama3,_mlc,_rclone
+        names:
+          - cnndm-llama3-datacenter
+        enable_if_env:
+          MLC_MLPERF_SUBMISSION_SYSTEM_TYPE: 
+            - datacenter
+          MLC_USE_DATASET_FROM_HOST:
+          - 'yes'
+  
+  whisper:
+    group:
+      model
+    add_deps_recursive:
+      mlperf-inference-implementation:
+        tags: _whisper
+    env:
+      MLC_MODEL:
+        whisper
+    posthook_deps:
+    - enable_if_env:
+        MLC_MLPERF_LOADGEN_MODE:
+        - accuracy
+        - all
+        MLC_MLPERF_ACCURACY_RESULTS_DIR:
+        - 'on'
+      skip_if_env:
+        MLC_MLPERF_IMPLEMENTATION:
+        - nvidia
+      names:
+      - mlperf-accuracy-script
+      - whisper-accuracy-script
+      tags: run,accuracy,mlperf,_librispeech_whisper,_int64
+    docker:
+      deps:
+      - tags: get,ml-model,whisper,_rclone,_mlc
+        enable_if_env:
+          MLC_USE_ML_MODEL_FROM_HOST:
+          - 'yes'
+        names:
+          - whisper-model
+      - tags: get,dataset,whisper,_preprocessed,_mlc,_rclone
+        names:
+          - whisper-dataset
+        enable_if_env:
+          MLC_USE_DATASET_FROM_HOST:
+          - 'yes'
+      mounts:
+        - "${{ MLC_DATASET_WHISPER_PATH }}:${{ MLC_DATASET_WHISPER_PATH }}" 
+        - "${{ MLC_ML_MODEL_WHISPER_PATH }}:${{ MLC_ML_MODEL_WHISPER_PATH }}" 
+  
+  whisper,cpu:
+    docker:
+      base_image: ubuntu:24.04
 
   llama3_1-405b:
     group:
@@ -943,12 +1070,57 @@ variations:
       deps:
       - tags: get,ml-model,llama3
         enable_if_env:
-          MLC_USE_DATASET_FROM_HOST:
+          MLC_USE_ML_MODEL_FROM_HOST:
           - 'yes'
         names:
           - llama3_1-405b
           - llama3-405b
+  
+  deepseek-r1:
+    group:
+      model
+    add_deps_recursive:
+      mlperf-inference-implementation:
+        tags: _deepseek-r1
+    env:
+      MLC_MODEL:
+        deepseek-r1
+    posthook_deps:
+    - enable_if_env:
+        MLC_MLPERF_LOADGEN_MODE:
+        - accuracy
+        - all
+        MLC_MLPERF_ACCURACY_RESULTS_DIR:
+        - 'on'
+      skip_if_env:
+        MLC_MLPERF_IMPLEMENTATION:
+        - nvidia
+      names:
+      - mlperf-accuracy-script
+      - deepseek-r1-accuracy-script
+      tags: run,accuracy,mlperf,_dataset_deepseek-r1
+    docker:
+      deps:
+      - tags: get,preprocessed,dataset,deepseek-r1,_validation,_mlc,_rclone
+        enable_if_env:
+          MLC_USE_DATASET_FROM_HOST:
+          - 'yes'
+        names:
+          - deepseek-r1-preprocessed-dataset
+      mounts:
+        - "${{ MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_VALIDATION_PATH }}:${{ MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_VALIDATION_PATH }}"
 
+  deepseek-r1,pytorch:
+    docker:
+      base_image: nvcr.io/nvidia/pytorch:25.04-py3
+
+  deepseek-r1,sglang:
+    docker:
+      base_image: nvidia/cuda:12.6.0-devel-ubuntu22.04
+  
+  deepseek-r1,vllm:
+    docker:
+      base_image: nvidia/cuda:12.6.0-devel-ubuntu22.04
 
   sdxl:
     group:
@@ -1402,6 +1574,24 @@ variations:
     add_deps_recursive:
       mlperf-inference-implementation:
         tags: _pytorch
+
+  vllm:
+    group: backend
+    env:
+      MLC_MLPERF_BACKEND:
+        vllm
+    add_deps_recursive:
+      mlperf-inference-implementation:
+        tags: _vllm
+  
+  sglang:
+    group: backend
+    env:
+      MLC_MLPERF_BACKEND:
+        sglang
+    add_deps_recursive:
+      mlperf-inference-implementation:
+        tags: _sglang
 
   openshift:
     group: backend
@@ -1881,6 +2071,25 @@ variations:
       MLC_REGENERATE_MEASURE_FILES: 'yes'
       MLC_MLPERF_INFERENCE_VERSION: '5.0'
 
+  r5.1-dev_default:
+    group:
+      reproducibility
+    add_deps_recursive:
+      nvidia-inference-common-code:
+        tags: _mlcommons,_v5.1
+      nvidia-inference-server:
+        version: r5.0
+        tags: _mlcommons
+      nvidia-harness:   
+        tags: _v5.0
+      intel-harness:
+        tags: _v4.1
+      nvidia-scratch-space:
+        tags: _version.5.1-dev
+    default_env:
+      MLC_SKIP_SYS_UTILS: 'yes'
+      MLC_REGENERATE_MEASURE_FILES: 'yes'
+      MLC_MLPERF_INFERENCE_VERSION: '5.1'
 
 invalid_variation_combinations:
   -
@@ -1934,7 +2143,7 @@ input_description:
   num_threads: 
     desc: "Number of CPU threads to launch the application with"
   hw_name: 
-    desc: "Valid value - any system description which has a config file (under same name) defined [here](https://github.com/mlcommons/cm4mlops/tree/main/script/get-configs-sut-mlperf-inference/configs)"
+    desc: "Hardware part of the SUT name"
   output_dir: 
     desc: "Location where the outputs are produced"
   rerun: 

@@ -1,13 +1,12 @@
-# This file is originally created for CM Script automations and is now
-# modified to make it work for MLC automation.
+# This file was originally created for CM Script automations and is now
+# modified to make it work for MLCFlow automation.
 
-# CM "script" automation helps users to encode their MLOps, DevOps and other knowledge
-# as portable and reusable automation recipes with simple tags, native scripts
-# and a unified CLI, Python API and JSON/YAML meta descriptions.
+# This file contains the CM/MLC script execution logic which includes processing the script meta,
+# running the dependencies and finally preparing the required environment and running the specified script.
 #
-# This is a stable prototype of the MLC script automation being developed by Grigori Fursin and Arjun Suresh
+# Developed by Grigori Fursin and Arjun Suresh for CM and modified for MLCFlow by Arjun Suresh and Anandhu Sooraj
 #
-#
+
 import os
 import logging
 
@@ -68,22 +67,24 @@ class ScriptAutomation(Automation):
                                'MLC_GIT_*',
                                'MLC_RENEW_CACHE_ENTRY']
 
-        self.input_flags_converted_to_tmp_env = ['path']
+        self.input_flags_converted_to_tmp_env = {
+            'path': {'desc': 'Filesystem path to search for executable', 'default': ''}}
 
-        self.input_flags_converted_to_env = ['input',
-                                             'output',
-                                             'outdirname',
-                                             'outbasename',
-                                             'name',
-                                             'extra_cache_tags',
-                                             'skip_compile',
-                                             'skip_run',
-                                             'accept_license',
-                                             'skip_system_deps',
-                                             'git_ssh',
-                                             'gh_token',
-                                             'hf_token',
-                                             'verify_ssl']
+        self.input_flags_converted_to_env = {'input': {'desc': 'Input to the script passed using the env key `MLC_INPUT`', 'default': ''},
+                                             'output': {'desc': 'Output from the script passed using the env key `MLC_OUTPUT`', 'default': ''},
+                                             'outdirname': {'desc': 'The directory to store the script output', 'default': 'cache directory ($HOME/MLC/repos/local/cache/<>) if the script is cacheable or else the current directory'},
+                                             'outbasename': {'desc': 'The output file/folder name', 'default': ''},
+                                             'name': {},
+                                             'extra_cache_tags': {'desc': 'Extra cache tags to be added to the cached entry when the script results are saved', 'default': ''},
+                                             'skip_compile': {'desc': 'Skip compilation', 'default': False},
+                                             'skip_run': {'desc': 'Skip run', 'default': False},
+                                             'accept_license': {'desc': 'Accept the required license requirement to run the script', 'default': False},
+                                             'skip_system_deps': {'desc': 'Skip installing any system dependencies', 'default': False},
+                                             'git_ssh': {'desc': 'Use SSH for git repos', 'default': False},
+                                             'gh_token': {'desc': 'Github Token', 'default': ''},
+                                             'hf_token': {'desc': 'Huggingface Token', 'default': ''},
+                                             'verify_ssl': {'desc': 'Verify SSL', 'default': False}
+                                             }
 
     ############################################################
 
@@ -2343,6 +2344,9 @@ class ScriptAutomation(Automation):
         import copy
         explicit_variation_tags = copy.deepcopy(variation_tags)
 
+        if add_deps_recursive is None:
+            add_deps_recursive = {}
+
         # Calculate space
         required_disk_space = {}
 
@@ -4461,8 +4465,8 @@ pip install mlcflow
 
         """
 
-        return utils.call_internal_module(
-            self, __file__, 'module_misc', 'doc', i)
+        from script.doc import generate_doc
+        return generate_doc(self, i)
 
     ############################################################
 

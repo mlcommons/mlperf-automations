@@ -166,11 +166,13 @@ variations:
       '+ CXXFLAGS':
         - '-Werror'
         - '-Wno-unused-parameter'
-  automotive:
+  wg-automotive:
+    group: benchmark_wg
     env:
       MLC_INFERENCE_AUTOMOTIVE_REPO: 'YES'
-  inference:
+  wg-inference:
     default: true
+    group: benchmark_wg
     env:
       MLC_INFERENCE_AUTOMOTIVE_REPO: 'NO'
 versions:

@@ -435,6 +435,7 @@ variations:
         tags: _singlestream
 
   constantstream:
+    group: loadgen-scenario
     env:
       MLC_MLPERF_LOADGEN_SCENARIO: ConstantStream
     add_deps_recursive:

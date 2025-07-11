@@ -338,3 +338,42 @@ variations:
     env:
       MLC_DATASET: cognata_deeplab
     group: dataset
+  cnndm_llama_3:
+    deps:
+    - tags: get,ml-model,llama3,_hf,_meta-llama/Llama-3.1-8B-Instruct
+      names:
+        - llama3_1-8b
+        - llama3-8b
+      skip_if_env:
+        MLC_SKIP_MODEL_DOWNLOAD_FOR_ACCURACY_EVAL:
+          - "yes"
+    env:
+      MLC_DATASET: cnndm_llama_3
+      MLC_ML_MODEL_FULL_NAME: meta-llama/Meta-Llama-3.1-8B-Instruct
+    group: dataset
+  cnndm_llama_3,edge:
+    deps:
+      - tags: get,dataset,cnndm,_validation,_edge,_llama3,_mlc,_rclone
+        names:
+          - cnndm-llama3-edge
+        skip_if_env:
+          MLC_RUN_STATE_DOCKER:
+          - "yes"
+  cnndm_llama_3,datacenter:
+    deps:
+      - tags: get,dataset,cnndm,_validation,_datacenter,_llama3,_mlc,_rclone
+        names:
+          - cnndm-llama3-datacenter
+        skip_if_env:
+          MLC_RUN_STATE_DOCKER:
+          - "yes"
+  librispeech_whisper:
+    group: dataset
+    env:
+      MLC_DATASET: librispeech_whisper
+    deps:
+      - tags: get,generic-python-lib,_package.openai-whisper
+  edge:
+    group: category
+  datacenter:
+    group: category

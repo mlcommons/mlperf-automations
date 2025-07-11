@@ -1,5 +1,6 @@
 from mlc import utils
 import os
+import re
 
 lscpu_out = 'tmp-lscpu.out'
 
@@ -172,7 +173,18 @@ def postprocess(i):
                 else:
                     env[env_key] = v[1].strip()
 
-    if env.get('MLC_HOST_CPU_SOCKETS', '') == '-':  # assume as 1
+    # get start cores
+    matches = re.findall(r"NUMA node\d+ CPU\(s\):\s+([\d,-]+)", ss)
+    start_cores = []
+    for cpu_range in matches:
+        # Example: '0-15,32-47' or '0-15'
+        for part in cpu_range.split(','):
+            start = part.split('-')[0]
+            start_cores.append(start)
+    if start_cores:
+        env['MLC_HOST_CPU_START_CORES'] = ','.join(start_cores)
+
+    if env.get('MLC_HOST_CPU_SOCKETS', '') in ['-', '']:  # assume as 1
         env['MLC_HOST_CPU_SOCKETS'] = '1'
 
     if env.get('MLC_HOST_CPU_TOTAL_CORES', '') != '' and env.get(
@@ -184,9 +196,17 @@ def postprocess(i):
         env['MLC_HOST_CPU_THREADS_PER_CORE'] = str(int(int(env['MLC_HOST_CPU_TOTAL_LOGICAL_CORES']) //
                                                        int(env['MLC_HOST_CPU_TOTAL_PHYSICAL_CORES'])))
 
-    if env.get('MLC_HOST_CPU_SOCKETS', '') != '' and env.get('MLC_HOST_CPU_TOTAL_PHYSICAL_CORES',
-                                                             '') != '' and env.get('MLC_HOST_CPU_PHYSICAL_CORES_PER_SOCKET', '') == '':
+    if env.get('MLC_HOST_CPU_TOTAL_PHYSICAL_CORES', '') != '' and env.get(
+            'MLC_HOST_CPU_PHYSICAL_CORES_PER_SOCKET', '') == '':
         env['MLC_HOST_CPU_PHYSICAL_CORES_PER_SOCKET'] = str(
             int(env['MLC_HOST_CPU_TOTAL_PHYSICAL_CORES']) // int(env['MLC_HOST_CPU_SOCKETS']))
+
+    if env.get('MLC_HOST_CPU_TOTAL_PHYSICAL_CORES', '') == '' and env.get(
+            'MLC_HOST_CPU_PHYSICAL_CORES_PER_SOCKET', '') != '':
+        env['MLC_HOST_CPU_TOTAL_PHYSICAL_CORES'] = str(int(
+            env['MLC_HOST_CPU_PHYSICAL_CORES_PER_SOCKET']) * int(env['MLC_HOST_CPU_SOCKETS']))
+
+    if env.get('MLC_HOST_CPU_TOTAL_PHYSICAL_CORES', '') != '':
+        env['MLC_HOST_CPU_PHYSICAL_CORES_LIST'] = f"""0-{int(env['MLC_HOST_CPU_TOTAL_PHYSICAL_CORES'])-1}"""
 
     return {'return': 0}

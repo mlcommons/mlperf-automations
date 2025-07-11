@@ -29,6 +29,11 @@ tags:
 - get-oneapi
 uid: 1af872e81ef54742
 
+tests:
+  run_inputs:
+    - variations_list:
+      - fortran
+
 versions:
   2025.1.1:
     env:

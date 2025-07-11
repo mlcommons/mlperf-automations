@@ -43,7 +43,7 @@ variations:
         enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - yes
-      - tags: get,rclone-config,_config-name.cognata
+      - tags: get,rclone-config,_config-name.mlc-cognata
         force_cache: true
         enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
@@ -84,6 +84,7 @@ variations:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
 tests:
+  needs_pat: true
   run_inputs:
   - variations_list:
       - onnx,rclone,mlc,dry-run

@@ -13,7 +13,7 @@ def preprocess(i):
 
     submission_dir = env.get("MLC_MLPERF_INFERENCE_SUBMISSION_DIR", "")
 
-    version = env.get('MLC_MLPERF_SUBMISSION_CHECKER_VERSION', 'v5.0')
+    version = env.get('MLC_MLPERF_SUBMISSION_CHECKER_VERSION', 'v5.1')
 
     if submission_dir == "":
         return {'return': 1,
@@ -57,6 +57,11 @@ def preprocess(i):
         power_check = " --skip-power-check"
     else:
         power_check = ""
+
+    if is_true(env.get('MLC_MLPERF_SKIP_CALIBRATION_CHECK', 'no')):
+        calibration_check = " --skip-calibration-check"
+    else:
+        calibration_check = ""
 
     extra_args = ' ' + env.get('MLC_MLPERF_SUBMISSION_CHECKER_EXTRA_ARGS', '')
 

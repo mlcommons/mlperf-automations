@@ -11,6 +11,7 @@ def preprocess(i):
     if os_info['platform'] == 'windows':
         return {'return': 1, 'error': 'Windows is not supported in this script yet'}
     env = i['env']
+    state = i['state']
 
     if is_true(env.get('MLC_RUN_STATE_DOCKER', '')):
         return {'return': 0}
@@ -110,7 +111,8 @@ def preprocess(i):
                     shutil.rmtree(target_data_path)
         if not os.path.exists(tsv_file):
             os.makedirs(target_data_path, exist_ok=True)
-            # cmds.append("make download_data BENCHMARKS='stable-diffusion-xl'")
+            # cmds.append("make download_data
+            # BENCHMARKS='stable-diffusion-xl'")
             env['MLC_REQUIRE_COCO2014_DOWNLOAD'] = 'yes'
             cmds.append(
                 f"""cp -r \\$MLC_DATASET_PATH_ROOT/captions/captions.tsv {target_data_path}/captions_5k_final.tsv""")
@@ -154,7 +156,8 @@ def preprocess(i):
 
         if not os.path.exists(target_data_path) or not os.path.exists(
                 inference_cases_json_path) or not os.path.exists(calibration_cases_json_path):
-            # cmds.append(f"ln -sf {env['MLC_DATASET_PATH']} {target_data_path}")
+            # cmds.append(f"ln -sf {env['MLC_DATASET_PATH']}
+            # {target_data_path}")
             cmds.append("make download_data BENCHMARKS='3d-unet'")
 
         model_path = os.path.join(
@@ -174,7 +177,8 @@ def preprocess(i):
         if not os.path.exists(target_data_path_base_dir):
             cmds.append(f"mkdir -p {target_data_path_base_dir}")
         if not os.path.exists(target_data_path):
-            # cmds.append(f"ln -sf {env['MLC_DATASET_LIBRISPEECH_PATH']} {target_data_path}")
+            # cmds.append(f"ln -sf {env['MLC_DATASET_LIBRISPEECH_PATH']}
+            # {target_data_path}")
             cmds.append("make download_data BENCHMARKS='rnnt'")
 
         model_path = os.path.join(
@@ -238,7 +242,7 @@ def preprocess(i):
             'data',
             'open-images-v6-mlperf',
             'calibration',
-            'train')
+            'calibration')
         if not os.path.exists(target_data_path_dir):
             cmds.append(f"mkdir -p {target_data_path_dir}")
         target_data_path = os.path.join(target_data_path_dir, 'data')
@@ -257,11 +261,18 @@ def preprocess(i):
         model_path = os.path.join(
             target_model_path_dir,
             'retinanet-fpn-torch2.1-postprocessed.onnx')
+        alt_model_versions = ["2.2", "2.6"]
         alt_model_path = os.path.join(
             target_model_path_dir,
             'retinanet-fpn-torch2.2-postprocessed.onnx')
-        if not os.path.exists(model_path) and os.path.exists(alt_model_path):
-            cmds.append(f"ln -s {alt_model_path} {model_path}")
+        if not os.path.exists(model_path):
+            for alt_model_version in alt_model_versions:
+                alt_model_path = os.path.join(
+                    target_model_path_dir,
+                    f'retinanet-fpn-torch{alt_model_version}-postprocessed.onnx')
+                if os.path.exists(alt_model_path):
+                    cmds.append(f"ln -s {alt_model_path} {model_path}")
+                    break
 
         model_name = "retinanet"
 
@@ -355,20 +366,51 @@ def preprocess(i):
             else:
                 cmds.append(f"make download_model BENCHMARKS='{model_name}'")
         elif "stable-diffusion" in env['MLC_MODEL']:
-            folders = ["clip1", "clip2", "unetxl", "vae"]
-            for folder in folders:
-                onnx_model_path = os.path.join(
-                    env['MLPERF_SCRATCH_PATH'],
-                    'models',
-                    'SDXL',
-                    'onnx_models',
-                    folder,
-                    'model.onnx')
-                if not os.path.exists(onnx_model_path):
+            if env.get('MLC_MLPERF_INFERENCE_CODE_VERSION') == 'v5.0':
+                # Define folder mappings for each model type
+                model_folders = {
+                    'onnx_models': ["clip1", "clip2", "unetxl", "vae"],
+                    'modelopt_models': ["unetxl.fp8", "vae.int8"]
+                }
+
+                model_found = True
+
+                # Check all required models across both directories
+                for model_type, folders in model_folders.items():
+                    for folder in folders:
+                        onnx_model_path = os.path.join(
+                            env['MLPERF_SCRATCH_PATH'],
+                            'models',
+                            'SDXL',
+                            model_type,
+                            folder,
+                            'model.onnx'
+                        )
+                        if not os.path.exists(onnx_model_path):
+                            model_found = False
+                            break
+                    if not model_found:
+                        break
+                if not model_found:
                     env['MLC_REQUIRE_SDXL_MODEL_DOWNLOAD'] = 'yes'
                     cmds.append(
                         f"make download_model BENCHMARKS='{model_name}'")
-                    break
+            else:
+                folders = ["clip1", "clip2", "unetxl", "vae"]
+                for folder in folders:
+                    onnx_model_path = os.path.join(
+                        env['MLPERF_SCRATCH_PATH'],
+                        'models',
+                        'SDXL',
+                        'onnx_models',
+                        folder,
+                        'model.onnx')
+                    if not os.path.exists(onnx_model_path):
+                        env['MLC_REQUIRE_SDXL_MODEL_DOWNLOAD'] = 'yes'
+                        cmds.append(
+                            f"make download_model BENCHMARKS='{model_name}'")
+                        break
+
             if scenario.lower() == "singlestream":
                 ammo_model_path = os.path.join(
                     env['MLPERF_SCRATCH_PATH'],
@@ -520,11 +562,13 @@ def preprocess(i):
 
         gpu_batch_size = env.get('MLC_MLPERF_NVIDIA_HARNESS_GPU_BATCH_SIZE')
         if gpu_batch_size:
-            run_config += f" --gpu_batch_size={gpu_batch_size}"
+            run_config += f" --gpu_batch_size={gpu_batch_size}".replace(
+                "##", ",")
 
         dla_batch_size = env.get('MLC_MLPERF_NVIDIA_HARNESS_DLA_BATCH_SIZE')
         if dla_batch_size:
-            run_config += f" --dla_batch_size={dla_batch_size}"
+            run_config += f" --dla_batch_size={dla_batch_size}".replace(
+                "##", ",")
 
         input_format = env.get('MLC_MLPERF_NVIDIA_HARNESS_INPUT_FORMAT')
         if input_format:
@@ -708,11 +752,13 @@ def preprocess(i):
     if '+LD_LIBRARY_PATH' not in env:
         env['+LD_LIBRARY_PATH'] = []
 
+    hpcx_paths = []
     if os.path.exists("/opt/hpcx/ucx/lib"):
-        env['+LD_LIBRARY_PATH'].append("/opt/hpcx/ucx/lib")
-
+        hpcx_paths.append("/opt/hpcx/ucx/lib")
     if os.path.exists("/opt/hpcx/ucc/lib"):
-        env['+LD_LIBRARY_PATH'].append("/opt/hpcx/ucc/lib")
+        hpcx_paths.append("/opt/hpcx/ucc/lib")
+
+    env['+LD_LIBRARY_PATH'] = hpcx_paths + env['+LD_LIBRARY_PATH']
 
     #    print(env)
 

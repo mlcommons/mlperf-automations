@@ -154,6 +154,21 @@ variations:
         dnf: ''   
         yum: ''
   
+  sox:
+    env:
+      MLC_SYS_UTIL_NAME: sox
+      MLC_SYS_UTIL_VERSION_CMD: sox --version
+      MLC_SYS_UTIL_VERSION_RE: 'SoX ([\d.]+)'
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+    - MLC_SOX_VERSION
+    state:
+      ipmitool: # tbd: complete for other flavours of linux
+        apt: sox
+        brew: sox
+        dnf: sox   
+        yum: ''
+  
   libgl:
     env:
       MLC_SYS_UTIL_NAME: libgl # tbd: regular expression for version as well as whether its installed?

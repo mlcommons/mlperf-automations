@@ -1,0 +1,67 @@
+alias: get-ml-model-whisper
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+new_env_keys:
+- MLC_ML_MODEL_WHISPER_PATH
+- MLC_ML_MODEL_FILE_WITH_PATH
+print_env_at_the_end:
+  MLC_ML_MODEL_WHISPER_PATH: Whisper checkpoint path
+tags:
+- get-ml-model-whisper
+- get
+- ml-model
+- whisper
+tests:
+  run_inputs:
+  - variations_list:
+    - rclone,mlc,dry-run
+uid: 3bea2356e97f47b1
+variations:
+  dry-run:
+    env:
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  mlc:
+    default: true
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+    group: download-src
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+      tags: get,rclone
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+      env:
+        MLC_RCLONE_DRIVE_FOLDER_ID: 17CpM5eU8tjrxh_LpH_BTNTeT37PhzcnC
+      force_cache: true
+      tags: get,rclone-config,_mlc-inference
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      env:
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_WHISPER_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_MODEL_WHISPER_PATH
+        MLC_DOWNLOAD_URL: 'mlc-inference:mlcommons-inference-wg-public/Whisper/model/'
+      extra_cache_tags: ml,model,whisper
+      force_cache: true
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      names:
+      - dae
+      tags: download-and-extract
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
+  rclone:
+    add_deps_recursive:
+      dae:
+        tags: _rclone
+    default: true
+    group: download-tool
