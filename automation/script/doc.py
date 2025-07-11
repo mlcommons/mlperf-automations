@@ -7,7 +7,6 @@ import copy
 from collections import defaultdict, OrderedDict
 
 
-
 def generate_doc(self_module, input_params):
     """
     Generates the documentation of MLC scripts.
