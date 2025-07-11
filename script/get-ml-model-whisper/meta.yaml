@@ -16,6 +16,7 @@ tests:
   run_inputs:
   - variations_list:
     - rclone,mlc,dry-run
+    - r2_downloader,mlc,dry-run
 uid: 3bea2356e97f47b1
 variations:
   dry-run:
@@ -25,6 +26,9 @@ variations:
   dry-run,rclone:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  dry-run,r2_downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   mlc:
     default: true
     env:
@@ -33,22 +37,10 @@ variations:
     prehook_deps:
     - enable_if_env:
         MLC_TMP_REQUIRE_DOWNLOAD:
-        - true
-      tags: get,rclone
-    - enable_if_env:
-        MLC_TMP_REQUIRE_DOWNLOAD:
-        - true
-      env:
-        MLC_RCLONE_DRIVE_FOLDER_ID: 17CpM5eU8tjrxh_LpH_BTNTeT37PhzcnC
-      force_cache: true
-      tags: get,rclone-config,_mlc-inference
-    - enable_if_env:
-        MLC_TMP_REQUIRE_DOWNLOAD:
         - 'yes'
       env:
         MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_WHISPER_PATH
         MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_MODEL_WHISPER_PATH
-        MLC_DOWNLOAD_URL: 'mlc-inference:mlcommons-inference-wg-public/Whisper/model/'
       extra_cache_tags: ml,model,whisper
       force_cache: true
       force_env_keys:
@@ -63,5 +55,26 @@ variations:
     add_deps_recursive:
       dae:
         tags: _rclone
+        env:
+          MLC_DOWNLOAD_URL: 'mlc-inference:mlcommons-inference-wg-public/Whisper/model/'
+    prehook_deps:
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - true
+        tags: get,rclone
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - true
+        env:
+          MLC_RCLONE_DRIVE_FOLDER_ID: 17CpM5eU8tjrxh_LpH_BTNTeT37PhzcnC
+        force_cache: true
+        tags: get,rclone-config,_mlc-inference
     default: true
+    group: download-tool
+  r2_downloader:
+    add_deps_recursive:
+      dae:
+        tags: _r2_downloader
+        env:
+          MLC_DOWNLOAD_URL: 'https://inference.mlcommons-storage.org/metadata/whisper-model.uri'
     group: download-tool
