@@ -71,6 +71,7 @@ jobs:
           mlc doc script ${{ matrix.modified_metas.uid}} --quiet
           cd automation-scripts
           find . -type f -name README.md -exec git add {} +
+          find . -type f \( -name "meta.yaml" -o -name "meta.yml" \) -exec git add {} +
           # Use the GitHub actor's name and email
           git config --global user.name github-actions[bot]
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
