@@ -225,7 +225,7 @@ variations:
         enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - yes
-      - tags: get,rclone-config,_config-name.cognata
+      - tags: get,rclone-config,_config-name.mlc-cognata
         force_cache: true
         enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
