@@ -2105,7 +2105,7 @@ variations:
         tags: _custom,_v5.1-dev
       nvidia-inference-server:
         version: r5.0
-        tags: _mlcommons
+        tags: _custom
       nvidia-harness:   
         tags: _v5.0
       intel-harness:
