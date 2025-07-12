@@ -2088,6 +2088,8 @@ variations:
          version: r5.0
       nvidia-scratch-space:
         tags: _version.5.0
+      nvidia-mitten-git-src:
+        tags: _sha.e5574192b3ae76910b6824a9275d14a4158d8afa
       pycuda:
         version: "2024.1"
     default_env:
@@ -2110,6 +2112,8 @@ variations:
         tags: _v4.1
       nvidia-scratch-space:
         tags: _version.5.1-dev
+      nvidia-mitten-git-src:
+        tags: _sha.e5574192b3ae76910b6824a9275d14a4158d8afa
       pycuda:
         version: "2024.1"
     default_env:
