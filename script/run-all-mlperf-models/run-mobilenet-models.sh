@@ -22,7 +22,7 @@ function run() {
     exit_if_error
   fi
 }
-POWER=" --power=yes --adr.mlperf-power-client.power_server=192.168.0.15 --adr.mlperf-power-client.port=4940 "
+POWER=" --power=yes --adr.mlperf-power-client.power_server=192.168.0.15 --adr.mlperf-power-client.port=4940 --adr.mlperf-power-client.ntp_server=time.google.com "
 POWER=""
 #extra_option=" --minimize_disk_usage=yes"
 extra_option=" --minimize_disk_usage=no"
