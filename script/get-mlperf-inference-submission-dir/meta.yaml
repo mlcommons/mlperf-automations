@@ -26,13 +26,23 @@ tags:
 - directory
 uid: ddf36a41d6934a7e
 variations:
+  wg-inference:
+    group: working-group
+    default: true
+    env:
+      MLC_MLPERF_WORKING_GROUP: inference
+  wg-automotive:
+    group: working-group
+    env:
+      MLC_MLPERF_WORKING_GROUP: automotive
+
   version.#:
     env:
       MLC_MLPERF_INFERENCE_SUBMISSION_VERSION: '#'
     group: version
-  version.4_1-dev:
+  version.5_1-dev:
     default: true
     env:
-      MLC_MLPERF_INFERENCE_SUBMISSION_VERSION: 4_1-dev
+      MLC_MLPERF_INFERENCE_SUBMISSION_VERSION: 5_1-dev
     group: version
 versions: {}

@@ -111,7 +111,9 @@ post_deps:
 - enable_if_env:
     MLC_MLPERF_SUBMITTER_ID:
     - 'yes'
-  tags: submit,mlperf,results,_inference
+  names:
+  - submit-results
+  tags: submit,mlperf,results
   env:
     MLC_MLPERF_SUBMISSION_FILE: <<<MLC_TAR_OUTFILE>>>
 tags:
@@ -136,6 +138,10 @@ variations:
     add_deps_recursive:
       preprocess-mlperf-submission:
         tags: _wg-inference
+      submit-results:
+        tags: _wg-inference
+      get-mlperf-submission-dir:
+        tags: _wg-inference
     deps:
       - names:
         - inference-src
@@ -152,6 +158,10 @@ variations:
     add_deps_recursive:
       preprocess-mlperf-submission:
         tags: _wg-automotive
+      submit-results:
+        tags: _wg-automotive
+      get-mlperf-submission-dir:
+        tags: _wg-automotive
     deps:
       - names:
         - automotive-src
@@ -163,6 +173,17 @@ variations:
         enable_if_env:
           MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES:
           - 'yes'
+  version.master:
+    group: version
+  version.master,wg-inference:
+    adr:
+      submission-checker-src:
+        version: master
+  version.master,wg-automotive:
+    adr:
+      submission-checker-src:
+        version: master
+
 versions:
   master:
     adr:

@@ -78,6 +78,7 @@ deps:
     enable_if_env:
       MLC_MLPERF_INFERENCE_VERSION:
       - "5.0"
+      - "5.1-dev"
 
 variations:
   nvidia-only:
@@ -95,11 +96,6 @@ variations:
     add_deps_recursive:
       nvidia-inference-common-code:
         tags: _mlcommons
-  ctuning:
-    group: code
-    add_deps_recursive:
-      nvidia-inference-common-code:
-        tags: _ctuning
   go:
     group: code
     add_deps_recursive:
@@ -109,9 +105,14 @@ variations:
     add_deps_recursive:
       nvidia-inference-common-code:
         tags: _v5.0
+  v5.1-dev:
+    add_deps_recursive:
+      nvidia-inference-common-code:
+        tags: _v5.1-dev
 
 
 
+#deprecated
 versions:
   r2.1:
     add_deps_recursive:

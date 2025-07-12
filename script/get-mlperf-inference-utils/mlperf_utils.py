@@ -52,7 +52,8 @@ def get_result_from_log(version, model, scenario,
         if has_power:
             power_valid, power_metric, scenario, avg_power_efficiency = checker.get_power_metric(
                 config, scenario, result_path, True, result_)
-            power_result = f"{round(power_metric,3)},{round(avg_power_efficiency,3)}"
+            if power_valid:
+                power_result = f"{round(power_metric,3)},{round(avg_power_efficiency,3)}"
             valid['power'] = power_valid
 
     elif mode == "accuracy" and os.path.exists(os.path.join(result_path, 'accuracy.txt')):

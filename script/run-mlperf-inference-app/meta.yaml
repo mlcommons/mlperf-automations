@@ -62,6 +62,7 @@ input_mapping:
   execution_mode: MLC_MLPERF_RUN_STYLE
   find_performance: MLC_MLPERF_FIND_PERFORMANCE_MODE
   framework: MLC_MLPERF_BACKEND
+  status: MLC_MLPERF_SUBMISSION_SYSTEM_STATUS
   docker_keep_alive: MLC_DOCKER_CONTAINER_KEEP_ALIVE
   get_platform_details: MLC_GET_PLATFORM_DETAILS
   gpu_name: MLC_NVIDIA_GPU_NAME
