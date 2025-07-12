@@ -32,7 +32,6 @@ predeps: False
 default_env:
   MLC_MLPERF_IMPLEMENTATION: reference
   MLC_MLPERF_MODEL: resnet50
-  MLC_MLPERF_BACKEND: onnxruntime
   MLC_MLPERF_DEVICE: cpu
   MLC_MLPERF_LOADGEN_SCENARIO: Offline
   MLC_MLPERF_RUN_STYLE: test
