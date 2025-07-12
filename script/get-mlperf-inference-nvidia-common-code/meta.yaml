@@ -48,7 +48,7 @@ variations:
   v5.1-dev:
     add_deps_recursive:
       mlperf-inference-results:
-        tags: _code-only,_v5.1-dev
+        tags: _code-only-for-v5.1,_v5.1-dev
 versions:
   r2.1:
     add_deps_recursive:
