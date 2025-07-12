@@ -20,21 +20,35 @@ tags:
 - common-code
 uid: 26b78bf3ffdc4926
 variations:
-  ctuning:
-    group: repo-owner
   custom:
     group: repo-owner
+    adr:
+      mlperf-inference-results:
+        tags: _custom
   go:
     group: repo-owner
+    adr:
+      mlperf-inference-results:
+        tags: _go
   mlcommons:
     default: true
     group: repo-owner
+    adr:
+      mlperf-inference-results:
+        tags: _mlcommons
   nvidia-only:
     group: repo-owner
+    adr:
+      mlperf-inference-results:
+        tags: _nvidia-only
   v5.0:
     add_deps_recursive:
       mlperf-inference-results:
         tags: _code-only,_v5.0
+  v5.1-dev:
+    add_deps_recursive:
+      mlperf-inference-results:
+        tags: _code-only,_v5.1-dev
 versions:
   r2.1:
     add_deps_recursive:
