@@ -66,7 +66,8 @@ def preprocess(i):
     with open('tmp-power-server.conf', 'w') as configfile:
         config.write(configfile)
 
-    config_dict = {section: dict(config[section]) for section in config.sections()}
+    config_dict = {section: dict(config[section])
+                   for section in config.sections()}
     logger.info(f"{config_dict}")
 
     if env['MLC_HOST_OS_TYPE'] == "windows":
