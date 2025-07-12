@@ -13,7 +13,7 @@ if [[ ${MLC_MLPERF_DEVICE} == "inferentia" ]]; then
 fi
 
 
-if [[ "${MLC_MLPERF_INFERENCE_VERSION}" =~ ^[5-9]\.[0-9]+$ ]]; then
+if [[ "${MLC_MLPERF_INFERENCE_VERSION}" =~ ^[5-9]\.[0-9]+(-dev)?$ ]]; then
   echo "Replacing /work/ with ${MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH} in all files..."
   find . -type f -exec sed -i "s|/work/|${MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH}/|g" {} +
 fi
