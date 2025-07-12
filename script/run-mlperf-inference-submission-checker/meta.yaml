@@ -140,6 +140,8 @@ variations:
         tags: _wg-inference
       submit-results:
         tags: _wg-inference
+      get-mlperf-submission-dir:
+        tags: _wg-inference
     deps:
       - names:
         - inference-src
@@ -158,6 +160,8 @@ variations:
         tags: _wg-automotive
       submit-results:
         tags: _wg-automotive
+      get-mlperf-submission-dir:
+        tags: _wg-automotive
     deps:
       - names:
         - automotive-src
@@ -169,6 +173,17 @@ variations:
         enable_if_env:
           MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES:
           - 'yes'
+  version.master:
+    group: version
+  version.master,wg-inference:
+    adr:
+      submission-checker-src:
+        version: master
+  version.master,wg-automotive:
+    adr:
+      submission-checker-src:
+        version: master
+
 versions:
   master:
     adr:
