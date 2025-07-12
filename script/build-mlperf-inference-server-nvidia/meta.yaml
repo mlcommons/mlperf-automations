@@ -137,12 +137,9 @@ post_deps:
   - tags: add,custom,system,nvidia
     names:
     - custom-system-nvidia
-    - nvidia-inference-common-code
     skip_if_env:
       MLC_CUSTOM_SYSTEM_NVIDIA:
       - "no"
-      - False
-      - "False"
 
 variations:
   # Target devices
