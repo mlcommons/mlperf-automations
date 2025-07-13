@@ -85,7 +85,7 @@ jobs:
         fi
     - name: Pull repo where test cases are uploaded
       run: |
-        git clone -b submission-generation-examples https://github.com/mlcommons/inference.git submission_generation_examples
+        git clone -b add_retinanet_res https://github.com/anandhu-eng/inference.git submission_generation_examples
     - name: Run Submission Generation - round-${{ matrix.round }}${{ matrix.folder_name }} ${{ matrix.action }} ${{ matrix.category }} ${{ matrix.division }} 
       run: |
         if [ "${{ matrix.folder_name }}" == "closed" ]; then
