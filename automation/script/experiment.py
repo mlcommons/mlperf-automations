@@ -115,13 +115,13 @@ def run_script_and_tag_experiment(
     recursion_spaces = ''
     exp_tags = tags + extra_exp_tags
     ssi = {'action': 'update',
-          'target': 'experiment',
-          'script_alias': script_meta['alias'],
-          'script_uid': script_meta['uid'],
-          'tags': ','.join(exp_tags),
-          'extra_tags': ",".join(extra_exp_tags),
-          'meta': experiment_meta,
-          'force': True}
+           'target': 'experiment',
+           'script_alias': script_meta['alias'],
+           'script_uid': script_meta['uid'],
+           'tags': ','.join(exp_tags),
+           'extra_tags': ",".join(extra_exp_tags),
+           'meta': experiment_meta,
+           'force': True}
 
     r = experiment_action.access(ssi)
     if r['return'] > 0:
