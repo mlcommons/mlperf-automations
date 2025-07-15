@@ -2574,6 +2574,63 @@ class ScriptAutomation(Automation):
         return {'return': 0, 'variation_tags_string': variation_tags_string,
                 'explicit_variation_tags': explicit_variation_tags, 'warnings': warnings}
 
+
+
+    def _add_base_variations(
+        self,
+        variation_name,
+        variations,
+        variation_tags,
+        tmp_variations,
+        excluded_variation_tags
+    ):
+        """
+        Adds base variations for a given variation_name into variation_tags
+        and updates tmp_variations if valid.
+        """
+
+        if "base" not in variations[variation_name]:
+            return {'return': 0}
+
+        for base_variation in variations[variation_name]["base"]:
+            tag_to_append = None
+            dynamic_base_variation = False
+            dynamic_base_variation_already_added = False
+
+            # Handle dynamic variation
+            if base_variation not in variations:
+                base_variation_dynamic = self._get_name_for_dynamic_variation_tag(base_variation)
+                if not base_variation_dynamic or base_variation_dynamic not in variations:
+                    return {
+                        'return': 1,
+                        'error': f'Variation "{base_variation}" specified as base variation of "{variation_name}" is not existing'
+                    }
+                dynamic_base_variation = True
+                base_prefix = base_variation_dynamic.split(".")[0] + "."
+
+                # We allow repeated dynamic variations like _patch.1,_patch.2,_patch.3
+                #for tag in variation_tags:
+                #    if tag.startswith(base_prefix):
+                #        dynamic_base_variation_already_added = True
+                #        break
+
+            # Append if not already added
+            if base_variation not in variation_tags and not dynamic_base_variation_already_added:
+                tag_to_append = base_variation
+
+            # Validate exclusion list
+            if tag_to_append:
+                if tag_to_append in excluded_variation_tags:
+                    return {
+                        'return': 1,
+                        'error': f'Variation "{tag_to_append}" specified as base variation for the variation is in the excluded list "{variation_name}"'
+                    }
+                variation_tags.append(tag_to_append)
+                tmp_variations[tag_to_append] = False
+
+        return {'return': 0}
+
+
     ##########################################################################
     def _update_variation_tags_from_variations(
             self, variation_tags, variations, variation_groups, excluded_variation_tags):
@@ -2612,40 +2669,16 @@ class ScriptAutomation(Automation):
                         variation_name = self._get_name_for_dynamic_variation_tag(
                             variation_name)
 
-                    # TODO: Move this to a function and apply it for combination of variations too
-                    # base variations are automatically turned on. Only
-                    # variations outside of any variation group can be added as
-                    # a base_variation
-                    if "base" in variations[variation_name]:
-                        base_variations = variations[variation_name]["base"]
-                        for base_variation in base_variations:
-                            dynamic_base_variation = False
-                            dynamic_base_variation_already_added = False
-                            if base_variation not in variations:
-                                base_variation_dynamic = self._get_name_for_dynamic_variation_tag(
-                                    base_variation)
-                                if not base_variation_dynamic or base_variation_dynamic not in variations:
-                                    return {'return': 1, 'error': 'Variation "{}" specified as base variation of "{}" is not existing'.format(
-                                        base_variation, variation_name)}
-                                else:
-                                    dynamic_base_variation = True
-                                    base_prefix = base_variation_dynamic.split(".")[
-                                        0] + "."
-                                    for x in variation_tags:
-                                        if x.startswith(base_prefix):
-                                            dynamic_base_variation_already_added = True
+                    result = self._add_base_variations(
+                        variation_name,
+                        variations,
+                        variation_tags,
+                        tmp_variations,
+                        excluded_variation_tags
+                    )
+                    if result.get('return', 0) > 0:
+                        return result
 
-                            if base_variation not in variation_tags and not dynamic_base_variation_already_added:
-                                tag_to_append = base_variation
-
-                            if tag_to_append:
-                                if tag_to_append in excluded_variation_tags:
-                                    return {'return': 1, 'error': 'Variation "{}" specified as base variation for the variation is in the excluded list "{}" '.format(
-                                        tag_to_append, variation_name)}
-                                variation_tags.append(tag_to_append)
-                                tmp_variations[tag_to_append] = False
-
-                            tag_to_append = None
 
                     # default_variations dictionary specifies the
                     # default_variation for each variation group. A default
@@ -2676,6 +2709,16 @@ class ScriptAutomation(Automation):
                         if all_present:
                             combined_variation_meta = variations[combined_variation]
                             tmp_combined_variations[combined_variation] = True
+
+                            result = self._add_base_variations(
+                                combined_variation,
+                                variations,
+                                variation_tags,
+                                tmp_combined_variations,
+                                excluded_variation_tags
+                            )
+                            if result.get('return', 0) > 0:
+                                return result
 
                             r = self._get_variation_tags_from_default_variations(
                                 combined_variation_meta,
