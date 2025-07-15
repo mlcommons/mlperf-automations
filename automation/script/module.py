@@ -4471,6 +4471,12 @@ pip install mlcflow
 
     ############################################################
 
+    def lint(self, i):
+        from script.lint import lint_meta
+        return lint_meta(self, i)
+
+    ############################################################
+
     def dockerfile(self, i):
         from script.docker import dockerfile
         return dockerfile(self, i)
