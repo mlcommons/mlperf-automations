@@ -3459,13 +3459,13 @@ class ScriptAutomation(Automation):
                             d['tags'] += "," + str(d.get('env')[t])
                         elif isinstance(d.get('env')[t], list):
                             for item in d.get('env')[t]:
-                                d['tags'] += "," + t + str(item)
+                                d['tags'] += "," + str(item)
                     elif str(env.get(t, '')).strip() != '':
                         if isinstance(env[t], str):
-                            d['tags'] += "," + t + str(env[t])
+                            d['tags'] += "," + str(env[t])
                         elif isinstance(env[t], list):
                             for item in env[t]:
-                                d['tags'] += "," + t + str(item)
+                                d['tags'] += "," + str(item)
 
                 update_tags_if_env = d.get("update_tags_if_env", [])
                 for t in update_tags_if_env:
