@@ -31,7 +31,6 @@ def lint_meta(self_module, input_params):
         return search_result
 
     scripts_list = search_result['list']
-    print(scripts_list)
     if not scripts_list:
         return {'return': 1, 'error': 'No scripts were found'}
 
