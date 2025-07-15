@@ -3405,9 +3405,17 @@ class ScriptAutomation(Automation):
                 for t in update_tags_from_env_with_prefix:
                     for key in update_tags_from_env_with_prefix[t]:
                         if str(d.get('env', {}).get(key, '')).strip() != '':
-                            d['tags'] += "," + t + str(d.get('env')[key])
+                            if isinstance(d.get('env')[key], str):
+                                d['tags'] += "," + t + str(d.get('env')[key])
+                            elif isinstance(d.get('env')[key], list):
+                                for item in d.get('env')[key]:
+                                    d['tags'] += "," + t + str(item)
                         elif str(env.get(key, '')).strip() != '':
-                            d['tags'] += "," + t + str(env[key])
+                            if isinstance(env[key], str):
+                                d['tags'] += "," + t + str(env[key])
+                            elif isinstance(env[key], list):
+                                for item in env[key]:
+                                    d['tags'] += "," + t + str(item)
 
                 for key in clean_env_keys_deps:
                     if '?' in key or '*' in key:
@@ -3446,8 +3454,18 @@ class ScriptAutomation(Automation):
 
                 update_tags_from_env = d.get("update_tags_from_env", [])
                 for t in update_tags_from_env:
-                    if env.get(t, '').strip() != '':
-                        d['tags'] += "," + env[t]
+                    if str(d.get('env', {}).get(t, '')).strip() != '':
+                        if isinstance(d.get('env')[t], str):
+                            d['tags'] += "," str(d.get('env')[t])
+                        elif isinstance(d.get('env')[t], list):
+                            for item in d.get('env')[t]:
+                                d['tags'] += "," + t + str(item)
+                    elif str(env.get(t, '')).strip() != '':
+                        if isinstance(env[t], str):
+                            d['tags'] += "," + t + str(env[t])
+                        elif isinstance(env[t], list):
+                            for item in env[t]:
+                                d['tags'] += "," + t + str(item)
 
                 update_tags_if_env = d.get("update_tags_if_env", [])
                 for t in update_tags_if_env:
