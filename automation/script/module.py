@@ -2461,6 +2461,7 @@ class ScriptAutomation(Automation):
 
                 variation_meta = variations[variation_tag]
                 if variation_tag_dynamic_suffix:
+                    variation_meta = copy.deepcopy(variation_meta)
                     self._update_variation_meta_with_dynamic_suffix(
                         variation_meta, variation_tag_dynamic_suffix)
 
