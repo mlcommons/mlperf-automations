@@ -67,6 +67,10 @@ variations:
   patch:
     env:
       MLC_GIT_PATCH: 'yes'
+  patch.#:
+    env:
+      MLC_GIT_PATCH: 'yes'
+      +,MLC_GIT_PATCH_FILEPATHS: '#'
   pr-to-apply.#:
     env:
       MLC_GIT_PR_TO_APPLY: '#'
