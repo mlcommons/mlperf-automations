@@ -4,6 +4,7 @@ import copy
 from mlc import utils
 from utils import *
 
+
 def lint_meta(self_module, input_params):
     """
     Lints MLC script metadata files by fixing key order and validating structure.
@@ -34,7 +35,6 @@ def lint_meta(self_module, input_params):
     if not scripts_list:
         return {'return': 1, 'error': 'No scripts were found'}
 
-
     env = input_params.get('env', {})
     state_data = input_params.get('state', {})
     constant_vars = input_params.get('const', {})
@@ -53,7 +53,7 @@ def lint_meta(self_module, input_params):
         script_input_description = metadata.get('input_description', {})
         script_repo = script.repo
 
-        # Sort YAML keys 
+        # Sort YAML keys
         sort_result = sort_meta_yaml_file(script_directory, quiet)
         if sort_result['return'] > 0:
             if not quiet:
@@ -64,9 +64,11 @@ def lint_meta(self_module, input_params):
                 logger.info(f"Sorted YAML keys for {script_alias}")
         elif not sort_result.get('modified', False):
             if not quiet:
-                logger.info(f"No input mapping or variations keys to be sorted for {script_alias}")
-    
+                logger.info(
+                    f"No input mapping or variations keys to be sorted for {script_alias}")
+
     return {'return': 0}
+
 
 def sort_meta_yaml_file(script_directory, quiet=False):
     """
