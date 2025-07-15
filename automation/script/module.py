@@ -3456,7 +3456,7 @@ class ScriptAutomation(Automation):
                 for t in update_tags_from_env:
                     if str(d.get('env', {}).get(t, '')).strip() != '':
                         if isinstance(d.get('env')[t], str):
-                            d['tags'] += ","  + str(d.get('env')[t])
+                            d['tags'] += "," + str(d.get('env')[t])
                         elif isinstance(d.get('env')[t], list):
                             for item in d.get('env')[t]:
                                 d['tags'] += "," + t + str(item)
