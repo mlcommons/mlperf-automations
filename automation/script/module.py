@@ -2574,8 +2574,6 @@ class ScriptAutomation(Automation):
         return {'return': 0, 'variation_tags_string': variation_tags_string,
                 'explicit_variation_tags': explicit_variation_tags, 'warnings': warnings}
 
-
-
     def _add_base_variations(
         self,
         variation_name,
@@ -2599,7 +2597,8 @@ class ScriptAutomation(Automation):
 
             # Handle dynamic variation
             if base_variation not in variations:
-                base_variation_dynamic = self._get_name_for_dynamic_variation_tag(base_variation)
+                base_variation_dynamic = self._get_name_for_dynamic_variation_tag(
+                    base_variation)
                 if not base_variation_dynamic or base_variation_dynamic not in variations:
                     return {
                         'return': 1,
@@ -2609,7 +2608,7 @@ class ScriptAutomation(Automation):
                 base_prefix = base_variation_dynamic.split(".")[0] + "."
 
                 # We allow repeated dynamic variations like _patch.1,_patch.2,_patch.3
-                #for tag in variation_tags:
+                # for tag in variation_tags:
                 #    if tag.startswith(base_prefix):
                 #        dynamic_base_variation_already_added = True
                 #        break
@@ -2630,8 +2629,8 @@ class ScriptAutomation(Automation):
 
         return {'return': 0}
 
-
     ##########################################################################
+
     def _update_variation_tags_from_variations(
             self, variation_tags, variations, variation_groups, excluded_variation_tags):
 
@@ -2678,7 +2677,6 @@ class ScriptAutomation(Automation):
                     )
                     if result.get('return', 0) > 0:
                         return result
-
 
                     # default_variations dictionary specifies the
                     # default_variation for each variation group. A default
