@@ -263,7 +263,7 @@ def get_run_cmd_reference(
                     env['MLC_MODEL'] + ' ' + env['MLC_MLPERF_DEVICE'] + " --scenario " + env['MLC_MLPERF_LOADGEN_SCENARIO'] + env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] + \
                     scenario_extra_options + mode_extra_options + dataset_options
                 if env['MLC_MODEL'] in ["resnet50"]:
-                    cmd += f" --max-batchsize {env.get('MLC_MLPERF_LOADGEN_MAX_BATCHSIZE', '128')} " 
+                    cmd += f" --max-batchsize {env.get('MLC_MLPERF_LOADGEN_MAX_BATCHSIZE', '128')} "
             return cmd, env['RUN_DIR']
 
         if env['MLC_MLPERF_BACKEND'] == "ncnn":
