@@ -2063,7 +2063,7 @@ variations:
         version: r4.0
         tags: _mlcommons
       nvidia-harness:   
-        tags: _v4.0
+        tags: _v4.1
       intel-harness:
         tags: _v4.1
       inference-src:
