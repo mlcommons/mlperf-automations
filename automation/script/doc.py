@@ -43,7 +43,10 @@ def generate_doc(self_module, input_params):
     tag_values = input_params.get('tags', '').split(",")
     variation_tags = [tag[1:] for tag in tag_values if tag.startswith("_")]
 
-    # Step 4: Iterate over scripts and generate Dockerfile
+    # capture path of generated README's for each script
+    generated_readme_paths = []
+
+    # Step 4: Iterate over scripts and generate readme
     for script in sorted(scripts_list, key=lambda x: x.meta.get('alias', '')):
         metadata = script.meta
         script_directory = script.path
@@ -60,8 +63,10 @@ def generate_doc(self_module, input_params):
             generic_inputs)
         if r['return'] > 0:
             continue
+        else:
+            generated_readme_paths.append(os.path.join(script_directory, "README.md"))
 
-    return {'return': 0}
+    return {'return': 0, 'generated_readme_paths': generated_readme_paths}
 
 
 def get_setup_readme(script_repo):
