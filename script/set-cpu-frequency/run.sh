@@ -24,6 +24,9 @@ case "$DRIVER_KEY" in
     echo "→ intel_pstate: disabling turbo, setting performance governor"
     echo 0 | ${MLC_SUDO} tee /sys/devices/system/cpu/intel_pstate/no_turbo >/dev/null
     ${MLC_SUDO} cpupower frequency-set -g performance
+    echo ""
+    echo "Note: intel_pstate does _not_ support a userspace/fixed frequency mode."
+    echo "If you need a precise kHz, switch back to acpi-cpufreq in your kernel cmdline."
     ;;
 
   amd-pstate)
