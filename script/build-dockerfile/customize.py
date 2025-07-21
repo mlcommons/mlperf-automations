@@ -293,7 +293,8 @@ def preprocess(i):
     dockerfile_env_input_string = ""
     for docker_env_key in dockerfile_env:
         dockerfile_env_input_string = dockerfile_env_input_string + " --env." + \
-            docker_env_key + "=" + str(dockerfile_env[docker_env_key])
+            docker_env_key + "=" + \
+            str(dockerfile_env[docker_env_key]).replace("\n", "\\n")
 
     workdir = env.get('WORKDIR', '')
     if workdir == '':
