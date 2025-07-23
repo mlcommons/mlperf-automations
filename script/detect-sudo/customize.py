@@ -13,6 +13,9 @@ def preprocess(i):
 
     os_info = i['os_info']
 
+    if os_info['platform'] == 'windows':
+        return {'return': 0}
+
     env = i['env']
 
     meta = i['meta']
