@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -e "${MLC_EXTRACT_EXTRACTED_FILENAME}" ] ; then
-  MLCD=${MLC_EXTRACT_EXTRACTED_CHECKSUM_CMD}
+  CMD=${MLC_EXTRACT_EXTRACTED_CHECKSUM_CMD}
   echo ""
   echo "${CMD}"
   eval "${CMD}"
