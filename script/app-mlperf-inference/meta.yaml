@@ -1001,7 +1001,7 @@ variations:
         - "${{ MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH }}:${{ MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH }}" 
         - "${{ MLC_DATASET_CNNDM_EVAL_PATH }}:${{ MLC_DATASET_CNNDM_EVAL_PATH }}"
       deps:
-      - tags: get,ml-model,llama3,_hf,_meta-llama/Llama-3.1-8B-Instruct
+      - tags: get,ml-model,llama3,_mlc,_8b,_r2_downloader
         enable_if_env:
           MLC_USE_ML_MODEL_FROM_HOST:
           - 'yes'
@@ -1009,7 +1009,7 @@ variations:
           - llama3_1-8b
           - llama3-8b
       ## CNNDM for Llama3 8B model - edge
-      - tags: get,dataset,cnndm,_validation,_edge,_llama3,_mlc,_rclone
+      - tags: get,dataset,cnndm,_validation,_edge,_llama3,_mlc,_r2_downloader
         names:
           - cnndm-llama3-edge
         enable_if_env:
@@ -1018,7 +1018,7 @@ variations:
           MLC_USE_DATASET_FROM_HOST:
           - 'yes'
       ## CNNDM for Llama3 8B model - datacenter
-      - tags: get,dataset,cnndm,_validation,_datacenter,_llama3,_mlc,_rclone
+      - tags: get,dataset,cnndm,_validation,_datacenter,_llama3,_mlc,_r2_downloader
         names:
           - cnndm-llama3-datacenter
         enable_if_env:
@@ -1052,13 +1052,13 @@ variations:
       tags: run,accuracy,mlperf,_librispeech_whisper,_int64
     docker:
       deps:
-      - tags: get,ml-model,whisper,_rclone,_mlc
+      - tags: get,ml-model,whisper,_r2_downloader,_mlc
         enable_if_env:
           MLC_USE_ML_MODEL_FROM_HOST:
           - 'yes'
         names:
           - whisper-model
-      - tags: get,dataset,whisper,_preprocessed,_mlc,_rclone
+      - tags: get,dataset,whisper,_preprocessed,_mlc,_r2_downloader
         names:
           - whisper-dataset
         enable_if_env:
@@ -1130,7 +1130,7 @@ variations:
       tags: run,accuracy,mlperf,_dataset_deepseek-r1
     docker:
       deps:
-      - tags: get,preprocessed,dataset,deepseek-r1,_validation,_mlc,_rclone
+      - tags: get,preprocessed,dataset,deepseek-r1,_validation,_mlc,_r2_downloader
         enable_if_env:
           MLC_USE_DATASET_FROM_HOST:
           - 'yes'

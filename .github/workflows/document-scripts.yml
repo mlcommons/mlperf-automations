@@ -65,7 +65,8 @@ jobs:
       - name: Document meta.yaml file
         run: |
           echo "Documenting ${{ matrix.modified_metas.file }}"
-
+          python3 -m venv mlcflow
+          . mlcflow/bin/activate
           pip install mlcflow
           mlc add repo automation-scripts
           mlc doc script ${{ matrix.modified_metas.uid}} --quiet
