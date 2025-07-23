@@ -146,7 +146,7 @@ def postprocess(i):
         cur_dir = os.getcwd()
         path_bin = os.path.join(cur_dir, file_name)
         if os.path.isfile(path_bin):
-            # Was downloaded and extracted by CM
+            # Was downloaded and extracted by MLC
             env['MLC_RCLONE_BIN_WITH_PATH'] = path_bin
             env['+PATH'] = [cur_dir]
 

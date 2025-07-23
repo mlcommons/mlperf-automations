@@ -58,4 +58,4 @@ variations:
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
 warnings:
-- This CM script will need sudo to install numactl!
+- This MLC script will need sudo to install numactl!

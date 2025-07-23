@@ -15,7 +15,7 @@ def preprocess(i):
 
     if env["MLC_DOCKER_OS"] not in ["ubuntu", "rhel", "arch"]:
         return {
-            'return': 1, 'error': f"Specified docker OS: {env['MLC_DOCKER_OS']}. Currently only ubuntu, rhel and arch are supported in CM docker"}
+            'return': 1, 'error': f"Specified docker OS: {env['MLC_DOCKER_OS']}. Currently only ubuntu, rhel and arch are supported in MLC docker"}
 
     path = i['run_script_input']['path']
 

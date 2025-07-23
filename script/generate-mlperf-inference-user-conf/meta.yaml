@@ -1,4 +1,4 @@
-# Identification of this CM script
+# Identification of this MLC script
 alias: generate-mlperf-inference-user-conf
 uid: 3af4475745964b93
 
@@ -9,7 +9,7 @@ category: "MLPerf benchmark support"
 
 developers: "[Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Thomas Zhu](https://www.linkedin.com/in/hanwen-zhu-483614189), [Grigori Fursin](https://cKnowledge.org/gfursin)"
 
-# User-friendly tags to find this CM script
+# User-friendly tags to find this MLC script
 tags:
   - generate
   - mlperf
@@ -63,7 +63,7 @@ new_env_keys:
 new_state_keys:
   - MLC_SUT_*
 
-# Dependencies on other CM scripts
+# Dependencies on other MLC scripts
 deps:
 
   # Detect host OS features

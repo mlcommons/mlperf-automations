@@ -43,7 +43,7 @@ for file in "${FILES[@]}"; do
   base_name=${base%.*}
   echo $base
   echo $basename
-  CMD="${MLC_C_COMPILER_WITH_PATH} -c ${MLC_C_COMPILER_FLAGS} ${MLC_C_INCLUDE_PATH} $file ${MLC_C_COMPILER_FLAG_OUTPUT}$base_name.o"
+  MLCD="${MLC_C_COMPILER_WITH_PATH} -c ${MLC_C_COMPILER_FLAGS} ${MLC_C_INCLUDE_PATH} $file ${MLC_C_COMPILER_FLAG_OUTPUT}$base_name.o"
   echo $CMD
   eval $CMD
   test $? -eq 0 || exit 1
@@ -55,7 +55,7 @@ for file in "${FILES[@]}"; do
   base_name=${base%.*}
   echo $base
   echo $basename
-  CMD="${MLC_CXX_COMPILER_WITH_PATH} -c ${MLC_CXX_COMPILER_FLAGS} ${MLC_CPLUS_INCLUDE_PATH} $file ${MLC_CXX_COMPILER_FLAG_OUTPUT}$base_name.o"
+  MLCD="${MLC_CXX_COMPILER_WITH_PATH} -c ${MLC_CXX_COMPILER_FLAGS} ${MLC_CPLUS_INCLUDE_PATH} $file ${MLC_CXX_COMPILER_FLAG_OUTPUT}$base_name.o"
   echo $CMD
   eval $CMD
   test $? -eq 0 || exit 1

@@ -6,7 +6,7 @@ from utils import is_true
 
 def preprocess(i):
 
-    # CM script internal variables
+    # MLC script internal variables
     variation_tags = i.get('variation_tags', [])
     automation = i['automation']
     env = i['env']

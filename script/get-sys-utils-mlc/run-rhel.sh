@@ -24,7 +24,8 @@ ${MLC_SUDO} ${MLC_PACKAGE_TOOL} update && \
            ca-certificates curl  cmake \
            gcc git g++ \
            libtool libffi-devel libssl-devel\
-           zlib-devel \
+           procps-ng \
+	   zlib-devel \
            libbz2-devel \
            openssh-client \
            make mesa-libGL \

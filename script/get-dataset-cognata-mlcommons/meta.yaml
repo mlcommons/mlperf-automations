@@ -43,7 +43,7 @@ env:
 
 
 deps:
-# Prepare dummy CM cache entry to manage dataset
+# Prepare dummy MLC cache entry to manage dataset
 - names:
   - custom-cache-entry-mlcommons-cognata-dataset
   tags: create,custom,cache,entry

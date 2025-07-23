@@ -20,7 +20,7 @@ tags_help: "modular python app stable-diffusion onnx"
 
 deps:
 - tags: detect,os
-- tags: get,sys-utils-cm
+- tags: get,sys-utils-mlc
 - names:
   - python
   - python3

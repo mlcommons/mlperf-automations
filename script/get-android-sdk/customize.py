@@ -20,7 +20,7 @@ def preprocess(i):
     # Check if ANDROID_HOME is already set
     android_home = os.environ.get('ANDROID_HOME', '').strip()
 
-    # We are inside CM cache entry
+    # We are inside MLC cache entry
     cur_dir = os.getcwd()
 
     if android_home == '':

@@ -23,7 +23,7 @@ cd ${MLC_TMP_CURRENT_SCRIPT_PATH}
 ${MLC_NVCC_BIN_WITH_PATH} -allow-unsupported-compiler print_cuda_devices.cu
 test $? -eq 0 || exit 1
 
-# Return to the original path obtained in CM
+# Return to the original path obtained in MLC
 
 echo ""
 echo "Running program ..."

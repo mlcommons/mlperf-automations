@@ -331,9 +331,9 @@ def preprocess(i):
     if state.get("mlc-mlperf-inference-results"):
         # print(state["mlc-mlperf-inference-results"])
         for sut in state["mlc-mlperf-inference-results"]:  # only one sut will be there
-            # Better to do this in a stand alone CM script with proper deps but
+            # Better to do this in a stand alone MLC script with proper deps but
             # currently we manage this by modifying the sys path of the python
-            # executing CM
+            # executing MLC
             from tabulate import tabulate  # noqa
 
             logger.info(f"{sut}")

@@ -1,4 +1,4 @@
-# Identification of this CM script
+# Identification of this MLC script
 alias: generate-nvidia-engine
 uid: 0eef9f05b272401f
 
@@ -8,7 +8,7 @@ automation_uid: 5b4e0237da074764
 category: "MLPerf benchmark support"
 
 
-# User-friendly tags to find this CM script
+# User-friendly tags to find this MLC script
 tags:
   - generate
   - engine
@@ -32,7 +32,7 @@ new_env_keys:
   - MLC_MLPERF_*
   - MLC_DATASET_*
 
-# Dependencies on other CM scripts
+# Dependencies on other MLC scripts
 
 deps:
 
@@ -43,7 +43,7 @@ deps:
   - tags: detect,cpu
 
   # Install system dependencies on a given host
-  - tags: get,sys-utils-cm
+  - tags: get,sys-utils-mlc
 
   # Detect CUDA
   - tags: get,cuda,_cudnn

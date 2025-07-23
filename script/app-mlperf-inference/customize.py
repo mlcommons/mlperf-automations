@@ -395,7 +395,7 @@ def postprocess(i):
         if env.get('MLC_HOST_SYSTEM_NAME', '') != '':
             host_info['system_name'] = env['MLC_HOST_SYSTEM_NAME']
 
-        # Check CM automation repository
+        # Check MLC automation repository
         repo_name = 'mlcommons@mlperf-automations'
         repo_hash = ''
         r = mlc.access({'action': 'find', 'automation': 'repo',
@@ -429,7 +429,7 @@ def postprocess(i):
             cmd = ""
             xcmd = ""
 
-        readme_init = "*Check [CM MLPerf docs](https://docs.mlcommons.org/inference) for more details.*\n\n"
+        readme_init = "*Check [MLC MLPerf docs](https://docs.mlcommons.org/inference) for more details.*\n\n"
 
         readme_body = "## Host platform\n\n* OS version: {}\n* CPU version: {}\n* Python version: {}\n* MLC version: {}\n\n".format(platform.platform(),
                                                                                                                                     platform.processor(), sys.version, mlc_version)
@@ -438,7 +438,7 @@ def postprocess(i):
         if repo_hash != '':
             x += ' --checkout=' + str(repo_hash)
 
-        readme_body += "## CM Run Command\n\nSee [CM installation guide](https://docs.mlcommons.org/inference/install/).\n\n" + \
+        readme_body += "## MLC Run Command\n\nSee [MLC installation guide](https://docs.mlcommons.org/inference/install/).\n\n" + \
             "```bash\npip install -U mlcflow\n\nmlc rm cache -f\n\nmlc pull repo {}\n\n{}\n```".format(
                 x, xcmd)
 
