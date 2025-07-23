@@ -101,8 +101,9 @@ def prompt_retry(logger, timeout=10, default_retry=False):
 
 
 def is_user_in_sudo_group(logger):
-  """Check if the current user is in the 'sudo' group."""
-   try:
+    import grp
+    """Check if the current user is in the 'sudo' group."""
+    try:
         sudo_group = grp.getgrnam('sudo').gr_mem
         return os.getlogin() in sudo_group
     except KeyError:
