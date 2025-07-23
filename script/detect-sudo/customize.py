@@ -100,7 +100,7 @@ def prompt_retry(logger, timeout=10, default_retry=False):
 
 
 def is_user_in_sudo_group(logger):
-    import grp #noqa
+    import grp  # noqa
     """Check if the current user is in the 'sudo' group."""
     try:
         sudo_group = grp.getgrnam('sudo').gr_mem
