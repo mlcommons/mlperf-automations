@@ -39,10 +39,12 @@ def preprocess(i):
 
 
 def detect_version(i):
-    r = i['automation'].parse_version({'match_text': r'Apptainer version\s*([\d.]+)',
-                                       'group_number': 1,
-                                       'env_key': 'MLC_APPTAINER_VERSION',
-                                       'which_env': i['env']})
+    r = i['automation'].parse_version({
+        'match_text': r'[Aa]pptainer version\s*([\d.]+)',
+        'group_number': 1,
+        'env_key': 'MLC_APPTAINER_VERSION',
+        'which_env': i['env']
+    })
     if r['return'] > 0:
         return r
 
