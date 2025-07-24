@@ -33,7 +33,7 @@ def preprocess(i):
 
     logger.info('')
     print(
-        'Local CM cache path to the updated BERT pruner src from NeurIPS 2022: ' +
+        'Local MLC cache path to the updated BERT pruner src from NeurIPS 2022: ' +
         env['MLC_GIT_REPO_BERT_PRUNER_NEURIPS_2022_CHECKOUT_PATH'])
 
     logger.info('')

@@ -1,4 +1,4 @@
-# Identification of this CM script
+# Identification of this MLC script
 alias: runtime-system-infos
 uid: 755cf27627784001
 cache: false
@@ -9,7 +9,7 @@ category: "MLPerf benchmark support"
 docker:
   real_run: False
 
-# User-friendly tags to find this CM script
+# User-friendly tags to find this MLC script
 tags:
   - runtime
   - system
@@ -21,7 +21,7 @@ input_mapping:
   interval: MLC_SYSTEM_INFO_MEASUREMENT_INTERVAL
 
 
-# Dependencies on other CM scripts
+# Dependencies on other MLC scripts
 
 deps:
 
@@ -32,7 +32,7 @@ deps:
   - tags: detect,cpu
 
   # Install system dependencies on a given host
-  - tags: get,sys-utils-cm
+  - tags: get,sys-utils-mlc
 
   # Detect python3
   - tags: get,python3

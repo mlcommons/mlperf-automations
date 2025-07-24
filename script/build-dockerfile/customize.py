@@ -15,7 +15,7 @@ def preprocess(i):
 
     if env["MLC_DOCKER_OS"] not in ["ubuntu", "rhel", "arch"]:
         return {
-            'return': 1, 'error': f"Specified docker OS: {env['MLC_DOCKER_OS']}. Currently only ubuntu, rhel and arch are supported in CM docker"}
+            'return': 1, 'error': f"Specified docker OS: {env['MLC_DOCKER_OS']}. Currently only ubuntu, rhel and arch are supported in MLC docker"}
 
     path = i['run_script_input']['path']
 
@@ -264,7 +264,7 @@ def preprocess(i):
         env['MLC_DOCKER_USE_DEFAULT_USER'] = 'yes'
 
     if docker_user and not is_true(
-            env.get('MLC_DOCKER_USE_DEFAULT_USER', '') and docker_user != 'root'):
+            env.get('MLC_DOCKER_USE_DEFAULT_USER', '')) and docker_user != 'root':
 
         f.write('RUN groupadd -g $GID -o ' + docker_group + EOL)
 

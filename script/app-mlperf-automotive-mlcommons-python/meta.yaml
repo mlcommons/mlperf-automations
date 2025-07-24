@@ -7,7 +7,7 @@ automation_uid: 5b4e0237da074764
 category: "Modular MLPerf inference benchmark pipeline for ABTF model"
 
 
-# User-friendly tags to find this CM script
+# User-friendly tags to find this MLC script
 tags:
 - automotive
 - mlcommons
@@ -65,7 +65,7 @@ input_mapping:
   multistream_target_latency: MLC_MLPERF_LOADGEN_MULTISTREAM_TARGET_LATENCY
   output: MLC_MLPERF_OUTPUT_DIR
 
-# Duplicate CM environment variables to the ones used in native apps
+# Duplicate MLC environment variables to the ones used in native apps
 env_key_mappings:
   MLC_HOST_: HOST_
   MLC_ML_: ML_
@@ -87,7 +87,7 @@ new_state_keys:
   - mlperf-inference-implementation
   - MLC_SUT_*
 
-# Dependencies on other CM scripts
+# Dependencies on other MLC scripts
 deps:
 
   # Detect host OS features
@@ -97,7 +97,7 @@ deps:
   - tags: detect,cpu
 
   # Install system dependencies on a given host
-  - tags: get,sys-utils-cm
+  - tags: get,sys-utils-mlc
 
   # Detect/install python
   - tags: get,python
@@ -105,7 +105,7 @@ deps:
     - python
     - python3
 
-  # Use cmind inside CM scripts
+  # Use cmind inside MLC scripts
   - tags: get,generic-python-lib,_package.cmind
 
 
@@ -120,7 +120,7 @@ deps:
 
 
   ########################################################################
-  # Install ML engines via CM
+  # Install ML engines via MLC
 
   ## Onnx CPU Runtime
   - tags: get,generic-python-lib,_onnxruntime

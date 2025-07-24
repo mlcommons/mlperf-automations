@@ -1,4 +1,4 @@
-# Identification of this CM script
+# Identification of this MLC script
 alias: build-mlperf-inference-server-nvidia
 uid: f37403af5e9f4541
 cache: true
@@ -9,7 +9,7 @@ default_version: r3.1
 category: "MLPerf benchmark support"
 
 
-# User-friendly tags to find this CM script
+# User-friendly tags to find this MLC script
 tags:
   - build
   - mlcommons
@@ -33,7 +33,7 @@ input_mapping:
   custom_system: MLC_CUSTOM_SYSTEM_NVIDIA
   clean: MLC_MAKE_CLEAN
 
-# Dependencies on other CM scripts
+# Dependencies on other MLC scripts
 
 deps:
 
@@ -44,7 +44,7 @@ deps:
   - tags: detect,cpu
 
   # Install system dependencies on a given host
-  - tags: get,sys-utils-cm
+  - tags: get,sys-utils-mlc
 
   # Detect python3
   - tags: get,python3
@@ -76,7 +76,7 @@ deps:
   # Detect gcc
   - tags: get,gcc
 
-  # Detect CMake
+  # Detect MLCake
   - tags: get,cmake
     version: "3.25.1"
 

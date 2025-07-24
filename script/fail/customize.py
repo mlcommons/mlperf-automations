@@ -19,7 +19,7 @@ def preprocess(i):
     if is_true(env.get('MLC_FAIL_WINDOWS', '')):
         if os_info['platform'] == 'windows':
             return {'return': 1,
-                    'error': 'CM detected fail condition: running on Windows'}
+                    'error': 'MLC detected fail condition: running on Windows'}
 
     return {'return': 0}
 

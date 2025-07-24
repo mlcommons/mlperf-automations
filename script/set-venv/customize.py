@@ -80,10 +80,10 @@ def preprocess(i):
                     shell = shell.replace('MLC_SET_VENV_WORK', 'work')
                 if shell == '':
                     shell = 'cmd'
-                cmd = 'cd {} & call {} & set MLC_REPOS=%CD%\\{}\\CM & {}\n'.format(
+                cmd = 'cd {} & call {} & set MLC_REPOS=%CD%\\{}\\MLC & {}\n'.format(
                     name, activate_script, name, shell)
             else:
-                cmd = '#!/bin/bash\n\ncd {} ; source {} ; export MLC_REPOS=$PWD/CM ; cd work\n'.format(
+                cmd = '#!/bin/bash\n\ncd {} ; source {} ; export MLC_REPOS=$PWD/MLC ; cd work\n'.format(
                     name, activate_script)
 
             with open(script_file, 'w') as f:

@@ -7,7 +7,7 @@ default_version: r1.0
 deps:
 - tags: detect,os
 - tags: detect,cpu
-- tags: get,sys-utils-cm
+- tags: get,sys-utils-mlc
 - names:
   - python3
   - python

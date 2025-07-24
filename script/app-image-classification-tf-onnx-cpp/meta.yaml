@@ -7,7 +7,7 @@ default_env:
   MLC_BATCH_SIZE: '1'
 deps:
 - tags: detect,os
-- tags: get,sys-utils-cm
+- tags: get,sys-utils-mlc
 - tags: get,gcc
 - tags: get,dataset,image-classification,original
 - tags: get,dataset-aux,image-classification

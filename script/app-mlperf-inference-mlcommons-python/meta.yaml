@@ -1,4 +1,4 @@
-# Identification of this CM script
+# Identification of this MLC script
 alias: app-mlperf-inference-mlcommons-python
 uid: ff149e9781fc4b65
 
@@ -9,7 +9,7 @@ category: "Modular MLPerf inference benchmark pipeline"
 
 developers: "[Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Thomas Zhu](https://www.linkedin.com/in/hanwen-zhu-483614189), [Grigori Fursin](https://cKnowledge.org/gfursin)"
 
-# User-friendly tags to find this CM script
+# User-friendly tags to find this MLC script
 tags:
   - app
   - vision
@@ -70,7 +70,7 @@ input_mapping:
   deeplab_resnet50_path: MLC_ML_MODEL_DPLAB_RESNET50_PATH
   waymo_path: MLC_DATASET_WAYMO_PATH
 
-# Duplicate CM environment variables to the ones used in native apps
+# Duplicate MLC environment variables to the ones used in native apps
 env_key_mappings:
   MLC_HOST_: HOST_
   MLC_ML_: ML_
@@ -89,7 +89,7 @@ new_state_keys:
   - mlperf-inference-implementation
   - MLC_SUT_*
 
-# Dependencies on other CM scripts
+# Dependencies on other MLC scripts
 deps:
   # Detect host OS features
   - tags: detect,os
@@ -98,7 +98,7 @@ deps:
   - tags: detect,cpu
 
   # Install system dependencies on a given host
-  - tags: get,sys-utils-cm
+  - tags: get,sys-utils-mlc
 
   # Detect/install python
   - tags: get,python
@@ -126,7 +126,7 @@ deps:
         - tensorrt
 
   ########################################################################
-  # Install ML engines via CM
+  # Install ML engines via MLC
 
   ## Onnx CPU Runtime
   - tags: get,generic-python-lib,_onnxruntime

@@ -1,4 +1,4 @@
-# Identification of this CM script
+# Identification of this MLC script
 alias: generate-mlperf-tiny-report
 uid: 709c3f3f9b3e4783
 
@@ -12,7 +12,7 @@ developers: "[Grigori Fursin](https://cKnowledge.org/gfursin)"
 default_env:
   MLC_IMPORT_TINYMLPERF_REPO_TAGS: "1.1-private"
 
-# User-friendly tags to find this CM script
+# User-friendly tags to find this MLC script
 tags:
   - generate
   - mlperf
@@ -23,14 +23,14 @@ tags:
 input_mapping:
   repo_tags: MLC_IMPORT_TINYMLPERF_REPO_TAGS
 
-# Dependencies on other CM scripts
+# Dependencies on other MLC scripts
 deps:
 
   # Detect host OS features
   - tags: detect,os
 
   # Install system dependencies on a given host
-  - tags: get,sys-utils-cm
+  - tags: get,sys-utils-mlc
 
   # Detect python3
   - tags: get,python3

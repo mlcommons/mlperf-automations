@@ -2,7 +2,7 @@
 
 MLC_TMP_CURRENT_SCRIPT_PATH=${MLC_TMP_CURRENT_SCRIPT_PATH:-$PWD}
 
-# connect CM intelligent components with CK env
+# connect MLC intelligent components with CK env
 export MLC_ML_TORCH_MODEL_NAME=resnet50
 export MLC_ML_MODEL_INPUT_DATA_TYPE=float32
 export MLC_ML_MODEL_IMAGE_HEIGHT=224

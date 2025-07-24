@@ -21,7 +21,7 @@ default_env:
 deps:
 - tags: detect,os
 - tags: detect,cpu
-- tags: get,sys-utils-cm
+- tags: get,sys-utils-mlc
 - enable_if_env:
     MLC_MLPERF_DEVICE:
     - gpu

@@ -1,4 +1,4 @@
-# Identification of this CM script
+# Identification of this MLC script
 alias: app-mlperf-inference-nvidia
 uid: bc3b17fb430f4732
 cache: false
@@ -10,7 +10,7 @@ automation_uid: 5b4e0237da074764
 category: "Reproduce MLPerf benchmarks"
 
 
-# User-friendly tags to find this CM script
+# User-friendly tags to find this MLC script
 tags:
   - reproduce
   - mlcommons
@@ -92,7 +92,7 @@ input_mapping:
   embedding_weights_on_gpu_part: MLC_MLPERF_NVIDIA_HARNESS_EMBEDDING_WEIGHTS_ON_GPU_PART
   sdxl_batcher_time_limit: MLC_MLPERF_NVIDIA_HARNESS_SDXL_SERVER_BATCHER_TIME_LIMIT
 
-# Dependencies on other CM scripts
+# Dependencies on other MLC scripts
 
 deps:
 
@@ -103,7 +103,7 @@ deps:
   - tags: detect,cpu
 
   # Install system dependencies on a given host
-  - tags: get,sys-utils-cm
+  - tags: get,sys-utils-mlc
 
   # Get Nvidia scratch space where data and models get downloaded
   - tags: get,mlperf,inference,nvidia,scratch,space

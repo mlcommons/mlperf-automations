@@ -4,7 +4,6 @@ import os
 import subprocess
 import select
 import sys
-import grp
 import threading
 import getpass
 
@@ -12,6 +11,9 @@ import getpass
 def preprocess(i):
 
     os_info = i['os_info']
+
+    if os_info['platform'] == 'windows':
+        return {'return': 0}
 
     env = i['env']
 
@@ -98,6 +100,7 @@ def prompt_retry(logger, timeout=10, default_retry=False):
 
 
 def is_user_in_sudo_group(logger):
+    import grp  # noqa
     """Check if the current user is in the 'sudo' group."""
     try:
         sudo_group = grp.getgrnam('sudo').gr_mem

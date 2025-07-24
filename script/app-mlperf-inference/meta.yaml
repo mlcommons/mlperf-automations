@@ -1,4 +1,4 @@
-# Identification of this CM script
+# Identification of this MLC script
 alias: app-mlperf-inference
 uid: d775cac873ee4231
 
@@ -9,7 +9,7 @@ category: "Modular MLPerf inference benchmark pipeline"
 
 developers: "[Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Thomas Zhu](https://www.linkedin.com/in/hanwen-zhu-483614189), [Grigori Fursin](https://cKnowledge.org/gfursin)"
 
-# User-friendly tags to find this CM script
+# User-friendly tags to find this MLC script
 tags:
   - app
   - vision
@@ -68,7 +68,7 @@ input_mapping:
 
 predeps: False
 
-# Duplicate CM environment variables to the ones used in native apps
+# Duplicate MLC environment variables to the ones used in native apps
 env_key_mappings:
   MLC_HOST_: HOST_
   MLC_ML_: ML_
@@ -82,14 +82,14 @@ new_state_keys:
   - app_mlperf_inference_*
   - mlc-mlperf-inference-results*
 
-# Dependencies on other CM scripts
+# Dependencies on other MLC scripts
 deps:
 
   # Detect host OS features
   - tags: detect,os
 
   # Install system dependencies on a given host
-  - tags: get,sys-utils-cm
+  - tags: get,sys-utils-mlc
 
   # Detect/install python
   - tags: get,python

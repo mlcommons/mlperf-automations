@@ -7,7 +7,7 @@ automation_uid: 5b4e0237da074764
 category: "Modular MLPerf automotive benchmark pipeline for ABTF models"
 
 
-# User-friendly tags to find this CM script
+# User-friendly tags to find this MLC script
 tags:
 - app
 - app-mlperf-inference
@@ -72,7 +72,7 @@ new_env_keys:
 new_state_keys:
   - mlc-mlperf-inference-results*
 
-# Dependencies on other CM scripts
+# Dependencies on other MLC scripts
 deps:
 
   # Detect host OS features
@@ -82,7 +82,7 @@ deps:
   - tags: detect,cpu
 
   # Install system dependencies on a given host
-  - tags: get,sys-utils-cm
+  - tags: get,sys-utils-mlc
 
   # Detect/install python
   - tags: get,python

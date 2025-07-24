@@ -8,6 +8,7 @@ default_env:
   MLC_SUDO: sudo
 deps:
 - tags: detect,os
+- tags: detect,sudo
 env:
   MLC_GENERIC_SYS_UTIL_INSTALL_NEEDED: 'no'
   MLC_SYS_UTIL_VERSION_CMD: ''
@@ -573,8 +574,6 @@ variations:
         dnf: libudev-devl
         yum: libudev-devel
   linux-tools:
-    deps:
-    - tags: detect,os
     env:
       MLC_SYS_UTIL_NAME: linux-tools
     new_env_keys:
@@ -641,13 +640,13 @@ variations:
       tags: install,numactl,from.src
     env:
       MLC_SYS_UTIL_NAME: numactl
-      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+      MLC_SYS_UTIL_CHECK_CMD: 'numactl -s'
     new_env_keys:
     - MLC_NUMACTL_VERSION
     state:
       numactl:
         apt: numactl
-        dnf: numactl-devel
+        dnf: numactl
         yum: numactl-devel
   nvidia-cuda-toolkit:
     env:

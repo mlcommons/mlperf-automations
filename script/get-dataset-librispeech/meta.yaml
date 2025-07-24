@@ -7,7 +7,7 @@ default_version: dev-clean
 deps:
 - names:
   - sys-utils
-  tags: get,sys-utils-cm
+  tags: get,sys-utils-mlc
 env:
   MLC_DATASET: LIBRISPEECH
   MLC_WGET_URL: http://www.openslr.org/resources/12/<<<MLC_DATASET_ARCHIVE>>>

@@ -11,7 +11,7 @@ default_version: custom
 deps:
 - tags: detect,os
 new_env_keys:
-- CMSIS*
+- MLCSIS*
 tags:
 - get
 - cmsis

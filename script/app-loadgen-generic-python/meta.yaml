@@ -1,4 +1,4 @@
-# Identification of this CM script
+# Identification of this MLC script
 alias: app-loadgen-generic-python
 uid: d3d949cc361747a6
 
@@ -10,7 +10,7 @@ category: "Modular MLPerf inference benchmark pipeline"
 developers: "[Gaz Iqbal](https://www.linkedin.com/in/gaziqbal), [Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Grigori Fursin](https://cKnowledge.org/gfursin)"
 
 
-# User-friendly tags to find this CM script
+# User-friendly tags to find this MLC script
 tags:
   - app
   - loadgen
@@ -49,7 +49,7 @@ input_mapping:
 new_env_keys:
   - MLC_MLPERF_*
 
-# Dependencies on other CM scripts
+# Dependencies on other MLC scripts
 
 deps:
 
@@ -82,7 +82,7 @@ deps:
     - loadgen
 
   ########################################################################
-  # Install ML engines via CM
+  # Install ML engines via MLC
   # ONNX
   - enable_if_env:
       MLC_MLPERF_BACKEND:
@@ -110,7 +110,7 @@ deps:
     - onnx
 
   ########################################################################
-  # Install ML engines via CM
+  # Install ML engines via MLC
   # PyTorch
 
   # CPU
@@ -175,7 +175,7 @@ deps:
 
 
 
-# Customize this CM script
+# Customize this MLC script
 variations:
 
   pytorch:

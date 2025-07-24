@@ -11,7 +11,7 @@ fi
 MLC_PYTHON_BIN=${MLC_PYTHON_BIN_WITH_PATH:-python3}
 MLC_TMP_CURRENT_SCRIPT_PATH=${MLC_TMP_CURRENT_SCRIPT_PATH:-$PWD}
 
-# connect CM intelligent components with CK env
+# connect MLC intelligent components with CK env
 export CK_ENV_ONNX_MODEL_ONNX_FILEPATH=${MLC_ML_MODEL_FILE_WITH_PATH}
 export CK_ENV_ONNX_MODEL_INPUT_LAYER_NAME="input_tensor:0"
 export CK_ENV_ONNX_MODEL_OUTPUT_LAYER_NAME="softmax_tensor:0"
@@ -33,5 +33,5 @@ echo ""
 ${MLC_PYTHON_BIN} ${MLC_TMP_CURRENT_SCRIPT_PATH}/src/onnx_classify.py
 test $? -eq 0 || exit 1
 
-# Just a demo to pass environment variables from native scripts back to CM workflows
+# Just a demo to pass environment variables from native scripts back to MLC workflows
 echo "MLC_APP_IMAGE_CLASSIFICATION_ONNX_PY=sucess" > tmp-run-env.out

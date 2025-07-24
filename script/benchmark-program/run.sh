@@ -29,7 +29,7 @@ cd "${MLC_RUN_DIR}"
 
 if [[ "${MLC_DEBUG_SCRIPT_BENCHMARK_PROGRAM}" == "True" ]]; then
   echo "*****************************************************"
-  echo "You are now in Debug shell with pre-set CM env and can run the following command line manually:"
+  echo "You are now in Debug shell with pre-set MLC env and can run the following command line manually:"
 
   echo ""
   if [[ "${MLC_RUN_CMD0}" != "" ]]; then
@@ -39,7 +39,7 @@ if [[ "${MLC_DEBUG_SCRIPT_BENCHMARK_PROGRAM}" == "True" ]]; then
   fi
 
   echo ""
-  echo "Type exit to return to CM script."
+  echo "Type exit to return to MLC script."
   echo ""
 #  echo "You can also run . ./debug-script-benchmark-program.sh to reproduce and customize run."
 #  echo ""
