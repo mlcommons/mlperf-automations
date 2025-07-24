@@ -76,8 +76,7 @@ jobs:
           git config --global user.name github-actions[bot]
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           # Commit changes
-          git commit -m '[Automated Commit] Document ${{ matrix.modified_metas.file}}  [skip ci]'
-          git push
+          git diff-index --quiet HEAD || (git commit -am "[Automated Commit] Document ${{ matrix.modified_metas.file}}  [skip ci]" ) && git push)
           
 
   
