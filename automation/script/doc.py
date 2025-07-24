@@ -76,10 +76,10 @@ def get_setup_readme(script_repo):
     if '@' in repo_name:
         repo_name = repo_name.split('@')[1]
 
-    setup_readme = f"""`mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/user`, you can do
+    setup_readme = f"""`mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
 ```
-mkdir /mnt/user/MLC
-ln -s /mnt/user/MLC $HOME/MLC
+mkdir /mnt/$USER/MLC
+ln -s /mnt/$USER/MLC $HOME/MLC
 ```
 You can also use the `ENV` variable `MLC_REPOS` to control this location but this will need a set after every system reboot.
 
