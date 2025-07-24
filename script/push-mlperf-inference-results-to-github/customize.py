@@ -43,11 +43,12 @@ def preprocess(i):
 
     return {'return': 0}
 
+
 def postprocess(i):
-    
+
     os_info = i['os_info']
     env = i['env']
     meta = i['meta']
     automation = i['automation']
 
-    env['MLC_LOCAL_SUBMISSION_SYNC_DIR'] = env['MLC_GIT_REPO_CHECKOUT_PATH']    
+    env['MLC_LOCAL_SUBMISSION_SYNC_DIR'] = env['MLC_GIT_REPO_CHECKOUT_PATH']
