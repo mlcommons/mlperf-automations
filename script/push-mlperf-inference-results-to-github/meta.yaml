@@ -7,7 +7,7 @@ default_env:
 new_env_keys: 
   - MLC_MLPERF_INFERENCE_SUBMISSION_DIR
 print_env_at_the_end:
-  MLC_MLPERF_INFERENCE_SUBMISSION_DIR: Path to the submission directory
+  MLC_LOCAL_SUBMISSION_SYNC_DIR: Path to the locally synced submission directory
 deps:
 - names:
   - python3
