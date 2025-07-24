@@ -52,3 +52,5 @@ def postprocess(i):
     automation = i['automation']
 
     env['MLC_LOCAL_SUBMISSION_SYNC_DIR'] = env['MLC_GIT_REPO_CHECKOUT_PATH']
+
+    return {'return': 0}
