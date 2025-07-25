@@ -959,6 +959,12 @@ variations:
   llama3_1-8_:
     group:
       model
+    deps:
+    - names:
+      - numpy
+      tags: get,generic-python-lib,_package.numpy
+      version_max: "1.26.999"
+      version_max_usable: "1.26.4"
     docker:
       base_image: ubuntu:24.04
       mounts:
