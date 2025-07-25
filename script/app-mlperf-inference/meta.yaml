@@ -1028,8 +1028,6 @@ variations:
         - all
         MLC_MLPERF_ACCURACY_RESULTS_DIR:
         - 'on'
-        MLC_MLPERF_SUBMISSION_SYSTEM_TYPE: 
-        - edge
       skip_if_env:
         MLC_MLPERF_IMPLEMENTATION:
         - nvidia
