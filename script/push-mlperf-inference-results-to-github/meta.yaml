@@ -5,9 +5,9 @@ category: MLPerf benchmark support
 default_env:
   MLC_MLPERF_RESULTS_GIT_REPO_URL: https://github.com/mlcommons/mlperf_inference_submissions_v4.0
 new_env_keys: 
-  - MLC_LOCAL_SUBMISSION_SYNC_DIR
+  - MLC_MLPERF_RESULTS_SYNC_DIR
 print_env_at_the_end:
-  MLC_LOCAL_SUBMISSION_SYNC_DIR: Path to the locally synced submission directory
+  MLC_MLPERF_RESULTS_SYNC_DIR: Path to the locally synced submission directory
 deps:
 - names:
   - python3
