@@ -1496,7 +1496,7 @@ variations:
       MLC_MODEL: whisper
     adr:
       vllm-from-src:
-        tags: _branch.b124e1085b1bf977e3dac96d99ffd9d8ddfdb6cc
+        tags: _sha.b124e1085b1bf977e3dac96d99ffd9d8ddfdb6cc
     deps:
       - tags: get,generic-python-lib,_package.py-libnuma
       - tags: get,generic-sys-util,_libnuma-dev
