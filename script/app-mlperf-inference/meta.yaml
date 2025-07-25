@@ -960,6 +960,7 @@ variations:
     group:
       model
     docker:
+      base_image: ubuntu:24.04
       mounts:
         - "${{ MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH }}:${{ MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH }}" 
         - "${{ MLC_DATASET_CNNDM_EVAL_PATH }}:${{ MLC_DATASET_CNNDM_EVAL_PATH }}"
@@ -971,14 +972,6 @@ variations:
         names:
           - llama3_1-8b
           - llama3-8b
-
-  llama3_1-8_,cpu:
-    docker:
-      base_image: ubuntu:24.04
-
-  llama3_1-8_,cuda:
-    docker:
-      base_image: nvcr.io/nvidia/pytorch:24.07-py3
       
   llama3_1-8b:
     base:
