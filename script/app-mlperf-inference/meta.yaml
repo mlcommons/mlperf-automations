@@ -956,7 +956,7 @@ variations:
       - waymo-accuracy-script
       tags: run,accuracy,mlperf,_waymo
   
-  llama3_1-8_:
+  llama3_1-8b_:
     group:
       model
     adr:
@@ -979,7 +979,7 @@ variations:
       
   llama3_1-8b:
     base:
-    - llama3_1-8_
+    - llama3_1-8b_
     add_deps_recursive:
       mlperf-inference-implementation:
         tags: _llama3_1-8b
@@ -1014,7 +1014,7 @@ variations:
   
   llama3.1-8b-edge:
     base:
-    - llama3_1-8_
+    - llama3_1-8b_
     add_deps_recursive:
       mlperf-inference-implementation:
         tags: _llama3_1-8b-edge
