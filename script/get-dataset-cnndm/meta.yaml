@@ -153,7 +153,7 @@ variations:
       MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/llama3.1_8b/<<<MLC_DATASET_CNNDM_FILENAME>>>
       MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
       MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
-  validation,datacenter,llama3,mlc,r2_downlaoder:
+  validation,datacenter,llama3,mlc,r2_downloader:
     adr:
       dae:
         extra_cache_tags: cnndm,dataset,llama3,val,datacenter
