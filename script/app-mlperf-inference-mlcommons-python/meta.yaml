@@ -1447,10 +1447,9 @@ variations:
     env:
       MLC_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: "https://data.pyg.org/whl/torch-<<<MLC_TORCH_VERSION>>>+cpu.html"
 
-  llama3_1-8b:
-    group: models
-    env:
-      MLC_MODEL: llama3_1-8b
+  llama3_1-8_:
+    group:
+      models
     deps:
       - tags: get,generic-python-lib,_package.transformers
       - tags: get,generic-python-lib,_package.sentencepiece
@@ -1467,27 +1466,35 @@ variations:
         names:
           - llama3_1-8b
           - llama3-8b
-      ## CNNDM for Llama3 8B model - edge
-      - tags: get,dataset,cnndm,_validation,_edge,_llama3,_mlc,_r2_downloader
-        names:
-          - cnndm-llama3-edge
-        enable_if_env:
-          MLC_MLPERF_SUBMISSION_SYSTEM_TYPE: 
-            - edge
-        skip_if_env:
-          MLC_RUN_STATE_DOCKER:
-          - "yes"
+
+  llama3_1-8b:
+    base:
+    - llama3_1-8_
+    env:
+      MLC_MODEL: llama3_1-8b
+    deps:
       ## CNNDM for Llama3 8B model - datacenter
       - tags: get,dataset,cnndm,_validation,_datacenter,_llama3,_mlc,_r2_downloader
         names:
           - cnndm-llama3-datacenter
-        enable_if_env:
-          MLC_MLPERF_SUBMISSION_SYSTEM_TYPE: 
-            - datacenter
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
           - "yes"
         
+  llama3_1-8b-edge:
+    base:
+    - llama3_1-8_
+    env:
+      MLC_MODEL: llama3_1-8b-edge
+    deps:
+      ## CNNDM for Llama3 8B model - edge
+      - tags: get,dataset,cnndm,_validation,_edge,_llama3,_mlc,_r2_downloader
+        names:
+          - cnndm-llama3-edge
+        skip_if_env:
+          MLC_RUN_STATE_DOCKER:
+          - "yes"
+
   whisper:
     group: models
     env:
