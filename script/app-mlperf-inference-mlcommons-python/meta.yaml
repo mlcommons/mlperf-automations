@@ -1449,7 +1449,7 @@ variations:
     env:
       MLC_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: "https://data.pyg.org/whl/torch-<<<MLC_TORCH_VERSION>>>+cpu.html"
 
-  llama3_1-8_:
+  llama3_1-8b_:
     group:
       models
     deps:
@@ -1471,7 +1471,7 @@ variations:
 
   llama3_1-8b:
     base:
-    - llama3_1-8_
+    - llama3_1-8b_
     env:
       MLC_MODEL: llama3_1-8b
     deps:
@@ -1485,7 +1485,7 @@ variations:
         
   llama3_1-8b-edge:
     base:
-    - llama3_1-8_
+    - llama3_1-8b_
     env:
       MLC_MODEL: llama3_1-8b-edge
     deps:
