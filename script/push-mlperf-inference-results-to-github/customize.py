@@ -53,4 +53,8 @@ def postprocess(i):
 
     env['MLC_MLPERF_RESULTS_SYNC_DIR'] = env['MLC_GIT_REPO_CHECKOUT_PATH']
 
+    logger = automation.logger
+
+    logger.log(f"Path to the locally synced submission directory: {MLC_MLPERF_RESULTS_SYNC_DIR}")
+
     return {'return': 0}
