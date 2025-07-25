@@ -55,6 +55,7 @@ def postprocess(i):
 
     logger = automation.logger
 
-    logger.log(f"Path to the locally synced submission directory: {MLC_MLPERF_RESULTS_SYNC_DIR}")
+    logger.log(
+        f"Path to the locally synced submission directory: {MLC_MLPERF_RESULTS_SYNC_DIR}")
 
     return {'return': 0}
