@@ -974,7 +974,7 @@ variations:
 
   llama3_1-8_,cpu:
     docker:
-      base_image: ubuntu;24.04
+      base_image: ubuntu:24.04
 
   llama3_1-8_,cuda:
     docker:
