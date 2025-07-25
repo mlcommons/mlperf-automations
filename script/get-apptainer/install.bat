@@ -1,2 +1,2 @@
-echo "Please install docker to continue"
+echo "Please install apptainer to continue"
 exit 1
