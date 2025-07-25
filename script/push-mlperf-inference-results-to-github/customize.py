@@ -42,3 +42,15 @@ def preprocess(i):
         env['MLC_GIT_PUSH_CMD'] = "git push"
 
     return {'return': 0}
+
+
+def postprocess(i):
+
+    os_info = i['os_info']
+    env = i['env']
+    meta = i['meta']
+    automation = i['automation']
+
+    env['MLC_MLPERF_RESULTS_SYNC_DIR'] = env['MLC_GIT_REPO_CHECKOUT_PATH']
+
+    return {'return': 0}

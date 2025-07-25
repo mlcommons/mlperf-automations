@@ -211,6 +211,8 @@ deps:
         - cpu
 
   - tags: install-vllm-from-src,_cpu
+    names:
+      - vllm-from-src
     enable_if_env:
       MLC_MLPERF_BACKEND:
         - vllm
@@ -1499,6 +1501,9 @@ variations:
     group: models
     env:
       MLC_MODEL: whisper
+    adr:
+      vllm-from-src:
+        tags: _sha.b124e1085b1bf977e3dac96d99ffd9d8ddfdb6cc
     deps:
       - tags: get,generic-python-lib,_package.py-libnuma
       - tags: get,generic-sys-util,_libnuma-dev
@@ -1522,10 +1527,6 @@ variations:
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
           - "yes"
-  
-  whisper,cpu:
-    deps:
-      - tags: install-vllm-from-src,_cpu
   
   deepseek-r1:
     group: models
