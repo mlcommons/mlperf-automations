@@ -58,6 +58,7 @@ def postprocess(i):
     logger.log(
         f"Path to the locally synced submission directory: {MLC_MLPERF_RESULTS_SYNC_DIR}")
 
-    print(f"Path to the locally synced submission directory: {MLC_MLPERF_RESULTS_SYNC_DIR}")
+    print(
+        f"Path to the locally synced submission directory: {MLC_MLPERF_RESULTS_SYNC_DIR}")
 
     return {'return': 0}
