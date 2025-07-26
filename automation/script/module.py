@@ -529,12 +529,6 @@ class ScriptAutomation(Automation):
             if i.get(key):
                 ii[key] = i[key]
 
-        # if cm run script without tags/artifact and with --help
-        if len(ii.get('parsed_artifact', [])) == 0 and ii.get(
-                'tags', '') == '' and i.get('help', False):
-            return utils.call_internal_module(
-                self, __file__, 'module_help', 'print_help', {'meta': {}, 'path': ''})
-
         r = self.search(ii)
         if r['return'] > 0:
             return r
@@ -791,8 +785,7 @@ class ScriptAutomation(Automation):
 
         # Check if has --help
         if i.get('help', False):
-            return utils.call_internal_module(self, __file__, 'module_help', 'print_help', {
-                                              'meta': meta, 'path': path})
+            return self.help(i)
 
         run_state['script_id'] = meta['alias'] + "," + meta['uid']
         run_state['script_tags'] = script_tags
@@ -4528,6 +4521,36 @@ pip install mlcflow
 
         from script.doc import generate_doc
         return generate_doc(self, i)
+
+    ############################################################
+
+    def help(self, i):
+        """
+        Document MLC script.
+
+        Args:
+          (MLC input dict):
+
+          (out) (str): if 'con', output to console
+
+          parsed_artifact (list): prepared in MLC CLI or MLC access function
+                                    [ (artifact alias, artifact UID) ] or
+                                    [ (artifact alias, artifact UID), (artifact repo alias, artifact repo UID) ]
+
+          (repos) (str): list of repositories to search for automations
+
+          (output_dir) (str): output directory (../docs by default)
+
+        Returns:
+          (MLC return dict):
+
+          * return (int): return code == 0 if no error and >0 if error
+          * (error) (str): error string if return>0
+
+        """
+
+        from script.help import display_help
+        return display_help(self, i)
 
     ############################################################
 
