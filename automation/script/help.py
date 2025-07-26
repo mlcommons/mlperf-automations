@@ -39,12 +39,12 @@ def display_help(self_module, input_params):
     # Step 4: Iterate over scripts and generate help output
     for script in sorted(scripts_list, key=lambda x: x.meta.get('alias', '')):
         metadata = script.meta
-        print_script_help(metadata, generic_inputs)
+        script_path = script.path
+        print_script_help(metadata, script_path, generic_inputs, env, self_module)
 
     return {'return': 0}
 
-
-def print_script_help(metadata, generic_inputs):
+def print_script_help(metadata, script_path, generic_inputs, env, self_module):
     print("")
     print(f"Script Name: {metadata.get('alias', metadata['uid'])}")
     print(f"Tags: {', '.join(metadata.get('tags', []))}")
@@ -72,7 +72,21 @@ def print_script_help(metadata, generic_inputs):
     else:
         print("    - No variations.")
 
-    print("\n" + "=" * 40 + "\n")  # Separator for clarity
+    print("\n" + "=" * 60 + "\n")  # Separator for clarity
+
+    print(f"""Script meta file path: {os.path.join(script_path, "meta.yaml")}""")
+    customize_path = os.path.join(script_path, "customize.py")
+    if os.path.exists(customize_path):
+        print(f"""Script customize file path: {customize_path}""")
+    else:
+        print(f"""Script customize file can be created at: {customize_path}""")
+   
+    run_script_name = self_module._get_script_name(env, script_path)
+    run_script_path = os.path.join(script_path, run_script_name)
+    if os.path.exists(run_script_path):
+        print(f"""Script run file path: {run_script_path}""")
+    
+    print("\n" + "=" * 60 + "\n")  # Separator for clarity
 
 
 def print_input_details(input_mapping, input_description, default_env):
@@ -83,6 +97,10 @@ def print_input_details(input_mapping, input_description, default_env):
             if i not in input_description:
                 input_description[i] = {}
             input_description[i]['env_key'] = input_mapping[i]
+
+    keys_to_delete = [key for key in input_description if key not in input_mapping and "." not in key]
+    for key in keys_to_delete:
+        del input_description[key]
 
     if input_description:
         reverse_map = defaultdict(list)
@@ -101,7 +119,8 @@ def print_input_details(input_mapping, input_description, default_env):
                     if alias in input_description:
                         input_description[alias] = {}
                         input_description[alias]['alias'] = canonical
-                        input_description[alias]['desc'] = f"""Alias for {canonical}"""
+                        input_description[alias]['desc'] = f"""Alias for --{canonical}"""
+                        input_description[alias]['env_key'] = mapped_env
 
     print_input_descriptions(input_description)
 
@@ -109,16 +128,27 @@ def print_input_details(input_mapping, input_description, default_env):
 
 
 def print_input_descriptions(input_descriptions):
+
+    if not input_descriptions:
+        print("\tNo inputs")
+
     for key in input_descriptions:
-        env_key = input_descriptions.get(key, {}).get(
-            'env_key', f"""MLC_TMP_{key.upper()}""")
-        desc = input_descriptions.get(
-            key, {}).get(
-            'desc', 'No description available')
-        default = input_descriptions.get(key, {}).get('default', 'None')
+        field = input_descriptions[key]
+        env_key = field.get('env_key', f"""MLC_TMP_{key.upper()}""")
+        desc = field.get('desc')
+        default = field.get('default', 'None')
+        choices = field.get("choices", "")
+        dtype = infer_type(field)
         # Use .ljust(15) to ensure the key occupies 15 characters minimum
-        print(
-            f"    --{key.ljust(26)} : maps to --env.{env_key}\n{' '.ljust(35)}{desc}\n{' '.ljust(35)}Default: {default}\n")
+        print(f"\t--{key.ljust(26)}: maps to --env.{env_key}")
+        if desc:
+            print(f"\t{' '.ljust(30)}Desc: {desc}")
+        print(f"\t{' '.ljust(30)}Default: {default}")
+        if choices:
+            print(f"\t{' '.ljust(30)}Choices: {choices}")
+        if dtype:
+            print(f"\t{' '.ljust(30)}Type: {dtype}")
+        print("")
 
 
 def print_variations_help(variations):
@@ -168,7 +198,7 @@ def print_variations_help(variations):
 
         if bases.get(var):
             base_str = ", ".join(bases[var])
-            output += f" [Base: {base_str}]"
+            output += f" [base: {base_str}]"
 
         if group != "ungrouped" and main_variations[var].get("default", False):
             output += " [Default]"
