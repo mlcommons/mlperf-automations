@@ -43,6 +43,7 @@ def display_help(self_module, input_params):
 
     return {'return': 0}
 
+
 def print_script_help(metadata, generic_inputs):
     print("")
     print(f"Script Name: {metadata.get('alias', metadata['uid'])}")
@@ -73,12 +74,12 @@ def print_script_help(metadata, generic_inputs):
 
     print("\n" + "=" * 40 + "\n")  # Separator for clarity
 
-    
+
 def print_input_details(input_mapping, input_description, default_env):
 
-
     for i in input_mapping:
-        if i not in input_description or input_description[i].get('env','') != input_mapping[i]:
+        if i not in input_description or input_description[i].get(
+                'env', '') != input_mapping[i]:
             if i not in input_description:
                 input_description[i] = {}
             input_description[i]['env_key'] = input_mapping[i]
@@ -87,7 +88,7 @@ def print_input_details(input_mapping, input_description, default_env):
         reverse_map = defaultdict(list)
         for k, v in input_mapping.items():
             reverse_map[v].append(k)
-        
+
         for i in input_description:
             if i in input_mapping and input_mapping[i] in default_env:
                 input_description[i]['default'] = default_env[input_mapping[i]]
@@ -106,13 +107,18 @@ def print_input_details(input_mapping, input_description, default_env):
 
     return
 
+
 def print_input_descriptions(input_descriptions):
     for key in input_descriptions:
-        env_key = input_descriptions.get(key, {}).get('env_key', f"""MLC_TMP_{key.upper()}""")
-        desc = input_descriptions.get(key, {}).get('desc', 'No description available')
+        env_key = input_descriptions.get(key, {}).get(
+            'env_key', f"""MLC_TMP_{key.upper()}""")
+        desc = input_descriptions.get(
+            key, {}).get(
+            'desc', 'No description available')
         default = input_descriptions.get(key, {}).get('default', 'None')
         # Use .ljust(15) to ensure the key occupies 15 characters minimum
-        print(f"    --{key.ljust(26)} : maps to --env.{env_key}\n{' '.ljust(35)}{desc}\n{' '.ljust(35)}Default: {default}\n")
+        print(
+            f"    --{key.ljust(26)} : maps to --env.{env_key}\n{' '.ljust(35)}{desc}\n{' '.ljust(35)}Default: {default}\n")
 
 
 def print_variations_help(variations):
@@ -191,7 +197,7 @@ def print_run_commands(metadata):
     print(f"""
         * Any input can be appended to the run command directly or using its --env.key mapping.
         * --env.key is useful to modify the input of a dependent script for which direct input may not be there in the main script.
-        * Any variation can be selected by adding it to the tags using the _ prefix. 
+        * Any variation can be selected by adding it to the tags using the _ prefix.
           For example, mlcr get,generic-python-lib,_panda turns on the panda variation for the get-generic-python-lib script.
         * --adr.<dep_name> can be used to modify the dependency(ies) with the name dep_name.
           For example, --adr.compiler.tags=gcc adds the tag 'gcc' to any dependency with the name compiler.
