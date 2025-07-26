@@ -4,6 +4,7 @@ from utils import *
 import os
 from collections import defaultdict
 
+
 def display_help(self_module, input_params):
     """
     Generates the documentation of MLC scripts.
@@ -40,6 +41,7 @@ def display_help(self_module, input_params):
 
     return {'return': 0}
 
+
 def print_script_help(metadata):
     print(f"Script Name: {metadata.get('alias', metadata['uid'])}")
     print(f"Tags: {', '.join(metadata.get('tags', []))}")
@@ -72,12 +74,13 @@ def print_script_help(metadata):
                         input_description[alias]['alias'] = canonical
                         input_description[alias]['desc'] = f"""Alias for {canonical}"""
 
-
     for key, value in input_mapping.items():
-        desc = input_description.get(key, {}).get('desc', 'No description available')
+        desc = input_description.get(key, {}).get(
+            'desc', 'No description available')
         default = input_description.get(key, {}).get('default', 'None')
         # Use .ljust(15) to ensure the key occupies 15 characters minimum
-        print(f"    --{key.ljust(26)} : maps to --env.{value}\n{' '.ljust(35)}{desc}\n{' '.ljust(35)}Default: {default}\n")
+        print(
+            f"    --{key.ljust(26)} : maps to --env.{value}\n{' '.ljust(35)}{desc}\n{' '.ljust(35)}Default: {default}\n")
 
     variations = metadata.get('variations', {})
 
@@ -152,7 +155,6 @@ def print_variations_help(variations):
         print("")  # Blank line between groups
 
 
-
 def print_run_commands(metadata):
     tags = ','.join(metadata.get('tags', []))
     input_mapping = metadata.get('input_mapping', {})
@@ -171,7 +173,6 @@ def print_run_commands(metadata):
     """)
 
 
-
 def infer_type(field):
     if "dtype" in field:
         return field["dtype"]
@@ -179,5 +180,3 @@ def infer_type(field):
         return type(field["default"]).__name__
     else:
         return "str"
-
-

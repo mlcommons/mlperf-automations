@@ -529,7 +529,6 @@ class ScriptAutomation(Automation):
             if i.get(key):
                 ii[key] = i[key]
 
-
         r = self.search(ii)
         if r['return'] > 0:
             return r
