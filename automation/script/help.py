@@ -40,9 +40,15 @@ def display_help(self_module, input_params):
     for script in sorted(scripts_list, key=lambda x: x.meta.get('alias', '')):
         metadata = script.meta
         script_path = script.path
-        print_script_help(metadata, script_path, generic_inputs, env, self_module)
+        print_script_help(
+            metadata,
+            script_path,
+            generic_inputs,
+            env,
+            self_module)
 
     return {'return': 0}
+
 
 def print_script_help(metadata, script_path, generic_inputs, env, self_module):
     print("")
@@ -74,18 +80,19 @@ def print_script_help(metadata, script_path, generic_inputs, env, self_module):
 
     print("\n" + "=" * 60 + "\n")  # Separator for clarity
 
-    print(f"""Script meta file path: {os.path.join(script_path, "meta.yaml")}""")
+    print(
+        f"""Script meta file path: {os.path.join(script_path, "meta.yaml")}""")
     customize_path = os.path.join(script_path, "customize.py")
     if os.path.exists(customize_path):
         print(f"""Script customize file path: {customize_path}""")
     else:
         print(f"""Script customize file can be created at: {customize_path}""")
-   
+
     run_script_name = self_module._get_script_name(env, script_path)
     run_script_path = os.path.join(script_path, run_script_name)
     if os.path.exists(run_script_path):
         print(f"""Script run file path: {run_script_path}""")
-    
+
     print("\n" + "=" * 60 + "\n")  # Separator for clarity
 
 
@@ -98,7 +105,8 @@ def print_input_details(input_mapping, input_description, default_env):
                 input_description[i] = {}
             input_description[i]['env_key'] = input_mapping[i]
 
-    keys_to_delete = [key for key in input_description if key not in input_mapping and "." not in key]
+    keys_to_delete = [
+        key for key in input_description if key not in input_mapping and "." not in key]
     for key in keys_to_delete:
         del input_description[key]
 
