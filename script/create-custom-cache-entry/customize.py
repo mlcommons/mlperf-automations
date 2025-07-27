@@ -5,7 +5,7 @@ import shutil
 
 def preprocess(i):
 
-    # CM script internal variables
+    # MLC script internal variables
     env = i['env']
     logger = i['automation'].logger
     extra_cache_tags = []

@@ -46,8 +46,8 @@ def postprocess(i):
         with open(fjson, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
     except Exception as e:
-        logger.warning('CM warning: {}'.format(e))
-        logger.warning('CM warning: {}'.format(e))
+        logger.warning('MLC warning: {}'.format(e))
+        logger.warning('MLC warning: {}'.format(e))
 
     try:
         import yaml

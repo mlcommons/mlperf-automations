@@ -1,4 +1,4 @@
-# Identification of this CM script
+# Identification of this MLC script
 alias: reproduce-mlperf-training-nvidia
 uid: f183628f292341e2
 cache: false
@@ -9,7 +9,7 @@ automation_uid: 5b4e0237da074764
 category: "Reproduce MLPerf benchmarks"
 
 
-# User-friendly tags to find this CM script
+# User-friendly tags to find this MLC script
 tags:
   - reproduce
   - mlcommons
@@ -29,7 +29,7 @@ new_state_keys:
   - mlperf-training-implementation
   - MLC_SUT_*
 
-# Dependencies on other CM scripts
+# Dependencies on other MLC scripts
 
 deps:
 

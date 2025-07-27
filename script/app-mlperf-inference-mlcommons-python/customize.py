@@ -580,7 +580,7 @@ def get_run_cmd_reference(
             --dataset_dir {x}{env['MLC_DATASET_WHISPER_PATH']}{x} \
             --manifest {x}{os.path.join(env['MLC_DATASET_WHISPER_PATH'], "data", "dev-all-repack.json")}{x} \
             --log_dir {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
-            --model-path {x}{env['MLC_ML_MODEL_WHISPER_PATH']}{x} \
+            --model_path {x}{env['MLC_ML_MODEL_WHISPER_PATH']}{x} \
             {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} \
             {scenario_extra_options} {mode_extra_options}"""
 

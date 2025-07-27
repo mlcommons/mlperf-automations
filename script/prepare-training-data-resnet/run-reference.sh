@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#CM Script location: ${MLC_TMP_CURRENT_SCRIPT_PATH}
+#MLC Script location: ${MLC_TMP_CURRENT_SCRIPT_PATH}
 
 #To export any variable
 #echo "VARIABLE_NAME=VARIABLE_VALUE" >>tmp-run-env.out

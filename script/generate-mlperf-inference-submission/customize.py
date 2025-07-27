@@ -488,7 +488,7 @@ def generate_submission(env, state, inp, submission_division, logger):
                                     result_mode_path, "system_meta.json")
                             else:
                                 logger.error(
-                                    "WARNING: system_meta.json was not found in the SUT root or mode directory inside the results folder. CM is automatically creating one using the system defaults. Please modify them as required.")
+                                    "WARNING: system_meta.json was not found in the SUT root or mode directory inside the results folder. MLC is automatically creating one using the system defaults. Please modify them as required.")
                         if os.path.exists(saved_system_meta_file_path):
                             with open(saved_system_meta_file_path, "r") as f:
                                 saved_system_meta = json.load(f)

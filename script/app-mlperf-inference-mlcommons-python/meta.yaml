@@ -1,4 +1,4 @@
-# Identification of this CM script
+# Identification of this MLC script
 alias: app-mlperf-inference-mlcommons-python
 uid: ff149e9781fc4b65
 
@@ -9,7 +9,7 @@ category: "Modular MLPerf inference benchmark pipeline"
 
 developers: "[Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Thomas Zhu](https://www.linkedin.com/in/hanwen-zhu-483614189), [Grigori Fursin](https://cKnowledge.org/gfursin)"
 
-# User-friendly tags to find this CM script
+# User-friendly tags to find this MLC script
 tags:
   - app
   - vision
@@ -70,7 +70,7 @@ input_mapping:
   deeplab_resnet50_path: MLC_ML_MODEL_DPLAB_RESNET50_PATH
   waymo_path: MLC_DATASET_WAYMO_PATH
 
-# Duplicate CM environment variables to the ones used in native apps
+# Duplicate MLC environment variables to the ones used in native apps
 env_key_mappings:
   MLC_HOST_: HOST_
   MLC_ML_: ML_
@@ -89,7 +89,7 @@ new_state_keys:
   - mlperf-inference-implementation
   - MLC_SUT_*
 
-# Dependencies on other CM scripts
+# Dependencies on other MLC scripts
 deps:
   # Detect host OS features
   - tags: detect,os
@@ -98,7 +98,7 @@ deps:
   - tags: detect,cpu
 
   # Install system dependencies on a given host
-  - tags: get,sys-utils-cm
+  - tags: get,sys-utils-mlc
 
   # Detect/install python
   - tags: get,python
@@ -126,7 +126,7 @@ deps:
         - tensorrt
 
   ########################################################################
-  # Install ML engines via CM
+  # Install ML engines via MLC
 
   ## Onnx CPU Runtime
   - tags: get,generic-python-lib,_onnxruntime
@@ -211,6 +211,8 @@ deps:
         - cpu
 
   - tags: install-vllm-from-src,_cpu
+    names:
+      - vllm-from-src
     enable_if_env:
       MLC_MLPERF_BACKEND:
         - vllm
@@ -524,7 +526,7 @@ deps:
         - "yes"
   
   ## LLAMA3_1-8B
-  - tags: get,ml-model,llama3,_hf,_meta-llama/Llama-3.1-8B-Instruct
+  - tags: get,ml-model,llama3,_mlc,_8b,_r2_downloader
     names:
       - llama3-8b-model
     enable_if_env:
@@ -1447,10 +1449,9 @@ variations:
     env:
       MLC_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: "https://data.pyg.org/whl/torch-<<<MLC_TORCH_VERSION>>>+cpu.html"
 
-  llama3_1-8b:
-    group: models
-    env:
-      MLC_MODEL: llama3_1-8b
+  llama3_1-8b_:
+    group:
+      models
     deps:
       - tags: get,generic-python-lib,_package.transformers
       - tags: get,generic-python-lib,_package.sentencepiece
@@ -1467,31 +1468,42 @@ variations:
         names:
           - llama3_1-8b
           - llama3-8b
-      ## CNNDM for Llama3 8B model - edge
-      - tags: get,dataset,cnndm,_validation,_edge,_llama3,_mlc,_rclone
-        names:
-          - cnndm-llama3-edge
-        enable_if_env:
-          MLC_MLPERF_SUBMISSION_SYSTEM_TYPE: 
-            - edge
-        skip_if_env:
-          MLC_RUN_STATE_DOCKER:
-          - "yes"
+
+  llama3_1-8b:
+    base:
+    - llama3_1-8b_
+    env:
+      MLC_MODEL: llama3_1-8b
+    deps:
       ## CNNDM for Llama3 8B model - datacenter
-      - tags: get,dataset,cnndm,_validation,_datacenter,_llama3,_mlc,_rclone
+      - tags: get,dataset,cnndm,_validation,_datacenter,_llama3,_mlc,_r2_downloader
         names:
           - cnndm-llama3-datacenter
-        enable_if_env:
-          MLC_MLPERF_SUBMISSION_SYSTEM_TYPE: 
-            - datacenter
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
           - "yes"
         
+  llama3_1-8b-edge:
+    base:
+    - llama3_1-8b_
+    env:
+      MLC_MODEL: llama3_1-8b-edge
+    deps:
+      ## CNNDM for Llama3 8B model - edge
+      - tags: get,dataset,cnndm,_validation,_edge,_llama3,_mlc,_r2_downloader
+        names:
+          - cnndm-llama3-edge
+        skip_if_env:
+          MLC_RUN_STATE_DOCKER:
+          - "yes"
+
   whisper:
     group: models
     env:
       MLC_MODEL: whisper
+    adr:
+      vllm-from-src:
+        tags: _sha.b124e1085b1bf977e3dac96d99ffd9d8ddfdb6cc
     deps:
       - tags: get,generic-python-lib,_package.py-libnuma
       - tags: get,generic-sys-util,_libnuma-dev
@@ -1503,29 +1515,25 @@ variations:
       # - tags: get,generic-python-lib,_package.evaluate
       # - tags: get,generic-python-lib,_package.absl-py
       # - tags: get,generic-python-lib,_package.rouge-score
-      - tags: get,ml-model,whisper,_rclone,_mlc
+      - tags: get,ml-model,whisper,_r2_downloader,_mlc
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
           - "yes"
         names:
           - whisper-model
-      - tags: get,dataset,whisper,_preprocessed,_mlc,_rclone
+      - tags: get,dataset,whisper,_preprocessed,_mlc,_r2_downloader
         names:
           - whisper-dataset
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
           - "yes"
   
-  whisper,cpu:
-    deps:
-      - tags: install-vllm-from-src,_cpu
-  
   deepseek-r1:
     group: models
     env:
       MLC_MODEL: deepseek-r1
     deps:
-      - tags: get,preprocessed,dataset,deepseek-r1,_validation,_mlc,_rclone
+      - tags: get,preprocessed,dataset,deepseek-r1,_validation,_mlc,_r2_downloader
         names:
           - deepseek-r1-preprocessed-dataset
         skip_if_env:

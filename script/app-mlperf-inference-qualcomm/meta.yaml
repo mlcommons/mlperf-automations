@@ -1,4 +1,4 @@
-# Identification of this CM script
+# Identification of this MLC script
 alias: app-mlperf-inference-qualcomm
 uid: eef1aca5d7c0470e
 cache: false
@@ -10,7 +10,7 @@ automation_uid: 5b4e0237da074764
 category: "Modular MLPerf benchmarks"
 
 
-# User-friendly tags to find this CM script
+# User-friendly tags to find this MLC script
 tags:
   - reproduce
   - mlcommons
@@ -79,7 +79,7 @@ new_env_keys:
   - MLC_SQUAD_ACCURACY_DTYPE
 
 
-# Dependencies on other CM scripts
+# Dependencies on other MLC scripts
 
 deps:
 
@@ -90,7 +90,7 @@ deps:
   - tags: detect,cpu
 
   # Install system dependencies on a given host
-  - tags: get,sys-utils-cm
+  - tags: get,sys-utils-mlc
 
   - tags: get,git,repo
     names:
@@ -226,7 +226,7 @@ deps:
 
 
 ########################################################################
-  # Install ML engines via CM
+  # Install ML engines via MLC
   - enable_if_env:
       MLC_MLPERF_BACKEND:
       - onnxruntime

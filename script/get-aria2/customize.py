@@ -5,7 +5,7 @@ import os
 
 def preprocess(i):
 
-    # Pre-set by CM
+    # Pre-set by MLC
     os_info = i['os_info']
     env = i['env']
     logger = i['automation'].logger

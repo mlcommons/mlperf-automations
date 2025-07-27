@@ -36,7 +36,7 @@ def preprocess(i):
 
     env['MLC_EXTRACT_FILENAME'] = filename
 
-    # Check if extract to some path outside CM cache (to reuse large files
+    # Check if extract to some path outside MLC cache (to reuse large files
     # later if cache is cleaned)
     extract_path = env.get('MLC_EXTRACT_PATH', '')
     if extract_path != '':

@@ -40,7 +40,7 @@ def preprocess(i):
                 env['MLC_DATASET_IMAGENET_VAL_REQUIRE_DAE'] = 'yes'
 
                 return {'return': 0}
-                # return {'return':1, 'error':'Please rerun the last CM command
+                # return {'return':1, 'error':'Please rerun the last MLC command
                 # with --env.IMAGENET_PATH={path the folder containing full
                 # ImageNet images} or envoke mlcr "get val dataset
                 # imagenet" --input={path to the folder containing ImageNet

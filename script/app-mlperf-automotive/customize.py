@@ -283,7 +283,7 @@ def postprocess(i):
         if env.get('MLC_HOST_SYSTEM_NAME', '') != '':
             host_info['system_name'] = env['MLC_HOST_SYSTEM_NAME']
 
-        # Check CM automation repository
+        # Check MLC automation repository
         repo_name = 'mlcommons@mlperf-automations'
         repo_hash = ''
         r = mlc.access({'action': 'find', 'automation': 'repo',
@@ -292,9 +292,6 @@ def postprocess(i):
             repo_path = r['list'][0].path
             if os.path.isdir(repo_path):
                 repo_name = os.path.basename(repo_path)
-
-                # Check dev
-                # if repo_name == 'cm4mlops': repo_name = 'mlcommons@cm4mlops'
 
                 r = utils.run_system_cmd({
                     'path': repo_path,

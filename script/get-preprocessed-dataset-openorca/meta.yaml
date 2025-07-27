@@ -7,7 +7,7 @@ category_sort: 8500
 default_env:
   MLC_DATASET_CALIBRATION: 'no'
 deps:
-- tags: get,sys-utils-cm
+- tags: get,sys-utils-mlc
 - names:
   - python
   - python3
