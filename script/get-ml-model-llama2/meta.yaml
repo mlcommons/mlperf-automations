@@ -107,6 +107,7 @@ variations:
           - yes
   r2_downloader:
     group: download-tool
+    default: true
     add_deps_recursive:
       dae:
         tags: _r2_downloader
