@@ -130,8 +130,8 @@ variations:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - 'yes'
         env:
-          MLC_DOWNLOAD_FINAL_ENV_NAME: LLAMA3_CHECKPOINT_PATH
-          MLC_EXTRACT_FINAL_ENV_NAME: LLAMA3_CHECKPOINT_PATH
+          MLC_DOWNLOAD_FINAL_ENV_NAME: LLAMA2_CHECKPOINT_PATH
+          MLC_EXTRACT_FINAL_ENV_NAME: LLAMA2_CHECKPOINT_PATH
         force_cache: true
         names:
           - dae
