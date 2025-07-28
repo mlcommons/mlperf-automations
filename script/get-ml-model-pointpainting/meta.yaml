@@ -27,9 +27,11 @@ variations:
     env:
       MLC_ML_MODEL_PP_FORMAT: onnx
       MLC_ML_MODEL_DPLAB_RESNET50_FORMAT: onnx
-  mlc:
-    group: download-src
-    default: true
+  rclone:
+    group: download-tool
+    add_deps_recursive:
+      dae:
+        tags: _rclone
     prehook_deps:
       - tags: get,rclone
         enable_if_env:
@@ -40,6 +42,47 @@ variations:
         enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - yes
+  r2_downloader:
+    group: download-tool
+    add_deps_recursive:
+      dae:
+        tags: _r2_downloader
+    default: true
+  mlc:
+    group: download-src
+    default: true
+    prehook_deps:
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - 'yes'
+        env:
+          MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_POINT_PAINTING_TMP_PATH
+          MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_MODEL_POINT_PAINTING_TMP_PATH
+        extra_cache_tags: waymo,dataset
+        force_cache: true
+        names:
+          - dae
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
     env:
       MLC_DOWNLOAD_SRC: mlcommons
-  
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  dry-run,r2_downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  rclone,mlc:
+    env:
+      MLC_DOWNLOAD_URL: mlc-waymo:waymo_preprocessed_dataset/model
+  r2_downloader,mlc:
+    env:
+      MLC_DOWNLOAD_URL: https://waymo.mlcommons-storage.org/metadata/model.uri
