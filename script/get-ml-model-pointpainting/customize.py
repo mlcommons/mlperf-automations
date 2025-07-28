@@ -40,7 +40,7 @@ def postprocess(i):
             else:
                 env['MLC_ML_MODEL_POINT_PAINTING_PATH'] = os.path.join(
                     env['MLC_ML_MODEL_POINT_PAINTING_TMP_PATH'], "pp_ep36.pth")
-                    
+
         if env.get('MLC_ML_MODEL_DPLAB_RESNET50_PATH', '') == '':
             if env['MLC_ML_MODEL_DPLAB_RESNET50_FORMAT'] == "onnx":
                 env['MLC_ML_MODEL_DPLAB_RESNET50_PATH'] = os.path.join(
