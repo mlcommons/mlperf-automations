@@ -42,11 +42,11 @@ variations:
         enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - yes
-  r2_downloader:
+  r2-downloader:
     group: download-tool
     add_deps_recursive:
       dae:
-        tags: _r2_downloader
+        tags: _r2-downloader
     default: true
   mlc:
     group: download-src
@@ -77,12 +77,12 @@ variations:
   dry-run,rclone:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  dry-run,r2_downloader:
+  dry-run,r2-downloader:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   rclone,mlc:
     env:
       MLC_DOWNLOAD_URL: mlc-waymo:waymo_preprocessed_dataset/model
-  r2_downloader,mlc:
+  r2-downloader,mlc:
     env:
       MLC_DOWNLOAD_URL: https://waymo.mlcommons-storage.org/metadata/model.uri
