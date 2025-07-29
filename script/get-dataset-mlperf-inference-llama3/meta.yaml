@@ -40,7 +40,7 @@ variations:
     env:
       MLC_RCLONE_URL: mlc-inference:mlcommons-inference-wg-public/llama3.1_405b/mlperf_llama3.1_405b_dataset_8313_processed_fp16_eval.pkl
       MLC_DATASET_FILE_NAME: mlperf_llama3.1_405b_dataset_8313_processed_fp16_eval.pkl
-  validation,r2_downloader:
+  validation,r2-downloader:
     env:
       MLC_RCLONE_URL: ""
       MLC_DATASET_FILE_NAME: ""
@@ -54,7 +54,7 @@ variations:
     env:
       MLC_RCLONE_URL: mlc-inference:mlcommons-inference-wg-public/llama3.1_405b/mlperf_llama3.1_405b_calibration_dataset_512_processed_fp16_eval.pkl
       MLC_DATASET_FILE_NAME: mlperf_llama3.1_405b_calibration_dataset_512_processed_fp16_eval.pkl
-  calibration,r2_downloader:
+  calibration,r2-downloader:
     env:
       MLC_RCLONE_URL: ""
       MLC_DATASET_FILE_NAME: ""
@@ -68,10 +68,10 @@ variations:
       MLC_DOWNLOAD_URL: <<<MLC_RCLONE_URL>>>
       MLC_RCLONE_CONFIG_NAME: mlc-inference
     group: download-tool
-  r2_downloader:
+  r2-downloader:
     add_deps_recursive:
       dae:
-        tags: _r2_downloader
+        tags: _r2-downloader
     env:
       MLC_DOWNLOAD_FILENAME: checkpoint
       MLC_RCLONE_CONFIG_NAME: mlc-inference
