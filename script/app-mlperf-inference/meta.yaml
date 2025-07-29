@@ -1012,7 +1012,7 @@ variations:
           MLC_USE_DATASET_FROM_HOST:
           - 'yes'
   
-  llama3.1-8b-edge:
+  llama3_1-8b-edge:
     base:
     - llama3_1-8b_
     add_deps_recursive:
