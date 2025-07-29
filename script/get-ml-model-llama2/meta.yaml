@@ -45,8 +45,8 @@ tests:
   needs_pat: true
   run_inputs:
   - variations_list:
-    - r2_downloader,70b,mlc,dry-run
-    - r2_downloader,7b,mlc,dry-run
+    - r2-downloader,70b,mlc,dry-run
+    - r2-downloader,7b,mlc,dry-run
 variations:
   L40s:
     env:
@@ -105,12 +105,12 @@ variations:
         enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - yes
-  r2_downloader:
+  r2-downloader:
     group: download-tool
     default: true
     add_deps_recursive:
       dae:
-        tags: _r2_downloader
+        tags: _r2-downloader
   dry-run:
     group: run-mode
     env:
@@ -118,7 +118,7 @@ variations:
   dry-run,rclone:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  dry-run,r2_downloader:
+  dry-run,r2-downloader:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   mlc:
@@ -148,10 +148,10 @@ variations:
   mlc,rclone,7b:
     env:
       MLC_DOWNLOAD_URL: mlc-llama2:Llama-2-7b-chat-hf
-  mlc,r2_downloader,70b:
+  mlc,r2-downloader,70b:
     env:
       MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama-2-70b-chat-hf.uri
-  mlc,r2_downloader,7b:
+  mlc,r2-downloader,7b:
     env:
       MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama-2-7b-chat-hf.uri
   hf:
