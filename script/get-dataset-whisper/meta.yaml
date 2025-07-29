@@ -14,7 +14,7 @@ tests:
   run_inputs:
   - variations_list:
     - rclone,preprocessed,mlc,dry-run
-    - r2_downloader,preprocessed,mlc,dry-run
+    - r2-downloader,preprocessed,mlc,dry-run
 variations:
   preprocessed:
     group: dataset-type
@@ -45,7 +45,7 @@ variations:
   dry-run,rclone:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  dry-run,r2_downloader:
+  dry-run,r2-downloader:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   mlc:
@@ -59,10 +59,10 @@ variations:
         tags: _rclone
     default: true
     group: download-tool
-  r2_downloader:
+  r2-downloader:
     add_deps_recursive:
       dae:
-        tags: _r2_downloader
+        tags: _r2-downloader
     group: download-tool
   rclone,preprocessed:
     env:
@@ -95,6 +95,6 @@ variations:
       update_tags_from_env_with_prefix:
         _url.:
         - MLC_DOWNLOAD_URL
-  r2_downloader,preprocessed:
+  r2-downloader,preprocessed:
     env:
       MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/whisper-dataset.uri

@@ -16,7 +16,7 @@ tests:
   run_inputs:
   - variations_list:
     - rclone,mlc,dry-run
-    - r2_downloader,mlc,dry-run
+    - r2-downloader,mlc,dry-run
 uid: 3bea2356e97f47b1
 variations:
   dry-run:
@@ -26,7 +26,7 @@ variations:
   dry-run,rclone:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  dry-run,r2_downloader:
+  dry-run,r2-downloader:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   mlc:
@@ -46,14 +46,14 @@ variations:
       force_env_keys:
       - MLC_OUTDIRNAME
       names:
-      - dae
+      - whisper-model-dae
       tags: download-and-extract
       update_tags_from_env_with_prefix:
         _url.:
         - MLC_DOWNLOAD_URL
   rclone:
-    add_deps_recursive:
-      dae:
+    adr:
+      whisper-model-dae:
         tags: _rclone
         env:
           MLC_DOWNLOAD_URL: 'mlc-inference:mlcommons-inference-wg-public/Whisper/model/'
@@ -71,10 +71,10 @@ variations:
         tags: get,rclone-config,_mlc-inference
     default: true
     group: download-tool
-  r2_downloader:
-    add_deps_recursive:
-      dae:
-        tags: _r2_downloader
+  r2-downloader:
+    adr:
+      whisper-model-dae:
+        tags: _r2-downloader
         env:
           MLC_DOWNLOAD_URL: 'https://inference.mlcommons-storage.org/metadata/whisper-model.uri'
     group: download-tool

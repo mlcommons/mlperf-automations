@@ -72,11 +72,11 @@ variations:
     add_deps_recursive:
       dae:
         tags: _rclone
-  r2_downloader:
+  r2-downloader:
     group: download-tool
     add_deps_recursive:
       dae:
-        tags: _r2_downloader
+        tags: _r2-downloader
   dry-run:
     group: run-mode
     env:
@@ -84,7 +84,7 @@ variations:
   dry-run,rclone:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  dry-run,r2_downloader:
+  dry-run,r2-downloader:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   mlc:
@@ -135,7 +135,7 @@ variations:
       MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/llama3.1_8b/<<<MLC_DATASET_CNNDM_FILENAME>>>
       MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
       MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
-  validation,edge,llama3,mlc,r2_downloader:
+  validation,edge,llama3,mlc,r2-downloader:
     adr:
       dae:
         extra_cache_tags: cnndm,dataset,llama3,val,edge
@@ -153,7 +153,7 @@ variations:
       MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/llama3.1_8b/<<<MLC_DATASET_CNNDM_FILENAME>>>
       MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
       MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
-  validation,datacenter,llama3,mlc,r2_downloader:
+  validation,datacenter,llama3,mlc,r2-downloader:
     adr:
       dae:
         extra_cache_tags: cnndm,dataset,llama3,val,datacenter
@@ -171,7 +171,7 @@ variations:
       MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/llama3.1_8b/<<<MLC_DATASET_CNNDM_FILENAME>>>
       MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_CALIBRATION_DATASET_CNNDM_PATH
       MLC_EXTRACT_FINAL_ENV_NAME: MLC_CALIBRATION_DATASET_CNNDM_PATH
-  calibation,llama3,mlc,r2_downloader:
+  calibation,llama3,mlc,r2-downloader:
     adr:
       dae:
         extra_cache_tags: cnndm,dataset,llama3,calib
@@ -185,7 +185,7 @@ tests:
   - variations_list:
       # - validation,edge,rclone,llama3,mlc,dry-run
       # - validation,datacenter,rclone,llama3,mlc,dry-run
-      - validation,edge,r2_downloader,llama3,mlc,dry-run
-      - validation,datacenter,r2_downloader,llama3,mlc,dry-run
-      - calibration,r2_downloader,llama3,mlc,dry-run
+      - validation,edge,r2-downloader,llama3,mlc,dry-run
+      - validation,datacenter,r2-downloader,llama3,mlc,dry-run
+      - calibration,r2-downloader,llama3,mlc,dry-run
       # - calibration,rclone,llama3,mlc,dry-run

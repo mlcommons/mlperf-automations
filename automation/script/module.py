@@ -1384,6 +1384,7 @@ class ScriptAutomation(Automation):
                       'script_alias': meta['alias'],
                       'extra_tags': ",".join(extra_cache_tags),
                       'tags': ','.join(tmp_tags),
+                      'exact_tags_match': True,
                       'meta': cached_meta,
                       'force': True}
 

@@ -125,9 +125,9 @@ variations:
       download-script:
         tags: _wget
     group: download-tool
-  r2_downloader:
+  r2-downloader:
     add_deps:
       download-script:
-        tags: _r2_downloader
+        tags: _r2-downloader
     group: download-tool
 versions: {}

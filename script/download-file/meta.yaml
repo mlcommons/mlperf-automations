@@ -77,9 +77,9 @@ variations:
     env:
       MLC_DOWNLOAD_TOOL: wget
     group: download-tool
-  r2_downloader:
+  r2-downloader:
     env:
-      MLC_DOWNLOAD_TOOL: r2_downloader
+      MLC_DOWNLOAD_TOOL: r2-downloader
     group: download-tool
     
 versions: {}
