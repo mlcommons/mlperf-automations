@@ -38,8 +38,8 @@ tests:
   run_inputs:
   - variations_list:
     - rclone,405b,mlc,dry-run
-    - r2_downloader,405b,mlc,dry-run
-    - r2_downloader,8b,mlc,dry-run
+    - r2-downloader,405b,mlc,dry-run
+    - r2-downloader,8b,mlc,dry-run
 variations:
   fp16:
     default: true
@@ -75,11 +75,11 @@ variations:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - yes
     default: true
-  r2_downloader:
+  r2-downloader:
     group: download-tool
     add_deps_recursive:
       dae:
-        tags: _r2_downloader
+        tags: _r2-downloader
   mlc:
     group: download-src
     default: true
@@ -107,7 +107,7 @@ variations:
     adr:
       dae:
         extra_cache_tags: llama3,dataset,rclone
-  mlc,r2_downloader:
+  mlc,r2-downloader:
     env:
       MLC_DOWNLOAD_URL: https://llama3-1.mlcommons-storage.org/metadata/<<<MLC_ML_MODEL_R2_HOSTED_NAME>>>.uri
     adr:
@@ -120,7 +120,7 @@ variations:
   dry-run,rclone:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  dry-run,r2_downloader:
+  dry-run,r2-downloader:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   hf:
