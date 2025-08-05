@@ -394,7 +394,7 @@ def docker_run(self_module, i):
         container_env_string = res['container_env_string']
 
         res = update_docker_environment(
-            docker_settings, env, container_env_string)
+            docker_settings, env, self_module.host_env_keys, container_env_string)
         if res['return'] > 0:
             return res
 

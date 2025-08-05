@@ -41,6 +41,12 @@ tags:
 - llama2-70b
 - text-summarization
 uid: 5db97be9f61244c6
+tests:
+  needs_pat: true
+  run_inputs:
+  - variations_list:
+    - r2-downloader,70b,mlc,dry-run
+    - r2-downloader,7b,mlc,dry-run
 variations:
   L40s:
     env:
@@ -84,11 +90,11 @@ variations:
       MLC_ML_MODEL_PRECISION: int8
       MLC_ML_MODEL_WEIGHT_DATA_TYPES: int8
     group: precision
-  mlc:
-    group: download-source
-    default: true
-    env:
-      MLC_DOWNLOAD_SRC: mlcommons
+  rclone:
+    group: download-tool
+    add_deps_recursive:
+      dae:
+        tags: _rclone
     prehook_deps:
       - tags: get,rclone
         enable_if_env:
@@ -99,6 +105,55 @@ variations:
         enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - yes
+  r2-downloader:
+    group: download-tool
+    default: true
+    add_deps_recursive:
+      dae:
+        tags: _r2-downloader
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  mlc:
+    group: download-source
+    default: true
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+    prehook_deps:
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - 'yes'
+        env:
+          MLC_DOWNLOAD_FINAL_ENV_NAME: LLAMA2_CHECKPOINT_PATH
+          MLC_EXTRACT_FINAL_ENV_NAME: LLAMA2_CHECKPOINT_PATH
+        force_cache: true
+        names:
+          - dae
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
+  mlc,rclone,70b:
+    env:
+      MLC_DOWNLOAD_URL: mlc-llama2:Llama-2-70b-chat-hf
+  mlc,rclone,7b:
+    env:
+      MLC_DOWNLOAD_URL: mlc-llama2:Llama-2-7b-chat-hf
+  mlc,r2-downloader,70b:
+    env:
+      MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama-2-70b-chat-hf.uri
+  mlc,r2-downloader,7b:
+    env:
+      MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama-2-7b-chat-hf.uri
   hf:
     group: download-source
     env:

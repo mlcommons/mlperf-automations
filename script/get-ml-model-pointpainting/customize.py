@@ -12,9 +12,9 @@ def preprocess(i):
         return {'return': 1, 'error': 'Script not supported in windows yet!'}
 
     if env.get('MLC_ML_MODEL_POINT_PAINTING_PATH', '') != '':
-        if not os.path.exists(env['MLC_ML_MODEL_POINT_PAINTING']):
+        if not os.path.exists(env['MLC_ML_MODEL_POINT_PAINTING_PATH']):
             return {
-                'return': 1, 'error': f"Provided model path {env['MLC_ML_MODEL_POINT_PAINTING']} does not exist."}
+                'return': 1, 'error': f"Provided model path {env['MLC_ML_MODEL_POINT_PAINTING_PATH']} does not exist."}
 
     if env.get('MLC_ML_MODEL_DPLAB_RESNET50_PATH', '') != '':
         if not os.path.exists(env['MLC_ML_MODEL_DPLAB_RESNET50_PATH']):
@@ -24,13 +24,6 @@ def preprocess(i):
     if env.get('MLC_ML_MODEL_POINT_PAINTING_PATH', '') == '' or env.get(
             'MLC_ML_MODEL_DPLAB_RESNET50_PATH', '') == '':
         env['MLC_TMP_REQUIRE_DOWNLOAD'] = "yes"
-        if env['MLC_DOWNLOAD_SRC'] == "mlcommons":
-            i['run_script_input']['script_name'] = 'run-rclone'
-            if env.get('MLC_OUTDIRNAME', '') != '':
-                env['MLC_ML_MODEL_POINT_PAINTING_TMP_PATH'] = env['MLC_OUTDIRNAME']
-            else:
-                env['MLC_ML_MODEL_POINT_PAINTING_TMP_PATH'] = os.path.join(
-                    os.getcwd(), "model")
 
     return {'return': 0}
 
@@ -39,21 +32,22 @@ def postprocess(i):
 
     env = i['env']
 
-    if env.get('MLC_ML_MODEL_POINT_PAINTING_PATH', '') == '':
-        if env['MLC_ML_MODEL_PP_FORMAT'] == "onnx":
-            env['MLC_ML_MODEL_POINT_PAINTING_PATH'] = os.path.join(
-                env['MLC_ML_MODEL_POINT_PAINTING_TMP_PATH'], "pp.onnx")
-        else:
-            env['MLC_ML_MODEL_POINT_PAINTING_PATH'] = os.path.join(
-                env['MLC_ML_MODEL_POINT_PAINTING_TMP_PATH'], "pp_ep36.pth")
+    if env.get('MLC_DOWNLOAD_MODE', '') != "dry":
+        if env.get('MLC_ML_MODEL_POINT_PAINTING_PATH', '') == '':
+            if env['MLC_ML_MODEL_PP_FORMAT'] == "onnx":
+                env['MLC_ML_MODEL_POINT_PAINTING_PATH'] = os.path.join(
+                    env['MLC_ML_MODEL_POINT_PAINTING_TMP_PATH'], "pp.onnx")
+            else:
+                env['MLC_ML_MODEL_POINT_PAINTING_PATH'] = os.path.join(
+                    env['MLC_ML_MODEL_POINT_PAINTING_TMP_PATH'], "pp_ep36.pth")
 
-    if env.get('MLC_ML_MODEL_DPLAB_RESNET50_PATH', '') == '':
-        if env['MLC_ML_MODEL_DPLAB_RESNET50_FORMAT'] == "onnx":
-            env['MLC_ML_MODEL_DPLAB_RESNET50_PATH'] = os.path.join(
-                env['MLC_ML_MODEL_POINT_PAINTING_TMP_PATH'], "deeplabv3+.onnx")
-        else:
-            env['MLC_ML_MODEL_DPLAB_RESNET50_PATH'] = os.path.join(
-                env['MLC_ML_MODEL_POINT_PAINTING_TMP_PATH'],
-                "best_deeplabv3plus_resnet50_waymo_os16.pth")
+        if env.get('MLC_ML_MODEL_DPLAB_RESNET50_PATH', '') == '':
+            if env['MLC_ML_MODEL_DPLAB_RESNET50_FORMAT'] == "onnx":
+                env['MLC_ML_MODEL_DPLAB_RESNET50_PATH'] = os.path.join(
+                    env['MLC_ML_MODEL_POINT_PAINTING_TMP_PATH'], "deeplabv3+.onnx")
+            else:
+                env['MLC_ML_MODEL_DPLAB_RESNET50_PATH'] = os.path.join(
+                    env['MLC_ML_MODEL_POINT_PAINTING_TMP_PATH'],
+                    "best_deeplabv3plus_resnet50_waymo_os16.pth")
 
     return {'return': 0}

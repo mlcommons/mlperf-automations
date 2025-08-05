@@ -353,7 +353,7 @@ variations:
     group: dataset
   cnndm_llama_3,edge:
     deps:
-      - tags: get,dataset,cnndm,_validation,_edge,_llama3,_mlc,_rclone
+      - tags: get,dataset,cnndm,_validation,_edge,_llama3
         names:
           - cnndm-llama3-edge
         skip_if_env:
@@ -361,7 +361,7 @@ variations:
           - "yes"
   cnndm_llama_3,datacenter:
     deps:
-      - tags: get,dataset,cnndm,_validation,_datacenter,_llama3,_mlc,_rclone
+      - tags: get,dataset,cnndm,_validation,_datacenter,_llama3
         names:
           - cnndm-llama3-datacenter
         skip_if_env:

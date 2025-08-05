@@ -37,6 +37,10 @@ tags:
 - gcc
 - src-gcc
 uid: faae0ebd6e1242db
+docker:
+  skip_run_cmd: true
+  pre_run_cmds:
+    - mlc pull repo
 tests:
   run_inputs:
     - {}

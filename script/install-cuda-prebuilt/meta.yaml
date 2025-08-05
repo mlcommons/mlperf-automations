@@ -8,6 +8,7 @@ default_env:
 default_version: 11.8.0
 deps:
 - tags: detect,os
+- tags: detect,sudo
 docker:
   run: true
 input_mapping:
@@ -15,6 +16,7 @@ input_mapping:
   local_run_file_path: CUDA_RUN_FILE_LOCAL_PATH
   override-driver-check: MLC_CUDA_DRIVER_INSTALL_OVERRIDE
   skip_sudo: CUDA_SKIP_SUDO
+sudo_install: True
 new_env_keys:
 - MLC_CUDA_*
 - MLC_NVCC_*
@@ -89,3 +91,9 @@ versions:
   12.6.1:
     env:
       MLC_CUDA_LINUX_FILENAME: cuda_12.6.1_560.35.03_linux.run
+  12.8.1:
+    env:
+      MLC_CUDA_LINUX_FILENAME: cuda_12.8.1_570.124.06_linux.run
+  12.9.1:
+    env:
+      MLC_CUDA_LINUX_FILENAME: cuda_12.9.1_575.57.08_linux.run

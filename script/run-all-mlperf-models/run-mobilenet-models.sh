@@ -22,8 +22,8 @@ function run() {
     exit_if_error
   fi
 }
-POWER=" --power=yes --adr.mlperf-power-client.power_server=192.168.0.15 --adr.mlperf-power-client.port=4940 --adr.mlperf-power-client.ntp_server=time.google.com "
-POWER=""
+POWER=" --power=yes --adr.mlperf-power-client.power_server=192.168.1.79 --adr.mlperf-power-client.port=4950 --adr.mlperf-power-client.ntp_server=time.google.com "
+#POWER=""
 #extra_option=" --minimize_disk_usage=yes"
 extra_option=" --minimize_disk_usage=no"
 extra_tags=""
@@ -35,11 +35,8 @@ extra_tags=""
 # run "$MLC_RUN_CMD"
 run "mlcr run,mobilenet-models,_tflite$extra_tags \
 --adr.compiler.tags=gcc \
-${extra_option} "
+${extra_option} $POWER"
 
-run "mlcr run,mobilenet-models,_tflite,_armnn,_neon$extra_tags \
---adr.compiler.tags=gcc \
-${extra_option} "
 
 
 extra_option=" $extra_option --adr.mlperf-inference-implementation.compressed_dataset=on"

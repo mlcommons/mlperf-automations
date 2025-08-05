@@ -21,9 +21,6 @@ prehook_deps:
   inherit_variation_tags: true
   reuse_version: true
   tags: install,python,src
-print_env_at_the_end:
-  MLC_PYTHON_BIN_WITH_PATH: Path to Python
-  MLC_PYTHON_VERSION: Python version
 tags:
 - get
 - python

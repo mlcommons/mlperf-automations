@@ -526,12 +526,13 @@ deps:
         - "yes"
   
   ## LLAMA3_1-8B
-  - tags: get,ml-model,llama3,_mlc,_8b,_r2_downloader
+  - tags: get,ml-model,llama3,_8b
     names:
       - llama3-8b-model
     enable_if_env:
       MLC_MODEL:
         - llama3_1-8b
+        - llama3_1-8b-edge
     skip_if_env:
       MLC_USE_MODEL_FROM_HOST:
         - "yes"
@@ -1476,7 +1477,7 @@ variations:
       MLC_MODEL: llama3_1-8b
     deps:
       ## CNNDM for Llama3 8B model - datacenter
-      - tags: get,dataset,cnndm,_validation,_datacenter,_llama3,_mlc,_r2_downloader
+      - tags: get,dataset,cnndm,_validation,_datacenter,_llama3
         names:
           - cnndm-llama3-datacenter
         skip_if_env:
@@ -1490,7 +1491,7 @@ variations:
       MLC_MODEL: llama3_1-8b-edge
     deps:
       ## CNNDM for Llama3 8B model - edge
-      - tags: get,dataset,cnndm,_validation,_edge,_llama3,_mlc,_r2_downloader
+      - tags: get,dataset,cnndm,_validation,_edge,_llama3
         names:
           - cnndm-llama3-edge
         skip_if_env:
@@ -1510,18 +1511,17 @@ variations:
       - tags: get,generic-python-lib,_package.setuptools-scm
       - tags: get,generic-python-lib,_package.librosa
       - tags: get,generic-python-lib,_package.transformers
-        version_max: "4.52.4"
       - tags: get,generic-python-lib,_package.openai-whisper
       # - tags: get,generic-python-lib,_package.evaluate
       # - tags: get,generic-python-lib,_package.absl-py
       # - tags: get,generic-python-lib,_package.rouge-score
-      - tags: get,ml-model,whisper,_r2_downloader,_mlc
+      - tags: get,ml-model,whisper,_r2-downloader,_mlc
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
           - "yes"
         names:
           - whisper-model
-      - tags: get,dataset,whisper,_preprocessed,_mlc,_r2_downloader
+      - tags: get,dataset,whisper,_preprocessed
         names:
           - whisper-dataset
         skip_if_env:
@@ -1533,7 +1533,7 @@ variations:
     env:
       MLC_MODEL: deepseek-r1
     deps:
-      - tags: get,preprocessed,dataset,deepseek-r1,_validation,_mlc,_r2_downloader
+      - tags: get,preprocessed,dataset,deepseek-r1,_validation,_mlc,_r2-downloader
         names:
           - deepseek-r1-preprocessed-dataset
         skip_if_env:

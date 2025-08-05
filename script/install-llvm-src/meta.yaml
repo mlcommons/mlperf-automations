@@ -247,6 +247,10 @@ variations:
     - full-history
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
+docker:
+  skip_run_cmd: true
+  pre_run_cmds:
+    - mlc pull repo
 versions: {}
 tests:
   run_inputs:

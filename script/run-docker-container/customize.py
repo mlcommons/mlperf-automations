@@ -62,7 +62,8 @@ def preprocess(i):
     if os_info['platform'] == 'windows':
         CMD += " 2> nul"
     else:
-        CMD += " 2> /dev/null"
+        CMD += " 2> /dev/null || true "
+
     logger.info('  ' + CMD)
     logger.info('')
 
@@ -100,7 +101,7 @@ def preprocess(i):
         if os_info['platform'] == 'windows':
             CMD += " 2> nul"
         else:
-            CMD += " 2> /dev/null"
+            CMD += " 2> /dev/null || true"
 
         logger.info('')
         logger.info('Checking Docker images:')

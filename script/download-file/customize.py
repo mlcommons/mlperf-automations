@@ -203,7 +203,7 @@ def preprocess(i):
                 env['MLC_DOWNLOAD_CMD'] += f" || (({del_cmd} {env['MLC_DOWNLOAD_FILENAME']} || true) && wget -nc {extra_download_options} {url})"
             logger.info(f"{env['MLC_DOWNLOAD_CMD']}")
 
-        elif tool == "r2_downloader":
+        elif tool == "r2-downloader":
             env['MLC_DOWNLOAD_CMD'] = f"bash <(curl -s https://raw.githubusercontent.com/mlcommons/r2-downloader/refs/heads/main/mlc-r2-downloader.sh) "
             if env["MLC_HOST_OS_TYPE"] == "windows":
                 # have to modify the variable from url to temp_url if it is

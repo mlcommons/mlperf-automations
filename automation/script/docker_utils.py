@@ -40,6 +40,10 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd, run_state):
     if 'mounts' in docker_settings:
         mounts.extend(docker_settings['mounts'])
 
+    for key in ["MLC_INPUT", "MLC_OUTPUT", "MLC_OUTDIRNAME"]:
+        if "${{ " + key + " }}:${{ " + key + " }}" not in mounts:
+            mounts.append("${{ " + key + " }}:${{ " + key + " }}")
+
     docker_input_mapping = docker_settings.get("input_mapping", {})
     container_env_string = ""
 
@@ -182,7 +186,8 @@ def prepare_docker_inputs(input_params, docker_settings,
     return docker_inputs, dockerfile_path
 
 
-def update_docker_environment(docker_settings, env, container_env_string):
+def update_docker_environment(
+        docker_settings, env, host_env_keys, container_env_string):
     """
     Updates the Docker environment variables and build arguments.
 
@@ -194,15 +199,6 @@ def update_docker_environment(docker_settings, env, container_env_string):
     Returns:
         dict: A dictionary with a return code indicating success or failure.
     """
-    # Define proxy-related environment variable keys to propagate
-    proxy_keys = [
-        "ftp_proxy", "FTP_PROXY",
-        "http_proxy", "HTTP_PROXY",
-        "https_proxy", "HTTPS_PROXY",
-        "no_proxy", "NO_PROXY",
-        "socks_proxy", "SOCKS_PROXY",
-        "GH_TOKEN"
-    ]
 
     # Ensure the '+ CM_DOCKER_BUILD_ARGS' key exists in the environment
     if '+ MLC_DOCKER_BUILD_ARGS' not in env:
@@ -210,7 +206,7 @@ def update_docker_environment(docker_settings, env, container_env_string):
 
     # Add proxy environment variables to Docker build arguments and container
     # environment string
-    for proxy_key in proxy_keys:
+    for proxy_key in host_env_keys:
         proxy_value = os.environ.get(proxy_key)
         if proxy_value:
             container_env_string += f" --env.{proxy_key}={proxy_value} "
@@ -343,6 +339,8 @@ def regenerate_script_cmd(i):
         keys = sorted(command_dict.keys(), key=lambda x: x != "tags")
 
         for key in keys:
+            if key in ["input", "output", "outdirname"]:
+                continue  # We have the corresponding env keys in container env string
             # Construct the full key with the prefix.
             full_key = f"{prefix}.{key}" if prefix else key
 

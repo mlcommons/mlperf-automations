@@ -67,6 +67,19 @@ class ScriptAutomation(Automation):
                                'MLC_GIT_*',
                                'MLC_RENEW_CACHE_ENTRY']
 
+        self.host_env_keys = [
+            "GH_TOKEN",
+            "ftp_proxy",
+            "FTP_PROXY",
+            "http_proxy",
+            "HTTP_PROXY",
+            "https_proxy",
+            "HTTPS_PROXY",
+            "no_proxy",
+            "NO_PROXY",
+            "socks_proxy",
+            "SOCKS_PROXY"]
+
         self.input_flags_converted_to_tmp_env = {
             'path': {'desc': 'Filesystem path to search for executable', 'default': ''}}
 
@@ -486,19 +499,7 @@ class ScriptAutomation(Automation):
                                'append_unique': True})
 
         # take some env from the user environment
-        keys = [
-            "GH_TOKEN",
-            "ftp_proxy",
-            "FTP_PROXY",
-            "http_proxy",
-            "HTTP_PROXY",
-            "https_proxy",
-            "HTTPS_PROXY",
-            "no_proxy",
-            "NO_PROXY",
-            "socks_proxy",
-            "SOCKS_PROXY"]
-        for key in keys:
+        for key in self.host_env_keys:
             if os.environ.get(key, '') != '' and env.get(key, '') == '':
                 env[key] = os.environ[key]
 
@@ -1384,6 +1385,7 @@ class ScriptAutomation(Automation):
                       'script_alias': meta['alias'],
                       'extra_tags': ",".join(extra_cache_tags),
                       'tags': ','.join(tmp_tags),
+                      'exact_tags_match': True,
                       'meta': cached_meta,
                       'force': True}
 
@@ -1753,9 +1755,10 @@ class ScriptAutomation(Automation):
                         env['MLC_TMP_CURRENT_PATH'], env['MLC_OUTDIRNAME'])
                     env['MLC_OUTDIRNAME'] = c_outdirname
 
-                if not os.path.exists(c_outdirname):
-                    os.makedirs(c_outdirname)
-                os.chdir(c_outdirname)
+                if not fake_run:  # prevent permission error inside docker runs
+                    if not os.path.exists(c_outdirname):
+                        os.makedirs(c_outdirname)
+                    os.chdir(c_outdirname)
 
             # Check if pre-process and detect
             if 'preprocess' in dir(customize_code) and not fake_run:

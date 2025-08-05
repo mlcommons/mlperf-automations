@@ -537,7 +537,7 @@ def get_run_cmd_reference(
             --tensor-parallel-size {env['MLC_MLPERF_INFERENCE_TP_SIZE']} \
             {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} \
             {scenario_extra_options} {mode_extra_options} \
-            --vllm"""
+            --vllm --lg-model-name {env['MLC_MODEL']}"""
 
         if env.get('MLC_MLPERF_INFERENCE_NUM_WORKERS', '') != '':
             cmd += f" --num-workers {env['MLC_MLPERF_INFERENCE_NUM_WORKERS']}"
@@ -609,7 +609,7 @@ def get_run_cmd_reference(
         if env.get('MLC_MLPERF_POINTPAINTING_TIME', '') != '':
             cmd += f" --time {env['MLC_MLPERF_POINTPAINTING_TIME']}"
 
-        logger.info(fcmd)
+        logger.info(cmd)
 
     elif "deepseek-r1" in env['MLC_MODEL']:
         env['RUN_DIR'] = os.path.join(

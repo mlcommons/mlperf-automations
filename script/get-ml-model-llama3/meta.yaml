@@ -38,8 +38,8 @@ tests:
   run_inputs:
   - variations_list:
     - rclone,405b,mlc,dry-run
-    - r2_downloader,405b,mlc,dry-run
-    - r2_downloader,8b,mlc,dry-run
+    - r2-downloader,405b,mlc,dry-run
+    - r2-downloader,8b,mlc,dry-run
 variations:
   fp16:
     default: true
@@ -59,39 +59,6 @@ variations:
     env:
       MLC_ML_MODEL_NAME: Llama-3.1-8b-Instruct
       MLC_ML_MODEL_R2_HOSTED_NAME: llama3-1-8b-instruct
-  mlc:
-    group: download-src
-    default: true
-    prehook_deps:
-      - enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - 'yes'
-        env:
-          MLC_DOWNLOAD_FINAL_ENV_NAME: LLAMA3_CHECKPOINT_PATH
-          MLC_EXTRACT_FINAL_ENV_NAME: LLAMA3_CHECKPOINT_PATH
-        force_cache: true
-        names:
-          - dae
-        tags: download-and-extract
-        force_env_keys:
-          - MLC_OUTDIRNAME  
-        update_tags_from_env_with_prefix:
-          _url.:
-            - MLC_DOWNLOAD_URL
-    env:
-      MLC_DOWNLOAD_SRC: mlcommons
-  mlc,rclone:
-    env:
-      MLC_DOWNLOAD_URL: mlc-llama3-1:inference/<<<MLC_ML_MODEL_NAME>>>
-    adr:
-      dae:
-        extra_cache_tags: llama3,dataset,rclone
-  mlc,r2_downloader:
-    env:
-      MLC_DOWNLOAD_URL: https://llama3-1.mlcommons-storage.org/metadata/<<<MLC_ML_MODEL_R2_HOSTED_NAME>>>.uri
-    adr:
-      dae:
-        extra_cache_tags: llama3,dataset,rclone
   rclone:
     group: download-tool
     add_deps_recursive:
@@ -108,11 +75,45 @@ variations:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - yes
     default: true
-  r2_downloader:
+  r2-downloader:
     group: download-tool
     add_deps_recursive:
       dae:
-        tags: _r2_downloader
+        tags: _r2-downloader
+  mlc:
+    group: download-src
+    default: true
+    prehook_deps:
+      - enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - 'yes'
+        env:
+          MLC_DOWNLOAD_FINAL_ENV_NAME: LLAMA3_CHECKPOINT_PATH
+          MLC_EXTRACT_FINAL_ENV_NAME: LLAMA3_CHECKPOINT_PATH
+        force_cache: true
+        names:
+          - dae
+          - llama3-model-download
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+  mlc,rclone:
+    env:
+      MLC_DOWNLOAD_URL: mlc-llama3-1:inference/<<<MLC_ML_MODEL_NAME>>>
+    adr:
+      llama3-model-download:
+        extra_cache_tags: llama3,dataset,rclone
+  mlc,r2-downloader:
+    env:
+      MLC_DOWNLOAD_URL: https://llama3-1.mlcommons-storage.org/metadata/<<<MLC_ML_MODEL_R2_HOSTED_NAME>>>.uri
+    adr:
+      llama3-model-download:
+        extra_cache_tags: llama3,dataset,rclone
   dry-run:
     group: run-mode
     env:
@@ -120,7 +121,7 @@ variations:
   dry-run,rclone:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  dry-run,r2_downloader:
+  dry-run,r2-downloader:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   hf:
