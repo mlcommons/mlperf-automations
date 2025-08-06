@@ -12,8 +12,26 @@ def preprocess(i):
     if os_info['platform'] == "windows":
         return {'return': 1, 'error': 'Script not supported in windows yet!'}
 
-    if env.get('MLC_ML_MODEL_WHISPER_PATH', '') == '':
+    checkpoint_path = env.get('MLC_ML_MODEL_WHISPER_PATH', '').strip()
+
+    if checkpoint_path == '':
         env['MLC_TMP_REQUIRE_DOWNLOAD'] = "yes"
+    else:
+        # Normalize and expand the path
+        checkpoint_path = os.path.abspath(os.path.expanduser(checkpoint_path))
+        env['MLC_ML_MODEL_WHISPER_PATH'] = checkpoint_path
+
+        if not os.path.exists(checkpoint_path):
+            return {
+                'return': 1,
+                'error': f"Provided Whisper model path '{checkpoint_path}' does not exist."
+            }
+
+        if not os.path.isdir(checkpoint_path):
+            return {
+                'return': 1,
+                'error': f"Provided Whisper model path '{checkpoint_path}' is not a directory."
+            }
 
     return {'return': 0}
 

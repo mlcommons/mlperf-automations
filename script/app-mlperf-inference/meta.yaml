@@ -2079,8 +2079,7 @@ variations:
       reproducibility
     add_deps_recursive:
       nvidia-inference-common-code:
-        version: r4.1-dev
-        tags: _mlcommons
+        tags: _mlcommons,_v4.0
       nvidia-inference-server:
         version: r4.0
         tags: _mlcommons

@@ -154,7 +154,6 @@ variations:
     - names:
       - cuda
       tags: get,cuda
-    - tags: get,nvidia,scratch,space
     - tags: get,cuda-devices,_with-pycuda
       enable_if_env:
         MLC_HOST_OS_FLAVOR:
@@ -163,6 +162,7 @@ variations:
       skip_if_env:
         MLC_HOST_OS_FLAVOR:
         - ubuntu
+    - tags: get,nvidia,scratch,space
     - env: {}
       force_new_env_keys:
       - GPTJ_CHECKPOINT_PATH

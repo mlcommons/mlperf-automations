@@ -69,6 +69,12 @@ variations:
       GITHUB_REPO_OWNER: GATEOverflow
       NVIDIA_ONLY: 'yes'
     group: source-repo
+  v4.0:
+    group: version
+    env:
+      MLC_GIT_URL: https://github.com/<<<GITHUB_REPO_OWNER>>>/inference_results_v4.0.git
+      MLC_MLPERF_INFERENCE_RESULTS_VERSION_NAME: v4.0
+      MLC_VERSION: "v4.0"
   v5.0:
     group: version
     env:

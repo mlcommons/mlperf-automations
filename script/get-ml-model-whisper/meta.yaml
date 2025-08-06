@@ -2,6 +2,12 @@ alias: get-ml-model-whisper
 automation_alias: script
 automation_uid: 5b4e0237da074764
 cache: true
+category: AI/ML models
+env:
+  MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'no'
+  MLC_ML_MODEL_DATASET: whisper
+input_mapping:
+  checkpoint: MLC_ML_MODEL_WHISPER_PATH
 new_env_keys:
 - MLC_ML_MODEL_WHISPER_PATH
 - MLC_ML_MODEL_FILE_WITH_PATH
@@ -12,13 +18,62 @@ tags:
 - get
 - ml-model
 - whisper
+- speech-recognition
 tests:
   run_inputs:
   - variations_list:
     - rclone,mlc,dry-run
     - r2-downloader,mlc,dry-run
+    # - huggingface
+
 uid: 3bea2356e97f47b1
+
+prehook_deps:
+- enable_if_env:
+    MLC_TMP_REQUIRE_DOWNLOAD:
+    - 'yes'
+    MLC_DOWNLOAD_SRC:
+    - 'huggingface'
+  env: {}
+  extra_cache_tags: whisper
+  force_env_keys:
+  - MLC_GIT_CHECKOUT_FOLDER
+  names:
+  - hf-zoo
+  tags: get,ml-model,huggingface,zoo,_clone-repo
+
 variations:
+  fp32:
+    default: true
+    env:
+      MLC_ML_MODEL_INPUT_DATA_TYPES: fp32
+      MLC_ML_MODEL_PRECISION: fp32
+      MLC_ML_MODEL_WEIGHT_DATA_TYPES: fp32
+    group: precision
+
+  huggingface:
+    group: download-src
+    env:
+      MLC_DOWNLOAD_SRC: huggingface
+
+  large-v3:
+    env:
+      MLC_GIT_CHECKOUT_FOLDER: whisper-large-v3
+    group: model-size
+    default: true
+    default_variations:
+      huggingface-stub: openai/whisper-large-v3
+
+  openai/whisper-large-v3:
+    base:
+      - large-v3
+    adr:
+      hf-zoo:
+        tags: _model-stub.openai/whisper-large-v3
+    env:
+      MLC_MODEL_ZOO_ENV_KEY: WHISPER
+    group: huggingface-stub
+
   dry-run:
     env:
       MLC_DOWNLOAD_MODE: dry
@@ -58,17 +113,17 @@ variations:
         env:
           MLC_DOWNLOAD_URL: 'mlc-inference:mlcommons-inference-wg-public/Whisper/model/'
     prehook_deps:
-      - enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - true
-        tags: get,rclone
-      - enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - true
-        env:
-          MLC_RCLONE_DRIVE_FOLDER_ID: 17CpM5eU8tjrxh_LpH_BTNTeT37PhzcnC
-        force_cache: true
-        tags: get,rclone-config,_mlc-inference
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+      tags: get,rclone
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+      env:
+        MLC_RCLONE_DRIVE_FOLDER_ID: 17CpM5eU8tjrxh_LpH_BTNTeT37PhzcnC
+      force_cache: true
+      tags: get,rclone-config,_mlc-inference
     default: true
     group: download-tool
   r2-downloader:
