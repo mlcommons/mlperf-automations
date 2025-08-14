@@ -25,7 +25,7 @@ deps:
     _tag.:
     - MLC_GIT_CHECKOUT_TAG
 input_mapping:
-  target: MLC_GCC_TARGET_STRING 
+  target: MLC_GCC_TARGET 
 
 env:
   MLC_GIT_URL: git://gcc.gnu.org/git/gcc.git
