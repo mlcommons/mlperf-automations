@@ -17,6 +17,11 @@ def preprocess(i):
 
     recursion_spaces = i['recursion_spaces']
 
+    if env.get('MLC_GCC_TARGET', '') != '':
+        env['MLC_GCC_TARGET_STRING'] = f""" --target={env['MLC_GCC_TARGET']} """
+    else:
+        env['MLC_GCC_TARGET_STRING'] = ''
+
     env['MLC_GCC_INSTALLED_PATH'] = os.path.join(os.getcwd(), 'install', 'bin')
 
     return {'return': 0}

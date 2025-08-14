@@ -37,7 +37,7 @@ deps:
     _tag.llvmorg-:
     - MLC_VERSION
 input_mapping:
-  target: MLC_LLVM_TARGETS_TO_BUILD
+  targets: MLC_LLVM_TARGETS_TO_BUILD
 
 env:
   MLC_GIT_URL: https://github.com/llvm/llvm-project

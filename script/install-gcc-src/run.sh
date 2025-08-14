@@ -22,7 +22,10 @@ cd src
 ./contrib/download_prerequisites
 cd ../build
 
-../src/configure --prefix="${INSTALL_DIR}" ${MLC_GCC_TARGET_STRING} --with-gcc-major-version-only --disable-multilib
+
+cmd="../src/configure --prefix="${INSTALL_DIR}" ${MLC_GCC_TARGET_STRING} --with-gcc-major-version-only --disable-multilib"
+echo $cmd
+eval $cmd
 
 test $? -eq 0 || exit $?
 
