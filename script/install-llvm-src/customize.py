@@ -52,7 +52,7 @@ def preprocess(i):
 
             targets_to_build = env.get('MLC_LLVM_TARGETS_TO_BUILD', 'X86')
 
-            cmake_cmd = f"""cmake {os.path.join(env["MLC_LLVM_SRC_REPO_PATH"], "llvm")} -GNinja -DCMAKE_BUILD_TYPE={llvm_build_type } -DLLVM_ENABLE_PROJECTS={q}{enable_projects}{q} -DLLVM_ENABLE_RUNTIMES={q}{enable_runtimes}{q} -DCMAKE_INSTALL_PREFIX={q}{install_prefix}{q} -DLLVM_ENABLE_RTTI=ON  -DLLVM_INSTALL_UTILS=ON -DLLVM_TARGETS_TO_BUILD={targets_to_build} {extra_cmake_options}"""
+            cmake_cmd = f"""cmake {os.path.join(env["MLC_LLVM_SRC_REPO_PATH"], "llvm")} -GNinja -DCMAKE_BUILD_TYPE={llvm_build_type} -DLLVM_ENABLE_PROJECTS={q}{enable_projects}{q} -DLLVM_ENABLE_RUNTIMES={q}{enable_runtimes}{q} -DCMAKE_INSTALL_PREFIX={q}{install_prefix}{q} -DLLVM_ENABLE_RTTI=ON  -DLLVM_INSTALL_UTILS=ON -DLLVM_TARGETS_TO_BUILD={targets_to_build} {extra_cmake_options}"""
 
             env['MLC_LLVM_CMAKE_CMD'] = cmake_cmd
 
