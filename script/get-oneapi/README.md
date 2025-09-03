@@ -1,13 +1,46 @@
 # README for get-one-api
-This README is automatically generated. Add custom content in [info.txt](info.txt). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
+This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
+`mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
+```
+mkdir /mnt/$USER/MLC
+ln -s /mnt/$USER/MLC $HOME/MLC
+```
+You can also use the `ENV` variable `MLC_REPOS` to control this location but this will need a set after every system reboot.
+
+## Setup
+
+If you are not on a Python development environment please refer to the [official docs](https://docs.mlcommons.org/mlcflow/install/) for the installation.
+
+```bash
+python3 -m venv mlcflow
+. mlcflow/bin/activate
+pip install mlcflow
+```
+
+- Using a virtual environment is recommended (per `pip` best practices), but you may skip it or use `--break-system-packages` if needed.
+
+### Pull mlperf-automations
+
+Once `mlcflow` is installed:
+
+```bash
+mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
+```
+- `--pat` or `--ssh` is only needed if the repo is PRIVATE
+- If `--pat` is avoided, you'll be asked to enter the password where you can enter your Private Access Token
+- `--ssh` option can be used instead of `--pat=<>` option if you prefer to use SSH for accessing the github repository.
 ## Run Commands
 
 ```bash
 mlcr get,oneapi,compiler,get-oneapi
 ```
 
-No script specific inputs
+### Script Inputs
+
+| Name | Description | Choices | Default |
+|------|-------------|---------|------|
+| `--oneapi_dir` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -26,3 +59,9 @@ No script specific inputs
 | `--gh_token` | Github Token |  | `` |
 | `--hf_token` | Huggingface Token |  | `` |
 | `--verify_ssl` | Verify SSL |  | `False` |
+## Variations
+
+### Ungrouped
+
+- `fortran`
+- `path.#` _(# can be substituted dynamically)_

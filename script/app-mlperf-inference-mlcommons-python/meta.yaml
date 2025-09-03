@@ -1322,8 +1322,8 @@ variations:
       - tags: get,generic-python-lib,_protobuf
         names:
           - protobuf
-        version_max: "4.23.4"
-        version_max_usable: "4.23.4"
+        version_max1: "4.23.4"
+        version_max_usable1: "4.23.4"
         version_min: "3.20.3"
         enable_if_env:
           MLC_MLPERF_BACKEND:

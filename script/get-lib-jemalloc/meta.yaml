@@ -65,7 +65,16 @@ variations:
   config.#:
     env:
       MLC_JEMALLOC_CONFIG: '#'
+  enable-stats:
+    env:
+      MLC_JEMALLOC_STATS: true
+  enable-prof:
+    env:
+      MLC_JEMALLOC_PROF: true
   lg-page.#:
+    env:
+      MLC_JEMALLOC_LG_PAGE: '#'
+  lg-hugepage.#:
     env:
       MLC_JEMALLOC_LG_PAGE: '#'
   lg-quantum.#:

@@ -32,20 +32,26 @@ def display_help(self_module, input_params):
 
     scripts_list = search_result['list']
     if not scripts_list:
-        return {'return': 1, 'error': 'No scripts were found'}
 
-    generic_inputs = self_module.input_flags_converted_to_env
+        print("")
+        print("Please use script tags or alias/uid to get help for a specific script")
+        print("")
+        print("Generic Inputs for all Scripts:")
+        print("")
+        print_input_descriptions(generic_inputs)
 
-    # Step 4: Iterate over scripts and generate help output
-    for script in sorted(scripts_list, key=lambda x: x.meta.get('alias', '')):
-        metadata = script.meta
-        script_path = script.path
-        print_script_help(
-            metadata,
-            script_path,
-            generic_inputs,
-            env,
-            self_module)
+    else:
+        # Step 4: Iterate over scripts and generate help output
+        for script in sorted(
+                scripts_list, key=lambda x: x.meta.get('alias', '')):
+            metadata = script.meta
+            script_path = script.path
+            print_script_help(
+                metadata,
+                script_path,
+                generic_inputs,
+                env,
+                self_module)
 
     return {'return': 0}
 

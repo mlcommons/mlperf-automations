@@ -46,18 +46,16 @@ jobs:
           else
             echo "run_step=false" >> $GITHUB_ENV
           fi
-    - name: Load secret
+    - name: Load secrets
       if: github.repository_owner == 'mlcommons' && env.run_step == 'true'
-      id: op-load-secret
-      uses: 1password/load-secrets-action@v2
-      with:
-        export-env: false
+      id: op-load-secrets
+      uses: 1password/load-secrets-action@v3
       env:
         OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
         PAT: op://7basd2jirojjckncf6qnq3azai/bzbaco3uxoqs2rcyu42rvuccga/credential
     - name: Push Results
       env:
-        GITHUB_TOKEN: ${{ steps.op-load-secret.outputs.PAT }}
+        GITHUB_TOKEN: ${{ steps.op-load-secrets.outputs.PAT }}
         USER: mlcommons-bot
         EMAIL: mlcommons-bot@users.noreply.github.com
       if: github.repository_owner == 'mlcommons' && env.run_step == 'true'

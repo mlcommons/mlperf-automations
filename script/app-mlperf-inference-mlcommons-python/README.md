@@ -1,10 +1,10 @@
 # README for app-mlperf-inference-mlcommons-python
 This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
-`mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/user`, you can do
+`mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
 ```
-mkdir /mnt/user/MLC
-ln -s /mnt/user/MLC $HOME/MLC
+mkdir /mnt/$USER/MLC
+ln -s /mnt/$USER/MLC $HOME/MLC
 ```
 You can also use the `ENV` variable `MLC_REPOS` to control this location but this will need a set after every system reboot.
 
@@ -136,7 +136,7 @@ mlcr app,vision,language,mlcommons,mlperf,inference,reference,ref
 - `llama2-70b-99` (base: llama2-70b_)
 - `llama2-70b-99.9` (base: llama2-70b_)
 - `llama3_1-405b`
-- `llama3_1-8b`
+- `llama3_1-8b_`
 - `mixtral-8x7b`
 - `pointpainting`
 - `resnet50` (default)
@@ -166,6 +166,8 @@ mlcr app,vision,language,mlcommons,mlperf,inference,reference,ref
 - `dlrm-v2_`
 - `gptj_`
 - `llama2-70b_`
+- `llama3_1-8b` (base: llama3_1-8b_)
+- `llama3_1-8b-edge` (base: llama3_1-8b_)
 - `multistream`
 - `offline`
 - `r2.1_default`

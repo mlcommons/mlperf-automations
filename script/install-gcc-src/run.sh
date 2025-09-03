@@ -11,6 +11,8 @@ if [ ! -d "src" ]; then
   test $? -eq 0 || exit $?
 fi
 
+rm -rf install
+rm -rf build
 
 mkdir -p install
 mkdir -p build
@@ -22,7 +24,10 @@ cd src
 ./contrib/download_prerequisites
 cd ../build
 
-../src/configure --prefix="${INSTALL_DIR}" --with-gcc-major-version-only --disable-multilib
+
+cmd="../src/configure --prefix="${INSTALL_DIR}" ${MLC_GCC_TARGET_STRING} ${MLC_GCC_HOST_STRING} ${MLC_GCC_BUILD_STRING} ${MLC_GCC_SYSROOT_STRING} ${MLC_GCC_EXTRA_CONFIGURE_STRING}  --with-gcc-major-version-only --disable-multilib"
+echo $cmd
+eval $cmd
 
 test $? -eq 0 || exit $?
 

@@ -173,18 +173,16 @@ jobs:
           Write-Host "run_step=false" | Out-File -FilePath $Env:GITHUB_ENV -Append
         }
 
-    - name: Load secret
+    - name: Load secrets
       if: github.repository_owner == 'mlcommons' && env.run_step == 'true'
-      id: op-load-secret
-      uses: 1password/load-secrets-action@v2
-      with:
-        export-env: false
+      id: op-load-secrets
+      uses: 1password/load-secrets-action@v3
       env:
         OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
         PAT: op://7basd2jirojjckncf6qnq3azai/bzbaco3uxoqs2rcyu42rvuccga/credential
     - name: Push Results
       env:
-        GITHUB_TOKEN: ${{ steps.op-load-secret.outputs.PAT }}
+        GITHUB_TOKEN: ${{ steps.op-load-secrets.outputs.PAT }}
       if: github.repository_owner == 'mlcommons' && env.run_step == 'true'
       run: |
         git config --global user.name "mlcommons-bot"

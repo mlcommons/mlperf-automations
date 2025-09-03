@@ -9,35 +9,8 @@ on:
       - '!**.md'
 
 jobs:
-  fetch-secret:
-    runs-on: ubuntu-latest
-    outputs:
-      encrypted_secret: ${{ steps.encrypt-secret.outputs.encrypted_secret }}
-    steps:
-      - name: Load secret
-        id: op-load-secret
-        uses: 1password/load-secrets-action@v2
-        with:
-          export-env: false
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          PAT: op://7basd2jirojjckncf6qnq3azai/bzbaco3uxoqs2rcyu42rvuccga/credential
-
-      - name: Encrypt secret
-        id: encrypt-secret
-        env:
-          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
-        run: |
-          # AES-256 encrypt
-          encrypted=$(echo "${{ steps.op-load-secret.outputs.pat }}" | \
-            openssl enc -e -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 \
-            -pass pass:"$ENCRYPTION_KEY" -base64 -A)
-
-          echo "encrypted_secret=$encrypted" >> $GITHUB_OUTPUT
-          
   build:
     name: MLPerf Inference Bert ${{ matrix.backend }} on ${{ matrix.os }}
-    needs: [fetch-secret]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -85,25 +58,15 @@ jobs:
           else
             echo "run_step=false" >> $GITHUB_ENV
           fi
-    - name: Decrypt secret
-      id: decrypt-secret
-      shell: bash
+    - name: Load secrets
+      id: op-load-secrets
+      uses: 1password/load-secrets-action@v3
       env:
-        ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
-        encrypted_secret: ${{ needs.fetch-secret.outputs.encrypted_secret }}
-      run: |
-        echo "Running on OS: ${{ matrix.os }}"
-
-        # Decrypt
-        decrypted=$(echo "$encrypted_secret" | \
-          openssl enc -d -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 \
-          -pass pass:"$ENCRYPTION_KEY" -base64 -A)
-          
-        echo "::add-mask::$decrypted"
-        echo "DECRYPTED_SECRET=$decrypted" >> $GITHUB_OUTPUT
+        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        PAT: op://7basd2jirojjckncf6qnq3azai/bzbaco3uxoqs2rcyu42rvuccga/credential
     - name: Push Results
       env:
-        GITHUB_TOKEN: ${{ steps.decrypt-secret.outputs.decrypted_secret }}
+        GITHUB_TOKEN: ${{ steps.op-load-secrets.outputs.PAT }}
       if: github.repository_owner == 'mlcommons' && env.run_step == 'true'
       run: |
         git config --global user.name "mlcommons-bot"

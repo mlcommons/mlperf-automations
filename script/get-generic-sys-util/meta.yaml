@@ -628,6 +628,13 @@ variations:
         brew: ''
         dnf: ntpdate
         yum: ntpdate
+  crossbuild-essential-arm64:
+    env:
+      MLC_SYS_UTIL_NAME: crossbuild-essential-arm64
+      MLC_SYS_UTIL_CHECK_CMD: 'command -v aarch64-linux-gnu-gcc >/dev/null 2>&1'
+    state:
+      crossbuild-essential-arm64:
+        apt: crossbuild-essential-arm64
   numactl:
     deps:
     - enable_if_env:

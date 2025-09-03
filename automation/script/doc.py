@@ -76,6 +76,8 @@ def get_setup_readme(script_repo):
     if '@' in repo_name:
         repo_name = repo_name.split('@')[1]
 
+    repo_location = script_repo.meta.get('url', repo_alias)
+
     setup_readme = f"""`mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
 ```
 mkdir /mnt/$USER/MLC
@@ -100,7 +102,7 @@ pip install mlcflow
 Once `mlcflow` is installed:
 
 ```bash
-mlc pull repo {repo_alias} --pat=<Your Private Access Token>
+mlc pull repo {repo_location} --pat=<Your Private Access Token>
 ```
 - `--pat` or `--ssh` is only needed if the repo is PRIVATE
 - If `--pat` is avoided, you'll be asked to enter the password where you can enter your Private Access Token

@@ -28,8 +28,8 @@ CMD="bash ./${MLC_ONEAPI_INSTALL_FILENAME} -a --silent --cli --eula accept  --in
 run "$CMD"
 
 if [[ ${MLC_ONEAPI_FORTRAN} == 'yes' ]] then
-  wget -nc https://registrationcenter-download.intel.com/akdlm/IRC_NAS/2238465b-cfc7-4bf8-ad04-e55cb6577cba/intel-fortran-essentials-2025.1.1.8_offline.sh
+  wget -nc ${MLC_ONEAPI_FORTRAN_COMPILER_URL_BASE}/${MLC_ONEAPI_FORTRAN_COMPILER_FILENAME}
   test $? -eq 0 || exit $?
-  CMD="bash ./intel-fortran-essentials-2025.1.1.8_offline.sh -a --silent --cli --eula accept --install-dir ${PWD}/install"
+  CMD="bash ./${MLC_ONEAPI_FORTRAN_COMPILER_FILENAME} -a --silent --cli --eula accept --install-dir ${PWD}/install"
   run "$CMD"
 fi

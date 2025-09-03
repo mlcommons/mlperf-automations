@@ -2870,6 +2870,8 @@ class ScriptAutomation(Automation):
             if i.get(key):
                 ii[key] = i[key]
 
+        if i.get('all'):
+            ii['all'] = i['all']
         r = super(ScriptAutomation, self).search(ii)
         if r['return'] > 0:
             return r
@@ -4871,10 +4873,28 @@ def find_cached_script(i):
                     'customize_code': customize_code,
                     'customize_common_input': customize_common_input
                 }
+                env_tmp = copy.deepcopy(env)
+                path_to_cached_state_file = os.path.join(cached_script.path,
+                                                         self_obj.file_with_cached_state)
+
+                r = utils.load_json(file_name=path_to_cached_state_file)
+                if r['return'] > 0:
+                    continue
+
+                cached_meta = r.get("meta")
+                if not cached_meta:
+                    continue
+                new_env = cached_meta.get("new_env", {})
+                if new_env:
+                    env_tmp.update(new_env)
+                state_tmp = copy.deepcopy(state)
+                new_state = cached_meta.get("new_state", {})
+                if new_state:
+                    state_tmp.update(new_state)
 
                 deps = meta.get('deps')
                 if deps:
-                    r = self_obj._call_run_deps(deps, self_obj.local_env_keys, meta.get('local_env_keys', []), env, state, const, const_state, add_deps_recursive,
+                    r = self_obj._call_run_deps(deps, self_obj.local_env_keys, meta.get('local_env_keys', []), env_tmp, state_tmp, const, const_state, add_deps_recursive,
                                                 recursion_spaces + extra_recursion_spaces,
                                                 remembered_selections, variation_tags_string, True, '', show_time, extra_recursion_spaces, {})
                     if r['return'] > 0:
@@ -4882,7 +4902,7 @@ def find_cached_script(i):
 
                 ii = {
                     'run_script_input': run_script_input,
-                    'env': env,
+                    'env': env_tmp,
                     'script_name': 'validate_cache',
                     'detect_version': True
                 }

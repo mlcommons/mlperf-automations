@@ -7,35 +7,24 @@ on:
       - 'script/**meta.yaml'
 
 jobs:
-  fetch-secret:
-    runs-on: ubuntu-latest
-    outputs:
-      gdrive_secret: ${{ steps.op-load-secret.outputs.GDRIVE_SERVICE_ACCOUNT_KEY }}
-    steps:
-      - name: Load secret from 1Password
-        id: op-load-secret
-        uses: 1password/load-secrets-action@v2
-        with:
-          export-env: false
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          GDRIVE_SERVICE_ACCOUNT_KEY: op://7basd2jirojjckncf6qnq3azai/bzbaco3uxoqs2rcyu42rvuccga/credential
-
   run-mlperf:
     runs-on: ubuntu-latest
-    needs: 
-      - fetch-secret
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
+      - name: Load secrets
+        id: op-load-secrets
+        uses: 1password/load-secrets-action@v3
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          GDRIVE_SERVICE_ACCOUNT_KEY: op://7basd2jirojjckncf6qnq3azai/bzbaco3uxoqs2rcyu42rvuccga/credential
       - name: Set RCLONE Service account env var from secret
         shell: bash
         run: |
-          echo "::add-mask::${{ needs.fetch-secret.outputs.gdrive_secret }}"
-          echo "RCLONE_CONFIG_MLC_COGNATA_SERVICE_ACCOUNT_CREDENTIALS=${{ needs.fetch-secret.outputs.gdrive_secret }}" >> $GITHUB_ENV
-          echo "RCLONE_CONFIG_MLC_NUSCENES_SERVICE_ACCOUNT_CREDENTIALS=${{ needs.fetch-secret.outputs.gdrive_secret }}" >> $GITHUB_ENV
+          echo "RCLONE_CONFIG_MLC_COGNATA_SERVICE_ACCOUNT_CREDENTIALS=${{ steps.op-load-secrets.outputs.GDRIVE_SERVICE_ACCOUNT_KEY }}" >> $GITHUB_ENV
+          echo "RCLONE_CONFIG_MLC_NUSCENES_SERVICE_ACCOUNT_CREDENTIALS=${{ steps.op-load-secrets.outputs.GDRIVE_SERVICE_ACCOUNT_KEY }}" >> $GITHUB_ENV
       - name: Run MLPerf
         run: |
           pip install mlcflow

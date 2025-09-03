@@ -24,7 +24,8 @@ deps:
   - MLC_GIT_*
   tags: get,git,repo,_repo.https://github.com/mlcommons/power
 input_description:
-  input: Path to SPEC PTDaemon (Optional)
+  input:
+    desc: Path to SPEC PTDaemon (Optional)
 input_mapping:
   input: MLC_INPUT
 new_env_keys:

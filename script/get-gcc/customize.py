@@ -83,7 +83,9 @@ def postprocess(i):
 
     found_file_path = env['MLC_GCC_BIN_WITH_PATH']
 
-    found_path = os.path.dirname(found_file_path)
+    # found_path = os.path.dirname(os.path.realpath(found_file_path)) //Need
+    # to use this if we don't want to cache specific to softlinks
+    found_path = os.path.dirname(os.path.abspath(found_file_path))
 
     env['MLC_GCC_INSTALLED_PATH'] = os.path.dirname(
         found_path)  # /usr in case of /usr/bin/gcc

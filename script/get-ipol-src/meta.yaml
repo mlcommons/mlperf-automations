@@ -13,8 +13,10 @@ extra_cache_tags_from_env:
 - env: MLC_IPOL_YEAR
   prefix: year-
 input_description:
-  number: IPOL publication number
-  year: IPOL publication year
+  number:
+    desc: IPOL publication number
+  year: 
+    desc: IPOL publication year
 input_mapping:
   number: MLC_IPOL_NUMBER
   year: MLC_IPOL_YEAR

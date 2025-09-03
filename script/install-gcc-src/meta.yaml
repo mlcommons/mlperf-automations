@@ -24,8 +24,15 @@ deps:
     - MLC_GIT_CHECKOUT_SHA
     _tag.:
     - MLC_GIT_CHECKOUT_TAG
-env:
-  MLC_GIT_URL: git://gcc.gnu.org/git/gcc.git
+input_mapping:
+  targets: MLC_GCC_TARGET 
+  host: MLC_GCC_HOST
+  build: MLC_GCC_BUILD
+  extra: MLC_GCC_EXTRA_CONFIGURE_STRING
+
+
+new_env_keys:
+  - MLC_GCC_*
 post_deps:
 - skip_if_env:
     MLC_REQUIRE_INSTALL:
@@ -45,9 +52,20 @@ tests:
   run_inputs:
     - {}
 variations:
+  mainline:
+    group: repo
+    default: true
+    default_variations:
+      version: master
+    env:
+      MLC_GIT_URL: git://gcc.gnu.org/git/gcc.git
+  darwin:
+    group: repo
+    env:
+      MLC_GIT_URL: https://github.com/iains/gcc-darwin-arm64
+      MLC_GCC_WITH_SYSROOT: '`xcrun --show-sdk-path`'
   master:
     group: version
-    default: true
     env:
       MLC_GIT_CHECKOUT: master
   version.#:

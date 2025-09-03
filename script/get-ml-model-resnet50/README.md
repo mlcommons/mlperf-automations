@@ -1,10 +1,10 @@
 # README for get-ml-model-resnet50
 This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
-`mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/user`, you can do
+`mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
 ```
-mkdir /mnt/user/MLC
-ln -s /mnt/user/MLC $HOME/MLC
+mkdir /mnt/$USER/MLC
+ln -s /mnt/$USER/MLC $HOME/MLC
 ```
 You can also use the `ENV` variable `MLC_REPOS` to control this location but this will need a set after every system reboot.
 

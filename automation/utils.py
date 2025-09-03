@@ -14,12 +14,12 @@ def get_host_os_info(i={}):
     Get some host platform name (currently windows or linux) and OS bits
 
     Args:
-       (CM input dict):
+       (input dict):
 
        (bits) (str): force host platform bits
 
     Returns:
-       (CM return dict):
+       (dict):
 
        * return (int): return code == 0 if no error and >0 if error
        * (error) (str): error string if return>0
@@ -41,7 +41,7 @@ def get_host_os_info(i={}):
     pbits = str(8 * struct.calcsize("P"))
 
     if platform.system().lower().startswith('win'):
-        platform = 'windows'
+        platform_name = 'windows'
         info['bat_ext'] = '.bat'
         info['set_env'] = 'set ${key}=${value}'
         info['env_separator'] = ';'
@@ -56,9 +56,9 @@ def get_host_os_info(i={}):
         }
     else:
         if platform.system().lower().startswith('darwin'):
-            platform = 'darwin'
+            platform_name = 'darwin'
         else:
-            platform = 'linux'
+            platform_name = 'linux'
 
         info['bat_ext'] = '.sh'
         info['set_env'] = 'export ${key}="${value}"'
@@ -72,12 +72,14 @@ def get_host_os_info(i={}):
         info['start_script'] = ['#!/bin/bash', '']
         info['env'] = {}
 
-    info['platform'] = platform
+    info['platform'] = platform_name
+    info['env']['MLC_HOST_PLATFORM_FLAVOR'] = platform.machine()
+    info['env']['MLC_HOST_OS_TYPE'] = platform_name
 
     obits = i.get('bits', '')
     if obits == '':
         obits = '32'
-        if platform == 'windows':
+        if platform_name == 'windows':
             # Trying to get fast way to detect bits
             if os.environ.get('ProgramW6432', '') != '' or os.environ.get(
                     'ProgramFiles(x86)', '') != '':  # pragma: no cover
