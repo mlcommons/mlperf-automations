@@ -2,7 +2,7 @@ name: MLPerf Inference TVM ResNet50
 
 on:
   pull_request_target:
-    branches: [ "main", "dev" ]
+    branches: [ "main-off", "dev-off" ]
     paths:
       - '.github/workflows/test-mlperf-inference-tvm-resnet50.yml'
       - '**'
@@ -20,8 +20,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
@@ -30,9 +28,12 @@ jobs:
       run: |
         pip install mlcflow
     - name: Pull MLOps repository
+      env:
+        REPO: ${{ github.event.pull_request.head.repo.html_url }
+        BRANCH: ${{ github.event.pull_request.head.ref }}
       run: |
-        mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
-        mlcr --quiet --tags=get,sys-utils-cm
+        mlc pull repo "$REPO" --branch="$BRANCH"
+        mlcr --quiet --tags=get,sys-utils-mlc
     - name: Test MLC Tutorial TVM
       run: |
         mlcr run-mlperf,inference,_submission,_short --adr.python.name=mlperf --adr.python.version_min=3.8 --submitter=MLCommons --implementation=python --hw_name=gh_ubuntu-latest --model=resnet50 --backend=tvm-onnx --device=cpu --scenario=Offline --mode=accuracy --test_query_count=5 --clean --quiet ${{ matrix.extra-options }}
@@ -60,8 +61,8 @@ jobs:
         EMAIL: mlcommons-bot@users.noreply.github.com
       if: github.repository_owner == 'mlcommons' && env.run_step == 'true'
       run: |
-        git config --global user.name "${{ env.USER }}"
-        git config --global user.email "${{ env.EMAIL }}"
+        git config --global user.name "$USER"
+        git config --global user.email "$EMAIL"
         git config --global credential.https://github.com.helper ""
         git config --global credential.https://github.com.helper "!gh auth git-credential"
         git config --global credential.https://gist.github.com.helper ""

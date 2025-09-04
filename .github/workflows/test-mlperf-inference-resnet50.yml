@@ -47,8 +47,11 @@ jobs:
         pip install tabulate
 
     - name: Pull MLOps repo
+      env:
+        REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        BRANCH: ${{ github.event.pull_request.head.ref }}
       run: |
-        mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
+        mlc pull repo "$REPO" --branch="$BRANCH"
 
     - name: Test MLPerf Inference ResNet50 (Windows)
       if: matrix.os == 'windows-latest'

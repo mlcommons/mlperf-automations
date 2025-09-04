@@ -38,7 +38,8 @@ deps:
     - MLC_VERSION
 input_mapping:
   targets: MLC_LLVM_TARGETS_TO_BUILD
-
+  target_triple: MLC_LLVM_TARGET_TRIPLE
+  extra_options: MLC_LLVM_EXTRA_CMAKE_OPTIONS
 env:
   MLC_GIT_URL: https://github.com/llvm/llvm-project
 name: Build LLVM compiler from sources (can take >30 min)
