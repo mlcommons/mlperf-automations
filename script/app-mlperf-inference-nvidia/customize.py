@@ -570,6 +570,10 @@ def preprocess(i):
             run_config += f" --dla_batch_size={dla_batch_size}".replace(
                 "##", ",")
 
+        model_precision = env.get('MLC_MLPERF_MODEL_PRECISION').replace('float', 'fp')
+        if model_precision:
+            run_config += f" --precision={model_precision}"
+            
         input_format = env.get('MLC_MLPERF_NVIDIA_HARNESS_INPUT_FORMAT')
         if input_format:
             run_config += f" --input_format={input_format}"
