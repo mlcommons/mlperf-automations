@@ -18,7 +18,7 @@ def preprocess(i):
             env['MLC_GPU_ARCH'] = gpu_arch
             env['MLC_TMP_REQUIRE_DOWNLOAD'] = 'no'
         else:
-            target_dir = os.path.join(
+            target_quantized_model_dir = os.path.join(
                 env['MLC_NVIDIA_MLPERF_SCRATCH_PATH'],
                 "models",
                 "Llama2",
@@ -26,8 +26,16 @@ def preprocess(i):
                 f"llama-2-70b-chat-hf-tp{env['MLC_NVIDIA_TP_SIZE']}pp{env['MLC_NVIDIA_PP_SIZE']}-{env['MLC_ML_MODEL_PRECISION']}"
             )
 
+            target_model_dir = os.path.join(
+                env['MLC_NVIDIA_MLPERF_SCRATCH_PATH'],
+                "models",
+                "Llama2",
+                "Llama-2-70b-chat-hf"
+            )
+
             # Ensure target directory exists
-            os.makedirs(target_dir, exist_ok=True)
+            os.makedirs(target_quantized_model_dir, exist_ok=True)
+            os.makedirs(target_model_dir, exist_ok=True)
 
             run_cmd = f"cp -r {env['LLAMA2_QUANTIZED_CHECKPOINT_PATH']}/* {env['MLC_NVIDIA_MLPERF_SCRATCH_PATH']}/models/Llama2/fp8-quantized-ammo/llama-2-70b-chat-hf-tp{env['MLC_NVIDIA_TP_SIZE']}pp{env['MLC_NVIDIA_PP_SIZE']}-{env['MLC_ML_MODEL_PRECISION']}"
             run_cmd += f" && cp -r {env['LLAMA2_CHECKPOINT_PATH']}/* {env['MLC_NVIDIA_MLPERF_SCRATCH_PATH']}/models/Llama2/Llama-2-70b-chat-hf"
