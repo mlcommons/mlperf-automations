@@ -51,13 +51,32 @@ tests:
 variations:
   pre-quantized:
     group: quantization
+    deps:
+      - enable_if_env:
+          MLC_TMP_ML_MODEL_PRE_QUANTIZED:
+          - 'yes'
+        skip_if_env:
+          LLAMA2_QUANTIZED_CHECKPOINT_PATH:
+          - 'yes'
+        env:
+          MLC_DOWNLOAD_FINAL_ENV_NAME: LLAMA2_QUANTIZED_CHECKPOINT_PATH
+          MLC_EXTRACT_FINAL_ENV_NAME: LLAMA2_QUANTIZED_CHECKPOINT_PATH
+        force_cache: true
+        names:
+          - dae_quantized_models
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
     env:
-      MLC_ML_MODEL_PRE_QUANTIZED: 'yes'
+      MLC_TMP_ML_MODEL_PRE_QUANTIZED: 'yes'
   quantize-locally:
     default: true
     group: quantization
     env:
-      MLC_ML_MODEL_QUANTIZE_LOCALLY: 'yes'
+      MLC_TMP_ML_MODEL_QUANTIZE_LOCALLY: 'yes'
   amd:
     default_env:
       MLC_LLAMA2_QUANTIZATION_DEVICE: ''
@@ -212,6 +231,10 @@ variations:
       - tags: get,nvidia,scratch,space
         names:
         - mlperf-inference-nvidia-scratch-space
+      - env: {}
+        force_new_env_keys:
+        - LLAMA2_CHECKPOINT_PATH
+        tags: get,ml-model,llama2-70b,_fp32,_pytorch
     group: model-provider
   pytorch:
     default: true
@@ -242,7 +265,7 @@ variations:
     - tags: get,generic-python-lib,_package.compressed_tensors
   pytorch,fp32:
     env: {}
-  pytorch,nvidia,v5.0:
+  pytorch,nvidia,v5.0,quantize-locally:
     deps:
       - env:
           MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_TENSORRT_LLM_CHECKOUT_PATH
@@ -258,10 +281,6 @@ variations:
       - cuda
       tags: get,cuda
     - tags: get,cuda-devices,_with-pycuda
-    - env: {}
-      force_new_env_keys:
-      - LLAMA2_CHECKPOINT_PATH
-      tags: get,ml-model,llama2-70b,_fp32,_pytorch
     - names:
       - nvidia-inference-common-code
       tags: get,nvidia,inference,common-code
