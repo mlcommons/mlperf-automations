@@ -177,7 +177,7 @@ variations:
       MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama-2-7b-chat-hf.uri
   mlc,r2-downloader,70b,pre-quantized,fp8:
     env:
-      MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama-2-70b-chat-hf-tp<<MLC_NVIDIA_TP_SIZE>>pp<<MLC_NVIDIA_PP_SIZE>>-<<<MLC_ML_MODEL_PRECISION>>>.uri
+      MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama-2-70b-chat-hf-tp<<<MLC_NVIDIA_TP_SIZE>>>pp<<<MLC_NVIDIA_PP_SIZE>>>-<<<MLC_ML_MODEL_PRECISION>>>.uri
   hf:
     group: download-source
     env:
