@@ -63,7 +63,7 @@ variations:
           MLC_EXTRACT_FINAL_ENV_NAME: LLAMA2_QUANTIZED_CHECKPOINT_PATH
         force_cache: true
         names:
-          - dae_quantized_models
+          - dae-quantized-models
         tags: download-and-extract
         force_env_keys:
           - MLC_OUTDIRNAME  
@@ -176,6 +176,9 @@ variations:
     env:
       MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama-2-7b-chat-hf.uri
   mlc,r2-downloader,70b,pre-quantized,fp8:
+    add_deps_recursive:
+      dae-quantized-model:
+        tags: _r2-downloader
     env:
       MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/staging-33-llama-2-70b-chat-hf-tp<<<MLC_NVIDIA_TP_SIZE>>>pp<<<MLC_NVIDIA_PP_SIZE>>>-<<<MLC_ML_MODEL_PRECISION>>>.uri
   hf:
