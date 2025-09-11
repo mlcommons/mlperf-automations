@@ -29,9 +29,9 @@ def preprocess(i):
             # Ensure target directory exists
             os.makedirs(target_dir, exist_ok=True)
 
-            run_cmd = f"cp -r {env['LLAMA2_QUANTIZED_CHECKPOINT_PATH']}\* {env['MLC_NVIDIA_MLPERF_SCRATCH_PATH']}/models/Llama2/fp8-quantized-ammo/llama-2-70b-chat-hf-tp{env['MLC_NVIDIA_TP_SIZE']}pp{env['MLC_NVIDIA_PP_SIZE']}-{env['MLC_ML_MODEL_PRECISION']}"
-            run_cmd += f" && cp -r {env['LLAMA2_CHECKPOINT_PATH']}\* {env['MLC_NVIDIA_MLPERF_SCRATCH_PATH']}/models/Llama2/Llama-2-70b-chat-hf"
-            
+            run_cmd = f"cp -r {env['LLAMA2_QUANTIZED_CHECKPOINT_PATH']}\\* {env['MLC_NVIDIA_MLPERF_SCRATCH_PATH']}/models/Llama2/fp8-quantized-ammo/llama-2-70b-chat-hf-tp{env['MLC_NVIDIA_TP_SIZE']}pp{env['MLC_NVIDIA_PP_SIZE']}-{env['MLC_ML_MODEL_PRECISION']}"
+            run_cmd += f" && cp -r {env['LLAMA2_CHECKPOINT_PATH']}\\* {env['MLC_NVIDIA_MLPERF_SCRATCH_PATH']}/models/Llama2/Llama-2-70b-chat-hf"
+
             env['MLC_RUN_CMD'] = run_cmd
     else:
         path = env.get('LLAMA2_CHECKPOINT_PATH', '').strip()
