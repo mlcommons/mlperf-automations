@@ -106,7 +106,8 @@ def postprocess(i):
 
     env['MLC_AOCC_BIN_PATH'] = found_path
     env['MLC_AOCC_INSTALLED_PATH'] = os.path.dirname(found_path)
-    env['MLC_AOCC_LIB_PATH'] = os.path.join(env['MLC_AOCC_INSTALLED_PATH'], 'lib')
+    env['MLC_AOCC_LIB_PATH'] = os.path.join(
+        env['MLC_AOCC_INSTALLED_PATH'], 'lib')
 
     file_name_c = os.path.basename(found_file_path)
     file_name_cpp = file_name_c.replace('clang', 'clang++')
@@ -132,8 +133,6 @@ def postprocess(i):
         env['MLC_FORTRAN_COMPILER_WITH_PATH'] = fortran_compiler_path
         env['MLC_FORTRAN_COMPILER_FLAG_OUTPUT'] = '-o '
         env['MLC_FORTRAN_COMPILER_FLAG_VERSION'] = '--version'
-
-
 
     env['MLC_COMPILER_FLAGS_FAST'] = "-O3"
     env['MLC_LINKER_FLAGS_FAST'] = "-O3"
