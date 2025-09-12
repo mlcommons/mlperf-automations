@@ -180,7 +180,7 @@ variations:
       dae-quantized-models:
         tags: _r2-downloader
     env:
-      MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/staging-33-llama2-70b-chat-hf-tp<<<MLC_NVIDIA_TP_SIZE>>>pp<<<MLC_NVIDIA_PP_SIZE>>>-<<<MLC_ML_MODEL_PRECISION>>>.uri
+      MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama2-70b-chat-hf-tp<<<MLC_NVIDIA_TP_SIZE>>>pp<<<MLC_NVIDIA_PP_SIZE>>>-<<<MLC_ML_MODEL_PRECISION>>>.uri
   hf:
     group: download-source
     env:
