@@ -438,7 +438,7 @@ def preprocess(i):
             if not os.path.exists(target_preprocessed_data_path):
                 cmds.append(
                     f"mkdir -p {os.path.dirname(target_preprocessed_data_path)}")
-                if env('MLC_DATASET_OPENORCA_PREPROCESSED_PATH'):
+                if env.get('MLC_DATASET_OPENORCA_PREPROCESSED_PATH'):
                     cmds.append(
                         f"ln -sf {env['MLC_DATASET_OPENORCA_PREPROCESSED_PATH']} {os.path.join(env['MLPERF_SCRATCH_PATH'], "preprocessed_data", "open_orca")}"
                     )
