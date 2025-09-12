@@ -3,6 +3,10 @@ CUR=$PWD
 
 cd ${MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH}
 
+if [[ ${BUILD_TRTLLM} == "1" ]]; then
+  git lfs install
+fi
+
 if [[ ${MLC_MAKE_CLEAN} == "yes" ]]; then
   make clean
 fi
