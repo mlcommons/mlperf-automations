@@ -333,7 +333,7 @@ def preprocess(i):
 
         tmp_tp_size = env['MLC_NVIDIA_TP_SIZE']
         tmp_pp_size = env['MLC_NVIDIA_PP_SIZE']
-        
+
         fp8_model_path = os.path.join(
             env['MLPERF_SCRATCH_PATH'],
             'models',
@@ -443,7 +443,8 @@ def preprocess(i):
                         f"ln -sf {env['MLC_DATASET_OPENORCA_PREPROCESSED_PATH']} {os.path.join(env['MLPERF_SCRATCH_PATH'], "preprocessed_data", "open_orca")}"
                     )
                 else:
-                    cmds.append(f"make preprocess_data BENCHMARKS='{model_name}'")
+                    cmds.append(
+                        f"make preprocess_data BENCHMARKS='{model_name}'")
         else:
             cmds.append(f"make preprocess_data BENCHMARKS='{model_name}'")
 
