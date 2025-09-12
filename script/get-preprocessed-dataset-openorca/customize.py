@@ -65,7 +65,7 @@ def postprocess(i):
         else:
             env['MLC_DATASET_PREPROCESSED_PATH'] = os.path.join(
                 env['MLC_OPENORCA_PREPROCESSED_ROOT'],
-                "open_orca_gpt4_tokenized_llama.sampled_24576.pkl")
+                "preprocessed")
             env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_DATASET_PREPROCESSED_PATH']
             env['MLC_DATASET_OPENORCA_PREPROCESSED_PATH'] = env['MLC_DATASET_PREPROCESSED_PATH']
 
