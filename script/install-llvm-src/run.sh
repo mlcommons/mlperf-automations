@@ -33,7 +33,6 @@ if [ ! -d "${INSTALL_DIR}" ] || [ ${MLC_LLVM_CONDA_ENV} == "yes" ]; then
     ninja install
     if [ "${?}" != "0" ]; then exit 1; fi
 
-    mkdir -p ${INSTALL_DIR}
 fi
 
 # Clean build directory (too large)
