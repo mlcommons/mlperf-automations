@@ -65,8 +65,8 @@ def postprocess(i):
                 env['MLC_DATASET_OPENORCA_CALIBRATION_PATH'] = env['MLC_DATASET_CALIBRATION_PATH']
         else:
             env['MLC_DATASET_PREPROCESSED_PATH'] = os.path.join(
-                    env['MLC_OPENORCA_PREPROCESSED_ROOT'],
-                    "open_orca_gpt4_tokenized_llama.sampled_24576.pkl")
+                env['MLC_OPENORCA_PREPROCESSED_ROOT'],
+                "open_orca_gpt4_tokenized_llama.sampled_24576.pkl")
             if env.get('MLC_TMP_DATASET_PREPROCESS_STEP_PROVIDER',
                        '') == "nvidia":
                 env['MLC_DATASET_OPENORCA_NVIDIA_PREPROCESSED_PATH'] = os.path.join(
@@ -75,7 +75,8 @@ def postprocess(i):
                 env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_DATASET_OPENORCA_NVIDIA_PREPROCESSED_PATH']
             else:
                 env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_DATASET_PREPROCESSED_PATH']
-            # The openorca mlc preprocessed dataset is used in nvidia implementation for checking accuracy
+            # The openorca mlc preprocessed dataset is used in nvidia
+            # implementation for checking accuracy
             env['MLC_DATASET_OPENORCA_PREPROCESSED_PATH'] = env['MLC_DATASET_PREPROCESSED_PATH']
 
     return {'return': 0}
