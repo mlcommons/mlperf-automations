@@ -339,7 +339,7 @@ def preprocess(i):
             'models',
             'Llama2',
             'fp8-quantized-ammo',
-            f'llama2-70b-chat-hf-tp{tmp_tp_size}pp{tmp_pp_size}-fp8')
+            f'llama-2-70b-chat-hf-tp{tmp_tp_size}pp{tmp_pp_size}-fp8')
 
         if not os.path.exists(preprocessed_data_for_accuracy_checker):
             if not os.path.exists(preprocessed_data_for_accuracy_checker):
