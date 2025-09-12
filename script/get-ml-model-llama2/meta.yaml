@@ -62,6 +62,7 @@ variations:
           MLC_DOWNLOAD_FINAL_ENV_NAME: LLAMA2_QUANTIZED_CHECKPOINT_PATH
           MLC_EXTRACT_FINAL_ENV_NAME: LLAMA2_QUANTIZED_CHECKPOINT_PATH
         force_cache: true
+        extra_cache_tags: llama2,llama2-model,llama2-checkpoint,llama2-70b
         names:
           - dae-quantized-models
         tags: download-and-extract
