@@ -712,6 +712,8 @@ variations:
     state:
       postfix:
         apt: postfix
+        dnf: postfix
+        yum: postfix
   psmisc:
     env:
       MLC_SYS_UTIL_NAME: psmisc

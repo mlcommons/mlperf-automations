@@ -328,6 +328,11 @@ def preprocess(i):
         EOL)
 
     f.write(EOL + '# Download MLC repo for scripts' + EOL)
+    pat = env.get('MLC_GH_TOKEN')
+    if pat:
+        token_string = f" --pat={pat}"
+    else:
+        token_string = ""
 
     if use_copy_repo:
         docker_repo_dest = "$HOME/MLC/repos/mlcommons@mlperf-automations"
@@ -336,7 +341,9 @@ def preprocess(i):
             EOL)
 
         f.write(EOL + '# Register MLC repository' + EOL)
-        f.write('RUN mlc pull repo --url={} --quiet'.format(docker_repo_dest) + EOL)
+        f.write(
+            'RUN mlc pull repo --url={} {token_string} --quiet'.format(docker_repo_dest) +
+            EOL)
         f.write(EOL)
 
     else:
@@ -349,6 +356,7 @@ def preprocess(i):
             'RUN mlc pull repo ' +
             mlc_mlops_repo +
             mlc_mlops_repo_branch_string +
+            token_string +
             x +
             EOL)
 

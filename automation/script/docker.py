@@ -55,6 +55,10 @@ def dockerfile(self_module, input_params):
             'script_variation_tags': variation_tags
         }
         docker_settings = metadata.get('docker', {})
+        docker_settings_default_env = docker_settings.get('default_env', {})
+        for key in docker_settings_default_env:
+            env.setdefault(key, docker_settings_default_env[key])
+
         state_data['docker'] = docker_settings
         add_deps_recursive = input_params.get('add_deps_recursive', {})
 
@@ -301,6 +305,10 @@ def docker_run(self_module, i):
         folder_path_env_keys = meta.get('folder_path_env_keys', [])
 
         docker_settings = meta.get('docker', {})
+        docker_settings_default_env = docker_settings.get('default_env', {})
+        for key in docker_settings_default_env:
+            env.setdefault(key, docker_settings_default_env[key])
+
         state['docker'] = docker_settings
         run_state = {
             'deps': [], 'fake_deps': [], 'parent': None,

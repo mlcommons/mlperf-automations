@@ -71,7 +71,9 @@ mlcr get,sys-util,generic,generic-sys-util
 
 - `autoconf`
 - `bzip2`
+- `ccache`
 - `cmake`
+- `coreutils`
 - `crossbuild-essential-arm64`
 - `dmidecode`
 - `ffmpeg`

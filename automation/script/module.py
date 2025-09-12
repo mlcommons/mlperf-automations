@@ -504,6 +504,9 @@ class ScriptAutomation(Automation):
                 env[key] = os.environ[key]
 
         r = self._update_env_from_input(env, i)
+        if env.get('MLC_OUTDIRNAME', '') != '':
+            if not os.path.isabs(env['MLC_OUTDIRNAME']):
+                env['MLC_OUTDIRNAME'] = os.path.abspath(env['MLC_OUTDIRNAME'])
 
         #######################################################################
         # Check if we want to skip cache (either by skip_cache or by fake_run)
@@ -1748,12 +1751,7 @@ class ScriptAutomation(Automation):
 
             tmp_curdir = os.getcwd()
             if env.get('MLC_OUTDIRNAME', '') != '':
-                if os.path.isabs(env['MLC_OUTDIRNAME']) or recursion:
-                    c_outdirname = env['MLC_OUTDIRNAME']
-                else:
-                    c_outdirname = os.path.join(
-                        env['MLC_TMP_CURRENT_PATH'], env['MLC_OUTDIRNAME'])
-                    env['MLC_OUTDIRNAME'] = c_outdirname
+                c_outdirname = env['MLC_OUTDIRNAME']
 
                 if not fake_run:  # prevent permission error inside docker runs
                     if not os.path.exists(c_outdirname):
