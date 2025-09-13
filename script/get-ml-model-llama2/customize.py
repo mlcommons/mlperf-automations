@@ -8,7 +8,7 @@ def preprocess(i):
     os_info = i['os_info']
     env = i['env']
 
-    if env.get('MLC_TMP_ML_MODEL_QUANTIZE_LOCALLY', '') == 'nvidia':
+    if env.get('MLC_TMP_ML_MODEL_PROVIDER', '') == 'nvidia':
         if is_true(env.get('MLC_ML_MODEL_QUANTIZE_LOCALLY')):
             i['run_script_input']['script_name'] = 'run-nvidia'
             gpu_arch = int(
