@@ -9,7 +9,7 @@ def preprocess(i):
     env = i['env']
 
     if env.get('MLC_TMP_ML_MODEL_PROVIDER', '') == 'nvidia':
-        if is_true(env.get('MLC_ML_MODEL_QUANTIZE_LOCALLY')):
+        if is_true(env.get('MLC_TMP_ML_MODEL_QUANTIZE_LOCALLY')):
             i['run_script_input']['script_name'] = 'run-nvidia'
             gpu_arch = int(
                 float(
@@ -63,7 +63,7 @@ def postprocess(i):
 
     env = i['env']
     if env.get('MLC_DOWNLOAD_MODE', '') != "dry":
-        if is_true(env.get('MLC_ML_MODEL_QUANTIZE_LOCALLY')):
+        if is_true(env.get('MLC_TMP_ML_MODEL_QUANTIZE_LOCALLY')):
             if env.get('LLAMA2_CHECKPOINT_PATH', '') == '':
                 env['LLAMA2_CHECKPOINT_PATH'] = env['MLC_ML_MODEL_PATH']
             else:
