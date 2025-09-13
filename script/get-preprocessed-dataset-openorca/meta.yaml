@@ -144,3 +144,6 @@ variations:
   nvidia,calibration:
     new_env_keys:
     - MLC_NVIDIA_PREPROCESSED_CALIBRATION_DATASET_PATH
+  nvidia,validation:
+    new_env_keys:
+    - MLC_DATASET_OPENORCA_NVIDIA_PREPROCESSED_PATH
