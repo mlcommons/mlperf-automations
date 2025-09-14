@@ -123,3 +123,4 @@ mlcr get,raw,ml-model,language-processing,llama2,llama2-70b,text-summarization
 ### Version
 
 - `v5.0` (default)
+- `v5.1`
