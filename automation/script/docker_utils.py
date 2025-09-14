@@ -285,7 +285,6 @@ def regenerate_script_cmd(i):
                 del env[key]
                 continue
 
-
             # Check if the value is a string containing the specified paths
             if isinstance(value, str) and (
                     os.path.join("local", "cache", "") in value or
