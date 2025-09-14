@@ -362,13 +362,15 @@ def regenerate_script_cmd(i):
                 )
             # Process lists by concatenating values with commas.
             elif isinstance(value, list):
-                list_values = ",".join(quote_if_needed(item, quote) for item in value)
+                list_values = ",".join(
+                    quote_if_needed(
+                        item, quote) for item in value)
                 command_line += f" --{full_key},={list_values}"
             # Process scalar values.
             else:
                 if full_key in ['s', 'v']:
                     command_line += f" -{full_key}"
-                elif :
+                elif:
                     command_line += f" --{full_key}={quote_if_needed(value, quote)}"
 
         return command_line
