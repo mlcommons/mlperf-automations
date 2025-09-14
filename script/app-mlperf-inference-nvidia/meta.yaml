@@ -357,6 +357,16 @@ variations:
     group: batchsize-format-change
     env:
       MLC_MLPERF_INFERENCE_POST_5_0: "yes"
+  v5.1:
+    base:
+      - v5.0+
+    group: version
+    env:
+      MLC_MLPERF_INFERENCE_CODE_VERSION: "v5.1"
+      MLC_NVIDIA_MITTEN_FROM_SRC: "yes"
+    adr:
+      pycuda:
+        version: "2024.1"
   v5.0:
     base:
       - v5.0+

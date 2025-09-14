@@ -238,6 +238,14 @@ variations:
       numpy:
         version_max: "1.26.999"
         version_max_usable: "1.26.4"
+  
+  r5.1:
+    add_deps_recursive:
+      pycuda:
+        version: "2024.1"
+      numpy:
+        version_max: "1.26.999"
+        version_max_usable: "1.26.4"
 
 
 versions:
