@@ -413,7 +413,6 @@ variations:
         tags: _version.r5.1-dev
 
   r5.1:
-    default: true
     env:
       MLC_MLPERF_INFERENCE_VERSION: '5.1'
       MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r5.1_default
