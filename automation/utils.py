@@ -1140,5 +1140,5 @@ def quote_if_needed(val: str, quote: str) -> str:
     if " " in s or '"' in s or quote == '"':
         # Escape all existing double quotes
         s = s.replace('"', r'\"')
-        return f"\\\"{s}\\\""
+        return f'"{s}"'
     return s
