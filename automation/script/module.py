@@ -4840,7 +4840,7 @@ def find_cached_script(i):
             skip_cached_script = False
             dependent_paths = []
             dependent_cached_path = cached_script.meta.get(
-                'dependent_cached_path', '')
+                'dependent_cached_path', None)
             if dependent_cached_path:
                 dependent_paths.append(dependent_cached_path)
             dependent_cached_paths = cached_script.meta.get(
