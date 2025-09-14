@@ -4859,7 +4859,10 @@ def find_cached_script(i):
                             recursion_spaces +
                             '  - Skipping cached entry as the dependent path {} is missing!'.format(r['value_env']))
                         skip_cached_script = True
-                        continue
+                        break
+                        
+            if skip_cached_script:
+                continue
 
             os_info = self_obj.os_info
 
