@@ -4844,7 +4844,7 @@ def find_cached_script(i):
             if dependent_cached_path:
                 dependent_paths.append(dependent_cached_path)
             dependent_cached_paths = cached_script.meta.get(
-                    'dependent_cached_paths', '').split(':')
+                'dependent_cached_paths', '').split(':')
             dependent_paths += dependent_cached_paths
             for dependent_cached_path in dependent_paths:
                 if not os.path.exists(dependent_cached_path):
