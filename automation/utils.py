@@ -1104,6 +1104,7 @@ def print_json(i):
 
 
 def parse_expiration(user_input: str) -> float:
+    import time
     """
     Parse user input like '10m', '2h', '3d' into a UNIX timestamp.
     """

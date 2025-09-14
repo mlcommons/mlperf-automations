@@ -2041,7 +2041,7 @@ class ScriptAutomation(Automation):
                             cached_meta['dependent_cached_path'] = dependent_cached_path
 
                 if run_state.get('cache_expiration'):  # convert to seconds
-                    cached_meta['cache_expiration'] = utils.parse_expiration(
+                    cached_meta['cache_expiration'] = parse_expiration(
                         run_state['cache_expiration'])
 
                 ii = {'action': 'update',
