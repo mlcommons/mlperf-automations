@@ -5290,7 +5290,7 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
         if r['return'] > 0:
             return r
 
-        # Save file to run without CM
+        # Save file to run without MLC
         if debug_script_tags != '' and all(
                 item in found_script_tags for item in debug_script_tags.split(',')):
 

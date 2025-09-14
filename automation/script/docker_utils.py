@@ -349,7 +349,7 @@ def regenerate_script_cmd(i):
                 continue
 
             value = command_dict[key]
-            quote = '\\"' if full_key in quote_keys else ""
+            quote = '"' if full_key in quote_keys else ""
 
             # Recursively process nested dictionaries.
             if isinstance(value, dict):
@@ -362,15 +362,14 @@ def regenerate_script_cmd(i):
                 )
             # Process lists by concatenating values with commas.
             elif isinstance(value, list):
-                list_values = ",".join(
-                    f"{quote}{str(item)}{quote}" for item in value)
+                list_values = ",".join(quote_if_needed(item, quote) for item in value)
                 command_line += f" --{full_key},={list_values}"
             # Process scalar values.
             else:
                 if full_key in ['s', 'v']:
                     command_line += f" -{full_key}"
-                else:
-                    command_line += f" --{full_key}={quote}{str(value)}{quote}"
+                elif :
+                    command_line += f" --{full_key}={quote_if_needed(value, quote)}"
 
         return command_line
 

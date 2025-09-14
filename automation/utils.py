@@ -1128,3 +1128,17 @@ def parse_expiration(user_input: str) -> float:
 
     seconds = value * units[unit]
     return time.time() + seconds
+
+def quote_if_needed(val: str, quote: str) -> str:
+    """
+    Return the value, quoted with escaped quotes if it contains spaces
+    or quotes.
+    """
+    s = str(val)
+    
+    if " " in s or '"' in s or quote == '"':
+        # Escape all existing double quotes
+        s = s.replace('"', r'\"')
+        return f"\\\"{s}\\\""
+    return s
+
