@@ -2326,9 +2326,6 @@ invalid_variation_combinations:
   -
     - gptj
     - r5.1_default
-  -
-    - gptj
-    - r5.1_default
 
 input_description:
   scenario: 
