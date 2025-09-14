@@ -97,6 +97,11 @@ def dockerfile(self_module, input_params):
         # Set Docker-specific configurations
         docker_settings = state_data['docker']
 
+        if is_true(docker_settings.get('pass_docker_to_script', False)):
+            input_params['docker'] = True
+            r = self_module.run(input_params)
+            return r
+
         if not docker_settings.get('run', True) and not input_params.get(
                 'docker_run_override', False):
             logger.info("Docker 'run' is set to False in meta.json")
@@ -249,12 +254,6 @@ def docker_run(self_module, i):
     r = prune_input({'input': i, 'extra_keys_starts_with': ['docker_']})
     f_run_cmd = r['new_input']
 
-    # Regenerate Dockerfile if required
-    if regenerate_docker_file:
-        r = dockerfile(self_module, i)
-        if r['return'] > 0:
-            return r
-
     # Save current directory and prepare to search for scripts
     cur_dir = os.getcwd()
     r = self_module.search(i.copy())
@@ -279,12 +278,6 @@ def docker_run(self_module, i):
 
     image_repo = i.get('docker_image_repo', '')
     add_deps_recursive = i.get('add_deps_recursive', {})
-
-    # Ensure Docker is available
-    r = self_module.action_object.access(
-        {'action': 'run', 'automation': 'script', 'tags': "get,docker"})
-    if r['return'] > 0:
-        return r
 
     # Process each artifact
     for artifact in sorted(lst, key=lambda x: x.meta.get('alias', '')):
@@ -367,6 +360,24 @@ def docker_run(self_module, i):
                 'docker_run_override', False):
             logger.info("docker.run set to False in meta.yaml")
             continue
+
+        if is_true(docker_settings.get('pass_docker_to_script', False)):
+            logger.info("Docker 'run' is passed to the run script")
+            i['docker'] = True
+            r = self_module.run(i)
+            return r
+
+        # Regenerate Dockerfile if required
+        if regenerate_docker_file:
+            r = dockerfile(self_module, i)
+            if r['return'] > 0:
+                return r
+
+        # Ensure Docker is available
+        r = self_module.action_object.access(
+            {'action': 'run', 'automation': 'script', 'tags': "get,docker"})
+        if r['return'] > 0:
+            return r
 
         r = self_module._update_env_from_input(env, i)
         if r['return'] > 0:
