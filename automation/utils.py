@@ -1101,3 +1101,28 @@ def print_json(i):
     print(json.dumps(meta, indent=2))
 
     return {'return': 0}
+
+def parse_expiration(user_input: str) -> float:
+    """
+    Parse user input like '10m', '2h', '3d' into a UNIX timestamp.
+    """
+    units = {
+        'm': 60,             # minutes
+        'h': 3600,           # hours
+        'd': 86400,          # days
+    }
+
+    if not user_input:
+        raise ValueError("Expiration time cannot be empty")
+
+    unit = user_input[-1].lower()
+    if unit not in units:
+        raise ValueError(f"Unknown unit '{unit}', use m/h/d")
+
+    try:
+        value = int(user_input[:-1])
+    except ValueError:
+        raise ValueError(f"Invalid number in '{user_input}'")
+
+    seconds = value * units[unit]
+    return time.time() + seconds
