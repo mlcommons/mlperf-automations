@@ -215,14 +215,14 @@ def update_docker_environment(
     # Add host group ID if specified in the Docker settings and not on Windows
     if not is_false(docker_settings.get('pass_group_id')) and os.name != 'nt':
         env['+ MLC_DOCKER_BUILD_ARGS'].append(
-            f"GID=\\\" $(id -g $USER) \\\""
+            f"GID=\" $(id -g $USER) \""
         )
 
     # Add host user ID if specified in the Docker settings and not on Windows
     if not is_false(docker_settings.get(
             'use_host_user_id')) and os.name != 'nt':
         env['+ MLC_DOCKER_BUILD_ARGS'].append(
-            f"UID=\\\" $(id -u $USER) \\\""
+            f"UID=\" $(id -u $USER) \""
         )
 
     return {'return': 0}

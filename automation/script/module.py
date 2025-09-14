@@ -3154,9 +3154,8 @@ class ScriptAutomation(Automation):
                 if os.name == 'nt':
                     script.append('set ' + k + '=' + v)
                 else:
-                    if ' ' in v:
-                        v = '"' + v + '"'
-                    script.append('export ' + k + '=' + v)
+                    safe_v = quote_if_needed(v)
+                    script.append('export ' + k + '=' + safe_v)
 
             script.append('')
 
@@ -5596,10 +5595,12 @@ def convert_env_to_script(env, os_info, start_script=None):
                 os_info['env_var'].replace(
                     'env_var', key)}"""
 
-        # Replace placeholders in the platform-specific environment command
+        env_quote = os_info['env_quote']
+        # Replace placeholders in the platform-specific environment command 
+        # and escapes any quote in the env value
         env_command = os_info['set_env'].replace(
             '${key}', key).replace(
-            '${value}', str(env_value))
+            '${value}', str(env_value).replace(env_quote, f"""\\{env_quote}"""))
         script.append(env_command)
 
     return script
