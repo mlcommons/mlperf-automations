@@ -281,6 +281,10 @@ def regenerate_script_cmd(i):
         env = i_run_cmd['env']
         for key in list(env):
             value = env[key]
+            if "<<<" in value:
+                del env[key]
+                continue
+
 
             # Check if the value is a string containing the specified paths
             if isinstance(value, str) and (
