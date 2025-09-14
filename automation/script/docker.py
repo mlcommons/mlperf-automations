@@ -279,6 +279,8 @@ def docker_run(self_module, i):
     image_repo = i.get('docker_image_repo', '')
     add_deps_recursive = i.get('add_deps_recursive', {})
 
+    input_i = copy.deepcopy(i)
+
     # Process each artifact
     for artifact in sorted(lst, key=lambda x: x.meta.get('alias', '')):
         meta, script_path = artifact.meta, artifact.path
@@ -369,7 +371,7 @@ def docker_run(self_module, i):
 
         # Regenerate Dockerfile if required
         if regenerate_docker_file:
-            r = dockerfile(self_module, i)
+            r = dockerfile(self_module, input_i)
             if r['return'] > 0:
                 return r
 
