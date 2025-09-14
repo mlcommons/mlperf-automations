@@ -370,7 +370,7 @@ def regenerate_script_cmd(i):
             else:
                 if full_key in ['s', 'v']:
                     command_line += f" -{full_key}"
-                elif:
+                else:
                     command_line += f" --{full_key}={quote_if_needed(value, quote)}"
 
         return command_line
