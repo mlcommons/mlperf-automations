@@ -346,7 +346,7 @@ def preprocess(i):
                 cmds.append(
                     f"mkdir -p {os.path.dirname(preprocessed_data_for_accuracy_checker)}")
             cmds.append(
-                f"ln -sf {env['MLC_DATASET_OPENORCA_PREPROCESSED_PATH']} {preprocessed_data_for_accuracy_checker}")
+                f"cp {env['MLC_DATASET_OPENORCA_PREPROCESSED_PATH']} {preprocessed_data_for_accuracy_checker}")
 
         model_name = "llama2-70b"
         model_path = fp8_model_path
@@ -440,7 +440,7 @@ def preprocess(i):
                     f"mkdir -p {os.path.dirname(target_preprocessed_data_path)}")
                 if env.get('MLC_DATASET_OPENORCA_PREPROCESSED_PATH'):
                     cmds.append(
-                        f"ln -sf {env['MLC_DATASET_OPENORCA_NVIDIA_PREPROCESSED_PATH']} {os.path.join(env['MLPERF_SCRATCH_PATH'], 'preprocessed_data')}"
+                        f"cp -r {env['MLC_DATASET_OPENORCA_NVIDIA_PREPROCESSED_PATH']} {os.path.join(env['MLPERF_SCRATCH_PATH'], 'preprocessed_data')}"
                     )
                 else:
                     cmds.append(
