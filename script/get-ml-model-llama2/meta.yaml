@@ -325,3 +325,7 @@ variations:
     default: true
   v5.1:
     group: version
+  use-no-cache:
+    group: docker-build-args
+    env:
+      DOCKER_BUILD_OPTS: ' --no-cache '
