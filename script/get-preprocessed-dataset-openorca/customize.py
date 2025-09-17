@@ -71,7 +71,7 @@ def postprocess(i):
                        '') == "nvidia":
                 env['MLC_DATASET_OPENORCA_NVIDIA_PREPROCESSED_PATH'] = os.path.join(
                     env['MLC_OPENORCA_PREPROCESSED_ROOT'],
-                    "preprocessed")
+                    "preprocessed_data")
                 env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_DATASET_OPENORCA_NVIDIA_PREPROCESSED_PATH']
             else:
                 env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_DATASET_PREPROCESSED_PATH']
