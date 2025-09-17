@@ -697,6 +697,7 @@ def preprocess(i):
 
         if "llama2" in env["MLC_MODEL"]:
             run_config += f" --checkpoint_dir={fp8_model_path}"
+            run_config += f" --tensor_path={os.path.join(env['MLPERF_SCRATCH_PATH'], "preprocessed_data", "open_orca")}"
             if env.get('MLC_MLPERF_INFERENCE_POST_5_0'):
                 run_config += f" --trtllm_build_flags=tensor_parallelism:{tmp_tp_size},pipeline_parallelism:{tmp_pp_size}"
             else:
