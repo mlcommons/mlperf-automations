@@ -150,7 +150,6 @@ def preprocess(i):
 
     extract_to_folder = env.get('MLC_EXTRACT_TO_FOLDER', '')
 
-    
     # Check if extract to additional folder in the current directory (or external path)
     # to avoid messing up other files and keep clean directory structure
     # particularly if archive has many sub-directories and files
