@@ -127,6 +127,9 @@ input_mapping:
   deeplab_resnet50_path: MLC_ML_MODEL_DPLAB_RESNET50_PATH
   waymo_path: MLC_DATASET_WAYMO_PATH
   nm_model_zoo_stub: MLC_MLPERF_NEURALMAGIC_MODEL_ZOO_STUB
+  use_service_account: MLC_AUTH_USING_SERVICE_ACCOUNT
+  client_id: CF_ACCESS_CLIENT_ID
+  client_secret: CF_ACCESS_CLIENT_SECRET
 
 new_state_keys:
 - app_mlperf_inference_*
@@ -391,6 +394,21 @@ variations:
         tags: _version.r5.1-dev
       mlperf-inference-nvidia-scratch-space:
         tags: _version.r5.1-dev
+
+  r5.1:
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: '5.1'
+      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r5.1_default
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v5.1
+      MLC_CUSTOM_SYSTEM_NVIDIA: no  # prevents build-mlperf-inference-server-nvidia from calling add-custom-system-nvidia
+    group: benchmark-version
+    adr:
+      get-mlperf-inference-results-dir:
+        tags: _version.r5.1
+      get-mlperf-inference-submission-dir:
+        tags: _version.r5.1
+      mlperf-inference-nvidia-scratch-space:
+        tags: _version.r5.1
 
   short:
     add_deps_recursive:

@@ -5604,7 +5604,7 @@ def convert_env_to_script(env, os_info, start_script=None):
                 os_info['env_var'].replace(
                     'env_var', key)}"""
 
-        env_quote = os_info['env_quote']
+        env_quote = os_info.get('env_quote', '"')
         # Replace placeholders in the platform-specific environment command
         # and escapes any quote in the env value
         env_command = os_info['set_env'].replace(

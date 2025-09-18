@@ -140,6 +140,9 @@ mlcr run-mlperf,inference
 | `--deeplab_resnet50_path` |  |  | `` |
 | `--waymo_path` |  |  | `` |
 | `--nm_model_zoo_stub` |  |  | `` |
+| `--use_service_account` |  |  | `` |
+| `--client_id` |  |  | `` |
+| `--client_secret` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -171,6 +174,7 @@ mlcr run-mlperf,inference
 - `r4.1-dev`
 - `r5.0`
 - `r5.0-dev`
+- `r5.1`
 - `r5.1-dev` (default)
 
 ### Mode
