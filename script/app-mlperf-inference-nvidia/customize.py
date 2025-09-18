@@ -346,7 +346,7 @@ def preprocess(i):
                 cmds.append(
                     f"mkdir -p {os.path.dirname(preprocessed_data_for_accuracy_checker)}")
             cmds.append(
-                f"ln -sf {env['MLC_DATASET_OPENORCA_PREPROCESSED_PATH']} {preprocessed_data_for_accuracy_checker}")
+                f"cp {env['MLC_DATASET_OPENORCA_PREPROCESSED_PATH']} {preprocessed_data_for_accuracy_checker}")
 
         model_name = "llama2-70b"
         model_path = fp8_model_path
@@ -440,7 +440,7 @@ def preprocess(i):
                     f"mkdir -p {os.path.dirname(target_preprocessed_data_path)}")
                 if env.get('MLC_DATASET_OPENORCA_PREPROCESSED_PATH'):
                     cmds.append(
-                        f"ln -sf {env['MLC_DATASET_OPENORCA_PREPROCESSED_PATH']} {os.path.join(env['MLPERF_SCRATCH_PATH'], "preprocessed_data", "open_orca")}"
+                        f"cp -r {env['MLC_DATASET_OPENORCA_NVIDIA_PREPROCESSED_PATH']}/* {os.path.join(env['MLPERF_SCRATCH_PATH'], 'preprocessed_data', 'open_orca')}"
                     )
                 else:
                     cmds.append(
@@ -697,6 +697,7 @@ def preprocess(i):
 
         if "llama2" in env["MLC_MODEL"]:
             run_config += f" --checkpoint_dir={fp8_model_path}"
+            run_config += f" --tensor_path={os.path.join(env['MLPERF_SCRATCH_PATH'], 'preprocessed_data', 'open_orca')}"
             if is_true(env.get('MLC_MLPERF_INFERENCE_POST_5_0')):
                 run_config += f" --trtllm_build_flags=tensor_parallelism:{tmp_tp_size},pipeline_parallelism:{tmp_pp_size}"
             else:
