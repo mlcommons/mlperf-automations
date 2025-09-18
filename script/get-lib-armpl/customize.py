@@ -29,7 +29,7 @@ def postprocess(i):
         'MLC_EXTRACT_EXTRACTED_SUBDIR_PATH',
         env['MLC_ARMPL_INSTALL_PATH'])
 
-    include_path = os.path.join(armpl_install_path, 'include')
+    inc_path = os.path.join(armpl_install_path, 'include')
 
     env['+C_INCLUDE_PATH'].append(inc_path)
     env['+CPLUS_INCLUDE_PATH'].append(inc_path)
@@ -38,7 +38,7 @@ def postprocess(i):
     env['+LD_LIBRARY_PATH'].append(lib_path)
     env['+DYLD_FALLBACK_LIBRARY_PATH'].append(lib_path)
 
-    env['MLC_ARMPL_INCLUDE_PATH'] = include_path
+    env['MLC_ARMPL_INCLUDE_PATH'] = inc_path
     env['MLC_ARMPL_LIB_PATH'] = lib_path
 
     return {'return': 0}

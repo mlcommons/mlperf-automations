@@ -7,6 +7,9 @@ deps:
 - tags: detect,os
 new_env_keys:
 - MLC_ARMPL_SRC_PATH
+- MLC_ARMPL_INSTALL_PATH
+- MLC_ARMPL_INCLUDE_PATH
+- MLC_ARMPL_LIB_PATH
 - MLC_ARMPL_VERSION
 - +C_INCLUDE_PATH
 - +CPLUS_INCLUDE_PATH
@@ -48,6 +51,9 @@ tags:
 - lib
 - get
 - arm
+tests:
+  run_inputs:
+    - {}
 uid: 01ebcd701d8f480f
 variations:
   version.25.07:
