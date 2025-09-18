@@ -65,7 +65,7 @@ variations:
   mlcutil:
     add_deps:
       download-script:
-        tags: _cmutil
+        tags: _mlcutil
     default: true
     group: download-tool
   cmutil:

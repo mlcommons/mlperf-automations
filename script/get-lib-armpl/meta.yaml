@@ -8,35 +8,40 @@ deps:
 new_env_keys:
 - MLC_ARMPL_SRC_PATH
 - MLC_ARMPL_VERSION
+- +C_INCLUDE_PATH
 - +CPLUS_INCLUDE_PATH
+- +DYLD_FALLBACK_LIBRARY_PATH
 - +LD_LIBRARY_PATH
 prehook_deps:
-- force_cache: true
-  extra_cache_tags: armpl,armpl-src
-  env:
-    MLC_DAE_FINAL_ENV_NAME: MLC_ARMPL_SRC_PATH
-  names:
-    - dae
-  tags: download-and-extract,_extract
-  force_env_keys:
-    - MLC_OUTDIRNAME
-  update_tags_from_env_with_prefix:
-    _url.:
-      - MLC_DOWNLOAD_URL
-- tags: extract,file
-  env:
-    MLC_EXTRACT_FINAL_ENV_NAME: MLC_ARMPL_INSTALL_PATH
-    MLC_EXTRACT_TO_FOLDER: armpl-install
-    MLC_EXTRACT_FILE_PATH: <<<MLC_ARMPL_SRC_PATH>>>/<<<MLC_ARMPL_TAR_FILENAME>>>
-  names:
-    - extract  
-  extra_cache_tags: armpl,armpl-lib
-  force_cache: true
-  force_env_keys:
-    - MLC_OUTDIRNAME
-  update_tags_from_env_with_prefix:
-    _path.:
-      - MLC_EXTRACT_FILE_PATH
+  - force_cache: true
+    extra_cache_tags: armpl,armpl-src
+    env:
+      MLC_DAE_FINAL_ENV_NAME: MLC_ARMPL_SRC_PATH
+    names:
+      - dae
+      - dae-armpl 
+    tags: download-and-extract,_extract
+    force_env_keys:
+      - MLC_OUTDIRNAME
+    update_tags_from_env_with_prefix:
+      _url.:
+        - MLC_DOWNLOAD_URL
+  
+  - tags: extract,file
+    env:
+      MLC_EXTRACT_TO_FOLDER1: armpl-install
+      MLC_EXTRACT_FINAL_ENV_NAME: MLC_ARMPL_INSTALL_PATH
+      MLC_EXTRACT_FILE_PATH: <<<MLC_ARMPL_SRC_PATH>>>/<<<MLC_ARMPL_TAR_FILENAME>>>
+    names:
+      - extract  
+      - extract-armpl 
+    extra_cache_tags: armpl,armpl-lib
+    force_cache: true
+    force_env_keys:
+      - MLC_OUTDIRNAME
+    update_tags_from_env_with_prefix:
+      _path.:
+        - MLC_EXTRACT_FILE_PATH
 
 tags:
 - armpl

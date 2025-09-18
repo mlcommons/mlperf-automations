@@ -54,6 +54,7 @@ def preprocess(i):
 
     if filename.endswith(".zip") or filename.endswith(".pth"):
         env['MLC_EXTRACT_TOOL'] = "unzip"
+
     elif filename.endswith(".tar.gz"):
         if windows:
             x = '"' if ' ' in filename else ''
@@ -67,6 +68,7 @@ def preprocess(i):
         else:
             env['MLC_EXTRACT_TOOL_OPTIONS'] = ' --skip-old-files -xvzf '
             env['MLC_EXTRACT_TOOL'] = 'tar '
+
     elif filename.endswith(".tar.xz"):
         if windows:
             x = '"' if ' ' in filename else ''
@@ -77,6 +79,7 @@ def preprocess(i):
         else:
             env['MLC_EXTRACT_TOOL_OPTIONS'] = ' -xvJf'
             env['MLC_EXTRACT_TOOL'] = 'tar '
+
     elif filename.endswith(".tar.bz2"):
         if windows:
             x = '"' if ' ' in filename else ''
@@ -90,9 +93,11 @@ def preprocess(i):
         else:
             env['MLC_EXTRACT_TOOL_OPTIONS'] = ' --skip-old-files -xvjf '
             env['MLC_EXTRACT_TOOL'] = 'tar '
+
     elif filename.endswith(".tar") or filename.endswith(".tgz"):
         env['MLC_EXTRACT_TOOL_OPTIONS'] = ' -xvf'
         env['MLC_EXTRACT_TOOL'] = 'tar '
+
     elif filename.endswith(".7z"):
         if windows:
             env['MLC_EXTRACT_TOOL'] = '7z'
@@ -110,6 +115,7 @@ def preprocess(i):
             # unrar or unar may be available on Unix-like systems
             env['MLC_EXTRACT_TOOL'] = 'unrar'
             env['MLC_EXTRACT_TOOL_OPTIONS'] = ' x -y '
+
     elif filename.endswith(".gz"):
         # Check target filename
         extracted_filename = env.get('MLC_EXTRACT_EXTRACTED_FILENAME', '')
@@ -123,15 +129,19 @@ def preprocess(i):
             ' > ' + q + extracted_filename + q + ' < '
 
         env['MLC_EXTRACT_TOOL'] = 'gzip '
+
     elif is_true(env.get('MLC_EXTRACT_UNZIP', '')):
         env['MLC_EXTRACT_TOOL'] = 'unzip '
+
     elif is_true(env.get('MLC_EXTRACT_UNTAR', '')):
         env['MLC_EXTRACT_TOOL_OPTIONS'] = ' -xvf'
         env['MLC_EXTRACT_TOOL'] = 'tar '
+
     elif is_true(env.get('MLC_EXTRACT_GZIP', '')):
         env['MLC_EXTRACT_CMD'] = 'gzip '
         env['MLC_EXTRACT_TOOL_OPTIONS'] = ' -d ' + \
             ('-k ' if not remove_extracted else '')
+
     else:
         return {'return': 1,
                 'error': 'Neither MLC_EXTRACT_UNZIP nor MLC_EXTRACT_UNTAR is yes'}
@@ -140,6 +150,7 @@ def preprocess(i):
 
     extract_to_folder = env.get('MLC_EXTRACT_TO_FOLDER', '')
 
+    
     # Check if extract to additional folder in the current directory (or external path)
     # to avoid messing up other files and keep clean directory structure
     # particularly if archive has many sub-directories and files
