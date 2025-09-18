@@ -33,6 +33,7 @@ prehook_deps: []
 tags:
 - extract
 - file
+- extract-file
 tags_help: extract file
 uid: 3f0b76219d004817
 variations:

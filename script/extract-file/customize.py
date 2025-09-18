@@ -90,7 +90,7 @@ def preprocess(i):
         else:
             env['MLC_EXTRACT_TOOL_OPTIONS'] = ' --skip-old-files -xvjf '
             env['MLC_EXTRACT_TOOL'] = 'tar '
-    elif filename.endswith(".tar"):
+    elif filename.endswith(".tar") or filename.endswith(".tgz"):
         env['MLC_EXTRACT_TOOL_OPTIONS'] = ' -xvf'
         env['MLC_EXTRACT_TOOL'] = 'tar '
     elif filename.endswith(".7z"):
@@ -229,8 +229,6 @@ def postprocess(i):
     if not os.path.exists(filepath):
         return {
             'return': 1, 'error': 'Path {} was not created or doesn\'t exist'.format(filepath)}
-# return {'return':1, 'error': 'MLC_EXTRACT_EXTRACTED_FILENAME and
-# MLC_EXTRACT_TO_FOLDER are not set'}
 
     env['MLC_EXTRACT_EXTRACTED_PATH'] = filepath
 
