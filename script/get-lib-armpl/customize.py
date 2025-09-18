@@ -17,7 +17,6 @@ def postprocess(i):
     print(env)
     return {'return': 1}
 
-
     paths = [
         "+C_INCLUDE_PATH",
         "+CPLUS_INCLUDE_PATH",
@@ -30,7 +29,9 @@ def postprocess(i):
 
     include_paths = []
     armpl_src_path = env['MLC_ARMPL_SRC_PATH']
-    armpl_lib_path = os.path.join(armpl_src_path, env['MLC_ARMPL_TAR_FILENAME'])
+    armpl_lib_path = os.path.join(
+        armpl_src_path,
+        env['MLC_ARMPL_TAR_FILENAME'])
     include_paths.append(os.path.join(os.getcwd(), 'include'))
     include_paths.append(os.path.join(armnn_src_path, 'include'))
     include_paths.append(os.path.join(armnn_src_path, 'profiling'))
