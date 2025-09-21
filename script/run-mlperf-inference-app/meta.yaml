@@ -401,6 +401,7 @@ variations:
       MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r5.1_default
       MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v5.1
       MLC_CUSTOM_SYSTEM_NVIDIA: no  # prevents build-mlperf-inference-server-nvidia from calling add-custom-system-nvidia
+      SYSTEM_NAME: '<<<MLC_NVIDIA_SYSTEM_NAME>>>'
     group: benchmark-version
     adr:
       get-mlperf-inference-results-dir:
