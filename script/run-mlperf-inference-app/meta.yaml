@@ -568,6 +568,18 @@ input_description:
   submission_dir:
     desc: Folder path to store MLPerf submission tree 
     sort: 1000
+  use_dataset_from_host: 
+    desc: Run the dataset download script on the host machine and mount the dataset into the Docker container to avoid repeated downloads.
+    choices:
+      - yes
+      - no
+    default: 'no'
+  use_model_from_host: 
+    desc: Run the model download script on the host machine and mount the model files into the Docker container to avoid repeated downloads.
+    choices:
+      - yes
+      - no
+    default: 'no'
 
   adr.compiler.tags:
     desc: Compiler for loadgen and any C/C++ part of implementation
