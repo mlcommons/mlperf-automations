@@ -17,4 +17,4 @@ def postprocess(i):
 
     env = i['env']
 
-    return {'return': 0, 'version': version}
+    return {'return': 0}
