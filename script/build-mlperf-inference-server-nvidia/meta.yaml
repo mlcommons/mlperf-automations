@@ -240,8 +240,6 @@ variations:
         version_max_usable: "1.26.4"
   
   r5.1:
-    deps:
-      - tags: get-nvrtc,_v5.1,_nvidia
     add_deps_recursive:
       pycuda:
         version: "2024.1"
@@ -358,6 +356,10 @@ versions:
   r4.1:
     default_env:
       BUILD_TRTLLM: 1
+  
+  r5.1:
+    deps:
+      - tags: get-nvrtc,_v5.1,_nvidia
   
 docker:
   skip_run_cmd: 'no'
