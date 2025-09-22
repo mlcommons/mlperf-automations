@@ -1,0 +1,29 @@
+alias: get-nvrtc
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+category: Detection or installation of tools and artifacts
+deps:
+  - tags: detect,os
+new_env_keys:
+- MLC_CMAKE_*
+- MLC_MAKE_CORES
+- +PATH
+print_env_at_the_end:
+  MLC_CMAKE_BIN_WITH_PATH: Path to the tool
+tags:
+- get-nvrtc
+uid: fde37d9fd6fa43b7
+variations:
+  nvidia:
+    group: vendor
+    default: true
+  v5.1:
+    group: inference-version
+    default: true
+  nvidia,v5.1:
+    env:
+      MLC_NVRTC_CUDA_VERSION: '12-9'
+      MLC_NVRTC_VERSION: '12.9.41-1'
+    posthook_deps:
+      - tags: get,generic,sys-util,_cuda-nvrtc-dev
