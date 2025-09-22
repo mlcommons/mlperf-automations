@@ -369,6 +369,8 @@ variations:
     adr:
       pycuda:
         version: "2024.1"
+    deps:
+      - tags: get,generic-python-lib,_package.onnx_graphsurgeon
   v5.0:
     base:
       - v5.0+
