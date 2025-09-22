@@ -7,5 +7,5 @@ test $? -eq 0 || exit 1
 
 rm cuda-keyring_1.1-1_all.deb
 
-apt-get install -y --no-install-recommends cuda-nvrtc-dev-<<<MLC_NVRTC_CUDA_VERSION>>>=<<<MLC_NVRTC_VERSION>>>
+apt-get install -y --no-install-recommends cuda-nvrtc-dev-$MLC_NVRTC_CUDA_VERSION=$MLC_NVRTC_VERSION
 test $? -eq 0 || exit 1
