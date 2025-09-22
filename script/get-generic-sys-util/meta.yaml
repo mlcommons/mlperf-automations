@@ -91,7 +91,7 @@ variations:
   cuda-nvrtc-dev:
     env:
       MLC_SYS_UTIL_NAME: cuda-nvrtc-dev
-      MLC_SYS_UTIL_VERSION_CMD: 'dpkg -s cuda-nvrtc-dev-<<<MLC_NVRTC_CUDA_VERSION>>>=<<<MLC_NVRTC_VERSION>>>'
+      MLC_SYS_UTIL_VERSION_CMD: 'dpkg -s cuda-nvrtc-dev-<<<MLC_NVRTC_CUDA_VERSION>>>'
       MLC_SYS_UTIL_VERSION_RE: ([\d]+\.[\d]+\.[\d]+-[\d]+)
       MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
     new_env_keys:
