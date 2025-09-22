@@ -5,12 +5,6 @@ cache: true
 category: Detection or installation of tools and artifacts
 deps:
   - tags: detect,os
-new_env_keys:
-- MLC_CMAKE_*
-- MLC_MAKE_CORES
-- +PATH
-print_env_at_the_end:
-  MLC_CMAKE_BIN_WITH_PATH: Path to the tool
 tags:
 - get-nvrtc
 uid: fde37d9fd6fa43b7

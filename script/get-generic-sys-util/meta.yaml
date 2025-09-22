@@ -97,7 +97,7 @@ variations:
     new_env_keys:
     - MLC__VERSION
     state:
-      cmake:
+      cuda-nvrtc-dev:
         apt: cuda-nvrtc-dev-<<<MLC_NVRTC_CUDA_VERSION>>>=<<<MLC_NVRTC_VERSION>>>
   detect:
     default: true
