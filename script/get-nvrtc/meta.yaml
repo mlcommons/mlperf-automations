@@ -19,5 +19,5 @@ variations:
     env:
       MLC_NVRTC_CUDA_VERSION: '12-9'
       MLC_NVRTC_VERSION: '12.9.41-1'
-    posthook_deps:
-      - tags: get,generic,sys-util,_cuda-nvrtc-dev
+    # posthook_deps:
+    #   - tags: get,generic,sys-util,_cuda-nvrtc-dev
