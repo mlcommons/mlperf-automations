@@ -27,5 +27,5 @@ echo ""
 echo "Running program ..."
 echo ""
 
-${MLC_TMP_CURRENT_SCRIPT_PATH}/a.out > tmp-run.out
+./a.out > tmp-run.out
 test $? -eq 0 || exit 1

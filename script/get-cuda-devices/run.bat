@@ -25,5 +25,5 @@ echo.
 echo Running program ...
 echo.
 
-%MLC_TMP_CURRENT_SCRIPT_PATH%\a.exe > tmp-run.out
+.\a.exe > tmp-run.out
 IF %ERRORLEVEL% NEQ 0 EXIT %ERRORLEVEL%
