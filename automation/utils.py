@@ -45,6 +45,7 @@ def get_host_os_info(i={}):
         info['bat_ext'] = '.bat'
         info['set_env'] = 'set ${key}=${value}'
         info['env_separator'] = ';'
+        info['env_quote'] = '\''
         info['env_var'] = '%env_var%'
         info['bat_rem'] = 'rem ${rem}'
         info['run_local_bat'] = 'call ${bat_file}'
@@ -63,6 +64,7 @@ def get_host_os_info(i={}):
         info['bat_ext'] = '.sh'
         info['set_env'] = 'export ${key}="${value}"'
         info['env_separator'] = ':'
+        info['env_quote'] = '"'
         info['env_var'] = '${env_var}'
         info['set_exec_file'] = 'chmod 755 "${file_name}"'
         info['bat_rem'] = '# ${rem}'
@@ -1101,3 +1103,44 @@ def print_json(i):
     print(json.dumps(meta, indent=2))
 
     return {'return': 0}
+
+
+def parse_expiration(user_input: str) -> float:
+    import time
+    """
+    Parse user input like '10m', '2h', '3d' into a UNIX timestamp.
+    """
+    units = {
+        'm': 60,             # minutes
+        'h': 3600,           # hours
+        'd': 86400,          # days
+    }
+
+    if not user_input:
+        raise ValueError("Expiration time cannot be empty")
+
+    unit = user_input[-1].lower()
+    if unit not in units:
+        raise ValueError(f"Unknown unit '{unit}', use m/h/d")
+
+    try:
+        value = int(user_input[:-1])
+    except ValueError:
+        raise ValueError(f"Invalid number in '{user_input}'")
+
+    seconds = value * units[unit]
+    return time.time() + seconds
+
+
+def quote_if_needed(val: str, quote: str) -> str:
+    """
+    Return the value, quoted with escaped quotes if it contains spaces
+    or quotes.
+    """
+    s = str(val)
+
+    if " " in s or '"' in s or quote == '"':
+        # Escape all existing double quotes
+        s = s.replace('"', r'\"')
+        return f'"{s}"'
+    return s

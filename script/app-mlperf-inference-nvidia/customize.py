@@ -318,18 +318,6 @@ def preprocess(i):
         model_path = fp8_model_path
 
     elif "llama2" in env["MLC_MODEL"]:
-        # path to which the data file is present
-        target_data_path = os.path.join(
-            env['MLPERF_SCRATCH_PATH'],
-            'data',
-            'llama2-70b')
-        # path to the dataset file
-        target_data_file_path = os.path.join(
-            env['MLPERF_SCRATCH_PATH'],
-            'data',
-            'llama2-70b',
-            'open_orca_gpt4_tokenized_llama.sampled_24576.pkl')
-
         preprocessed_data_for_accuracy_checker = os.path.join(
             env['MLPERF_SCRATCH_PATH'],
             'preprocessed_data',
@@ -345,48 +333,20 @@ def preprocess(i):
 
         tmp_tp_size = env['MLC_NVIDIA_TP_SIZE']
         tmp_pp_size = env['MLC_NVIDIA_PP_SIZE']
-        if tmp_tp_size == "1":
-            fp8_model_path = os.path.join(
-                env['MLPERF_SCRATCH_PATH'],
-                'models',
-                'Llama2',
-                'fp8-quantized-ammo',
-                f'llama2-70b-chat-hf-tp{tmp_tp_size}pp1-fp8-02072024')
-        else:
-            fp8_model_path = os.path.join(
-                env['MLPERF_SCRATCH_PATH'],
-                'models',
-                'Llama2',
-                'fp8-quantized-ammo',
-                f'llama2-70b-chat-hf-tp{tmp_tp_size}pp{tmp_pp_size}-fp8')
 
-        # check the presence of validation dataset
-        if not os.path.exists(target_data_file_path):
-            if env.get('MLC_DATASET_OPENORCA_PREPROCESSED_PATH', '') == '':
-                return {
-                    'return': 1, 'error': 'Llama2 70B validation dataset not present.'}
-            if not os.path.exists(target_data_path):
-                cmds.append(f"mkdir -p {target_data_path}")
-            cmds.append(
-                f"ln -sf {env['MLC_DATASET_OPENORCA_PREPROCESSED_PATH']} {target_data_file_path}")
-
-        # check the presence of calibration dataset
-        if not env.get('LLAMA2_PRE_QUANTIZED_CHECKPOINT_PATH'):
-            if not os.path.exists(target_calibration_data_file_path):
-                if env.get('MLC_DATASET_OPENORCA_CALIBRATION_PATH', '') == '':
-                    return {
-                        'return': 1, 'error': 'Llama2 70B calibration dataset not present.'}
-                if not os.path.exists(target_data_path):
-                    cmds.append(f"mkdir -p {target_data_path}")
-                cmds.append(
-                    f"ln -sf {env['MLC_DATASET_OPENORCA_CALIBRATION_PATH']} {target_calibration_data_file_path}")
+        fp8_model_path = os.path.join(
+            env['MLPERF_SCRATCH_PATH'],
+            'models',
+            'Llama2',
+            'fp8-quantized-ammo',
+            f'llama-2-70b-chat-hf-tp{tmp_tp_size}pp{tmp_pp_size}-fp8')
 
         if not os.path.exists(preprocessed_data_for_accuracy_checker):
             if not os.path.exists(preprocessed_data_for_accuracy_checker):
                 cmds.append(
                     f"mkdir -p {os.path.dirname(preprocessed_data_for_accuracy_checker)}")
             cmds.append(
-                f"ln -sf {env['MLC_DATASET_OPENORCA_PREPROCESSED_PATH']} {preprocessed_data_for_accuracy_checker}")
+                f"cp {env['MLC_DATASET_OPENORCA_PREPROCESSED_PATH']} {preprocessed_data_for_accuracy_checker}")
 
         model_name = "llama2-70b"
         model_path = fp8_model_path
@@ -401,7 +361,7 @@ def preprocess(i):
             else:
                 cmds.append(f"make download_model BENCHMARKS='{model_name}'")
         elif "stable-diffusion" in env['MLC_MODEL']:
-            if env.get('MLC_MLPERF_INFERENCE_CODE_VERSION') == 'v5.0':
+            if is_true(env.get('MLC_MLPERF_INFERENCE_POST_5_0')):
                 # Define folder mappings for each model type
                 model_folders = {
                     'onnx_models': ["clip1", "clip2", "unetxl", "vae"],
@@ -476,7 +436,15 @@ def preprocess(i):
                 'open_orca',
                 'input_ids_padded.npy')
             if not os.path.exists(target_preprocessed_data_path):
-                cmds.append(f"make preprocess_data BENCHMARKS='{model_name}'")
+                cmds.append(
+                    f"mkdir -p {os.path.dirname(target_preprocessed_data_path)}")
+                if env.get('MLC_DATASET_OPENORCA_PREPROCESSED_PATH'):
+                    cmds.append(
+                        f"cp -r {env['MLC_DATASET_OPENORCA_NVIDIA_PREPROCESSED_PATH']}/* {os.path.join(env['MLPERF_SCRATCH_PATH'], 'preprocessed_data', 'open_orca')}"
+                    )
+                else:
+                    cmds.append(
+                        f"make preprocess_data BENCHMARKS='{model_name}'")
         else:
             cmds.append(f"make preprocess_data BENCHMARKS='{model_name}'")
 
@@ -729,7 +697,8 @@ def preprocess(i):
 
         if "llama2" in env["MLC_MODEL"]:
             run_config += f" --checkpoint_dir={fp8_model_path}"
-            if env.get('MLC_MLPERF_INFERENCE_POST_5_0'):
+            run_config += f" --tensor_path={os.path.join(env['MLPERF_SCRATCH_PATH'], 'preprocessed_data', 'open_orca')}"
+            if is_true(env.get('MLC_MLPERF_INFERENCE_POST_5_0')):
                 run_config += f" --trtllm_build_flags=tensor_parallelism:{tmp_tp_size},pipeline_parallelism:{tmp_pp_size}"
             else:
                 run_config += f" --tensor_parallelism={tmp_tp_size}"

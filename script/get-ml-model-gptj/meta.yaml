@@ -154,7 +154,7 @@ variations:
     - names:
       - cuda
       tags: get,cuda
-    - tags: get,cuda-devices,_with-pycuda
+    - tags: get,cuda-devices
       enable_if_env:
         MLC_HOST_OS_FLAVOR:
         - ubuntu

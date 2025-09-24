@@ -204,6 +204,8 @@ def preprocess(i):
             logger.info(f"{env['MLC_DOWNLOAD_CMD']}")
 
         elif tool == "r2-downloader":
+            if is_true(env.get('MLC_AUTH_USING_SERVICE_ACCOUNT')):
+                extra_download_options += " -s "
             env['MLC_DOWNLOAD_CMD'] = f"bash <(curl -s https://raw.githubusercontent.com/mlcommons/r2-downloader/refs/heads/main/mlc-r2-downloader.sh) "
             if env["MLC_HOST_OS_TYPE"] == "windows":
                 # have to modify the variable from url to temp_url if it is

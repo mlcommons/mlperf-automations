@@ -9,7 +9,7 @@ def preprocess(i):
     env = i['env']
 
     if env.get('MLC_TMP_ML_MODEL_PROVIDER', '') == 'nvidia':
-        if is_true(env.get('MLC_ML_MODEL_QUANTIZE_LOCALLY')):
+        if is_true(env.get('MLC_TMP_ML_MODEL_QUANTIZE_LOCALLY')):
             i['run_script_input']['script_name'] = 'run-nvidia'
             gpu_arch = int(
                 float(
@@ -18,7 +18,28 @@ def preprocess(i):
             env['MLC_GPU_ARCH'] = gpu_arch
             env['MLC_TMP_REQUIRE_DOWNLOAD'] = 'no'
         else:
-            run_cmd = f"ln -sf {env['LLAMA2_CHECKPOINT_PATH']} {env['MLC_NVIDIA_MLPERF_SCRATCH_PATH']}/models/Llama2/fp8-quantized-ammo/llama-2-70b-chat-hf-tp{env['MLC_NVIDIA_TP_SIZE']}pp{env['MLC_NVIDIA_PP_SIZE']}-{env['MLC_ML_MODEL_PRECISION']}"
+            target_quantized_model_dir = os.path.join(
+                env['MLC_NVIDIA_MLPERF_SCRATCH_PATH'],
+                "models",
+                "Llama2",
+                "fp8-quantized-ammo",
+                f"llama-2-70b-chat-hf-tp{env['MLC_NVIDIA_TP_SIZE']}pp{env['MLC_NVIDIA_PP_SIZE']}-{env['MLC_ML_MODEL_PRECISION']}"
+            )
+
+            target_model_dir = os.path.join(
+                env['MLC_NVIDIA_MLPERF_SCRATCH_PATH'],
+                "models",
+                "Llama2",
+                "Llama-2-70b-chat-hf"
+            )
+
+            # Ensure target directory exists
+            os.makedirs(target_quantized_model_dir, exist_ok=True)
+            os.makedirs(target_model_dir, exist_ok=True)
+
+            run_cmd = f"cp -r {env['LLAMA2_QUANTIZED_CHECKPOINT_PATH']}/* {env['MLC_NVIDIA_MLPERF_SCRATCH_PATH']}/models/Llama2/fp8-quantized-ammo/llama-2-70b-chat-hf-tp{env['MLC_NVIDIA_TP_SIZE']}pp{env['MLC_NVIDIA_PP_SIZE']}-{env['MLC_ML_MODEL_PRECISION']}"
+            run_cmd += f" && cp -r {env['LLAMA2_CHECKPOINT_PATH']}/* {env['MLC_NVIDIA_MLPERF_SCRATCH_PATH']}/models/Llama2/Llama-2-70b-chat-hf"
+
             env['MLC_RUN_CMD'] = run_cmd
     else:
         path = env.get('LLAMA2_CHECKPOINT_PATH', '').strip()
@@ -42,7 +63,7 @@ def postprocess(i):
 
     env = i['env']
     if env.get('MLC_DOWNLOAD_MODE', '') != "dry":
-        if is_true(env.get('MLC_ML_MODEL_QUANTIZE_LOCALLY')):
+        if is_true(env.get('MLC_TMP_ML_MODEL_QUANTIZE_LOCALLY')):
             if env.get('LLAMA2_CHECKPOINT_PATH', '') == '':
                 env['LLAMA2_CHECKPOINT_PATH'] = env['MLC_ML_MODEL_PATH']
             else:

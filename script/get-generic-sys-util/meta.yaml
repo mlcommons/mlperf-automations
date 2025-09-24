@@ -171,12 +171,17 @@ variations:
     new_env_keys:
     - MLC_SOX_VERSION
     state:
-      ipmitool: # tbd: complete for other flavours of linux
+      sox: # tbd: complete for other flavours of linux
         apt: sox
         brew: sox
         dnf: sox   
         yum: ''
-  
+  gfortran-aarch64-linux-gnu: 
+    env:
+      MLC_SYS_UTIL_NAME: gfortran-aarch64
+    state:
+      gfortran-aarch64: # tbd: complete for other flavours of linux
+        apt: gfortran-aarch64-linux-gnu
   libgl:
     env:
       MLC_SYS_UTIL_NAME: libgl # tbd: regular expression for version as well as whether its installed?
@@ -712,6 +717,8 @@ variations:
     state:
       postfix:
         apt: postfix
+        dnf: postfix
+        yum: postfix
   psmisc:
     env:
       MLC_SYS_UTIL_NAME: psmisc

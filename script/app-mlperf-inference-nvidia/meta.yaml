@@ -289,6 +289,8 @@ deps:
         - 'yes'
 
   - tags: get,nvidia,mitten
+    names:
+      - nvidia-mitten
     enable_if_env:
       MLC_NVIDIA_MITTEN_FROM_SRC:
         - 'yes'
@@ -357,6 +359,16 @@ variations:
     group: batchsize-format-change
     env:
       MLC_MLPERF_INFERENCE_POST_5_0: "yes"
+  v5.1:
+    base:
+      - v5.0+
+    group: version
+    env:
+      MLC_MLPERF_INFERENCE_CODE_VERSION: "v5.1"
+      MLC_NVIDIA_MITTEN_FROM_SRC: "yes"
+    adr:
+      pycuda:
+        version: "2024.1"
   v5.0:
     base:
       - v5.0+
@@ -786,6 +798,7 @@ variations:
       - tags: get,generic-python-lib,_package.rouge-score
         names:
           - rouge-score
+      - tags: get,generic-python-lib,_package.typeguard
     env:
       MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: "https://github.com/mlcommons/cm4mlops/blob/b18ff890ff559e21d2e27a3b54cd26467ac1fd9e/script/get-ml-model-llama2/_cm.json#L51"
       MLC_ML_MODEL_INPUTS_DATA_TYPE: int32
