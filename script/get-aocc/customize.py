@@ -73,7 +73,7 @@ def preprocess(i):
 def detect_version(i):
     logger = i['automation'].logger
 
-    r = i['automation'].parse_version({'match_text': r'CLANG:\sAOCC_([\d.]+(?:-[\w]+)?-Build#[\d]+)',
+    r = i['automation'].parse_version({'match_text': r'CLANG:\s(?:AOCC_)?([\d.]+(?:-[\w]+)?(?:-Build#\d+)?|Unknown-Revision)(?=[ )])',
                                        'group_number': 1,
                                        'env_key': 'MLC_AOCC_VERSION',
                                        'which_env': i['env']})
@@ -106,9 +106,12 @@ def postprocess(i):
 
     env['MLC_AOCC_BIN_PATH'] = found_path
     env['MLC_AOCC_INSTALLED_PATH'] = os.path.dirname(found_path)
+    env['MLC_AOCC_LIB_PATH'] = os.path.join(
+        env['MLC_AOCC_INSTALLED_PATH'], 'lib')
 
     file_name_c = os.path.basename(found_file_path)
     file_name_cpp = file_name_c.replace('clang', 'clang++')
+    file_name_flang = file_name_c.replace('clang', 'flang')
     env['FILE_NAME_CPP'] = file_name_cpp
 
     env['MLC_AOCC_BIN'] = file_name_c
@@ -123,6 +126,13 @@ def postprocess(i):
     env['MLC_CXX_COMPILER_WITH_PATH'] = os.path.join(found_path, file_name_cpp)
     env['MLC_CXX_COMPILER_FLAG_OUTPUT'] = '-o '
     env['MLC_CXX_COMPILER_FLAG_VERSION'] = '--version'
+
+    fortran_compiler_path = os.path.join(found_path, file_name_flang)
+    if os.path.exists(fortran_compiler_path):
+        env['MLC_FORTRAN_COMPILER_BIN'] = file_name_flang
+        env['MLC_FORTRAN_COMPILER_WITH_PATH'] = fortran_compiler_path
+        env['MLC_FORTRAN_COMPILER_FLAG_OUTPUT'] = '-o '
+        env['MLC_FORTRAN_COMPILER_FLAG_VERSION'] = '--version'
 
     env['MLC_COMPILER_FLAGS_FAST'] = "-O3"
     env['MLC_LINKER_FLAGS_FAST'] = "-O3"

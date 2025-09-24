@@ -2,6 +2,8 @@ alias: detect-os
 automation_alias: script
 automation_uid: 5b4e0237da074764
 category: Platform information
+cache: true
+cache_expiration: 1h
 clean_files:
 - tmp-run.out
 new_env_keys:

@@ -93,6 +93,24 @@ variations:
       +MLC_LLVM_ENABLE_RUNTIMES: 
         - flang-rt
     group: flang
+  compiler-rt:
+    group: compiler-rt
+    default: true
+    env:
+      +MLC_LLVM_ENABLE_PROJECTS:
+        - compiler-rt
+  no-compiler-rt:
+    group: compiler-rt
+  libcxx:
+    group: libcxx
+    default: true
+    env:
+      +MLC_LLVM_ENABLE_RUNTIMES: 
+        - libcxx
+        - libcxxabi
+        - libunwind
+  no-libcxx:
+    group: libcxx
   lld:
     default: true
     env:
@@ -114,6 +132,7 @@ variations:
   cross-compile-x86-aarch64:
     deps:
       - tags: get,generic-sys-util,_crossbuild-essential-arm64
+      - tags: get,generic-sys-util,_gfortran-aarch64-linux-gnu
     env:
       MLC_LLVM_CROSS_COMPILE_FLAGS: "-DCMAKE_SYSTEM_NAME=Linux  -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DLLVM_DEFAULT_TARGET_TRIPLE=aarch64-linux-gnu -DCMAKE_Fortran_COMPILER=aarch64-linux-gnu-gfortran -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc  -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++"
   for-intel-mlperf-inference-v3.1-bert:

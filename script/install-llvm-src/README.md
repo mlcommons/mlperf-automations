@@ -1,4 +1,4 @@
-# README for get-generic-sys-util
+# README for install-llvm-src
 This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,15 +33,16 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr get,sys-util,generic,generic-sys-util
+mlcr install,src,llvm,from.src,src-llvm
 ```
 
 ### Script Inputs
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
-| `--fail_safe` |  |  | `` |
-| `--ignore_missing` |  |  | `` |
+| `--targets` |  |  | `` |
+| `--target_triple` |  |  | `` |
+| `--extra_options` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -62,79 +63,52 @@ mlcr get,sys-util,generic,generic-sys-util
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
-### Mode
+### Build-type
 
-- `detect` (default)
-- `install`
+- `debug`
+- `release` (default)
+
+### Clang
+
+- `clang` (default)
+- `no-clang`
+
+### Compiler-rt
+
+- `compiler-rt` (default)
+- `no-compiler-rt`
+
+### Flang
+
+- `flang`
+
+### Libcxx
+
+- `libcxx` (default)
+- `no-libcxx`
+
+### Lld
+
+- `lld` (default)
+- `no-lld`
+
+### Repo
+
+- `repo.#` _(# can be substituted dynamically)_
 
 ### Ungrouped
 
-- `autoconf`
-- `bzip2`
-- `ccache`
-- `cmake`
-- `coreutils`
-- `crossbuild-essential-arm64`
-- `dmidecode`
-- `ffmpeg`
-- `flex`
-- `g++-11`
-- `g++-12`
-- `g++-9`
-- `gcc-11`
-- `gcc-9`
-- `gflags-dev`
-- `gfortran-aarch64-linux-gnu`
-- `git-lfs`
-- `glog-dev`
-- `ipmitool`
-- `libboost-all-dev`
-- `libbz2-dev`
-- `libev-dev`
-- `libffi`
-- `libffi-dev`
-- `libffi7`
-- `libffi8`
-- `libgdbm-dev`
-- `libgl`
-- `libgl1-mesa-glx`
-- `libgmock-dev`
-- `liblzma-dev`
-- `libmkl-dev`
-- `libmpfr-dev`
-- `libncurses-dev`
-- `libnuma-dev`
-- `libpci-dev`
-- `libpng-dev`
-- `libre2-dev`
-- `libreadline-dev`
-- `libsm6`
-- `libsqlite3-dev`
-- `libssl-dev`
-- `libudev-dev`
-- `libxext6`
-- `linux-tools`
-- `md5sha1sum`
-- `ninja-build`
-- `nlohmann-json3-dev`
-- `ntpdate`
-- `numactl`
-- `nvidia-cuda-toolkit`
-- `pkg-config`
-- `postfix`
-- `psmisc`
-- `rapidjson-dev`
-- `rsync`
-- `screen`
-- `sox`
-- `systemd`
-- `tk-dev`
-- `transmission`
-- `unzip`
-- `vim-common`
-- `wget`
-- `wkhtmltopdf`
-- `xfonts-base`
-- `xz`
-- `zlib`
-- `zlib1g-dev`
+- `branch.#` _(# can be substituted dynamically)_
+- `cross-compile-x86-aarch64`
+- `for-intel-mlperf-inference-v3.1-bert` (base: tag.llvmorg-15.0.7, clang, release)
+- `for-intel-mlperf-inference-v3.1-gptj` (base: tag.llvmorg-16.0.6, clang, release)
+- `full-history`
+- `path.#` _(# can be substituted dynamically)_
+- `runtimes.#` _(# can be substituted dynamically)_
+- `sha.#` _(# can be substituted dynamically)_
+- `tag.#` _(# can be substituted dynamically)_ (base: full-history)
+
+### Version
+
+- `version.#` _(# can be substituted dynamically)_
+- `version.main` (base: branch.main)

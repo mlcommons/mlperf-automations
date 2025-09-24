@@ -1,4 +1,4 @@
-# README for get-generic-sys-util
+# README for get-lib-armpl
 This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,15 +33,10 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr get,sys-util,generic,generic-sys-util
+mlcr armpl,lib,get,arm
 ```
 
-### Script Inputs
-
-| Name | Description | Choices | Default |
-|------|-------------|---------|------|
-| `--fail_safe` |  |  | `` |
-| `--ignore_missing` |  |  | `` |
+No script specific inputs
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -62,79 +57,6 @@ mlcr get,sys-util,generic,generic-sys-util
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
-### Mode
+### Version
 
-- `detect` (default)
-- `install`
-
-### Ungrouped
-
-- `autoconf`
-- `bzip2`
-- `ccache`
-- `cmake`
-- `coreutils`
-- `crossbuild-essential-arm64`
-- `dmidecode`
-- `ffmpeg`
-- `flex`
-- `g++-11`
-- `g++-12`
-- `g++-9`
-- `gcc-11`
-- `gcc-9`
-- `gflags-dev`
-- `gfortran-aarch64-linux-gnu`
-- `git-lfs`
-- `glog-dev`
-- `ipmitool`
-- `libboost-all-dev`
-- `libbz2-dev`
-- `libev-dev`
-- `libffi`
-- `libffi-dev`
-- `libffi7`
-- `libffi8`
-- `libgdbm-dev`
-- `libgl`
-- `libgl1-mesa-glx`
-- `libgmock-dev`
-- `liblzma-dev`
-- `libmkl-dev`
-- `libmpfr-dev`
-- `libncurses-dev`
-- `libnuma-dev`
-- `libpci-dev`
-- `libpng-dev`
-- `libre2-dev`
-- `libreadline-dev`
-- `libsm6`
-- `libsqlite3-dev`
-- `libssl-dev`
-- `libudev-dev`
-- `libxext6`
-- `linux-tools`
-- `md5sha1sum`
-- `ninja-build`
-- `nlohmann-json3-dev`
-- `ntpdate`
-- `numactl`
-- `nvidia-cuda-toolkit`
-- `pkg-config`
-- `postfix`
-- `psmisc`
-- `rapidjson-dev`
-- `rsync`
-- `screen`
-- `sox`
-- `systemd`
-- `tk-dev`
-- `transmission`
-- `unzip`
-- `vim-common`
-- `wget`
-- `wkhtmltopdf`
-- `xfonts-base`
-- `xz`
-- `zlib`
-- `zlib1g-dev`
+- `version.25.07` (default)

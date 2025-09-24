@@ -22,7 +22,7 @@ deps:
     MLC_MLPERF_DEVICE:
     - gpu
     - cuda
-  tags: get,cuda-devices,_with-pycuda
+  tags: get,cuda-devices
 - enable_if_env:
     MLC_DETERMINE_MEMORY_CONFIGURATION:
     - 'yes'

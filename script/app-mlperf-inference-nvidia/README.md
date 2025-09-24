@@ -234,3 +234,4 @@ mlcr reproduce,mlcommons,mlperf,inference,harness,nvidia-harness,nvidia
 - `v4.1` (base: pre5.0)
 - `v4.1-dev` (base: pre5.0) (default)
 - `v5.0` (base: v5.0+)
+- `v5.1` (base: v5.0+)

@@ -8,7 +8,8 @@ tags:
 - get
 - cuda-devices
 
-cache: false
+cache: true
+cache_expiration: 1d
 
 can_force_cache: true
 

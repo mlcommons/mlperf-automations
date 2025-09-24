@@ -504,6 +504,9 @@ class ScriptAutomation(Automation):
                 env[key] = os.environ[key]
 
         r = self._update_env_from_input(env, i)
+        if env.get('MLC_OUTDIRNAME', '') != '':
+            if not os.path.isabs(env['MLC_OUTDIRNAME']):
+                env['MLC_OUTDIRNAME'] = os.path.abspath(env['MLC_OUTDIRNAME'])
 
         #######################################################################
         # Check if we want to skip cache (either by skip_cache or by fake_run)
@@ -796,6 +799,7 @@ class ScriptAutomation(Automation):
         run_state['script_repo_git'] = script_item.repo.meta.get(
             'git', False)
         run_state['cache'] = meta.get('cache', False)
+        run_state['cache_expiration'] = meta.get('cache_expiration', False)
 
         if not recursion:
             run_state['script_entry_repo_to_report_errors'] = meta.get(
@@ -1748,12 +1752,7 @@ class ScriptAutomation(Automation):
 
             tmp_curdir = os.getcwd()
             if env.get('MLC_OUTDIRNAME', '') != '':
-                if os.path.isabs(env['MLC_OUTDIRNAME']) or recursion:
-                    c_outdirname = env['MLC_OUTDIRNAME']
-                else:
-                    c_outdirname = os.path.join(
-                        env['MLC_TMP_CURRENT_PATH'], env['MLC_OUTDIRNAME'])
-                    env['MLC_OUTDIRNAME'] = c_outdirname
+                c_outdirname = env['MLC_OUTDIRNAME']
 
                 if not fake_run:  # prevent permission error inside docker runs
                     if not os.path.exists(c_outdirname):
@@ -2040,6 +2039,10 @@ class ScriptAutomation(Automation):
                         if not os.path.samefile(
                                 cached_path, dependent_cached_path):
                             cached_meta['dependent_cached_path'] = dependent_cached_path
+
+                if run_state.get('cache_expiration'):  # convert to seconds
+                    cached_meta['cache_expiration'] = parse_expiration(
+                        run_state['cache_expiration'])
 
                 ii = {'action': 'update',
                       'target': 'cache',
@@ -3151,9 +3154,8 @@ class ScriptAutomation(Automation):
                 if os.name == 'nt':
                     script.append('set ' + k + '=' + v)
                 else:
-                    if ' ' in v:
-                        v = '"' + v + '"'
-                    script.append('export ' + k + '=' + v)
+                    safe_v = quote_if_needed(v)
+                    script.append('export ' + k + '=' + safe_v)
 
             script.append('')
 
@@ -4836,13 +4838,19 @@ def find_cached_script(i):
 
         for cached_script in found_cached_scripts:
             skip_cached_script = False
+            dependent_paths = []
             dependent_cached_path = cached_script.meta.get(
-                'dependent_cached_path', '')
+                'dependent_cached_path')
             if dependent_cached_path:
+                dependent_paths.append(dependent_cached_path)
+            dependent_cached_paths = cached_script.meta.get(
+                'dependent_cached_paths', '').split(':')
+            dependent_paths += [p for p in dependent_cached_paths if p]
+            for dep in dependent_paths:
                 if not os.path.exists(dependent_cached_path):
                     # TODO Need to restrict the below check to within container
                     # env
-                    i['tmp_dep_cached_path'] = dependent_cached_path
+                    i['tmp_dep_cached_path'] = dep
                     from script import docker_utils
                     r = docker_utils.get_container_path_script(i)
                     if not os.path.exists(r['value_env']):
@@ -4851,7 +4859,10 @@ def find_cached_script(i):
                             recursion_spaces +
                             '  - Skipping cached entry as the dependent path {} is missing!'.format(r['value_env']))
                         skip_cached_script = True
-                        continue
+                        break
+
+            if skip_cached_script:
+                continue
 
             os_info = self_obj.os_info
 
@@ -5047,7 +5058,7 @@ def update_env_with_values(env, fail_on_not_found=False, extra_env=None):
         # No placeholders found
         if not placeholders:
             # Special handling for MLC_GIT_URL
-            if key == 'MLC_GIT_URL' and env.get('MLC_GIT_AUTH', "no") == "yes":
+            if key == 'MLC_GIT_URL' and is_true(env.get('MLC_GIT_AUTH')):
                 if env.get('MLC_GH_TOKEN',
                            '') and '@' not in env['MLC_GIT_URL']:
                     params = {"token": env['MLC_GH_TOKEN']}
@@ -5287,7 +5298,7 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
         if r['return'] > 0:
             return r
 
-        # Save file to run without CM
+        # Save file to run without MLC
         if debug_script_tags != '' and all(
                 item in found_script_tags for item in debug_script_tags.split(',')):
 
@@ -5593,10 +5604,12 @@ def convert_env_to_script(env, os_info, start_script=None):
                 os_info['env_var'].replace(
                     'env_var', key)}"""
 
+        env_quote = os_info.get('env_quote', '"')
         # Replace placeholders in the platform-specific environment command
+        # and escapes any quote in the env value
         env_command = os_info['set_env'].replace(
             '${key}', key).replace(
-            '${value}', str(env_value))
+            '${value}', str(env_value).replace(env_quote, f"""\\{env_quote}"""))
         script.append(env_command)
 
     return script
@@ -5879,6 +5892,9 @@ def update_state_from_meta(meta, env, state, const, const_state, deps, post_deps
 
     if meta.get('cache', '') != '':
         run_state['cache'] = meta['cache']
+
+    if meta.get('cache_expiration', '') != '':
+        run_state['cache_expiration'] = meta['cache_expiration']
 
     default_env = meta.get('default_env', {})
     for key in default_env:

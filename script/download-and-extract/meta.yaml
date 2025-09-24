@@ -62,12 +62,14 @@ tags:
 tags_help: download-and-extract file
 uid: c67e81a4ce2649f5
 variations:
-  cmutil:
+  mlcutil:
     add_deps:
       download-script:
-        tags: _cmutil
+        tags: _mlcutil
     default: true
     group: download-tool
+  cmutil:
+    alias: mlcutil
   curl:
     add_deps:
       download-script:

@@ -78,7 +78,7 @@ deps:
 
   # Detect MLCake
   - tags: get,cmake
-    version: "3.26.4"
+    version: "3.27"
 
   # Detect Google Logger
   - tags: get,generic,sys-util,_glog-dev
@@ -232,6 +232,14 @@ variations:
             - 8
     
   r5.0:
+    add_deps_recursive:
+      pycuda:
+        version: "2024.1"
+      numpy:
+        version_max: "1.26.999"
+        version_max_usable: "1.26.4"
+  
+  r5.1:
     add_deps_recursive:
       pycuda:
         version: "2024.1"

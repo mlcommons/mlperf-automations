@@ -10,6 +10,9 @@ env:
   MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'no'
 input_mapping:
   checkpoint: LLAMA2_CHECKPOINT_PATH
+  use_service_account: MLC_AUTH_USING_SERVICE_ACCOUNT
+  client_id: CF_ACCESS_CLIENT_ID
+  client_secret: CF_ACCESS_CLIENT_SECRET
 new_env_keys:
 - MLC_ML_MODEL_*
 - LLAMA2_CHECKPOINT_PATH
@@ -51,13 +54,33 @@ tests:
 variations:
   pre-quantized:
     group: quantization
+    deps:
+      - enable_if_env:
+          MLC_TMP_ML_MODEL_PRE_QUANTIZED:
+          - 'yes'
+        skip_if_env:
+          LLAMA2_QUANTIZED_CHECKPOINT_PATH:
+          - 'yes'
+        env:
+          MLC_DOWNLOAD_FINAL_ENV_NAME: LLAMA2_QUANTIZED_CHECKPOINT_PATH
+          MLC_EXTRACT_FINAL_ENV_NAME: LLAMA2_QUANTIZED_CHECKPOINT_PATH
+        force_cache: true
+        extra_cache_tags: llama2,llama2-model,llama2-checkpoint,llama2-70b
+        names:
+          - dae-quantized-models
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        update_tags_from_env_with_prefix:
+          _url.:
+            - MLC_DOWNLOAD_URL
     env:
-      MLC_ML_MODEL_PRE_QUANTIZED: 'yes'
+      MLC_TMP_ML_MODEL_PRE_QUANTIZED: 'yes'
   quantize-locally:
     default: true
     group: quantization
     env:
-      MLC_ML_MODEL_QUANTIZE_LOCALLY: 'yes'
+      MLC_TMP_ML_MODEL_QUANTIZE_LOCALLY: 'yes'
   amd:
     default_env:
       MLC_LLAMA2_QUANTIZATION_DEVICE: ''
@@ -157,8 +180,11 @@ variations:
     env:
       MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama-2-7b-chat-hf.uri
   mlc,r2-downloader,70b,pre-quantized,fp8:
+    add_deps_recursive:
+      dae-quantized-models:
+        tags: _r2-downloader
     env:
-      MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama-2-70b-chat-hf-tp<<MLC_NVIDIA_TP_SIZE>>pp<<MLC_NVIDIA_PP_SIZE>>-<<<MLC_ML_MODEL_PRECISION>>>.uri
+      MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama2-70b-chat-hf-tp<<<MLC_NVIDIA_TP_SIZE>>>pp<<<MLC_NVIDIA_PP_SIZE>>>-<<<MLC_ML_MODEL_PRECISION>>>.uri
   hf:
     group: download-source
     env:
@@ -212,6 +238,10 @@ variations:
       - tags: get,nvidia,scratch,space
         names:
         - mlperf-inference-nvidia-scratch-space
+      - env: {}
+        force_new_env_keys:
+        - LLAMA2_CHECKPOINT_PATH
+        tags: get,ml-model,llama2-70b,_fp32,_pytorch
     group: model-provider
   pytorch:
     default: true
@@ -242,12 +272,18 @@ variations:
     - tags: get,generic-python-lib,_package.compressed_tensors
   pytorch,fp32:
     env: {}
-  pytorch,nvidia,v5.0:
+  pytorch,nvidia,v5.0,quantize-locally:
     deps:
       - env:
           MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_TENSORRT_LLM_CHECKOUT_PATH
         extra_cache_tags: tensorrt-llm
         tags: get,git,repo,_repo.https://github.com/NVIDIA/TensorRT-LLM.git,_sha.2ea17cdad28bed0f30e80eea5b1380726a7c6493,_submodules.3rdparty/NVTX;3rdparty/cutlass;3rdparty/cxxopts;3rdparty/json;3rdparty/pybind11;3rdparty/ucxx;3rdparty/xgrammar
+  pytorch,nvidia,v5.1,quantize-locally:
+    deps:
+      - env:
+          MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_TENSORRT_LLM_CHECKOUT_PATH
+        extra_cache_tags: tensorrt-llm
+        tags: get,git,repo,_repo.https://github.com/NVIDIA/TensorRT-LLM.git,_branch.1.0-mlpinf,_sha.18c0333e96ea7a2c37caded8a310d05c5f095e88,_submodules.3rdparty/NVTX;3rdparty/cutlass;3rdparty/cxxopts;3rdparty/json;3rdparty/pybind11;3rdparty/ucxx;3rdparty/xgrammar
   pytorch,nvidia,quantize-locally:
     default_variations:
       precision: fp8
@@ -257,11 +293,7 @@ variations:
     - names:
       - cuda
       tags: get,cuda
-    - tags: get,cuda-devices,_with-pycuda
-    - env: {}
-      force_new_env_keys:
-      - LLAMA2_CHECKPOINT_PATH
-      tags: get,ml-model,llama2-70b,_fp32,_pytorch
+    - tags: get,cuda-devices
     - names:
       - nvidia-inference-common-code
       tags: get,nvidia,inference,common-code
@@ -294,3 +326,5 @@ variations:
   v5.0:
     group: version
     default: true
+  v5.1:
+    group: version
