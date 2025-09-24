@@ -293,7 +293,7 @@ variations:
     - names:
       - cuda
       tags: get,cuda
-    - tags: get,cuda-devices,_with-pycuda
+    - tags: get,cuda-devices
     - names:
       - nvidia-inference-common-code
       tags: get,nvidia,inference,common-code
