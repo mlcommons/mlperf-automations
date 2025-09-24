@@ -18,9 +18,7 @@ echo ""
 echo "Compiling program ..."
 echo ""
 
-cd ${MLC_TMP_CURRENT_SCRIPT_PATH}
-
-${MLC_NVCC_BIN_WITH_PATH} -allow-unsupported-compiler print_cuda_devices.cu
+${MLC_NVCC_BIN_WITH_PATH} -allow-unsupported-compiler ${MLC_TMP_CURRENT_SCRIPT_PATH}/print_cuda_devices.cu
 test $? -eq 0 || exit 1
 
 # Return to the original path obtained in MLC
@@ -28,8 +26,6 @@ test $? -eq 0 || exit 1
 echo ""
 echo "Running program ..."
 echo ""
-
-cd ${MLC_TMP_CURRENT_PATH}
 
 ${MLC_TMP_CURRENT_SCRIPT_PATH}/a.out > tmp-run.out
 test $? -eq 0 || exit 1

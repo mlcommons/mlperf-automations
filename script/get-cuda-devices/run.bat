@@ -16,9 +16,7 @@ echo.
 echo Compiling program ...
 echo.
 
-cd %MLC_TMP_CURRENT_SCRIPT_PATH%
-
-"%MLC_NVCC_BIN_WITH_PATH%" print_cuda_devices.cu -allow-unsupported-compiler -DWINDOWS
+"%MLC_NVCC_BIN_WITH_PATH%" %MLC_TMP_CURRENT_SCRIPT_PATH%\print_cuda_devices.cu -allow-unsupported-compiler -DWINDOWS
 IF %ERRORLEVEL% NEQ 0 EXIT %ERRORLEVEL%
 
 rem Return to the original path obtained in CM
@@ -26,8 +24,6 @@ rem Return to the original path obtained in CM
 echo.
 echo Running program ...
 echo.
-
-cd %MLC_TMP_CURRENT_PATH%
 
 %MLC_TMP_CURRENT_SCRIPT_PATH%\a.exe > tmp-run.out
 IF %ERRORLEVEL% NEQ 0 EXIT %ERRORLEVEL%
