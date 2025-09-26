@@ -19,7 +19,7 @@ RUN_CMD="bash -c 'git lfs install && git lfs pull && python3 scripts/build_wheel
 echo "$RUN_CMD"
 
 # TODO: check whether --device nvidia.com/gpu=all would work for docker
-DOCKER_RUN_ARGS=" -v ${MLC_NVIDIA_MLPERF_SCRATCH_PATH}:/mnt -v ${MLC_NVIDIA_PREPROCESSED_CALIBRATION_DATASET_PATH}:/calib_dataset -u $(id -u):$(id -g) --userns=keep-id --device nvidia.com/gpu=all -e NVIDIA_VISIBLE_DEVICES=all"
+DOCKER_RUN_ARGS=" -v ${MLC_NVIDIA_MLPERF_SCRATCH_PATH}:/mnt -v ${MLC_NVIDIA_PREPROCESSED_CALIBRATION_DATASET_PATH}:/calib_dataset -u $(id -u):$(id -g) --device nvidia.com/gpu=all -e NVIDIA_VISIBLE_DEVICES=all"
 export DOCKER_RUN_ARGS="$DOCKER_RUN_ARGS"
 export RUN_CMD="$RUN_CMD"
 make -C docker run LOCAL_USER=1
