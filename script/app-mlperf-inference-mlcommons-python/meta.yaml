@@ -546,8 +546,10 @@ deps:
     enable_if_env:
       MLC_MODEL:
         - pointpainting
-    skip_if_env:
+    skip_if_any_env:
       MLC_RUN_STATE_DOCKER:
+        - "yes"
+      MLC_USE_DATASET_FROM_HOST:
         - "yes"
 
   ########################################################################
