@@ -23,18 +23,27 @@ variations:
     env:
       MLC_DATASET_NUSCENES_EXTRACTED_FOLDER_NAME: val_3d
       MLC_DATASET_NUSCENES_TAR_FILENAME: val_3d.tar.gz
+  validation,rclone:
+    env:
       MLC_DOWNLOAD_URL: mlc-nuscenes:nuscenes_dataset/preprocessed/<<<MLC_DATASET_NUSCENES_TAR_FILENAME>>>
+  validation,r2-downloader:
+    env:
+      MLC_DOWNLOAD_URL: https://nuscenes.mlcommons-storage.org/metadata/nuscenes-dataset.uri
   calibration:
     group: dataset-type
     env:
       MLC_DATASET_NUSCENES_EXTRACTED_FOLDER_NAME: calib_3d
       MLC_DATASET_NUSCENES_TAR_FILENAME: calib_3d.tar.gz
+  calibration,rclone:
+      MLC_DOWNLOAD_URL: mlc-nuscenes:nuscenes_dataset/preprocessed/<<<MLC_DATASET_NUSCENES_TAR_FILENAME>>>
+  calibration,r2-downloader:
       MLC_DOWNLOAD_URL: mlc-nuscenes:nuscenes_dataset/preprocessed/<<<MLC_DATASET_NUSCENES_TAR_FILENAME>>>
   prebuilt:
     default: true
     group: dataset-src
     env:
       MLC_NUSCENES_DATASET_TYPE: prebuilt
+  prebuilt,rclone:
       MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_PATH
       MLC_EXTRACT_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_PATH
       MLC_DOWNLOAD_EXTRA_OPTIONS: ' --include '
@@ -42,17 +51,6 @@ variations:
     group: download-src
     default: true
     prehook_deps:
-      - tags: get,rclone
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-      - tags: get,rclone-config,_config-name.mlc-nuscenes
-        force_cache: true
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-        env:
-          MLC_RCLONE_DRIVE_FOLDER_ID: 17CpM5eU8tjrxh_LpH_BTNTeT37PhzcnC
       - enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - 'yes'
@@ -68,11 +66,25 @@ variations:
             - MLC_DOWNLOAD_URL
     env:
       MLC_DOWNLOAD_SRC: mlcommons
+  mlc,rclone:
+    prehook_deps:
+      - tags: get,rclone
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+      - tags: get,rclone-config,_config-name.mlc-nuscenes
+        force_cache: true
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+        env:
+          MLC_RCLONE_DRIVE_FOLDER_ID: 17CpM5eU8tjrxh_LpH_BTNTeT37PhzcnC
   mlc,validation:
     env:
       MLC_DATASET_NUSCENES_SCENE_PICKLE_FILENAME: scene_lengths.pkl
       MLC_DATASET_NUSCENES_ACC_CHECKER_DEP_FILES_TAR_NAME: nuscenes_min.tar.gz
       MLC_DATASET_NUSCENES_ACC_REQ_FILE_EXTRACTED_FOLDER_NAME: nuscenes
+  mlc,validation,rclone:
     prehook_deps:
       - enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
@@ -118,6 +130,15 @@ variations:
       dae_ac:
         tags: _rclone
     default: true
+  r2-downloader:
+    add_deps_recursive:
+      dae:
+        tags: _r2-downloader
+      dae_sl:
+        tags: _r2-downloader
+      dae_ac:
+        tags: _r2-downloader
+    group: download-tool
   dry-run:
     group: run-mode
     env:
@@ -125,8 +146,13 @@ variations:
   dry-run,rclone:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
 tests:
   run_inputs:
   - variations_list:
       - validation,prebuilt,rclone,mlc,dry-run
       - calibration,prebuilt,rclone,mlc,dry-run
+      - validation,prebuilt,r2-downloader,mlc,dry-run
+      - calibration,prebuilt,r2-downloader,mlc,dry-run
