@@ -1018,6 +1018,12 @@ variations:
         names:
           - igbh-original
           - igbh-dataset
+      - tags: get,ml-model,rgat,_r2-downloader,_mlcommons
+        enable_if_env:
+          MLC_USE_ML_MODEL_FROM_HOST:
+          - 'yes'
+        names:
+          - rgat-model
 
   pointpainting:
     group:
@@ -1225,6 +1231,13 @@ variations:
         names:
           - llama3_1-405b
           - llama3-405b
+      - tags: mlcr get,dataset,mlperf,inference,llama3,_validation,_r2-downloader
+        enable_if_env:
+          MLC_USE_DATASET_FROM_HOST:
+          - 'yes'
+        names:
+          - llama3_1-dataset
+          - llama3-dataset
   
   deepseek-r1:
     group:
