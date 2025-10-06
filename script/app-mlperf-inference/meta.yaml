@@ -748,7 +748,7 @@ variations:
       implementation
     docker:
       interactive: True
-      privileged_mode: True
+      privileged: True
       mounts:
       - "${{ LLAMA2_CHECKPOINT_PATH }}:${{ LLAMA2_CHECKPOINT_PATH }}"
       - "${{ GPTJ_CHECKPOINT_PATH }}:${{ GPTJ_CHECKPOINT_PATH }}"
