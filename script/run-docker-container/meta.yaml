@@ -50,7 +50,7 @@ input_mapping:
   port_maps: MLC_DOCKER_PORT_MAPS
   post_run_cmds: MLC_DOCKER_POST_RUN_COMMANDS
   pre_run_cmds: MLC_DOCKER_PRE_RUN_COMMANDS
-  privileged_mode: MLC_DOCKER_PRIVILEGED_MODE
+  privileged: MLC_DOCKER_PRIVILEGED_MODE
   real_run: MLC_REAL_RUN
   recreate: MLC_DOCKER_IMAGE_RECREATE
   rebuild: MLC_DOCKER_IMAGE_RECREATE
