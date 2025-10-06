@@ -704,7 +704,7 @@ variations:
       implementation
     docker:
       interactive: True
-      privileged_mode: True
+      privileged: True
       mounts:
       - "${{ MLC_MLPERF_INFERENCE_INTEL_GPTJ_INT8_MODEL_PATH }}:${{ MLC_MLPERF_INFERENCE_INTEL_GPTJ_INT8_MODEL_PATH }}"
       - "${{ GPTJ_CHECKPOINT_PATH }}:${{ GPTJ_CHECKPOINT_PATH }}"
