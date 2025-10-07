@@ -507,7 +507,6 @@ def postprocess(i):
         SCRIPT_PATH = os.path.join(
             env['MLC_MLPERF_INFERENCE_SOURCE'],
             "compliance",
-            "nvidia",
             test,
             "run_verification.py")
         if test == "TEST06":
@@ -523,7 +522,7 @@ def postprocess(i):
             run_script_input = i['run_script_input']
             automation = i['automation']
 
-            SCRIPT_PATH = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "compliance", "nvidia", test,
+            SCRIPT_PATH = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "compliance", test,
                                        "create_accuracy_baseline.sh")
             TEST01_DIR = os.path.join(OUTPUT_DIR, "TEST01")
             OUTPUT_DIR = os.path.join(OUTPUT_DIR, "TEST01", "accuracy")
