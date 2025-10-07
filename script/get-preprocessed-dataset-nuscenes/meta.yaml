@@ -104,9 +104,12 @@ variations:
       MLC_DATASET_NUSCENES_ACC_CHECKER_DEP_FILES_TAR_NAME: nuscenes_min.tar.gz
       MLC_DATASET_NUSCENES_ACC_REQ_FILE_EXTRACTED_FOLDER_NAME: nuscenes
   prebuilt,mlc,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: ' --include '
+  prebuilt,mlc:
+    env:
       MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_PATH
       MLC_EXTRACT_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_PATH
-      MLC_DOWNLOAD_EXTRA_OPTIONS: ' --include '
   validation,mlc,rclone:
     prehook_deps:
       - enable_if_env:
