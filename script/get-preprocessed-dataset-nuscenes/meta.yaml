@@ -66,23 +66,25 @@ variations:
     env:
       MLC_DATASET_NUSCENES_EXTRACTED_FOLDER_NAME: calib_3d
       MLC_DATASET_NUSCENES_TAR_FILENAME: calib_3d.tar.gz
-  mlc,rclone:
+  mlc:
+    group: download-src
+    default: true
     prehook_deps:
       - tags: get,rclone
         enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - yes
+          MLC_DOWNLOAD_TOOL:
+          - rclone
       - tags: get,rclone-config,_config-name.mlc-nuscenes
         force_cache: true
         enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - yes
+          MLC_DOWNLOAD_TOOL:
+          - rclone
         env:
           MLC_RCLONE_DRIVE_FOLDER_ID: 17CpM5eU8tjrxh_LpH_BTNTeT37PhzcnC
-  mlc:
-    group: download-src
-    default: true
-    prehook_deps:
       - enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - 'yes'
