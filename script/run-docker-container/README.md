@@ -1,4 +1,4 @@
-# README for install-llvm-src
+# README for run-docker-container
 This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,16 +33,54 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr install,src,llvm,from.src,src-llvm
+mlcr run,docker,container
 ```
 
 ### Script Inputs
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
-| `--targets` |  |  | `` |
-| `--target_triple` |  |  | `` |
-| `--extra_options` |  |  | `` |
+| `--all_gpus` |  |  | `` |
+| `--num_gpus` |  |  | `` |
+| `--base` |  |  | `` |
+| `--cache` |  |  | `` |
+| `--mlc_repo` |  |  | `` |
+| `--detached` |  |  | `` |
+| `--device` |  |  | `` |
+| `--docker_image_base` | Alias for base |  | `` |
+| `--docker_base_image` | Alias for base |  | `` |
+| `--base_image` | Alias for base |  | `` |
+| `--keep_detached` |  |  | `` |
+| `--reuse_existing` |  |  | `no` |
+| `--docker_os` |  |  | `` |
+| `--docker_os_version` |  |  | `` |
+| `--os` | Alias for docker_os |  | `` |
+| `--os_version` | Alias for docker_os_version |  | `` |
+| `--extra_run_args` |  |  | `` |
+| `--fake_run_option` |  |  | `` |
+| `--gh_token` |  |  | `` |
+| `--image_name` |  |  | `` |
+| `--image_repo` |  |  | `` |
+| `--image_tag` |  |  | `` |
+| `--image_tag_extra` |  |  | `` |
+| `--interactive` |  |  | `` |
+| `--it` |  |  | `` |
+| `--mounts` |  |  | `` |
+| `--pass_user_id` |  |  | `` |
+| `--pass_user_group` |  |  | `` |
+| `--port_maps` |  |  | `` |
+| `--post_run_cmds` |  |  | `` |
+| `--pre_run_cmds` |  |  | `` |
+| `--privileged` |  |  | `no` |
+| `--real_run` |  |  | `` |
+| `--recreate` |  |  | `` |
+| `--rebuild` | Alias for recreate |  | `` |
+| `--run_cmd` |  |  | `` |
+| `--run_cmd_extra` |  |  | `` |
+| `--save_script` |  |  | `` |
+| `--script_tags` |  |  | `` |
+| `--shm_size` |  |  | `` |
+| `--use_google_dns` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -62,63 +100,3 @@ mlcr install,src,llvm,from.src,src-llvm
 | `--hf_token` | Huggingface Token |  | `` |
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
-
-### Build-type
-
-- `debug`
-- `release` (default)
-
-### Clang
-
-- `clang` (default)
-- `no-clang`
-
-### Compiler-rt
-
-- `compiler-rt` (default)
-- `no-compiler-rt`
-
-### Flang
-
-- `flang`
-
-### Libcxx
-
-- `libcxx` (default)
-- `no-libcxx`
-
-### Lld
-
-- `lld` (default)
-- `no-lld`
-
-### Openmp
-
-- `no-openmp`
-- `openmp` (default)
-
-### Repo
-
-- `repo.#` _(# can be substituted dynamically)_
-
-### Tests
-
-- `no-tests` (default)
-- `tests`
-
-### Ungrouped
-
-- `branch.#` _(# can be substituted dynamically)_
-- `cross-compile-x86-aarch64`
-- `for-intel-mlperf-inference-v3.1-bert` (base: tag.llvmorg-15.0.7, clang, release)
-- `for-intel-mlperf-inference-v3.1-gptj` (base: tag.llvmorg-16.0.6, clang, release)
-- `full-history`
-- `path.#` _(# can be substituted dynamically)_
-- `runtimes.#` _(# can be substituted dynamically)_
-- `sha.#` _(# can be substituted dynamically)_
-- `tag.#` _(# can be substituted dynamically)_ (base: full-history)
-
-### Version
-
-- `version.#` _(# can be substituted dynamically)_
-- `version.main` (base: branch.main)

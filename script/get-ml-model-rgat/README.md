@@ -1,4 +1,4 @@
-# README for install-llvm-src
+# README for get-ml-model-rgat
 This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,16 +33,14 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr install,src,llvm,from.src,src-llvm
+mlcr get,raw,ml-model,rgat
 ```
 
 ### Script Inputs
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
-| `--targets` |  |  | `` |
-| `--target_triple` |  |  | `` |
-| `--extra_options` |  |  | `` |
+| `--checkpoint` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -63,62 +61,23 @@ mlcr install,src,llvm,from.src,src-llvm
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
-### Build-type
+### Download-source
 
-- `debug`
-- `release` (default)
+- `mlcommons` (default)
 
-### Clang
+### Download-tool
 
-- `clang` (default)
-- `no-clang`
+- `r2-downloader`
+- `rclone`
 
-### Compiler-rt
+### Precision
 
-- `compiler-rt` (default)
-- `no-compiler-rt`
+- `fp32` (default)
 
-### Flang
+### Run-mode
 
-- `flang`
-
-### Libcxx
-
-- `libcxx` (default)
-- `no-libcxx`
-
-### Lld
-
-- `lld` (default)
-- `no-lld`
-
-### Openmp
-
-- `no-openmp`
-- `openmp` (default)
-
-### Repo
-
-- `repo.#` _(# can be substituted dynamically)_
-
-### Tests
-
-- `no-tests` (default)
-- `tests`
+- `dry-run`
 
 ### Ungrouped
 
-- `branch.#` _(# can be substituted dynamically)_
-- `cross-compile-x86-aarch64`
-- `for-intel-mlperf-inference-v3.1-bert` (base: tag.llvmorg-15.0.7, clang, release)
-- `for-intel-mlperf-inference-v3.1-gptj` (base: tag.llvmorg-16.0.6, clang, release)
-- `full-history`
-- `path.#` _(# can be substituted dynamically)_
-- `runtimes.#` _(# can be substituted dynamically)_
-- `sha.#` _(# can be substituted dynamically)_
-- `tag.#` _(# can be substituted dynamically)_ (base: full-history)
-
-### Version
-
-- `version.#` _(# can be substituted dynamically)_
-- `version.main` (base: branch.main)
+- `pytorch`
