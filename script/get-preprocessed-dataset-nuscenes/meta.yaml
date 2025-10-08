@@ -70,21 +70,6 @@ variations:
     group: download-src
     default: true
     prehook_deps:
-      - tags: get,rclone
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-          MLC_DOWNLOAD_TOOL:
-          - rclone
-      - tags: get,rclone-config,_config-name.mlc-nuscenes
-        force_cache: true
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-          MLC_DOWNLOAD_TOOL:
-          - rclone
-        env:
-          MLC_RCLONE_DRIVE_FOLDER_ID: 17CpM5eU8tjrxh_LpH_BTNTeT37PhzcnC
       - enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - 'yes'
@@ -114,6 +99,21 @@ variations:
       MLC_EXTRACT_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_NUSCENES_PATH
   validation,mlc,rclone:
     prehook_deps:
+      - tags: get,rclone
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+          MLC_DOWNLOAD_TOOL:
+          - rclone
+      - tags: get,rclone-config,_config-name.mlc-nuscenes
+        force_cache: true
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+          MLC_DOWNLOAD_TOOL:
+          - rclone
+        env:
+          MLC_RCLONE_DRIVE_FOLDER_ID: 17CpM5eU8tjrxh_LpH_BTNTeT37PhzcnC
       - enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - 'yes'
@@ -163,4 +163,5 @@ tests:
       - validation,prebuilt,rclone,mlc,dry-run
       - calibration,prebuilt,rclone,mlc,dry-run
       - validation,prebuilt,r2-downloader,mlc,dry-run
+
       - calibration,prebuilt,r2-downloader,mlc,dry-run
