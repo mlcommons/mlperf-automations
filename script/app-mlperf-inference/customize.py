@@ -504,11 +504,20 @@ def postprocess(i):
         COMPLIANCE_DIR = output_dir
         OUTPUT_DIR = os.path.dirname(COMPLIANCE_DIR)
 
+        # For backward compatibility with inference commit d9efabf829526234629a4dfe5cc34a36cb81417c
         SCRIPT_PATH = os.path.join(
+            env['MLC_MLPERF_INFERENCE_SOURCE'],
+            "compliance",
+            "nvidia",
+            test,
+            "run_verification.py")
+        if not os.path.exists(SCRIPT_PATH):
+            SCRIPT_PATH = os.path.join(
             env['MLC_MLPERF_INFERENCE_SOURCE'],
             "compliance",
             test,
             "run_verification.py")
+            
         if test == "TEST06":
             cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']}  {q}{SCRIPT_PATH}{q}  -c  {q}{COMPLIANCE_DIR}{q}  -o  {q}{OUTPUT_DIR}{q} --scenario {scenario} --dtype int32"""
         else:
@@ -522,8 +531,13 @@ def postprocess(i):
             run_script_input = i['run_script_input']
             automation = i['automation']
 
+            # For backward compatibility with inference commit d9efabf829526234629a4dfe5cc34a36cb81417c
             SCRIPT_PATH = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "compliance", test,
                                        "create_accuracy_baseline.sh")
+            if not os.path.exists(SCRIPT_PATH):
+                SCRIPT_PATH = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "compliance", "nvidia", test,
+                                       "create_accuracy_baseline.sh")
+                
             TEST01_DIR = os.path.join(OUTPUT_DIR, "TEST01")
             OUTPUT_DIR = os.path.join(OUTPUT_DIR, "TEST01", "accuracy")
             if not os.path.exists(OUTPUT_DIR):
