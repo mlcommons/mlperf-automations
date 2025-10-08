@@ -158,6 +158,7 @@ variations:
   calibration,mlc,r2-downloader:
       MLC_DOWNLOAD_URL: https://nuscenes.mlcommons-storage.org/metadata/nuscenes-dataset.uri
 tests:
+  needs_pat: true
   run_inputs:
   - variations_list:
       - validation,prebuilt,rclone,mlc,dry-run
@@ -165,3 +166,4 @@ tests:
       - validation,prebuilt,r2-downloader,mlc,dry-run
 
       - calibration,prebuilt,r2-downloader,mlc,dry-run
+
