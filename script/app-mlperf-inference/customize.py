@@ -534,10 +534,10 @@ def postprocess(i):
 
             # For backward compatibility with inference commit
             # d9efabf829526234629a4dfe5cc34a36cb81417c
-            SCRIPT_PATH = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "compliance", test,
+            SCRIPT_PATH = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "compliance", "nvidia", test,
                                        "create_accuracy_baseline.sh")
             if not os.path.exists(SCRIPT_PATH):
-                SCRIPT_PATH = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "compliance", "nvidia", test,
+                SCRIPT_PATH = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "compliance", test,
                                            "create_accuracy_baseline.sh")
 
             TEST01_DIR = os.path.join(OUTPUT_DIR, "TEST01")
