@@ -799,7 +799,9 @@ class ScriptAutomation(Automation):
         run_state['script_repo_git'] = script_item.repo.meta.get(
             'git', False)
         run_state['cache'] = meta.get('cache', False)
-        run_state['cache_expiration'] = meta.get('cache_expiration', False)
+        run_state['cache_expiration'] = i.get(
+            'cache_expiration', meta.get(
+                'cache_expiration', False))
 
         if not recursion:
             run_state['script_entry_repo_to_report_errors'] = meta.get(

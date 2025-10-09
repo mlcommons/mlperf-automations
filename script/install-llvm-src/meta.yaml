@@ -78,6 +78,7 @@ variations:
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
   branch.#:
+    cache_expiration: 5d
     env:
       MLC_GIT_CHECKOUT: '#'
   clang:
@@ -85,6 +86,8 @@ variations:
     env:
       +MLC_LLVM_ENABLE_PROJECTS:
         - clang
+    group: clang
+  no-clang:
     group: clang
   flang:
     env:
@@ -116,11 +119,19 @@ variations:
     env:
       +MLC_LLVM_ENABLE_PROJECTS:
         - lld
+      +MLC_LLVM_CMAKE_OPTIONS:
+        - '-DCLANG_DEFAULT_LINKER=lld'
     group: lld
-  no-clang:
-    group: clang
   no-lld:
     group: lld
+  openmp:
+    default: true
+    env:
+      +MLC_LLVM_ENABLE_PROJECTS:
+        - openmp
+    group: openmp
+  no-openmp:
+    group: openmp
   debug:
     env:
       MLC_LLVM_BUILD_TYPE: debug
@@ -276,6 +287,15 @@ variations:
     - full-history
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
+  no-tests:
+    group: tests
+    default: true
+    env:
+      MLC_LLVM_CHECK_ALL: ''
+  tests:
+    group: tests
+    env:
+      MLC_LLVM_CHECK_ALL: check-all
 docker:
   skip_run_cmd: true
   pre_run_cmds:
