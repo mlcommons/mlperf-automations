@@ -138,6 +138,7 @@ variations:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
 tests:
+  needs_pat: true
   run_inputs:
   - variations_list:
       - validation,prebuilt,2d_obj_det,rclone,mlc,dry-run
