@@ -43,7 +43,7 @@ variations:
       MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/preprocessed_2d/<<<MLC_DATASET_COGNATA_TAR_FILENAME>>>
   validation,2d_obj_det,r2-downloader:
     env:
-      MLC_DOWNLOAD_URL: ""
+      MLC_DOWNLOAD_URL: https://cognata.mlcommons-storage.org/metadata/val_2d.uri
   calibration,2d_obj_det:
     env:
       MLC_DATASET_COGNATA_EXTRACTED_FOLDER_NAME: calib_2d
@@ -53,7 +53,7 @@ variations:
       MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/preprocessed_2d/<<<MLC_DATASET_COGNATA_TAR_FILENAME>>>
   calibration,2d_obj_det,r2-downloader:
     env:
-      MLC_DOWNLOAD_URL: ""
+      MLC_DOWNLOAD_URL: https://cognata.mlcommons-storage.org/metadata/calib_2d.uri
   validation,segmentation:
     env:
       MLC_DATASET_COGNATA_EXTRACTED_FOLDER_NAME: val_seg
@@ -63,7 +63,7 @@ variations:
       MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/preprocessed_seg/<<<MLC_DATASET_COGNATA_TAR_FILENAME>>>
   validation,segmentation,r2-downloader:
     env:
-      MLC_DOWNLOAD_URL: ""
+      MLC_DOWNLOAD_URL: https://cognata.mlcommons-storage.org/metadata/val_seg.uri
   calibration,segmentation:
     env:
       MLC_DATASET_COGNATA_EXTRACTED_FOLDER_NAME: calib_seg
@@ -73,7 +73,7 @@ variations:
       MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/preprocessed_seg/<<<MLC_DATASET_COGNATA_TAR_FILENAME>>>
   calibration,segmentation,r2-downloader:
     env:
-      MLC_DOWNLOAD_URL: ""
+      MLC_DOWNLOAD_URL: https://cognata.mlcommons-storage.org/metadata/calib_seg.uri
   prebuilt:
     default: true
     group: dataset-src
