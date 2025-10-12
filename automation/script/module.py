@@ -4669,7 +4669,7 @@ pip install mlcflow
         sorted_list = sorted(lst, key=lambda x: x.meta.get('alias', ''))
 
         # If quiet mode is off, prompt the user
-        if not i.get('quiet', False):
+        if not i.get('quiet', False) and len(sorted_list) > 1:
             print("\nAvailable scripts:")
             for idx, artifact in enumerate(sorted_list, 1):
                 meta = artifact.meta
