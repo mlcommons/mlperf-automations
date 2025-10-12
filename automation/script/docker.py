@@ -105,7 +105,7 @@ def dockerfile(self_module, input_params):
     if not docker_settings.get('run', True) and not input_params.get(
             'docker_run_override', False):
         logger.info("Docker 'run' is set to False in meta.json")
-        continue
+        return {'return': 0, 'warning': 'Docker run is set to false in script meta'}
 
     # Handle build dependencies
     show_time = input_params.get('show_time', False)
