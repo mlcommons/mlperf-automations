@@ -362,7 +362,7 @@ def docker_run(self_module, i):
     if not docker_settings.get('run', True) and not i.get(
             'docker_run_override', False):
         logger.info("docker.run set to False in meta.yaml")
-        continue
+        return {'return': 0, 'warning': 'Docker run is set to false in script meta'}
 
     if is_true(docker_settings.get('pass_docker_to_script', False)):
         logger.info("Docker 'run' is passed to the run script")
