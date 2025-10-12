@@ -184,7 +184,6 @@ def run_script_and_tag_experiment(
 
     return {'return': 0, 'experiment': experiment, 'folder_name': folder_name}
 
-
     elif seconds < 3600:
         mins, secs = divmod(seconds, 60)
         return f"{int(mins)} minutes {secs:.1f} seconds"

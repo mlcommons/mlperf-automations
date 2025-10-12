@@ -22,7 +22,6 @@ def dockerfile(self_module, input_params):
     is_quiet_mode = input_params.get('quiet', False)
     is_console_output = input_params.get('out') == 'con'
 
-
     # Step 2: Process Dockerfile-related configurations
     env = input_params.get('env', {})
     state_data = input_params.get('state', {})
@@ -38,7 +37,8 @@ def dockerfile(self_module, input_params):
     script = r['script']
 
     if not script:
-        return {'return': 1, 'error': 'No scripts were found for generating dockerfile'}
+        return {'return': 1,
+                'error': 'No scripts were found for generating dockerfile'}
 
     metadata = script.meta
     script_directory = script.path
@@ -53,7 +53,7 @@ def dockerfile(self_module, input_params):
         'script_id': f"{script_alias},{script_uid}",
         'script_variation_tags': variation_tags
     }
-        
+
     docker_settings = metadata.get('docker', {})
     docker_settings_default_env = docker_settings.get('default_env', {})
     for key in docker_settings_default_env:
@@ -281,7 +281,8 @@ def docker_run(self_module, i):
     script = r['script']
 
     if not script:
-        return {'return': 1, 'error': 'No scripts were found for generating dockerfile'}
+        return {'return': 1,
+                'error': 'No scripts were found for generating dockerfile'}
 
     meta, script_path = script.meta, script.path
     tags, script_alias, script_uid = meta.get(
@@ -315,11 +316,11 @@ def docker_run(self_module, i):
 
     # Update state and handle variations
     r = self_module.update_state_from_meta(meta, env, state, const, const_state, deps=[],
-            post_deps=[],
-            prehook_deps=[],
-            posthook_deps=[],
-            new_env_keys=[],
-            new_state_keys=[], run_state=run_state, i=i)
+                                           post_deps=[],
+                                           prehook_deps=[],
+                                           posthook_deps=[],
+                                           new_env_keys=[],
+                                           new_state_keys=[], run_state=run_state, i=i)
     if r['return'] > 0:
         return r
 
