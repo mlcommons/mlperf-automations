@@ -274,7 +274,7 @@ def docker_run(self_module, i):
 
     input_i = copy.deepcopy(i)
 
-    r = self_module.select_script(input_params)
+    r = self_module.select_script(i)
     if r['return'] > 0:
         return r
 
