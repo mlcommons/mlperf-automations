@@ -30,7 +30,7 @@ def dockerfile(self_module, input_params):
     tag_values = input_params.get('tags', '').split(",")
     variation_tags = [tag[1:] for tag in tag_values if tag.startswith("_")]
 
-    r = self_module.select_script(input_params)
+    r = self_module._select_script(input_params)
     if r['return'] > 0:
         return r
 
@@ -274,7 +274,7 @@ def docker_run(self_module, i):
 
     input_i = copy.deepcopy(i)
 
-    r = self_module.select_script(i)
+    r = self_module._select_script(i)
     if r['return'] > 0:
         return r
 
