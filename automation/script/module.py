@@ -4657,7 +4657,7 @@ pip install mlcflow
         return get_script_name(env, path, filename)
 
     def _select_script(self, i):
-        r = self_module.search(i.copy())
+        r = self.search(i.copy())
         if r['return'] > 0:
             return r
 
