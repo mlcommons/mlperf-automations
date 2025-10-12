@@ -59,7 +59,6 @@ def remote_run(self_module, i):
         'action': 'run', 'target': 'script'
     }
 
-    
     run_cmds = []
     remote_mlc_python_venv = i.get('remote_python_venv', 'mlcflow')
     run_cmds.append(f". {remote_mlc_python_venv}/bin/activate")
@@ -70,10 +69,10 @@ def remote_run(self_module, i):
     run_cmds.append(f"mlcr {script_run_cmd}")
 
     remote_inputs = {}
-    for key in [ "host", "port", "user", "client_refresh", "password", "skip_host_verify", "ssh_key_file" ]:
+    for key in ["host", "port", "user", "client_refresh",
+                "password", "skip_host_verify", "ssh_key_file"]:
         if i.get(f"remote_{key}"):
             remote_inputs[key] = i[f"remote_{key}"]
-
 
     # Execute the remote command
     mlc_remote_input = {
@@ -87,4 +86,3 @@ def remote_run(self_module, i):
         return r
 
     return {'return': 0}
-
