@@ -1,4 +1,4 @@
-# README for get-ml-model-deeplabv3-plus
+# README for get-preprocessed-dataset-cognata
 This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,7 +33,7 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr get,ml-model,deeplab,v3-plus,deeplabv3-plus
+mlcr get,dataset,cognata,preprocessed
 ```
 
 No script specific inputs
@@ -57,6 +57,15 @@ No script specific inputs
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
+### Dataset-src
+
+- `prebuilt` (default)
+
+### Dataset-type
+
+- `calibration`
+- `validation` (default)
+
 ### Download-src
 
 - `mlc` (default)
@@ -66,15 +75,11 @@ No script specific inputs
 - `r2-downloader`
 - `rclone` (default)
 
-### Model-format
-
-- `onnx` (default)
-- `pytorch`
-
 ### Run-mode
 
 - `dry-run`
 
-### Ungrouped
+### Task
 
-- `dynamic`
+- `2d_obj_det` (default)
+- `segmentation`

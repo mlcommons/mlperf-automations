@@ -704,7 +704,7 @@ variations:
       implementation
     docker:
       interactive: True
-      extra_run_args: ' --privileged'
+      privileged: True
       mounts:
       - "${{ MLC_MLPERF_INFERENCE_INTEL_GPTJ_INT8_MODEL_PATH }}:${{ MLC_MLPERF_INFERENCE_INTEL_GPTJ_INT8_MODEL_PATH }}"
       - "${{ GPTJ_CHECKPOINT_PATH }}:${{ GPTJ_CHECKPOINT_PATH }}"
@@ -748,7 +748,7 @@ variations:
       implementation
     docker:
       interactive: True
-      extra_run_args: ' --privileged'
+      privileged: True
       mounts:
       - "${{ LLAMA2_CHECKPOINT_PATH }}:${{ LLAMA2_CHECKPOINT_PATH }}"
       - "${{ GPTJ_CHECKPOINT_PATH }}:${{ GPTJ_CHECKPOINT_PATH }}"

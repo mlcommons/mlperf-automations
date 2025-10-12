@@ -92,9 +92,19 @@ mlcr install,src,llvm,from.src,src-llvm
 - `lld` (default)
 - `no-lld`
 
+### Openmp
+
+- `no-openmp`
+- `openmp` (default)
+
 ### Repo
 
 - `repo.#` _(# can be substituted dynamically)_
+
+### Tests
+
+- `no-tests` (default)
+- `tests`
 
 ### Ungrouped
 

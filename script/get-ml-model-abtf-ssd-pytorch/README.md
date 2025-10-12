@@ -69,6 +69,7 @@ mlcr get,ml-model,abtf-ssd-pytorch,ssd,resnet50,cmc
 ### Download-tool
 
 - `gdown`
+- `r2-downloader`
 - `rclone`
 - `wget` (default)
 
