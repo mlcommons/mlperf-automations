@@ -143,6 +143,8 @@ variations:
         MLC_EXTRACT_TO_FOLDER: criteo-preprocessed
       extra_cache_tags: criteo,preprocessed,dataset
       force_cache: true
+      force_env_keys:
+        - MLC_OUTDIRNAME  
       names:
       - dae-criteo-preprocessed
       tags: download-and-extract
