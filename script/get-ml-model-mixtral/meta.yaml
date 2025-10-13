@@ -60,7 +60,7 @@ variations:
   mlc:
     default: true
     prehook_deps:
-        env:
+      - env:
           MLC_DOWNLOAD_FINAL_ENV_NAME: MIXTRAL_CHECKPOINT_PATH
           MLC_EXTRACT_FINAL_ENV_NAME: MIXTRAL_CHECKPOINT_PATH
         extra_cache_tags: ml-model,mixtral,raw,ml-model-mixtral
