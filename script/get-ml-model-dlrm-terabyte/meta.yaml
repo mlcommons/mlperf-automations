@@ -123,6 +123,10 @@ variations:
       dae:
         tags: _r2-downloader
     group: download-tool
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
   dry-run,rclone:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
