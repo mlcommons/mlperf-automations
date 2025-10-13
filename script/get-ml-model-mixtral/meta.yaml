@@ -89,6 +89,10 @@ variations:
     env:
       MLC_DOWNLOAD_TOOL: r2-downloader
     group: download-tool
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
   dry-run,r2-downloader:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
