@@ -18,7 +18,8 @@ prehook_deps:
     MLC_TMP_REQUIRE_DOWNLOAD:
     - 'yes'
   skip_if_env:
-    MLC_DOWNLOAD_TOOL: r2-downloader
+    MLC_DOWNLOAD_TOOL: 
+    - r2-downloader
   env: {}
   extra_cache_tags: mixtral
   force_env_keys:
