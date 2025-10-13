@@ -61,7 +61,6 @@ variations:
       MLC_MODEL_ZOO_ENV_KEY: MIXTRAL
     group: huggingface-stub
   mlc:
-    default: true
     prehook_deps:
       - env:
           MLC_DOWNLOAD_FINAL_ENV_NAME: MIXTRAL_CHECKPOINT_PATH
@@ -89,7 +88,6 @@ variations:
         tags: _r2-downloader
     env:
       MLC_DOWNLOAD_TOOL: r2-downloader
-    default: true
     group: download-tool
   dry-run,r2-downloader:
     env:
