@@ -50,48 +50,29 @@ def experiment_run(self_module, i):
         exp = {}
 
     cur_dir = os.getcwd()
-    r = self_module.search(i.copy())
+
+    r = self_module._select_script(i)
     if r['return'] > 0:
         return r
 
-    lst = r['list']
-    if not lst:
-        return {'return': 1, 'error': 'No scripts were found'}
+    script = r['script']
 
-    # Process each artifact
-    for artifact in sorted(lst, key=lambda x: x.meta.get('alias', '')):
-        meta, script_path = artifact.meta, artifact.path
-        tags, script_alias, script_uid = meta.get(
-            "tags", []), meta.get(
-            'alias', ''), meta.get(
-            'uid', '')
+    meta, script_path = script.meta, script.path
+    tags, script_alias, script_uid = meta.get(
+        "tags", []), meta.get(
+        'alias', ''), meta.get(
+        'uid', '')
 
-        # Execute the experiment script
-        mlc_script_input = {
-            'action': 'run', 'target': 'script'
-        }
-        if exp:
-            for key in exp:
-                ii = {**mlc_script_input, **run_input}
-                if isinstance(exp[key], list):
-                    for val in exp[key]:
-                        ii[key] = val
-                        r = run_script_and_tag_experiment(
-                            ii,
-                            self_module.action_object,
-                            experiment_action,
-                            tags,
-                            extra_exp_tags,
-                            meta,
-                            skip_state_save,
-                            logger)
-                        if r['return'] > 0:
-                            return r
-                elif isinstance(exp[key], dict):
-                    return {
-                        'return': 1, 'error': 'Dictionary inputs are not supported for mlc experiment script'}
-                else:
-                    ii[key] = exp[key]
+    # Execute the experiment script
+    mlc_script_input = {
+        'action': 'run', 'target': 'script'
+    }
+    if exp:
+        for key in exp:
+            ii = {**mlc_script_input, **run_input}
+            if isinstance(exp[key], list):
+                for val in exp[key]:
+                    ii[key] = val
                     r = run_script_and_tag_experiment(
                         ii,
                         self_module.action_object,
@@ -103,6 +84,22 @@ def experiment_run(self_module, i):
                         logger)
                     if r['return'] > 0:
                         return r
+            elif isinstance(exp[key], dict):
+                return {
+                    'return': 1, 'error': 'Dictionary inputs are not supported for mlc experiment script'}
+            else:
+                ii[key] = exp[key]
+                r = run_script_and_tag_experiment(
+                    ii,
+                    self_module.action_object,
+                    experiment_action,
+                    tags,
+                    extra_exp_tags,
+                    meta,
+                    skip_state_save,
+                    logger)
+                if r['return'] > 0:
+                    return r
 
     return {'return': 0}
 
