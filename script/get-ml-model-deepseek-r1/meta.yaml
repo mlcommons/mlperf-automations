@@ -1,0 +1,58 @@
+alias: get-ml-model-deepseek-r1
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+new_env_keys:
+- MLC_ML_MODEL_DEEPSEEK_R1_PATH
+- MLC_ML_MODEL_FILE_WITH_PATH
+print_env_at_the_end:
+  MLC_ML_MODEL_DEEPSEEK_R1_PATH: DeepSeek-R1 checkpoint path
+tags:
+- get
+- ml-model
+- deepseek-r1
+- get-ml-model-deepseek-r1
+tests:
+  run_inputs:
+  - variations_list:
+    - r2-downloader,mlc,dry-run
+uid: 2bcb61611b1f4af3
+variations:
+  dry-run:
+    env:
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  mlc:
+    default: true
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+    group: download-src
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      env:
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_DEEPSEEK_R1_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_MODEL_DEEPSEEK_R1_PATH
+      extra_cache_tags: ml,model,deepseek-r1
+      force_cache: true
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      names:
+      - dae-deepseek-r1
+      tags: download-and-extract
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
+  r2-downloader:
+    default: true
+    add_deps_recursive:
+      dae-deepseek-r1:
+        tags: _r2-downloader
+    group: download-tool
+  r2-downloader,mlc:
+    env:
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/deepseek-r1-0528.uri
