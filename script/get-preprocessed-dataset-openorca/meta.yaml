@@ -133,6 +133,8 @@ variations:
       names:
       - dae-openorca
       tags: download-and-extract
+      force_env_keys:
+        - MLC_OUTDIRNAME  
       update_tags_from_env_with_prefix:
         _url.:
         - MLC_DOWNLOAD_URL
