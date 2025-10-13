@@ -104,6 +104,9 @@ variations:
     env:
       MLC_PACKAGE_URL: mlc-inference:mlcommons-inference-wg-public/model_weights
       MLC_RCLONE_CONFIG_NAME: mlc-inference
+  pytorch,fp32,weight_sharded,r2-downloader:
+    env:
+      MLC_PACKAGE_URL: https://inference.mlcommons-storage.org/metadata/dlrm-v2-model-weights.uri
   pytorch,fp32,weight_sharded,wget:
     env:
       MLC_DAE_EXTRACT_DOWNLOADED: 'yes'
@@ -115,6 +118,17 @@ variations:
       dae:
         tags: _rclone
     group: download-tool
+  r2-downloader:
+    ad:
+      dae:
+        tags: _r2-downloader
+    group: download-tool
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   weight_sharded:
     default: true
     env:
@@ -125,3 +139,8 @@ variations:
       dae:
         tags: _wget
     group: download-tool
+tests:
+  run_inputs:
+  - variations_list:
+    - pytorch,fp32,weight_sharded,r2-downloader,dry-run
+    - pytorch,fp32,weight_sharded,rclone,dry-run
