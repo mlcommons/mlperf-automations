@@ -190,7 +190,7 @@ variations:
         tags: _rclone
     env:
       MLC_DOWNLOAD_FILENAME: checkpoint
-      MLC_DOWNLOAD_URL: <<<MLC_RCLONE_URL>>>
+      MLC_DOWNLOAD_URL: <<<MLC_PACKAGE_URL>>>
     group: download-tool
   r2-downloader:
     group: download-tool
