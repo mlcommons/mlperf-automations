@@ -19,9 +19,16 @@ def preprocess(i):
 def postprocess(i):
     env = i['env']
 
-    env['MLC_DATASET_MIXTRAL_PREPROCESSED_PATH'] = env['MLC_DATASET_PREPROCESSED_PATH']
+    if not env.get('MLC_DOWNLOAD_MODE', '') == "dry":
+        env['MLC_DATASET_MIXTRAL_PREPROCESSED_PATH'] = env['MLC_DATASET_PREPROCESSED_PATH']
 
-    if is_true(env.get('MLC_DATASET_MIXTRAL_GENERATE_TEST_DATA', '')):
-        env['MLC_DATASET_MIXTRAL_PREPROCESSED_PATH'] = env['MLC_DATASET_MIXTRAL_TEST_DATA_GENERATED_PATH']
+        if env.get('MLC_DOWNLOAD_TOOL', '') == "r2-downloader":
+            if env.get('MLC_DATASET_TYPE', '') == 'validation':
+                env['MLC_DATASET_MIXTRAL_PREPROCESSED_PATH'] = os.path.join(env['MLC_DATASET_PREPROCESSED_PATH'], '09292024_mixtral_15k_mintoken2_v1.pkl')
+            elif env.get('MLC_DATASET_TYPE', '') == 'calibration':
+                env['MLC_DATASET_MIXTRAL_PREPROCESSED_PATH'] = os.path.join(env['MLC_DATASET_PREPROCESSED_PATH'], '2024.06.06_mixtral_15k_calibration_v4.pkl')
+
+        if is_true(env.get('MLC_DATASET_MIXTRAL_GENERATE_TEST_DATA', '')):
+            env['MLC_DATASET_MIXTRAL_PREPROCESSED_PATH'] = env['MLC_DATASET_MIXTRAL_TEST_DATA_GENERATED_PATH']
 
     return {'return': 0}
