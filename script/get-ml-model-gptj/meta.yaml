@@ -110,7 +110,7 @@ variations:
       MLC_RCLONE_CONFIG_NAME: mlc-inference
   pytorch,fp32,r2-downloader:
     env:
-      MLC_PACKAGE_URL: https://inference.mlcommons-storage.org/metadata/gpt-j-model-checkpoint.uri
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/gpt-j-model-checkpoint.uri
   pytorch,fp32,wget:
     add_deps_recursive:
       dae:
