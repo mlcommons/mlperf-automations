@@ -37,7 +37,8 @@ prehook_deps:
 tests:
   run_inputs:
     - variations_list:
-      - fp32
+      - fp32,pytorch,r2-downloader,dry-run
+      - fp32,pytorch,rclone,dry-run
   
     
 print_env_at_the_end:
