@@ -17,6 +17,9 @@ prehook_deps:
 - enable_if_env:
     MLC_TMP_REQUIRE_DOWNLOAD:
     - 'yes'
+  skip_if_env:
+    MLC_DOWNLOAD_TOOL: 
+    - r2-downloader
   env: {}
   extra_cache_tags: mixtral
   force_env_keys:
@@ -57,6 +60,42 @@ variations:
       MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1
       MLC_MODEL_ZOO_ENV_KEY: MIXTRAL
     group: huggingface-stub
+  mlc:
+    prehook_deps:
+      - env:
+          MLC_DOWNLOAD_FINAL_ENV_NAME: MIXTRAL_CHECKPOINT_PATH
+          MLC_EXTRACT_FINAL_ENV_NAME: MIXTRAL_CHECKPOINT_PATH
+        extra_cache_tags: ml-model,mixtral,raw,ml-model-mixtral
+        force_cache: true
+        names:
+        - dae-mixtral-model
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+            - 'yes'
+        tags: download-and-extract
+        force_env_keys:
+          - MLC_OUTDIRNAME  
+        update_tags_from_env_with_prefix:
+          _url.:
+          - MLC_PACKAGE_URL
+  mlc,r2-downloader:
+    env:
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/mixtral-8x7b-model-checkpoint.uri
+      MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: ""
+  r2-downloader:
+    adr:
+      dae-mixtral-model:
+        tags: _r2-downloader
+    env:
+      MLC_DOWNLOAD_TOOL: r2-downloader
+    group: download-tool
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   pytorch:
     default: true
     env:
@@ -69,3 +108,7 @@ variations:
     env:
       MLC_MODEL_ZOO_ENV_KEY: MIXTRAL
     group: huggingface-stub
+tests:
+  run_inputs:
+  - variations_list:
+    - r2-downloader,mlc,dry-run
