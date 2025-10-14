@@ -72,7 +72,7 @@ def postprocess(i):
                 env['GPTJ_CHECKPOINT_PATH'], "checkpoint-final")):
             env['GPTJ_CHECKPOINT_PATH'] = os.path.join(
                 env['GPTJ_CHECKPOINT_PATH'], "checkpoint-final")
-    
+
         is_saxml = env.get('MLC_TMP_MODEL_SAXML', '')
         if is_saxml == "fp32":
             if os.path.exists("pax_gptj_checkpoint"):
@@ -80,15 +80,17 @@ def postprocess(i):
                     os.getcwd(), "pax_gptj_checkpoint")
                 env['MLC_ML_MODEL_FILE_WITH_PATH'] = env['GPTJ_SAXML_CHECKPOINT_PATH']
             else:
-                return {'return': 1, 'error': 'pax_gptj_checkpoint generation failed'}
-    
+                return {'return': 1,
+                        'error': 'pax_gptj_checkpoint generation failed'}
+
         elif is_saxml == "int8":
             if os.path.exists("int8_ckpt"):
                 env['GPTJ_SAXML_INT8_CHECKPOINT_PATH'] = os.path.join(
                     os.getcwd(), "int8_ckpt")
                 env['MLC_ML_MODEL_FILE_WITH_PATH'] = env['GPTJ_SAXML_INT8_CHECKPOINT_PATH']
             else:
-                return {'return': 1, 'error': 'pax_gptj_checkpoint generation failed'}
+                return {'return': 1,
+                        'error': 'pax_gptj_checkpoint generation failed'}
         elif env.get('MLC_TMP_ML_MODEL_PROVIDER', '') == 'nvidia':
             env['MLC_ML_MODEL_FILE_WITH_PATH'] = os.path.join(
                 env['MLC_NVIDIA_MLPERF_SCRATCH_PATH'],
@@ -98,7 +100,7 @@ def postprocess(i):
                 'GPTJ-FP8-quantized')
         else:
             env['MLC_ML_MODEL_FILE_WITH_PATH'] = env['GPTJ_CHECKPOINT_PATH']
-    
+
         env['MLC_ML_MODEL_FILE'] = os.path.basename(
             env['MLC_ML_MODEL_FILE_WITH_PATH'])
         env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_ML_MODEL_FILE_WITH_PATH']
