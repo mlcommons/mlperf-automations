@@ -105,24 +105,53 @@ variations:
     group: size
   mlc:
     alias: mlcommons
+  r2-downloader:
+    add_deps_recursive:
+      dae-openorca:
+        tags: _r2-downloader
+    group: download-tool
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
+  rclone:
+    add_deps_recursive:
+      dae-openorca:
+        tags: _rclone
+    default: true
+    group: download-tool
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
   mlcommons:
     deps:
     - env:
         MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_OPENORCA_PREPROCESSED_ROOT
         MLC_EXTRACT_FINAL_ENV_NAME: MLC_OPENORCA_PREPROCESSED_ROOT
         MLC_EXTRACT_TO_FOLDER: openorca-preprocessed
-        MLC_RCLONE_CONFIG_NAME: mlc-inference
       extra_cache_tags: openorca,preprocessed,dataset
       force_cache: true
       names:
       - dae-openorca
-      tags: download-and-extract,_rclone
+      tags: download-and-extract
+      force_env_keys:
+        - MLC_OUTDIRNAME  
       update_tags_from_env_with_prefix:
         _url.:
-        - MLC_RCLONE_URL
+        - MLC_DOWNLOAD_URL
     env:
       MLC_DATASET_PREPROCESSED_BY_MLC: 'yes'
       MLC_RCLONE_URL: mlc-inference:mlcommons-inference-wg-public/open_orca
+  r2-downloader,mlc:
+    env:
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/llama-2-70b-open-orca-dataset.uri
+  rclone,mlc:
+    env:
+      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/open_orca
+      MLC_RCLONE_CONFIG_NAME: mlc-inference
   size.#:
     ad:
       dataset-original:
@@ -147,3 +176,8 @@ variations:
   nvidia,validation:
     new_env_keys:
     - MLC_DATASET_OPENORCA_NVIDIA_PREPROCESSED_PATH
+tests:
+  run_inputs:
+  - variations_list:
+    - r2-downloader,mlc,dry-run
+    - rclone,mlc,dry-run
