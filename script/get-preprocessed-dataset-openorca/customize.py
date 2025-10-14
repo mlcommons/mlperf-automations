@@ -39,8 +39,8 @@ def preprocess(i):
                     os.path.join(os.getcwd(), "processed-openorca") + \
                     ' --num_total_samples=' + env['MLC_DATASET_SIZE']
 
-    env['MLC_RUN_DIR'] = run_dir
-    env['MLC_RUN_CMD'] = run_cmd
+        env['MLC_RUN_DIR'] = run_dir
+        env['MLC_RUN_CMD'] = run_cmd
 
     return {'return': 0}
 
