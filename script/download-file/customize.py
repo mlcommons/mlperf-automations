@@ -111,7 +111,7 @@ def preprocess(i):
                 # Remove . from filename
                 index_dot = urltail.find('.')
                 if index_dot > 0
-                    urltail = urltail[:index_dot]
+                urltail = urltail[:index_dot]
                 env['MLC_DOWNLOAD_FILENAME'] = urltail
             elif env.get('MLC_DOWNLOAD_TOOL', '') == "rclone":
                 env['MLC_DOWNLOAD_FILENAME'] = urltail
