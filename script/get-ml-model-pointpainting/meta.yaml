@@ -86,6 +86,7 @@ variations:
   r2-downloader,mlc:
     env:
       MLC_DOWNLOAD_URL: https://waymo.mlcommons-storage.org/metadata/model.uri
+      MLC_DOWNLOAD_FILENAME: model
 tests:
   needs_pat: true
   run_inputs:
