@@ -79,6 +79,7 @@ variations:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
 tests:
+  needs_pat: true
   run_inputs:
   - variations_list:
     - r2-downloader,mlc,dry-run
