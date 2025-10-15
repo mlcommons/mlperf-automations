@@ -76,6 +76,7 @@ variations:
   r2-downloader,mlc:
     env:
       MLC_DOWNLOAD_URL: https://waymo.mlcommons-storage.org/metadata/dataset.uri
+      MLC_DOWNLOAD_FILENAME: dataset
 tests:
   needs_pat: true
   run_inputs:
