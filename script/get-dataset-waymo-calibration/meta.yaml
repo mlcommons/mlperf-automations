@@ -67,6 +67,7 @@ variations:
   r2-downloader,mlc:
     env:
       MLC_DOWNLOAD_URL: https://waymo.mlcommons-storage.org/metadata/calibration-dataset.uri
+      MLC_DOWNLOAD_FILENAME: calibration-dataset
   dry-run:
     group: run-mode
     env:
