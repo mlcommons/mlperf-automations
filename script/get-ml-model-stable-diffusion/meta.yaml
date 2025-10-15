@@ -40,7 +40,7 @@ prehook_deps:
   extra_cache_tags: stable-diffusion,sdxl,model
   force_cache: true
   names:
-  - dae
+  - dae-sdxl-model
   tags: download-and-extract
   update_tags_from_env_with_prefix:
     _url.:
@@ -104,11 +104,18 @@ variations:
     required_disk_space: 13000
   rclone:
     adr:
-      dae:
+      dae-sdxl-model:
         tags: _rclone
     env:
       MLC_DOWNLOAD_TOOL: rclone
       MLC_RCLONE_CONFIG_NAME: mlc-inference
+    group: download-tool
+  r2-downloader:
+    adr:
+      dae-sdxl-model:
+        tags: _r2-downloader
+    env:
+      MLC_DOWNLOAD_TOOL: r2-downloader
     group: download-tool
   rclone,fp16:
     env:
@@ -116,6 +123,12 @@ variations:
   rclone,fp32:
     env:
       MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/stable_diffusion_fp32
+  r2-downloader,fp16:
+    env:
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/stable-diffusion-xl-1-0-fp16-checkpoint.uri
+  r2-downloader,fp32:
+    env:
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/stable-diffusion-xl-1-0-fp32-checkpoint.uri
   uint8:
     env:
       MLC_ML_MODEL_INPUT_DATA_TYPES: uint8
@@ -124,8 +137,23 @@ variations:
     group: precision
   wget:
     adr:
-      dae:
+      dae-sdxl-model:
         tags: _wget
     env:
       MLC_DOWNLOAD_TOOL: wget
     group: download-tool
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+test:
+  run_inputs:
+    - variations_list:
+      - fp32,r2-downloader,dry-run
+      - fp16,r2-downloader,dry-run
