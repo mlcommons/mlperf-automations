@@ -110,6 +110,7 @@ variations:
       dae-openorca:
         tags: _r2-downloader
     group: download-tool
+    default: true
   dry-run:
     group: run-mode
     env:
@@ -118,7 +119,6 @@ variations:
     add_deps_recursive:
       dae-openorca:
         tags: _rclone
-    default: true
     group: download-tool
   dry-run,r2-downloader:
     env:
@@ -127,6 +127,7 @@ variations:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
   mlcommons:
+    default: true
     deps:
     - env:
         MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_OPENORCA_PREPROCESSED_ROOT
@@ -145,10 +146,10 @@ variations:
     env:
       MLC_DATASET_PREPROCESSED_BY_MLC: 'yes'
       MLC_RCLONE_URL: mlc-inference:mlcommons-inference-wg-public/open_orca
-  r2-downloader,mlc:
+  r2-downloader,mlcommons:
     env:
       MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/llama-2-70b-open-orca-dataset.uri
-  rclone,mlc:
+  rclone,mlcommons:
     env:
       MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/open_orca
       MLC_RCLONE_CONFIG_NAME: mlc-inference
