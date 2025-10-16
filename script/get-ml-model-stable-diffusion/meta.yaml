@@ -89,7 +89,7 @@ variations:
   mlcommons:
     default: true
     default_variations:
-      download-tool: rclone
+      download-tool: r2-downloader
     env:
       MLC_DOWNLOAD_SOURCE: mlcommons
     group: download-source
