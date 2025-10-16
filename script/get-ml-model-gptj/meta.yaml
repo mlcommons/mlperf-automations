@@ -133,7 +133,7 @@ variations:
         MLC_GPTJ_INTEL_MODEL: ''
       force_new_env_keys:
       - GPTJ_CHECKPOINT_PATH
-      tags: get,ml-model,gpt-j,_fp32,_pytorch
+      tags: get,ml-model,gptj,_fp32,_pytorch,_r2-downloader
     - tags: get,conda,_name.gptj-pt
     - tags: get,python,_conda.gptj-pt
     - names:
@@ -172,7 +172,7 @@ variations:
     - env: {}
       force_new_env_keys:
       - GPTJ_CHECKPOINT_PATH
-      tags: get,ml-model,gpt-j,_fp32,_pytorch
+      tags: get,ml-model,gptj,_fp32,_pytorch,_r2-downloader
     - names:
       - nvidia-inference-common-code
       tags: get,nvidia,inference,common-code
@@ -215,7 +215,7 @@ variations:
     group: framework
   saxml,fp32:
     deps:
-    - tags: get,ml-model,gptj,_pytorch,_fp32
+    - tags: get,ml-model,gptj,_fp32,_pytorch,_r2-downloader
     - names:
       - python
       - python3
