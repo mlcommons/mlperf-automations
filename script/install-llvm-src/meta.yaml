@@ -40,6 +40,7 @@ input_mapping:
   targets: MLC_LLVM_TARGETS_TO_BUILD
   target_triple: MLC_LLVM_TARGET_TRIPLE
   extra_options: MLC_LLVM_EXTRA_CMAKE_OPTIONS
+  clean: MLC_CLEAN
 env:
   MLC_GIT_URL: https://github.com/llvm/llvm-project
 name: Build LLVM compiler from sources (can take >30 min)
@@ -145,8 +146,13 @@ variations:
       - tags: get,generic-sys-util,_crossbuild-essential-arm64
       - tags: get,generic-sys-util,_gfortran-12-aarch64-linux-gnu
 
+    default_env:
+      MLC_LLVM_TARGETS_TO_BUILD: AArch64
     env:
       MLC_LLVM_CROSS_COMPILE_FLAGS: "-DCMAKE_SYSTEM_NAME=Linux  -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DLLVM_DEFAULT_TARGET_TRIPLE=aarch64-linux-gnu -DCMAKE_Fortran_COMPILER=aarch64-linux-gnu-gfortran-12 -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc  -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++"
+  cross-compile-x86-aarch64,flang:
+    deps:
+      - tags: get,generic-sys-util,_gfortran-12-aarch64-linux-gnu
   for-intel-mlperf-inference-v3.1-bert:
     adr:
       conda-package:

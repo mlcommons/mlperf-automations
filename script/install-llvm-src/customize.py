@@ -31,6 +31,9 @@ def preprocess(i):
     else:
         install_prefix = os.path.join(os.getcwd(), "install")
 
+    if is_true(env.get('MLC_CLEAN')):
+        env['MLC_CLEAN_BUILD'] = 'yes'
+
     if os.path.exists(os.path.join(install_prefix, "bin", "clang")) and is_true(
             env.get('MLC_LLVM_USE_INSTALLED_DIR')):
         i['run_script_input']['script_name'] = "no-install"  # skip install
@@ -61,7 +64,7 @@ def preprocess(i):
             targets_to_build = env.get('MLC_LLVM_TARGETS_TO_BUILD')
             host_platform = env.get('MLC_HOST_PLATFORM_FLAVOR')
             if not targets_to_build:
-                if 'arm64' in host_platform:
+                if 'arm64' in host_platform or 'aarch64' in host_platform:
                     targets_to_build = 'AArch64'
                 else:
                     targets_to_build = 'X86'
