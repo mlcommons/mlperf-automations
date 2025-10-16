@@ -1,4 +1,4 @@
-# README for get-preprocessed-dataset-openorca
+# README for get-ml-model-pointpillars
 This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,10 +33,15 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr get,dataset,openorca,language-processing,preprocessed
+mlcr get,ml-model,ml,model,pointpainting
 ```
 
-No script specific inputs
+### Script Inputs
+
+| Name | Description | Choices | Default |
+|------|-------------|---------|------|
+| `--pp_path` |  |  | `` |
+| `--dp_resnet50_path` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -57,30 +62,20 @@ No script specific inputs
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
-### Dataset-type
+### Device
 
-- `calibration` (base: mlcommons)
-- `validation` (default)
+- `cpu`
+- `gpu` (default)
+
+### Download-src
+
+- `mlc` (default)
 
 ### Download-tool
 
 - `r2-downloader` (default)
 - `rclone`
 
-### Preprocess-step-provider
-
-- `nvidia`
-
 ### Run-mode
 
 - `dry-run`
-
-### Size
-
-- `60`
-- `full` (default)
-- `size.#` _(# can be substituted dynamically)_
-
-### Ungrouped
-
-- `mlcommons` (alias: mlc)
