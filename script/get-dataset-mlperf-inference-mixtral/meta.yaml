@@ -26,7 +26,6 @@ uid: 89e7c91444804775
 variations:
   rclone:
     group: download-tool
-    default: true
     adr:
       download-file-mixtral-dataset:
         tags: _rclone
@@ -35,6 +34,7 @@ variations:
       MLC_RCLONE_COPY_USING: copyurl
   r2-downloader:
     group: download-tool
+    default: true
     adr:
       download-file-mixtral-dataset:
         tags: _r2-downloader

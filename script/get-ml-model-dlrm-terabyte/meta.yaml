@@ -93,7 +93,7 @@ variations:
       MLC_PACKAGE_URL: https://dlrm.s3-us-west-1.amazonaws.com/models/tb0875_10M.pt
   pytorch,fp32,weight_sharded:
     default_variations:
-      download-tool: rclone
+      download-tool: r2-downloader
     env:
       MLC_DOWNLOAD_CHECKSUM: ''
       MLC_ML_MODEL_ACCURACY: '0.8025'

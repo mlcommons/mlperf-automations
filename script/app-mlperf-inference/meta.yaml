@@ -317,7 +317,7 @@ variations:
   all-models,nvidia-original:
     docker:
       deps:
-        - tags: get,ml-model,gptj,raw
+        - tags: get,ml-model,gptj,_fp32,_pytorch,_r2-downloader
           skip_if_env:
             MLC_MLPERF_NVIDIA_SKIP_GPTJ:
               - "yes"
@@ -1036,13 +1036,13 @@ variations:
         pointpainting
     docker:
       deps:
-      - tags: get,dataset,waymo
+      - tags: get,dataset,waymo,_r2-downloader,_mlc
         enable_if_env:
           MLC_USE_DATASET_FROM_HOST:
           - 'yes'
         names:
           - waymo-dataset
-      - tags: get,ml-model,pointpainting
+      - tags: get,ml-model,pointpainting,_r2-downloader,_mlc
         enable_if_env:
           MLC_USE_ML_MODEL_FROM_HOST:
           - 'yes'
@@ -1231,7 +1231,7 @@ variations:
         names:
           - llama3_1-405b
           - llama3-405b
-      - tags: mlcr get,dataset,mlperf,inference,llama3,_validation,_r2-downloader
+      - tags: get,dataset,mlperf,inference,llama3,_validation,_r2-downloader
         enable_if_env:
           MLC_USE_DATASET_FROM_HOST:
           - 'yes'
@@ -1316,7 +1316,7 @@ variations:
             - 'yes'
             MLC_USE_MODEL_FROM_HOST:
             - 'yes'
-          tags: get,ml-model,sdxl,_fp16,_rclone
+          tags: get,ml-model,sdxl,_fp16,_r2-downloader
 
   sdxl,reference,float16:
     docker:
@@ -1327,7 +1327,7 @@ variations:
             - 'yes'
             MLC_USE_MODEL_FROM_HOST:
             - 'yes'
-          tags: get,ml-model,sdxl,_fp16,_rclone
+          tags: get,ml-model,sdxl,_fp16,_r2-downloader
 
   sdxl,reference,bfloat16:
     docker:
@@ -1338,7 +1338,7 @@ variations:
             - 'yes'
             MLC_USE_MODEL_FROM_HOST:
             - 'yes'
-          tags: get,ml-model,sdxl,_fp16,_rclone
+          tags: get,ml-model,sdxl,_fp16,__r2-downloader
 
   sdxl,reference,float32:
     docker:
@@ -1349,7 +1349,7 @@ variations:
             - 'yes'
             MLC_USE_MODEL_FROM_HOST:
             - 'yes'
-          tags: get,ml-model,sdxl,_fp32,_rclone
+          tags: get,ml-model,sdxl,_fp32,__r2-downloader
 
   llama2-70b_:
     default_env:
@@ -1463,7 +1463,7 @@ variations:
     docker:
       image_name: mlperf-inference-mlcommons-python-implementation-mixtral-8x7b
       deps:
-        - tags: get,ml-model,mixtral
+        - tags: get,ml-model,mixtral,_r2-downloader,_mlc
           names:
           - ml-model
           - mixtral-model
@@ -1540,7 +1540,7 @@ variations:
   gptj_:
     docker:
       deps:
-      - tags: get,ml-model,gptj,raw
+      - tags: get,ml-model,gptj,_fp32,_pytorch,_r2-downloader
     env:
       MLC_MLPERF_MODEL_EQUAL_ISSUE_MODE: 'yes'
     posthook_deps:
