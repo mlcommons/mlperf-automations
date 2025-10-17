@@ -58,7 +58,7 @@ jobs:
         fi
     - name: Pull repo where test cases are uploaded
       run: |
-        git clone -b submission-generation-examples https://github.com/anandhu-eng/inference.git new-sub-dir
+        git clone -b new-sub-dir https://github.com/anandhu-eng/inference.git submission-generation-examples
     - name: Run Submission Generation - round-${{ matrix.round }}${{ matrix.folder_name }} ${{ matrix.action }} ${{ matrix.category }} ${{ matrix.division }} 
       run: |
         if [ "${{ matrix.folder_name }}" == "closed" ]; then
