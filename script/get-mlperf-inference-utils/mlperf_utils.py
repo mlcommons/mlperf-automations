@@ -189,7 +189,7 @@ def get_result_string(version, model, scenario, result_path, has_power, sub_res,
 
     if scenario != effective_scenario:
         print(f"{fname} : {scenario} : {effective_scenario}")
-        inferred, inferred_result = checker.get_inferred_result(
+        inferred, inferred_result, inferred_valid = checker.get_inferred_result(
             scenario, effective_scenario, performance_result, mlperf_log, config, False)
 
     if has_power:
