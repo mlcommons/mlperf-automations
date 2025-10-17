@@ -29,42 +29,13 @@ jobs:
         python-version: [ "3.12" ]
         division: ["closed", "open", "closed-open"]
         category: ["datacenter", "edge"]
-        round: ["5.0", "5.1"]
+        round: ["6.0"]
         folder_name: ["closed", "open"]
         action: ["run", "docker"]
         exclude:
           - os: macos-latest
           - os: windows-latest
           - category: "edge"
-        include:
-          - os: ubuntu-latest
-            python-version: "3.12"
-            division: "closed"
-            category: "edge"
-            round: "5.0"
-            folder_name: "closed-edge"
-            action: "run"
-          - os: ubuntu-latest
-            python-version: "3.12"
-            division: "closed"
-            category: "edge"
-            round: "5.0"
-            folder_name: "closed-edge"
-            action: "docker"
-          - os: ubuntu-latest
-            python-version: "3.12"
-            division: "open"
-            category: "edge"
-            round: "5.0"
-            folder_name: "closed-edge"
-            action: "run"
-          - os: ubuntu-latest
-            python-version: "3.12"
-            division: "open"
-            category: "edge"
-            round: "5.0"
-            folder_name: "closed-edge"
-            action: "docker"
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
@@ -87,13 +58,13 @@ jobs:
         fi
     - name: Pull repo where test cases are uploaded
       run: |
-        git clone -b submission-generation-examples https://github.com/mlcommons/inference.git submission_generation_examples
+        git clone -b submission-generation-examples https://github.com/anandhu-eng/inference.git new-sub-dir
     - name: Run Submission Generation - round-${{ matrix.round }}${{ matrix.folder_name }} ${{ matrix.action }} ${{ matrix.category }} ${{ matrix.division }} 
       run: |
         if [ "${{ matrix.folder_name }}" == "closed" ]; then
           description="Test submission - contains closed edge and datacenter"
-        elif [ "${{ matrix.folder_name }}" == "closed-power" ]; then
-          description="Test submission - contains closed-power edge and datacenter results"
+        # elif [ "${{ matrix.folder_name }}" == "closed-power" ]; then
+        #   description="Test submission - contains closed-power edge and datacenter results"
         fi
         # Dynamically set the log group to simulate a dynamic step name
         echo "::group::$description"
@@ -107,7 +78,7 @@ jobs:
           mlc ${{ matrix.action }} script --tags=generate,inference,submission --adr.compiler.tags=gcc --version=v${{ matrix.round }} --clean --preprocess_submission=yes --submission_base_dir=mysubmissions --results_dir=$PWD/submission_generation_examples/submission_round_${{ matrix.round }}/${{ matrix.folder_name }}/ --run_checker --submitter=MLCommons --tar=yes --division=${{ matrix.division }} --env.MLC_DETERMINE_MEMORY_CONFIGURATION=yes --quiet --adr.inference-src.tags=_repo.${{ inputs.repo-url }},_branch.${{ inputs.ref }} $docker_tags
           mlc ${{ matrix.action }} script --tags=run,inference,submission,checker --submitter_id_off=mysubmitter_id --tar=yes --submission_dir=mysubmissions/mlperf_submission --submission_tar_file=mysubmission.tar.gz --quiet --src_version=v${{ matrix.round }} --adr.inference-src.tags=_repo.${{ inputs.repo-url }},_branch.${{ inputs.ref }} $docker_tags
         else
-          mlc ${{ matrix.action }} script --tags=generate,inference,submission --adr.compiler.tags=gcc --version=v${{ matrix.round }} --clean --preprocess_submission=yes --submission_base_dir=mysubmissions --results_dir=$PWD/submission_generation_examples/submission_round_${{ matrix.round }}/${{ matrix.folder_name }}/ --run_checker --submitter=MLCommons --tar=yes --division=${{ matrix.division }} --env.MLC_DETERMINE_MEMORY_CONFIGURATION=yes --quiet $docker_tags
+          mlc ${{ matrix.action }} script --tags=generate,inference,submission --adr.compiler.tags=gcc --version=v${{ matrix.round }} --clean --preprocess_submission=yes --submission_base_dir=mysubmissions --results_dir=$PWD/submission_generation_examples/submission_round_${{ matrix.round }}/${{ matrix.folder_name }}/ --run_checker --submitter=MLCommons --tar=yes --division=${{ matrix.division }} --env.MLC_DETERMINE_MEMORY_CONFIGURATION=yes --quiet --adr.inference-src.tags=_repo.https://github.com/mlcommons/inference,_branch.submission_dir $docker_tags
           mlc ${{ matrix.action }} script --tags=run,inference,submission,checker --submitter_id_off=mysubmitter_id --tar=yes --submission_dir=mysubmissions/mlperf_submission --submission_tar_file=mysubmission.tar.gz --quiet --src_version=v${{ matrix.round }} $docker_tags
         fi
 
