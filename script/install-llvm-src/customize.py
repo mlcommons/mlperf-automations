@@ -22,6 +22,9 @@ def preprocess(i):
     else:
         cmake_options = ''
 
+    if not is_true(env.get('MLC_LLVM_PER_TARGET_RUNTIME_DIR')):
+        cmake_options +=  " -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF "
+
     extra_cmake_options = cmake_options + \
         env.get('MLC_LLVM_EXTRA_CMAKE_OPTIONS', '')
 
