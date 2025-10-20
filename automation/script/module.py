@@ -2345,6 +2345,189 @@ class ScriptAutomation(Automation):
 
         return {'return': 0}
 
+    def _update_state_from_variations(
+        self, i, meta, variation_tags, variations, env, state,
+        const, const_state, deps, post_deps, prehook_deps,
+        posthook_deps, new_env_keys_from_meta, new_state_keys_from_meta,
+        add_deps_recursive, run_state, recursion_spaces
+    ):
+        import copy
+        logger = self.action_object.logger
+
+        explicit_variation_tags = copy.deepcopy(variation_tags)
+        add_deps_recursive = add_deps_recursive or {}
+        required_disk_space = {}
+        warnings = []
+
+        # 1️⃣ Expand and validate variation tags
+        r = self._get_variations_with_aliases(variation_tags, variations)
+        if r['return'] > 0: return r
+        variation_tags = r['variation_tags']
+        excluded_variation_tags = r['excluded_variation_tags']
+
+        r = self._get_variation_groups(variations)
+        if r['return'] > 0: return r
+        variation_groups = r['variation_groups']
+        run_state['variation_groups'] = variation_groups
+
+        default_variation = meta.get('default_variation', '')
+        if default_variation and default_variation not in variations:
+            return {'return': 1, 'error': f'Default variation "{default_variation}" not in {list(variations.keys())}'}
+
+        if not variation_tags and default_variation and default_variation not in excluded_variation_tags:
+            variation_tags = [default_variation]
+
+        # process group defaults
+        for func in [self._update_variation_tags_from_variations,
+                 self._process_variation_tags_in_groups]:
+            r = func(variation_tags, variation_groups, excluded_variation_tags, variations)
+            if r['return'] > 0: return r
+            variation_tags = r.get('variation_tags', variation_tags)
+
+        # Validate combinations
+        r = self._validate_variations(meta, variation_tags)
+        if r['return'] > 0: return r
+
+        variation_tags_string = ','.join(['_'+t for t in variation_tags])
+        logger.debug(f"{recursion_spaces}Prepared variations: {variation_tags_string}")
+
+        # 2️⃣ Apply individual variations
+        for variation_tag in variation_tags:
+            r = self._apply_single_variation(
+                variation_tag, variations, env, state, const, const_state,
+                deps, post_deps, prehook_deps, posthook_deps,
+                new_env_keys_from_meta, new_state_keys_from_meta,
+                run_state, i, meta, required_disk_space, warnings, add_deps_recursive
+            )
+            if r['return'] > 0: return r
+
+        # 3️⃣ Apply combined variations
+        r = self._apply_combined_variations(
+            variations, variation_tags, env, state, const, const_state,
+            deps, post_deps, prehook_deps, posthook_deps,
+            new_env_keys_from_meta, new_state_keys_from_meta,
+            run_state, i, meta, required_disk_space, warnings, add_deps_recursive
+        )
+        if r['return'] > 0: return r
+
+        # Done
+        return {
+            'return': 0,
+            'variation_tags_string': variation_tags_string,
+            'explicit_variation_tags': explicit_variation_tags,
+            'warnings': warnings,
+            'required_disk_space': required_disk_space,
+            'variation_tags': variation_tags
+        }
+
+
+    def _apply_single_variation(
+        self, variation_tag, variations, env, state, const, const_state,
+        deps, post_deps, prehook_deps, posthook_deps,
+        new_env_keys_from_meta, new_state_keys_from_meta,
+        run_state, i, meta, required_disk_space, warnings, add_deps_recursive
+    ):
+        import copy
+
+        if variation_tag.startswith(('~', '-')):
+            return {'return': 0}
+
+        variation_tag_dynamic_suffix = None
+        if variation_tag not in variations:
+            if '.' in variation_tag and variation_tag[-1] != '.':
+                variation_tag_dynamic_suffix = variation_tag.split('.', 1)[1]
+                variation_tag = self._get_name_for_dynamic_variation_tag(variation_tag)
+            if variation_tag not in variations:
+                return {'return': 1, 'error': f'Tag {variation_tag} not in variations {list(variations.keys())}'}
+
+        variation_meta = variations[variation_tag]
+        if variation_tag_dynamic_suffix:
+            variation_meta = copy.deepcopy(variation_meta)
+            self._update_variation_meta_with_dynamic_suffix(variation_meta, variation_tag_dynamic_suffix)
+
+        r = update_state_from_meta(
+            variation_meta, env, state, const, const_state, deps,
+            post_deps, prehook_deps, posthook_deps,
+            new_env_keys_from_meta, new_state_keys_from_meta,
+            run_state, i
+        )
+        if r['return'] > 0: return r
+
+        # Merge selected meta
+        meta.update({k: v for k, v in variation_meta.items() if k in ['script_name', 'default_version']})
+        if variation_meta.get('required_disk_space', 0) > 0:
+            required_disk_space[variation_tag] = variation_meta['required_disk_space']
+
+        if variation_meta.get('warning'):
+            x = variation_meta['warning']
+            if x not in warnings:
+                warnings.append(x)
+
+        adr = get_adr(variation_meta)
+        if adr:
+            self._merge_dicts_with_tags(add_deps_recursive, adr)
+
+        return {'return': 0}
+
+    def _apply_combined_variations(
+        self, variations, variation_tags, env, state, const, const_state,
+        deps, post_deps, prehook_deps, posthook_deps,
+        new_env_keys_from_meta, new_state_keys_from_meta,
+        run_state, i, meta, required_disk_space, warnings, add_deps_recursive
+    ):
+        combined_variations = [t for t in variations if ',' in t]
+        combined_variations.sort(key=lambda x: x.count(','))
+
+        relaxed_map = build_relaxed_mapping(variation_tags, variations)
+
+        for combined_variation in combined_variations:
+            if not isinstance(combined_variation, str):
+                continue
+            v = combined_variation.split(',')
+            all_present = relaxed_subset(v, variation_tags)
+            if not all_present:
+                continue
+
+            combined_meta = variations[combined_variation]
+            r = update_state_from_meta(
+                combined_meta, env, state, const, const_state, deps,
+                post_deps, prehook_deps, posthook_deps,
+                new_env_keys_from_meta, new_state_keys_from_meta,
+                run_state, i
+            )
+            if r['return'] > 0: return r
+
+            adr = get_adr(combined_meta)
+            if adr:
+                self._merge_dicts_with_tags(add_deps_recursive, adr)
+
+            meta.update({k: v for k, v in combined_meta.items() if k in ['script_name', 'default_version']})
+
+            if combined_meta.get('required_disk_space', 0) > 0:
+                required_disk_space[combined_variation] = combined_meta['required_disk_space']
+
+            if combined_meta.get('warning'):
+                x = combined_meta['warning']
+                if x not in warnings:
+                    warnings.append(x)
+
+        return {'return': 0}
+
+    def _validate_variations(self, meta, variation_tags):
+        valid = meta.get('valid_variation_combinations', [])
+        if valid:
+            if not any(all(t in variation_tags for t in s) for s in valid):
+                return {'return': 1, 'error': f'Invalid combination {variation_tags}, valid: {valid}'}
+
+        invalid = meta.get('invalid_variation_combinations', [])
+        if invalid:
+            if any(all(t in variation_tags for t in s) for s in invalid):
+                return {'return': 1, 'error': f'Combination {variation_tags} is explicitly invalid: {invalid}'}
+
+        return {'return': 0}
+
+    '''
+
     ##########################################################################
     def _update_state_from_variations(self, i, meta, variation_tags, variations, env, state, const, const_state, deps, post_deps, prehook_deps,
                                       posthook_deps, new_env_keys_from_meta, new_state_keys_from_meta, add_deps_recursive, run_state, recursion_spaces):
@@ -2505,63 +2688,63 @@ class ScriptAutomation(Automation):
                 if variation_meta.get('warning', '') != '':
                     x = variation_meta['warning']
                     if x not in warnings:
-                        warnings.append()
+                        warnings.append(x)
 
                 adr = get_adr(variation_meta)
                 if adr:
                     self._merge_dicts_with_tags(add_deps_recursive, adr)
 
-                combined_variations = [t for t in variations if ',' in t]
+            combined_variations = [t for t in variations if ',' in t]
 
-                combined_variations.sort(key=lambda x: x.count(','))
-                ''' By sorting based on the number of variations users can safely override
-                env and state in a larger combined variation
-                '''
+            combined_variations.sort(key=lambda x: x.count(','))
 
-                for combined_variation in combined_variations:
-                    v = combined_variation.split(",")
-                    all_present = set(v).issubset(set(variation_tags))
-                    if all_present:
+            print(variation_tags)
+            print(combined_variations)
+            for combined_variation in combined_variations:
+                v = combined_variation.split(",")
+                all_present = relaxed_subset(v, variation_tags)
+                if all_present:
 
-                        combined_variation_meta = variations[combined_variation]
+                    combined_variation_meta = variations[combined_variation]
 
-                        r = update_state_from_meta(
-                            combined_variation_meta,
-                            env,
-                            state,
-                            const,
-                            const_state,
-                            deps,
-                            post_deps,
-                            prehook_deps,
-                            posthook_deps,
-                            new_env_keys_from_meta,
-                            new_state_keys_from_meta,
-                            run_state,
-                            i)
-                        if r['return'] > 0:
-                            return r
+                    print(combined_variation_meta.get('env', 'hello'))
+                    r = update_state_from_meta(
+                        combined_variation_meta,
+                        env,
+                        state,
+                        const,
+                        const_state,
+                        deps,
+                        post_deps,
+                        prehook_deps,
+                        posthook_deps,
+                        new_env_keys_from_meta,
+                        new_state_keys_from_meta,
+                        run_state,
+                        i)
+                    if r['return'] > 0:
+                        return r
 
-                        adr = get_adr(combined_variation_meta)
-                        if adr:
-                            self._merge_dicts_with_tags(
-                                add_deps_recursive, adr)
+                    adr = get_adr(combined_variation_meta)
+                    if adr:
+                        self._merge_dicts_with_tags(
+                            add_deps_recursive, adr)
 
-                        if combined_variation_meta.get(
-                                'script_name', '') != '':
-                            meta['script_name'] = combined_variation_meta['script_name']
+                    if combined_variation_meta.get(
+                            'script_name', '') != '':
+                        meta['script_name'] = combined_variation_meta['script_name']
 
-                        if variation_meta.get('default_version', '') != '':
-                            run_state['default_version'] = variation_meta['default_version']
+                    if combined_variation_meta.get('default_version', '') != '':
+                        run_state['default_version'] = combined_variation_meta['default_version']
 
-                        if combined_variation_meta.get(
-                                'required_disk_space', 0) > 0 and combined_variation not in required_disk_space:
-                            required_disk_space[combined_variation] = combined_variation_meta['required_disk_space']
+                    if combined_variation_meta.get(
+                            'required_disk_space', 0) > 0 and combined_variation not in required_disk_space:
+                        required_disk_space[combined_variation] = combined_variation_meta['required_disk_space']
 
-                        if combined_variation_meta.get('warning', '') != '':
-                            x = combined_variation_meta['warning']
-                            if x not in warnings:
-                                warnings.append(x)
+                    if combined_variation_meta.get('warning', '') != '':
+                        x = combined_variation_meta['warning']
+                        if x not in warnings:
+                            warnings.append(x)
 
             # Processing them again using updated deps for add_deps_recursive
             r = update_adr_from_meta(
@@ -2584,6 +2767,7 @@ class ScriptAutomation(Automation):
         return {'return': 0, 'variation_tags_string': variation_tags_string,
                 'explicit_variation_tags': explicit_variation_tags, 'warnings': warnings}
 
+    '''
     def _add_base_variations(
         self,
         variation_name,
@@ -2642,7 +2826,7 @@ class ScriptAutomation(Automation):
     ##########################################################################
 
     def _update_variation_tags_from_variations(
-            self, variation_tags, variations, variation_groups, excluded_variation_tags):
+            self, variation_tags, variation_groups, excluded_variation_tags, variations):
 
         import copy
         tmp_variation_tags_static = copy.deepcopy(variation_tags)
@@ -2660,6 +2844,7 @@ class ScriptAutomation(Automation):
             env and state in a larger combined variation
         '''
         tmp_combined_variations = {k: False for k in combined_variations}
+        #relaxed_map = build_relaxed_mapping(variation_tags, variations)
 
         # Recursively add any base variations specified
         if len(variation_tags) > 0:
@@ -2713,11 +2898,11 @@ class ScriptAutomation(Automation):
                         if tmp_combined_variations[combined_variation]:
                             continue
                         v = combined_variation.split(",")
-                        all_present = set(v).issubset(set(variation_tags))
+                        all_present = relaxed_subset(v, variation_tags)
                         if all_present:
                             combined_variation_meta = variations[combined_variation]
                             tmp_combined_variations[combined_variation] = True
-
+                    
                             result = self._add_base_variations(
                                 combined_variation,
                                 variations,
@@ -2755,6 +2940,8 @@ class ScriptAutomation(Automation):
                 if all_base_processed:
                     break
         return {'return': 0}
+
+
 
     ##########################################################################
     def _get_variation_tags_from_default_variations(
@@ -4696,6 +4883,51 @@ pip install mlcflow
             'script': selected_artifact
         }
 
+##########################################################################
+def relaxed_subset(v, variation_tags):
+    """
+    Returns True if every element in v matches at least one element
+    in variation_tags, allowing patterns like 'build.#' to match
+    anything that starts with 'build.'.
+    """
+    for item in v:
+        matched = False
+        for tag in variation_tags:
+            if item == tag:
+                matched = True
+                break
+            # Relaxed match: 'build.#' -> matches 'build.' + anything
+            if item.endswith(".#"):
+                prefix = item[:-2]
+                if tag.startswith(prefix + "."):
+                    matched = True
+                    break
+        if not matched:
+            return False
+    return True
+
+
+import re
+
+def relaxed_match(pattern_tag, actual_tag):
+    """Return True if actual_tag matches pattern_tag with relaxed rules like build.# → build.*"""
+    if pattern_tag == actual_tag:
+        return True
+    if ".#" in pattern_tag:
+        prefix = pattern_tag.split(".#", 1)[0]
+        return actual_tag.startswith(prefix + ".")
+    return False
+
+
+def build_relaxed_mapping(variation_tags, variations):
+    """Return mapping of canonical variation keys -> actual active tags that match relaxed."""
+    mapping = {}
+    for vt in variation_tags:
+        for vname in variations:
+            if relaxed_match(vname, vt):  # your relaxed logic here
+                mapping[vname] = vt
+                break
+    return mapping
 
 def get_version_tag_from_version(version, cached_tags):
     tags_to_add = []
