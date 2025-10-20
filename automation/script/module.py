@@ -2448,10 +2448,24 @@ class ScriptAutomation(Automation):
             'variation_tags': variation_tags
         }
 
-    
-    def _apply_variation_meta(self, variation_key, variation_meta, env, state, const, const_state, deps, post_deps, prehook_deps, posthook_deps, new_env_keys_from_meta, new_state_keys_from_meta, run_state, i, meta, required_disk_space, warnings, add_deps_recursive ): 
-        r = update_state_from_meta( variation_meta, env, state, const, const_state, deps, post_deps, prehook_deps, posthook_deps, new_env_keys_from_meta, new_state_keys_from_meta, run_state, i ) 
-        if r['return'] > 0: return r
+    def _apply_variation_meta(self, variation_key, variation_meta, env, state, const, const_state, deps, post_deps, prehook_deps, posthook_deps,
+                              new_env_keys_from_meta, new_state_keys_from_meta, run_state, i, meta, required_disk_space, warnings, add_deps_recursive):
+        r = update_state_from_meta(
+            variation_meta,
+            env,
+            state,
+            const,
+            const_state,
+            deps,
+            post_deps,
+            prehook_deps,
+            posthook_deps,
+            new_env_keys_from_meta,
+            new_state_keys_from_meta,
+            run_state,
+            i)
+        if r['return'] > 0:
+            return r
 
         adr = get_adr(variation_meta)
         if adr:
@@ -2474,7 +2488,6 @@ class ScriptAutomation(Automation):
 
         return {'return': 0}
 
-
     def _apply_single_variation(
         self, variation_tag, variations, env, state, const, const_state,
         deps, post_deps, prehook_deps, posthook_deps,
@@ -2489,7 +2502,8 @@ class ScriptAutomation(Automation):
         if variation_tag not in variations:
             if '.' in variation_tag and variation_tag[-1] != '.':
                 variation_tag_dynamic_suffix = variation_tag.split('.', 1)[1]
-                variation_tag = self._get_name_for_dynamic_variation_tag(variation_tag)
+                variation_tag = self._get_name_for_dynamic_variation_tag(
+                    variation_tag)
             if variation_tag not in variations:
                 return {
                     'return': 1,
@@ -2551,8 +2565,6 @@ class ScriptAutomation(Automation):
                 return r
 
         return {'return': 0}
-
-
 
     def _validate_variations(self, meta, variation_tags):
         valid = meta.get('valid_variation_combinations', [])
