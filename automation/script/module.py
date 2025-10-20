@@ -2488,19 +2488,19 @@ class ScriptAutomation(Automation):
 
         return {'return': 0}
 
+    def _resolve_dynamic_tag(self, tag, variations):
+        # Returns (base_tag, suffix) for a possibly dynamic tag. # If not
+        # dynamic or cannot be resolved, returns (tag, None).
 
-    def _resolve_dynamic_tag(self, tag, variations): 
-        # Returns (base_tag, suffix) for a possibly dynamic tag. # If not dynamic or cannot be resolved, returns (tag, None). 
-   
-        if '.' in tag and tag[-1] != '.': 
-            suffix = tag.split('.', 1)[1] 
-            base = self._get_name_for_dynamic_variation_tag(tag) 
+        if '.' in tag and tag[-1] != '.':
+            suffix = tag.split('.', 1)[1]
+            base = self._get_name_for_dynamic_variation_tag(tag)
 
-            # Only accept if base is a known variation key; otherwise treat as non-dynamic 
-            if base in variations: 
-                return base, suffix 
+            # Only accept if base is a known variation key; otherwise treat as
+            # non-dynamic
+            if base in variations:
+                return base, suffix
         return tag, None
-
 
     def _apply_single_variation(
         self, variation_tag, variations, env, state, const, const_state,
@@ -2547,7 +2547,7 @@ class ScriptAutomation(Automation):
     def _is_dynamic_placeholder(self, comp):
         return isinstance(comp, str) and comp.endswith('.#')
 
-    def _dynamic_base(self, comp): # Assumes comp endswith ".#"
+    def _dynamic_base(self, comp):  # Assumes comp endswith ".#"
         return comp[:-2]
 
     def _apply_combined_variations(
@@ -2555,16 +2555,18 @@ class ScriptAutomation(Automation):
         deps, post_deps, prehook_deps, posthook_deps,
         new_env_keys_from_meta, new_state_keys_from_meta,
         run_state, i, meta, required_disk_space, warnings, add_deps_recursive
-        ):
+    ):
 
-
-        # Only consider string keys that are combined (contain a comma) 
-        combined_variations = [t for t in variations if isinstance(t, str) and ',' in t] 
-        # Ensure we apply more specific (more components) first 
+        # Only consider string keys that are combined (contain a comma)
+        combined_variations = [
+            t for t in variations if isinstance(
+                t, str) and ',' in t]
+        # Ensure we apply more specific (more components) first
         combined_variations.sort(key=lambda x: x.count(','), reverse=False)
 
         # Pre-resolve selected tags into base->(original_tag, suffix) so we can match combined keys by base
-        # If multiple selected tags map to the same base, keep the first occurrence
+        # If multiple selected tags map to the same base, keep the first
+        # occurrence
         selected_by_base = {}
         for sel in variation_tags:
             base, suffix = self._resolve_dynamic_tag(sel, variations)
@@ -2574,19 +2576,21 @@ class ScriptAutomation(Automation):
         for combined_key in combined_variations:
             components = combined_key.split(',')
 
-
             # Split into dynamic placeholders and static components
-            dyn_components = [c for c in components if self._is_dynamic_placeholder(c)]
-            static_components = [c for c in components if not self._is_dynamic_placeholder(c)]
+            dyn_components = [
+                c for c in components if self._is_dynamic_placeholder(c)]
+            static_components = [
+                c for c in components if not self._is_dynamic_placeholder(c)]
 
             # For static components, require presence via relaxed_subset
             # (so a selected "blas.3" can satisfy static "blas" if relaxed_subset allows it)
-            static_ok =  set(static_components).issubset(set(variation_tags))
+            static_ok = set(static_components).issubset(set(variation_tags))
             if not static_ok:
                 continue
 
-            # For dynamic placeholders, require the base to be present in selected tags
-            dyn_bases = [self._dynamic_base(c) +'.#' for c in dyn_components]
+            # For dynamic placeholders, require the base to be present in
+            # selected tags
+            dyn_bases = [self._dynamic_base(c) + '.#' for c in dyn_components]
             if not all(b in selected_by_base for b in dyn_bases):
                 continue
 
@@ -2597,15 +2601,16 @@ class ScriptAutomation(Automation):
                 # Skip if more than one dynamic suffix is present
                 continue
 
-
             combined_meta = variations[combined_key]
 
-            # If exactly one dynamic suffix among components, apply it to a copy of the combined meta
+            # If exactly one dynamic suffix among components, apply it to a
+            # copy of the combined meta
             if len(dynamic_infos) == 1:
                 _, dyn_suffix = dynamic_infos[0]
                 import copy
                 combined_meta = copy.deepcopy(combined_meta)
-                self._update_variation_meta_with_dynamic_suffix(combined_meta, dyn_suffix)
+                self._update_variation_meta_with_dynamic_suffix(
+                    combined_meta, dyn_suffix)
 
             r = self._apply_variation_meta(
                 variation_key=combined_key,
