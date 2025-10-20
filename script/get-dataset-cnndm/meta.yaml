@@ -35,6 +35,10 @@ deps:
   skip_if_env:
     MLC_TMP_ML_MODEL: 
       - llama3_1-8b
+- tags: get,generic-python-lib,_package.transformers
+  skip_if_env:
+    MLC_TMP_ML_MODEL: 
+      - llama3_1-8b
 - tags: get,generic-python-lib,_numpy
   skip_if_env:
     MLC_TMP_ML_MODEL: 

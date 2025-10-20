@@ -1,4 +1,4 @@
-# README for get-preprocessed-dataset-openorca
+# README for get-ml-model-gptj
 This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,10 +33,16 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr get,dataset,openorca,language-processing,preprocessed
+mlcr get,raw,ml-model,gptj,gpt-j,large-language-model
 ```
 
-No script specific inputs
+### Script Inputs
+
+| Name | Description | Choices | Default |
+|------|-------------|---------|------|
+| `--checkpoint` |  |  | `` |
+| `--download_path` |  |  | `` |
+| `--to` | Alias for download_path |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -57,30 +63,35 @@ No script specific inputs
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
-### Dataset-type
-
-- `calibration` (base: mlcommons)
-- `validation` (default)
-
 ### Download-tool
 
 - `r2-downloader` (default)
 - `rclone`
+- `wget`
 
-### Preprocess-step-provider
+### Framework
 
+- `pytorch` (default)
+- `saxml`
+
+### Model-provider
+
+- `intel`
+- `mlcommons` (default)
 - `nvidia`
+
+### Precision
+
+- `fp32`
+- `fp8`
+- `int4`
+- `int8`
+- `uint8`
 
 ### Run-mode
 
 - `dry-run`
 
-### Size
-
-- `60`
-- `full` (default)
-- `size.#` _(# can be substituted dynamically)_
-
 ### Ungrouped
 
-- `mlcommons` (alias: mlc)
+- `batch_size.#` _(# can be substituted dynamically)_

@@ -1,4 +1,4 @@
-# README for get-preprocessed-dataset-openorca
+# README for get-ml-model-mixtral
 This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,10 +33,14 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr get,dataset,openorca,language-processing,preprocessed
+mlcr get,raw,ml-model,language-processing,mixtral,mixtral-8x7b
 ```
 
-No script specific inputs
+### Script Inputs
+
+| Name | Description | Choices | Default |
+|------|-------------|---------|------|
+| `--checkpoint` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -57,30 +61,28 @@ No script specific inputs
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
-### Dataset-type
-
-- `calibration` (base: mlcommons)
-- `validation` (default)
-
 ### Download-tool
 
-- `r2-downloader` (default)
-- `rclone`
+- `r2-downloader`
 
-### Preprocess-step-provider
+### Framework
 
-- `nvidia`
+- `pytorch` (default)
+
+### Huggingface-stub
+
+- `mistralai/Mixtral-8x7B-Instruct-v0.1` (default)
+- `stub.#` _(# can be substituted dynamically)_
+
+### Precision
+
+- `fp32` (default)
 
 ### Run-mode
 
 - `dry-run`
 
-### Size
-
-- `60`
-- `full` (default)
-- `size.#` _(# can be substituted dynamically)_
-
 ### Ungrouped
 
-- `mlcommons` (alias: mlc)
+- `batch_size.#` _(# can be substituted dynamically)_
+- `mlc`
