@@ -6,7 +6,7 @@ import code.fields.harness as harness_fields
 
 EXPORTS = {
     C.WorkloadSetting(C.HarnessType.Custom, C.AccuracyTarget(0.99), C.PowerSetting.MaxP): {
-    
+
     },
     C.WorkloadSetting(C.HarnessType.Custom, C.AccuracyTarget(0.999), C.PowerSetting.MaxP): {
     },
