@@ -7,6 +7,7 @@
 # Developed by Grigori Fursin and Arjun Suresh for CM and modified for MLCFlow by Arjun Suresh and Anandhu Sooraj
 #
 
+import re
 import os
 import logging
 
@@ -2361,35 +2362,45 @@ class ScriptAutomation(Automation):
 
         # 1️⃣ Expand and validate variation tags
         r = self._get_variations_with_aliases(variation_tags, variations)
-        if r['return'] > 0: return r
+        if r['return'] > 0:
+            return r
         variation_tags = r['variation_tags']
         excluded_variation_tags = r['excluded_variation_tags']
 
         r = self._get_variation_groups(variations)
-        if r['return'] > 0: return r
+        if r['return'] > 0:
+            return r
         variation_groups = r['variation_groups']
         run_state['variation_groups'] = variation_groups
 
         default_variation = meta.get('default_variation', '')
         if default_variation and default_variation not in variations:
-            return {'return': 1, 'error': f'Default variation "{default_variation}" not in {list(variations.keys())}'}
+            return {
+                'return': 1, 'error': f'Default variation "{default_variation}" not in {list(variations.keys())}'}
 
         if not variation_tags and default_variation and default_variation not in excluded_variation_tags:
             variation_tags = [default_variation]
 
         # process group defaults
         for func in [self._update_variation_tags_from_variations,
-                 self._process_variation_tags_in_groups]:
-            r = func(variation_tags, variation_groups, excluded_variation_tags, variations)
-            if r['return'] > 0: return r
+                     self._process_variation_tags_in_groups]:
+            r = func(
+                variation_tags,
+                variation_groups,
+                excluded_variation_tags,
+                variations)
+            if r['return'] > 0:
+                return r
             variation_tags = r.get('variation_tags', variation_tags)
 
         # Validate combinations
         r = self._validate_variations(meta, variation_tags)
-        if r['return'] > 0: return r
+        if r['return'] > 0:
+            return r
 
-        variation_tags_string = ','.join(['_'+t for t in variation_tags])
-        logger.debug(f"{recursion_spaces}Prepared variations: {variation_tags_string}")
+        variation_tags_string = ','.join(['_' + t for t in variation_tags])
+        logger.debug(
+            f"{recursion_spaces}Prepared variations: {variation_tags_string}")
 
         # 2️⃣ Apply individual variations
         for variation_tag in variation_tags:
@@ -2399,7 +2410,8 @@ class ScriptAutomation(Automation):
                 new_env_keys_from_meta, new_state_keys_from_meta,
                 run_state, i, meta, required_disk_space, warnings, add_deps_recursive
             )
-            if r['return'] > 0: return r
+            if r['return'] > 0:
+                return r
 
         # 3️⃣ Apply combined variations
         r = self._apply_combined_variations(
@@ -2408,7 +2420,8 @@ class ScriptAutomation(Automation):
             new_env_keys_from_meta, new_state_keys_from_meta,
             run_state, i, meta, required_disk_space, warnings, add_deps_recursive
         )
-        if r['return'] > 0: return r
+        if r['return'] > 0:
+            return r
 
         # Done
         return {
@@ -2419,7 +2432,6 @@ class ScriptAutomation(Automation):
             'required_disk_space': required_disk_space,
             'variation_tags': variation_tags
         }
-
 
     def _apply_single_variation(
         self, variation_tag, variations, env, state, const, const_state,
@@ -2436,14 +2448,17 @@ class ScriptAutomation(Automation):
         if variation_tag not in variations:
             if '.' in variation_tag and variation_tag[-1] != '.':
                 variation_tag_dynamic_suffix = variation_tag.split('.', 1)[1]
-                variation_tag = self._get_name_for_dynamic_variation_tag(variation_tag)
+                variation_tag = self._get_name_for_dynamic_variation_tag(
+                    variation_tag)
             if variation_tag not in variations:
-                return {'return': 1, 'error': f'Tag {variation_tag} not in variations {list(variations.keys())}'}
+                return {
+                    'return': 1, 'error': f'Tag {variation_tag} not in variations {list(variations.keys())}'}
 
         variation_meta = variations[variation_tag]
         if variation_tag_dynamic_suffix:
             variation_meta = copy.deepcopy(variation_meta)
-            self._update_variation_meta_with_dynamic_suffix(variation_meta, variation_tag_dynamic_suffix)
+            self._update_variation_meta_with_dynamic_suffix(
+                variation_meta, variation_tag_dynamic_suffix)
 
         r = update_state_from_meta(
             variation_meta, env, state, const, const_state, deps,
@@ -2451,10 +2466,12 @@ class ScriptAutomation(Automation):
             new_env_keys_from_meta, new_state_keys_from_meta,
             run_state, i
         )
-        if r['return'] > 0: return r
+        if r['return'] > 0:
+            return r
 
         # Merge selected meta
-        meta.update({k: v for k, v in variation_meta.items() if k in ['script_name', 'default_version']})
+        meta.update({k: v for k, v in variation_meta.items()
+                    if k in ['script_name', 'default_version']})
         if variation_meta.get('required_disk_space', 0) > 0:
             required_disk_space[variation_tag] = variation_meta['required_disk_space']
 
@@ -2495,13 +2512,15 @@ class ScriptAutomation(Automation):
                 new_env_keys_from_meta, new_state_keys_from_meta,
                 run_state, i
             )
-            if r['return'] > 0: return r
+            if r['return'] > 0:
+                return r
 
             adr = get_adr(combined_meta)
             if adr:
                 self._merge_dicts_with_tags(add_deps_recursive, adr)
 
-            meta.update({k: v for k, v in combined_meta.items() if k in ['script_name', 'default_version']})
+            meta.update({k: v for k, v in combined_meta.items()
+                        if k in ['script_name', 'default_version']})
 
             if combined_meta.get('required_disk_space', 0) > 0:
                 required_disk_space[combined_variation] = combined_meta['required_disk_space']
@@ -2517,12 +2536,14 @@ class ScriptAutomation(Automation):
         valid = meta.get('valid_variation_combinations', [])
         if valid:
             if not any(all(t in variation_tags for t in s) for s in valid):
-                return {'return': 1, 'error': f'Invalid combination {variation_tags}, valid: {valid}'}
+                return {
+                    'return': 1, 'error': f'Invalid combination {variation_tags}, valid: {valid}'}
 
         invalid = meta.get('invalid_variation_combinations', [])
         if invalid:
             if any(all(t in variation_tags for t in s) for s in invalid):
-                return {'return': 1, 'error': f'Combination {variation_tags} is explicitly invalid: {invalid}'}
+                return {
+                    'return': 1, 'error': f'Combination {variation_tags} is explicitly invalid: {invalid}'}
 
         return {'return': 0}
 
@@ -2768,6 +2789,7 @@ class ScriptAutomation(Automation):
                 'explicit_variation_tags': explicit_variation_tags, 'warnings': warnings}
 
     '''
+
     def _add_base_variations(
         self,
         variation_name,
@@ -2844,7 +2866,7 @@ class ScriptAutomation(Automation):
             env and state in a larger combined variation
         '''
         tmp_combined_variations = {k: False for k in combined_variations}
-        #relaxed_map = build_relaxed_mapping(variation_tags, variations)
+        # relaxed_map = build_relaxed_mapping(variation_tags, variations)
 
         # Recursively add any base variations specified
         if len(variation_tags) > 0:
@@ -2902,7 +2924,7 @@ class ScriptAutomation(Automation):
                         if all_present:
                             combined_variation_meta = variations[combined_variation]
                             tmp_combined_variations[combined_variation] = True
-                    
+
                             result = self._add_base_variations(
                                 combined_variation,
                                 variations,
@@ -2941,9 +2963,8 @@ class ScriptAutomation(Automation):
                     break
         return {'return': 0}
 
-
-
     ##########################################################################
+
     def _get_variation_tags_from_default_variations(
             self, variation_meta, variations, variation_groups, tmp_variation_tags_static, excluded_variation_tags):
         # default_variations dictionary specifies the default_variation for
@@ -4884,6 +4905,8 @@ pip install mlcflow
         }
 
 ##########################################################################
+
+
 def relaxed_subset(v, variation_tags):
     """
     Returns True if every element in v matches at least one element
@@ -4907,8 +4930,6 @@ def relaxed_subset(v, variation_tags):
     return True
 
 
-import re
-
 def relaxed_match(pattern_tag, actual_tag):
     """Return True if actual_tag matches pattern_tag with relaxed rules like build.# → build.*"""
     if pattern_tag == actual_tag:
@@ -4928,6 +4949,7 @@ def build_relaxed_mapping(variation_tags, variations):
                 mapping[vname] = vt
                 break
     return mapping
+
 
 def get_version_tag_from_version(version, cached_tags):
     tags_to_add = []
