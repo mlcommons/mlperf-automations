@@ -79,8 +79,16 @@ deps:
       MLC_MLPERF_INFERENCE_VERSION:
       - "5.0"
       - "5.1-dev"
+  
+  - tags: get,mlperf,sut,description
+    enable_if_env:
+      MLC_CUSTOM_CONFIG:
+      - yes
 
 variations:
+  custom-config:
+    env:
+      MLC_CUSTOM_CONFIG: yes
   nvidia-only:
     group: code
     add_deps_recursive:
@@ -109,6 +117,12 @@ variations:
     add_deps_recursive:
       nvidia-inference-common-code:
         tags: _v5.1-dev
+  v5.1:
+    base:
+      - 
+    add_deps_recursive:
+      nvidia-inference-common-code:
+        tags: _v5.1
 
 
 
