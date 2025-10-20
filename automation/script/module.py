@@ -2401,7 +2401,7 @@ class ScriptAutomation(Automation):
         variation_tags_string = ''
         if variation_tags:
             variation_tags_string = ','.join(['_' + t for t in variation_tags])
-        
+
             logger.debug(
                 f"{recursion_spaces}Prepared variations: {variation_tags_string}")
 
