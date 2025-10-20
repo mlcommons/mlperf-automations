@@ -2448,6 +2448,33 @@ class ScriptAutomation(Automation):
             'variation_tags': variation_tags
         }
 
+    
+    def _apply_variation_meta(self, variation_key, variation_meta, env, state, const, const_state, deps, post_deps, prehook_deps, posthook_deps, new_env_keys_from_meta, new_state_keys_from_meta, run_state, i, meta, required_disk_space, warnings, add_deps_recursive ): 
+        r = update_state_from_meta( variation_meta, env, state, const, const_state, deps, post_deps, prehook_deps, posthook_deps, new_env_keys_from_meta, new_state_keys_from_meta, run_state, i ) 
+        if r['return'] > 0: return r
+
+        adr = get_adr(variation_meta)
+        if adr:
+            self._merge_dicts_with_tags(add_deps_recursive, adr)
+
+        # Merge selected meta keys
+        for k in ('script_name', 'default_version'):
+            if k in variation_meta:
+                meta[k] = variation_meta[k]
+
+        # Track required disk space per variation key
+        rds = variation_meta.get('required_disk_space', 0)
+        if rds > 0:
+            required_disk_space[variation_key] = rds
+
+        # Collect unique warnings
+        x = variation_meta.get('warning')
+        if x and x not in warnings:
+            warnings.append(x)
+
+        return {'return': 0}
+
+
     def _apply_single_variation(
         self, variation_tag, variations, env, state, const, const_state,
         deps, post_deps, prehook_deps, posthook_deps,
@@ -2455,7 +2482,6 @@ class ScriptAutomation(Automation):
         run_state, i, meta, required_disk_space, warnings, add_deps_recursive
     ):
         import copy
-
         if variation_tag.startswith(('~', '-')):
             return {'return': 0}
 
@@ -2463,43 +2489,32 @@ class ScriptAutomation(Automation):
         if variation_tag not in variations:
             if '.' in variation_tag and variation_tag[-1] != '.':
                 variation_tag_dynamic_suffix = variation_tag.split('.', 1)[1]
-                variation_tag = self._get_name_for_dynamic_variation_tag(
-                    variation_tag)
+                variation_tag = self._get_name_for_dynamic_variation_tag(variation_tag)
             if variation_tag not in variations:
                 return {
-                    'return': 1, 'error': f'Tag {variation_tag} not in variations {list(variations.keys())}'}
+                    'return': 1,
+                    'error': f'Tag {variation_tag} not in variations {list(variations.keys())}'
+                }
 
         variation_meta = variations[variation_tag]
         if variation_tag_dynamic_suffix:
             variation_meta = copy.deepcopy(variation_meta)
             self._update_variation_meta_with_dynamic_suffix(
-                variation_meta, variation_tag_dynamic_suffix)
+                variation_meta, variation_tag_dynamic_suffix
+            )
 
-        r = update_state_from_meta(
-            variation_meta, env, state, const, const_state, deps,
-            post_deps, prehook_deps, posthook_deps,
-            new_env_keys_from_meta, new_state_keys_from_meta,
-            run_state, i
+        return self._apply_variation_meta(
+            variation_key=variation_tag,
+            variation_meta=variation_meta,
+            env=env, state=state, const=const, const_state=const_state,
+            deps=deps, post_deps=post_deps, prehook_deps=prehook_deps, posthook_deps=posthook_deps,
+            new_env_keys_from_meta=new_env_keys_from_meta, new_state_keys_from_meta=new_state_keys_from_meta,
+            run_state=run_state, i=i,
+            meta=meta,
+            required_disk_space=required_disk_space,
+            warnings=warnings,
+            add_deps_recursive=add_deps_recursive
         )
-        if r['return'] > 0:
-            return r
-
-        # Merge selected meta
-        meta.update({k: v for k, v in variation_meta.items()
-                    if k in ['script_name', 'default_version']})
-        if variation_meta.get('required_disk_space', 0) > 0:
-            required_disk_space[variation_tag] = variation_meta['required_disk_space']
-
-        if variation_meta.get('warning'):
-            x = variation_meta['warning']
-            if x not in warnings:
-                warnings.append(x)
-
-        adr = get_adr(variation_meta)
-        if adr:
-            self._merge_dicts_with_tags(add_deps_recursive, adr)
-
-        return {'return': 0}
 
     def _apply_combined_variations(
         self, variations, variation_tags, env, state, const, const_state,
@@ -2510,42 +2525,34 @@ class ScriptAutomation(Automation):
         combined_variations = [t for t in variations if ',' in t]
         combined_variations.sort(key=lambda x: x.count(','))
 
-        relaxed_map = build_relaxed_mapping(variation_tags, variations)
+        # If build_relaxed_mapping is intended, keep or use it; currently it’s unused:
+        # relaxed_map = build_relaxed_mapping(variation_tags, variations)
 
         for combined_variation in combined_variations:
-            if not isinstance(combined_variation, str):
-                continue
             v = combined_variation.split(',')
-            all_present = relaxed_subset(v, variation_tags)
-            if not all_present:
+            if not relaxed_subset(v, variation_tags):
                 continue
 
             combined_meta = variations[combined_variation]
-            r = update_state_from_meta(
-                combined_meta, env, state, const, const_state, deps,
-                post_deps, prehook_deps, posthook_deps,
-                new_env_keys_from_meta, new_state_keys_from_meta,
-                run_state, i
+
+            r = self._apply_variation_meta(
+                variation_key=combined_variation,
+                variation_meta=combined_meta,
+                env=env, state=state, const=const, const_state=const_state,
+                deps=deps, post_deps=post_deps, prehook_deps=prehook_deps, posthook_deps=posthook_deps,
+                new_env_keys_from_meta=new_env_keys_from_meta, new_state_keys_from_meta=new_state_keys_from_meta,
+                run_state=run_state, i=i,
+                meta=meta,
+                required_disk_space=required_disk_space,
+                warnings=warnings,
+                add_deps_recursive=add_deps_recursive
             )
             if r['return'] > 0:
                 return r
 
-            adr = get_adr(combined_meta)
-            if adr:
-                self._merge_dicts_with_tags(add_deps_recursive, adr)
-
-            meta.update({k: v for k, v in combined_meta.items()
-                        if k in ['script_name', 'default_version']})
-
-            if combined_meta.get('required_disk_space', 0) > 0:
-                required_disk_space[combined_variation] = combined_meta['required_disk_space']
-
-            if combined_meta.get('warning'):
-                x = combined_meta['warning']
-                if x not in warnings:
-                    warnings.append(x)
-
         return {'return': 0}
+
+
 
     def _validate_variations(self, meta, variation_tags):
         valid = meta.get('valid_variation_combinations', [])
