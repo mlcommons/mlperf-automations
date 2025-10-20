@@ -2430,10 +2430,9 @@ class ScriptAutomation(Automation):
         if r['return'] > 0:
             return r
 
-        print(env)
         # Done
         return {
-            'return': 1,
+            'return': 0,
             'variation_tags_string': variation_tags_string,
             'explicit_variation_tags': explicit_variation_tags,
             'warnings': warnings,
