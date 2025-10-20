@@ -372,7 +372,7 @@ deps:
         - retinanet
 
   ## GPT-J
-  - tags: get,ml-model,large-language-model,gptj
+  - tags: get,ml-model,gptj,_fp32,_pytorch,_r2-downloader
     names:
       - ml-model
       - gptj-model
@@ -450,7 +450,7 @@ deps:
         - "yes"
 
   ## mixtral-8x7b
-  - tags: get,ml-model,mixtral
+  - tags: get,ml-model,mixtral,_r2-downloader,_mlc
     names:
       - ml-model
       - mixtral-model
@@ -501,15 +501,17 @@ deps:
         - "on"
 
   ## RGAT
-  - tags: get,ml-model,rgat
+  - tags: get,ml-model,rgat,_r2-downloader,_mlcommons
     names:
       - rgat-model
     enable_if_env:
       MLC_MODEL:
         - rgat
     skip_if_env:
-      RGAT_CHECKPOINT_PATH:
-        - "on"
+      MLC_USE_MODEL_FROM_HOST:
+        - "yes"
+      MLC_RUN_STATE_DOCKER:
+        - "yes"
 
   ## LLAMA3_1-405B
   - tags: get,ml-model,llama3
@@ -540,7 +542,7 @@ deps:
         - "yes"
 
   ## pointpainting
-  - tags: get,ml-model,pointpainting
+  - tags: get,ml-model,pointpainting,_r2-downloader,_mlc
     names:
       - pointpillars-model
     enable_if_env:
@@ -690,7 +692,7 @@ deps:
         - "yes"
 
   ## waymo for pointpillats
-  - tags: get,dataset,waymo
+  - tags: get,dataset,waymo,_r2-downloader,_mlc
     enable_if_env:
       MLC_MODEL:
         - pointpainting
@@ -701,7 +703,7 @@ deps:
       - waymo-dataset
 
   ## llama3_1 dataset
-  - tags: get,dataset,mlperf,inference,llama3,_validation
+  - tags: get,dataset,mlperf,inference,llama3,_validation,_r2-downloader
     names:
       - llama3_1-dataset
       - llama3-dataset
@@ -1462,13 +1464,6 @@ variations:
       - tags: get,generic-python-lib,_package.evaluate
       - tags: get,generic-python-lib,_package.absl-py
       - tags: get,generic-python-lib,_package.rouge-score
-      - tags: get,ml-model,llama3,_hf,_meta-llama/Llama-3.1-8B-Instruct
-        skip_if_env:
-          MLC_RUN_STATE_DOCKER:
-          - "yes"
-        names:
-          - llama3_1-8b
-          - llama3-8b
 
   llama3_1-8b:
     base:
@@ -1477,7 +1472,7 @@ variations:
       MLC_MODEL: llama3_1-8b
     deps:
       ## CNNDM for Llama3 8B model - datacenter
-      - tags: get,dataset,cnndm,_validation,_datacenter,_llama3
+      - tags: get,dataset,cnndm,_validation,_datacenter,_llama3,_mlc,_r2-downloader
         names:
           - cnndm-llama3-datacenter
         skip_if_env:
@@ -1491,7 +1486,7 @@ variations:
       MLC_MODEL: llama3_1-8b-edge
     deps:
       ## CNNDM for Llama3 8B model - edge
-      - tags: get,dataset,cnndm,_validation,_edge,_llama3
+      - tags: get,dataset,cnndm,_validation,_edge,_llama3,_mlc,_r2-downloader
         names:
           - cnndm-llama3-edge
         skip_if_env:

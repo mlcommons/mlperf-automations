@@ -799,7 +799,9 @@ class ScriptAutomation(Automation):
         run_state['script_repo_git'] = script_item.repo.meta.get(
             'git', False)
         run_state['cache'] = meta.get('cache', False)
-        run_state['cache_expiration'] = meta.get('cache_expiration', False)
+        run_state['cache_expiration'] = i.get(
+            'cache_expiration', meta.get(
+                'cache_expiration', False))
 
         if not recursion:
             run_state['script_entry_repo_to_report_errors'] = meta.get(
@@ -809,14 +811,15 @@ class ScriptAutomation(Automation):
             run_state['script_entry_repo_git'] = script_item.repo.meta.get(
                 'git', False)
 
-        deps = meta.get('deps', [])
-        post_deps = meta.get('post_deps', [])
-        prehook_deps = meta.get('prehook_deps', [])
-        posthook_deps = meta.get('posthook_deps', [])
+        deps = []
+        post_deps = []
+        prehook_deps = []
+        posthook_deps = []
         input_mapping = meta.get('input_mapping', {})
+        new_env_keys_from_meta = []
+        new_state_keys_from_meta = []
+
         docker_settings = meta.get('docker')
-        new_env_keys_from_meta = meta.get('new_env_keys', [])
-        new_state_keys_from_meta = meta.get('new_state_keys', [])
 
         found_script_item = utils.assemble_object(
             meta['alias'], meta['uid'])
@@ -844,22 +847,30 @@ class ScriptAutomation(Automation):
         for key in script_item_default_env:
             env.setdefault(key, script_item_default_env[key])
 
-        # Force env from meta['env'] as a CONST
-        # (env OVERWRITE)
-        script_item_env = meta.get('env', {})
-        # print(f"script meta env= {script_item_env}")
+        # for update_meta_if_env
 
-        utils.merge_dicts({'dict1': env,
-                           'dict2': script_item_env,
-                           'append_lists': True,
-                           'append_unique': True})
-        # print(f"env = {env}")
+        r = update_state_from_meta(
+            meta,
+            env,
+            state,
+            const,
+            const_state,
+            deps,
+            post_deps,
+            prehook_deps,
+            posthook_deps,
+            new_env_keys_from_meta,
+            new_state_keys_from_meta,
+            run_state,
+            i)
+        if r['return'] > 0:
+            return r
 
-        script_item_state = meta.get('state', {})
-        utils.merge_dicts({'dict1': state,
-                           'dict2': script_item_state,
-                           'append_lists': True,
-                           'append_unique': True})
+        # taking from meta or else deps with same names will be ignored
+        deps = meta.get('deps', [])
+        post_deps = meta.get('post_deps', [])
+        prehook_deps = meta.get('prehook_deps', [])
+        posthook_deps = meta.get('posthook_deps', [])
 
         # Store the default_version in run_state -> may be overridden by
         # variations
@@ -4581,6 +4592,11 @@ pip install mlcflow
         from script.experiment import experiment_run
         return experiment_run(self, i)
 
+    ############################################################
+    def remote_run(self, i):
+        from script.remote_run import remote_run
+        return remote_run(self, i)
+
     ##########################################################################
 
     def _available_variations(self, i):
@@ -4639,6 +4655,46 @@ pip install mlcflow
 
     def _get_script_name(self, env, path, filename="run"):
         return get_script_name(env, path, filename)
+
+    def _select_script(self, i):
+        r = self.search(i.copy())
+        if r['return'] > 0:
+            return r
+
+        lst = r['list']
+        if not lst:
+            return {'return': 1, 'error': 'No scripts were found'}
+
+        # Sort scripts by alias for consistent display
+        sorted_list = sorted(lst, key=lambda x: x.meta.get('alias', ''))
+
+        # If quiet mode is off, prompt the user
+        if not i.get('quiet', False) and len(sorted_list) > 1:
+            print("\nAvailable scripts:")
+            for idx, artifact in enumerate(sorted_list, 1):
+                meta = artifact.meta
+                alias = meta.get('alias', '')
+                uid = meta.get('uid', '')
+                tags = ', '.join(meta.get('tags', []))
+                print(f"{idx}. {alias or uid}  [{tags}]")
+
+            try:
+                choice = int(input("\nSelect a script by number: ")) - 1
+            except ValueError:
+                return {'return': 1, 'error': 'Invalid selection'}
+
+            if choice < 0 or choice >= len(sorted_list):
+                return {'return': 1, 'error': 'Selection out of range'}
+
+            selected_artifact = sorted_list[choice]
+        else:
+            # Quiet mode: select the first script
+            selected_artifact = sorted_list[0]
+
+        return {
+            'return': 0,
+            'script': selected_artifact
+        }
 
 
 def get_version_tag_from_version(version, cached_tags):

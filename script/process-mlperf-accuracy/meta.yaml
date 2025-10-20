@@ -94,7 +94,7 @@ variations:
     - enable_if_env:
         MLC_MLPERF_IMPLEMENTATION:
         - intel
-      tags: get,ml-model,gptj,_fp32,_pytorch
+      tags: get,ml-model,gptj,_fp32,_pytorch,_r2-downloader
     env:
       MLC_DATASET: cnndm
     group: dataset
@@ -235,7 +235,7 @@ variations:
       skip_if_env:
         MLC_MLPERF_MODEL_MIXTRAL_8X7B_DOWNLOAD_TO_HOST:
         - 'yes'
-      tags: get,ml-model,mixtral
+      tags: get,ml-model,mixtral,_r2-downloader,_mlc
     env:
       MLC_DATASET: openorca-gsm8k-mbxp-combined
     group: dataset
@@ -340,7 +340,7 @@ variations:
     group: dataset
   cnndm_llama_3:
     deps:
-    - tags: get,ml-model,llama3,_hf,_meta-llama/Llama-3.1-8B-Instruct
+    - tags: get,ml-model,llama3,_8b
       names:
         - llama3_1-8b
         - llama3-8b
@@ -353,7 +353,7 @@ variations:
     group: dataset
   cnndm_llama_3,edge:
     deps:
-      - tags: get,dataset,cnndm,_validation,_edge,_llama3
+      - tags: get,dataset,cnndm,_validation,_edge,_llama3,_mlc,_r2-downloader
         names:
           - cnndm-llama3-edge
         skip_if_env:
@@ -361,7 +361,7 @@ variations:
           - "yes"
   cnndm_llama_3,datacenter:
     deps:
-      - tags: get,dataset,cnndm,_validation,_datacenter,_llama3
+      - tags: get,dataset,cnndm,_validation,_datacenter,_llama3,_mlc,_r2-downloader
         names:
           - cnndm-llama3-datacenter
         skip_if_env:

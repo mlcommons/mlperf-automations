@@ -166,6 +166,16 @@ variations:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: google_auth_oauthlib
     new_env_keys:
     - MLC_GOOGLE_AUTH_OAUTHLIB_VERSION
+  google-generativeai:
+    env:
+      MLC_GENERIC_PYTHON_PACKAGE_NAME: google-generativeai
+    new_env_keys:
+    - MLC_GOOGLE_GENERATIVEAI_VERSION
+  groq:
+    env:
+      MLC_GENERIC_PYTHON_PACKAGE_NAME: groq
+    new_env_keys:
+    - MLC_GROQ_VERSION
   huggingface_hub:
     env:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: huggingface_hub
@@ -381,6 +391,11 @@ variations:
       MLC_GENERIC_PYTHON_PIP_EXTRA_INDEX_URL: https://pypi.ngc.nvidia.com
     new_env_keys:
     - MLC_POLYGRAPHY_VERSION
+  pdfplumber:
+    env:
+      MLC_GENERIC_PYTHON_PACKAGE_NAME: pdfplumber
+    new_env_keys:
+    - MLC_PDFPLUMBER_VERSION  
   pre:
     env:
       MLC_GENERIC_PYTHON_DEV_VERSION: 'yes'
@@ -394,6 +409,11 @@ variations:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: psutil
     new_env_keys:
     - MLC_PSUTIL_VERSION
+  python-dotenv:
+    env:
+      MLC_GENERIC_PYTHON_PACKAGE_NAME: python-dotenv
+    new_env_keys:
+    - MLC_PYTHON_DOTENV_VERSION
   pycocotools:
     env:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: pycocotools

@@ -37,7 +37,8 @@ prehook_deps:
 tests:
   run_inputs:
     - variations_list:
-      - fp32
+      - fp32,pytorch,r2-downloader,dry-run
+      - fp32,pytorch,rclone,dry-run
   
     
 print_env_at_the_end:
@@ -102,10 +103,15 @@ variations:
     env:
       MLC_DOWNLOAD_CHECKSUM_NOT_USED: e677e28aaf03da84584bb3073b7ee315
       MLC_PACKAGE_URL: https://cloud.mlcommons.org/index.php/s/QAZ2oM94MkFtbQx/download
-      MLC_RCLONE_CONFIG_NAME: mlc-inference
-      MLC_RCLONE_URL: mlc-inference:mlcommons-inference-wg-public/gpt-j
       MLC_UNZIP: 'yes'
     required_disk_space: 22700
+  pytorch,fp32,rclone:
+    env:
+      MLC_PACKAGE_URL: mlc-inference:mlcommons-inference-wg-public/gpt-j
+      MLC_RCLONE_CONFIG_NAME: mlc-inference
+  pytorch,fp32,r2-downloader:
+    env:
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/gpt-j-model-checkpoint.uri
   pytorch,fp32,wget:
     add_deps_recursive:
       dae:
@@ -127,7 +133,7 @@ variations:
         MLC_GPTJ_INTEL_MODEL: ''
       force_new_env_keys:
       - GPTJ_CHECKPOINT_PATH
-      tags: get,ml-model,gpt-j,_fp32,_pytorch
+      tags: get,ml-model,gptj,_fp32,_pytorch,_r2-downloader
     - tags: get,conda,_name.gptj-pt
     - tags: get,python,_conda.gptj-pt
     - names:
@@ -154,7 +160,7 @@ variations:
     - names:
       - cuda
       tags: get,cuda
-    - tags: get,cuda-devices,_with-pycuda
+    - tags: get,cuda-devices
       enable_if_env:
         MLC_HOST_OS_FLAVOR:
         - ubuntu
@@ -166,7 +172,7 @@ variations:
     - env: {}
       force_new_env_keys:
       - GPTJ_CHECKPOINT_PATH
-      tags: get,ml-model,gpt-j,_fp32,_pytorch
+      tags: get,ml-model,gptj,_fp32,_pytorch,_r2-downloader
     - names:
       - nvidia-inference-common-code
       tags: get,nvidia,inference,common-code
@@ -183,16 +189,33 @@ variations:
     add_deps_recursive:
       dae:
         tags: _rclone
-    default: true
     env:
       MLC_DOWNLOAD_FILENAME: checkpoint
-      MLC_DOWNLOAD_URL: <<<MLC_RCLONE_URL>>>
+      MLC_DOWNLOAD_URL: <<<MLC_PACKAGE_URL>>>
     group: download-tool
+  r2-downloader:
+    group: download-tool
+    default: true
+    add_deps_recursive:
+      dae:
+        tags: _r2-downloader
+    env:
+      MLC_DOWNLOAD_FILENAME: checkpoint
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
   saxml:
     group: framework
   saxml,fp32:
     deps:
-    - tags: get,ml-model,gptj,_pytorch,_fp32
+    - tags: get,ml-model,gptj,_fp32,_pytorch,_r2-downloader
     - names:
       - python
       - python3

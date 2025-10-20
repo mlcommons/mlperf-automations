@@ -19,8 +19,8 @@ def preprocess(i):
         env['+LIBRARY_PATH'].append(os.path.join(
             env['MLC_TENSORRT_INSTALL_PATH'], "lib"))
 
+    hpcx_paths = []
     if is_true(env.get('BUILD_TRTLLM')):
-        hpcx_paths = []
         if os.path.exists("/opt/hpcx/ucx/lib"):
             hpcx_paths.append("/opt/hpcx/ucx/lib")
         if os.path.exists("/opt/hpcx/ucc/lib"):

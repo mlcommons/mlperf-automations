@@ -62,9 +62,18 @@ No script specific inputs
 - `calibration` (base: mlcommons)
 - `validation` (default)
 
+### Download-tool
+
+- `r2-downloader` (default)
+- `rclone`
+
 ### Preprocess-step-provider
 
 - `nvidia`
+
+### Run-mode
+
+- `dry-run`
 
 ### Size
 

@@ -48,6 +48,9 @@ def preprocess(i):
                 env.get('MLC_DAE_FINAL_ENV_NAME', '') != ''):
             env['MLC_EXTRACT_FINAL_ENV_NAME'] = env['MLC_DAE_FINAL_ENV_NAME']
 
+        if is_true(env.get('MLC_DAE_EXTRACT_TO_DOWNLOADED')):
+            env['MLC_OUTDIRNAME'] = os.getcwd()
+
     return {'return': 0}
 
 

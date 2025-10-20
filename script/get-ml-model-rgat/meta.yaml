@@ -15,8 +15,6 @@ new_env_keys:
 - RGAT_CHECKPOINT_PATH
 prehook_deps:
 - enable_if_env:
-    MLC_DOWNLOAD_TOOL:
-    - rclone
     MLC_TMP_REQUIRE_DOWNLOAD:
     - 'yes'
   env:
@@ -24,7 +22,7 @@ prehook_deps:
   extra_cache_tags: rgat,gnn,model,ml-model
   force_cache: true
   names:
-  - download-file
+  - download-rgat-model-file
   tags: download,file
   force_env_keys:
     - MLC_OUTDIRNAME
@@ -52,18 +50,45 @@ variations:
   mlcommons:
     default: true
     default_variations:
-      download-tool: rclone
+      download-tool: r2-downloader
     group: download-source
   rclone:
     adr:
-      download-file:
+      download-rgat-model-file:
         tags: _rclone
     env:
       MLC_DOWNLOAD_TOOL: rclone
       MLC_RCLONE_CONFIG_NAME: mlc-inference
     group: download-tool
-  rclone,fp32:
+  r2-downloader:
+    adr:
+      download-rgat-model-file:
+        tags: _r2-downloader
+    env:
+      MLC_DOWNLOAD_TOOL: r2-downloader
+    group: download-tool
+  rclone,mlcommons,fp32:
     env:
       MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: https://github.com/mlcommons/inference/tree/master/graph/R-GAT#download-model-using-rclone
       MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/R-GAT/RGAT.pt
       MLC_DOWNLOAD_FILENAME: RGAT
+  r2-downloader,mlcommons,fp32:
+    env:
+      MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: https://github.com/mlcommons/inference/tree/master/graph/R-GAT#download-model-using-mlc-r2-downloader
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/rgat-model.uri
+      MLC_DOWNLOAD_FILENAME: RGAT
+  dry-run:
+    env:
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+tests:
+  run_inputs:
+  - variations_list:
+    - rclone,mlcommons,fp32,dry-run
+    - r2-downloader,mlcommons,fp32,dry-run

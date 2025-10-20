@@ -78,6 +78,9 @@ variations:
   extract:
     env:
       MLC_DAE_EXTRACT_DOWNLOADED: 'yes'
+  extract-to-download-dir:
+    env:
+      MLC_DAE_EXTRACT_TO_DOWNLOADED: 'yes'
   gdown:
     add_deps:
       download-script:

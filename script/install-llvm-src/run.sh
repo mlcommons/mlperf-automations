@@ -14,7 +14,9 @@ else
 fi
 
 if [[ ${MLC_CLEAN_BUILD} == "yes" ]]; then
-  rm -rf build
+    cmd="rm -rf build"
+    echo "$cmd"
+    eval "$cmd"
 fi
 
 mkdir -p build
@@ -24,14 +26,20 @@ if [ ! -d "${INSTALL_DIR}" ] || [ ${MLC_LLVM_CONDA_ENV} == "yes" ]; then
     echo "******************************************************"
 
     cd build
-    if [ "${?}" != "0" ]; then exit 1; fi
+    test $? -eq 0 || exit $?
 
     echo "${MLC_LLVM_CMAKE_CMD}"
     eval "${MLC_LLVM_CMAKE_CMD}"
-    ninja
-    if [ "${?}" != "0" ]; then exit 1; fi
-    ninja install
-    if [ "${?}" != "0" ]; then exit 1; fi
+    
+    cmd="ninja ${MLC_LLVM_CHECK_ALL}"
+    echo $cmd
+    eval $cmd
+    test $? -eq 0 || exit $?
+    
+    cmd="ninja install"
+    echo $cmd
+    eval $cmd
+    test $? -eq 0 || exit $?
 
 fi
 
