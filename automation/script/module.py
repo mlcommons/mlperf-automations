@@ -2488,6 +2488,20 @@ class ScriptAutomation(Automation):
 
         return {'return': 0}
 
+
+    def _resolve_dynamic_tag(self, tag, variations): 
+        # Returns (base_tag, suffix) for a possibly dynamic tag. # If not dynamic or cannot be resolved, returns (tag, None). 
+   
+        if '.' in tag and tag[-1] != '.': 
+            suffix = tag.split('.', 1)[1] 
+            base = self._get_name_for_dynamic_variation_tag(tag) 
+
+            # Only accept if base is a known variation key; otherwise treat as non-dynamic 
+            if base in variations: 
+                return base, suffix 
+        return tag, None
+
+
     def _apply_single_variation(
         self, variation_tag, variations, env, state, const, const_state,
         deps, post_deps, prehook_deps, posthook_deps,
@@ -2530,27 +2544,71 @@ class ScriptAutomation(Automation):
             add_deps_recursive=add_deps_recursive
         )
 
+    def _is_dynamic_placeholder(self, comp):
+        return isinstance(comp, str) and comp.endswith('.#')
+
+    def _dynamic_base(self, comp): # Assumes comp endswith ".#"
+        return comp[:-2]
+
     def _apply_combined_variations(
         self, variations, variation_tags, env, state, const, const_state,
         deps, post_deps, prehook_deps, posthook_deps,
         new_env_keys_from_meta, new_state_keys_from_meta,
         run_state, i, meta, required_disk_space, warnings, add_deps_recursive
-    ):
-        combined_variations = [t for t in variations if ',' in t]
-        combined_variations.sort(key=lambda x: x.count(','))
+        ):
 
-        # If build_relaxed_mapping is intended, keep or use it; currently it’s unused:
-        # relaxed_map = build_relaxed_mapping(variation_tags, variations)
 
-        for combined_variation in combined_variations:
-            v = combined_variation.split(',')
-            if not relaxed_subset(v, variation_tags):
+        # Only consider string keys that are combined (contain a comma) 
+        combined_variations = [t for t in variations if isinstance(t, str) and ',' in t] 
+        # Ensure we apply more specific (more components) first 
+        combined_variations.sort(key=lambda x: x.count(','), reverse=False)
+
+        # Pre-resolve selected tags into base->(original_tag, suffix) so we can match combined keys by base
+        # If multiple selected tags map to the same base, keep the first occurrence
+        selected_by_base = {}
+        for sel in variation_tags:
+            base, suffix = self._resolve_dynamic_tag(sel, variations)
+            if base not in selected_by_base:
+                selected_by_base[base] = (sel, suffix)
+
+        for combined_key in combined_variations:
+            components = combined_key.split(',')
+
+
+            # Split into dynamic placeholders and static components
+            dyn_components = [c for c in components if self._is_dynamic_placeholder(c)]
+            static_components = [c for c in components if not self._is_dynamic_placeholder(c)]
+
+            # For static components, require presence via relaxed_subset
+            # (so a selected "blas.3" can satisfy static "blas" if relaxed_subset allows it)
+            static_ok =  set(static_components).issubset(set(variation_tags))
+            if not static_ok:
                 continue
 
-            combined_meta = variations[combined_variation]
+            # For dynamic placeholders, require the base to be present in selected tags
+            dyn_bases = [self._dynamic_base(c) +'.#' for c in dyn_components]
+            if not all(b in selected_by_base for b in dyn_bases):
+                continue
+
+            # Enforce at most one dynamic component among these bases
+            dynamic_infos = [(b, selected_by_base[b][1]) for b in dyn_bases]
+            dynamic_infos = [(b, sfx) for b, sfx in dynamic_infos if sfx]
+            if len(dynamic_infos) > 1:
+                # Skip if more than one dynamic suffix is present
+                continue
+
+
+            combined_meta = variations[combined_key]
+
+            # If exactly one dynamic suffix among components, apply it to a copy of the combined meta
+            if len(dynamic_infos) == 1:
+                _, dyn_suffix = dynamic_infos[0]
+                import copy
+                combined_meta = copy.deepcopy(combined_meta)
+                self._update_variation_meta_with_dynamic_suffix(combined_meta, dyn_suffix)
 
             r = self._apply_variation_meta(
-                variation_key=combined_variation,
+                variation_key=combined_key,
                 variation_meta=combined_meta,
                 env=env, state=state, const=const, const_state=const_state,
                 deps=deps, post_deps=post_deps, prehook_deps=prehook_deps, posthook_deps=posthook_deps,
@@ -2657,7 +2715,6 @@ class ScriptAutomation(Automation):
             env and state in a larger combined variation
         '''
         tmp_combined_variations = {k: False for k in combined_variations}
-        # relaxed_map = build_relaxed_mapping(variation_tags, variations)
 
         # Recursively add any base variations specified
         if len(variation_tags) > 0:
@@ -4719,27 +4776,6 @@ def relaxed_subset(v, variation_tags):
         if not matched:
             return False
     return True
-
-
-def relaxed_match(pattern_tag, actual_tag):
-    """Return True if actual_tag matches pattern_tag with relaxed rules like build.# → build.*"""
-    if pattern_tag == actual_tag:
-        return True
-    if ".#" in pattern_tag:
-        prefix = pattern_tag.split(".#", 1)[0]
-        return actual_tag.startswith(prefix + ".")
-    return False
-
-
-def build_relaxed_mapping(variation_tags, variations):
-    """Return mapping of canonical variation keys -> actual active tags that match relaxed."""
-    mapping = {}
-    for vt in variation_tags:
-        for vname in variations:
-            if relaxed_match(vname, vt):  # your relaxed logic here
-                mapping[vname] = vt
-                break
-    return mapping
 
 
 def get_version_tag_from_version(version, cached_tags):
