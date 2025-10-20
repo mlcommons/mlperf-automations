@@ -2398,14 +2398,27 @@ class ScriptAutomation(Automation):
         if r['return'] > 0:
             return r
 
-        variation_tags_string = ','.join(['_' + t for t in variation_tags])
-        logger.debug(
-            f"{recursion_spaces}Prepared variations: {variation_tags_string}")
+        variation_tags_string = ''
+        if variation_tags:
+            variation_tags_string = ','.join(['_' + t for t in variation_tags])
+        
+            logger.debug(
+                f"{recursion_spaces}Prepared variations: {variation_tags_string}")
 
-        # 2️⃣ Apply individual variations
-        for variation_tag in variation_tags:
-            r = self._apply_single_variation(
-                variation_tag, variations, env, state, const, const_state,
+            # 2️⃣ Apply individual variations
+            for variation_tag in variation_tags:
+                r = self._apply_single_variation(
+                    variation_tag, variations, env, state, const, const_state,
+                    deps, post_deps, prehook_deps, posthook_deps,
+                    new_env_keys_from_meta, new_state_keys_from_meta,
+                    run_state, i, meta, required_disk_space, warnings, add_deps_recursive
+                )
+                if r['return'] > 0:
+                    return r
+
+            # 3️⃣ Apply combined variations
+            r = self._apply_combined_variations(
+                variations, variation_tags, env, state, const, const_state,
                 deps, post_deps, prehook_deps, posthook_deps,
                 new_env_keys_from_meta, new_state_keys_from_meta,
                 run_state, i, meta, required_disk_space, warnings, add_deps_recursive
@@ -2413,15 +2426,16 @@ class ScriptAutomation(Automation):
             if r['return'] > 0:
                 return r
 
-        # 3️⃣ Apply combined variations
-        r = self._apply_combined_variations(
-            variations, variation_tags, env, state, const, const_state,
-            deps, post_deps, prehook_deps, posthook_deps,
-            new_env_keys_from_meta, new_state_keys_from_meta,
-            run_state, i, meta, required_disk_space, warnings, add_deps_recursive
-        )
-        if r['return'] > 0:
-            return r
+            # Processing them again using updated deps for add_deps_recursive
+            r = update_adr_from_meta(
+                deps,
+                post_deps,
+                prehook_deps,
+                posthook_deps,
+                add_deps_recursive,
+                env)
+            if r['return'] > 0:
+                return r
 
         # Done
         return {
