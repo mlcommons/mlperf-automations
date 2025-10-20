@@ -873,7 +873,6 @@ class ScriptAutomation(Automation):
         prehook_deps = meta.get('prehook_deps', [])
         posthook_deps = meta.get('posthook_deps', [])
 
-
         # STEP 700: Overwrite env with keys from the script input (to allow user friendly CLI)
         #           IT HAS THE PRIORITY OVER meta['default_env'] and meta['env'] but not over the meta from versions/variations
         #           (env OVERWRITE - user enforces it from CLI)
