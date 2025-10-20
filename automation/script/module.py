@@ -2381,17 +2381,24 @@ class ScriptAutomation(Automation):
         if not variation_tags and default_variation and default_variation not in excluded_variation_tags:
             variation_tags = [default_variation]
 
+        r = self._update_variation_tags_from_variations(
+            variation_tags, variation_groups, excluded_variation_tags, variations)
+        if r['return'] > 0:
+            return r
+
         # process group defaults
-        for func in [self._update_variation_tags_from_variations,
-                     self._process_variation_tags_in_groups]:
-            r = func(
-                variation_tags,
-                variation_groups,
-                excluded_variation_tags,
-                variations)
+        r = self._process_variation_tags_in_groups(
+            variation_tags, variation_groups, excluded_variation_tags, variations)
+        if r['return'] > 0:
+            return r
+        if variation_tags != r['variation_tags']:
+            variation_tags = r['variation_tags']
+            # we need to again process variation tags if any new default
+            # variation is added
+            r = self._update_variation_tags_from_variations(
+                variation_tags, variation_groups, excluded_variation_tags, variations)
             if r['return'] > 0:
                 return r
-            variation_tags = r.get('variation_tags', variation_tags)
 
         # Validate combinations
         r = self._validate_variations(meta, variation_tags)
@@ -2423,9 +2430,10 @@ class ScriptAutomation(Automation):
         if r['return'] > 0:
             return r
 
+        print(env)
         # Done
         return {
-            'return': 0,
+            'return': 1,
             'variation_tags_string': variation_tags_string,
             'explicit_variation_tags': explicit_variation_tags,
             'warnings': warnings,
