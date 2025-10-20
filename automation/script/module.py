@@ -2547,7 +2547,6 @@ class ScriptAutomation(Automation):
 
         return {'return': 0}
 
-
     def _add_base_variations(
         self,
         variation_name,
