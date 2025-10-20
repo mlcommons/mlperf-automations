@@ -873,12 +873,6 @@ class ScriptAutomation(Automation):
         prehook_deps = meta.get('prehook_deps', [])
         posthook_deps = meta.get('posthook_deps', [])
 
-        # Store the default_version in run_state -> may be overridden by
-        # variations
-        default_version = meta.get(
-            'default_version',
-            '')  # not used if version is given
-        run_state['default_version'] = default_version
 
         # STEP 700: Overwrite env with keys from the script input (to allow user friendly CLI)
         #           IT HAS THE PRIORITY OVER meta['default_env'] and meta['env'] but not over the meta from versions/variations
@@ -1472,7 +1466,7 @@ class ScriptAutomation(Automation):
 
             # Update default version meta if version is not set
             if version == '':
-                default_version = run_state.get('default_version', '')
+                default_version = meta.get('default_version', '')
                 if default_version != '':
                     version = default_version
 
