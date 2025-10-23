@@ -176,9 +176,11 @@ variations:
   mlc,r2-downloader,70b,quantize-locally:
     env:
       MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama-2-70b-chat-hf.uri
+      MLC_DOWNLOAD_FILENAME: llama-2-70b-chat-hf
   mlc,r2-downloader,7b,quantize-locally:
     env:
       MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama-2-7b-chat-hf.uri
+      MLC_DOWNLOAD_FILENAME: llama-2-7b-chat-hf
   mlc,r2-downloader,70b,pre-quantized,fp8:
     add_deps_recursive:
       dae-quantized-models:
