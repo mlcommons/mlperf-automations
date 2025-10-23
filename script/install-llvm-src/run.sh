@@ -14,7 +14,9 @@ else
 fi
 
 if [[ ${MLC_CLEAN_BUILD} == "yes" ]]; then
-  rm -rf build
+    cmd="rm -rf build"
+    echo "$cmd"
+    eval "$cmd"
 fi
 
 mkdir -p build

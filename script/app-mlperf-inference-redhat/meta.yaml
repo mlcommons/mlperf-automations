@@ -221,7 +221,7 @@ variations:
 
   gptj_:
     deps:
-      - tags: get,ml-model,gptj
+      - tags: get,ml-model,gptj,_fp32,_pytorch,_r2-downloader
         names:
          - gptj-model
       - tags: get,dataset,cnndm,_validation
