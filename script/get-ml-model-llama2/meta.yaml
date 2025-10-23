@@ -273,12 +273,18 @@ variations:
   pytorch,fp32:
     env: {}
   pytorch,nvidia,v5.0,quantize-locally:
+    ad:
+      nvidia-inference-common-code:
+        tags: _v5.0
     deps:
       - env:
           MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_TENSORRT_LLM_CHECKOUT_PATH
         extra_cache_tags: tensorrt-llm
         tags: get,git,repo,_repo.https://github.com/NVIDIA/TensorRT-LLM.git,_sha.2ea17cdad28bed0f30e80eea5b1380726a7c6493,_submodules.3rdparty/NVTX;3rdparty/cutlass;3rdparty/cxxopts;3rdparty/json;3rdparty/pybind11;3rdparty/ucxx;3rdparty/xgrammar
   pytorch,nvidia,v5.1,quantize-locally:
+    ad:
+      nvidia-inference-common-code:
+        tags: _v5.1
     deps:
       - env:
           MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_TENSORRT_LLM_CHECKOUT_PATH
@@ -325,12 +331,6 @@ variations:
     group: precision
   v5.0:
     group: version
-    ad:
-      nvidia-inference-common-code:
-        tags: _v5.0
     default: true
   v5.1:
-    ad:
-      nvidia-inference-common-code:
-        tags: _v5.1
     group: version
