@@ -25,7 +25,7 @@ def postprocess(i):
     if is_true(env.get('MLC_CUSTOM_CONFIG', '')):
         state = i['state']
         system_meta = state['MLC_SUT_META']
-        with open(os.path.join(env['MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH'], "systems", f"{env.get('MLC_NVIDIA_SYSTEM_NAME')}.json")) as fp:
+        with open(os.path.join(env['MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH'], "systems", f"{env.get('MLC_NVIDIA_SYSTEM_NAME')}.json"), "w") as fp:
             json.dump(system_meta, fp, indent=2)
 
     return {'return': 0}
