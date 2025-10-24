@@ -83,12 +83,12 @@ deps:
   - tags: get,mlperf,sut,description
     enable_if_env:
       MLC_CUSTOM_CONFIG:
-      - yes
+      - "yes"
 
 variations:
   custom-config:
     env:
-      MLC_CUSTOM_CONFIG: yes
+      MLC_CUSTOM_CONFIG: "yes"
   nvidia-only:
     group: code
     add_deps_recursive:
