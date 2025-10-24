@@ -119,7 +119,7 @@ variations:
         tags: _v5.1-dev
   v5.1:
     base:
-      - 
+      - custom-config
     add_deps_recursive:
       nvidia-inference-common-code:
         tags: _v5.1
