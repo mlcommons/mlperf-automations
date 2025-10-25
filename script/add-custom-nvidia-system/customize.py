@@ -27,5 +27,18 @@ def postprocess(i):
         system_meta = state['MLC_SUT_META']
         with open(os.path.join(env['MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH'], "systems", f"{env.get('MLC_NVIDIA_SYSTEM_NAME')}.json"), "w") as fp:
             json.dump(system_meta, fp, indent=2)
+        # copy the dummy config file to proper location
+        system_name = env["MLC_NVIDIA_SYSTEM_NAME"]
+        scenario = env["MLC_MLPERF_LOADGEN_SCENARIO"]
+        tmp_script_path = env["MLC_TMP_CURRENT_SCRIPT_PATH"]
+        mlc_model = env["MLC_MODEL"]
+        if "llama2-70b" in mlc_model:
+            mlc_model = "llama2-70b"
+        target_dir = os.path.join(mlc_code_path, "configs", system_name, scenario)
+        os.makedirs(target_dir, exist_ok=True)
+        src_file = os.path.join(tmp_script_path, "dummy_config.py")
+
+        dest_file = os.path.join(target_dir, f"{mlc_model}.py")
+        shutil.copy(src_file, dest_file)
 
     return {'return': 0}
