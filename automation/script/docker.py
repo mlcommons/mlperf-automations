@@ -429,15 +429,19 @@ def docker_run(self_module, i):
         return r
     final_run_cmd = f"""{r['run_cmd_string']} {container_env_string} --docker_run_deps """
 
+
     # Execute the Docker container
     mlc_docker_input = {
         'action': 'run', 'target': 'script', 'tags': 'run,docker,container',
         'rebuild': rebuild_docker_image,
         'env': env, 'mounts': mounts,
         'script_tags': i.get('tags'), 'run_cmd': final_run_cmd,
-        'quiet': True, 'real_run': True, 'add_deps_recursive': {'build-docker-image': {'dockerfile': dockerfile_path}},
-        **docker_inputs
+        'quiet': True, 'real_run': True, 'add_deps_recursive': {'build-docker-image': {'dockerfile': dockerfile_path}}
     }
+    utils.merge_dicts({'dict1': mlc_docker_input,
+                        'dict2': docker_inputs,
+                        'append_lists': True,
+                        'append_unique': True})
 
     r = self_module.action_object.access(mlc_docker_input)
     if r['return'] > 0:

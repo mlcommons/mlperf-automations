@@ -45,6 +45,8 @@ input_mapping:
   interactive: MLC_DOCKER_INTERACTIVE_MODE
   it: MLC_DOCKER_INTERACTIVE
   mounts: MLC_DOCKER_VOLUME_MOUNTS
+  use_host_user_id: MLC_DOCKER_USE_HOST_USER_ID
+  use_host_group_id: MLC_DOCKER_USE_HOST_GROUP_ID
   pass_user_id: MLC_DOCKER_PASS_USER_ID
   pass_user_group: MLC_DOCKER_PASS_USER_GROUP
   port_maps: MLC_DOCKER_PORT_MAPS
