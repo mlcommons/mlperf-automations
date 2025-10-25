@@ -34,7 +34,7 @@ def postprocess(i):
         mlc_model = env["MLC_MODEL"]
         if "llama2-70b" in mlc_model:
             mlc_model = "llama2-70b"
-        target_dir = os.path.join(mlc_code_path, "configs", system_name, scenario)
+        target_dir = os.path.join(env['MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH'], "configs", system_name, scenario)
         os.makedirs(target_dir, exist_ok=True)
         src_file = os.path.join(tmp_script_path, "dummy_config.py")
 
