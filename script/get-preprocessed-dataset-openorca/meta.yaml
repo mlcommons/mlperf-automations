@@ -149,6 +149,7 @@ variations:
   r2-downloader,mlcommons:
     env:
       MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/llama-2-70b-open-orca-dataset.uri
+      MLC_DOWNLOAD_FILENAME: openorca-mlcommons-preprocessed
   rclone,mlcommons:
     env:
       MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/open_orca
