@@ -5,6 +5,7 @@ import shutil
 import importlib.util
 import json
 
+
 def preprocess(i):
 
     os_info = i['os_info']
@@ -46,7 +47,8 @@ def postprocess(i):
         dest_file = os.path.join(target_dir, f"{mlc_model}.py")
 
         dummy_config_path = os.path.join(tmp_script_path, "dummy_config.py")
-        spec = importlib.util.spec_from_file_location("dummy_config", dummy_config_path)
+        spec = importlib.util.spec_from_file_location(
+            "dummy_config", dummy_config_path)
         dummy_module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(dummy_module)
 
