@@ -53,7 +53,8 @@ def postprocess(i):
         # Remove llm_fields line if not an LLM model
         if not any(x in mlc_model.lower() for x in ["llama"]):
             content = "\n".join(
-                [line for line in content.splitlines() if "llm_fields.llm_gen_config_path" not in line]
+                [line for line in content.splitlines(
+                ) if "llm_fields.llm_gen_config_path" not in line]
             )
 
         with open(dest_file, "w") as f:
