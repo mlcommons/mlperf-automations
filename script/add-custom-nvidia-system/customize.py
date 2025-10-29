@@ -2,8 +2,6 @@ from mlc import utils
 from utils import *
 import os
 import shutil
-import importlib.util
-import json
 
 
 def preprocess(i):
@@ -46,26 +44,19 @@ def postprocess(i):
 
         dest_file = os.path.join(target_dir, f"{mlc_model}.py")
 
-        dummy_config_path = os.path.join(tmp_script_path, "dummy_config.py")
-        spec = importlib.util.spec_from_file_location(
-            "dummy_config", dummy_config_path)
-        dummy_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(dummy_module)
+        with open(src_file, "r") as f:
+            content = f.read()
 
-        EXPORTS = dummy_module.EXPORTS
+        # Replace model name
+        content = re.sub(r"'llama2-70b'", f"'{mlc_model}'", content)
 
-        # --- Example dynamic insertion ---
-        if mlc_model == "llama2-70b":
-            for k, v in EXPORTS.items():
-                if isinstance(v, dict):
-                    v.setdefault('llm_fields.llm_gen_config_path',
-                                 'code/llama2-70b/tensorrt/generation_config.json')
+        # Remove llm_fields line if not an LLM model
+        if not any(x in mlc_model.lower() for x in ["llama"]):
+            content = "\n".join(
+                [line for line in content.splitlines() if "llm_fields.llm_gen_config_path" not in line]
+            )
 
-        # --- Write modified config to destination ---
         with open(dest_file, "w") as f:
-            f.write("# Auto-generated config\n\n")
-            f.write("EXPORTS = ")
-            f.write(repr(EXPORTS))
-            f.write("\n")
+            f.write(content)
 
     return {'return': 0}
