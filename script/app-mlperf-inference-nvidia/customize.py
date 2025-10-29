@@ -698,14 +698,12 @@ def preprocess(i):
         if "llama2" in env["MLC_MODEL"]:
             run_config += f" --checkpoint_dir={fp8_model_path}"
             run_config += f" --tensor_path={os.path.join(env['MLPERF_SCRATCH_PATH'], 'preprocessed_data', 'open_orca')}"
-            if is_true(env.get('MLC_MLPERF_INFERENCE_POST_5_0')):
+            if is_true(env.get('MLC_MLPERF_INFERENCE_POST_5_0')) and env.get('MLC_MLPERF_INFERENCE_VERSION', '') != "5.1":
                 run_config += f" --trtllm_build_flags=tensor_parallelism:{tmp_tp_size},pipeline_parallelism:{tmp_pp_size}"
             else:
                 run_config += f" --tensor_parallelism={tmp_tp_size}"
                 run_config += f" --pipeline_parallelism={tmp_pp_size}"
-            if is_true(env.get('MLC_CUSTOM_CONFIG', '')):
-                run_config += f" --llm_gen_config_path={env['MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH']}/code/llama2-70b/tensorrt/generation_config.json"
-
+                
         enable_sort = env.get('MLC_MLPERF_NVIDIA_HARNESS_ENABLE_SORT')
         if enable_sort and not is_false(enable_sort):
             run_config += f" --enable_sort"
