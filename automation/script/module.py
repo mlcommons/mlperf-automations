@@ -251,6 +251,10 @@ class ScriptAutomation(Automation):
         import time
         import shutil
 
+        # Check if has --help
+        if i.get('help', False):
+            return self.help(i)
+
         # Check if save input/output to file
         repro = i.get('repro', False)
         repro_prefix = ''
@@ -787,10 +791,6 @@ class ScriptAutomation(Automation):
 
         env['MLC_TMP_CURRENT_SCRIPT_REPO_PATH'] = script_repo_path
         env['MLC_TMP_CURRENT_SCRIPT_REPO_PATH_WITH_PREFIX'] = script_repo_path_with_prefix
-
-        # Check if has --help
-        if i.get('help', False):
-            return self.help(i)
 
         run_state['script_id'] = meta['alias'] + "," + meta['uid']
         run_state['script_tags'] = script_tags
@@ -1723,9 +1723,9 @@ class ScriptAutomation(Automation):
             # Assemble PIP versions
             pip_version_string = ''
 
-            pip_version = env.get('MLC_VERSION', '')
-            pip_version_min = env.get('MLC_VERSION_MIN', '')
-            pip_version_max = env.get('MLC_VERSION_MAX', '')
+            pip_version = str(env.get('MLC_VERSION', ''))
+            pip_version_min = str(env.get('MLC_VERSION_MIN', ''))
+            pip_version_max = str(env.get('MLC_VERSION_MAX', ''))
 
             if pip_version != '':
                 pip_version_string = '==' + pip_version
@@ -4786,6 +4786,7 @@ def relaxed_subset(v, variation_tags):
 def get_version_tag_from_version(version, cached_tags):
     tags_to_add = []
     if version != '':
+        version = str(version)
         if 'version-' + version not in cached_tags:
             cached_tags.append('version-' + version)
         if '-git-' in version:

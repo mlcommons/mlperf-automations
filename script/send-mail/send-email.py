@@ -1,6 +1,7 @@
 import smtplib
 import sys
 import argparse
+import os
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
@@ -9,7 +10,7 @@ from email import encoders
 
 
 def send_email(subject, to_addresses, cc_addresses, bcc_addresses, content_file,
-               attachments, use_smtp_server=False, smtp_server=None, email=None, password=None):
+               attachments, use_smtp_server=False, smtp_server=None, email=None, password=None, use_attachment_basenames=False):
 
     to_list = to_addresses.split(',')
     cc_list = cc_addresses.split(',')
@@ -38,9 +39,11 @@ def send_email(subject, to_addresses, cc_addresses, bcc_addresses, content_file,
             part = MIMEBase('application', 'octet-stream')
             part.set_payload(file.read())
             encoders.encode_base64(part)
+            attachment_name = os.path.basename(
+                attachment) if use_attachment_basenames else attachment
             part.add_header(
                 'Content-Disposition',
-                f'attachment; filename={attachment}')
+                f'attachment; filename={attachment_name}')
             msg.attach(part)
 
     recipients = to_list + cc_list + bcc_list
@@ -110,6 +113,10 @@ if __name__ == '__main__':
         nargs='?',
         help='Password for SMTP server')
     parser.add_argument('--smtp_server', type=str, help='SMTP server address')
+    parser.add_argument(
+        '--use_attachment_basenames',
+        action='store_true',
+        help='Use the attachment basenames in the attachment instead of the full path name')
 
     args = parser.parse_args()
 
@@ -128,4 +135,5 @@ if __name__ == '__main__':
         args.use_smtp_server,
         args.smtp_server,
         args.email,
-        args.password)
+        args.password,
+        use_attachment_basenames=args.use_attachment_basenames)

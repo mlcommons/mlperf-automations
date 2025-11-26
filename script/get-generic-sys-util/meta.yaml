@@ -609,6 +609,9 @@ variations:
   linux-tools:
     env:
       MLC_SYS_UTIL_NAME: linux-tools
+      MLC_SYS_UTIL_VERSION_CMD: perf --version
+      MLC_SYS_UTIL_VERSION_RE: \b(\d+\.\d+(?:\.\d+)?)\b
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
     new_env_keys:
     - MLC_LINUX_TOOLS_VERSION
     state:

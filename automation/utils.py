@@ -861,7 +861,7 @@ def prune_input(i):
     i_run_cmd_arc = copy.deepcopy(inp)
     for k in inp:
         remove = False
-        if k in ['action', 'automation', 'cmd', 'out',
+        if k in ['automation', 'cmd', 'out',
                  'parsed_automation', 'parsed_artifact', 'self_module']:
             remove = True
         if not remove:

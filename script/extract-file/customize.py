@@ -12,7 +12,6 @@ def preprocess(i):
 
     windows = os_info['platform'] == 'windows'
 
-#    xsep = '^&^&' if windows else '&&'
     xsep = '&&'
     q = '"' if os_info['platform'] == 'windows' else "'"
 
@@ -216,7 +215,8 @@ def postprocess(i):
 
     env = i['env']
 
-    extract_to_folder = env.get('MLC_EXTRACT_TO_FOLDER', '')
+    extract_to_folder = env.get('MLC_EXTRACT_TO_FOLDER')
+
     extract_path = env.get('MLC_EXTRACT_PATH', '')
     folderpath = None
     extracted_file = env.get('MLC_EXTRACT_EXTRACTED_FILENAME', '')
@@ -236,24 +236,15 @@ def postprocess(i):
         filepath = os.getcwd()  # Extracted to the root cache folder
         folderpath = os.getcwd()
 
+    if extract_to_folder:
+        if os.path.exists(os.path.join(folderpath, extract_to_folder)):
+            folderpath = os.path.join(folderpath, extract_to_folder)
+        if os.path.exists(os.path.join(filepath, extract_to_folder)):
+            filepath = os.path.join(filepath, extract_to_folder)
+
     if not os.path.exists(filepath):
         return {
             'return': 1, 'error': 'Path {} was not created or doesn\'t exist'.format(filepath)}
-
-    env['MLC_EXTRACT_EXTRACTED_PATH'] = filepath
-
-    # Set external environment variable with the final path
-    if env.get('MLC_EXTRACT_FINAL_ENV_NAME', '') != '':
-        env[env['MLC_EXTRACT_FINAL_ENV_NAME']] = filepath
-
-    # Detect if this file will be deleted or moved
-    env['MLC_GET_DEPENDENT_CACHED_PATH'] = filepath
-
-    # Check if need to remove archive after extraction
-    if is_true(env.get('MLC_EXTRACT_REMOVE_EXTRACTED', '')):
-        archive_filepath = env.get('MLC_EXTRACT_FILEPATH', '')
-        if archive_filepath != '' and os.path.isfile(archive_filepath):
-            os.remove(archive_filepath)
 
     # Check if only a single folder is created and if so, export the folder
     # name
@@ -266,6 +257,26 @@ def postprocess(i):
         if len(sub_folders) == 1:
             env['MLC_EXTRACT_EXTRACTED_SUBDIR_PATH'] = os.path.join(
                 folderpath, sub_folders[0])
+
+    env['MLC_EXTRACT_EXTRACTED_PATH'] = filepath
+
+    # Set external environment variable with the final path
+    if env.get('MLC_EXTRACT_FINAL_ENV_NAME', '') != '':
+        if is_true(env.get('MLC_EXTRACT_USE_SUBDIR_PATH')) and env.get(
+                'MLC_EXTRACT_EXTRACTED_SUBDIR_PATH', '') != '':
+            env[env['MLC_EXTRACT_FINAL_ENV_NAME']
+                ] = env['MLC_EXTRACT_EXTRACTED_SUBDIR_PATH']
+        else:
+            env[env['MLC_EXTRACT_FINAL_ENV_NAME']] = filepath
+
+    # Detect if this file will be deleted or moved
+    env['MLC_GET_DEPENDENT_CACHED_PATH'] = filepath
+
+    # Check if need to remove archive after extraction
+    if is_true(env.get('MLC_EXTRACT_REMOVE_EXTRACTED', '')):
+        archive_filepath = env.get('MLC_EXTRACT_FILEPATH', '')
+        if archive_filepath != '' and os.path.isfile(archive_filepath):
+            os.remove(archive_filepath)
 
     # Since may change directory, check if need to clean some temporal files
     automation.clean_some_tmp_files({'env': env})

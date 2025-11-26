@@ -1,4 +1,4 @@
-# README for run-docker-container
+# README for build-dockerfile
 This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,56 +33,50 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr run,docker,container
+mlcr build,dockerfile
 ```
 
 ### Script Inputs
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
-| `--all_gpus` |  |  | `` |
-| `--num_gpus` |  |  | `` |
-| `--base` |  |  | `` |
+| `--build` |  |  | `` |
 | `--cache` |  |  | `` |
 | `--mlc_repo` |  |  | `` |
-| `--detached` |  |  | `` |
-| `--device` |  |  | `` |
-| `--docker_image_base` | Alias for base |  | `` |
-| `--docker_base_image` | Alias for base |  | `` |
-| `--base_image` | Alias for base |  | `` |
-| `--keep_detached` |  |  | `` |
-| `--reuse_existing` |  |  | `no` |
-| `--docker_os` |  |  | `` |
-| `--docker_os_version` |  |  | `` |
-| `--os` | Alias for docker_os |  | `` |
-| `--os_version` | Alias for docker_os_version |  | `` |
-| `--extra_run_args` |  |  | `` |
+| `--mlc_repo_flags` |  |  | `` |
+| `--mlc_repos` |  |  | `` |
+| `--mlc_repo_branch` |  |  | `dev` |
+| `--comments` |  |  | `` |
+| `--copy_files` |  |  | `` |
+| `--base_image` |  |  | `` |
+| `--os` |  |  | `ubuntu` |
+| `--os_version` |  |  | `` |
+| `--docker_base_image` | Alias for base_image |  | `` |
+| `--docker_os` | Alias for os |  | `` |
+| `--docker_os_version` | Alias for os_version |  | `` |
+| `--dockerfile_env` |  |  | `` |
+| `--dockerfile_build_env` |  |  | `` |
+| `--extra_sys_deps` |  |  | `` |
+| `--fake_docker_deps` |  |  | `` |
 | `--fake_run_option` |  |  | `` |
+| `--file_path` |  |  | `` |
 | `--gh_token` |  |  | `` |
-| `--image_name` |  |  | `` |
 | `--image_repo` |  |  | `` |
 | `--image_tag` |  |  | `` |
-| `--image_tag_extra` |  |  | `` |
-| `--interactive` |  |  | `` |
-| `--it` |  |  | `` |
-| `--mounts` |  |  | `` |
-| `--use_host_user_id` |  |  | `` |
-| `--use_host_group_id` |  |  | `` |
-| `--pass_user_id` |  |  | `` |
-| `--pass_user_group` |  |  | `` |
-| `--port_maps` |  |  | `` |
+| `--mlc_repo_path` |  |  | `` |
+| `--package_manager_update_cmd` |  |  | `` |
+| `--pip_extra_flags` |  |  | `` |
+| `--post_file` |  |  | `` |
 | `--post_run_cmds` |  |  | `` |
 | `--pre_run_cmds` |  |  | `` |
-| `--privileged` |  |  | `no` |
 | `--real_run` |  |  | `` |
-| `--recreate` |  |  | `` |
-| `--rebuild` | Alias for recreate |  | `` |
 | `--run_cmd` |  |  | `` |
 | `--run_cmd_extra` |  |  | `` |
-| `--save_script` |  |  | `` |
 | `--script_tags` |  |  | `` |
-| `--shm_size` |  |  | `` |
-| `--use_google_dns` |  |  | `` |
+| `--skip_mlc_sys_upgrade` |  |  | `` |
+| `--push_image` |  |  | `` |
+| `--docker_not_pull_update` |  |  | `False` |
+| `--user` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -102,3 +96,7 @@ mlcr run,docker,container
 | `--hf_token` | Huggingface Token |  | `` |
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
+
+### Ungrouped
+
+- `slim`

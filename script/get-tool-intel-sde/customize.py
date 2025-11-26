@@ -22,7 +22,7 @@ def preprocess(i):
     if 'MLC_INTEL_SDE_BIN_WITH_PATH' not in env:
         if env.get('MLC_INTEL_SDE_DIR_PATH', '') != '':
             sde_path = env['MLC_INTEL_SDE_DIR_PATH']
-            if os.path.exists(os.path.join(sde_path, 'sde')):
+            if os.path.exists(os.path.join(sde_path, exe)):
                 env['MLC_TMP_PATH'] = sde_path
 
         r = i['automation'].find_artifact({'file_name': exe,

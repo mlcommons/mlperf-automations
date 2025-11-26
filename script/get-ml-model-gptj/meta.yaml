@@ -107,7 +107,7 @@ variations:
     required_disk_space: 22700
   pytorch,fp32,rclone:
     env:
-      MLC_PACKAGE_URL: mlc-inference:mlcommons-inference-wg-public/gpt-j
+      MLC_RCLONE_URL: mlc-inference:mlcommons-inference-wg-public/gpt-j
       MLC_RCLONE_CONFIG_NAME: mlc-inference
   pytorch,fp32,r2-downloader:
     env:
@@ -191,7 +191,7 @@ variations:
         tags: _rclone
     env:
       MLC_DOWNLOAD_FILENAME: checkpoint
-      MLC_DOWNLOAD_URL: <<<MLC_PACKAGE_URL>>>
+      MLC_DOWNLOAD_URL: <<<MLC_RCLONE_URL>>>
     group: download-tool
   r2-downloader:
     group: download-tool

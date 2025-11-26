@@ -45,6 +45,7 @@ input_mapping:
   gh_token: MLC_GH_TOKEN
   image_repo: MLC_DOCKER_IMAGE_REPO
   image_tag: MLC_DOCKER_IMAGE_TAG
+  mlc_repo_path: MLC_REPO_PATH
   package_manager_update_cmd: MLC_PACKAGE_MANAGER_UPDATE_CMD
   pip_extra_flags: MLC_DOCKER_PIP_INSTALL_EXTRA_FLAGS
   post_file: DOCKER_IMAGE_POST_FILE

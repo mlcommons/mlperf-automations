@@ -1,0 +1,81 @@
+alias: get-profiler-uprof
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+category: Compiler automation
+clean_files: []
+deps:
+- tags: detect,os
+- enable_if_env:
+    MLC_UPROF_ACCEPT_EULA:
+    - true
+    MLC_UPROF_URL:
+    - true
+  env:
+    MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_UPROF_TAR_FILE_PATH
+  extra_cache_tags: uprof,download
+  force_cache: true
+  tags: download,file,_mlcutil
+  update_tags_from_env_with_prefix:
+    _url.:
+    - MLC_UPROF_URL
+- enable_if_env:
+    MLC_UPROF_NEEDS_TAR:
+    - true
+  env:
+    MLC_EXTRACT_FINAL_ENV_NAME: MLC_UPROF_DIR_PATH
+    MLC_EXTRACT_USE_SUBDIR_PATH: yes
+    MLC_EXTRACT_TO_FOLDER: uprof_install
+  extra_cache_tags: uprof,extract
+  force_cache: true
+  tags: extract,file
+  update_tags_from_env_with_prefix:
+    _path.:
+    - MLC_UPROF_TAR_FILE_PATH
+input_mapping:
+  accept_eula: MLC_UPROF_ACCEPT_EULA
+  uprof_dir: MLC_UPROF_DIR_PATH
+  tar_file_path: MLC_UPROF_TAR_FILE_PATH
+name: Detect or install AMD uprof
+new_env_keys:
+- +PATH
+- MLC_UPROF_INSTALLED_PATH
+- MLC_UPROF_BIN_WITH_PATH
+post_deps_off:
+- tags: get,compiler-flags
+sort: 500
+tags:
+- get-uprof
+- get
+- uprof
+- uprof-profiler
+tests:
+  run_inputs:
+  - accept_eula: true
+uid: 1530bfcddc3f4fa1
+
+variations:
+  download-and-install:
+    # currently not supported as EULA needs to be approved manually
+    default_version: 5.1
+    env:
+      MLC_UPROF_DOWNLOAD: true
+    group: install-type
+  local-install:
+    default: true
+    env:
+      MLC_UPROF_DOWNLOAD: false
+    group: install-type
+  path.#:
+    default_variations:
+      install-type: local-install
+    env:
+      MLC_UPROF_DIR_PATH: '#'
+
+versions:
+  5.1:
+    env:
+      MLC_UPROF_NEEDS_TAR: true
+      MLC_UPROF_URL: https://download.amd.com/developer/eula/uprof/uprof-5-1/AMDuProf_Linux_x64_5.1.701.tar.bz2
+      MLC_DOWNLOAD_CHECKSUM: a297f370e633505e4c432da4f94c680a
+      MLC_VERSION: 5.1.701

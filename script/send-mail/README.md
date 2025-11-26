@@ -1,4 +1,4 @@
-# README for run-docker-container
+# README for send-mail
 This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,56 +33,19 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr run,docker,container
+mlcr send,mail,email
 ```
 
 ### Script Inputs
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
-| `--all_gpus` |  |  | `` |
-| `--num_gpus` |  |  | `` |
-| `--base` |  |  | `` |
-| `--cache` |  |  | `` |
-| `--mlc_repo` |  |  | `` |
-| `--detached` |  |  | `` |
-| `--device` |  |  | `` |
-| `--docker_image_base` | Alias for base |  | `` |
-| `--docker_base_image` | Alias for base |  | `` |
-| `--base_image` | Alias for base |  | `` |
-| `--keep_detached` |  |  | `` |
-| `--reuse_existing` |  |  | `no` |
-| `--docker_os` |  |  | `` |
-| `--docker_os_version` |  |  | `` |
-| `--os` | Alias for docker_os |  | `` |
-| `--os_version` | Alias for docker_os_version |  | `` |
-| `--extra_run_args` |  |  | `` |
-| `--fake_run_option` |  |  | `` |
-| `--gh_token` |  |  | `` |
-| `--image_name` |  |  | `` |
-| `--image_repo` |  |  | `` |
-| `--image_tag` |  |  | `` |
-| `--image_tag_extra` |  |  | `` |
-| `--interactive` |  |  | `` |
-| `--it` |  |  | `` |
-| `--mounts` |  |  | `` |
-| `--use_host_user_id` |  |  | `` |
-| `--use_host_group_id` |  |  | `` |
-| `--pass_user_id` |  |  | `` |
-| `--pass_user_group` |  |  | `` |
-| `--port_maps` |  |  | `` |
-| `--post_run_cmds` |  |  | `` |
-| `--pre_run_cmds` |  |  | `` |
-| `--privileged` |  |  | `no` |
-| `--real_run` |  |  | `` |
-| `--recreate` |  |  | `` |
-| `--rebuild` | Alias for recreate |  | `` |
-| `--run_cmd` |  |  | `` |
-| `--run_cmd_extra` |  |  | `` |
-| `--save_script` |  |  | `` |
-| `--script_tags` |  |  | `` |
-| `--shm_size` |  |  | `` |
-| `--use_google_dns` |  |  | `` |
+| `--subject` |  |  | `` |
+| `--to_addresses` |  |  | `` |
+| `--to_address` | Alias for to_addresses |  | `` |
+| `--attachments` |  |  | `` |
+| `--attachment` | Alias for attachments |  | `` |
+| `--use_attachment_basenames` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |

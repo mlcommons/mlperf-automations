@@ -21,6 +21,13 @@ def preprocess(i):
 
     MLC_DOCKER_BUILD_ARGS = env.get('+ MLC_DOCKER_BUILD_ARGS', [])
 
+    if not is_false(env.get('MLC_DOCKER_USE_HOST_USER_ID')
+                    ) and os.name != 'nt' and "UID=\" $(id -u $USER) \"" not in MLC_DOCKER_BUILD_ARGS:
+        MLC_DOCKER_BUILD_ARGS.append(f"UID=\" $(id -u $USER) \"")
+    if not is_false(env.get('MLC_DOCKER_USE_HOST_GROUP_ID')
+                    ) and os.name != 'nt' and "GID=\" $(id -g $USER) \"" not in MLC_DOCKER_BUILD_ARGS:
+        MLC_DOCKER_BUILD_ARGS.append(f"GID=\" $(id -g $USER) \"")
+
     if env.get('MLC_GH_TOKEN', '') != '':
         MLC_DOCKER_BUILD_ARGS.append("MLC_GH_TOKEN=" + env['MLC_GH_TOKEN'])
 

@@ -87,8 +87,10 @@ def preprocess(i):
                     "Dockerfile")))
         os.makedirs(build_context_dir, exist_ok=True)
 
+        repo_name = os.path.basename(mlc_repo_path)
         # Create mlc_repo directory relative to the build context
-        repo_build_context_path = os.path.join(build_context_dir, "mlc_repo")
+        repo_build_context_path = os.path.join(
+            build_context_dir, "mlc_repo", repo_name)
 
         # Remove existing directory if it exists
         if os.path.exists(repo_build_context_path):
@@ -309,8 +311,8 @@ def preprocess(i):
 
     docker_use_virtual_python = env.get('MLC_DOCKER_USE_VIRTUAL_PYTHON', "yes")
     if not is_false(docker_use_virtual_python):
-        f.write('RUN {} -m venv $HOME/venv/mlc'.format(python) + " " + EOL)
-        f.write('ENV PATH="$HOME/venv/mlc/bin:$PATH"' + EOL)
+        f.write('RUN {} -m venv $HOME/venv/mlcflow'.format(python) + " " + EOL)
+        f.write('ENV PATH="$HOME/venv/mlcflow/bin:$PATH"' + EOL)
     # f.write('RUN . /opt/venv/mlc/bin/activate' + EOL)
 
     f.write('ENV PATH="$PATH:$HOME/.local/bin"' + EOL)
@@ -328,22 +330,27 @@ def preprocess(i):
         EOL)
 
     f.write(EOL + '# Download MLC repo for scripts' + EOL)
-    pat = env.get('MLC_GH_TOKEN')
-    if pat:
+    pat = env.get('MLC_GH_TOKEN', '')
+
+    if pat != '':
         token_string = f" --pat={pat}"
     else:
         token_string = ""
 
     if use_copy_repo:
-        docker_repo_dest = "$HOME/MLC/repos/mlcommons@mlperf-automations"
+        repo_name = os.path.basename(relative_repo_path)
+        docker_repo_dest = f"$HOME/MLC/repos/{repo_name}"
         f.write(
-            f'COPY --chown=mlcuser:mlc {relative_repo_path} {docker_repo_dest}' +
+            f'COPY --chown={docker_user}:{docker_group} {relative_repo_path} {docker_repo_dest}' +
             EOL)
 
         f.write(EOL + '# Register MLC repository' + EOL)
         f.write(
-            'RUN mlc pull repo --url={} {token_string} --quiet'.format(docker_repo_dest) +
+            'RUN mlc add repo {} --quiet'.format(docker_repo_dest) +
             EOL)
+        # f.write(
+        #    'RUN mlc pull repo --url={} {} --quiet'.format(docker_repo_dest, token_string) +
+        #    EOL)
         f.write(EOL)
 
     else:

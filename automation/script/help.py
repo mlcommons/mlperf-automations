@@ -26,12 +26,14 @@ def display_help(self_module, input_params):
     generic_inputs = self_module.input_flags_converted_to_env
 
     # Step 2: Search for scripts
-    search_result = self_module.search(input_params.copy())
-    if search_result['return'] > 0:
-        return search_result
 
-    scripts_list = search_result['list']
-    if not scripts_list:
+    r = self_module._select_script(input_params)
+    if r['return'] > 0:
+        return r
+
+    script = r['script']
+
+    if not script:
 
         print("")
         print("Please use script tags or alias/uid to get help for a specific script")
@@ -41,17 +43,14 @@ def display_help(self_module, input_params):
         print_input_descriptions(generic_inputs)
 
     else:
-        # Step 4: Iterate over scripts and generate help output
-        for script in sorted(
-                scripts_list, key=lambda x: x.meta.get('alias', '')):
-            metadata = script.meta
-            script_path = script.path
-            print_script_help(
-                metadata,
-                script_path,
-                generic_inputs,
-                env,
-                self_module)
+        metadata = script.meta
+        script_path = script.path
+        print_script_help(
+            metadata,
+            script_path,
+            generic_inputs,
+            env,
+            self_module)
 
     return {'return': 0}
 
@@ -146,22 +145,28 @@ def print_input_descriptions(input_descriptions):
     if not input_descriptions:
         print("\tNo inputs")
 
-    for key in input_descriptions:
+    for key in sorted(input_descriptions):
         field = input_descriptions[key]
         env_key = field.get('env_key', f"""MLC_TMP_{key.upper()}""")
         desc = field.get('desc')
-        default = field.get('default', 'None')
+        default = field.get('default', None)
         choices = field.get("choices", "")
         dtype = infer_type(field)
+
+        line = []
+
         # Use .ljust(15) to ensure the key occupies 15 characters minimum
-        print(f"\t--{key.ljust(26)}: maps to --env.{env_key}")
-        if desc:
-            print(f"\t{' '.ljust(30)}Desc: {desc}")
-        print(f"\t{' '.ljust(30)}Default: {default}")
+        line.append(f"--{key.ljust(26)}: maps to --env.{env_key}")
+        if default:
+            line.append(f"{' '.ljust(30)}Default: {default}")
+        # if dtype:
+        #    line.append(f"{' '.ljust(30)}Type: {dtype}")
         if choices:
-            print(f"\t{' '.ljust(30)}Choices: {choices}")
-        if dtype:
-            print(f"\t{' '.ljust(30)}Type: {dtype}")
+            line.append(f"{' '.ljust(30)}Choices: {choices}")
+        if desc:
+            line.append(f"{' '.ljust(30)}Desc: {desc}")
+
+        print("\t" + "\t\n\t".join(line))
         print("")
 
 

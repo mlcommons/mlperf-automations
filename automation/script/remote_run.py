@@ -65,7 +65,7 @@ def remote_run(self_module, i):
     if i.get('remote_pull_mlc_repos', False):
         run_cmds.append("mlc pull repo")
 
-    script_run_cmd = " ".join(mlc_run_cmd.split(" ")[3:])
+    script_run_cmd = " ".join(mlc_run_cmd.split(" ")[1:])
     run_cmds.append(f"mlcr {script_run_cmd}")
 
     remote_inputs = {}
