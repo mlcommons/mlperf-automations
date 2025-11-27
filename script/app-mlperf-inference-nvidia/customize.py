@@ -555,7 +555,7 @@ def preprocess(i):
 
         model_precision = env.get(
             'MLC_MLPERF_MODEL_PRECISION').replace('float', 'fp')
-        if model_precision:
+        if model_precision and "fp32" not in model_precision: #by default we use the precision from the custom config
             run_config += f" --precision={model_precision}"
 
         dla_copy_streams = env.get(
