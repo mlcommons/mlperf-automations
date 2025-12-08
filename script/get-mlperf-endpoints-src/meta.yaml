@@ -1,0 +1,94 @@
+alias: get-mlperf-endpoints-src
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+category: MLPerf benchmark support
+default_env:
+  MLC_GIT_CHECKOUT_FOLDER: endpoints
+  MLC_GIT_DEPTH: --depth 4
+  MLC_GIT_PATCH: 'no'
+  MLC_GIT_RECURSE_SUBMODULES: ''
+deps:
+- tags: detect,os
+- names:
+  - python
+  - python3
+  tags: get,python3
+new_env_keys:
+- MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE
+- MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE_VERSION
+- MLC_MLPERF_LAST_RELEASE
+- +PYTHONPATH
+prehook_deps:
+- env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE
+  extra_cache_tags: endpoints,src
+  force_env_keys:
+  - MLC_GIT_*
+  names:
+  - inference-git-repo
+  tags: get,git,repo
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_URL
+    _sha.:
+    - MLC_GIT_SHA
+    _submodules.:
+    - MLC_GIT_SUBMODULES
+print_env_at_the_end_disabled:
+  MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE: Path to MLPerf endpoints benchmark sources
+tags:
+- get-mlperf-endpoints-src
+uid: 82c6b66389b24322
+variations:
+  mlcommons:
+    default: true
+    env:
+      MLC_GIT_URL: https://github.com/mlcommons/endpoints
+    group: repo
+  main:
+    default: true
+    env:
+      MLC_GIT_CHECKOUT: main
+    group: checkout
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+      MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE_VERSION: 'custom'
+    group: checkout
+  repo.#:
+    env:
+      MLC_GIT_URL: '#'
+      MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE_VERSION: 'custom'
+    group: repo
+  submodules.#:
+    env:
+      MLC_GIT_SUBMODULES: '#'
+  sha.#:
+    env:
+      MLC_GIT_SHA: '#'
+    group: checkout
+  full-history:
+    env:
+      MLC_GIT_DEPTH: ''
+    group: git-history
+  no-recurse-submodules:
+    env:
+      MLC_GIT_RECURSE_SUBMODULES: ''
+  patch:
+    ad:
+      inference-git-repo:
+        tags: _patch
+    env:
+      MLC_GIT_PATCH: 'yes'
+  recurse-submodules:
+    env:
+      MLC_GIT_RECURSE_SUBMODULES: ' --recurse-submodules'
+  short-history:
+    default: true
+    env:
+      MLC_GIT_DEPTH: --depth 10
+    group: git-history
+  
