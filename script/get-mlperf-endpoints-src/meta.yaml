@@ -26,7 +26,7 @@ prehook_deps:
   force_env_keys:
   - MLC_GIT_*
   names:
-  - inference-git-repo
+  - endpoints-git-repo
   tags: get,git,repo
   update_tags_from_env_with_prefix:
     _branch.:
