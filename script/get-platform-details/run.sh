@@ -42,7 +42,12 @@ eval "lscpu" >> "${OUTPUT_FILE}"
 test $? -eq 0 || exit $?
 echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
 
-echo "8. numactl --hardware" >> "${OUTPUT_FILE}"
+echo "8. lscpu --cache" >> "${OUTPUT_FILE}"
+eval "lscpu --cache" >> "${OUTPUT_FILE}"
+test $? -eq 0 || exit $?
+echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
+
+echo "9. numactl --hardware" >> "${OUTPUT_FILE}"
 if [[ ${MLC_SUDO_USER} == "yes" ]]; then
     echo "${MLC_SUDO} numactl --hardware"
     eval "${MLC_SUDO} numactl --hardware" >> "${OUTPUT_FILE}"
@@ -52,37 +57,32 @@ else
 fi
 echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
 
-echo "9. /proc/meminfo" >> "${OUTPUT_FILE}"
+echo "10. /proc/meminfo" >> "${OUTPUT_FILE}"
 eval "cat /proc/meminfo" >> "${OUTPUT_FILE}"
 test $? -eq 0 || exit $?
 echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-
-echo "10. who -r" >> "${OUTPUT_FILE}"
+echo "11. who -r" >> "${OUTPUT_FILE}"
 eval "who -r" >> "${OUTPUT_FILE}"
 test $? -eq 0 || exit $?
 echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-
-echo "11. Systemd service manager version" >> "${OUTPUT_FILE}"
+echo "12. Systemd service manager version" >> "${OUTPUT_FILE}"
 eval "systemctl --version | head -n 1" >> "${OUTPUT_FILE}"
 #test $? -eq 0 || exit $?
 echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-
-echo "12. Services, from systemctl list-unit-files" >> "${OUTPUT_FILE}"
+echo "13. Services, from systemctl list-unit-files" >> "${OUTPUT_FILE}"
 eval "systemctl list-unit-files" >> "${OUTPUT_FILE}"
 #test $? -eq 0 || exit $?
 echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-
-echo "13. Linux kernel boot-time arguments, from /proc/cmdline" >> "${OUTPUT_FILE}"
+echo "14. Linux kernel boot-time arguments, from /proc/cmdline" >> "${OUTPUT_FILE}"
 eval "cat /proc/cmdline" >> "${OUTPUT_FILE}"
 test $? -eq 0 || exit $?
 echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-
-echo "14. cpupower frequency-info" >> "${OUTPUT_FILE}"
+echo "15. cpupower frequency-info" >> "${OUTPUT_FILE}"
 eval "cpupower frequency-info" >> "${OUTPUT_FILE}"
 test $? -eq 0 || echo "FAILED: cpupower frequency-info" >> "${OUTPUT_FILE}"
 echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
 
-echo "15. sysctl" >> "${OUTPUT_FILE}"
+echo "16. sysctl" >> "${OUTPUT_FILE}"
 if [[ ${MLC_SUDO_USER} == "yes" ]]; then
     echo "${MLC_SUDO} sysctl -a"
     eval "${MLC_SUDO} sysctl -a" >> "${OUTPUT_FILE}"
@@ -91,33 +91,48 @@ else
     echo "Requires SUDO permission" >> "${OUTPUT_FILE}"
 fi
 echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-
-echo "16. /sys/kernel/mm/transparent_hugepage" >> "${OUTPUT_FILE}"
+echo "17. /sys/kernel/mm/transparent_hugepage" >> "${OUTPUT_FILE}"
 eval "cat /sys/kernel/mm/transparent_hugepage/enabled" >> "${OUTPUT_FILE}"
 #test $? -eq 0 || exit $?
 echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-
-echo "17. /sys/kernel/mm/transparent_hugepage/khugepaged" >> "${OUTPUT_FILE}"
+echo "18. /sys/kernel/mm/transparent_hugepage/khugepaged" >> "${OUTPUT_FILE}"
 eval "cat /sys/kernel/mm/transparent_hugepage/khugepaged/defrag" >> "${OUTPUT_FILE}"
 #test $? -eq 0 || exit $?
 echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-
-echo "18. OS release" >> "${OUTPUT_FILE}"
+echo "19. OS release" >> "${OUTPUT_FILE}"
 eval "cat /etc/os-release" >> "${OUTPUT_FILE}"
 test $? -eq 0 || exit $?
 echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-
-echo "19. Disk information" >> "${OUTPUT_FILE}"
+echo "20. Disk information" >> "${OUTPUT_FILE}"
 eval "lsblk" >> "${OUTPUT_FILE}"
 test $? -eq 0 || exit $?
 echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-
-echo "20. /sys/devices/virtual/dmi/id" >> "${OUTPUT_FILE}"
+echo "21. /sys/devices/virtual/dmi/id" >> "${OUTPUT_FILE}"
 eval "ls /sys/devices/virtual/dmi/id" >> "${OUTPUT_FILE}"
 #test $? -eq 0 || exit $?
 echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
 
-echo "21. dmidecode" >> "${OUTPUT_FILE}"
+echo "22. /usr/bin/lsb_release -d" >> "${OUTPUT_FILE}"
+eval "/usr/bin/lsb_release -d" >> "${OUTPUT_FILE}"
+test $? -eq 0 || exit $?
+echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
+
+echo "23. cat /etc/*version*" >> "${OUTPUT_FILE}"
+eval "cat /etc/*version*" >> "${OUTPUT_FILE}"
+test $? -eq 0 || echo "FAILED: cat /etc/*version*" >> "${OUTPUT_FILE}"
+echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
+
+echo "24. cat /etc/*release*" >> "${OUTPUT_FILE}"
+eval "cat /etc/*release*" >> "${OUTPUT_FILE}"
+test $? -eq 0 || echo "FAILED: cat /etc/*release*" >> "${OUTPUT_FILE}"
+echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
+
+echo "25. Kernel self-reported vulnerability status:" >> "${OUTPUT_FILE}"
+eval "grep . /sys/devices/system/cpu/vulnerabilities/*" >> "${OUTPUT_FILE}"
+test $? -eq 0 || echo "FAILED: grep /sys/devices/system/cpu/vulnerabilities/*" >> "${OUTPUT_FILE}"
+echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
+
+echo "26. dmidecode" >> "${OUTPUT_FILE}"
 if [[ ${MLC_SUDO_USER} == "yes" ]]; then
     eval "${MLC_SUDO} dmidecode" >> "${OUTPUT_FILE}"
     test $? -eq 0 || echo "FAILED: dmidecode" >> "${OUTPUT_FILE}"
@@ -126,7 +141,7 @@ else
 fi
 echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
 
-echo "22. BIOS" >> "${OUTPUT_FILE}"
+echo "27. BIOS" >> "${OUTPUT_FILE}"
 if [[ ${MLC_SUDO_USER} == "yes" ]]; then
     eval "${MLC_SUDO} dmidecode -t bios" >> "${OUTPUT_FILE}"
     test $? -eq 0 || echo "FAILED: dmidecode -t bios" >> "${OUTPUT_FILE}"
