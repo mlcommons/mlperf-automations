@@ -1,0 +1,19 @@
+alias: get-multilib
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: MLC Script Template
+deps:
+  - tags: detect,os
+  - tags: detect,sudo
+new_env_keys: []
+new_state_keys: []
+post_deps: []
+posthook_deps: []
+prehook_deps: []
+tags:
+- get-multilib
+- multilib
+- get
+tests:
+  run_inputs: []
+uid: ae2a3a1cd5db4c24

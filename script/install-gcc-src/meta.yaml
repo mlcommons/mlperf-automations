@@ -55,6 +55,14 @@ variations:
   extra.#:
     env:
       MLC_GCC_EXTRA_CONFIGURE_STRING: '#'
+      
+  enable-multilib:
+    deps:
+      - tags: get,multilib
+    env:
+      +MLC_GCC_EXTRA_CONFIGURE_LIST:
+        - "--enable-multilib"
+
   mainline:
     group: repo
     default: true
