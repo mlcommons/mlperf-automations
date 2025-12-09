@@ -100,7 +100,7 @@ class ScriptAutomation(Automation):
                                              'verify_ssl': {'desc': 'Verify SSL', 'default': False}
                                              }
 
-    ############################################################
+    #################################################################
 
     def run(self, i):
         """
