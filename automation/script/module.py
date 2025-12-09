@@ -4501,7 +4501,8 @@ pip install mlcflow
 
         if r['match'].lastindex and r['match'].lastindex >= group_number:
             version = r['match'].group(group_number)
-            if i.get('group_number_extra') and r['match'].lastindex >= i['group_number_extra']:
+            if i.get(
+                    'group_number_extra') and r['match'].lastindex >= i['group_number_extra']:
                 join_string = i.get('group_join_string', '-')
                 group_number_extra = i['group_number_extra']
                 version += f"{join_string}{r['match'].group(group_number_extra)}"
