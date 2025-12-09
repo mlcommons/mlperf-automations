@@ -30,7 +30,7 @@ jobs:
           extra-args: "--adr.compiler.tags=gcc"
         - os: windows-latest 
           docker: " --docker --docker_mlc_repo=${{ github.event.pull_request.head.repo.html_url }} --docker_mlc_repo_branch=${{ github.event.pull_request.head.ref }} --docker_dt"
-          # windows docker image is not supported in CM yet
+          # windows docker image is not supported in MLC yet
         - os: macos-latest
           python-version: "3.8"
         - os: macos-15
