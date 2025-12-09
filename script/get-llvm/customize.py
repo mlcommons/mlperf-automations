@@ -48,7 +48,7 @@ def preprocess(i):
 
 def detect_version(i):
 
-    r = i['automation'].parse_version({'match_text': r'clang version\s*([\d.]+)',
+    r = i['automation'].parse_version({'match_text': r'clang version\s+([\w.]+(?:.*?\s([0-9a-f]{7,40}))?)',
                                        'group_number': 1,
                                        'env_key': 'MLC_LLVM_CLANG_VERSION',
                                        'which_env': i['env']})

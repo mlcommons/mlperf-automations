@@ -71,6 +71,7 @@ mlcr install,src,gcc,src-gcc
 
 ### Ungrouped
 
+- `enable-multilib`
 - `extra.#` _(# can be substituted dynamically)_
 - `lang.#` _(# can be substituted dynamically)_
 
