@@ -143,5 +143,7 @@ def postprocess(i):
     env['MLC_PYTHON_MINOR_VERSION'] = python_minor_version
     env['MLC_PYTHON_PATCH_VERSION'] = python_patch_version
 
+    env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_PYTHON_BIN_PATH']
+
     return {'return': 0, 'version': version,
             'add_extra_cache_tags': add_extra_cache_tags}

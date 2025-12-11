@@ -97,7 +97,7 @@ def postprocess(i):
     env['MLC_ONEAPI_COMPILER_WITH_PATH'] = found_file_path
     env['MLC_ONEAPI_COMPILER_FLAG_VERSION'] = 'version'
 
-    env['MLC_DEPENDENT_CACHED_PATH'] = found_file_path
+    env['MLC_GET_DEPENDENT_CACHED_PATH'] = found_file_path
 
     list_keys = ['+LD_LIBRARY_PATH']
     for key in list_keys:
