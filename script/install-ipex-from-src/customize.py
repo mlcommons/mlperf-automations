@@ -36,7 +36,7 @@ def postprocess(i):
         "Release",
         "packages",
         "intel_extension_for_pytorch")
-    
+
     env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_IPEX_INSTALLED_PATH']
 
     return {'return': 0}
