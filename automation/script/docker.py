@@ -6,6 +6,7 @@ from pathlib import PureWindowsPath, PurePosixPath
 from script.docker_utils import *
 import copy
 
+
 def dockerfile(self_module, input_params):
 
     # Step 1: Prune and prepare input
