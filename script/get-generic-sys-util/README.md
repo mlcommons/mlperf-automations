@@ -89,6 +89,7 @@ mlcr get,sys-util,generic,generic-sys-util
 - `git-lfs`
 - `glog-dev`
 - `ipmitool`
+- `lcov`
 - `libboost-all-dev`
 - `libbz2-dev`
 - `libev-dev`

@@ -189,6 +189,18 @@ variations:
     state:
       gfortran-aarch64: # tbd: complete for other flavours of linux
         apt: gfortran-aarch64-linux-gnu
+  lcov:
+    env:
+      MLC_SYS_UTIL_NAME: lcov
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+    - MLC_LCOV_VERSION
+    state:
+      lcov:
+        apt: lcov
+        brew: ''
+        dnf: ''   
+        yum: ''
   libgl:
     env:
       MLC_SYS_UTIL_NAME: libgl # tbd: regular expression for version as well as whether its installed?

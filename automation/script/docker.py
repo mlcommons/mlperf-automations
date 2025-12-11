@@ -30,6 +30,9 @@ def dockerfile(self_module, input_params):
     tag_values = input_params.get('tags', '').split(",")
     variation_tags = [tag[1:] for tag in tag_values if tag.startswith("_")]
 
+    if is_quiet_mode:
+        env['MLC_QUIET'] = 'yes'
+
     r = self_module._select_script(input_params)
     if r['return'] > 0:
         return r
@@ -250,6 +253,9 @@ def docker_run(self_module, i):
     show_time = i.get('show_time', False)
     logger = self_module.logger
     env = i.get('env', {})
+
+    if quiet:
+        env['MLC_QUIET'] = 'yes'
 
     regenerate_docker_file = not i.get('docker_noregenerate', False)
     rebuild_docker_image = i.get('docker_rebuild', False)
