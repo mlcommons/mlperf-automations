@@ -12,7 +12,8 @@ def preprocess(i):
     if os_info['platform'] == "windows":
         return {'return': 1, 'error': 'Script not supported in windows yet!'}
 
-    if env.get('MLC_ML_DATASET_MLPERF_INFERENCE_DLRMV3_SYNTHETIC_STREAMING_PATH', '') == '':
+    if env.get(
+            'MLC_ML_DATASET_MLPERF_INFERENCE_DLRMV3_SYNTHETIC_STREAMING_PATH', '') == '':
         env['MLC_TMP_REQUIRE_DOWNLOAD'] = "yes"
 
     return {'return': 0}
