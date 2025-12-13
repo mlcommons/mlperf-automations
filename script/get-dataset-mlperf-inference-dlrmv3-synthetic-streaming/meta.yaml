@@ -1,0 +1,60 @@
+alias: get-dataset-mlperf-inference-dlrmv3-synthetic-streaming
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+new_env_keys:
+- MLC_ML_DATASET_MLPERF_INFERENCE_DLRMV3_SYNTHETIC_STREAMING_PATH
+- MLC_ML_DATASET_FILE_WITH_PATH
+print_env_at_the_end:
+  MLC_ML_DATASET_MLPERF_INFERENCE_DLRMV3_SYNTHETIC_STREAMING_PATH: DLRM V3 synthetic streaming dataset path
+tags:
+- get
+- dataset
+- mlperf
+- inference
+- dlrmv3
+- synthetic-streaming
+- get-dataset-mlperf-inference-dlrmv3-synthetic-streaming
+tests:
+  needs_pat: true
+  run_inputs:
+  - variations_list:
+    - r2-downloader,mlc,dry-run
+uid: d73c9e063f5e44f2
+variations:
+  dry-run:
+    env:
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  mlc:
+    default: true
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+    group: download-src
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      env:
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_DATASET_MLPERF_INFERENCE_DLRMV3_SYNTHETIC_STREAMING_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_DATASET_MLPERF_INFERENCE_DLRMV3_SYNTHETIC_STREAMING_PATH
+      extra_cache_tags: ml,dataset,dlrmv3,synthetic-streaming
+      force_cache: true
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      names:
+      - dlrm-v3-synthetic-streaming-dataset
+      tags: download-and-extract
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
+  r2-downloader:
+    adr:
+      dlrm-v3-synthetic-streaming-dataset:
+        env:
+          MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/staging-53-dlrm-v3-checkpoint.uri
+        tags: _r2-downloader
+    default: true
