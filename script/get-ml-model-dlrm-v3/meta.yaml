@@ -52,4 +52,4 @@ variations:
       dlrm-v3-model-dae:
         tags: _r2-downloader
         env:
-          MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/staging-53-dlrm-v3-checkpoint.uri
+          MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/dlrmv3_trained_checkpoint
