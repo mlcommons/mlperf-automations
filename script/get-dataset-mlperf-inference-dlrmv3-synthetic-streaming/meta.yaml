@@ -41,6 +41,7 @@ variations:
       env:
         MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_DATASET_MLPERF_INFERENCE_DLRMV3_SYNTHETIC_STREAMING_PATH
         MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_DATASET_MLPERF_INFERENCE_DLRMV3_SYNTHETIC_STREAMING_PATH
+        MLC_DOWNLOAD_FILENAME: dlrm-v3-dataset
       extra_cache_tags: ml,dataset,dlrmv3,synthetic-streaming
       force_cache: true
       force_env_keys:

@@ -35,6 +35,7 @@ variations:
       env:
         MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_DLRM_V3_PATH
         MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_MODEL_DLRM_V3_PATH
+        MLC_DOWNLOAD_FILENAME: dlrm-v3-checkpoint
       extra_cache_tags: ml,model,dlrm-v3
       force_cache: true
       force_env_keys:
