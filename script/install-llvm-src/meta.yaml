@@ -98,6 +98,9 @@ variations:
       +MLC_LLVM_ENABLE_RUNTIMES: 
         - flang-rt
     group: flang
+    default_variations:
+      openmp-rt: openmp-rt
+      openmp: no-openmp
   compiler-rt:
     group: compiler-rt
     default: true
@@ -126,6 +129,15 @@ variations:
     group: lld
   no-lld:
     group: lld
+  openmp-rt:
+    env:
+      +MLC_LLVM_CMAKE_OPTIONS:
+       - '-DLIBOMP_USE_QUAD_PRECISION=OFF'
+      +MLC_LLVM_ENABLE_RUNTIMES:
+        - openmp
+    group: openmp-rt
+  no-openmp-rt:
+    group: openmp-rt
   openmp:
     default: true
     env:
