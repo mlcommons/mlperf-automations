@@ -70,6 +70,7 @@ mlcr get,sys-util,generic,generic-sys-util
 ### Ungrouped
 
 - `autoconf`
+- `build-essential`
 - `bzip2`
 - `ccache`
 - `cmake`
