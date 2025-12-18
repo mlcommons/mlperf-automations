@@ -74,6 +74,17 @@ variations:
     state:
       coreutils:
         brew: coreutils
+  build-essential:
+    env:
+      MLC_SYS_UTIL_NAME: build-essential
+      MLC_SYS_UTIL_VERSION_CMD: make --version
+      MLC_SYS_UTIL_VERSION_RE: GNU Make ([\d.]+)
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 1
+    new_env_keys:
+    - MLC_MAKE_VERSION
+    state:
+      build-essential:
+        apt: build-essential
   cmake:
     env:
       MLC_SYS_UTIL_NAME: cmake
