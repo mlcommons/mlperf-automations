@@ -15,10 +15,12 @@ tags:
 - dlrmv3
 - synthetic-streaming
 - get-dataset-mlperf-inference-dlrmv3-synthetic-streaming
+
 tests:
   run_inputs:
   - variations_list:
     - r2-downloader,mlc,dry-run
+    
 uid: d73c9e063f5e44f2
 variations:
   dry-run:
