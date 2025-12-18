@@ -2,7 +2,6 @@ from mlc import utils
 from utils import is_true
 import os
 
-
 def preprocess(i):
 
     os_info = i['os_info']
@@ -27,3 +26,4 @@ def postprocess(i):
         env['MLC_ML_DATASET_FILE_WITH_PATH'] = env['MLC_ML_DATASET_MLPERF_INFERENCE_DLRMV3_SYNTHETIC_STREAMING_PATH']
 
     return {'return': 0}
+
