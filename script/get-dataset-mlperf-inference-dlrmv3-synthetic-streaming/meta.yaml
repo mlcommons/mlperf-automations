@@ -57,6 +57,6 @@ variations:
     adr:
       dlrm-v3-synthetic-streaming-dataset:
         env:
-          MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/dlrmv3_dataset
+          MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/dlrm-v3-dataset.uri
         tags: _r2-downloader
     default: true
