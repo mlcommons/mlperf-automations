@@ -44,7 +44,7 @@ variations:
   hf:
     group: download-source
     env:
-      MLC_DOWNLOAD_SRC: huggingface\
+      MLC_DOWNLOAD_SRC: huggingface
   120b:
     env:
       MLC_GIT_CHECKOUT_FOLDER: gpt-oss-120b
