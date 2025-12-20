@@ -1,0 +1,101 @@
+alias: get-ml-model-gpt-oss
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+new_env_keys:
+- MLC_ML_MODEL_GPT_OSS_PATH
+- MLC_ML_MODEL_FILE_WITH_PATH
+print_env_at_the_end:
+  MLC_ML_MODEL_GPT_OSS_PATH: GPT OSS model path
+input_mapping:
+  checkpoint: MLC_ML_MODEL_GPT_OSS_PATH
+prehook_deps:
+- enable_if_env:
+    MLC_TMP_REQUIRE_DOWNLOAD:
+    - 'yes'
+    MLC_DOWNLOAD_SRC:
+    - 'huggingface'
+  env: {}
+  extra_cache_tags: gpt-oss,gpt-oss-model
+  force_env_keys:
+  - MLC_GIT_CHECKOUT_FOLDER
+  names:
+  - hf-zoo
+  tags: get,ml-model,huggingface,zoo,_clone-repo
+  force_env_keys:
+    - MLC_OUTDIRNAME  
+tags:
+- get-ml-model-gpt-oss
+# Will be enabled after the r2 downloader link is added
+# tests:
+#   needs_pat: true
+#   run_inputs:
+#   - variations_list:
+#     - r2-downloader,mlc,dry-run
+uid: 562047f9667c4c09
+variations:
+  dry-run:
+    env:
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  hf:
+    group: download-source
+    env:
+      MLC_DOWNLOAD_SRC: huggingface\
+  120b:
+    env:
+      MLC_GIT_CHECKOUT_FOLDER: gpt-oss-120b
+      MLC_ML_MODEL_SIZE: 120b
+    group: model-size
+    default: true
+  20b:
+    env:
+      MLC_GIT_CHECKOUT_FOLDER: gpt-oss-20b
+      MLC_ML_MODEL_SIZE: 20b
+    group: model-size
+  mlc:
+    default: true
+    default_variations:
+      model-size: 120b
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+    group: download-src
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      env:
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_GPT_OSS_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_MODEL_GPT_OSS_PATH
+      extra_cache_tags: ml,model,gpt-oss
+      force_cache: true
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      names:
+      - gpt-oss-model-dae
+      tags: download-and-extract
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
+  r2-downloader:
+    adr:
+      gpt-oss-model-dae:
+        env:
+          MLC_DOWNLOAD_URL: ""
+        tags: _r2-downloader
+    default: true
+  hf,120b:
+    adr:
+      hf-zoo:
+        tags: _model-stub.openai/gpt-oss-120b
+    env:
+      MLC_MODEL_ZOO_ENV_KEY: GPT-OSS
+  hf,20b:
+    adr:
+      hf-zoo:
+        tags: _model-stub.openai/gpt-oss-20b
+    env:
+      MLC_MODEL_ZOO_ENV_KEY: GPT-OSS
