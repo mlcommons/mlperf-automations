@@ -23,7 +23,11 @@ def postprocess(i):
 
     env = i['env']
 
-    if env.get('MLC_DOWNLOAD_MODE', '') != 'dry':
-        env['MLC_ML_MODEL_FILE_WITH_PATH'] = env['MLC_ML_MODEL_GPT_OSS_PATH']
+    if env.get('MLC_DOWNLOAD_MODE', '') != 'dry': 
+        if env.get('MLC_DOWNLOAD_SRC', '') == 'mlc':
+            env['MLC_ML_MODEL_FILE_WITH_PATH'] = env['MLC_ML_MODEL_GPT_OSS_PATH']
+        elif env.get('MLC_DOWNLOAD_SRC', '') == 'huggingface':
+            env['MLC_ML_MODEL_FILE_WITH_PATH'] = env['MLC_ML_MODEL_PATH']
+            env['MLC_ML_MODEL_GPT_OSS_PATH'] = env['MLC_ML_MODEL_PATH']
 
     return {'return': 0}
