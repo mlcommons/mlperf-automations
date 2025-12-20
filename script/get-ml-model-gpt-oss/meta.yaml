@@ -42,7 +42,7 @@ variations:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   hf:
-    group: download-source
+    group: download-src
     env:
       MLC_DOWNLOAD_SRC: huggingface
   120b:
