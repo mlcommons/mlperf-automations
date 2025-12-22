@@ -16,25 +16,17 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04, ubuntu-latest, macos-latest, macos-15, windows-latest]
-        python-version: [ "3.8", "3.12" ]
+        python-version: [ "3.9", "3.14" ]
         backend: [ "pytorch" ]
         implementation: [ "python" ]
         docker: [ "", " --docker --docker_mlc_repo=${{ github.event.pull_request.head.repo.html_url }} --docker_mlc_repo_branch=${{ github.event.pull_request.head.ref }} --docker_dt" ]
         extra-args: [ "--adr.compiler.tags=gcc", "--env.MLC_MLPERF_LOADGEN_BUILD_FROM_SRC=off" ]
         exclude:
-        - os: ubuntu-latest
-          python-version: "3.8"
-        - os: windows-latest
-          python-version: "3.8"
         - os: windows-latest
           extra-args: "--adr.compiler.tags=gcc"
         - os: windows-latest 
           docker: " --docker --docker_mlc_repo=${{ github.event.pull_request.head.repo.html_url }} --docker_mlc_repo_branch=${{ github.event.pull_request.head.ref }} --docker_dt"
           # windows docker image is not supported in MLC yet
-        - os: macos-latest
-          python-version: "3.8"
-        - os: macos-15
-          python-version: "3.8"
         - os: macos-latest
           docker: " --docker --docker_mlc_repo=${{ github.event.pull_request.head.repo.html_url }} --docker_mlc_repo_branch=${{ github.event.pull_request.head.ref }} --docker_dt"
         - os: macos-15
