@@ -112,6 +112,7 @@ variations:
       MLC_DOWNLOAD_CHECKSUM: a55f6bec3464f605ce8d686da8ac1533
       MLC_ML_MODEL_ACCURACY: '0.3755'
       MLC_PACKAGE_URL: https://zenodo.org/record/6617981/files/resnext50_32x4d_fpn.pth
+      MLC_DOWNLOAD_URL1: https://armi.in/files/resnext50_32x4d_fpn.pth
   pytorch,fp32,weights:
     add_deps_recursive:
       dae:
