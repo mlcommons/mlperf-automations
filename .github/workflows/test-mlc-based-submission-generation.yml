@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: [ "3.12" ]
+        python-version: [ "3.13" ]
         division: ["closed", "open", "closed-open"]
         category: ["datacenter", "edge"]
         case: ["closed", "closed-no-compliance", "closed-power", "closed-failed-power-logs", "case-1", "case-2", "case-3", "case-5", "case-6", "case-7", "case-8"]

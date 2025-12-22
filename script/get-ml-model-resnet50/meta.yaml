@@ -186,6 +186,7 @@ variations:
       MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: <<<MLC_PACKAGE_URL>>>
       MLC_ML_MODEL_SUBTRACT_MEANS: 'YES'
       MLC_PACKAGE_URL: https://zenodo.org/record/2535873/files/resnet50_v1.pb
+      MLC_DOWNLOAD_URL1: https://armi.in/files/resnet50_v1.pb
     group: framework
   tensorflow,fix-input-shape:
     deps:
