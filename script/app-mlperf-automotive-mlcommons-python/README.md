@@ -1,4 +1,4 @@
-# README for install-llvm-src
+# README for app-mlperf-automotive-mlcommons-python
 This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,18 +33,44 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr install,src,llvm,from.src,src-llvm
+mlcr automotive,mlcommons,reference,run-mlperf-inference,object-detection,abtf-model,demo
 ```
 
 ### Script Inputs
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
-| `--targets` |  |  | `` |
-| `--target_triple` |  |  | `` |
-| `--extra_options` |  |  | `` |
-| `--per_target_runtime_dir` |  |  | `` |
+| `--device` |  |  | `` |
+| `--count` |  |  | `` |
+| `--docker` |  |  | `` |
+| `--hw_name` |  |  | `` |
+| `--imagenet_path` |  |  | `` |
+| `--max_batchsize` |  |  | `` |
+| `--mode` |  |  | `accuracy` |
+| `--num_threads` |  |  | `` |
+| `--threads` | Alias for num_threads |  | `` |
+| `--dataset` |  |  | `` |
+| `--model` |  |  | `` |
+| `--output_dir` |  |  | `` |
+| `--power` |  |  | `` |
+| `--power_server` |  |  | `` |
+| `--ntp_server` |  |  | `` |
+| `--max_amps` |  |  | `` |
+| `--max_volts` |  |  | `` |
+| `--regenerate_files` |  |  | `` |
+| `--rerun` |  |  | `` |
+| `--scenario` |  |  | `Offline` |
+| `--test_query_count` |  |  | `10` |
 | `--clean` |  |  | `` |
+| `--dataset_args` |  |  | `` |
+| `--target_qps` |  |  | `` |
+| `--target_latency` |  |  | `` |
+| `--offline_target_qps` |  |  | `` |
+| `--server_target_qps` |  |  | `` |
+| `--constantstream_target_qps` |  |  | `` |
+| `--singlestream_target_latency` |  |  | `` |
+| `--multistream_target_latency` |  |  | `` |
+| `--output` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -65,67 +91,40 @@ mlcr install,src,llvm,from.src,src-llvm
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
-### Build-type
+### Batch-size
 
-- `debug`
-- `release` (default)
+- `batch_size.#` _(# can be substituted dynamically)_
 
-### Clang
+### Device
 
-- `clang` (default)
-- `no-clang`
+- `cpu` (default)
+- `cuda`
 
-### Compiler-rt
+### Framework
 
-- `compiler-rt` (default)
-- `no-compiler-rt`
+- `onnxruntime`
+- `pytorch` (default)
 
-### Flang
+### Implementation
 
-- `flang`
+- `python` (default)
 
-### Libcxx
+### Loadgen-scenario
 
-- `libcxx` (default)
-- `no-libcxx`
+- `constantstream`
+- `singlestream`
 
-### Lld
+### Models
 
-- `lld` (default)
-- `no-lld`
-
-### Openmp
-
-- `no-openmp`
-- `openmp` (default)
-
-### Openmp-rt
-
-- `no-openmp-rt`
-- `openmp-rt`
-
-### Repo
-
-- `repo.#` _(# can be substituted dynamically)_
-
-### Tests
-
-- `no-tests` (default)
-- `tests`
+- `abtf-demo-model`
+- `abtf-poc-model` (default)
+- `bevformer`
+- `deeplabv3plus`
+- `ssd`
 
 ### Ungrouped
 
-- `branch.#` _(# can be substituted dynamically)_
-- `cross-compile-x86-aarch64`
-- `for-intel-mlperf-inference-v3.1-bert` (base: tag.llvmorg-15.0.7, clang, release)
-- `for-intel-mlperf-inference-v3.1-gptj` (base: tag.llvmorg-16.0.6, clang, release)
-- `full-history`
-- `path.#` _(# can be substituted dynamically)_
-- `runtimes.#` _(# can be substituted dynamically)_
-- `sha.#` _(# can be substituted dynamically)_
-- `tag.#` _(# can be substituted dynamically)_ (base: full-history)
-
-### Version
-
-- `version.#` _(# can be substituted dynamically)_
-- `version.main` (base: branch.main)
+- `multistream`
+- `mvp_demo`
+- `offline`
+- `server`
