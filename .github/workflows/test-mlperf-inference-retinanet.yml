@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: [ "3.12" ]
+        python-version: [ "3.13" ]
         backend: [ "onnxruntime", "pytorch" ]
         implementation: [ "python", "cpp" ]
         compiler-string: [ "", "--adr.compiler.tags=aocc --env.MLC_AOCC_ACCEPT_EULA=yes" ]
