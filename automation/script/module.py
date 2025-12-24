@@ -3628,7 +3628,7 @@ class ScriptAutomation(Automation):
                     if r['return'] > 0:
                         if is_true(d.get('continue_on_error')):
                             # Warning printed by mlcflow
-                            #logger.warning(f"Dependency with tags: {d['tags']} failed. Ignoring the failure as 'continue_on_error' is set for the dependency call")
+                            # logger.warning(f"Dependency with tags: {d['tags']} failed. Ignoring the failure as 'continue_on_error' is set for the dependency call")
                             pass
                         else:
                             return r
