@@ -175,12 +175,11 @@ def postprocess(i):
     env['MLC_PYTHONLIB_' + env['MLC_TMP_PYTHON_PACKAGE_NAME_ENV'] +
         '_CACHE_TAGS'] = 'version-' + version
 
-    import pkgutil
+    import importlib.util
     package_name = env.get('MLC_GENERIC_PYTHON_PACKAGE_NAME', '').strip()
-    package = pkgutil.get_loader(package_name)
-    if package:
-        installed_file_path = package.get_filename()
-        env['MLC_GET_DEPENDENT_CACHED_PATH'] = installed_file_path
+    spec = importlib.util.find_spec(package_name)
+    if spec and spec.origin:
+        env['MLC_GET_DEPENDENT_CACHED_PATH'] = spec.origin
 
     pip_version = env.get('MLC_PIP_VERSION', '').strip().split('.')
     if pip_version and len(pip_version) > 1 and int(pip_version[0]) >= 23:
