@@ -3621,13 +3621,17 @@ class ScriptAutomation(Automation):
                         if d.get(key):
                             d[key] = {}
 
-                    # print(f"ii = {ii}, d = {d}")
                     utils.merge_dicts(
                         {'dict1': ii, 'dict2': d, 'append_lists': True, 'append_unique': True})
 
                     r = self.action_object.access(ii)
                     if r['return'] > 0:
-                        return r
+                        if is_true(d.get('continue_on_error')):
+                            # Warning printed by mlcflow
+                            #logger.warning(f"Dependency with tags: {d['tags']} failed. Ignoring the failure as 'continue_on_error' is set for the dependency call")
+                            pass
+                        else:
+                            return r
 
                     run_state['version_info'] = run_state_copy.get(
                         'version_info')
@@ -5466,7 +5470,7 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
 
         rc = os.system(cmd)
 
-        if rc > 0 and not i.get('ignore_script_error', False):
+        if rc > 0 and not is_true(i.get('ignore_script_error', False)):
             # Check if print files when error
             print_files = meta.get('print_files_if_script_error', [])
             if len(print_files) > 0:
