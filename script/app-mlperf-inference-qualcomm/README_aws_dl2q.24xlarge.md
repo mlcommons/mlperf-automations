@@ -1,4 +1,4 @@
-# MLPerf Inference Benchmarking on AWS dl2q.24xlarge instance using 8 QAIC Cloud AI 100
+# MLPerf™ Inference Benchmarking on AWS dl2q.24xlarge instance using 8 QAIC Cloud AI 100
 
 `dl2q.24xlarge` instance is available in `us-west-2d` and it has 96 vCPUs and 768 GB of memory. 
 
