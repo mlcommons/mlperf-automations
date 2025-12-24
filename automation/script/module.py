@@ -5510,15 +5510,15 @@ or full console log.
                 rr = {
                     'return': 2,
                     'error': f"""Native run script failed inside MLC script (name = {meta['alias']}, return code = {rc})\n\n{note}"""
-                    }
+                }
 
                 if repro_prefix != '':
                     dump_repro(repro_prefix, rr, run_state)
 
                 return rr
             else:
-                logger.warn(f"""Native run script failed inside MLC script (name = {meta['alias']}, return code = {rc}. Ignoring as ignore_script_error is set.)\n""")
-
+                logger.warn(
+                    f"""Native run script failed inside MLC script (name = {meta['alias']}, return code = {rc}. Ignoring as ignore_script_error is set.)\n""")
 
         # Load updated state if exists
         if tmp_file_run_state != '' and os.path.isfile(tmp_file_run_state):
