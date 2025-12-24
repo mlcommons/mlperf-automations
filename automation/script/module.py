@@ -5470,53 +5470,55 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
 
         rc = os.system(cmd)
 
-        if rc > 0 and not is_true(i.get('ignore_script_error', False)):
-            # Check if print files when error
-            print_files = meta.get('print_files_if_script_error', [])
-            if len(print_files) > 0:
-                for pr in print_files:
-                    if os.path.isfile(pr):
-                        r = utils.load_txt(file_name=pr)
-                        if r['return'] == 0:
-                            logger.info(
-                                "========================================================")
-                            logger.info("Print file {}:".format(pr))
-                            logger.info("")
-                            logger.info(r['string'])
-                            logger.info("")
+        if rc > 0:
+            if not is_true(i.get('ignore_script_error', False)):
+                # Check if print files when error
+                print_files = meta.get('print_files_if_script_error', [])
+                if len(print_files) > 0:
+                    for pr in print_files:
+                        if os.path.isfile(pr):
+                            r = utils.load_txt(file_name=pr)
+                            if r['return'] == 0:
+                                logger.info(
+                                    "========================================================")
+                                logger.info("Print file {}:".format(pr))
+                                logger.info("")
+                                logger.info(r['string'])
+                                logger.info("")
 
-            # Check where to report errors and failures
-            repo_to_report = run_state.get(
-                'script_entry_repo_to_report_errors', '')
+                # Check where to report errors and failures
+                repo_to_report = run_state.get(
+                    'script_entry_repo_to_report_errors', '')
 
-            if repo_to_report == '':
-                script_repo_alias = run_state.get('script_repo_alias', '')
-                script_repo_git = run_state.get('script_repo_git', False)
+                if repo_to_report == '':
+                    script_repo_alias = run_state.get('script_repo_alias', '')
+                    script_repo_git = run_state.get('script_repo_git', False)
 
-                if script_repo_git and script_repo_alias != '':
-                    repo_to_report = 'https://github.com/' + \
-                        script_repo_alias.replace('@', '/') + '/issues'
+                    if script_repo_git and script_repo_alias != '':
+                        repo_to_report = 'https://github.com/' + \
+                            script_repo_alias.replace('@', '/') + '/issues'
 
-            if repo_to_report == '':
-                repo_to_report = 'https://github.com/mlcommons/mlperf-automations/issues'
+                if repo_to_report == '':
+                    repo_to_report = 'https://github.com/mlcommons/mlperf-automations/issues'
 
-            note = '''
+                note = '''
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Please file an issue at {} along with the full MLC command being run and the relevant
 or full console log.
 '''.format(repo_to_report)
 
-            rr = {
-                'return': 2,
-                'error': 'MLC script failed (name = {}, return code = {})\n\n{}'.format(
-                    meta['alias'],
-                    rc,
-                    note)}
+                rr = {
+                    'return': 2,
+                    'error': f"""Native run script failed inside MLC script (name = {meta['alias']}, return code = {rc})\n\n{note}"""
+                    }
 
-            if repro_prefix != '':
-                dump_repro(repro_prefix, rr, run_state)
+                if repro_prefix != '':
+                    dump_repro(repro_prefix, rr, run_state)
 
-            return rr
+                return rr
+            else:
+                logger.warn(f"""Native run script failed inside MLC script (name = {meta['alias']}, return code = {rc}. Ignoring as ignore_script_error is set.)\n""")
+
 
         # Load updated state if exists
         if tmp_file_run_state != '' and os.path.isfile(tmp_file_run_state):
