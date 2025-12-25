@@ -11,13 +11,8 @@ on:
 jobs:
   run_nvidia:
       if: github.repository_owner == 'gateoverflow'
-      timeout-minutes: 1440
       runs-on:
-       - self-hosted
-       - linux
-       - x64
-       - cuda
-       - ${{ matrix.system }}
+       - ubuntu-latest
       strategy:
         fail-fast: false
         matrix:
