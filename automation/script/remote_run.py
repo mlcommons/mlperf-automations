@@ -74,7 +74,7 @@ def remote_run(self_module, i):
         run_cmds.append("mlc pull repo")
 
     files_to_copy = []
-    env_keys_to_copy = remote_run_settings.get('env_keys_to_copy')
+    env_keys_to_copy = remote_run_settings.get('env_keys_to_copy', [])
     for key in env_keys_to_copy:
         if key in env and os.path.exists(env[key]):
             files_to_copy.append(env[key])
