@@ -40,8 +40,8 @@ mlcr app,vision,language,mlcommons,mlperf,inference,generic
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
-| `--scenario` | MLPerf™ inference scenario | ['Offline', 'Server', 'SingleStream', 'MultiStream'] | `Offline` |
-| `--mode` | MLPerf™ inference mode | ['performance', 'accuracy'] | `accuracy` |
+| `--scenario` | MLPerf® inference scenario | ['Offline', 'Server', 'SingleStream', 'MultiStream'] | `Offline` |
+| `--mode` | MLPerf® inference mode | ['performance', 'accuracy'] | `accuracy` |
 | `--test_query_count` | Specifies the number of samples to be processed during a test run |  | `10` |
 | `--target_qps` | Target QPS |  | `` |
 | `--target_latency` | Target Latency |  | `` |
@@ -55,11 +55,11 @@ mlcr app,vision,language,mlcommons,mlperf,inference,generic
 | `--adr.python.version_min` | Minimal Python version |  | `3.8` |
 | `--adr.python.version` | Force Python version (must have all system deps) |  | `` |
 | `--adr.compiler.tags` | Compiler for loadgen |  | `gcc` |
-| `--adr.inference-src-loadgen.env.MLC_GIT_URL` | Git URL for MLPerf™ inference sources to build LoadGen (to enable non-reference implementations) |  | `` |
-| `--adr.inference-src.env.MLC_GIT_URL` | Git URL for MLPerf™ inference sources to run benchmarks (to enable non-reference implementations) |  | `` |
+| `--adr.inference-src-loadgen.env.MLC_GIT_URL` | Git URL for MLPerf® inference sources to build LoadGen (to enable non-reference implementations) |  | `` |
+| `--adr.inference-src.env.MLC_GIT_URL` | Git URL for MLPerf® inference sources to run benchmarks (to enable non-reference implementations) |  | `` |
 | `--quiet` | Quiet run (select default values for all questions) |  | `False` |
 | `--readme` | Generate README with the reproducibility report |  | `` |
-| `--debug` | Debug MLPerf™ script |  | `` |
+| `--debug` | Debug MLPerf® script |  | `` |
 | `--count` |  |  | `` |
 | `--docker` |  |  | `` |
 | `--imagenet_path` |  |  | `` |
