@@ -12,6 +12,7 @@ deps:
   - python3
   tags: get,python3
   version_max: 3.9.999
+  version_max_usable: 3.9.12
   skip_if_env:
     MLC_TMP_ML_MODEL: 
       - llama3_1-8b
