@@ -54,7 +54,7 @@ def remote_run(self_module, i):
         'alias', ''), meta.get(
         'uid', '')
 
-    #Update meta for selected variation and input
+    # Update meta for selected variation and input
     r = update_meta_for_selected_variations(self_module, script, i)
     if r['return'] > 0:
         return r
@@ -87,10 +87,9 @@ def remote_run(self_module, i):
                 "password", "skip_host_verify", "ssh_key_file"]:
         if i.get(f"remote_{key}"):
             remote_inputs[key] = i[f"remote_{key}"]
-    
+
     if files_to_copy:
         remote_inputs['files_to_copy'] = files_to_copy
-    
 
     # Execute the remote command
     mlc_remote_input = {
@@ -104,6 +103,7 @@ def remote_run(self_module, i):
         return r
 
     return {'return': 0}
+
 
 def update_meta_for_selected_variations(self_module, script, input_params):
     metadata = script.meta
@@ -127,7 +127,8 @@ def update_meta_for_selected_variations(self_module, script, input_params):
     constant_state = input_params.get('const_state', {})
 
     remote_run_settings = metadata.get('remote_run', {})
-    remote_run_settings_default_env = remote_run_settings.get('default_env', {})
+    remote_run_settings_default_env = remote_run_settings.get(
+        'default_env', {})
     for key in remote_run_settings_default_env:
         env.setdefault(key, remote_run_settings_default_env[key])
 
@@ -168,4 +169,5 @@ def update_meta_for_selected_variations(self_module, script, input_params):
 
     # Set Docker-specific configurations
     remote_run_settings = state_data['remote_run']
-    return {'return': 0, 'remote_run_settings': remote_run_settings, 'env': env, 'state': state_data}
+    return {'return': 0, 'remote_run_settings': remote_run_settings,
+            'env': env, 'state': state_data}

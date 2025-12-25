@@ -2,6 +2,7 @@ from mlc import utils
 import os
 import subprocess
 
+
 def preprocess(i):
 
     os_info = i['os_info']
@@ -34,11 +35,11 @@ def preprocess(i):
     else:
         password_string = ""
 
-
     ssh_cmd = ["ssh"]
 
     if env.get("MLC_SSH_SKIP_HOST_VERIFY"):
-        ssh_cmd += ["-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null"]
+        ssh_cmd += ["-o", "StrictHostKeyChecking=no",
+                    "-o", "UserKnownHostsFile=/dev/null"]
 
     key_file = env.get("MLC_SSH_KEY_FILE")
     if key_file:
@@ -46,12 +47,9 @@ def preprocess(i):
 
     ssh_cmd_str = " ".join(ssh_cmd)
 
-
-
-    ssh_run_command = ssh_cmd_str + " " +user + "@" + host + \
+    ssh_run_command = ssh_cmd_str + " " + user + "@" + host + \
         password_string + " '" + cmd_string + "'"
     env['MLC_SSH_CMD'] = ssh_run_command
-
 
     # ---- Use sshpass if password is provided ----
     rsync_base = ["rsync", "-avz"]
@@ -87,7 +85,6 @@ def preprocess(i):
             )
 
         print(f"✅ Copied {file} successfully")
-
 
     return {'return': 0}
 
