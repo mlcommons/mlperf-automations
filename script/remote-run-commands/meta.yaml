@@ -5,15 +5,15 @@ category: Remote automation
 default_env:
   MLC_SSH_CLIENT_REFRESH: '10'
   MLC_SSH_HOST: localhost
-  MLC_SSH_KEY_FILE: $HOME/.ssh/id_rsa
+  MLC_SSH_KEY_FILE: <<<HOME>>>/.ssh/id_rsa
   MLC_SSH_PORT: '22'
-  MLC_SSH_USER: $USER
 input_mapping:
   client_refresh: MLC_SSH_CLIENT_REFRESH
   host: MLC_SSH_HOST
   password: MLC_SSH_PASSWORD
   port: MLC_SSH_PORT
   run_cmds: MLC_SSH_RUN_COMMANDS
+  files_to_copy: MLC_SSH_FILES_TO_COPY
   skip_host_verify: MLC_SSH_SKIP_HOST_VERIFY
   ssh_key_file: MLC_SSH_KEY_FILE
   user: MLC_SSH_USER
