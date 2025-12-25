@@ -69,6 +69,8 @@ class ScriptAutomation(Automation):
                                'MLC_RENEW_CACHE_ENTRY']
 
         self.host_env_keys = [
+            "USER",
+            "HOME",
             "GH_TOKEN",
             "ftp_proxy",
             "FTP_PROXY",
