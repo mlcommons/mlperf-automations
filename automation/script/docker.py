@@ -388,7 +388,7 @@ def docker_run(self_module, i):
 
     # Ensure Docker is available
     r = self_module.action_object.access(
-            {'action': 'run', 'automation': 'script', 'tags': "get,docker", 'quiet': True})
+        {'action': 'run', 'automation': 'script', 'tags': "get,docker", 'quiet': True})
     if r['return'] > 0:
         return r
 

@@ -40,7 +40,7 @@ def remote_run(self_module, i):
     run_input = prune_result['new_input']
     mlc_run_cmd = run_input['mlc_run_cmd']
 
-    #print(script_cmd)
+    # print(script_cmd)
     cur_dir = os.getcwd()
 
     r = self_module._select_script(i)
@@ -59,7 +59,7 @@ def remote_run(self_module, i):
     r = update_meta_for_selected_variations(self_module, script, i)
     if r['return'] > 0:
         return r
-    
+
     remote_env = {}
 
     remote_run_settings = r['remote_run_settings']
@@ -84,15 +84,16 @@ def remote_run(self_module, i):
     if i.get('remote_pull_mlc_repos', False):
         run_cmds.append("mlc pull repo")
 
-    
     env_keys_to_copy = remote_run_settings.get('env_keys_to_copy', [])
     input_mapping = meta.get('input_mapping', {})
 
     for key in env_keys_to_copy:
         if key in env and os.path.exists(env[key]):
             files_to_copy.append(env[key])
-            remote_env[key] = os.path.join("mlc-remote-artifacts", os.path.basename(env[key]))
-
+            remote_env[key] = os.path.join(
+                "mlc-remote-artifacts",
+                os.path.basename(
+                    env[key]))
 
             for k, value in input_mapping.items():
                 if value == key and k in run_input:
@@ -100,16 +101,17 @@ def remote_run(self_module, i):
 
     i_copy = copy.deepcopy(i)
     i_copy['run_cmd'] = run_input
-    
+
     r = regenerate_script_cmd(i_copy)
     if r['return'] > 0:
         return r
 
-    script_run_cmd = r['run_cmd_string']#" ".join(mlc_run_cmd.split(" ")[1:])
-    
+    # " ".join(mlc_run_cmd.split(" ")[1:])
+    script_run_cmd = r['run_cmd_string']
+
     if remote_env:
         for key in remote_env:
-            script_run_cmd  += f" --env.{key}={remote_env[key]}"
+            script_run_cmd += f" --env.{key}={remote_env[key]}"
 
     run_cmds.append(f"{script_run_cmd}")
 
@@ -121,7 +123,9 @@ def remote_run(self_module, i):
             remote_inputs[key] = i[f"remote_{key}"]
 
     if files_to_copy:
-        remote_copy_directory = i.get("remote_copy_directory", "mlc-remote-artifacts")
+        remote_copy_directory = i.get(
+            "remote_copy_directory",
+            "mlc-remote-artifacts")
         remote_inputs['files_to_copy'] = files_to_copy
         remote_inputs['copy_directory'] = remote_copy_directory
 
@@ -226,11 +230,11 @@ def call_remote_run_prepare(self_module, meta, script_item, env, state, i):
             'input': i,
             'automation': self_module,
             'artifact': script_item,
-            #'customize': script_item.meta.get('customize', {}),
-            #'os_info': os_info,
-            #'recursion_spaces': recursion_spaces,
-            #'script_tags': script_tags,
-            #'variation_tags': variation_tags
+            # 'customize': script_item.meta.get('customize', {}),
+            # 'os_info': os_info,
+            # 'recursion_spaces': recursion_spaces,
+            # 'script_tags': script_tags,
+            # 'variation_tags': variation_tags
         }
         run_script_input = {}
         run_script_input['customize_code'] = customize_code
@@ -239,7 +243,7 @@ def call_remote_run_prepare(self_module, meta, script_item, env, state, i):
         if 'remote_run_prepare' in dir(customize_code):
 
             logger.debug(
-                 recursion_spaces +
+                recursion_spaces +
                 '  - Running remote_run_prepare ...')
 
             run_script_input['run_state'] = {}
@@ -254,8 +258,9 @@ def call_remote_run_prepare(self_module, meta, script_item, env, state, i):
 
             r = customize_code.remote_run_prepare(ii)
             return r
-    
+
     return {'return': 0}
+
 
 def regenerate_script_cmd(i):
 
@@ -297,7 +302,7 @@ def regenerate_script_cmd(i):
                     env[key] = [
                         val for val in value if val not in values_to_remove]
 
-    #docker_run_cmd_prefix = i.get('docker_run_cmd_prefix', '')
+    # docker_run_cmd_prefix = i.get('docker_run_cmd_prefix', '')
 
     # Regenerate command from dictionary input
     run_cmd = 'mlcr'
@@ -305,6 +310,7 @@ def regenerate_script_cmd(i):
     skip_input_for_fake_run = remote_run_settings.get(
         'skip_input_for_fake_run', [])
     add_quotes_to_keys = remote_run_settings.get('add_quotes_to_keys', [])
+
     def rebuild_flags(
             command_dict,
             is_fake_run,
@@ -370,7 +376,7 @@ def regenerate_script_cmd(i):
                              add_quotes_to_keys,
                              '')
 
-    #run_cmd = docker_run_cmd_prefix + ' && ' + \
+    # run_cmd = docker_run_cmd_prefix + ' && ' + \
     #    run_cmd if docker_run_cmd_prefix != '' else run_cmd
 
     return {'return': 0, 'run_cmd_string': run_cmd}

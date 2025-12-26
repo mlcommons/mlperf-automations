@@ -47,11 +47,7 @@ def preprocess(i):
     if key_file:
         ssh_cmd += ["-i", key_file]
 
-
     ssh_cmd_str = " ".join(ssh_cmd)
-
-    
-
 
     ssh_run_command = ssh_cmd_str + " " + user + "@" + host + \
         password_string + " '" + cmd_string + "'"
