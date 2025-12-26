@@ -259,7 +259,7 @@ def call_remote_run_prepare(self_module, meta, script_item, env, state, i):
 
 def regenerate_script_cmd(i):
 
-    docker_settings = i.get('docker_settings', {})
+    remote_run_settings = i.get('remote_run_settings', {})
     fake_run = i.get('fake_run', False)
 
     i_run_cmd = i['run_cmd']
@@ -297,14 +297,14 @@ def regenerate_script_cmd(i):
                     env[key] = [
                         val for val in value if val not in values_to_remove]
 
-    docker_run_cmd_prefix = i.get('docker_run_cmd_prefix', '')
+    #docker_run_cmd_prefix = i.get('docker_run_cmd_prefix', '')
 
     # Regenerate command from dictionary input
     run_cmd = 'mlcr'
 
-    skip_input_for_fake_run = docker_settings.get(
+    skip_input_for_fake_run = remote_run_settings.get(
         'skip_input_for_fake_run', [])
-    add_quotes_to_keys = docker_settings.get('add_quotes_to_keys', [])
+    add_quotes_to_keys = remote_run_settings.get('add_quotes_to_keys', [])
     def rebuild_flags(
             command_dict,
             is_fake_run,
@@ -370,7 +370,7 @@ def regenerate_script_cmd(i):
                              add_quotes_to_keys,
                              '')
 
-    run_cmd = docker_run_cmd_prefix + ' && ' + \
-        run_cmd if docker_run_cmd_prefix != '' else run_cmd
+    #run_cmd = docker_run_cmd_prefix + ' && ' + \
+    #    run_cmd if docker_run_cmd_prefix != '' else run_cmd
 
     return {'return': 0, 'run_cmd_string': run_cmd}
