@@ -15,6 +15,7 @@ from mlc.main import Automation
 from mlc.main import CacheAction
 import mlc.utils as utils
 from utils import *
+from script.script_utils import *
 
 
 class ScriptAutomation(Automation):
@@ -533,236 +534,33 @@ class ScriptAutomation(Automation):
 
         # ii = utils.sub_input(i, self.action_object.cfg['artifact_keys'])
 
-        ii = {}
-        ii['tags'] = tags_string
-        ii['out'] = None
-        for key in ["automation", "artifact", "item", "details"]:
-            if i.get(key):
-                ii[key] = i[key]
-
-        r = self.search(ii)
+        r = get_variation_and_script_tags(tags_string)
         if r['return'] > 0:
             return r
 
-        # Search function will return
-
-        list_of_found_scripts = r['list']
-
         script_tags = r['script_tags']
-        script_tags_string = ','.join(script_tags)
-
         variation_tags = r['variation_tags']
 
-        mlc_script_info = i.get('script_call_prefix', '').strip()
-        if mlc_script_info == '':
-            mlc_script_info = 'mlcr '
-        if not mlc_script_info.endswith(' '):
-            mlc_script_info += ' '
+        r = select_script_and_cache(
+            self,
+            i,
+            script_tags,
+            variation_tags,
+            parsed_script_alias,
+            quiet,
+            logger,
+            recursion_spaces,
+            remembered_selections,
+            skip_remembered_selections=False,
+            force_cache=False,
+            force_skip_cache=False
+        )
+        if r['return'] > 0:
+            return r
 
-        x = ''
-        y = ','
-        if parsed_script_alias != '':
-            mlc_script_info += parsed_script_alias
-            x = '"'
+        script_item = r['script']
 
-        if len(script_tags) > 0 or len(variation_tags) > 0:
-            mlc_script_info += x
-
-            if len(script_tags) > 0:
-                mlc_script_info += script_tags_string
-
-            if len(variation_tags) > 0:
-                if len(script_tags) > 0:
-                    mlc_script_info += ','
-
-                x_variation_tags = ['_' + v for v in variation_tags]
-                mlc_script_info += y.join(x_variation_tags)
-
-        logger.info(recursion_spaces + '* ' + mlc_script_info)
-
-        #######################################################################
-        # Report if scripts were not found or there is an ambiguity with UIDs
-        if not r['found_scripts']:
-            return {
-                'return': 1, 'error': f"""no scripts were found with tags: {tags_string} (when variations ignored)"""}
-
-        if len(list_of_found_scripts) == 0:
-            return {
-                'return': 16, 'error': f"""no scripts were found with tags: {tags_string} \n {r.get('warning', '')}"""}
-
-        # Sometimes there is an ambiguity when someone adds a script
-        # while duplicating a UID. In such case, we will return >1 script
-        # and will start searching in the cache ...
-        # We are detecing such cases here:
-        if len(list_of_found_scripts) > 1 and script_tags_string == '' and parsed_script_alias != '' and '?' not in parsed_script_alias and '*' not in parsed_script_alias:
-            x = 'Ambiguity in the following scripts have the same UID - please change that in meta.json or meta.yaml:\n'
-            for y in list_of_found_scripts:
-                x += ' * ' + y.path + '\n'
-
-            return {'return': 1, 'error': x}
-
-        # STEP 100 Output: list_of_found_scripts based on tags (with variations) and/or parsed_artifact
-        #                  script_tags [] - contains tags without variations (starting from _ such as _cuda)
-        #                  variation_tags [] - contains only variations tags (without _)
-        #                  string_tags_string [str] (joined script_tags)
-
-        #######################################################################
-        # Sort scripts for better determinism
-        list_of_found_scripts = sorted(list_of_found_scripts, key=lambda a: (a.meta.get('sort', 0),
-                                                                             a.path))
-        logger.debug(recursion_spaces +
-                     '  - Number of scripts found: {}'.format(len(list_of_found_scripts)))
-
-        # Check if script selection is remembered
-        if not skip_remembered_selections and len(list_of_found_scripts) > 1:
-            for selection in remembered_selections:
-                if selection['type'] == 'script' and set(
-                        selection['tags'].split(',')) == set(script_tags_string.split(',')):
-                    # Leave 1 entry in the found list
-                    list_of_found_scripts = [selection['cached_script']]
-                    logger.debug(
-                        recursion_spaces +
-                        '  - Found remembered selection with tags: {}'.format(script_tags_string))
-                    break
-
-        # STEP 200 Output: potentially pruned list_of_found_scripts if
-        # selection of multple scripts was remembered
-
-        # STEP 300: If more than one MLC script found (example: "get compiler"),
-        # first, check if selection was already remembered!
-        # second, check in cache to prune scripts
-
-        # STEP 300 input: lit_of_found_scripts
-
-        select_script = 0
-
-        # If 1 script found and script_tags == '', pick them from the meta
-        if script_tags_string == '' and len(list_of_found_scripts) == 1:
-            script_tags_string = ','.join(
-                list_of_found_scripts[0].meta.get('tags', []))
-
-        # Found 1 or more scripts. Scans cache tags to find at least 1 with
-        # cache==True
-        preload_cached_scripts = False
-        for script in list_of_found_scripts:
-            if script.meta.get('cache', False) == True or (
-                    script.meta.get('can_force_cache', False) and force_cache):
-                preload_cached_scripts = True
-                break
-
-        # STEP 300 Output: preload_cached_scripts = True if at least one of the
-        # list_of_found_scripts must be cached
-
-        # STEP 400: If not force_skip_cache and at least one script can be cached, find (preload) related cache entries for found scripts
-        # STEP 400 input:  script_tags and -tmp (to avoid unfinished scripts
-        # particularly when installation fails)
-
-        cache_list = []
-
-        if not force_skip_cache and preload_cached_scripts:
-            cache_tags_without_tmp_string = '-tmp'
-            if script_tags_string != '':
-                cache_tags_without_tmp_string += ',' + script_tags_string
-            if variation_tags:
-                cache_tags_without_tmp_string += ',_' + \
-                    ",_".join(variation_tags)
-            # variation_tags are prefixed with "_" but the MLC search function knows only tags and so we need to change "_-" to "-_" for excluding any variations
-            # This change can later be moved to a search function specific to
-            # cache
-            cache_tags_without_tmp_string = cache_tags_without_tmp_string.replace(
-                ",_-", ",-_")
-
-            logger.debug(
-                recursion_spaces +
-                '  - Searching for cached script outputs with the following tags: {}'.format(cache_tags_without_tmp_string))
-
-            search_cache = {'action': 'search',
-                            'target_name': 'cache',
-                            'tags': cache_tags_without_tmp_string}
-            rc = self.cache_action.access(search_cache)
-            if rc['return'] > 0:
-                return rc
-
-            cache_list = rc['list']
-
-            logger.debug(
-                recursion_spaces +
-                '    - Number of cached script outputs found: {}'.format(
-                    len(cache_list)))
-
-            # STEP 400 output: cache_list
-
-        # STEP 500: At this stage with have cache_list related to either 1 or more scripts (in case of get,compiler)
-        #           If more than 1: Check if in cache and reuse it or ask user to select
-        # STEP 500 input: list_of_found_scripts
-
-        if len(list_of_found_scripts) > 0:
-            # If only tags are used, check if there are no cached scripts with tags - then we will reuse them
-            # The use case: mlc run script --tags=get,compiler
-            # MLC script will always ask to select gcc,llvm,etc even if any of
-            # them will be already cached
-            if len(cache_list) > 0:
-                new_list_of_found_scripts = []
-
-                for cache_entry in cache_list:
-                    # Find associated script and add to the
-                    # list_of_found_scripts
-                    associated_script_item = cache_entry.meta['associated_script_item']
-
-                    x = associated_script_item.find(',')
-                    if x < 0:
-                        return {'return': 1, 'error': 'MLC artifact format is wrong "{}" - no comma found'.format(
-                            associated_script_item)}
-
-                    associated_script_item_uid = associated_script_item[x + 1:]
-
-                    cache_entry.meta['associated_script_item_uid'] = associated_script_item_uid
-
-                    for script in list_of_found_scripts:
-                        script_uid = script.meta['uid']
-
-                        if associated_script_item_uid == script_uid:
-                            if script not in new_list_of_found_scripts:
-                                new_list_of_found_scripts.append(script)
-
-                # Avoid case when all scripts are pruned due to just 1
-                # variation used
-                if len(new_list_of_found_scripts) > 0:
-                    list_of_found_scripts = new_list_of_found_scripts
-
-            # Select scripts
-            if len(list_of_found_scripts) > 1:
-                select_script = select_script_item(
-                    list_of_found_scripts,
-                    'script',
-                    recursion_spaces,
-                    False,
-                    script_tags_string,
-                    quiet,
-                    logger)
-
-                # Remember selection
-                if not skip_remembered_selections:
-                    remembered_selections.append({'type': 'script',
-                                                  'tags': script_tags_string,
-                                                  'cached_script': list_of_found_scripts[select_script]})
-            else:
-                select_script = 0
-
-            # Prune cache list with the selected script
-            if len(list_of_found_scripts) > 0:
-                script_item_uid = list_of_found_scripts[select_script].meta['uid']
-
-                new_cache_list = []
-                for cache_entry in cache_list:
-                    if cache_entry.meta['associated_script_item_uid'] == script_item_uid:
-                        new_cache_list.append(cache_entry)
-
-                cache_list = new_cache_list
-
-        # Here a specific script is found and meta obtained
-        # Set some useful local variables
-        script_item = list_of_found_scripts[select_script]
+        cache_list = r['cache_list']
 
         # print(list_of_found_scripts)
         meta = script_item.meta
@@ -1219,7 +1017,7 @@ class ScriptAutomation(Automation):
                         'cached script output',
                         recursion_spaces,
                         True,
-                        script_tags_string,
+                        ",".join(script_tags),
                         quiet,
                         logger)
 
@@ -2901,22 +2699,8 @@ class ScriptAutomation(Automation):
 
         tags = [] if tags_string == '' else tags_string.split(',')
 
-        script_tags = []
-        variation_tags = []
-
-        for t in tags:
-            t = t.strip()
-            if t != '':
-                if t.startswith('_'):
-                    tx = t[1:]
-                    if tx not in variation_tags:
-                        variation_tags.append(tx)
-                elif t.startswith('-_'):
-                    tx = '-' + t[2:]
-                    if tx not in variation_tags:
-                        variation_tags.append(tx)
-                else:
-                    script_tags.append(t)
+        script_tags = i.get('script_tags', [])
+        variation_tags = i.get('variation_tags', [])
 
         excluded_tags = [v[1:] for v in script_tags if v.startswith("-")]
         common = set(script_tags).intersection(set(excluded_tags))
@@ -4729,7 +4513,13 @@ pip install mlcflow
         return get_script_name(env, path, filename)
 
     def _select_script(self, i):
-        r = self.search(i.copy())
+        ii = i.copy()
+        if not ii.get("script_tags") and ii.get("tags"):
+            r = get_variation_and_script_tags(ii["tags"].strip())
+            ii['script_tags'] = r['script_tags']
+            ii['variation_tags'] = r['variation_tags']
+
+        r = self.search(ii)
         if r['return'] > 0:
             return r
 
@@ -6260,77 +6050,6 @@ def detect_state_diff(env, saved_env, new_env_keys,
     return {'return': 0, 'env': env, 'new_env': new_env,
             'state': state, 'new_state': new_state}
 
-##############################################################################
-
-
-def select_script_item(lst, text, recursion_spaces,
-                       can_skip, script_tags_string, quiet, logger=None):
-    """
-    Internal: select script
-    """
-
-    string1 = recursion_spaces + \
-        '    - More than 1 {} found for "{}":'.format(text, script_tags_string)
-
-    if not logger:
-        return {'return': 1, 'error': 'No logger provided'}
-
-    # If quiet, select 0 (can be sorted for determinism)
-    if quiet:
-        logger.debug(string1)
-        logger.debug('Selected default due to "quiet" mode')
-
-        return 0
-
-    # Select 1 and proceed
-    logger.info(string1)
-    num = 0
-
-    for a in lst:
-        meta = a.meta
-
-        name = meta.get('name', '')
-
-        s = a.path
-        if name != '':
-            s = '"' + name + '" ' + s
-
-        x = recursion_spaces + \
-            '      {}) {} ({})'.format(num, s, ','.join(meta['tags']))
-
-        version = meta.get('version', '')
-        if version != '':
-            x += ' (Version {})'.format(version)
-
-        logger.info(x)
-        num += 1
-
-    s = 'Make your selection or press Enter for 0'
-    if can_skip:
-        s += ' or use -1 to skip'
-
-    x = input(recursion_spaces + '      ' + s + ': ')
-    x = x.strip()
-    if x == '':
-        x = '0'
-
-    selection = int(x)
-
-    if selection < 0 and not can_skip:
-        selection = 0
-
-    if selection < 0:
-        logger.info(recursion_spaces + '      Skipped')
-    else:
-        if selection >= num:
-            selection = 0
-        logger.info(
-            recursion_spaces +
-            '      Selected {}: {}'.format(
-                selection,
-                lst[selection].path))
-
-    return selection
 
 ##############################################################################
 

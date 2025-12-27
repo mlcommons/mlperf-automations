@@ -30,12 +30,14 @@ def preprocess(i):
     user = env.get('MLC_SSH_USER', os.environ.get('USER'))
     password = env.get('MLC_SSH_PASSWORD', None)
     host = env.get('MLC_SSH_HOST')
+    port = env.get('MLC_SSH_PORT', '22')
+
     if password:
         password_string = " -p " + password
     else:
         password_string = ""
 
-    ssh_cmd = ["ssh"]
+    ssh_cmd = ["ssh", "-p", port]
 
     if env.get("MLC_SSH_SKIP_HOST_VERIFY"):
         ssh_cmd += ["-o", "StrictHostKeyChecking=no",
@@ -57,6 +59,8 @@ def preprocess(i):
     if password:
         rsync_base = ["sshpass", "-p", password] + rsync_base
 
+    target_directory = env['MLC_SSH_TARGET_COPY_DIRECTORY']
+
     # ---- Execute copy commands ----
     for file in files_to_copy:
         cmd = [
@@ -64,7 +68,7 @@ def preprocess(i):
             "-avz",
             "-e", " ".join(ssh_cmd),   # rsync expects a single string here
             file,
-            f"{user}@{host}:",
+            f"{user}@{host}:{target_directory}/"
         ]
 
         print("Executing:", " ".join(cmd))
