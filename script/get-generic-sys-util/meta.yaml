@@ -648,8 +648,8 @@ variations:
       MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
     update_meta_if_env:
       - enable_if_env:
-        MLC_HOST_OS_FLAVOR:
-          - macos
+          MLC_HOST_OS_FLAVOR:
+            - macos
         env:
           MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE: yes
     new_env_keys:
