@@ -115,7 +115,7 @@ def select_script_and_cache(
     # ---------------------------------------------------------
     # STEP 5: Apply remembered selection
     if not skip_remembered_selections and len(list_of_found_scripts) > 1:
-        for sel in remembered_selections:
+        for sel in self.remembered_selections:
             if (
                 sel["type"] == "script"
                 and set(sel["tags"].split(",")) == set(script_tags_string.split(","))
