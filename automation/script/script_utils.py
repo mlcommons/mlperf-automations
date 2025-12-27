@@ -18,7 +18,9 @@ def get_variation_and_script_tags(tags_string):
                     variation_tags.append(tx)
             else:
                 script_tags.append(t)
-    return {'return': 0, 'script_tags': script_tags, 'variation_tags': variation_tags}
+    return {'return': 0, 'script_tags': script_tags,
+            'variation_tags': variation_tags}
+
 
 def select_script_and_cache(
     self,
@@ -134,7 +136,8 @@ def select_script_and_cache(
     # STEP: cache handling
     cache_list = []
 
-    if should_preload_cache(list_of_found_scripts, force_cache) and not force_skip_cache:
+    if should_preload_cache(list_of_found_scripts,
+                            force_cache) and not force_skip_cache:
         rc = search_script_cache(
             self.cache_action,
             script_tags_string,
@@ -172,7 +175,6 @@ def select_script_and_cache(
 
     # STEP: prune cache to selected script
     cache_list = prune_cache_for_selected_script(cache_list, selected_script)
-    
 
     return {
         "return": 0,
@@ -180,9 +182,6 @@ def select_script_and_cache(
         "scripts": list_of_found_scripts,
         "cache_list": cache_list,
     }
-
-
-
 
 
 def should_preload_cache(scripts, force_cache=False):
@@ -195,6 +194,7 @@ def should_preload_cache(scripts, force_cache=False):
         if script.meta.get("can_force_cache", False) and force_cache:
             return True
     return False
+
 
 def search_script_cache(
     cache_action,
@@ -238,6 +238,7 @@ def search_script_cache(
         "cache_list": rc["list"],
     }
 
+
 def prune_scripts_using_cache(scripts, cache_list):
     """
     Retain only scripts that have matching cache entries.
@@ -269,6 +270,7 @@ def prune_scripts_using_cache(scripts, cache_list):
         "cache_list": cache_list,
     }
 
+
 def prune_cache_for_selected_script(cache_list, selected_script):
     """
     Keep only cache entries associated with selected script.
@@ -279,4 +281,3 @@ def prune_cache_for_selected_script(cache_list, selected_script):
         c for c in cache_list
         if c.meta.get("associated_script_item_uid") == selected_uid
     ]
-

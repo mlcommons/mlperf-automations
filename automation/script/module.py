@@ -540,7 +540,6 @@ class ScriptAutomation(Automation):
         script_tags = r['script_tags']
         variation_tags = r['variation_tags']
 
-
         r = select_script_and_cache(
             self,
             i,
@@ -554,7 +553,7 @@ class ScriptAutomation(Automation):
             skip_remembered_selections=False,
             force_cache=False,
             force_skip_cache=False
-            )
+        )
         if r['return'] > 0:
             return r
 
