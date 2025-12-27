@@ -218,7 +218,7 @@ def call_remote_run_prepare(self_module, meta, script_item, env, state, i):
     recursion_spaces = ''
 
     # Check and run remote_run_prepare in customize.py
-    if os.path.isfile(path_to_customize_py):
+    if os.path.isfile(path_to_customize_py) and has_function_in_file(path_to_customize_py, "remote_run_prepare"):
         r = utils.load_python_module(
             {'path': script_item.path, 'name': 'customize'})
         if r['return'] > 0:
@@ -236,28 +236,22 @@ def call_remote_run_prepare(self_module, meta, script_item, env, state, i):
             # 'script_tags': script_tags,
             # 'variation_tags': variation_tags
         }
-        run_script_input = {}
-        run_script_input['customize_code'] = customize_code
-        run_script_input['customize_common_input'] = customize_common_input
 
-        if 'remote_run_prepare' in dir(customize_code):
+        run_script_input = {
+            "customize_code": customize_code,
+            "customize_common_input": customize_common_input,
+            "run_state": {},
+        }
 
-            logger.debug(
-                recursion_spaces +
-                '  - Running remote_run_prepare ...')
+        ii = copy.deepcopy(customize_common_input)
+        ii["env"] = env
+        ii["state"] = state
+        ii["meta"] = meta
+        ii["automation"] = self_module
+        ii["run_script_input"] = run_script_input
 
-            run_script_input['run_state'] = {}
+        return customize_code.remote_run_prepare(ii)
 
-            ii = copy.deepcopy(customize_common_input)
-            ii['env'] = env
-            ii['state'] = state
-            ii['meta'] = meta
-            ii['automation'] = self_module
-            # may need to detect versions in multiple paths
-            ii['run_script_input'] = run_script_input
-
-            r = customize_code.remote_run_prepare(ii)
-            return r
 
     return {'return': 0}
 
