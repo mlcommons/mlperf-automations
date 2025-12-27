@@ -4513,7 +4513,13 @@ pip install mlcflow
         return get_script_name(env, path, filename)
 
     def _select_script(self, i):
-        r = self.search(i.copy())
+        ii = i.copy()
+        if not ii.get("script_tags") and ii.get("tags"):
+            r = get_variation_and_script_tags(ii["tags"].strip())
+            ii['script_tags'] = r['script_tags']
+            ii['variation_tags'] = r['variation_tags']
+
+        r = self.search(ii)
         if r['return'] > 0:
             return r
 
