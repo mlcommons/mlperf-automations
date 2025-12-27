@@ -1398,8 +1398,6 @@ class ScriptAutomation(Automation):
                 run_script_input['customize_code'] = customize_code
                 run_script_input['customize_common_input'] = customize_common_input
 
-                if repro_prefix != '':
-                    run_script_input['repro_prefix'] = repro_prefix
                 if ignore_script_error:
                     run_script_input['ignore_script_error'] = True
                 if 'predeps' in dir(customize_code) and not fake_run:
@@ -1469,8 +1467,6 @@ class ScriptAutomation(Automation):
                 run_script_input['customize_code'] = customize_code
                 run_script_input['customize_common_input'] = customize_common_input
 
-            if repro_prefix != '':
-                run_script_input['repro_prefix'] = repro_prefix
             if ignore_script_error:
                 run_script_input['ignore_script_error'] = True
 
