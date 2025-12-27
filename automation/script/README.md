@@ -69,4 +69,4 @@ Sometimes it is difficult to add all variations needed for a script like say `ba
 <img src="https://github.com/mlcommons/cm4mlops/raw/mlperf-inference/automation/script/assets/scripts-workflow.png" width="248">
 
 
-&copy; 2022-25 [MLCommons](https://mlcommons.org)<br>
+&copy; 2022-25 [MLCommons™](https://mlcommons.org)<br>
