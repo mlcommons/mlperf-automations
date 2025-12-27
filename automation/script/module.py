@@ -5286,7 +5286,17 @@ or full console log.
                 customize_code.__file__))
 
     if len(posthook_deps) > 0 and (postprocess == "postprocess"):
-        r = script_automation._call_run_deps(posthook_deps, local_env_keys, local_env_keys_from_meta, recursion_spaces, variation_tags_string, found_cached, debug_script_tags, show_time, ' ', run_state)
+        r = script_automation._call_run_deps(
+            posthook_deps,
+            local_env_keys,
+            local_env_keys_from_meta,
+            recursion_spaces,
+            variation_tags_string,
+            found_cached,
+            debug_script_tags,
+            show_time,
+            ' ',
+            run_state)
         if r['return'] > 0:
             return r
 
