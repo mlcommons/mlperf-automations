@@ -2150,8 +2150,6 @@ class ScriptAutomation(Automation):
         logger = self.action_object.logger
 
         explicit_variation_tags = copy.deepcopy(variation_tags)
-        if add_deps_recursive is None:
-            add_deps_recursive = {}
         required_disk_space = {}
         warnings = []
 
