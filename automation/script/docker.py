@@ -351,7 +351,7 @@ def docker_run(self_module, i):
         posthook_deps=[],
         new_env_keys_from_meta=[],
         new_state_keys_from_meta=[],
-        run_state=run_state, recursion_spaces='')
+        run_state=run_state)
     if r['return'] > 0:
         return r
 
