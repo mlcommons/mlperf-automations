@@ -369,6 +369,7 @@ def docker_run(self_module, i):
 
     # For updating meta from update_meta_if_env
     r = self_module.update_state_from_meta(
+        meta,
         deps=[],
         post_deps=[],
         prehook_deps=[],
