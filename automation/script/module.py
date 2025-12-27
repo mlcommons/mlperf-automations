@@ -1403,7 +1403,7 @@ class ScriptAutomation(Automation):
                 if 'predeps' in dir(customize_code) and not fake_run:
 
                     logger.debug(
-                        recursion_spaces +
+                        self.recursion_spaces +
                         '  - Running preprocess ...')
 
                     run_script_input['run_state'] = run_state
