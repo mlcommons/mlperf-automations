@@ -94,7 +94,6 @@ def dockerfile(self_module, input_params):
         posthook_deps=[],  # Add posthook dependencies if needed
         new_env_keys_from_meta=[],  # Add keys from meta if needed
         new_state_keys_from_meta=[],  # Add state keys from meta if needed
-        add_deps_recursive=add_deps_recursive,
         run_state=run_state,
         recursion_spaces=''
     )
@@ -352,7 +351,7 @@ def docker_run(self_module, i):
         posthook_deps=[],
         new_env_keys_from_meta=[],
         new_state_keys_from_meta=[],
-        add_deps_recursive=add_deps_recursive, run_state=run_state, recursion_spaces='')
+        run_state=run_state, recursion_spaces='')
     if r['return'] > 0:
         return r
 

@@ -104,6 +104,17 @@ class ScriptAutomation(Automation):
         self.state = run_args.get('state', {})
         self.const = run_args.get('const', {})
         self.const_state = run_args.get('const_state', {})
+        
+
+        add_deps_recursive = run_args.get('adr', {})
+        if not add_deps_recursive:
+            add_deps_recursive = run_args.get('add_deps_recursive', {})
+        else:
+            utils.merge_dicts({'dict1': add_deps_recursive, 'dict2': run_args.get(
+                'add_deps_recursive', {}), 'append_lists': True, 'append_unique': True})
+
+        self.add_deps = add_deps
+        self.add_deps_recursive = add_deps_recursive
 
     #################################################################
 
@@ -324,11 +335,18 @@ class ScriptAutomation(Automation):
         self.state = i.get('state', self.state)
         self.const = i.get('const', self.const)
         self.const_state = i.get('const_state', self.const_state)
+        self.add_deps_recursive = i.get('adr', {})
+        if not self.add_deps_recursive:
+            self.add_deps_recursive = i.get('add_deps_recursive', {})
+        else:
+            utils.merge_dicts({'dict1': self.add_deps_recursive, 'dict2': i.get(
+                'add_deps_recursive', {}), 'append_lists': True, 'append_unique': True})
 
         env = self.env
         state = self.state
         const = self.const
         const_state = self.const_state
+        add_deps_recursive = self.add_deps_recursive
 
         # Save current env and state to detect new env and state after running
         # a given script
@@ -351,12 +369,6 @@ class ScriptAutomation(Automation):
             utils.merge_dicts({'dict1': add_deps, 'dict2': i.get(
                 'add_deps', {}), 'append_lists': True, 'append_unique': True})
 
-        add_deps_recursive = i.get('adr', {})
-        if not add_deps_recursive:
-            add_deps_recursive = i.get('add_deps_recursive', {})
-        else:
-            utils.merge_dicts({'dict1': add_deps_recursive, 'dict2': i.get(
-                'add_deps_recursive', {}), 'append_lists': True, 'append_unique': True})
 
         save_env = i.get('save_env', False)
 
@@ -721,7 +733,6 @@ class ScriptAutomation(Automation):
             posthook_deps,
             new_env_keys_from_meta,
             new_state_keys_from_meta,
-            add_deps_recursive,
             run_state,
             recursion_spaces)
         if r['return'] > 0:
@@ -2136,7 +2147,7 @@ class ScriptAutomation(Automation):
     def _update_state_from_variations(
         self, i, meta, variation_tags, variations, deps, post_deps, prehook_deps,
         posthook_deps, new_env_keys_from_meta, new_state_keys_from_meta,
-        add_deps_recursive, run_state, recursion_spaces
+        run_state, recursion_spaces
     ):
         import copy
         logger = self.action_object.logger
@@ -2205,7 +2216,7 @@ class ScriptAutomation(Automation):
                     variation_tag, variations,
                     deps, post_deps, prehook_deps, posthook_deps,
                     new_env_keys_from_meta, new_state_keys_from_meta,
-                    run_state, i, meta, required_disk_space, warnings, add_deps_recursive
+                    run_state, i, meta, required_disk_space, warnings
                 )
                 if r['return'] > 0:
                     return r
@@ -2215,7 +2226,7 @@ class ScriptAutomation(Automation):
                 variations, variation_tags,
                 deps, post_deps, prehook_deps, posthook_deps,
                 new_env_keys_from_meta, new_state_keys_from_meta,
-                run_state, i, meta, required_disk_space, warnings, add_deps_recursive
+                run_state, i, meta, required_disk_space, warnings
             )
             if r['return'] > 0:
                 return r
@@ -2226,7 +2237,7 @@ class ScriptAutomation(Automation):
                 post_deps,
                 prehook_deps,
                 posthook_deps,
-                add_deps_recursive,
+                self.add_deps_recursive,
                 self.env)
             if r['return'] > 0:
                 return r
@@ -2242,7 +2253,7 @@ class ScriptAutomation(Automation):
         }
 
     def _apply_variation_meta(self, variation_key, variation_meta, deps, post_deps, prehook_deps, posthook_deps,
-                              new_env_keys_from_meta, new_state_keys_from_meta, run_state, i, meta, required_disk_space, warnings, add_deps_recursive):
+                              new_env_keys_from_meta, new_state_keys_from_meta, run_state, i, meta, required_disk_space, warnings):
         r = self.update_state_from_meta(
             variation_meta,
             deps,
@@ -2258,7 +2269,7 @@ class ScriptAutomation(Automation):
 
         adr = get_adr(variation_meta)
         if adr:
-            self._merge_dicts_with_tags(add_deps_recursive, adr)
+            self._merge_dicts_with_tags(self.add_deps_recursive, adr)
 
         # Merge selected meta keys
         for k in ('script_name', 'default_version'):
@@ -2295,7 +2306,7 @@ class ScriptAutomation(Automation):
         self, variation_tag, variations,
         deps, post_deps, prehook_deps, posthook_deps,
         new_env_keys_from_meta, new_state_keys_from_meta,
-        run_state, i, meta, required_disk_space, warnings, add_deps_recursive
+        run_state, i, meta, required_disk_space, warnings
     ):
         import copy
         if variation_tag.startswith(('~', '-')):
@@ -2328,8 +2339,7 @@ class ScriptAutomation(Automation):
             run_state=run_state, i=i,
             meta=meta,
             required_disk_space=required_disk_space,
-            warnings=warnings,
-            add_deps_recursive=add_deps_recursive
+            warnings=warnings
         )
 
     def _is_dynamic_placeholder(self, comp):
@@ -2342,7 +2352,7 @@ class ScriptAutomation(Automation):
         self, variations, variation_tags,
         deps, post_deps, prehook_deps, posthook_deps,
         new_env_keys_from_meta, new_state_keys_from_meta,
-        run_state, i, meta, required_disk_space, warnings, add_deps_recursive
+        run_state, i, meta, required_disk_space, warnings
     ):
 
         # Only consider string keys that are combined (contain a comma)
@@ -2408,8 +2418,7 @@ class ScriptAutomation(Automation):
                 run_state=run_state, i=i,
                 meta=meta,
                 required_disk_space=required_disk_space,
-                warnings=warnings,
-                add_deps_recursive=add_deps_recursive
+                warnings=warnings
             )
             if r['return'] > 0:
                 return r
