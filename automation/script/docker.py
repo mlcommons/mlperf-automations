@@ -279,6 +279,11 @@ def docker_run(self_module, i):
         'state', {}), i.get(
         'const', {}), i.get(
         'const_state', {})
+
+    state = self_module.state
+    const = self_module.const
+    const_state = self_module.const_state
+
     variation_tags = [t[1:]
                       for t in i.get('tags', '').split(",") if t.startswith("_")]
 
