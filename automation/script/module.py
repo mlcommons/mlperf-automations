@@ -26,7 +26,7 @@ class ScriptAutomation(Automation):
     """
 
     ############################################################
-    def __init__(self, action_object, automation_file, run_args = {}):
+    def __init__(self, action_object, automation_file, run_args={}):
         super().__init__(action_object, "script", automation_file)
         self.os_info = {}
         self.run_state = {}
