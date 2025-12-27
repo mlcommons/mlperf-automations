@@ -29,9 +29,6 @@ def select_script_and_cache(
     variation_tags,
     parsed_script_alias,
     quiet,
-    logger,
-    recursion_spaces,
-    remembered_selections,
     skip_remembered_selections=False,
     force_cache=False,
     force_skip_cache=False,
@@ -40,6 +37,9 @@ def select_script_and_cache(
     Search scripts by tags, resolve ambiguity, apply cache pruning,
     select a script (quiet or interactive), and return pruned cache entries.
     """
+
+    logger = self.logger
+    recursion_spaces = self.recursion_spaces
 
     # ---------------------------------------------------------
     # STEP 1: Script search
@@ -83,13 +83,13 @@ def select_script_and_cache(
     if not r["found_scripts"]:
         return {
             "return": 1,
-            "error": f"no scripts were found with tags: {tags_string} (when variations ignored)",
+            "error": f"no scripts were found with tags: {script_tags} (when variations ignored)",
         }
 
     if not list_of_found_scripts:
         return {
             "return": 16,
-            "error": f"no scripts were found with tags: {tags_string}\n{r.get('warning', '')}",
+            "error": f"no scripts were found with tags: {script_tags}\n{r.get('warning', '')}",
         }
 
     if (

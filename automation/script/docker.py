@@ -118,7 +118,7 @@ def dockerfile(self_module, input_params):
     deps = docker_settings.get('build_deps', [])
     if deps:
         r = self_module._run_deps(
-            deps, [], env, {}, {}, {}, add_deps_recursive, '', [], '', False, '',
+            deps, [], '', '', False, '',
             show_time, ' ', run_state)
         if r['return'] > 0:
             return r
@@ -360,7 +360,7 @@ def docker_run(self_module, i):
     deps = docker_settings.get('deps', [])
     if deps:
         r = self_module._run_deps(
-            deps, [], env, {}, {}, {}, add_deps_recursive, '', [], '', False, '',
+            deps, [], '', '', False, '',
             show_time, ' ', run_state)
         if r['return'] > 0:
             return r
