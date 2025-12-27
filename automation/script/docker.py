@@ -258,8 +258,7 @@ def docker_run(self_module, i):
     show_time = i.get('show_time', False)
     logger = self_module.logger
     env = i.get('env', {})
-    
-    
+
     self_module.env = env
 
     if quiet:
