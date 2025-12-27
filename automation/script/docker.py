@@ -322,7 +322,7 @@ def docker_run(self_module, i):
     for key in docker_settings_default_env:
         env.setdefault(key, docker_settings_default_env[key])
 
-    state['docker'] = docker_settings
+    self_module.state['docker'] = docker_settings
     run_state = {
         'deps': [], 'fake_deps': [], 'parent': None,
         'script_id': f"{script_alias},{script_uid}",
@@ -352,7 +352,7 @@ def docker_run(self_module, i):
     if r['return'] > 0:
         return r
 
-    docker_settings = state['docker']
+    docker_settings = self_module.state['docker']
 
     deps = docker_settings.get('deps', [])
     if deps:
