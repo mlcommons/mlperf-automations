@@ -807,7 +807,7 @@ class ScriptAutomation(Automation):
 
         if version != '' and version in versions:
             versions_meta = versions[version]
-            r = update_state_from_meta(
+            r = self.update_state_from_meta(
                 versions_meta,
                 deps,
                 post_deps,
