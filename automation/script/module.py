@@ -324,7 +324,7 @@ class ScriptAutomation(Automation):
         self.state = i.get('state', self.state)
         self.const = i.get('const', self.const)
         self.const_state = i.get('const_state', self.const_state)
-        
+
         env = self.env
         state = self.state
         const = self.const
