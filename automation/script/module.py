@@ -26,7 +26,7 @@ class ScriptAutomation(Automation):
     """
 
     ############################################################
-    def __init__(self, action_object, automation_file):
+    def __init__(self, action_object, automation_file, run_args = {}):
         super().__init__(action_object, "script", automation_file)
         self.os_info = {}
         self.run_state = {}
@@ -100,10 +100,10 @@ class ScriptAutomation(Automation):
                                              'hf_token': {'desc': 'Huggingface Token', 'default': ''},
                                              'verify_ssl': {'desc': 'Verify SSL', 'default': False}
                                              }
-        self.env = {}
-        self.state = {}
-        self.const = {}
-        self.const_state = {}
+        self.env = run_args.get('env', {})
+        self.state = run_args.get('state', {})
+        self.const = run_args.get('const', {})
+        self.const_state = run_args.get('const_state', {})
 
     #################################################################
 
@@ -715,10 +715,6 @@ class ScriptAutomation(Automation):
             meta,
             variation_tags,
             variations,
-            env,
-            state,
-            const,
-            const_state,
             deps,
             post_deps,
             prehook_deps,
@@ -2138,8 +2134,7 @@ class ScriptAutomation(Automation):
         return {'return': 0}
 
     def _update_state_from_variations(
-        self, i, meta, variation_tags, variations, env, state,
-        const, const_state, deps, post_deps, prehook_deps,
+        self, i, meta, variation_tags, variations, deps, post_deps, prehook_deps,
         posthook_deps, new_env_keys_from_meta, new_state_keys_from_meta,
         add_deps_recursive, run_state, recursion_spaces
     ):
@@ -2207,7 +2202,7 @@ class ScriptAutomation(Automation):
             # 2️⃣ Apply individual variations
             for variation_tag in variation_tags:
                 r = self._apply_single_variation(
-                    variation_tag, variations, env, state, const, const_state,
+                    variation_tag, variations,
                     deps, post_deps, prehook_deps, posthook_deps,
                     new_env_keys_from_meta, new_state_keys_from_meta,
                     run_state, i, meta, required_disk_space, warnings, add_deps_recursive
@@ -2217,7 +2212,7 @@ class ScriptAutomation(Automation):
 
             # 3️⃣ Apply combined variations
             r = self._apply_combined_variations(
-                variations, variation_tags, env, state, const, const_state,
+                variations, variation_tags,
                 deps, post_deps, prehook_deps, posthook_deps,
                 new_env_keys_from_meta, new_state_keys_from_meta,
                 run_state, i, meta, required_disk_space, warnings, add_deps_recursive
@@ -2246,7 +2241,7 @@ class ScriptAutomation(Automation):
             'variation_tags': variation_tags
         }
 
-    def _apply_variation_meta(self, variation_key, variation_meta, env, state, const, const_state, deps, post_deps, prehook_deps, posthook_deps,
+    def _apply_variation_meta(self, variation_key, variation_meta, deps, post_deps, prehook_deps, posthook_deps,
                               new_env_keys_from_meta, new_state_keys_from_meta, run_state, i, meta, required_disk_space, warnings, add_deps_recursive):
         r = self.update_state_from_meta(
             variation_meta,
@@ -2297,7 +2292,7 @@ class ScriptAutomation(Automation):
         return tag, None
 
     def _apply_single_variation(
-        self, variation_tag, variations, env, state, const, const_state,
+        self, variation_tag, variations,
         deps, post_deps, prehook_deps, posthook_deps,
         new_env_keys_from_meta, new_state_keys_from_meta,
         run_state, i, meta, required_disk_space, warnings, add_deps_recursive
@@ -2328,7 +2323,6 @@ class ScriptAutomation(Automation):
         return self._apply_variation_meta(
             variation_key=variation_tag,
             variation_meta=variation_meta,
-            env=env, state=state, const=const, const_state=const_state,
             deps=deps, post_deps=post_deps, prehook_deps=prehook_deps, posthook_deps=posthook_deps,
             new_env_keys_from_meta=new_env_keys_from_meta, new_state_keys_from_meta=new_state_keys_from_meta,
             run_state=run_state, i=i,
@@ -2345,7 +2339,7 @@ class ScriptAutomation(Automation):
         return comp[:-2]
 
     def _apply_combined_variations(
-        self, variations, variation_tags, env, state, const, const_state,
+        self, variations, variation_tags,
         deps, post_deps, prehook_deps, posthook_deps,
         new_env_keys_from_meta, new_state_keys_from_meta,
         run_state, i, meta, required_disk_space, warnings, add_deps_recursive
@@ -2409,7 +2403,6 @@ class ScriptAutomation(Automation):
             r = self._apply_variation_meta(
                 variation_key=combined_key,
                 variation_meta=combined_meta,
-                env=env, state=state, const=const, const_state=const_state,
                 deps=deps, post_deps=post_deps, prehook_deps=prehook_deps, posthook_deps=posthook_deps,
                 new_env_keys_from_meta=new_env_keys_from_meta, new_state_keys_from_meta=new_state_keys_from_meta,
                 run_state=run_state, i=i,

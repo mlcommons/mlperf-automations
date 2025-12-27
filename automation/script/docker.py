@@ -88,7 +88,6 @@ def dockerfile(self_module, input_params):
     update_variations_result = self_module._update_state_from_variations(
         input_params, metadata, variation_tags, metadata.get(
             'variations', {}),
-        env, state_data, constant_vars, constant_state,
         deps=[],  # Add your dependencies if needed
         post_deps=[],  # Add post dependencies if needed
         prehook_deps=[],  # Add prehook dependencies if needed
@@ -347,7 +346,7 @@ def docker_run(self_module, i):
         return r
 
     r = self_module._update_state_from_variations(
-        i, meta, variation_tags, variations, env, state, const, const_state, deps=[],
+        i, meta, variation_tags, variations, deps=[],
         post_deps=[],
         prehook_deps=[],
         posthook_deps=[],
