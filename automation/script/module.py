@@ -112,7 +112,6 @@ class ScriptAutomation(Automation):
             utils.merge_dicts({'dict1': add_deps_recursive, 'dict2': run_args.get(
                 'add_deps_recursive', {}), 'append_lists': True, 'append_unique': True})
 
-        self.add_deps = add_deps
         self.add_deps_recursive = add_deps_recursive
 
     #################################################################
