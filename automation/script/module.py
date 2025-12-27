@@ -113,7 +113,7 @@ class ScriptAutomation(Automation):
                 'add_deps_recursive', {}), 'append_lists': True, 'append_unique': True})
 
         self.add_deps_recursive = add_deps_recursive
-        
+
         # Recursion spaces needed to format log and print
         self.recursion_spaces = run_args.get('recursion_spaces', '')
         # Caching selections to avoid asking users again
@@ -303,9 +303,11 @@ class ScriptAutomation(Automation):
                                'append_unique': True})
 
         # Recursion spaces needed to format log and print
-        self.recursion_spaces = i.get('recursion_spaces', self.recursion_spaces)
+        self.recursion_spaces = i.get(
+            'recursion_spaces', self.recursion_spaces)
         # Caching selections to avoid asking users again
-        self.remembered_selections = i.get('remembered_selections', self.remembered_selections)
+        self.remembered_selections = i.get(
+            'remembered_selections', self.remembered_selections)
 
         # Get current env and state before running this script and sub-scripts
         # env = i.get('env', {})
@@ -712,7 +714,7 @@ class ScriptAutomation(Automation):
             new_env_keys_from_meta,
             new_state_keys_from_meta,
             run_state
-            )
+        )
         if r['return'] > 0:
             return r
 
@@ -1012,8 +1014,8 @@ class ScriptAutomation(Automation):
                         if not skip_remembered_selections:
                             # Remember selection
                             self.remembered_selections.append({'type': 'cache',
-                                                          'tags': search_tags,
-                                                          'cached_script': found_cached_scripts[selection]})
+                                                               'tags': search_tags,
+                                                               'cached_script': found_cached_scripts[selection]})
                     else:
                         num_found_cached_scripts = 0
 
@@ -1519,7 +1521,9 @@ class ScriptAutomation(Automation):
             # Check if pre-process and detect
             if 'preprocess' in dir(customize_code) and not fake_run:
 
-                logger.debug(self.recursion_spaces + '  - Running preprocess ...')
+                logger.debug(
+                    self.recursion_spaces +
+                    '  - Running preprocess ...')
                 # print(f"preprocess_env:")
                 # utils.print_env(env)
 
@@ -1951,7 +1955,6 @@ class ScriptAutomation(Automation):
         if i.get('json', False) or i.get('j', False):
             import json
             logger.info(json.dumps(rr, indent=2))
-
 
         if show_time:
             logger.info(
@@ -3138,10 +3141,10 @@ class ScriptAutomation(Automation):
 
     ##########################################################################
 
-    def _call_run_deps(script, deps, local_env_keys, local_env_keys_from_meta, env, recursion_spaces, 
+    def _call_run_deps(script, deps, local_env_keys, local_env_keys_from_meta, env, recursion_spaces,
                        remembered_selections, variation_tags_string, found_cached, debug_script_tags='',
                        show_time=False, extra_recursion_spaces='  ', run_state={'deps': [], 'fake_deps': [], 'parent': None}):
-        
+
         if len(deps) == 0:
             return {'return': 0}
 
@@ -3172,7 +3175,7 @@ class ScriptAutomation(Automation):
         if len(deps) > 0:
             # Preserve local env
             tmp_env = {}
-            env=self.env
+            env = self.env
 
             variation_groups = run_state.get('variation_groups')
 
@@ -3624,7 +3627,8 @@ pip install mlcflow
         paths = i['paths']
         select = i.get('select', False)
         select_default = i.get('select_default', False)
-        self.recursion_spaces = i.get('recursion_spaces', self.recursion_spaces)
+        self.recursion_spaces = i.get(
+            'recursion_spaces', self.recursion_spaces)
         logger = self.action_object.logger
         hook = i.get('hook', None)
 
@@ -3745,7 +3749,10 @@ pip install mlcflow
                 new_recursion_spaces = self.recursion_spaces + '    '
 
                 for path_to_file in found_files:
-                    logger.info(self.recursion_spaces + '    * ' + path_to_file)
+                    logger.info(
+                        self.recursion_spaces +
+                        '    * ' +
+                        path_to_file)
 
                     run_script_input['env'] = env
                     run_script_input['env'][env_path_key] = path_to_file
@@ -3847,7 +3854,8 @@ pip install mlcflow
            (detected_version) (str): detected version
 
         """
-        self.recursion_spaces = i.get('recursion_spaces', self.recursion_spaces)
+        self.recursion_spaces = i.get(
+            'recursion_spaces', self.recursion_spaces)
 
         import copy
 
@@ -3961,7 +3969,8 @@ pip install mlcflow
             run_script_input.get('state', {}))
 
         default_path_env_key = i.get('default_path_env_key', '')
-        self.recursion_spaces = i.get('recursion_spaces', self.recursion_spaces)
+        self.recursion_spaces = i.get(
+            'recursion_spaces', self.recursion_spaces)
 
         hook = i.get('hook', None)
 
@@ -5059,7 +5068,6 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
     found_cached = i.get('found_cached', False)
     script_automation = i['self']
 
-
     # Prepare script name
     check_if_run_script_exists = False
     script_name = i.get('script_name', '').strip()
@@ -5237,7 +5245,6 @@ or full console log.
                     'return': 2,
                     'error': f"""Native run script failed inside MLC script (name = {meta['alias']}, return code = {rc})\n\n{note}"""
                 }
-
 
                 return rr
             else:
