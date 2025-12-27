@@ -315,10 +315,10 @@ class ScriptAutomation(Automation):
         remembered_selections = i.get('remembered_selections', [])
 
         # Get current env and state before running this script and sub-scripts
-        #env = i.get('env', {})
-        #state = i.get('state', {})
-        #const = i.get('const', {})
-        #const_state = i.get('const_state', {})
+        # env = i.get('env', {})
+        # state = i.get('state', {})
+        # const = i.get('const', {})
+        # const_state = i.get('const_state', {})
 
         env = self.env
         state = self.state
