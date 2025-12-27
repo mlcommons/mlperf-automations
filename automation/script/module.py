@@ -36,8 +36,6 @@ class ScriptAutomation(Automation):
         self.run_state['version_info'] = []
         self.run_state['cache'] = False
         self.file_with_cached_state = 'mlc-cached-state.json'
-        # self.logger = logging.getLogger()
-        # logging.basicConfig(level=logging.INFO)
         self.logger = self.action_object.logger
         self.logger.propagate = False
 
@@ -102,6 +100,10 @@ class ScriptAutomation(Automation):
                                              'hf_token': {'desc': 'Huggingface Token', 'default': ''},
                                              'verify_ssl': {'desc': 'Verify SSL', 'default': False}
                                              }
+        self.env = {}
+        self.state = {}
+        self.const = {}
+        self.const_state = {}
 
     #################################################################
 
@@ -313,15 +315,20 @@ class ScriptAutomation(Automation):
         remembered_selections = i.get('remembered_selections', [])
 
         # Get current env and state before running this script and sub-scripts
-        env = i.get('env', {})
-        state = i.get('state', {})
-        const = i.get('const', {})
-        const_state = i.get('const_state', {})
+        #env = i.get('env', {})
+        #state = i.get('state', {})
+        #const = i.get('const', {})
+        #const_state = i.get('const_state', {})
+
+        env = self.env
+        state = self.state
+        const = self.const
+        const_state = self.const_state
 
         # Save current env and state to detect new env and state after running
         # a given script
-        saved_env = copy.deepcopy(env)
-        saved_state = copy.deepcopy(state)
+        saved_env = copy.deepcopy(self.env)
+        saved_state = copy.deepcopy(self.state)
 
         for key in ["env", "state", "const", "const_state"]:
             if i.get("local_" + key):
@@ -650,12 +657,8 @@ class ScriptAutomation(Automation):
 
         # for update_meta_if_env
 
-        r = update_state_from_meta(
+        r = self.update_state_from_meta(
             meta,
-            env,
-            state,
-            const,
-            const_state,
             deps,
             post_deps,
             prehook_deps,
@@ -803,10 +806,6 @@ class ScriptAutomation(Automation):
             versions_meta = versions[version]
             r = update_state_from_meta(
                 versions_meta,
-                env,
-                state,
-                const,
-                const_state,
                 deps,
                 post_deps,
                 prehook_deps,
@@ -1306,10 +1305,6 @@ class ScriptAutomation(Automation):
                         versions_meta = versions[default_version]
                         r = update_state_from_meta(
                             versions_meta,
-                            env,
-                            state,
-                            const,
-                            const_state,
                             deps,
                             post_deps,
                             prehook_deps,
@@ -2250,12 +2245,8 @@ class ScriptAutomation(Automation):
 
     def _apply_variation_meta(self, variation_key, variation_meta, env, state, const, const_state, deps, post_deps, prehook_deps, posthook_deps,
                               new_env_keys_from_meta, new_state_keys_from_meta, run_state, i, meta, required_disk_space, warnings, add_deps_recursive):
-        r = update_state_from_meta(
+        r = self.update_state_from_meta(
             variation_meta,
-            env,
-            state,
-            const,
-            const_state,
             deps,
             post_deps,
             prehook_deps,
@@ -4328,7 +4319,7 @@ pip install mlcflow
         return {'return': 0}
 
     ##########################################################################
-    def update_state_from_meta(self, meta, env, state, const, const_state, deps, post_deps,
+    def update_state_from_meta(self, meta, deps, post_deps,
                                prehook_deps, posthook_deps, new_env_keys, new_state_keys, run_state, i):
         """
         Updates state and env from meta
@@ -4337,10 +4328,10 @@ pip install mlcflow
 
         r = update_state_from_meta(
             meta,
-            env,
-            state,
-            const,
-            const_state,
+            self.env,
+            self.state,
+            self.const,
+            self.const_state,
             deps,
             post_deps,
             prehook_deps,
