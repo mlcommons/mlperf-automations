@@ -104,7 +104,6 @@ class ScriptAutomation(Automation):
         self.state = run_args.get('state', {})
         self.const = run_args.get('const', {})
         self.const_state = run_args.get('const_state', {})
-        
 
         add_deps_recursive = run_args.get('adr', {})
         if not add_deps_recursive:
@@ -368,7 +367,6 @@ class ScriptAutomation(Automation):
         else:
             utils.merge_dicts({'dict1': add_deps, 'dict2': i.get(
                 'add_deps', {}), 'append_lists': True, 'append_unique': True})
-
 
         save_env = i.get('save_env', False)
 
