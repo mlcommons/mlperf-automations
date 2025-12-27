@@ -3363,9 +3363,9 @@ class ScriptAutomation(Automation):
                         return r
 
                     # Update env/state with const
-                    env.update(const)
-                    utils.merge_dicts({'dict1': state,
-                                       'dict2': const_state,
+                    env.update(self.const)
+                    utils.merge_dicts({'dict1': self.state,
+                                       'dict2': self.const_state,
                                        'append_lists': True,
                                        'append_unique': True})
 
