@@ -2227,7 +2227,7 @@ class ScriptAutomation(Automation):
                 prehook_deps,
                 posthook_deps,
                 add_deps_recursive,
-                env)
+                self.env)
             if r['return'] > 0:
                 return r
 
