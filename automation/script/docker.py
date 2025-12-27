@@ -65,9 +65,14 @@ def dockerfile(self_module, input_params):
     state_data['docker'] = docker_settings
     add_deps_recursive = input_params.get('add_deps_recursive', {})
 
+    self_module.env = env
+    self_module.state = state_data
+    self_module.const = constant_vars
+    self_module.const_state = constant_state
+
     # Update state with metadata and variations
     update_state_result = self_module.update_state_from_meta(
-        metadata, env, state_data, constant_vars, constant_state,
+        metadata,
         deps=[],
         post_deps=[],
         prehook_deps=[],
@@ -253,6 +258,9 @@ def docker_run(self_module, i):
     show_time = i.get('show_time', False)
     logger = self_module.logger
     env = i.get('env', {})
+    
+    
+    self_module.env = env
 
     if quiet:
         env['MLC_QUIET'] = 'yes'
@@ -268,7 +276,7 @@ def docker_run(self_module, i):
     cur_dir = os.getcwd()
 
     env['MLC_RUN_STATE_DOCKER'] = False
-    state, const, const_state = i.get(
+    self_module.state, self_module.const, self_module.const_state = i.get(
         'state', {}), i.get(
         'const', {}), i.get(
         'const_state', {})
@@ -325,7 +333,7 @@ def docker_run(self_module, i):
     }
 
     # Update state and handle variations
-    r = self_module.update_state_from_meta(meta, env, state, const, const_state, deps=[],
+    r = self_module.update_state_from_meta(meta, deps=[],
                                            post_deps=[],
                                            prehook_deps=[],
                                            posthook_deps=[],
@@ -357,7 +365,7 @@ def docker_run(self_module, i):
 
     # For updating meta from update_meta_if_env
     r = self_module.update_state_from_meta(
-        meta, env, state, const, const_state, deps=[],
+        deps=[],
         post_deps=[],
         prehook_deps=[],
         posthook_deps=[],
