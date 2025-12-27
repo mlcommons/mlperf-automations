@@ -3757,7 +3757,7 @@ pip install mlcflow
                     rx = prepare_and_run_script_with_postprocessing(
                         run_script_input, postprocess="detect_version")
 
-                    run_script_input['recursion_spaces'] = recursion_spaces
+                    run_script_input['recursion_spaces'] = self.recursion_spaces
 
                     if rx['return'] > 0:
                         if rx['return'] != 2:
