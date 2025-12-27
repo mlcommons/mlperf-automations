@@ -299,7 +299,7 @@ def regenerate_script_cmd(i):
     # docker_run_cmd_prefix = i.get('docker_run_cmd_prefix', '')
 
     # Regenerate command from dictionary input
-    run_cmd = 'mlcr'
+    run_cmd = 'mlcd' if i.get('docker') else 'mlcr'
 
     skip_input_for_fake_run = remote_run_settings.get(
         'skip_input_for_fake_run', [])
