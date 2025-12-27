@@ -3880,7 +3880,7 @@ pip install mlcflow
                 self.recursion_spaces +
                 '  - Searching for versions: {}'.format(x))
 
-        new_recursion_spaces = recursion_spaces + '    '
+        new_recursion_spaces = self.recursion_spaces + '    '
 
         run_script_input['recursion_spaces'] = new_recursion_spaces
         run_script_input['env'] = env
@@ -3889,7 +3889,7 @@ pip install mlcflow
         rx = prepare_and_run_script_with_postprocessing(
             run_script_input, postprocess="detect_version")
 
-        run_script_input['recursion_spaces'] = recursion_spaces
+        run_script_input['recursion_spaces'] = self.recursion_spaces
 
         if rx['return'] == 0:
             # Version was detected
