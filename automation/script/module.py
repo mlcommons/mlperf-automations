@@ -17,6 +17,7 @@ import mlc.utils as utils
 from utils import *
 from script.script_utils import *
 
+
 class ScriptAutomation(Automation):
 
     """
