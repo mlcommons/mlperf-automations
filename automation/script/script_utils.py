@@ -184,6 +184,76 @@ def select_script_and_cache(
     }
 
 
+def select_script_item(lst, text, recursion_spaces,
+                       can_skip, script_tags_string, quiet, logger=None):
+    """
+    Internal: select script
+    """
+
+    string1 = recursion_spaces + \
+        '    - More than 1 {} found for "{}":'.format(text, script_tags_string)
+
+    if not logger:
+        return {'return': 1, 'error': 'No logger provided'}
+
+    # If quiet, select 0 (can be sorted for determinism)
+    if quiet:
+        logger.debug(string1)
+        logger.debug('Selected default due to "quiet" mode')
+
+        return 0
+
+    # Select 1 and proceed
+    logger.info(string1)
+    num = 0
+
+    for a in lst:
+        meta = a.meta
+
+        name = meta.get('name', '')
+
+        s = a.path
+        if name != '':
+            s = '"' + name + '" ' + s
+
+        x = recursion_spaces + \
+            '      {}) {} ({})'.format(num, s, ','.join(meta['tags']))
+
+        version = meta.get('version', '')
+        if version != '':
+            x += ' (Version {})'.format(version)
+
+        logger.info(x)
+        num += 1
+
+    s = 'Make your selection or press Enter for 0'
+    if can_skip:
+        s += ' or use -1 to skip'
+
+    x = input(recursion_spaces + '      ' + s + ': ')
+    x = x.strip()
+    if x == '':
+        x = '0'
+
+    selection = int(x)
+
+    if selection < 0 and not can_skip:
+        selection = 0
+
+    if selection < 0:
+        logger.info(recursion_spaces + '      Skipped')
+    else:
+        if selection >= num:
+            selection = 0
+        logger.info(
+            recursion_spaces +
+            '      Selected {}: {}'.format(
+                selection,
+                lst[selection].path))
+
+    return selection
+
+
 def should_preload_cache(scripts, force_cache=False):
     """
     Return True if at least one script requires or allows caching.
