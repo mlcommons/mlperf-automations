@@ -320,6 +320,11 @@ class ScriptAutomation(Automation):
         # const = i.get('const', {})
         # const_state = i.get('const_state', {})
 
+        self.env = i.get('env', self.env)
+        self.state = i.get('state', self.state)
+        self.const = i.get('const', self.const)
+        self.const_state = i.get('const_state', self.const_state)
+        
         env = self.env
         state = self.state
         const = self.const
@@ -332,9 +337,7 @@ class ScriptAutomation(Automation):
 
         for key in ["env", "state", "const", "const_state"]:
             if i.get("local_" + key):
-                if not i.get(key, {}):
-                    i[key] = {}
-                utils.merge_dicts({'dict1': i[key],
+                utils.merge_dicts({'dict1': getattr(self, key),
                                    'dict2': i['local_' + key],
                                    'append_lists': True,
                                    'append_unique': True})
