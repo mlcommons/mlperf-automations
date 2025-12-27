@@ -126,7 +126,7 @@ def dockerfile(self_module, input_params):
             return r
 
     update_state_result = self_module.update_state_from_meta(
-        metadata, env, state_data, constant_vars, constant_state,
+        metadata,
         deps=[],
         post_deps=[],
         prehook_deps=[],
