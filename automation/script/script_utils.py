@@ -44,7 +44,7 @@ def select_script_and_cache(
     # ---------------------------------------------------------
     # STEP 1: Script search
     ii = {
-        "script_tags": tags_string,
+        "script_tags": script_tags,
         "variation_tags": variation_tags,
         "out": None,
     }

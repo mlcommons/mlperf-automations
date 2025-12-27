@@ -15,7 +15,7 @@ from mlc.main import Automation
 from mlc.main import CacheAction
 import mlc.utils as utils
 from utils import *
-
+from script.script_utils import *
 
 class ScriptAutomation(Automation):
 
@@ -1016,7 +1016,7 @@ class ScriptAutomation(Automation):
                         'cached script output',
                         recursion_spaces,
                         True,
-                        script_tags_string,
+                        ",".join(script_tags),
                         quiet,
                         logger)
 
