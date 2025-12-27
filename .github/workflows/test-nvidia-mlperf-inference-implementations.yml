@@ -5,12 +5,12 @@ on:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-nvidia-mlperf-inference-implementations.yml'
-      - '**'
+      - 'script/app-mlperf-inference-nvidia/**'
       - '!**.md'
 
 jobs:
   run_nvidia:
-      if: github.repository_owner == 'gateoverflow'
+      if: github.repository_owner == 'mlcommons'
       runs-on:
        - ubuntu-latest
       strategy:
