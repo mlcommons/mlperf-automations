@@ -94,8 +94,7 @@ def dockerfile(self_module, input_params):
         posthook_deps=[],  # Add posthook dependencies if needed
         new_env_keys_from_meta=[],  # Add keys from meta if needed
         new_state_keys_from_meta=[],  # Add state keys from meta if needed
-        run_state=run_state,
-        recursion_spaces=''
+        run_state=run_state
     )
     if update_variations_result['return'] > 0:
         return update_variations_result
