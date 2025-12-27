@@ -3137,8 +3137,8 @@ class ScriptAutomation(Automation):
 
     ##########################################################################
 
-    def _call_run_deps(script, deps, local_env_keys, local_env_keys_from_meta, env, recursion_spaces,
-                       remembered_selections, variation_tags_string, found_cached, debug_script_tags='',
+    def _call_run_deps(script, deps, local_env_keys, local_env_keys_from_meta, recursion_spaces,
+                       variation_tags_string, found_cached, debug_script_tags='',
                        show_time=False, extra_recursion_spaces='  ', run_state={'deps': [], 'fake_deps': [], 'parent': None}):
 
         if len(deps) == 0:
@@ -4789,9 +4789,9 @@ def find_cached_script(i):
 
                 deps = meta.get('deps')
                 if deps:
-                    r = self_obj._call_run_deps(deps, self_obj.local_env_keys, meta.get('local_env_keys', []), env_tmp, state_tmp, const, const_state, add_deps_recursive,
+                    r = self_obj._call_run_deps(deps, self_obj.local_env_keys, meta.get('local_env_keys', []),
                                                 recursion_spaces + extra_recursion_spaces,
-                                                remembered_selections, variation_tags_string, True, '', show_time, extra_recursion_spaces, {})
+                                                variation_tags_string, True, '', show_time, extra_recursion_spaces, {})
                     if r['return'] > 0:
                         return r
 
@@ -5286,8 +5286,7 @@ or full console log.
                 customize_code.__file__))
 
     if len(posthook_deps) > 0 and (postprocess == "postprocess"):
-        r = script_automation._call_run_deps(posthook_deps, local_env_keys, local_env_keys_from_meta, env, state, const, const_state,
-                                             add_deps_recursive, recursion_spaces, remembered_selections, variation_tags_string, found_cached, debug_script_tags, show_time, ' ', run_state)
+        r = script_automation._call_run_deps(posthook_deps, local_env_keys, local_env_keys_from_meta, recursion_spaces, variation_tags_string, found_cached, debug_script_tags, show_time, ' ', run_state)
         if r['return'] > 0:
             return r
 
