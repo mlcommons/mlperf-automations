@@ -1576,7 +1576,7 @@ class ScriptAutomation(Automation):
                     os.chdir(current_path)
 
                     ###########################################################
-                    return self.action_object.access(ii)
+                    return self.run(ii)
 
                 # If return version
                 if cache:
@@ -2881,7 +2881,7 @@ class ScriptAutomation(Automation):
                                 import copy
                                 ii['env'] = copy.deepcopy(i_env)
                             logger.info(ii)
-                            r = self.action_object.access(ii)
+                            r = self.run(ii)
                             if r['return'] > 0:
                                 return r
                     if is_true(i.get('docker_prune', '')):
@@ -3344,7 +3344,7 @@ class ScriptAutomation(Automation):
                     utils.merge_dicts(
                         {'dict1': ii, 'dict2': d, 'append_lists': True, 'append_unique': True})
 
-                    r = self.action_object.access(ii)
+                    r = self.run(ii)
                     if r['return'] > 0:
                         if is_true(d.get('continue_on_error')):
                             # Warning printed by mlcflow
