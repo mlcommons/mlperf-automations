@@ -361,9 +361,7 @@ class ScriptAutomation(Automation):
                                    'dict2': i['local_' + key],
                                    'append_lists': True,
                                    'append_unique': True})
-                # print(f"Merged local {key}: {i[key]}")
 
-        # print(f"env = {env}")
         add_deps = i.get('ad', {})
         if not add_deps:
             add_deps = i.get('add_deps', {})
@@ -1093,7 +1091,6 @@ class ScriptAutomation(Automation):
                         return r
                     new_env = r['new_env']
 
-                    print(f"env = {env}, new_env={new_env}")
                     utils.merge_dicts(
                         {'dict1': env, 'dict2': new_env, 'append_lists': True, 'append_unique': True})
 
@@ -3236,14 +3233,19 @@ class ScriptAutomation(Automation):
                         new_run_state['parent'] += " ( " + ',_'.join(
                                 run_state['script_variation_tags']) + " )"
 
-
                     ii = {
+                        'automation': utils.assemble_object(self.meta['alias'], self.meta['uid']),
                         'recursion': True,
                         'debug_script_tags': debug_script_tags,
+                        'env': env,
+                        'state': self.state,
+                        'const': self.const,
+                        'const_state': self.const_state,
                         'time': show_time,
                         'run_state': new_run_state
 
                     }
+                    
 
                     for key in ["env", "state", "const", "const_state"]:
                         ii['local_' + key] = d.get(key, {})
