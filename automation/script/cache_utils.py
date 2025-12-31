@@ -305,7 +305,7 @@ def run_validate_cache_if_present(i, cached_script):
     validate_script = os.path.join(script_path, f'validate_cache{bat_ext}')
     if not os.path.exists(validate_script):
         return None
-    
+
     i['logger'].debug(
         i['recursion_spaces'] +
         f'  - Validating cached entry: {cached_script.path}'
