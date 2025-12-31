@@ -1,3 +1,9 @@
+import os
+import importlib
+import subprocess
+import sys
+import ast
+
 def get_variation_and_script_tags(tags_string):
 
     tags = [] if tags_string == '' else tags_string.split(',')
@@ -351,3 +357,54 @@ def prune_cache_for_selected_script(cache_list, selected_script):
         c for c in cache_list
         if c.meta.get("associated_script_item_uid") == selected_uid
     ]
+
+def install_packages(packages):
+    """
+    Install a list of packages via pip.
+    """
+    if not packages:
+        return
+    print(f"Installing missing packages: {', '.join(packages)}")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", *packages])
+
+def get_imported_modules(py_file_path):
+    """
+    Parse a Python file and return all top-level module names it imports.
+    """
+    with open(py_file_path, "r", encoding="utf-8") as f:
+        node = ast.parse(f.read(), filename=py_file_path)
+    modules = set()
+    for n in ast.walk(node):
+        if isinstance(n, ast.Import):
+            for alias in n.names:
+                modules.add(alias.name.split('.')[0])
+        elif isinstance(n, ast.ImportFrom) and n.module:
+            modules.add(n.module.split('.')[0])
+    return modules
+
+def load_customize_with_deps(path_to_customize_py):
+    """
+    Load customize.py module, automatically installing all missing dependencies in one go.
+    """
+    if not os.path.isfile(path_to_customize_py):
+        raise FileNotFoundError(f"{path_to_customize_py} not found")
+
+
+    # Step 1: Get all imported modules
+    imported_modules = get_imported_modules(path_to_customize_py)
+    # Step 2: Detect which are missing
+    missing_packages = []
+    for mod in imported_modules:
+        try:
+            importlib.import_module(mod)
+        except ModuleNotFoundError:
+            missing_packages.append(mod)
+
+    # Step 3: Install all missing packages at once
+    install_packages(missing_packages)
+
+    # Step 4: Load the module
+    spec = importlib.util.spec_from_file_location("customize", path_to_customize_py)
+    customize = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(customize)
+    return customize
