@@ -220,12 +220,8 @@ def call_remote_run_prepare(self_module, meta, script_item, env, state, i):
     # Check and run remote_run_prepare in customize.py
     if os.path.isfile(path_to_customize_py) and has_function_in_file(
             path_to_customize_py, "remote_run_prepare"):
-        r = utils.load_python_module(
-            {'path': script_item.path, 'name': 'customize'})
-        if r['return'] > 0:
-            return r
 
-        customize_code = r['code']
+        customize_code = load_customize_with_deps(path_to_customize_py)
 
         customize_common_input = {
             'input': i,

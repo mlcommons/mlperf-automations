@@ -917,18 +917,18 @@ class ScriptAutomation(Automation):
 
         local_env_keys_from_meta = meta.get('local_env_keys', [])
 
+        # For allowing python files in one script to be called from another
+        if path not in sys.path:
+            sys.path.insert(0, path)
+
         # Check if has customize.py
         path_to_customize_py = os.path.join(path, 'customize.py')
         customize_code = None
         customize_common_input = {}
 
         if os.path.isfile(path_to_customize_py) and cache:
-            r = utils.load_python_module(
-                {'path': path, 'name': 'customize'})
-            if r['return'] > 0:
-                return r
 
-            customize_code = r['code']
+            customize_code = load_customize_with_deps(path_to_customize_py)
 
             customize_common_input = {
                 'input': i,
@@ -1380,12 +1380,8 @@ class ScriptAutomation(Automation):
             # Check and run predeps in customize.py
             if not is_false(meta.get('predeps', 'True')) and os.path.isfile(
                     path_to_customize_py):  # possible duplicate execution - needs fix
-                r = utils.load_python_module(
-                    {'path': path, 'name': 'customize'})
-                if r['return'] > 0:
-                    return r
 
-                customize_code = r['code']
+                customize_code = load_customize_with_deps(path_to_customize_py)
 
                 customize_common_input = {
                     'input': i,
@@ -1449,12 +1445,8 @@ class ScriptAutomation(Automation):
 
             if os.path.isfile(
                     path_to_customize_py):  # possible duplicate execution - needs fix
-                r = utils.load_python_module(
-                    {'path': path, 'name': 'customize'})
-                if r['return'] > 0:
-                    return r
 
-                customize_code = r['code']
+                customize_code = load_customize_with_deps(path_to_customize_py)
 
                 customize_common_input = {
                     'input': i,

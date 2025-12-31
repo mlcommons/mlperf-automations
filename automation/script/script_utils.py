@@ -1,3 +1,8 @@
+import os
+import importlib
+import subprocess
+import sys
+import ast
 from script.cache_utils import *
 
 
@@ -255,3 +260,156 @@ def select_script_item(lst, text, recursion_spaces,
                 lst[selection].path))
 
     return selection
+
+
+def should_preload_cache(scripts, force_cache=False):
+    """
+    Return True if at least one script requires or allows caching.
+    """
+    for script in scripts:
+        if script.meta.get("cache", False):
+            return True
+        if script.meta.get("can_force_cache", False) and force_cache:
+            return True
+    return False
+
+
+def search_script_cache(
+    cache_action,
+    script_tags_string,
+    variation_tags,
+    recursion_spaces,
+    logger,
+):
+    """
+    Search cache entries for given script & variation tags.
+    """
+    cache_tags = "-tmp"
+
+    if script_tags_string:
+        cache_tags += "," + script_tags_string
+
+    if variation_tags:
+        cache_tags += ",_" + ",_".join(variation_tags)
+
+    # Fix variation exclusion syntax
+    cache_tags = cache_tags.replace(",_-", ",-_")
+
+    logger.debug(
+        recursion_spaces +
+        f"  - Searching for cached script outputs with tags: {cache_tags}"
+    )
+
+    rc = cache_action.access(
+        {
+            "action": "search",
+            "target_name": "cache",
+            "tags": cache_tags,
+        }
+    )
+
+    if rc["return"] > 0:
+        return rc
+
+    return {
+        "return": 0,
+        "cache_list": rc["list"],
+    }
+
+
+def prune_scripts_using_cache(scripts, cache_list):
+    """
+    Retain only scripts that have matching cache entries.
+    """
+    pruned_scripts = []
+
+    for cache_entry in cache_list:
+        assoc = cache_entry.meta.get("associated_script_item", "")
+        if "," not in assoc:
+            return {
+                "return": 1,
+                "error": f'MLC artifact format is wrong "{assoc}" - no comma found',
+            }
+
+        uid = assoc.split(",", 1)[1]
+        cache_entry.meta["associated_script_item_uid"] = uid
+
+        for script in scripts:
+            if script.meta.get("uid") == uid and script not in pruned_scripts:
+                pruned_scripts.append(script)
+
+    # Avoid over-pruning
+    if pruned_scripts:
+        scripts = pruned_scripts
+
+    return {
+        "return": 0,
+        "scripts": scripts,
+        "cache_list": cache_list,
+    }
+
+
+def prune_cache_for_selected_script(cache_list, selected_script):
+    """
+    Keep only cache entries associated with selected script.
+    """
+    selected_uid = selected_script.meta["uid"]
+
+    return [
+        c for c in cache_list
+        if c.meta.get("associated_script_item_uid") == selected_uid
+    ]
+
+
+def install_packages(packages):
+    """
+    Install a list of packages via pip.
+    """
+    if not packages:
+        return
+    print(f"Installing missing packages: {', '.join(packages)}")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", *packages])
+
+
+def get_imported_modules(py_file_path):
+    """
+    Parse a Python file and return all top-level module names it imports.
+    """
+    with open(py_file_path, "r", encoding="utf-8") as f:
+        node = ast.parse(f.read(), filename=py_file_path)
+    modules = set()
+    for n in node.body:
+        if isinstance(n, ast.Import):
+            for alias in n.names:
+                modules.add(alias.name.split('.')[0])
+        elif isinstance(n, ast.ImportFrom) and n.module:
+            modules.add(n.module.split('.')[0])
+    return modules
+
+
+def load_customize_with_deps(path_to_customize_py):
+    """
+    Load customize.py module, automatically installing all missing dependencies in one go.
+    """
+    if not os.path.isfile(path_to_customize_py):
+        raise FileNotFoundError(f"{path_to_customize_py} not found")
+
+    # Step 1: Get all imported modules
+    imported_modules = get_imported_modules(path_to_customize_py)
+    # Step 2: Detect which are missing
+    missing_packages = []
+    for mod in imported_modules:
+        try:
+            importlib.import_module(mod)
+        except ModuleNotFoundError:
+            missing_packages.append(mod)
+
+    # Step 3: Install all missing packages at once
+    install_packages(missing_packages)
+
+    # Step 4: Load the module
+    spec = importlib.util.spec_from_file_location(
+        "customize", path_to_customize_py)
+    customize = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(customize)
+    return customize
