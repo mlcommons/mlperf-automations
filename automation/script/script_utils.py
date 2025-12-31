@@ -377,7 +377,7 @@ def get_imported_modules(py_file_path):
     with open(py_file_path, "r", encoding="utf-8") as f:
         node = ast.parse(f.read(), filename=py_file_path)
     modules = set()
-    for n in ast.walk(node):
+    for n in node.body:
         if isinstance(n, ast.Import):
             for alias in n.names:
                 modules.add(alias.name.split('.')[0])
