@@ -1,5 +1,6 @@
 from script.cache_utils import *
 
+
 def get_variation_and_script_tags(tags_string):
 
     tags = [] if tags_string == '' else tags_string.split(',')

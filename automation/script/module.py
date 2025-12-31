@@ -1084,7 +1084,7 @@ class ScriptAutomation(Automation):
                     # IF REUSE FROM CACHE - update env and state from cache!
                     cached_state = r['meta']
                     cached_path = self.action_object.local_cache_path
-                    r = fix_cache_paths(cached_path,cached_state['new_env'])
+                    r = fix_cache_paths(cached_path, cached_state['new_env'])
                     if r['return'] > 0:
                         return r
                     new_env = r['new_env']
@@ -4509,7 +4509,9 @@ def find_cached_script(i):
     # 4. Apply remembered cache selection
     # 5. Validate cached scripts
 
-    i['logger'].debug(i['recursion_spaces'] + '  - Checking if script execution is already cached ...')
+    i['logger'].debug(
+        i['recursion_spaces'] +
+        '  - Checking if script execution is already cached ...')
 
     cached_tags, explicit_cached_tags = prepare_cache_tags(i)
 
@@ -4518,10 +4520,12 @@ def find_cached_script(i):
             i['recursion_spaces'] +
             f'  - New cache entry requested, skipping cache search.'
         )
-        return { 'return': 0, 'cached_tags': cached_tags, 'search_tags': '', 'found_cached_scripts': [] }
+        return {'return': 0, 'cached_tags': cached_tags,
+                'search_tags': '', 'found_cached_scripts': []}
 
     search_tags, found_cached_scripts = search_cache(i, explicit_cached_tags)
-    found_cached_scripts = apply_remembered_cache_selection(i, search_tags, found_cached_scripts)
+    found_cached_scripts = apply_remembered_cache_selection(
+        i, search_tags, found_cached_scripts)
     found_cached_scripts = validate_cached_scripts(i, found_cached_scripts)
 
     return {'return': 0, 'cached_tags': cached_tags,
@@ -5695,7 +5699,6 @@ def detect_state_diff(env, saved_env, new_env_keys,
 
     return {'return': 0, 'env': env, 'new_env': new_env,
             'state': state, 'new_state': new_state}
-
 
 
 ##############################################################################

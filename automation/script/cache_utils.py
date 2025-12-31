@@ -2,6 +2,7 @@ import os
 import mlc.utils as utils
 from utils import compare_versions
 
+
 def check_versions(action_object, cached_script_version,
                    version_min, version_max):
     """
@@ -134,7 +135,8 @@ def prepare_cache_tags(i):
                 explicit_cached_tags.append(t)
 
     # env-driven tags
-    # Add tags from deps (will be also duplicated when creating new cache entry)
+    # Add tags from deps (will be also duplicated when creating new cache
+    # entry)
     extra_cache_tags_from_env = i['meta'].get('extra_cache_tags_from_env', [])
     for extra_cache_tags in extra_cache_tags_from_env:
         key = extra_cache_tags['env']
@@ -186,8 +188,10 @@ def apply_remembered_cache_selection(i, search_tags, found_cached_scripts):
         return found_cached_scripts
 
     for selection in i['remembered_selections']:
-        if selection['type'] == 'cache' and set(selection['tags'].split(',')) == set(search_tags.split(',')):
-            tmp_version_in_cached_script = selection['cached_script'].meta.get('version', '')
+        if selection['type'] == 'cache' and set(
+                selection['tags'].split(',')) == set(search_tags.split(',')):
+            tmp_version_in_cached_script = selection['cached_script'].meta.get(
+                'version', '')
             skip_cached_script = check_versions(
                 i['self'].action_object,
                 tmp_version_in_cached_script,
@@ -203,7 +207,7 @@ def apply_remembered_cache_selection(i, search_tags, found_cached_scripts):
                     i['recursion_spaces'] +
                     '  - Found remembered selection with tags "{}"!'.format(search_tags))
                 return [selection['cached_script']]
-            
+
     return found_cached_scripts
 
 
@@ -216,7 +220,7 @@ def validate_cached_scripts(i, found_cached_scripts):
         for cached_script in found_cached_scripts:
             if is_cached_entry_valid(i, cached_script):
                 i['logger'].debug(
-                    i['recursion_spaces'] + 
+                    i['recursion_spaces'] +
                     f'  - Validated cached entry: {cached_script.path}'
                 )
                 valid.append(cached_script)
@@ -232,7 +236,7 @@ def is_cached_entry_valid(i, cached_script):
     # Check dependent paths
     if not validate_dependent_paths(i, cached_script):
         return False
-    
+
     # Run validate_cache script if present
     detected_version = run_validate_cache_if_present(i, cached_script)
     # Get cached version
@@ -241,7 +245,7 @@ def is_cached_entry_valid(i, cached_script):
     if cached_version and detected_version and cached_version != detected_version:
         # Cached version mismatch
         return False
-    
+
     # check_versions returns True if cache should be skipped
     return not check_versions(
         i['self'].action_object,
@@ -264,7 +268,8 @@ def validate_dependent_paths(i, cached_script):
         dependent_paths.append(dependent_cached_path)
 
     # multiple dependent paths (colon-separated)
-    dependent_cached_paths = cached_script.meta.get('dependent_cached_paths', '').split(':')
+    dependent_cached_paths = cached_script.meta.get(
+        'dependent_cached_paths', '').split(':')
     dependent_paths += [p for p in dependent_cached_paths if p]
 
     if not dependent_paths:
@@ -375,6 +380,8 @@ def run_validate_cache_if_present(i, cached_script):
     return r.get('version')
 
 ##########################################################################
+
+
 def fix_cache_paths(cached_path, env):
 
     current_cache_path = cached_path
@@ -414,6 +421,7 @@ def fix_cache_paths(cached_path, env):
 
     return {'return': 0, 'new_env': new_env}
 
+
 def prune_cache_for_selected_script(cache_list, selected_script):
     """
     Keep only cache entries associated with selected script.
@@ -424,6 +432,7 @@ def prune_cache_for_selected_script(cache_list, selected_script):
         c for c in cache_list
         if c.meta.get("associated_script_item_uid") == selected_uid
     ]
+
 
 def prune_scripts_using_cache(scripts, cache_list):
     """
@@ -455,6 +464,7 @@ def prune_scripts_using_cache(scripts, cache_list):
         "scripts": scripts,
         "cache_list": cache_list,
     }
+
 
 def search_script_cache(
     cache_action,
@@ -497,6 +507,7 @@ def search_script_cache(
         "return": 0,
         "cache_list": rc["list"],
     }
+
 
 def should_preload_cache(scripts, force_cache=False):
     """
