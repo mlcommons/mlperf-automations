@@ -16,6 +16,7 @@ from mlc.main import CacheAction
 import mlc.utils as utils
 from utils import *
 from script.script_utils import *
+from script.cache_utils import *
 
 
 class ScriptAutomation(Automation):
@@ -975,7 +976,8 @@ class ScriptAutomation(Automation):
                                     'skip_remembered_selections': skip_remembered_selections,
                                     'remembered_selections': self.remembered_selections,
                                     'quiet': quiet,
-                                    'show_time': show_time
+                                    'show_time': show_time,
+                                    'logger': self.action_object.logger
                                     })
             if r['return'] > 0:
                 return r
@@ -1081,8 +1083,8 @@ class ScriptAutomation(Automation):
                     ###########################################################
                     # IF REUSE FROM CACHE - update env and state from cache!
                     cached_state = r['meta']
-
-                    r = self._fix_cache_paths(cached_state['new_env'])
+                    cached_path = self.action_object.local_cache_path
+                    r = fix_cache_paths(cached_path, cached_state['new_env'])
                     if r['return'] > 0:
                         return r
                     new_env = r['new_env']
@@ -2021,46 +2023,6 @@ class ScriptAutomation(Automation):
             return r
 
         return {'return': 0}
-
-    ##########################################################################
-    def _fix_cache_paths(self, env):
-
-        current_cache_path = self.action_object.local_cache_path
-
-        new_env = env  # just a reference
-
-        for key, val in new_env.items():
-            # Check for a path separator in a string and determine the
-            # separator
-            if isinstance(val, str) and any(sep in val for sep in [
-                    "/local/cache/", "\\local\\cache\\"]):
-                sep = "/" if "/local/cache/" in val else "\\"
-
-                path_split = val.split(sep)
-                repo_entry_index = path_split.index("local")
-                loaded_cache_path = sep.join(
-                    path_split[0:repo_entry_index + 2])
-                if loaded_cache_path != current_cache_path and os.path.exists(
-                        current_cache_path):
-                    new_env[key] = val.replace(
-                        loaded_cache_path, current_cache_path).replace(sep, "/")
-
-            elif isinstance(val, list):
-                for i, val2 in enumerate(val):
-                    if isinstance(val2, str) and any(sep in val2 for sep in [
-                            "/local/cache/", "\\local\\cache\\"]):
-                        sep = "/" if "/local/cache/" in val2 else "\\"
-
-                        path_split = val2.split(sep)
-                        repo_entry_index = path_split.index("local")
-                        loaded_cache_path = sep.join(
-                            path_split[0:repo_entry_index + 2])
-                        if loaded_cache_path != current_cache_path and os.path.exists(
-                                current_cache_path):
-                            new_env[key][i] = val2.replace(
-                                loaded_cache_path, current_cache_path).replace(sep, "/")
-
-        return {'return': 0, 'new_env': new_env}
 
     ##########################################################################
     def _dump_version_info_for_script(
@@ -4516,20 +4478,7 @@ def relaxed_subset(v, variation_tags):
     return True
 
 
-def get_version_tag_from_version(version, cached_tags):
-    tags_to_add = []
-    if version != '':
-        version = str(version)
-        if 'version-' + version not in cached_tags:
-            cached_tags.append('version-' + version)
-        if '-git-' in version:
-            version_without_git_commit = version.split("-git-")[0]
-            if 'version-' + version_without_git_commit not in cached_tags:
-                cached_tags.append('version-' + version_without_git_commit)
-    return {'return': 0}
-
 ##############################################################################
-
 
 def find_cached_script(i):
     """
@@ -4546,273 +4495,30 @@ def find_cached_script(i):
        * return (int): return code == 0 if no error and >0 if error
        * (error) (str): error string if return>0
     """
+    # 1. Prepare cache tags
+    # 2. If new_cache_entry, return empty
+    # 3. Search cache
+    # 4. Apply remembered cache selection
+    # 5. Validate cached scripts
 
-    import copy
-
-    recursion_spaces = i['recursion_spaces']
-    extra_recursion_spaces = i['extra_recursion_spaces']
-    script_tags = i['script_tags']
-    cached_tags = []
-    customize_code = i.get('customize_code')
-    customize_common_input = i.get('customize_common_input', {})
-    found_script_tags = i['found_script_tags']
-    variation_tags = i['variation_tags']
-    variation_tags_string = i['variation_tags_string']
-    explicit_variation_tags = i['explicit_variation_tags']
-    version = i['version']
-    version_min = i['version_min']
-    version_max = i['version_max']
-    extra_cache_tags = i['extra_cache_tags']
-    add_deps_recursive = i['add_deps_recursive']
-    new_cache_entry = i['new_cache_entry']
-    meta = i['meta']
-    env = i['env']
-    state = i['state']
-    const = i['const']
-    const_state = i['const_state']
-    self_obj = i['self']
-    skip_remembered_selections = i['skip_remembered_selections']
-    remembered_selections = i['remembered_selections']
-    quiet = i['quiet']
-    show_time = i.get('show_time', False)
-    search_tags = ''
-
-    logger = self_obj.action_object.logger
-
-    found_cached_scripts = []
-
-    logger.debug(
-        recursion_spaces +
+    i['logger'].debug(
+        i['recursion_spaces'] +
         '  - Checking if script execution is already cached ...')
 
-    # Create a search query to find that we already ran this script with the same or similar input
-    # It will be gradually enhanced with more "knowledge"  ...
-    if len(script_tags) > 0:
-        for x in script_tags:
-            if x not in cached_tags:
-                cached_tags.append(x)
+    cached_tags, explicit_cached_tags = prepare_cache_tags(i)
 
-    if len(found_script_tags) > 0:
-        for x in found_script_tags:
-            if x not in cached_tags:
-                cached_tags.append(x)
+    if i['new_cache_entry']:
+        i['logger'].debug(
+            i['recursion_spaces'] +
+            f'  - New cache entry requested, skipping cache search.'
+        )
+        return {'return': 0, 'cached_tags': cached_tags,
+                'search_tags': '', 'found_cached_scripts': []}
 
-    explicit_cached_tags = copy.deepcopy(cached_tags)
-
-    if len(explicit_variation_tags) > 0:
-        explicit_variation_tags_string = ''
-
-        for t in explicit_variation_tags:
-            if explicit_variation_tags_string != '':
-                explicit_variation_tags_string += ','
-            if t.startswith("-"):
-                x = "-_" + t[1:]
-            else:
-                x = '_' + t
-            explicit_variation_tags_string += x
-
-            if x not in explicit_cached_tags:
-                explicit_cached_tags.append(x)
-
-        logger.debug(
-            recursion_spaces +
-            '    - Prepared explicit variations: {}'.format(explicit_variation_tags_string))
-
-    if len(variation_tags) > 0:
-        variation_tags_string = ''
-
-        for t in variation_tags:
-            if variation_tags_string != '':
-                variation_tags_string += ','
-            if t.startswith("-"):
-                x = "-_" + t[1:]
-            else:
-                x = '_' + t
-            variation_tags_string += x
-
-            if x not in cached_tags:
-                cached_tags.append(x)
-
-        logger.debug(
-            recursion_spaces +
-            '    - Prepared variations: {}'.format(variation_tags_string))
-
-    r = get_version_tag_from_version(version, cached_tags)
-    if r['return'] > 0:
-        return r
-    get_version_tag_from_version(version, explicit_cached_tags)
-    if r['return'] > 0:
-        return r
-
-    # Add extra cache tags (such as "virtual" for python)
-    if len(extra_cache_tags) > 0:
-        for t in extra_cache_tags:
-            if t not in cached_tags:
-                cached_tags.append(t)
-                explicit_cached_tags.append(t)
-
-    # Add tags from deps (will be also duplicated when creating new cache
-    # entry)
-    extra_cache_tags_from_env = meta.get('extra_cache_tags_from_env', [])
-    for extra_cache_tags in extra_cache_tags_from_env:
-        key = extra_cache_tags['env']
-        prefix = extra_cache_tags.get('prefix', '')
-
-        v = env.get(key, '').strip()
-        if v != '':
-            for t in v.split(','):
-                x = 'deps-' + prefix + t
-                if x not in cached_tags:
-                    cached_tags.append(x)
-                    explicit_cached_tags.append(x)
-
-    # Check if already cached
-    if not new_cache_entry:
-        search_tags = '-tmp'
-        if len(cached_tags) > 0:
-            search_tags += ',' + ','.join(explicit_cached_tags)
-
-        logger.debug(
-            recursion_spaces +
-            '    - Searching for cached script outputs with the following tags: {}'.format(search_tags))
-
-        r = self_obj.cache_action.access({'action': 'search',
-                                          'target_name': 'cache',
-                                          'tags': search_tags})
-        if r['return'] > 0:
-            return r
-
-        found_cached_scripts = r['list']
-
-        # Check if selection is remembered
-        if not skip_remembered_selections and len(found_cached_scripts) > 1:
-            # Need to add extra cached tags here (since recorded later)
-            for selection in remembered_selections:
-                if selection['type'] == 'cache' and set(
-                        selection['tags'].split(',')) == set(search_tags.split(',')):
-                    tmp_version_in_cached_script = selection['cached_script'].meta.get(
-                        'version', '')
-
-                    skip_cached_script = check_versions(
-                        self_obj.action_object, tmp_version_in_cached_script, version_min, version_max)
-
-                    if skip_cached_script:
-                        return {'return': 2, 'error': 'The version of the previously remembered selection for a given script ({}) mismatches the newly requested one'.format(
-                            tmp_version_in_cached_script)}
-                    else:
-                        found_cached_scripts = [selection['cached_script']]
-                        logger.debug(
-                            recursion_spaces +
-                            '  - Found remembered selection with tags "{}"!'.format(search_tags))
-                        break
-
-    if len(found_cached_scripts) > 0:
-        selection = 0
-
-        # Check version ranges ...
-        new_found_cached_scripts = []
-
-        for cached_script in found_cached_scripts:
-            skip_cached_script = False
-            dependent_paths = []
-            dependent_cached_path = cached_script.meta.get(
-                'dependent_cached_path')
-            if dependent_cached_path:
-                dependent_paths.append(dependent_cached_path)
-            dependent_cached_paths = cached_script.meta.get(
-                'dependent_cached_paths', '').split(':')
-            dependent_paths += [p for p in dependent_cached_paths if p]
-            for dep in dependent_paths:
-                if not os.path.exists(dependent_cached_path):
-                    # TODO Need to restrict the below check to within container
-                    # env
-                    i['tmp_dep_cached_path'] = dep
-                    from script import docker_utils
-                    r = docker_utils.get_container_path_script(i)
-                    if not os.path.exists(r['value_env']):
-                        # Need to rm this cache entry
-                        logger.debug(
-                            recursion_spaces +
-                            '  - Skipping cached entry as the dependent path {} is missing!'.format(r['value_env']))
-                        skip_cached_script = True
-                        break
-
-            if skip_cached_script:
-                continue
-
-            os_info = self_obj.os_info
-
-            # Bat extension for this host OS
-            bat_ext = os_info['bat_ext']
-            script_path = i['found_script_path']
-            detected_version = None
-
-            if os.path.exists(os.path.join(script_path,
-                              f"validate_cache{bat_ext}")):
-                run_script_input = {
-                    'path': script_path,
-                    'bat_ext': bat_ext,
-                    'os_info': os_info,
-                    'recursion_spaces': recursion_spaces,
-                    'tmp_file_run': self_obj.tmp_file_run,
-                    'self': self_obj,
-                    'meta': meta,
-                    'customize_code': customize_code,
-                    'customize_common_input': customize_common_input
-                }
-                env_tmp = copy.deepcopy(env)
-                path_to_cached_state_file = os.path.join(cached_script.path,
-                                                         self_obj.file_with_cached_state)
-
-                r = utils.load_json(file_name=path_to_cached_state_file)
-                if r['return'] > 0:
-                    continue
-
-                cached_meta = r.get("meta")
-                if not cached_meta:
-                    continue
-                new_env = cached_meta.get("new_env", {})
-                if new_env:
-                    env_tmp.update(new_env)
-                state_tmp = copy.deepcopy(state)
-                new_state = cached_meta.get("new_state", {})
-                if new_state:
-                    state_tmp.update(new_state)
-
-                deps = meta.get('deps')
-                if deps:
-                    r = self_obj._call_run_deps(deps, self_obj.local_env_keys, meta.get('local_env_keys', []),
-                                                recursion_spaces + extra_recursion_spaces,
-                                                variation_tags_string, True, '', show_time, extra_recursion_spaces, {})
-                    if r['return'] > 0:
-                        return r
-
-                ii = {
-                    'run_script_input': run_script_input,
-                    'env': env_tmp,
-                    'script_name': 'validate_cache',
-                    'detect_version': True
-                }
-                r = self_obj.run_native_script(ii)
-                # print(r)
-                if r['return'] > 0:
-                    # return r
-                    continue
-                if r.get('version'):
-                    detected_version = r['version']
-
-            if not skip_cached_script:
-                cached_script_version = cached_script.meta.get('version', '')
-                if cached_script_version and detected_version and cached_script_version != detected_version:
-                    continue
-
-                skip_cached_script = check_versions(
-                    self_obj.action_object, cached_script_version, version_min, version_max)
-
-            if not skip_cached_script:
-                new_found_cached_scripts.append(cached_script)
-
-        found_cached_scripts = new_found_cached_scripts
+    search_tags, found_cached_scripts = search_cache(i, explicit_cached_tags)
+    found_cached_scripts = apply_remembered_cache_selection(
+        i, search_tags, found_cached_scripts)
+    found_cached_scripts = validate_cached_scripts(i, found_cached_scripts)
 
     return {'return': 0, 'cached_tags': cached_tags,
             'search_tags': search_tags, 'found_cached_scripts': found_cached_scripts}
@@ -5986,39 +5692,6 @@ def detect_state_diff(env, saved_env, new_env_keys,
     return {'return': 0, 'env': env, 'new_env': new_env,
             'state': state, 'new_state': new_state}
 
-
-##############################################################################
-
-
-def check_versions(action_object, cached_script_version,
-                   version_min, version_max):
-    """
-    Internal: check versions of the cached script
-    """
-    skip_cached_script = False
-
-    if cached_script_version != '':
-        if version_min != '':
-            ry = compare_versions({
-                'version1': cached_script_version,
-                'version2': version_min})
-            if ry['return'] > 0:
-                return ry
-
-            if ry['comparison'] < 0:
-                skip_cached_script = True
-
-        if not skip_cached_script and version_max != '':
-            ry = compare_versions({
-                'version1': cached_script_version,
-                'version2': version_max})
-            if ry['return'] > 0:
-                return ry
-
-            if ry['comparison'] > 0:
-                skip_cached_script = True
-
-    return skip_cached_script
 
 ##############################################################################
 

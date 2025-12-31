@@ -3,6 +3,7 @@ import importlib
 import subprocess
 import sys
 import ast
+from script.cache_utils import *
 
 
 def get_variation_and_script_tags(tags_string):
