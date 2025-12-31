@@ -811,10 +811,10 @@ class ScriptAutomation(Automation):
                 # Processing them again using updated deps for
                 # add_deps_recursive
                 r = update_adr_from_meta(
-                    run_state['deps'],
-                    run_state['post_deps'],
-                    run_state['prehook_deps'],
-                    run_state['posthook_deps'],
+                    deps,
+                    post_deps,
+                    prehook_deps,
+                    posthook_deps,
                     add_deps_recursive,
                     env)
 
@@ -3236,8 +3236,9 @@ class ScriptAutomation(Automation):
                         'debug_script_tags': debug_script_tags,
                         'env': env,
                         'state': self.state,
-                        'const': self.const,
-                        'const_state': self.const_state,
+                        'const': self.const.copy(),
+                        'const_state': self.const_state.copy(),
+                        'add_deps_recursive': self.add_deps_recursive,
                         'time': show_time,
                         'run_state': new_run_state
 
@@ -5364,7 +5365,7 @@ def is_dep_tobe_skipped(d, env):
 
 def update_deps_from_input(deps, post_deps, prehook_deps, posthook_deps, i):
     """
-    Internal: update deps from meta
+    Internal: update deps from input
     """
     add_deps_info_from_input = i.get('ad', {})
     if not add_deps_info_from_input:

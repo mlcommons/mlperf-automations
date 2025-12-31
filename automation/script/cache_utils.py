@@ -219,10 +219,6 @@ def validate_cached_scripts(i, found_cached_scripts):
     if len(found_cached_scripts) > 0:
         for cached_script in found_cached_scripts:
             if is_cached_entry_valid(i, cached_script):
-                i['logger'].debug(
-                    i['recursion_spaces'] +
-                    f'  - Validated cached entry: {cached_script.path}'
-                )
                 valid.append(cached_script)
 
     return valid
@@ -301,10 +297,6 @@ def run_validate_cache_if_present(i, cached_script):
     '''
     import copy
 
-    i['logger'].debug(
-        i['recursion_spaces'] +
-        f'  - Validating cached entry: {cached_script.path}'
-    )
     os_info = i['self'].os_info
     # Bat extension for this host OS
     bat_ext = os_info['bat_ext']
@@ -313,6 +305,11 @@ def run_validate_cache_if_present(i, cached_script):
     validate_script = os.path.join(script_path, f'validate_cache{bat_ext}')
     if not os.path.exists(validate_script):
         return None
+    
+    i['logger'].debug(
+        i['recursion_spaces'] +
+        f'  - Validating cached entry: {cached_script.path}'
+    )
 
     # reconstruct env/state from cached metadata
     env_tmp = copy.deepcopy(i['env'])
