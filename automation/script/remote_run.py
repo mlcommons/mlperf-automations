@@ -10,6 +10,7 @@ import copy
 from datetime import datetime
 from script.script_utils import *
 
+
 def remote_run(self_module, i):
     """
     Remote run of MLC scripts.
@@ -156,7 +157,7 @@ def update_meta_for_selected_variations(self_module, script, input_params):
     run_state.update({
         'script_id': f"{script_alias},{script_uid}",
         'script_variation_tags': variation_tags
-        }
+    }
     )
 
     remote_run_settings = metadata.get('remote_run', {})

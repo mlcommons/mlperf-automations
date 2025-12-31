@@ -117,7 +117,7 @@ def dockerfile(self_module, input_params):
     )
     if update_state_result['return'] > 0:
         return update_state_result
-    
+
     docker_settings = run_state['docker']
 
     # Prune temporary environment variables
@@ -322,7 +322,7 @@ def docker_run(self_module, i):
         return r
 
     r = self_module._update_state_from_variations(
-        i, meta, variation_tags, variations, 
+        i, meta, variation_tags, variations,
         run_state=run_state)
     if r['return'] > 0:
         return r

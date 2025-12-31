@@ -116,7 +116,8 @@ class ScriptAutomation(Automation):
 
         self.deps = []
 
-        self.run_state = self.init_run_state(run_args.get('run_state')) #changes for every run call
+        self.run_state = self.init_run_state(
+            run_args.get('run_state'))  # changes for every run call
 
     def init_run_state(self, run_state):
 
@@ -131,11 +132,10 @@ class ScriptAutomation(Automation):
             run_state.setdefault(d, {})
 
         for l in ['deps', 'post_deps', 'prehook_deps', 'posthook_deps',
-              'new_env_keys', 'new_state_keys', 'version_info', 'full_deps']:
+                  'new_env_keys', 'new_state_keys', 'version_info', 'full_deps']:
             run_state.setdefault(l, [])
 
         return run_state
-
 
     #################################################################
 
@@ -407,7 +407,6 @@ class ScriptAutomation(Automation):
         if is_true(i.get('skip_sudo', '')):
             env['MLC_TMP_SKIP_SUDO'] = 'yes'
 
-
         run_state = self.init_run_state(i.get('run_state'))
 
         # Check verbose and silent
@@ -632,7 +631,6 @@ class ScriptAutomation(Automation):
 
         input_mapping = run_state['input_mapping']
         docker_settings = run_state['docker_settings']
-        
 
         input_mapping = meta.get('input_mapping', {})
 
@@ -678,7 +676,6 @@ class ScriptAutomation(Automation):
         run_state['post_deps'] = meta.get('post_deps', [])
         run_state['prehook_deps'] = meta.get('prehook_deps', [])
         run_state['posthook_deps'] = meta.get('posthook_deps', [])
-
 
         deps = run_state['deps']
         post_deps = run_state['post_deps']
@@ -2127,7 +2124,8 @@ class ScriptAutomation(Automation):
             'variation_tags': variation_tags
         }
 
-    def _apply_variation_meta(self, variation_key, variation_meta, run_state, i, meta, required_disk_space, warnings):
+    def _apply_variation_meta(self, variation_key, variation_meta,
+                              run_state, i, meta, required_disk_space, warnings):
         r = self.update_state_from_meta(
             variation_meta,
             run_state,
@@ -3219,19 +3217,18 @@ class ScriptAutomation(Automation):
                     # deps should have non-empty tags
                     d['tags'] += "," + new_variation_tags_string
 
-                
                 run_state['full_deps'].append(d['tags'])
 
                 if not run_state.get('fake_deps'):
                     new_run_state = {}
-                        
+
                     new_run_state['full_deps'] = []
 
                     new_run_state['parent'] = run_state.get('script_id', '')
 
                     if len(run_state.get('script_variation_tags', [])) > 0:
                         new_run_state['parent'] += " ( " + ',_'.join(
-                                run_state['script_variation_tags']) + " )"
+                            run_state['script_variation_tags']) + " )"
 
                     ii = {
                         'automation': utils.assemble_object(self.meta['alias'], self.meta['uid']),
@@ -3245,7 +3242,6 @@ class ScriptAutomation(Automation):
                         'run_state': new_run_state
 
                     }
-                    
 
                     for key in ["env", "state", "const", "const_state"]:
                         ii['local_' + key] = d.get(key, {})
