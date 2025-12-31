@@ -30,12 +30,6 @@ class ScriptAutomation(Automation):
     def __init__(self, action_object, automation_file, run_args={}):
         super().__init__(action_object, "script", automation_file)
         self.os_info = {}
-        self.run_state = {}
-        self.run_state['deps'] = []
-        self.run_state['fake_deps'] = False
-        self.run_state['parent'] = None
-        self.run_state['version_info'] = []
-        self.run_state['cache'] = False
         self.file_with_cached_state = 'mlc-cached-state.json'
         self.logger = self.action_object.logger
         self.logger.propagate = False
@@ -119,6 +113,29 @@ class ScriptAutomation(Automation):
         self.recursion_spaces = run_args.get('recursion_spaces', '')
         # Caching selections to avoid asking users again
         self.remembered_selections = run_args.get('remembered_selections', [])
+
+        self.deps = []
+
+        self.run_state = self.init_run_state(run_args.get('run_state')) #changes for every run call
+
+    def init_run_state(self, run_state):
+
+        run_state = run_state or {}
+
+        run_state.setdefault('parent', None)
+
+        for f in ['fake_deps', 'cache']:
+            run_state.setdefault(f, False)
+
+        for d in ['input_mapping', 'docker_settings', 'remote_run']:
+            run_state.setdefault(d, {})
+
+        for l in ['deps', 'post_deps', 'prehook_deps', 'posthook_deps',
+              'new_env_keys', 'new_state_keys', 'version_info', 'full_deps']:
+            run_state.setdefault(l, [])
+
+        return run_state
+
 
     #################################################################
 
@@ -392,13 +409,8 @@ class ScriptAutomation(Automation):
         if is_true(i.get('skip_sudo', '')):
             env['MLC_TMP_SKIP_SUDO'] = 'yes'
 
-        run_state = i.get('run_state', self.run_state)
-        if not run_state.get('version_info', []):
-            run_state['version_info'] = []
-        if run_state.get('parent', '') == '':
-            run_state['parent'] = None
-        if fake_deps:
-            run_state['fake_deps'] = True
+
+        run_state = self.init_run_state(i.get('run_state'))
 
         # Check verbose and silent
 
@@ -470,7 +482,7 @@ class ScriptAutomation(Automation):
         if r['return'] > 0:
             return r
 
-        # Check if quiet mode
+        # Check if quiet/non-interactive mode
         quiet = i.get(
             'quiet',
             False) if 'quiet' in i else (
@@ -615,13 +627,16 @@ class ScriptAutomation(Automation):
             run_state['script_entry_repo_git'] = script_item.repo.meta.get(
                 'git', False)
 
-        deps = []
-        post_deps = []
-        prehook_deps = []
-        posthook_deps = []
+        deps = run_state['deps']
+        post_deps = run_state['post_deps']
+        prehook_deps = run_state['prehook_deps']
+        posthook_deps = run_state['posthook_deps']
+
+        input_mapping = run_state['input_mapping']
+        docker_settings = run_state['docker_settings']
+        
+
         input_mapping = meta.get('input_mapping', {})
-        new_env_keys_from_meta = []
-        new_state_keys_from_meta = []
 
         docker_settings = meta.get('docker')
 
@@ -655,22 +670,22 @@ class ScriptAutomation(Automation):
 
         r = self.update_state_from_meta(
             meta,
-            deps,
-            post_deps,
-            prehook_deps,
-            posthook_deps,
-            new_env_keys_from_meta,
-            new_state_keys_from_meta,
             run_state,
             i)
         if r['return'] > 0:
             return r
 
         # taking from meta or else deps with same names will be ignored
-        deps = meta.get('deps', [])
-        post_deps = meta.get('post_deps', [])
-        prehook_deps = meta.get('prehook_deps', [])
-        posthook_deps = meta.get('posthook_deps', [])
+        run_state['deps'] = meta.get('deps', [])
+        run_state['post_deps'] = meta.get('post_deps', [])
+        run_state['prehook_deps'] = meta.get('prehook_deps', [])
+        run_state['posthook_deps'] = meta.get('posthook_deps', [])
+
+
+        deps = run_state['deps']
+        post_deps = run_state['post_deps']
+        prehook_deps = run_state['prehook_deps']
+        posthook_deps = run_state['posthook_deps']
 
         # STEP 700: Overwrite env with keys from the script input (to allow user friendly CLI)
         #           IT HAS THE PRIORITY OVER meta['default_env'] and meta['env'] but not over the meta from versions/variations
@@ -708,12 +723,6 @@ class ScriptAutomation(Automation):
             meta,
             variation_tags,
             variations,
-            deps,
-            post_deps,
-            prehook_deps,
-            posthook_deps,
-            new_env_keys_from_meta,
-            new_state_keys_from_meta,
             run_state
         )
         if r['return'] > 0:
@@ -797,12 +806,6 @@ class ScriptAutomation(Automation):
             versions_meta = versions[version]
             r = self.update_state_from_meta(
                 versions_meta,
-                deps,
-                post_deps,
-                prehook_deps,
-                posthook_deps,
-                new_env_keys_from_meta,
-                new_state_keys_from_meta,
                 run_state,
                 i)
             if r['return'] > 0:
@@ -813,10 +816,10 @@ class ScriptAutomation(Automation):
                 # Processing them again using updated deps for
                 # add_deps_recursive
                 r = update_adr_from_meta(
-                    deps,
-                    post_deps,
-                    prehook_deps,
-                    posthook_deps,
+                    run_state['deps'],
+                    run_state['post_deps'],
+                    run_state['prehook_deps'],
+                    run_state['posthook_deps'],
                     add_deps_recursive,
                     env)
 
@@ -977,7 +980,8 @@ class ScriptAutomation(Automation):
                                     'remembered_selections': self.remembered_selections,
                                     'quiet': quiet,
                                     'show_time': show_time,
-                                    'logger': self.action_object.logger
+                                    'logger': self.action_object.logger,
+                                    'run_state': self.init_run_state({})
                                     })
             if r['return'] > 0:
                 return r
@@ -1089,12 +1093,10 @@ class ScriptAutomation(Automation):
                         return r
                     new_env = r['new_env']
 
-                    # print(f"env = {env}, new_env={new_env}")
+                    print(f"env = {env}, new_env={new_env}")
                     utils.merge_dicts(
                         {'dict1': env, 'dict2': new_env, 'append_lists': True, 'append_unique': True})
 
-                    # print(f"merged_env:")
-                    # utils.print_env(env)
                     new_state = cached_state['new_state']
                     utils.merge_dicts({'dict1': state,
                                        'dict2': new_state,
@@ -1297,12 +1299,6 @@ class ScriptAutomation(Automation):
                         versions_meta = versions[default_version]
                         r = self.update_state_from_meta(
                             versions_meta,
-                            deps,
-                            post_deps,
-                            prehook_deps,
-                            posthook_deps,
-                            new_env_keys_from_meta,
-                            new_state_keys_from_meta,
                             run_state,
                             i)
                         if r['return'] > 0:
@@ -1419,7 +1415,6 @@ class ScriptAutomation(Automation):
                         return r
 
             # Check chain of dependencies on other MLC scripts
-            # print(f"before deps: ")
             # utils.print_env(env)
             if len(deps) > 0:
                 logger.debug(self.recursion_spaces +
@@ -1438,8 +1433,6 @@ class ScriptAutomation(Automation):
                 if r['return'] > 0:
                     return r
 
-            # print(f"after deps:")
-            # utils.print_env(env)
             # Clean some output files
             clean_tmp_files(clean_files, self.recursion_spaces)
 
@@ -1686,12 +1679,12 @@ class ScriptAutomation(Automation):
         if i.get('force_new_env_keys', []):
             new_env_keys = i['force_new_env_keys']
         else:
-            new_env_keys = new_env_keys_from_meta
+            new_env_keys = run_state['new_env_keys']
 
         if i.get('force_new_state_keys', []):
             new_state_keys = i['force_new_state_keys']
         else:
-            new_state_keys = new_state_keys_from_meta
+            new_state_keys = run_state['new_state_keys']
         # print("Env:")
         # utils.print_env(env)
 
@@ -1925,7 +1918,7 @@ class ScriptAutomation(Automation):
             readme = self._get_readme(cmd, run_state)
 
         if print_readme:
-            with open('README-cm.md', 'w') as f:
+            with open('README-mlc.md', 'w') as f:
                 f.write(readme)
 
         if dump_version_info:
@@ -2038,9 +2031,7 @@ class ScriptAutomation(Automation):
         return {'return': 0}
 
     def _update_state_from_variations(
-        self, i, meta, variation_tags, variations, deps, post_deps, prehook_deps,
-        posthook_deps, new_env_keys_from_meta, new_state_keys_from_meta,
-        run_state
+        self, i, meta, variation_tags, variations, run_state
     ):
         import copy
         logger = self.action_object.logger
@@ -2105,8 +2096,6 @@ class ScriptAutomation(Automation):
             for variation_tag in variation_tags:
                 r = self._apply_single_variation(
                     variation_tag, variations,
-                    deps, post_deps, prehook_deps, posthook_deps,
-                    new_env_keys_from_meta, new_state_keys_from_meta,
                     run_state, i, meta, required_disk_space, warnings
                 )
                 if r['return'] > 0:
@@ -2115,8 +2104,6 @@ class ScriptAutomation(Automation):
             # 3️⃣ Apply combined variations
             r = self._apply_combined_variations(
                 variations, variation_tags,
-                deps, post_deps, prehook_deps, posthook_deps,
-                new_env_keys_from_meta, new_state_keys_from_meta,
                 run_state, i, meta, required_disk_space, warnings
             )
             if r['return'] > 0:
@@ -2124,10 +2111,10 @@ class ScriptAutomation(Automation):
 
             # Processing them again using updated deps for add_deps_recursive
             r = update_adr_from_meta(
-                deps,
-                post_deps,
-                prehook_deps,
-                posthook_deps,
+                run_state['deps'],
+                run_state['post_deps'],
+                run_state['prehook_deps'],
+                run_state['posthook_deps'],
                 self.add_deps_recursive,
                 self.env)
             if r['return'] > 0:
@@ -2143,16 +2130,9 @@ class ScriptAutomation(Automation):
             'variation_tags': variation_tags
         }
 
-    def _apply_variation_meta(self, variation_key, variation_meta, deps, post_deps, prehook_deps, posthook_deps,
-                              new_env_keys_from_meta, new_state_keys_from_meta, run_state, i, meta, required_disk_space, warnings):
+    def _apply_variation_meta(self, variation_key, variation_meta, run_state, i, meta, required_disk_space, warnings):
         r = self.update_state_from_meta(
             variation_meta,
-            deps,
-            post_deps,
-            prehook_deps,
-            posthook_deps,
-            new_env_keys_from_meta,
-            new_state_keys_from_meta,
             run_state,
             i)
         if r['return'] > 0:
@@ -2195,8 +2175,6 @@ class ScriptAutomation(Automation):
 
     def _apply_single_variation(
         self, variation_tag, variations,
-        deps, post_deps, prehook_deps, posthook_deps,
-        new_env_keys_from_meta, new_state_keys_from_meta,
         run_state, i, meta, required_disk_space, warnings
     ):
         import copy
@@ -2225,8 +2203,6 @@ class ScriptAutomation(Automation):
         return self._apply_variation_meta(
             variation_key=variation_tag,
             variation_meta=variation_meta,
-            deps=deps, post_deps=post_deps, prehook_deps=prehook_deps, posthook_deps=posthook_deps,
-            new_env_keys_from_meta=new_env_keys_from_meta, new_state_keys_from_meta=new_state_keys_from_meta,
             run_state=run_state, i=i,
             meta=meta,
             required_disk_space=required_disk_space,
@@ -2241,8 +2217,6 @@ class ScriptAutomation(Automation):
 
     def _apply_combined_variations(
         self, variations, variation_tags,
-        deps, post_deps, prehook_deps, posthook_deps,
-        new_env_keys_from_meta, new_state_keys_from_meta,
         run_state, i, meta, required_disk_space, warnings
     ):
 
@@ -2304,8 +2278,6 @@ class ScriptAutomation(Automation):
             r = self._apply_variation_meta(
                 variation_key=combined_key,
                 variation_meta=combined_meta,
-                deps=deps, post_deps=post_deps, prehook_deps=prehook_deps, posthook_deps=posthook_deps,
-                new_env_keys_from_meta=new_env_keys_from_meta, new_state_keys_from_meta=new_state_keys_from_meta,
                 run_state=run_state, i=i,
                 meta=meta,
                 required_disk_space=required_disk_space,
@@ -3093,7 +3065,7 @@ class ScriptAutomation(Automation):
 
     def _call_run_deps(script, deps, local_env_keys, local_env_keys_from_meta, recursion_spaces,
                        variation_tags_string, found_cached, debug_script_tags='',
-                       show_time=False, extra_recursion_spaces='  ', run_state={'deps': [], 'fake_deps': [], 'parent': None}):
+                       show_time=False, extra_recursion_spaces='  ', run_state={}):
 
         if len(deps) == 0:
             return {'return': 0}
@@ -3117,7 +3089,7 @@ class ScriptAutomation(Automation):
     ##########################################################################
     def _run_deps(self, deps, clean_env_keys_deps, recursion_spaces,
                   variation_tags_string='', from_cache=False, debug_script_tags='',
-                  show_time=False, extra_recursion_spaces='  ', run_state={'deps': [], 'fake_deps': [], 'parent': None}):
+                  show_time=False, extra_recursion_spaces='  ', run_state={}):
         """
         Runs all the enabled dependencies and pass them env minus local env
         """
@@ -3130,7 +3102,6 @@ class ScriptAutomation(Automation):
             variation_groups = run_state.get('variation_groups')
 
             for d in deps:
-
                 if not d.get('tags'):
                     continue
 
@@ -3251,42 +3222,26 @@ class ScriptAutomation(Automation):
                     # deps should have non-empty tags
                     d['tags'] += "," + new_variation_tags_string
 
-                if run_state:
-                    run_state['deps'].append(d['tags'])
+                
+                run_state['full_deps'].append(d['tags'])
 
                 if not run_state.get('fake_deps'):
-                    import copy
-                    if not run_state:
-                        run_state_copy = {}
-                    else:
-                        run_state_copy = copy.deepcopy(run_state)
-                        run_state_copy['deps'] = []
+                    new_run_state = {}
+                        
+                    new_run_state['full_deps'] = []
 
-                        run_state_copy['parent'] = run_state['script_id']
+                    new_run_state['parent'] = run_state.get('script_id', '')
 
-                        if len(run_state['script_variation_tags']) > 0:
-                            run_state_copy['parent'] += " ( " + ',_'.join(
+                    if len(run_state.get('script_variation_tags', [])) > 0:
+                        new_run_state['parent'] += " ( " + ',_'.join(
                                 run_state['script_variation_tags']) + " )"
 
-                    # Run collective script via MLC API:
-                    # Not very efficient but allows logger - can be optimized
-                    # later
 
-                    # print(f"env about to call deps {d}= {env}")
                     ii = {
-                        'action': 'run',
-                        'automation': utils.assemble_object(self.meta['alias'], self.meta['uid']),
-                        'recursion_spaces': self.recursion_spaces,  # + extra_recursion_spaces,
                         'recursion': True,
-                        'remembered_selections': self.remembered_selections,
-                        'env': env,
-                        'state': self.state,
-                        'const': copy.deepcopy(self.const),
-                        'const_state': copy.deepcopy(self.const_state),
-                        'add_deps_recursive': self.add_deps_recursive,
                         'debug_script_tags': debug_script_tags,
                         'time': show_time,
-                        'run_state': run_state_copy
+                        'run_state': new_run_state
 
                     }
 
@@ -3301,13 +3256,13 @@ class ScriptAutomation(Automation):
                     r = self.run(ii)
                     if r['return'] > 0:
                         if is_true(d.get('continue_on_error')):
-                            # Warning printed by mlcflow
+                            # Warning message is printed by mlcflow
                             # logger.warning(f"Dependency with tags: {d['tags']} failed. Ignoring the failure as 'continue_on_error' is set for the dependency call")
                             pass
                         else:
                             return r
 
-                    run_state['version_info'] = run_state_copy.get(
+                    run_state['version_info'] = new_run_state.get(
                         'version_info')
 
                     # Restore local env
@@ -3362,7 +3317,7 @@ class ScriptAutomation(Automation):
         Outputs a Markdown README file listing the MLC run commands for the dependencies
         """
 
-        deps = run_state['deps']
+        deps = run_state['full_deps']
 
         version_info = run_state.get('version_info', [])
         version_info_dict = {}
@@ -4222,8 +4177,7 @@ pip install mlcflow
         return {'return': 0}
 
     ##########################################################################
-    def update_state_from_meta(self, meta, deps, post_deps,
-                               prehook_deps, posthook_deps, new_env_keys, new_state_keys, run_state, i):
+    def update_state_from_meta(self, meta, run_state, i):
         """
         Updates state and env from meta
         Args:
@@ -4235,12 +4189,6 @@ pip install mlcflow
             self.state,
             self.const,
             self.const_state,
-            deps,
-            post_deps,
-            prehook_deps,
-            posthook_deps,
-            new_env_keys,
-            new_state_keys,
             run_state,
             i)
         if r['return'] > 0:
@@ -5472,8 +5420,7 @@ def update_env_from_input_mapping(env, inp, input_mapping):
 ##############################################################################
 
 
-def update_state_from_meta(meta, env, state, const, const_state, deps, post_deps,
-                           prehook_deps, posthook_deps, new_env_keys, new_state_keys, run_state, i):
+def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
     """
     Internal: update env and state from meta
     """
@@ -5544,19 +5491,19 @@ def update_state_from_meta(meta, env, state, const, const_state, deps, post_deps
 
     new_deps = meta.get('deps', [])
     if len(new_deps) > 0:
-        append_deps(deps, new_deps)
+        append_deps(run_state['deps'], new_deps)
 
     new_post_deps = meta.get("post_deps", [])
     if len(new_post_deps) > 0:
-        append_deps(post_deps, new_post_deps)
+        append_deps(run_state['post_deps'], new_post_deps)
 
     new_prehook_deps = meta.get("prehook_deps", [])
     if len(new_prehook_deps) > 0:
-        append_deps(prehook_deps, new_prehook_deps)
+        append_deps(run_state['prehook_deps'], new_prehook_deps)
 
     new_posthook_deps = meta.get("posthook_deps", [])
     if len(new_posthook_deps) > 0:
-        append_deps(posthook_deps, new_posthook_deps)
+        append_deps(run_state['posthook_deps'], new_posthook_deps)
 
     add_deps_info = meta.get('ad', {})
     if not add_deps_info:
@@ -5565,10 +5512,10 @@ def update_state_from_meta(meta, env, state, const, const_state, deps, post_deps
         utils.merge_dicts({'dict1': add_deps_info, 'dict2': meta.get(
             'add_deps', {}), 'append_lists': True, 'append_unique': True})
     if add_deps_info:
-        r1 = update_deps(deps, add_deps_info, True, env)
-        r2 = update_deps(post_deps, add_deps_info, True, env)
-        r3 = update_deps(prehook_deps, add_deps_info, True, env)
-        r4 = update_deps(posthook_deps, add_deps_info, True, env)
+        r1 = update_deps(run_state['deps'], add_deps_info, True, env)
+        r2 = update_deps(run_state['post_deps'], add_deps_info, True, env)
+        r3 = update_deps(run_state['prehook_deps'], add_deps_info, True, env)
+        r4 = update_deps(run_state['posthook_deps'], add_deps_info, True, env)
         if r1['return'] > 0 and r2['return'] > 0 and r3['return'] > 0 and r4['return'] > 0:
             return r1
 
@@ -5595,22 +5542,21 @@ def update_state_from_meta(meta, env, state, const, const_state, deps, post_deps
 
     new_docker_settings = meta.get('docker')
     if new_docker_settings:
-        docker_settings = state.get('docker', {})
+        docker_settings = run_state.get('docker', {})
         utils.merge_dicts({'dict1': docker_settings,
                            'dict2': new_docker_settings,
                            'append_lists': True,
                            'append_unique': True})
         if docker_settings.get('deps', []):
             update_deps(docker_settings['deps'], add_deps_info, False, env)
-        state['docker'] = docker_settings
 
     new_env_keys_from_meta = meta.get('new_env_keys', [])
     if new_env_keys_from_meta:
-        new_env_keys += new_env_keys_from_meta
+        run_state['new_env_keys'] += new_env_keys_from_meta
 
     new_state_keys_from_meta = meta.get('new_state_keys', [])
     if new_state_keys_from_meta:
-        new_state_keys += new_state_keys_from_meta
+        run_state['new_state_keys'] += new_state_keys_from_meta
 
     return {'return': 0}
 

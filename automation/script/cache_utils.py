@@ -350,7 +350,7 @@ def run_validate_cache_if_present(i, cached_script):
             '',
             i['show_time'],
             i['extra_recursion_spaces'],
-            {}
+            i['run_state']
         )
         if r['return'] > 0:
             return None
