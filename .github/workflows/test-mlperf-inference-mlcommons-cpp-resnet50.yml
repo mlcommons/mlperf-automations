@@ -9,8 +9,9 @@ on:
       - '!**.md'
 
 jobs:     
-  build:
+  run-mlperf-inference-resnet50-cpp:
     name: MLPerf inference MLCommons C++ ResNet50
+    if: github.repository_owner == 'mlcommons'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

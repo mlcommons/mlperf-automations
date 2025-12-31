@@ -4,20 +4,15 @@ on:
   pull_request_target:
     branches: [ "main", "dev" ]
     paths:
-      - '.github/workflows/test-mlperf-inference-resnet50.yml'
-      - '**'
+      - '.github/workflows/test-nvidia-mlperf-inference-implementations.yml'
+      - 'script/app-mlperf-inference-nvidia/**'
       - '!**.md'
 
 jobs:
   run_nvidia:
-      if: github.repository_owner == 'gateoverflow'
-      timeout-minutes: 1440
+      if: github.repository_owner == 'mlcommons'
       runs-on:
-       - self-hosted
-       - linux
-       - x64
-       - cuda
-       - ${{ matrix.system }}
+       - ubuntu-latest
       strategy:
         fail-fast: false
         matrix:
@@ -39,7 +34,7 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+          #ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_HOST }}  >> ~/.ssh/known_hosts
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -90,7 +85,7 @@ jobs:
           pip install --upgrade mlcflow
           mlc pull repo mlcommons@mlperf-automations --branch=dev
           
-          mlcrr run-mlperf,inference,_all-scenarios,_submission,_full,_r5.1-dev --remote_host=${{ secrets.SSH_HOST }} --remote_user=${{ secrets.SSH_USER }} --remote_port=${{ secrets.SSH_PORT }}  --preprocess_submission=yes --pull_changes=yes --pull_inference_changes=yes --execution_mode=valid --gpu_name=$gpu_name --pull_changes=yes --pull_inference_changes=yes --model=${{ matrix.model }} --submitter="GATEOverflow" --hw_name=$hw_name --implementation=nvidia --backend=tensorrt --category=$category --division=closed  --docker_dt --docker_mlc_repo=mlcommons@mlperf-automations --docker_mlc_repo_branch=dev --adr.compiler.tags=gcc --device=cuda --use_model_from_host=yes --use_dataset_from_host=yes --results_dir=$HOME/gh_action_results --submission_dir=$HOME/gh_action_submissions --clean  $docker_string $submission_preprocessor_args --quiet
+          mlcrr run-mlperf,inference,_all-scenarios,_submission,_full,_r5.1-dev --docker --remote_host=${{ secrets.SSH_HOST }} --remote_user=${{ secrets.SSH_USER }} --remote_port=${{ secrets.SSH_PORT }} --remote_ssh_key_file=$HOME/.ssh/id_ed25519 --remote_skip_host_verify --preprocess_submission=yes --pull_changes=yes --pull_inference_changes=yes --execution_mode=valid --gpu_name=$gpu_name --pull_changes=yes --pull_inference_changes=yes --model=${{ matrix.model }} --submitter="GATEOverflow" --hw_name=$hw_name --implementation=nvidia --backend=tensorrt --category=$category --division=closed  --docker_dt --docker_mlc_repo=mlcommons@mlperf-automations --docker_mlc_repo_branch=dev --adr.compiler.tags=gcc --device=cuda --use_model_from_host=yes --use_dataset_from_host=yes --results_dir=$HOME/gh_action_results --submission_dir=$HOME/gh_action_submissions --clean  $docker_string $submission_preprocessor_args --quiet
           #mlcr push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_unofficial_submissions_v5.1 --repo_branch=auto-update --commit_message="Results from GH action on NVIDIA_$hw_name" --quiet --submission_dir=$HOME/gh_action_submissions --hw_name=$hw_name
           #mlcr push,github,mlperf,inference,submission --repo_url=https://github.com/GATEOverflow/mlperf_inference_submissions_v5.0 --repo_branch=main --commit_message="Results from GH actions on NVIDIA_$hw_name" --quiet --submission_dir=$HOME/gh_action_submissions --hw_name=$hw_name
 

@@ -1,4 +1,5 @@
 from mlc.utils import *
+import ast
 
 
 def is_true(val):
@@ -1144,3 +1145,15 @@ def quote_if_needed(val: str, quote: str) -> str:
         s = s.replace('"', r'\"')
         return f'"{s}"'
     return s
+
+
+def has_function_in_file(py_file, func_name):
+    try:
+        with open(py_file, "r", encoding="utf-8") as f:
+            tree = ast.parse(f.read(), filename=py_file)
+        return any(
+            isinstance(node, ast.FunctionDef) and node.name == func_name
+            for node in tree.body
+        )
+    except Exception:
+        return False

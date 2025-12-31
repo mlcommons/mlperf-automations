@@ -65,9 +65,14 @@ def dockerfile(self_module, input_params):
     state_data['docker'] = docker_settings
     add_deps_recursive = input_params.get('add_deps_recursive', {})
 
+    self_module.env = env
+    self_module.state = state_data
+    self_module.const = constant_vars
+    self_module.const_state = constant_state
+
     # Update state with metadata and variations
     update_state_result = self_module.update_state_from_meta(
-        metadata, env, state_data, constant_vars, constant_state,
+        metadata,
         deps=[],
         post_deps=[],
         prehook_deps=[],
@@ -83,16 +88,13 @@ def dockerfile(self_module, input_params):
     update_variations_result = self_module._update_state_from_variations(
         input_params, metadata, variation_tags, metadata.get(
             'variations', {}),
-        env, state_data, constant_vars, constant_state,
         deps=[],  # Add your dependencies if needed
         post_deps=[],  # Add post dependencies if needed
         prehook_deps=[],  # Add prehook dependencies if needed
         posthook_deps=[],  # Add posthook dependencies if needed
         new_env_keys_from_meta=[],  # Add keys from meta if needed
         new_state_keys_from_meta=[],  # Add state keys from meta if needed
-        add_deps_recursive=add_deps_recursive,
-        run_state=run_state,
-        recursion_spaces=''
+        run_state=run_state
     )
     if update_variations_result['return'] > 0:
         return update_variations_result
@@ -115,13 +117,13 @@ def dockerfile(self_module, input_params):
     deps = docker_settings.get('build_deps', [])
     if deps:
         r = self_module._run_deps(
-            deps, [], env, {}, {}, {}, add_deps_recursive, '', [], '', False, '',
+            deps, [], '', '', False, '',
             show_time, ' ', run_state)
         if r['return'] > 0:
             return r
 
     update_state_result = self_module.update_state_from_meta(
-        metadata, env, state_data, constant_vars, constant_state,
+        metadata,
         deps=[],
         post_deps=[],
         prehook_deps=[],
@@ -254,6 +256,8 @@ def docker_run(self_module, i):
     logger = self_module.logger
     env = i.get('env', {})
 
+    self_module.env = env
+
     if quiet:
         env['MLC_QUIET'] = 'yes'
 
@@ -268,10 +272,15 @@ def docker_run(self_module, i):
     cur_dir = os.getcwd()
 
     env['MLC_RUN_STATE_DOCKER'] = False
-    state, const, const_state = i.get(
+    self_module.state, self_module.const, self_module.const_state = i.get(
         'state', {}), i.get(
         'const', {}), i.get(
         'const_state', {})
+
+    state = self_module.state
+    const = self_module.const
+    const_state = self_module.const_state
+
     variation_tags = [t[1:]
                       for t in i.get('tags', '').split(",") if t.startswith("_")]
 
@@ -315,7 +324,7 @@ def docker_run(self_module, i):
     for key in docker_settings_default_env:
         env.setdefault(key, docker_settings_default_env[key])
 
-    state['docker'] = docker_settings
+    self_module.state['docker'] = docker_settings
     run_state = {
         'deps': [], 'fake_deps': [], 'parent': None,
         'script_id': f"{script_alias},{script_uid}",
@@ -325,7 +334,7 @@ def docker_run(self_module, i):
     }
 
     # Update state and handle variations
-    r = self_module.update_state_from_meta(meta, env, state, const, const_state, deps=[],
+    r = self_module.update_state_from_meta(meta, deps=[],
                                            post_deps=[],
                                            prehook_deps=[],
                                            posthook_deps=[],
@@ -335,29 +344,30 @@ def docker_run(self_module, i):
         return r
 
     r = self_module._update_state_from_variations(
-        i, meta, variation_tags, variations, env, state, const, const_state, deps=[],
+        i, meta, variation_tags, variations, deps=[],
         post_deps=[],
         prehook_deps=[],
         posthook_deps=[],
         new_env_keys_from_meta=[],
         new_state_keys_from_meta=[],
-        add_deps_recursive=add_deps_recursive, run_state=run_state, recursion_spaces='')
+        run_state=run_state)
     if r['return'] > 0:
         return r
 
-    docker_settings = state['docker']
+    docker_settings = self_module.state['docker']
 
     deps = docker_settings.get('deps', [])
     if deps:
         r = self_module._run_deps(
-            deps, [], env, {}, {}, {}, add_deps_recursive, '', [], '', False, '',
+            deps, [], '', '', False, '',
             show_time, ' ', run_state)
         if r['return'] > 0:
             return r
 
     # For updating meta from update_meta_if_env
     r = self_module.update_state_from_meta(
-        meta, env, state, const, const_state, deps=[],
+        meta,
+        deps=[],
         post_deps=[],
         prehook_deps=[],
         posthook_deps=[],
@@ -388,7 +398,7 @@ def docker_run(self_module, i):
 
     # Ensure Docker is available
     r = self_module.action_object.access(
-        {'action': 'run', 'automation': 'script', 'tags': "get,docker"})
+        {'action': 'run', 'automation': 'script', 'tags': "get,docker", 'quiet': True})
     if r['return'] > 0:
         return r
 
