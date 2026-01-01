@@ -732,95 +732,15 @@ class ScriptAutomation(Automation):
         variation_tags_string = r['variation_tags_string']
         explicit_variation_tags = r['explicit_variation_tags']
 
-        # USE CASE:
-        #  HERE we may have versions in script input and env['MLC_VERSION_*']
+        r = self._update_state_from_version(meta, i)
+        version = r['version']
+        version_min = r['version_min']
+        version_max = r['version_max']
+        version_max_usable = r['version_max_usable']
+        versions = r['versions']
 
-        # STEP 900: Get version, min, max, usable from env (priority if passed from another script to force version),
-        #           then script input, then script meta
-
-        #           VERSIONS SHOULD NOT BE USED INSIDE VARIATIONS (in meta)!
-
-        # First, take version from input
-        version = str(i.get('version', '')).strip()
-        version_min = str(i.get('version_min', '')).strip()
-        version_max = str(i.get('version_max', '')).strip()
-        version_max_usable = str(i.get('version_max_usable', '')).strip()
-
-        # Second, take from env
-        if version == '':
-            version = str(env.get('MLC_VERSION', ''))
-        if version_min == '':
-            version_min = str(env.get('MLC_VERSION_MIN', ''))
-        if version_max == '':
-            version_max = str(env.get('MLC_VERSION_MAX', ''))
-        if version_max_usable == '':
-            version_max_usable = str(env.get(
-                'MLC_VERSION_MAX_USABLE', ''))
-
-        # Third, take from meta
-        if version == '':
-            version = str(meta.get('version', ''))
-        if version_min == '':
-            version_min = str(meta.get('version_min', ''))
-        if version_max == '':
-            version_max = str(meta.get('version_max', ''))
-        if version_max_usable == '':
-            version_max_usable = str(meta.get(
-                'version_max_usable', ''))
-
-        # Update env with resolved versions
-        notes = []
-        for version_index in [(version, 'MLC_VERSION', ' == {}'),
-                              (version_min, 'MLC_VERSION_MIN', ' >= {}'),
-                              (version_max, 'MLC_VERSION_MAX', ' <= {}'),
-                              (version_max_usable, 'MLC_VERSION_MAX_USABLE', '({})')]:
-            version_value = version_index[0]
-            key = version_index[1]
-            note = version_index[2]
-
-            if version_value != '':
-                env[key] = version_value
-
-                notes.append(note.format(version_value))
-#            elif key in env:
-#                # If version_X is "", remove related key from ENV ...
-#                del(env[key])
-
-        if len(notes) > 0:
-            logger.debug(
-                self.recursion_spaces +
-                '    - Requested version: ' +
-                '  '.join(notes))
-
-        # STEP 900 output: version* set
-        #                  env['MLC_VERSION*] set
-
-        # STEP 1000: Update version only if in "versions" (not obligatory)
-        # can be useful when handling complex Git revisions
-        versions = script_item.meta.get('versions', {})
-
-        if version != '' and version in versions:
-            versions_meta = versions[version]
-            r = self.update_state_from_meta(
-                versions_meta,
-                run_state,
-                i)
-            if r['return'] > 0:
-                return r
-            adr = get_adr(versions_meta)
-            if adr:
-                self._merge_dicts_with_tags(add_deps_recursive, adr)
-                # Processing them again using updated deps for
-                # add_deps_recursive
-                r = update_adr_from_meta(
-                    deps,
-                    post_deps,
-                    prehook_deps,
-                    posthook_deps,
-                    add_deps_recursive,
-                    env)
-
-        # STEP 1100: Update deps from input
+        # STEP 1100: Update deps from input -? is this needed as we update adr
+        # from meta anyway
         r = update_deps_from_input(
             deps, post_deps, prehook_deps, posthook_deps, i)
         if r['return'] > 0:
@@ -1984,6 +1904,102 @@ class ScriptAutomation(Automation):
         logger.setLevel(original_logging_level)
 
         return rr
+
+    ##########################################################################
+    def _update_state_from_version(self, meta, i):
+
+        # USE CASE:
+        #  HERE we may have versions in script input and env['MLC_VERSION_*']
+
+        # STEP 900: Get version, min, max, usable from env (priority if passed from another script to force version),
+        #           then script input, then script meta
+
+        #           VERSIONS SHOULD NOT BE USED INSIDE VARIATIONS (in meta)!
+
+        # First, take version from input
+        version = str(i.get('version', '')).strip()
+        version_min = str(i.get('version_min', '')).strip()
+        version_max = str(i.get('version_max', '')).strip()
+        version_max_usable = str(i.get('version_max_usable', '')).strip()
+
+        env = self.env
+
+        # Second, take from env
+        if version == '':
+            version = str(env.get('MLC_VERSION', ''))
+        if version_min == '':
+            version_min = str(env.get('MLC_VERSION_MIN', ''))
+        if version_max == '':
+            version_max = str(env.get('MLC_VERSION_MAX', ''))
+        if version_max_usable == '':
+            version_max_usable = str(env.get(
+                'MLC_VERSION_MAX_USABLE', ''))
+
+        # Third, take from meta
+        if version == '':
+            version = str(meta.get('version', ''))
+        if version_min == '':
+            version_min = str(meta.get('version_min', ''))
+        if version_max == '':
+            version_max = str(meta.get('version_max', ''))
+        if version_max_usable == '':
+            version_max_usable = str(meta.get(
+                'version_max_usable', ''))
+
+        # Update env with resolved versions
+        notes = []
+        for version_index in [(version, 'MLC_VERSION', ' == {}'),
+                              (version_min, 'MLC_VERSION_MIN', ' >= {}'),
+                              (version_max, 'MLC_VERSION_MAX', ' <= {}'),
+                              (version_max_usable, 'MLC_VERSION_MAX_USABLE', '({})')]:
+            version_value = version_index[0]
+            key = version_index[1]
+            note = version_index[2]
+
+            if version_value != '':
+                env[key] = version_value
+
+                notes.append(note.format(version_value))
+#            elif key in env:
+#                # If version_X is "", remove related key from ENV ...
+#                del(env[key])
+
+        if len(notes) > 0:
+            self.logger.debug(
+                self.recursion_spaces +
+                '    - Requested version: ' +
+                '  '.join(notes))
+
+        # STEP 900 output: version* set
+        #                  env['MLC_VERSION*] set
+
+        # STEP 1000: Update version only if in "versions" (not obligatory)
+        # can be useful when handling complex Git revisions
+        versions = meta.get('versions', {})
+
+        if version != '' and version in versions:
+            versions_meta = versions[version]
+            r = self.update_state_from_meta(
+                versions_meta,
+                self.run_state,
+                i)
+            if r['return'] > 0:
+                return r
+            adr = get_adr(versions_meta)
+            if adr:
+                self._merge_dicts_with_tags(add_deps_recursive, adr)
+                # Processing them again using updated deps for
+                # add_deps_recursive
+                r = update_adr_from_meta(
+                    deps,
+                    post_deps,
+                    prehook_deps,
+                    posthook_deps,
+                    add_deps_recursive,
+                    env)
+
+        return {'return': 0, 'version': version, 'version_min': version_min,
+                'version_max': version_max, 'version_max_usable': version_max_usable, 'versions': versions}
 
     ##########################################################################
 
