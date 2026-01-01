@@ -56,17 +56,23 @@ def remote_run(self_module, i):
         'alias', ''), meta.get(
         'uid', '')
 
-    # Update meta for selected variation and input
-    r = update_meta_for_selected_variations(self_module, script, i)
+    r = self_module.update_run_state_for_selected_script_and_variations(
+        script, i)
     if r['return'] > 0:
         return r
 
+    run_state = self_module.run_state
+
+    remote_run_settings = run_state.get('remote_run', {})
+    remote_run_settings_default_env = remote_run_settings.get(
+        'default_env', {})
+    for key in remote_run_settings_default_env:
+        env.setdefault(key, remote_run_settings_default_env[key])
+
     remote_env = {}
 
-    remote_run_settings = r['remote_run_settings']
     env = self_module.env
     state = self_module.state
-    meta = r['meta']
 
     r = call_remote_run_prepare(self_module, meta, script, i)
     if r['return'] > 0:
@@ -142,57 +148,6 @@ def remote_run(self_module, i):
         return r
 
     return {'return': 0}
-
-
-def update_meta_for_selected_variations(self_module, script, input_params):
-    metadata = script.meta
-    script_directory = script.path
-    script_tags = metadata.get("tags", [])
-    script_alias = metadata.get('alias', '')
-    script_uid = metadata.get('uid', '')
-    tag_values = input_params.get('tags', '').split(",")
-    variation_tags = [tag[1:] for tag in tag_values if tag.startswith("_")]
-
-    if not hasattr(self_module, 'run_state'):
-        self_module.run_state = self_module.init_run_state(
-            input_params.get('run_state'))
-
-    run_state = self_module.run_state
-
-    run_state.update({
-        'script_id': f"{script_alias},{script_uid}",
-        'script_variation_tags': variation_tags
-    }
-    )
-
-    remote_run_settings = metadata.get('remote_run', {})
-    remote_run_settings_default_env = remote_run_settings.get(
-        'default_env', {})
-    for key in remote_run_settings_default_env:
-        env.setdefault(key, remote_run_settings_default_env[key])
-
-    run_state['remote_run'] = remote_run_settings
-    add_deps_recursive = input_params.get('add_deps_recursive', {})
-
-    # Update state with metadata and variations
-    update_state_result = self_module.update_state_from_meta(
-        metadata,
-        run_state=run_state,
-        i=input_params
-    )
-    if update_state_result['return'] > 0:
-        return update_state_result
-
-    update_variations_result = self_module._update_state_from_variations(
-        input_params, metadata, variation_tags, metadata.get(
-            'variations', {}), run_state=run_state
-    )
-    if update_variations_result['return'] > 0:
-        return update_variations_result
-
-    remote_run_settings = run_state['remote_run']
-    return {'return': 0, 'remote_run_settings': remote_run_settings,
-            'meta': metadata}
 
 
 def call_remote_run_prepare(self_module, meta, script_item, i):

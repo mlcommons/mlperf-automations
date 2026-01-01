@@ -128,11 +128,12 @@ class ScriptAutomation(Automation):
         for f in ['fake_deps', 'cache']:
             run_state.setdefault(f, False)
 
-        for d in ['input_mapping', 'docker_settings', 'remote_run']:
+        for d in ['input_mapping', 'docker', 'remote_run']:
             run_state.setdefault(d, {})
 
         for l in ['deps', 'post_deps', 'prehook_deps', 'posthook_deps',
-                  'new_env_keys', 'new_state_keys', 'version_info', 'full_deps']:
+                  'new_env_keys', 'new_state_keys', 'file_path_env_keys',
+                  'folder_path_env_keys', 'version_info', 'full_deps']:
             run_state.setdefault(l, [])
 
         return run_state
@@ -631,7 +632,7 @@ class ScriptAutomation(Automation):
         posthook_deps = run_state['posthook_deps']
 
         input_mapping = run_state['input_mapping']
-        docker_settings = run_state['docker_settings']
+        docker_settings = run_state['docker']
 
         input_mapping = meta.get('input_mapping', {})
 
@@ -4401,6 +4402,40 @@ pip install mlcflow
         }
 
 ##########################################################################
+    def update_run_state_for_selected_script_and_variations(self, script, i):
+
+        tag_values = i.get('tags', '').split(",")
+        variation_tags = [tag[1:] for tag in tag_values if tag.startswith("_")]
+
+        script_alias = script.meta.get('alias', '')
+        script_uid = script.meta.get('uid', '')
+
+        run_state = self.run_state
+        run_state.update({
+            'script_id': f"{script_alias},{script_uid}",
+            'script_variation_tags': variation_tags
+        }
+        )
+
+        r = self.update_state_from_meta(
+            script.meta,
+            run_state=run_state,
+            i=i
+        )
+        if r['return'] > 0:
+            return r
+
+        r = self._update_state_from_variations(
+            i, script.meta, variation_tags, script.meta.get(
+                'variations', {}), run_state
+        )
+        if r['return'] > 0:
+            return r
+
+        return {'return': 0, 'run_state': run_state}
+
+
+##########################################################################
 
 
 def relaxed_subset(v, variation_tags):
@@ -5511,6 +5546,14 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
     new_state_keys_from_meta = meta.get('new_state_keys', [])
     if new_state_keys_from_meta:
         run_state['new_state_keys'] += new_state_keys_from_meta
+
+    file_path_env_keys = meta.get('file_path_env_keys', [])
+    if file_path_env_keys:
+        run_state['file_path_env_keys'] += file_path_env_keys
+
+    folder_path_env_keys = meta.get('folder_path_env_keys', [])
+    if folder_path_env_keys:
+        run_state['folder_path_env_keys'] += folder_path_env_keys
 
     return {'return': 0}
 
