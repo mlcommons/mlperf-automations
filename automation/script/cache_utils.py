@@ -155,7 +155,7 @@ def prepare_cache_tags(i):
 
 def search_cache(i, explicit_cached_tags):
     '''
-    Prune cache_lits based on prepared cache tags
+    Prune cache_lists based on prepared cache tags
     '''
 
     i['logger'].debug(
