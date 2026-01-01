@@ -259,7 +259,6 @@ def select_script_item(lst, text, recursion_spaces,
     return selection
 
 
-
 def search_script_cache(
     cache_action,
     script_tags_string,
