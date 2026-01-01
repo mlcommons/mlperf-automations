@@ -163,7 +163,6 @@ def search_cache(i, explicit_cached_tags):
         '    - Pruning cache list outputs with the following tags: {}'.format(explicit_cached_tags))
 
     cache_list = i['cache_list']
-
     pruned_cache_list = [
         item
         for item in cache_list
