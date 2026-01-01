@@ -737,6 +737,7 @@ class ScriptAutomation(Automation):
         version_min = r['version_min']
         version_max = r['version_max']
         version_max_usable = r['version_max_usable']
+        versions = r['versions']
 
         # STEP 1100: Update deps from input -? is this needed as we update adr
         # from meta anyway
@@ -1998,7 +1999,7 @@ class ScriptAutomation(Automation):
                     env)
 
         return {'return': 0, 'version': version, 'version_min': version_min,
-                'version_max': version_max, 'version_max_usable': version_max_usable}
+                'version_max': version_max, 'version_max_usable': version_max_usable, 'versions': versions}
 
     ##########################################################################
 
