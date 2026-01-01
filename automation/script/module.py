@@ -732,7 +732,7 @@ class ScriptAutomation(Automation):
         variation_tags_string = r['variation_tags_string']
         explicit_variation_tags = r['explicit_variation_tags']
 
-        r = self._update_state_from_version(self, meta, i)
+        r = self._update_state_from_version(meta, i)
         version = r['version']
         version_min = r['version_min']
         version_max = r['version_max']
