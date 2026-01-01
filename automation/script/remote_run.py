@@ -56,19 +56,18 @@ def remote_run(self_module, i):
         'alias', ''), meta.get(
         'uid', '')
 
-    r = self_module.update_run_state_for_selected_script_and_variations(script, i)
+    r = self_module.update_run_state_for_selected_script_and_variations(
+        script, i)
     if r['return'] > 0:
         return r
 
     run_state = self_module.run_state
-
 
     remote_run_settings = run_state.get('remote_run', {})
     remote_run_settings_default_env = remote_run_settings.get(
         'default_env', {})
     for key in remote_run_settings_default_env:
         env.setdefault(key, remote_run_settings_default_env[key])
-
 
     remote_env = {}
 
@@ -149,7 +148,6 @@ def remote_run(self_module, i):
         return r
 
     return {'return': 0}
-
 
 
 def call_remote_run_prepare(self_module, meta, script_item, i):

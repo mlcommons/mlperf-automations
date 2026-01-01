@@ -132,7 +132,7 @@ class ScriptAutomation(Automation):
             run_state.setdefault(d, {})
 
         for l in ['deps', 'post_deps', 'prehook_deps', 'posthook_deps',
-                  'new_env_keys', 'new_state_keys', 'file_path_env_keys', 
+                  'new_env_keys', 'new_state_keys', 'file_path_env_keys',
                   'folder_path_env_keys', 'version_info', 'full_deps']:
             run_state.setdefault(l, [])
 
@@ -4406,7 +4406,7 @@ pip install mlcflow
 
         tag_values = i.get('tags', '').split(",")
         variation_tags = [tag[1:] for tag in tag_values if tag.startswith("_")]
-       
+
         script_alias = script.meta.get('alias', '')
         script_uid = script.meta.get('uid', '')
 
@@ -4414,7 +4414,7 @@ pip install mlcflow
         run_state.update({
             'script_id': f"{script_alias},{script_uid}",
             'script_variation_tags': variation_tags
-            }
+        }
         )
 
         r = self.update_state_from_meta(
@@ -4433,10 +4433,6 @@ pip install mlcflow
             return r
 
         return {'return': 0, 'run_state': run_state}
-
-
-
-
 
 
 ##########################################################################

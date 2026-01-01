@@ -53,7 +53,8 @@ def dockerfile(self_module, input_params):
         self_module.run_state = self_module.init_run_state(
             input_params.get('run_state'))
 
-    r = self_module.update_run_state_for_selected_script_and_variations(script, input_params)
+    r = self_module.update_run_state_for_selected_script_and_variations(
+        script, input_params)
 
     run_state = self_module.run_state
 
@@ -61,7 +62,6 @@ def dockerfile(self_module, input_params):
     docker_settings_default_env = docker_settings.get('default_env', {})
     for key in docker_settings_default_env:
         env.setdefault(key, docker_settings_default_env[key])
-
 
     if is_true(docker_settings.get('pass_docker_to_script', False)):
         input_params['docker'] = True
@@ -272,23 +272,23 @@ def docker_run(self_module, i):
             []))  # do we need a copy here?
     variations = meta.get('variations', {})
 
-
     if not hasattr(self_module, 'run_state'):
         self_module.run_state = self_module.init_run_state(
             input_params.get('run_state'))
-   
-    r = self_module.update_run_state_for_selected_script_and_variations(script, i)
+
+    r = self_module.update_run_state_for_selected_script_and_variations(
+        script, i)
     if r['return'] > 0:
         return r
 
     run_state = self_module.run_state
-    
+
     # take the folder path as well as file path env variables from meta
     file_path_env_keys = run_state.get('file_path_env_keys', [])
     folder_path_env_keys = run_state.get('folder_path_env_keys', [])
 
     docker_settings = run_state.get('docker', {})
-    
+
     docker_settings_default_env = docker_settings.get('default_env', {})
     for key in docker_settings_default_env:
         env.setdefault(key, docker_settings_default_env[key])
