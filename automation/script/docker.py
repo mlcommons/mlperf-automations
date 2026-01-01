@@ -50,14 +50,15 @@ def dockerfile(self_module, input_params):
     script_uid = metadata.get('uid', '')
 
     if not has_attr(self_module, 'run_state'):
-        self_module.run_state = self_module.init_run_state(input_params.get('run_state'))
+        self_module.run_state = self_module.init_run_state(
+            input_params.get('run_state'))
 
     run_state = self_module.run_state
 
     run_state.update({
         'script_id': f"{script_alias},{script_uid}",
         'script_variation_tags': variation_tags
-        }
+    }
     )
 
     docker_settings = metadata.get('docker', {})
@@ -311,7 +312,8 @@ def docker_run(self_module, i):
         env.setdefault(key, docker_settings_default_env[key])
 
     if not has_attr(self_module, 'run_state'):
-        self_module.run_state = self_module.init_run_state(input_params.get('run_state'))
+        self_module.run_state = self_module.init_run_state(
+            input_params.get('run_state'))
 
     run_state = self_module.run_state
 
@@ -321,7 +323,7 @@ def docker_run(self_module, i):
         'script_variation_tags': variation_tags,
         'file_path_env_keys': file_path_env_keys,
         'folder_path_env_keys': folder_path_env_keys
-        }
+    }
     )
 
     # Update state and handle variations
