@@ -1981,7 +1981,7 @@ class ScriptAutomation(Automation):
             versions_meta = versions[version]
             r = self.update_state_from_meta(
                 versions_meta,
-                run_state,
+                self.run_state,
                 i)
             if r['return'] > 0:
                 return r
