@@ -154,7 +154,8 @@ def update_meta_for_selected_variations(self_module, script, input_params):
     variation_tags = [tag[1:] for tag in tag_values if tag.startswith("_")]
 
     if not hasattr(self_module, 'run_state'):
-        self_module.run_state = self_module.init_run_state(input_params.get('run_state'))
+        self_module.run_state = self_module.init_run_state(
+            input_params.get('run_state'))
 
     run_state = self_module.run_state
 
