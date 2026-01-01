@@ -1905,7 +1905,7 @@ class ScriptAutomation(Automation):
                 '  - cache UID: {}'.format(cached_uid))
 
         if print_deps:
-            print_deps_data = self._print_deps(run_state['deps'])
+            print_deps_data = self._print_deps(run_state['full_deps'])
             new_state['print_deps'] = print_deps_data
 
         if print_readme:
