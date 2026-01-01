@@ -264,10 +264,11 @@ def postprocess(i):
     if env.get('MLC_EXTRACT_FINAL_ENV_NAME', '') != '':
         if is_true(env.get('MLC_EXTRACT_USE_SUBDIR_PATH')) and env.get(
                 'MLC_EXTRACT_EXTRACTED_SUBDIR_PATH', '') != '':
-    
+
             env['MLC_EXTRACT_EXTRACTED_PATH'] = env['MLC_EXTRACT_EXTRACTED_SUBDIR_PATH']
 
-        env[env['MLC_EXTRACT_FINAL_ENV_NAME']] = env['MLC_EXTRACT_EXTRACTED_PATH']
+        env[env['MLC_EXTRACT_FINAL_ENV_NAME']
+            ] = env['MLC_EXTRACT_EXTRACTED_PATH']
 
     # Detect if this file will be deleted or moved
     env['MLC_GET_DEPENDENT_CACHED_PATH'] = filepath
