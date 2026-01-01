@@ -574,9 +574,7 @@ class ScriptAutomation(Automation):
 
         cache_list = r['cache_list']
 
-        # print(list_of_found_scripts)
         meta = script_item.meta
-        # print(meta)
         path = script_item.path
 
         # Check min MLC version requirement
@@ -711,7 +709,7 @@ class ScriptAutomation(Automation):
         # const)
 
         variations = script_item.meta.get('variations', {})
-        state['docker'] = meta.get('docker', {})
+        run_state['docker'] = meta.get('docker', {})
 
         r = self._update_state_from_variations(
             i,
@@ -829,8 +827,8 @@ class ScriptAutomation(Automation):
             return r
 
         if is_true(env.get('MLC_RUN_STATE_DOCKER', False)):
-            if state.get('docker'):
-                if is_false(state['docker'].get('run', True)):
+            if run_state.get('docker'):
+                if is_false(run_state['docker'].get('run', True)):
                     logger.info(
                         self.recursion_spaces +
                         '  - Skipping script::{} run as we are inside docker'.format(found_script_item))
@@ -853,7 +851,7 @@ class ScriptAutomation(Automation):
                         'deps': []}
                     return rr
 
-                elif is_false(state['docker'].get('real_run', True)):
+                elif is_false(run_state['docker'].get('real_run', True)):
                     logger.info(
                         self.recursion_spaces +
                         '  - Doing fake run for script::{} as we are inside docker'.format(found_script_item))
@@ -946,10 +944,10 @@ class ScriptAutomation(Automation):
         #######################################################################
         # Check if the output of a selected script should be cached
         if cache:
-            # TBD - need to reuse and prune cache_list instead of a new CM
-            # search inside find_cached_script
-
+            # Checking if any of the found entry in cache_list has
+            # matching_tags and is a valid cache_entry
             r = find_cached_script({'self': self,
+                                    'cache_list': cache_list,
                                     'extra_recursion_spaces': extra_recursion_spaces,
                                     'add_deps_recursive': add_deps_recursive,
                                     'script_tags': script_tags,
@@ -1768,7 +1766,7 @@ class ScriptAutomation(Automation):
                         return {
                             'return': 1, 'error': 'MLC artifact format is wrong "{}" - no comma found'.format(found_script_item)}
 
-                    cached_meta['associated_script_item_uid'] = found_script_item[x + 1:]
+                    cached_meta['associated_script_item_uid'] = found_script_item[x + 1:].strip()
 
                 # Check if the cached entry is dependent on any path
                 if dependent_cached_path != '':
@@ -4426,52 +4424,6 @@ def relaxed_subset(v, variation_tags):
 
 
 ##############################################################################
-
-def find_cached_script(i):
-    """
-    Internal automation function: find cached script
-
-    Args:
-      (MLC input dict):
-
-      deps (dict): deps dict
-      update_deps (dict): key matches "names" in deps
-
-    Returns:
-       (MLC return dict):
-       * return (int): return code == 0 if no error and >0 if error
-       * (error) (str): error string if return>0
-    """
-    # 1. Prepare cache tags
-    # 2. If new_cache_entry, return empty
-    # 3. Search cache
-    # 4. Apply remembered cache selection
-    # 5. Validate cached scripts
-
-    i['logger'].debug(
-        i['recursion_spaces'] +
-        '  - Checking if script execution is already cached ...')
-
-    cached_tags, explicit_cached_tags = prepare_cache_tags(i)
-
-    if i['new_cache_entry']:
-        i['logger'].debug(
-            i['recursion_spaces'] +
-            f'  - New cache entry requested, skipping cache search.'
-        )
-        return {'return': 0, 'cached_tags': cached_tags,
-                'search_tags': '', 'found_cached_scripts': []}
-
-    search_tags, found_cached_scripts = search_cache(i, explicit_cached_tags)
-    found_cached_scripts = apply_remembered_cache_selection(
-        i, search_tags, found_cached_scripts)
-    found_cached_scripts = validate_cached_scripts(i, found_cached_scripts)
-
-    return {'return': 0, 'cached_tags': cached_tags,
-            'search_tags': search_tags, 'found_cached_scripts': found_cached_scripts}
-
-
-##############################################################################
 def enable_or_skip_script(meta, env):
     """
     Internal: enable a dependency based on enable_if_env and skip_if_env meta information
@@ -5457,9 +5409,9 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
         utils.merge_dicts({'dict1': const_state, 'dict2': c_meta.get(
             'const_state', {}), 'append_lists': True, 'append_unique': True})
         if c_meta.get('docker', {}):
-            if not state.get('docker', {}):
-                state['docker'] = {}
-            utils.merge_dicts({'dict1': state['docker'],
+            if not run_state.get('docker', {}):
+                run_state['docker'] = {}
+            utils.merge_dicts({'dict1': run_state['docker'],
                                'dict2': c_meta['docker'],
                                'append_lists': True,
                                'append_unique': True})

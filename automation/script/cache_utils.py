@@ -155,28 +155,26 @@ def prepare_cache_tags(i):
 
 def search_cache(i, explicit_cached_tags):
     '''
-    Search for cached script outputs based on prepared cache tags
+    Prune cache_lists based on prepared cache tags
     '''
-    search_tags = '-tmp'
-    if len(explicit_cached_tags) > 0:
-        search_tags += ',' + ','.join(explicit_cached_tags)
 
     i['logger'].debug(
         i['recursion_spaces'] +
-        '    - Searching for cached script outputs with the following tags: {}'.format(search_tags))
+        '    - Pruning cache list outputs with the following tags: {}'.format(explicit_cached_tags))
 
-    r = i['self'].cache_action.access({
-        'action': 'search',
-        'target_name': 'cache',
-        'tags': search_tags
-    })
-    if r['return'] > 0:
-        return r
+    cache_list = i['cache_list']
 
-    return search_tags, r['list']
+    pruned_cache_list = [
+        item
+        for item in cache_list
+        if set(explicit_cached_tags) <= set(item.meta.get('tags', []))
+    ]
+
+    return pruned_cache_list
 
 
-def apply_remembered_cache_selection(i, search_tags, found_cached_scripts):
+def apply_remembered_cache_selection(
+        i, explicit_search_tags, found_cached_scripts):
     '''
     Apply remembered cache selection if any
     '''
@@ -189,7 +187,7 @@ def apply_remembered_cache_selection(i, search_tags, found_cached_scripts):
 
     for selection in i['remembered_selections']:
         if selection['type'] == 'cache' and set(
-                selection['tags'].split(',')) == set(search_tags.split(',')):
+                selection['tags'].split(',')) == set(explicit_search_tags):
             tmp_version_in_cached_script = selection['cached_script'].meta.get(
                 'version', '')
             skip_cached_script = check_versions(
@@ -205,7 +203,7 @@ def apply_remembered_cache_selection(i, search_tags, found_cached_scripts):
                 found_cached_scripts = [selection['cached_script']]
                 i['logger'].debug(
                     i['recursion_spaces'] +
-                    '  - Found remembered selection with tags "{}"!'.format(search_tags))
+                    '  - Found remembered selection with tags "{}"!'.format(explicit_search_tags))
                 return [selection['cached_script']]
 
     return found_cached_scripts
@@ -375,6 +373,58 @@ def run_validate_cache_if_present(i, cached_script):
         return None
 
     return r.get('version')
+
+##############################################################################
+
+
+def find_cached_script(i):
+    """
+    Internal automation function: find cached script
+
+    Args:
+      (MLC input dict):
+
+      deps (dict): deps dict
+      update_deps (dict): key matches "names" in deps
+
+    Returns:
+       (MLC return dict):
+       * return (int): return code == 0 if no error and >0 if error
+       * (error) (str): error string if return>0
+    """
+    # 1. Prepare cache tags
+    # 2. If new_cache_entry, return empty
+    # 3. Search cache
+    # 4. Apply remembered cache selection
+    # 5. Validate cached scripts
+
+    i['logger'].debug(
+        i['recursion_spaces'] +
+        '  - Checking if script execution is already cached ...')
+
+    cached_tags, explicit_cached_tags = prepare_cache_tags(i)
+
+    if i['new_cache_entry']:
+        i['logger'].debug(
+            i['recursion_spaces'] +
+            f'  - New cache entry requested, skipping cache search.'
+        )
+        return {'return': 0, 'cached_tags': cached_tags,
+                'search_tags': '', 'found_cached_scripts': []}
+
+    found_cached_scripts = search_cache(i, explicit_cached_tags)
+
+    found_cached_scripts = apply_remembered_cache_selection(
+        i, explicit_cached_tags, found_cached_scripts)
+    found_cached_scripts = validate_cached_scripts(i, found_cached_scripts)
+
+    search_tags = '-tmp'
+    if len(explicit_cached_tags) > 0:
+        search_tags += ',' + ','.join(explicit_cached_tags)
+
+    return {'return': 0, 'cached_tags': cached_tags,
+            'search_tags': search_tags, 'found_cached_scripts': found_cached_scripts}
+
 
 ##########################################################################
 
