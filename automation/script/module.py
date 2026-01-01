@@ -738,7 +738,8 @@ class ScriptAutomation(Automation):
         version_max = r['version_max']
         version_max_usable = r['version_max_usable']
 
-        # STEP 1100: Update deps from input -? is this needed as we update adr from meta anyway
+        # STEP 1100: Update deps from input -? is this needed as we update adr
+        # from meta anyway
         r = update_deps_from_input(
             deps, post_deps, prehook_deps, posthook_deps, i)
         if r['return'] > 0:
@@ -1996,10 +1997,11 @@ class ScriptAutomation(Automation):
                     add_deps_recursive,
                     env)
 
-        return {'return': 0, 'version': version, 'version_min': version_min, 'version_max': version_max, 'version_max_usable': version_max_usable}
-
+        return {'return': 0, 'version': version, 'version_min': version_min,
+                'version_max': version_max, 'version_max_usable': version_max_usable}
 
     ##########################################################################
+
     def _update_env_from_input(self, env, i):
         # Check path/input/output in input and pass to env
         for key in self.input_flags_converted_to_tmp_env:
