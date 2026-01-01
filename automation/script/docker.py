@@ -49,9 +49,8 @@ def dockerfile(self_module, input_params):
     script_alias = metadata.get('alias', '')
     script_uid = metadata.get('uid', '')
 
-    if not has_attr(self_module, 'run_state'):
-        self_module.run_state = self_module.init_run_state(
-            input_params.get('run_state'))
+    if not hasattr(self_module, 'run_state'):
+        self_module.run_state = self_module.init_run_state(input_params.get('run_state'))
 
     run_state = self_module.run_state
 
@@ -311,9 +310,8 @@ def docker_run(self_module, i):
     for key in docker_settings_default_env:
         env.setdefault(key, docker_settings_default_env[key])
 
-    if not has_attr(self_module, 'run_state'):
-        self_module.run_state = self_module.init_run_state(
-            input_params.get('run_state'))
+    if not hasattr(self_module, 'run_state'):
+        self_module.run_state = self_module.init_run_state(input_params.get('run_state'))
 
     run_state = self_module.run_state
 
