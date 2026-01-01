@@ -153,7 +153,11 @@ def update_meta_for_selected_variations(self_module, script, input_params):
     tag_values = input_params.get('tags', '').split(",")
     variation_tags = [tag[1:] for tag in tag_values if tag.startswith("_")]
 
-    run_state = self_module.init_run_state(input_params.get('run_state'))
+    if not has_attr(self_module, 'run_state'):
+        self_module.run_state = self_module.init_run_state(input_params.get('run_state'))
+
+    run_state = self_module.run_state
+
     run_state.update({
         'script_id': f"{script_alias},{script_uid}",
         'script_variation_tags': variation_tags

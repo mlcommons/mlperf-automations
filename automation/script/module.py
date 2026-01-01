@@ -337,7 +337,7 @@ class ScriptAutomation(Automation):
         self.state = i.get('state', self.state)
         self.const = i.get('const', self.const)
         self.const_state = i.get('const_state', self.const_state)
-        self.add_deps_recursive = i.get('adr', {})
+        self.add_deps_recursive = i.get('adr', self.add_deps_recursive)
         if not self.add_deps_recursive:
             self.add_deps_recursive = i.get('add_deps_recursive', {})
         else:

@@ -49,13 +49,16 @@ def dockerfile(self_module, input_params):
     script_alias = metadata.get('alias', '')
     script_uid = metadata.get('uid', '')
 
-    run_state = {
-        'deps': [],
-        'fake_deps': [],
-        'parent': None,
+    if not has_attr(self_module, 'run_state'):
+        self_module.run_state = self_module.init_run_state(input_params.get('run_state'))
+
+    run_state = self_module.run_state
+
+    run_state.update({
         'script_id': f"{script_alias},{script_uid}",
         'script_variation_tags': variation_tags
-    }
+        }
+    )
 
     docker_settings = metadata.get('docker', {})
     docker_settings_default_env = docker_settings.get('default_env', {})
@@ -307,14 +310,19 @@ def docker_run(self_module, i):
     for key in docker_settings_default_env:
         env.setdefault(key, docker_settings_default_env[key])
 
-    self_module.run_state['docker'] = docker_settings
-    run_state = {
-        'deps': [], 'fake_deps': [], 'parent': None,
+    if not has_attr(self_module, 'run_state'):
+        self_module.run_state = self_module.init_run_state(input_params.get('run_state'))
+
+    run_state = self_module.run_state
+
+    run_state['docker'] = docker_settings
+    run_state.update({
         'script_id': f"{script_alias},{script_uid}",
         'script_variation_tags': variation_tags,
         'file_path_env_keys': file_path_env_keys,
         'folder_path_env_keys': folder_path_env_keys
-    }
+        }
+    )
 
     # Update state and handle variations
     r = self_module.update_state_from_meta(meta, run_state=run_state, i=i)
