@@ -563,9 +563,12 @@ class ScriptAutomation(Automation):
             variation_tags,
             parsed_script_alias,
             quiet,
-            skip_remembered_selections=False,
+            skip_remembered_selections=skip_remembered_selections,
             force_cache=False,
-            force_skip_cache=False
+            # Forcing this to false as with new_cache_entry we want to exclude
+            # any force_cached cache entries
+            force_skip_cache=False,
+            new_cache_entry=new_cache_entry
         )
         if r['return'] > 0:
             return r

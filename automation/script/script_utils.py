@@ -40,6 +40,7 @@ def select_script_and_cache(
     skip_remembered_selections=False,
     force_cache=False,
     force_skip_cache=False,
+    new_cache_entry=False
 ):
     """
     Search scripts by tags, resolve ambiguity, apply cache pruning,
@@ -133,19 +134,16 @@ def select_script_and_cache(
 
     # ---------------------------------------------------------
     # STEP 6: Determine if cache preload is needed
-    preload_cached_scripts = any(
+    preload_cached_scripts = not new_cache_entry and any(
         s.meta.get("cache", False)
         or (s.meta.get("can_force_cache", False) and force_cache)
         for s in list_of_found_scripts
     )
 
-    cache_list = []
-
     # STEP: cache handling
     cache_list = []
 
-    if should_preload_cache(list_of_found_scripts,
-                            force_cache) and not force_skip_cache:
+    if preload_cached_scripts:
         rc = search_script_cache(
             self.cache_action,
             script_tags_string,
@@ -165,7 +163,6 @@ def select_script_and_cache(
         list_of_found_scripts = rc["scripts"]
         cache_list = rc["cache_list"]
 
-    # STEP: select script (unchanged)
     if len(list_of_found_scripts) > 1:
         selected_index = select_script_item(
             list_of_found_scripts,
@@ -260,18 +257,6 @@ def select_script_item(lst, text, recursion_spaces,
                 lst[selection].path))
 
     return selection
-
-
-def should_preload_cache(scripts, force_cache=False):
-    """
-    Return True if at least one script requires or allows caching.
-    """
-    for script in scripts:
-        if script.meta.get("cache", False):
-            return True
-        if script.meta.get("can_force_cache", False) and force_cache:
-            return True
-    return False
 
 
 def search_script_cache(
