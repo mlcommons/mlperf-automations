@@ -944,7 +944,8 @@ class ScriptAutomation(Automation):
         #######################################################################
         # Check if the output of a selected script should be cached
         if cache:
-            #Checking if any of the found entry in cache_list has matching_tags and is a valid cache_entry
+            # Checking if any of the found entry in cache_list has
+            # matching_tags and is a valid cache_entry
             r = find_cached_script({'self': self,
                                     'cache_list': cache_list,
                                     'extra_recursion_spaces': extra_recursion_spaces,
@@ -977,7 +978,6 @@ class ScriptAutomation(Automation):
                                     })
             if r['return'] > 0:
                 return r
-
 
             # Sort by tags to ensure determinism in order (and later add
             # versions)
@@ -4421,7 +4421,6 @@ def relaxed_subset(v, variation_tags):
         if not matched:
             return False
     return True
-
 
 
 ##############################################################################

@@ -170,11 +170,11 @@ def search_cache(i, explicit_cached_tags):
         if set(explicit_cached_tags) <= set(item.meta.get('tags', []))
     ]
 
-
     return pruned_cache_list
 
 
-def apply_remembered_cache_selection(i, explicit_search_tags, found_cached_scripts):
+def apply_remembered_cache_selection(
+        i, explicit_search_tags, found_cached_scripts):
     '''
     Apply remembered cache selection if any
     '''
@@ -376,6 +376,7 @@ def run_validate_cache_if_present(i, cached_script):
 
 ##############################################################################
 
+
 def find_cached_script(i):
     """
     Internal automation function: find cached script
@@ -412,7 +413,7 @@ def find_cached_script(i):
                 'search_tags': '', 'found_cached_scripts': []}
 
     found_cached_scripts = search_cache(i, explicit_cached_tags)
-    
+
     found_cached_scripts = apply_remembered_cache_selection(
         i, explicit_cached_tags, found_cached_scripts)
     found_cached_scripts = validate_cached_scripts(i, found_cached_scripts)

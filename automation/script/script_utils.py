@@ -183,7 +183,7 @@ def select_script_and_cache(
 
     # STEP: prune cache to selected script
     cache_list = prune_cache_for_selected_script(cache_list, selected_script)
-    
+
     return {
         "return": 0,
         "script": selected_script,
