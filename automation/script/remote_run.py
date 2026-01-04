@@ -62,7 +62,6 @@ def remote_run(self_module, i):
         return r
 
     run_state = self_module.run_state
-
     remote_run_settings = run_state.get('remote_run', {})
     remote_run_settings_default_env = remote_run_settings.get(
         'default_env', {})
