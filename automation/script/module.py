@@ -5555,6 +5555,16 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
         if docker_settings.get('deps', []):
             update_deps(docker_settings['deps'], add_deps_info, False, env)
 
+    new_remote_run_settings = meta.get('remote_run')
+    if new_remote_run_settings:
+        remote_run_settings = run_state.get('remote_run', {})
+        utils.merge_dicts({'dict1': remote_run_settings,
+                           'dict2': new_remote_run_settings,
+                           'append_lists': True,
+                           'append_unique': True})
+        if remote_run_settings.get('deps', []):
+            update_deps(remote_run_settings['deps'], add_deps_info, False, env)
+
     new_env_keys_from_meta = meta.get('new_env_keys', [])
     if new_env_keys_from_meta:
         run_state['new_env_keys'] += new_env_keys_from_meta
