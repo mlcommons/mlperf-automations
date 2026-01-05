@@ -1987,7 +1987,7 @@ class ScriptAutomation(Automation):
                 return r
             adr = get_adr(versions_meta)
             if adr:
-                self._merge_dicts_with_tags(add_deps_recursive, adr)
+                self._merge_dicts_with_tags(self.add_deps_recursive, adr)
                 # Processing them again using updated deps for
                 # add_deps_recursive
                 r = update_adr_from_meta(
