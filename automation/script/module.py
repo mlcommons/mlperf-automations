@@ -1985,17 +1985,18 @@ class ScriptAutomation(Automation):
                 i)
             if r['return'] > 0:
                 return r
+            
             adr = get_adr(versions_meta)
             if adr:
-                self._merge_dicts_with_tags(add_deps_recursive, adr)
+                self._merge_dicts_with_tags(self.add_deps_recursive, adr)
                 # Processing them again using updated deps for
                 # add_deps_recursive
                 r = update_adr_from_meta(
-                    deps,
-                    post_deps,
-                    prehook_deps,
-                    posthook_deps,
-                    add_deps_recursive,
+                    self.run_state['deps'],
+                    self.run_state['post_deps'],
+                    self.run_state['prehook_deps'],
+                    self.run_state['posthook_deps'],
+                    self.add_deps_recursive,
                     env)
 
         return {'return': 0, 'version': version, 'version_min': version_min,
@@ -2366,7 +2367,7 @@ class ScriptAutomation(Automation):
                         'return': 1,
                         'error': f'Variation "{tag_to_append}" specified as base variation for the variation is in the excluded list "{variation_name}"'
                     }
-                variation_tags.append(tag_to_append)
+                variation_tags.insert(0, tag_to_append)
                 tmp_variations[tag_to_append] = False
 
         return {'return': 0}
@@ -2707,125 +2708,132 @@ class ScriptAutomation(Automation):
 
         # Find script item(s)
         i['out'] = None
-        r = self.search(i)
+       
+        r = self._select_script(i)
         if r['return'] > 0:
             return r
 
+        script = r['script']
+
+        if not script:
+            return {'return': 1,
+                'error': 'No scripts were found for running tests'}
+
         logger = self.action_object.logger
-        lst = r['list']
-        for script_item in lst:
-            path = script_item.path
-            meta = script_item.meta
+            
+        path = script.path
+        meta = script.meta
 
-            alias = meta.get('alias', '')
-            uid = meta.get('uid', '')
-            if console or True:  # Todo restrict to console only?
-                logger.info(path)
-                test_config = meta.get('tests', '')
-                if test_config:
-                    logger.info(test_config)
-                    variations = meta.get("variations")
-                    tags_string = ",".join(meta.get("tags"))
-                    test_input_index = i.get('test_input_index')
-                    test_input_id = i.get('test_input_id')
-                    run_inputs = i.get("run_inputs", test_config.get(
-                        'run_inputs', [{"docker_os": "ubuntu", "docker_os_version": "22.04"}]))
-                    if test_input_index:
-                        index_plus = False
-                        try:
-                            if test_input_index.endswith("+"):
-                                input_index = int(test_input_index[:-1])
-                                index_plus = True
-                            else:
-                                input_index = int(test_input_index)
-                        except ValueError as e:
-                            print(e)
-                            return {
-                                'return': 1, 'error': f'Invalid test_input_index: {test_input_index}. Must be an integer or an integer followed by a +'}
-                        if input_index > len(run_inputs):
-                            run_inputs = []
+        alias = meta.get('alias', '')
+        uid = meta.get('uid', '')
+        if console or True:  # Todo restrict to console only?
+            logger.info(path)
+            test_config = meta.get('tests', '')
+            if test_config:
+                logger.info(test_config)
+                variations = meta.get("variations")
+                tags_string = ",".join(meta.get("tags"))
+                test_input_index = i.get('test_input_index')
+                test_input_id = i.get('test_input_id')
+                run_inputs = i.get("run_inputs", test_config.get(
+                    'run_inputs', [{"docker_os": "ubuntu", "docker_os_version": "22.04"}]))
+                if test_input_index:
+                    index_plus = False
+                    try:
+                        if test_input_index.endswith("+"):
+                            input_index = int(test_input_index[:-1])
+                            index_plus = True
                         else:
-                            if index_plus:
-                                run_inputs = run_inputs[index_index - 1:]
-                            else:
-                                run_inputs = [run_inputs[input_index - 1]]
-
-                    for run_input in run_inputs:
-                        if test_input_id:
-                            if run_input.get('id', '') != test_input_id:
-                                continue
-
-                        ii = {'action': 'run',
-                              'target': 'script',
-                              'quiet': i.get('quiet'),
-                              }
-                        test_all_variations = run_input.get(
-                            'test-all-variations', False)
-                        if test_all_variations:
-                            run_variations = [
-                                f"_{v}" for v in variations if variations[v].get(
-                                    'group',
-                                    '') == '' and not is_true(
-                                    variations[v].get(
-                                        'exclude-in-test',
-                                        ''))]
+                            input_index = int(test_input_index)
+                    except ValueError as e:
+                        print(e)
+                        return {
+                            'return': 1, 'error': f'Invalid test_input_index: {test_input_index}. Must be an integer or an integer followed by a +'}
+                    if input_index > len(run_inputs):
+                        run_inputs = []
+                    else:
+                        if index_plus:
+                            run_inputs = run_inputs[index_index - 1:]
                         else:
-                            given_variations = run_input.get(
-                                'variations_list', [])
-                            if given_variations:
-                                v_split = []
-                                run_variations = []
-                                for v in given_variations:
-                                    v_split = v.split(",")
-                                    for index, t in enumerate(v_split):
-                                        if not t.startswith("_"):
-                                            # variations must begin with _. We
-                                            # support both with and without _
-                                            # in the meta
-                                            v_split[index] = f"_{t}"
-                                    if v_split:
-                                        run_variations.append(
-                                            ",".join(v_split))
+                            run_inputs = [run_inputs[input_index - 1]]
+
+                for run_input in run_inputs:
+                    if test_input_id:
+                        if run_input.get('id', '') != test_input_id:
+                            continue
+
+                    ii = {'action': 'run',
+                          'target': 'script',
+                          'quiet': i.get('quiet'),
+                          }
+                    test_all_variations = run_input.get(
+                        'test-all-variations', False)
+                    if test_all_variations:
+                        run_variations = [
+                            f"_{v}" for v in variations if variations[v].get(
+                                'group',
+                                '') == '' and not is_true(
+                                variations[v].get(
+                                      'exclude-in-test',
+                                    ''))]
+                    else:
+                        given_variations = run_input.get(
+                            'variations_list', [])
+                        if given_variations:
+                            v_split = []
+                            run_variations = []
+                            for v in given_variations:
+                                v_split = v.split(",")
+                                for index, t in enumerate(v_split):
+                                    if not t.startswith("_"):
+                                        # variations must begin with _. We
+                                        # support both with and without _
+                                        # in the meta
+                                        v_split[index] = f"_{t}"
+                                if v_split:
+                                    run_variations.append(
+                                        ",".join(v_split))
+                        else:
+                            # run the test without any variations
+                            run_variations = [""]
+                    use_docker = run_input.get('docker', False)
+                    for key in run_input:  # override meta with any user inputs like for docker_mlc_repo
+                        if i.get(key):
+                            if isinstance(run_input[key], dict):
+                                utils.merge_dicts({
+                                    'dict1': run_input[key],
+                                    'dict2': i[key],
+                                    'append_lists': True,
+                                    'append_unique': True
+                                })
                             else:
-                                # run the test without any variations
-                                run_variations = [""]
-                        use_docker = run_input.get('docker', False)
-                        for key in run_input:  # override meta with any user inputs like for docker_mlc_repo
-                            if i.get(key):
-                                if isinstance(run_input[key], dict):
-                                    utils.merge_dicts({
-                                        'dict1': run_input[key],
-                                        'dict2': i[key],
-                                        'append_lists': True,
-                                        'append_unique': True
-                                    })
-                                else:
-                                    run_input[key] = i[key]
+                                run_input[key] = i[key]
 
-                        ii = {**ii, **run_input}
-                        i_env = ii.get('env', i.get('env', {}))
-                        if use_docker:
-                            ii['action'] = "docker"
-                            for key in i:
-                                if key.startswith("docker_"):
-                                    ii[key] = i[key]
+                    ii = {**ii, **run_input}
+                    i_env = ii.get('env', i.get('env', {}))
+                    if use_docker:
+                        ii['action'] = "docker"
+                        for key in i:
+                            if key.startswith("docker_"):
+                                ii[key] = i[key]
 
-                            if ii.get('docker_image_name', '') == '':
-                                ii['docker_image_name'] = alias
+                        if ii.get('docker_image_name', '') == '':
+                            ii['docker_image_name'] = alias
 
-                        for variation_tags in run_variations:
-                            run_tags = f"{tags_string},{variation_tags}"
-                            ii['tags'] = run_tags
-                            if i_env:
-                                import copy
-                                ii['env'] = copy.deepcopy(i_env)
-                            logger.info(ii)
-                            r = self.run(ii)
-                            if r['return'] > 0:
-                                return r
-                    if is_true(i.get('docker_prune', '')):
+                    for variation_tags in run_variations:
+                        run_tags = f"{tags_string},{variation_tags}"
+                        ii['tags'] = run_tags
+                        if i_env:
+                            import copy
+                            ii['env'] = copy.deepcopy(i_env)
+                        logger.info(ii)
+                        r = self.run(ii)
+                        if r['return'] > 0:
+                            return r
+                if is_true(i.get('docker_prune', '')):
                         docker_prune()
-        return {'return': 0, 'list': lst}
+
+        return {'return': 0}
 
     ############################################################
 
