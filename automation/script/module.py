@@ -732,7 +732,10 @@ class ScriptAutomation(Automation):
         variation_tags_string = r['variation_tags_string']
         explicit_variation_tags = r['explicit_variation_tags']
 
-        r = self._update_state_from_version(meta, i)
+        r = self._update_state_from_version(meta, run_state, i)
+        if r['return'] > 0:
+            return r
+
         version = r['version']
         version_min = r['version_min']
         version_max = r['version_max']
@@ -1906,7 +1909,7 @@ class ScriptAutomation(Automation):
         return rr
 
     ##########################################################################
-    def _update_state_from_version(self, meta, i):
+    def _update_state_from_version(self, meta, run_state, i):
 
         # USE CASE:
         #  HERE we may have versions in script input and env['MLC_VERSION_*']
@@ -1981,21 +1984,20 @@ class ScriptAutomation(Automation):
             versions_meta = versions[version]
             r = self.update_state_from_meta(
                 versions_meta,
-                self.run_state,
+                run_state,
                 i)
             if r['return'] > 0:
                 return r
-
             adr = get_adr(versions_meta)
             if adr:
                 self._merge_dicts_with_tags(self.add_deps_recursive, adr)
                 # Processing them again using updated deps for
                 # add_deps_recursive
                 r = update_adr_from_meta(
-                    self.run_state['deps'],
-                    self.run_state['post_deps'],
-                    self.run_state['prehook_deps'],
-                    self.run_state['posthook_deps'],
+                    run_state['deps'],
+                    run_state['post_deps'],
+                    run_state['prehook_deps'],
+                    run_state['posthook_deps'],
                     self.add_deps_recursive,
                     env)
 
