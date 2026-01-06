@@ -20,7 +20,7 @@ def preprocess(i):
     env['MLC_MLPERF_SKIP_RUN'] = env.get('MLC_MLPERF_SKIP_RUN', "no")
 
     mlperf_path = env['MLC_MLPERF_INFERENCE_SOURCE']
-    submission_checker_dir = os.path.join(mlperf_path, "tools", "submission")
+    submission_checker_dir = os.path.join(mlperf_path, "tools", "submission", "submission_checker")
     sys.path.append(submission_checker_dir)
 
     version = env.get('MLC_MLPERF_INFERENCE_VERSION', "4.1")
@@ -464,7 +464,7 @@ def preprocess(i):
 
 
 def run_files_exist(mode, OUTPUT_DIR, run_files, env, logger):
-    import submission_checker as checker
+    import submission_checker_main as checker
     from log_parser import MLPerfLog
 
     is_valid = True
@@ -579,25 +579,25 @@ def measure_files_exist(OUTPUT_DIR, run_files):
 
 
 def get_checker_files():
-    import submission_checker as checker
+    import constants
 
-    REQUIRED_ACC_FILES = checker.REQUIRED_ACC_FILES
-    REQUIRED_PERF_FILES = checker.REQUIRED_PERF_FILES
-    REQUIRED_POWER_FILES = checker.REQUIRED_POWER_FILES
-    REQUIRED_PERF_POWER_FILES = checker.REQUIRED_PERF_POWER_FILES
-    REQUIRED_MEASURE_FILES = checker.REQUIRED_MEASURE_FILES
+    REQUIRED_ACC_FILES =  constants.REQUIRED_ACC_FILES
+    REQUIRED_PERF_FILES = constants.REQUIRED_PERF_FILES
+    REQUIRED_POWER_FILES = constants.REQUIRED_POWER_FILES
+    REQUIRED_PERF_POWER_FILES = constants.REQUIRED_PERF_POWER_FILES
+    REQUIRED_MEASURE_FILES = constants.REQUIRED_MEASURE_FILES
     return REQUIRED_ACC_FILES, REQUIRED_PERF_FILES, REQUIRED_POWER_FILES, REQUIRED_PERF_POWER_FILES, REQUIRED_MEASURE_FILES
 
 
 def get_required_min_queries_offline(model, version):
 
-    import submission_checker as checker
+    import constants
 
     version_split = version.split(".")
     if int(version[0]) < 4:
         return 24756
 
-    REQUIRED_MIN_QUERIES = checker.OFFLINE_MIN_SPQ_SINCE_V4
+    REQUIRED_MIN_QUERIES = constants.OFFLINE_MIN_SPQ_SINCE_V4
     mlperf_model = model
     mlperf_model = mlperf_model.replace("resnet50", "resnet")
 

@@ -1,13 +1,16 @@
 import sys
 import os
-import submission_checker as checker
+import datetime
+import submission_checker.main as checker
+import submission_checker.constants as constants
+import submission_checker.utils as utils
 from log_parser import MLPerfLog
 
 
 def get_result_from_log(version, model, scenario,
                         result_path, mode, inference_src_version=None):
 
-    config = checker.Config(
+    config = constants.Config(
         version,
         None,
         ignore_uncommited=False,
@@ -26,10 +29,11 @@ def get_result_from_log(version, model, scenario,
             version_tuple = tuple(map(int, inference_src_version.split('.')))
 
         if version_tuple and version_tuple >= (4, 1, 22):
-            result_ = checker.get_performance_metric(
+            # if cant place, then will write the custom function 
+            result_ = utils.get_performance_metric(
                 config, mlperf_model, result_path, scenario)
         else:
-            result_ = checker.get_performance_metric(
+            result_ = utils.get_performance_metric(
                 config, mlperf_model, result_path, scenario, None, None, has_power)
         mlperf_log = MLPerfLog(
             os.path.join(
@@ -50,7 +54,7 @@ def get_result_from_log(version, model, scenario,
         result = str(round(result, 3))
 
         if has_power:
-            power_valid, power_metric, scenario, avg_power_efficiency = checker.get_power_metric(
+            power_valid, power_metric, scenario, avg_power_efficiency = utils.get_power_metric(
                 config, scenario, result_path, True, result_)
             if power_valid:
                 power_result = f"{round(power_metric,3)},{round(avg_power_efficiency,3)}"
@@ -100,12 +104,12 @@ def get_accuracy_metric(config, model, path):
                 if acc_type != acc_type1:
                     continue
                 acc_limits[ii // 2] = acc_target
-                up_patterns[ii // 2] = checker.ACC_PATTERN[acc_type]
+                up_patterns[ii // 2] = constants.ACC_PATTERN[acc_type]
 
     for i in range(0, len(target), 2):
         acc_type, acc_target = target[i:i + 2]
         acc_types.append(acc_type)
-        patterns.append(checker.ACC_PATTERN[acc_type])
+        patterns.append(constants.ACC_PATTERN[acc_type])
         acc_targets.append(acc_target)
 
     acc_seen = [False for _ in acc_targets]
@@ -163,7 +167,7 @@ def get_result_string(version, model, scenario, result_path, has_power, sub_res,
     mlperf_model = config.get_mlperf_model(model)
     performance_path = os.path.join(result_path, "performance", "run_1")
     accuracy_path = os.path.join(result_path, "accuracy")
-    scenario = checker.SCENARIO_MAPPING[scenario.lower()]
+    scenario = constants.SCENARIO_MAPPING[scenario.lower()]
 
     fname = os.path.join(performance_path, "mlperf_log_detail.txt")
     mlperf_log = MLPerfLog(fname)
@@ -176,10 +180,10 @@ def get_result_string(version, model, scenario, result_path, has_power, sub_res,
         version_tuple = tuple(map(int, inference_src_version.split('.')))
 
     if version_tuple and version_tuple >= (4, 1, 22):
-        performance_result = checker.get_performance_metric(
+        performance_result = utils.get_performance_metric(
             config, mlperf_model, performance_path, scenario)
     else:
-        performance_result = checker.get_performance_metric(
+        performance_result = utils.get_performance_metric(
             config, mlperf_model, performance_path, scenario, None, None)
     if "stream" in scenario.lower():
         performance_result_ = performance_result / 1000000  # convert to milliseconds
@@ -189,11 +193,11 @@ def get_result_string(version, model, scenario, result_path, has_power, sub_res,
 
     if scenario != effective_scenario:
         print(f"{fname} : {scenario} : {effective_scenario}")
-        inferred, inferred_result, inferred_valid = checker.get_inferred_result(
+        inferred, inferred_result, inferred_valid = utils.get_inferred_result(
             scenario, effective_scenario, performance_result, mlperf_log, config, False)
 
     if has_power:
-        is_valid, power_metric, scenario, avg_power_efficiency = checker.get_power_metric(
+        is_valid, power_metric, scenario, avg_power_efficiency = utils.get_power_metric(
             config, scenario, performance_path, True, performance_result)
         if "stream" in scenario.lower():
             power_metric_unit = "milliJoules"
@@ -213,7 +217,7 @@ def get_result_string(version, model, scenario, result_path, has_power, sub_res,
             if os.path.exists(
                     test_path):  # We dont consider missing test folders now - submission checker will do that
                 # test_pass = checker.check_compliance_dir(test_path, mlperf_model, scenario, config, "closed", system_json, sub_res)
-                test_pass = checker.check_compliance_perf_dir(
+                test_pass = utils.check_compliance_perf_dir(
                     test_path) if test != "TEST06" else True
                 if test_pass and test in ["TEST01", "TEST06"]:
                     # test_pass = checker.check_compliance_acc_dir(test_path, mlperf_model, config)
@@ -226,11 +230,11 @@ def get_result_string(version, model, scenario, result_path, has_power, sub_res,
     acc_valid, acc_results, acc_targets, acc_limits = get_accuracy_metric(
         config, mlperf_model, accuracy_path)
 
-    result_field = checker.RESULT_FIELD[effective_scenario]
+    result_field = constants.RESULT_FIELD[effective_scenario]
 
     performance_result_string = f"`{result_field}`: `{performance_result}`\n"
     if inferred:
-        inferred_result_field = checker.RESULT_FIELD[scenario]
+        inferred_result_field = constants.RESULT_FIELD[scenario]
         performance_result_string += f"Inferred result: `{inferred_result_field}`: `{inferred_result}`  \n"
 
     accuracy_result_string = ''

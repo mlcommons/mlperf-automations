@@ -29,20 +29,44 @@ def preprocess(i):
     else:
         skip_compliance = ""
 
-    submission_checker_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission",
-                                           "submission_checker.py")
-
+    submission_checker_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission", "submission-checker",
+                                           "submission_checker_main.py")
+    constants_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission", "submission-checker",
+                                           "constants.py")
+    performance_check_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission", "submission-checker", "checks",
+                                           "performance_check.py")
+    
     if is_true(env['MLC_MLPERF_SHORT_RUN']):
         import shutil
+        # modify constants.py
+        new_constants_file = os.path.join(
+            os.path.dirname(submission_checker_file), "constants1.py")
+        with open(constants_file, 'r') as file:
+            constants_data = file.read()
+        constants_data = constants_data.replace("OFFLINE_MIN_SPQ = 24576", "OFFLINE_MIN_SPQ = 100")
+        with open(new_constants_file, 'w') as file:
+            file.write(constants_data)
+        # modify performance_check.py
+        new_performance_check_file = os.path.join(
+            os.path.dirname(performance_check_file), "performance_check1.py")
+        with open(performance_check_file, 'r') as file:
+            performance_check_data = file.read()
+        performance_check_data = performance_check_data.replace(
+            "return is_valid",
+            "return True")
+        with open(new_performance_check_file, 'w') as file:
+            file.write(performance_check_data)
+        # modify submission_checker_main.py
         new_submission_checker_file = os.path.join(
             os.path.dirname(submission_checker_file),
             "submission_checker1.py")
         with open(submission_checker_file, 'r') as file:
             data = file.read()
-        data = data.replace("OFFLINE_MIN_SPQ = 24576", "OFFLINE_MIN_SPQ = 100")
         data = data.replace(
-            "return is_valid, res, inferred",
-            "return True, res, inferred")
+            "submission_checker.constants",
+            "submission_checker.constants1").replace(
+            "submission_checker.checks.performance_check",
+            "submission_checker.checks.performance_check1")
         with open(new_submission_checker_file, 'w') as file:
             file.write(data)
         submission_checker_file = new_submission_checker_file

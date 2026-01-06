@@ -160,18 +160,25 @@ def get_valid_models(mlperf_version, mlperf_path):
 
     import sys
 
-    submission_checker_dir = os.path.join(mlperf_path, "tools", "submission")
+    submission_checker_root = os.path.join(mlperf_path, "tools", "submission")
+    submission_checker_dir = os.path.join(mlperf_path, "tools", "submission", "submission_checker")
 
-    sys.path.append(submission_checker_dir)
+    sys.path.append(submission_checker_root)
 
-    if not os.path.exists(os.path.join(
-            submission_checker_dir, "submission_checker.py")):
-        shutil.copy(os.path.join(submission_checker_dir, "submission-checker.py"), os.path.join(submission_checker_dir,
-                                                                                                "submission_checker.py"))
+    # if not os.path.exists(os.path.join(
+    #         submission_checker_dir, "submission_checker_main.py")):
+    #     shutil.copy(os.path.join(submission_checker_dir, "main.py"), os.path.join(submission_checker_dir,
+    #                                                                                             "submission_checker_main.py"))
 
-    import submission_checker as checker
+    # if not os.path.exists(os.path.join(
+    #         submission_checker_dir, "submission_checker_utils.py")):
+    #     shutil.copy(os.path.join(submission_checker_dir, "utils.py"), os.path.join(submission_checker_dir,
+    #                                                                                             "submission_checker_utils.py"))
 
-    config = checker.MODEL_CONFIG
+    import submission_checker.main as checker
+    import submission_checker.constants as constants
+
+    config = constants.MODEL_CONFIG
 
     valid_models = config[mlperf_version]["models"]
 

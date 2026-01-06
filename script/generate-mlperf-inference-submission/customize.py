@@ -40,8 +40,8 @@ def check_dict_filled(keys, sut_info):
 
 
 def model_in_valid_models(model, mlperf_version):
-    import submission_checker as checker
-    config = checker.MODEL_CONFIG
+    import submission_checker.constants as constants
+    config = constants.MODEL_CONFIG
 
     if model not in config[mlperf_version]['models']:
         internal_model_name = config[mlperf_version]["model_mapping"].get(
