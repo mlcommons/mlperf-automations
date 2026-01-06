@@ -1985,7 +1985,7 @@ class ScriptAutomation(Automation):
                 i)
             if r['return'] > 0:
                 return r
-            
+
             adr = get_adr(versions_meta)
             if adr:
                 self._merge_dicts_with_tags(self.add_deps_recursive, adr)
@@ -2708,7 +2708,7 @@ class ScriptAutomation(Automation):
 
         # Find script item(s)
         i['out'] = None
-       
+
         r = self._select_script(i)
         if r['return'] > 0:
             return r
@@ -2717,10 +2717,10 @@ class ScriptAutomation(Automation):
 
         if not script:
             return {'return': 1,
-                'error': 'No scripts were found for running tests'}
+                    'error': 'No scripts were found for running tests'}
 
         logger = self.action_object.logger
-            
+
         path = script.path
         meta = script.meta
 
@@ -2774,7 +2774,7 @@ class ScriptAutomation(Automation):
                                 'group',
                                 '') == '' and not is_true(
                                 variations[v].get(
-                                      'exclude-in-test',
+                                    'exclude-in-test',
                                     ''))]
                     else:
                         given_variations = run_input.get(
@@ -2831,7 +2831,7 @@ class ScriptAutomation(Automation):
                         if r['return'] > 0:
                             return r
                 if is_true(i.get('docker_prune', '')):
-                        docker_prune()
+                    docker_prune()
 
         return {'return': 0}
 
