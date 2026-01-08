@@ -39,7 +39,8 @@ def check_dict_filled(keys, sut_info):
 # model names for MLPef Inference
 
 
-def model_in_valid_models(model, mlperf_version, submission_checker_modularised):
+def model_in_valid_models(model, mlperf_version,
+                          submission_checker_modularised):
     if submission_checker_modularised:
         import submission_checker.constants as constants
         config = constants.MODEL_CONFIG
