@@ -86,6 +86,14 @@ jobs:
         if [ "${{ matrix.action }}" == "docker" ] && [ -z "${{ inputs.inf-repo-url }}" ]; then
           docker_tags="--docker_mlc_repo=${{ github.event.pull_request.head.repo.html_url }} --docker_mlc_repo_branch=${{ github.event.pull_request.head.ref }}"
         fi
+        if [ "${{ matrix.action }}" == "docker" ] && [ -n "${{ inputs.inf-repo-url }}" ]; then
+          if [ -n "${{ inputs.automation-repo }}" ]; then
+            docker_tags="$docker_tags --automation_repo=${{ inputs.automation-repo }}"
+          fi
+          if [ -n "${{ inputs.automation-repo-branch }}" ]; then
+            docker_tags="$docker_tags --automation_repo_branch=${{ inputs.automation-repo-branch }}"
+          fi
+        fi
 
         if [ -n "${{ inputs.inf-repo-url }}" ]; then
             mlc ${{ matrix.action }} script --tags=generate,inference,submission --adr.compiler.tags=gcc --version=v${{ matrix.round }} --clean --preprocess_submission=yes --submission_base_dir=mysubmissions --results_dir=$PWD/submission_generation_examples/submission_round_${{ matrix.round }}/${{ matrix.folder_name }}/ --run_checker --submitter=MLCommons --tar=yes --division=${{ matrix.division }} --env.MLC_DETERMINE_MEMORY_CONFIGURATION=yes --quiet --adr.inference-src.tags=_repo.${{ inputs.inf-repo-url }},_branch.${{ inputs.inf-branch }} --extra_checker_args="--skip-extra-accuracy-files-check" $docker_tags
