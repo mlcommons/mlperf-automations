@@ -35,7 +35,7 @@ def preprocess(i):
         performance_check_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission", "submission_checker", "checks",
                                               "performance_check.py")
         accuracy_check_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission", "submission_checker", "checks",
-                                              "accuracy_check.py")
+                                           "accuracy_check.py")
         submission_checker_file = os.path.join(
             env['MLC_MLPERF_INFERENCE_SOURCE'],
             "tools",
@@ -71,10 +71,10 @@ def preprocess(i):
                 "return True").replace(
                     "return False",
                     "return True"
-                ).replace(
+            ).replace(
                     "return is_valid",
                     "return True"
-                )
+            )
             with open(new_performance_check_file, 'w') as file:
                 file.write(performance_check_data)
             # modify accuracy_check.py
@@ -87,10 +87,10 @@ def preprocess(i):
                 "return True").replace(
                     "return False",
                     "return True"
-                ).replace(
+            ).replace(
                     "return is_valid",
                     "return True"
-                )
+            )
             with open(new_accuracy_check_file, 'w') as file:
                 file.write(accuracy_check_data)
 
