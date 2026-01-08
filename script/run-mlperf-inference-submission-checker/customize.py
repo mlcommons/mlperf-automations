@@ -30,9 +30,9 @@ def preprocess(i):
         skip_compliance = ""
 
     if is_true(env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
-        constants_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission", "submission-checker",
+        constants_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission", "submission_checker",
                                       "constants.py")
-        performance_check_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission", "submission-checker", "checks",
+        performance_check_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission", "submission_checker", "checks",
                                               "performance_check.py")
         submission_checker_file = os.path.join(
             env['MLC_MLPERF_INFERENCE_SOURCE'],
