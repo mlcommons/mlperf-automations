@@ -55,14 +55,18 @@ jobs:
         pip install tabulate
     - name: Pull MLOps repository
       run: |
-        if [ -n "${{ inputs.automation-repo }}" ]; then
-          if [ -n "${{ inputs.automation-repo-branch }}" ]; then
-            mlc pull repo ${{ inputs.automation-repo }} --branch=${{ inputs.automation-repo-branch }}
+        if [ -n "${{ inputs.inf-repo-url }}" ]; then
+          if [ -n "${{ inputs.automation-repo }}" ]; then
+            if [ -n "${{ inputs.automation-repo-branch }}" ]; then
+              mlc pull repo ${{ inputs.automation-repo }} --branch=${{ inputs.automation-repo-branch }}
+            else
+              mlc pull repo ${{ inputs.automation-repo }}
+            fi
           else
-            mlc pull repo ${{ inputs.automation-repo }}
+            mlc pull repo mlcommons@mlperf-automations --branch=dev
           fi
         else
-          mlc pull repo mlcommons@mlperf-automations --branch=dev
+          mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
         fi
     - name: Pull repo where test cases are uploaded
       run: |
