@@ -1,0 +1,54 @@
+alias: get-ml-model-dlrm-v3
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+new_env_keys:
+- MLC_ML_MODEL_DLRM_V3_PATH
+- MLC_ML_MODEL_FILE_WITH_PATH
+print_env_at_the_end:
+  MLC_ML_MODEL_DLRM_V3_PATH: DLRM V3 checkpoint path
+tags:
+- get-ml-model-dlrm-v3
+tests:
+  run_inputs:
+  - variations_list:
+    - r2-downloader,mlc,dry-run
+uid: e901ca37bcaa4fbe
+variations:
+  dry-run:
+    env:
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  mlc:
+    default: true
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+    group: download-src
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      env:
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_DLRM_V3_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_MODEL_DLRM_V3_PATH
+        MLC_DOWNLOAD_FILENAME: dlrm-v3-checkpoint
+      extra_cache_tags: ml,model,dlrm-v3
+      force_cache: true
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      names:
+      - dlrm-v3-model-dae
+      tags: download-and-extract
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
+  r2-downloader:
+    default: true
+    adr:
+      dlrm-v3-model-dae:
+        tags: _r2-downloader
+        env:
+          MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/dlrm-v3-checkpoint.uri
