@@ -159,12 +159,14 @@ def postprocess(i):
 def get_valid_models(mlperf_version, mlperf_path, env):
 
     import sys
-    submission_checker_modularised = False  # for ensuring backward compatibility with the previous submission checker
+    # for ensuring backward compatibility with the previous submission checker
+    submission_checker_modularised = False
     submission_checker_root = os.path.join(mlperf_path, "tools", "submission")
 
     if os.path.isdir(os.path.join(
             mlperf_path, "tools", "submission", "submission_checker")):
-        submission_checker_dir = os.path.join(mlperf_path, "tools", "submission", "submission_checker")
+        submission_checker_dir = os.path.join(
+            mlperf_path, "tools", "submission", "submission_checker")
         submission_checker_modularised = True
         env['MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER'] = 'yes'
 

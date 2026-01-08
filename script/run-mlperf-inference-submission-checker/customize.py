@@ -31,21 +31,32 @@ def preprocess(i):
 
     if is_true(env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
         constants_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission", "submission-checker",
-                                           "constants.py")
+                                      "constants.py")
         performance_check_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission", "submission-checker", "checks",
-                                           "performance_check.py")
-        submission_checker_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission", "submission_checker", "main.py")
+                                              "performance_check.py")
+        submission_checker_file = os.path.join(
+            env['MLC_MLPERF_INFERENCE_SOURCE'],
+            "tools",
+            "submission",
+            "submission_checker",
+            "main.py")
     else:
-        submission_checker_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission", "submission_checker.py")
-    
+        submission_checker_file = os.path.join(
+            env['MLC_MLPERF_INFERENCE_SOURCE'],
+            "tools",
+            "submission",
+            "submission_checker.py")
+
     if is_true(env['MLC_MLPERF_SHORT_RUN']):
         # modify constants.py
-        if is_true(env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
+        if is_true(
+                env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
             new_constants_file = os.path.join(
                 os.path.dirname(submission_checker_file), "constants1.py")
             with open(constants_file, 'r') as file:
                 constants_data = file.read()
-            constants_data = constants_data.replace("OFFLINE_MIN_SPQ = 24576", "OFFLINE_MIN_SPQ = 100")
+            constants_data = constants_data.replace(
+                "OFFLINE_MIN_SPQ = 24576", "OFFLINE_MIN_SPQ = 100")
             with open(new_constants_file, 'w') as file:
                 file.write(constants_data)
             # modify performance_check.py
@@ -64,7 +75,8 @@ def preprocess(i):
             "submission_checker1.py")
         with open(submission_checker_file, 'r') as file:
             data = file.read()
-        if is_true(env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
+        if is_true(
+                env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
             import time
             print("Hurray")
             time.sleep(5)
@@ -74,7 +86,9 @@ def preprocess(i):
                 "submission_checker.checks.performance_check",
                 "submission_checker.checks.performance_check1")
         else:
-            data = data.replace("OFFLINE_MIN_SPQ = 24576", "OFFLINE_MIN_SPQ = 100")
+            data = data.replace(
+                "OFFLINE_MIN_SPQ = 24576",
+                "OFFLINE_MIN_SPQ = 100")
             data = data.replace(
                 "return is_valid, res, inferred",
                 "return True, res, inferred"

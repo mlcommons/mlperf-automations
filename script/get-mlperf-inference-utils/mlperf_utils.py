@@ -10,14 +10,14 @@ try:
     import submission_checker.constants as constants
     import submission_checker.utils as utils
     submission_checker_modularised = True
-except:
+except BaseException:
     import submission_checker as checker
     submission_checker_modularised = False
+
 
 def get_result_from_log(version, model, scenario,
                         result_path, mode, inference_src_version=None):
 
-    
     config = checker.Config(
         version,
         None,
@@ -51,7 +51,7 @@ def get_result_from_log(version, model, scenario,
             else:
                 result_ = checker.get_performance_metric(
                     config, mlperf_model, result_path, scenario, None, None, has_power)
-                
+
         mlperf_log = MLPerfLog(
             os.path.join(
                 result_path,
