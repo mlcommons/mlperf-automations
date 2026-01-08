@@ -580,7 +580,7 @@ def generate_submission(env, state, inp, submission_division, logger):
                             target_measurement_json_path) / f"{sub_res}.json"
                         shutil.copy(measurements_json_path, destination)
                         destination = Path(
-                            target_measurement_json_path) / "model-info.json"
+                            target_measurement_json_path) / "measurements.json"
                         shutil.copy(measurements_json_path, destination)
 
                     elif mode == 'performance':
@@ -796,5 +796,4 @@ def postprocess(i):
                 env, state, inp, submission_division, logger=logger)
             if r['return'] > 0:
                 return r
-
     return {'return': 0}
