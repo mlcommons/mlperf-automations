@@ -12,11 +12,17 @@ on:
       - '!**.md'
   workflow_call:
     inputs:
-      ref:
+      inf-branch:
         required: true
         type: string
-      repo-url:
+      inf-repo-url:
         required: true
+        type: string
+      automation-repo:
+        required: false
+        type: string
+      automation-repo-branch:
+        required: false
         type: string
 
 jobs:
@@ -48,12 +54,12 @@ jobs:
         pip install mlcflow
         pip install tabulate
     - name: Pull MLOps repository
-      env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
       run: |
-        if [ -z "${{ inputs.repo-url }}" ]; then
-          mlc pull repo "$REPO" --branch="$BRANCH"
+        if [ -n "${{ inputs.automation-repo }}" ]; then
+          if [ -n "${{ inputs.automation-repo-branch }}" ]; then
+            mlc pull repo ${{ inputs.automation-repo }} --branch=${{ inputs.automation-repo-branch }}
+          else
+            mlc pull repo ${{ inputs.automation-repo }}
         else
           mlc pull repo mlcommons@mlperf-automations --branch=dev
         fi
@@ -71,13 +77,14 @@ jobs:
         echo "::group::$description"
 
         docker_tags=""
-        if [ "${{ matrix.action }}" == "docker" ] && [ -z "${{ inputs.repo-url }}" ]; then
+        # we use inf-repo-url to identify whether the workflow is triggered from inference or automations repo
+        if [ "${{ matrix.action }}" == "docker" ] && [ -z "${{ inputs.inf-repo-url }}" ]; then
           docker_tags="--docker_mlc_repo=${{ github.event.pull_request.head.repo.html_url }} --docker_mlc_repo_branch=${{ github.event.pull_request.head.ref }}"
         fi
 
-        if [ -n "${{ inputs.repo-url }}" ]; then
-            mlc ${{ matrix.action }} script --tags=generate,inference,submission --adr.compiler.tags=gcc --version=v${{ matrix.round }} --clean --preprocess_submission=yes --submission_base_dir=mysubmissions --results_dir=$PWD/submission_generation_examples/submission_round_${{ matrix.round }}/${{ matrix.folder_name }}/ --run_checker --submitter=MLCommons --tar=yes --division=${{ matrix.division }} --env.MLC_DETERMINE_MEMORY_CONFIGURATION=yes --quiet --adr.inference-src.tags=_repo.${{ inputs.repo-url }},_branch.${{ inputs.ref }} --extra_checker_args="--skip-extra-accuracy-files-check" $docker_tags
-            mlc ${{ matrix.action }} script --tags=run,inference,submission,checker --submitter_id_off=mysubmitter_id --tar=yes --submission_dir=mysubmissions/mlperf_submission --submission_tar_file=mysubmission.tar.gz --quiet --src_version=v${{ matrix.round }} --adr.inference-src.tags=_repo.${{ inputs.repo-url }},_branch.${{ inputs.ref }} --extra_checker_args="--skip-extra-accuracy-files-check" $docker_tags
+        if [ -n "${{ inputs.inf-repo-url }}" ]; then
+            mlc ${{ matrix.action }} script --tags=generate,inference,submission --adr.compiler.tags=gcc --version=v${{ matrix.round }} --clean --preprocess_submission=yes --submission_base_dir=mysubmissions --results_dir=$PWD/submission_generation_examples/submission_round_${{ matrix.round }}/${{ matrix.folder_name }}/ --run_checker --submitter=MLCommons --tar=yes --division=${{ matrix.division }} --env.MLC_DETERMINE_MEMORY_CONFIGURATION=yes --quiet --adr.inference-src.tags=_repo.${{ inputs.inf-repo-url }},_branch.${{ inputs.inf-branch }} --extra_checker_args="--skip-extra-accuracy-files-check" $docker_tags
+            mlc ${{ matrix.action }} script --tags=run,inference,submission,checker --submitter_id_off=mysubmitter_id --tar=yes --submission_dir=mysubmissions/mlperf_submission --submission_tar_file=mysubmission.tar.gz --quiet --src_version=v${{ matrix.round }} --adr.inference-src.tags=_repo.${{ inputs.inf-repo-url }},_branch.${{ inputs.inf-branch }} --extra_checker_args="--skip-extra-accuracy-files-check" $docker_tags
         else
           if [ "${{ matrix.architecture }}" == "legacy" ]; then
             mlc ${{ matrix.action }} script --tags=generate,inference,submission --adr.compiler.tags=gcc --version=v${{ matrix.round }} --clean --preprocess_submission=yes --submission_base_dir=mysubmissions --results_dir=$PWD/submission_generation_examples/submission_round_${{ matrix.round }}/${{ matrix.folder_name }}/ --run_checker --submitter=MLCommons --tar=yes --division=${{ matrix.division }} --env.MLC_DETERMINE_MEMORY_CONFIGURATION=yes --extra_checker_args="--skip-extra-accuracy-files-check" --quiet $docker_tags
