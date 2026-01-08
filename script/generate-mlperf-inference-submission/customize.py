@@ -41,6 +41,7 @@ def check_dict_filled(keys, sut_info):
 
 def model_in_valid_models(model, mlperf_version,
                           submission_checker_modularised):
+    # ensure backward compatibility of submission checker
     if submission_checker_modularised:
         import submission_checker.constants as constants
         config = constants.MODEL_CONFIG
