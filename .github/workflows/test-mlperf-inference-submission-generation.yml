@@ -60,6 +60,7 @@ jobs:
             mlc pull repo ${{ inputs.automation-repo }} --branch=${{ inputs.automation-repo-branch }}
           else
             mlc pull repo ${{ inputs.automation-repo }}
+          fi
         else
           mlc pull repo mlcommons@mlperf-automations --branch=dev
         fi
