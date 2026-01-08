@@ -88,10 +88,10 @@ jobs:
         fi
         if [ "${{ matrix.action }}" == "docker" ] && [ -n "${{ inputs.inf-repo-url }}" ]; then
           if [ -n "${{ inputs.automation-repo }}" ]; then
-            docker_tags="$docker_tags --automation_repo=${{ inputs.automation-repo }}"
+            docker_tags="$docker_tags --docker_mlc_repo=${{ inputs.automation-repo }}"
           fi
           if [ -n "${{ inputs.automation-repo-branch }}" ]; then
-            docker_tags="$docker_tags --automation_repo_branch=${{ inputs.automation-repo-branch }}"
+            docker_tags="$docker_tags --docker_mlc_repo_branch=${{ inputs.automation-repo-branch }}"
           fi
         fi
 
