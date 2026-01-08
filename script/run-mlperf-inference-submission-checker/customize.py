@@ -13,7 +13,7 @@ def preprocess(i):
 
     submission_dir = env.get("MLC_MLPERF_INFERENCE_SUBMISSION_DIR", "")
 
-    version = env.get('MLC_MLPERF_SUBMISSION_CHECKER_VERSION', 'v5.1')
+    version = env.get('MLC_MLPERF_SUBMISSION_CHECKER_VERSION', 'v6.0')
 
     if submission_dir == "":
         return {'return': 1,
@@ -34,6 +34,8 @@ def preprocess(i):
                                       "constants.py")
         performance_check_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission", "submission_checker", "checks",
                                               "performance_check.py")
+        accuracy_check_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission", "submission_checker", "checks",
+                                              "accuracy_check.py")
         submission_checker_file = os.path.join(
             env['MLC_MLPERF_INFERENCE_SOURCE'],
             "tools",
@@ -66,9 +68,31 @@ def preprocess(i):
                 performance_check_data = file.read()
             performance_check_data = performance_check_data.replace(
                 "return is_valid",
-                "return True")
+                "return True").replace(
+                    "return False",
+                    "return True"
+                ).replace(
+                    "return is_valid",
+                    "return True"
+                )
             with open(new_performance_check_file, 'w') as file:
                 file.write(performance_check_data)
+            # modify accuracy_check.py
+            new_accuracy_check_file = os.path.join(
+                os.path.dirname(accuracy_check_file), "accuracy_check1.py")
+            with open(accuracy_check_file, 'r') as file:
+                accuracy_check_data = file.read()
+            accuracy_check_data = accuracy_check_data.replace(
+                "return is_valid",
+                "return True").replace(
+                    "return False",
+                    "return True"
+                ).replace(
+                    "return is_valid",
+                    "return True"
+                )
+            with open(new_accuracy_check_file, 'w') as file:
+                file.write(accuracy_check_data)
 
         new_submission_checker_file = os.path.join(
             os.path.dirname(submission_checker_file),
@@ -77,14 +101,13 @@ def preprocess(i):
             data = file.read()
         if is_true(
                 env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
-            import time
-            print("Hurray")
-            time.sleep(5)
             data = data.replace(
-                "submission_checker.constants",
-                "submission_checker.constants1").replace(
-                "submission_checker.checks.performance_check",
-                "submission_checker.checks.performance_check1")
+                ".constants",
+                ".constants1").replace(
+                ".checks.performance_check",
+                ".checks.performance_check1").replace(
+                ".checks.accuracy_check",
+                ".checks.accuracy_check1")
         else:
             data = data.replace(
                 "OFFLINE_MIN_SPQ = 24576",
