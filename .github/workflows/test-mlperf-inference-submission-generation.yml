@@ -29,7 +29,7 @@ jobs:
         python-version: [ "3.12" ]
         division: ["closed", "open", "closed-open"]
         category: ["datacenter", "edge"]
-        round: ["5.1"]
+        round: ["6.0"]
         folder_name: ["closed", "open"]
         action: ["run", "docker"]
         exclude:
