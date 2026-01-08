@@ -8,6 +8,7 @@ import mlperf_utils
 from pathlib import Path
 from utils import is_true
 
+
 def preprocess(i):
     return {'return': 0}
 
