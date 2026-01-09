@@ -144,7 +144,6 @@ def preprocess(i):
             arg.strip() for arg in raw_extra_args.split(',') if arg.strip()
         )
 
-
     if (is_true(env.get('MLC_TAR_SUBMISSION_DIR')) or env.get('MLC_MLPERF_SUBMITTER_ID',
                                                               '') != '') and "skip-extra-files-in-root-check" not in extra_args:
         extra_args += " --skip-extra-files-in-root-check "
