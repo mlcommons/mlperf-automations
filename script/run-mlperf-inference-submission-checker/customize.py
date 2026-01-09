@@ -136,7 +136,14 @@ def preprocess(i):
     else:
         calibration_check = ""
 
-    extra_args = ' ' + env.get('MLC_MLPERF_SUBMISSION_CHECKER_EXTRA_ARGS', '')
+    raw_extra_args = env.get('MLC_MLPERF_SUBMISSION_CHECKER_EXTRA_ARGS', '')
+
+    extra_args = ''
+    if raw_extra_args:
+        extra_args = ' ' + ' '.join(
+            arg.strip() for arg in raw_extra_args.split(',') if arg.strip()
+        )
+
 
     if (is_true(env.get('MLC_TAR_SUBMISSION_DIR')) or env.get('MLC_MLPERF_SUBMITTER_ID',
                                                               '') != '') and "skip-extra-files-in-root-check" not in extra_args:
