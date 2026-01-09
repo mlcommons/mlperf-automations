@@ -8,6 +8,7 @@ from pathlib import PureWindowsPath, PurePosixPath
 import time
 import copy
 from datetime import datetime
+from script.script_utils import *
 
 
 def remote_run(self_module, i):
@@ -55,19 +56,24 @@ def remote_run(self_module, i):
         'alias', ''), meta.get(
         'uid', '')
 
-    # Update meta for selected variation and input
-    r = update_meta_for_selected_variations(self_module, script, i)
+    r = self_module.update_run_state_for_selected_script_and_variations(
+        script, i)
     if r['return'] > 0:
         return r
 
+    run_state = self_module.run_state
+    remote_run_settings = run_state.get('remote_run', {})
+    remote_run_settings_default_env = remote_run_settings.get(
+        'default_env', {})
+    for key in remote_run_settings_default_env:
+        env.setdefault(key, remote_run_settings_default_env[key])
+
     remote_env = {}
 
-    remote_run_settings = r['remote_run_settings']
-    env = r['env']
-    state = r['state']
-    meta = r['meta']
+    env = self_module.env
+    state = self_module.state
 
-    r = call_remote_run_prepare(self_module, meta, script, env, state, i)
+    r = call_remote_run_prepare(self_module, meta, script, i)
     if r['return'] > 0:
         return r
 
@@ -143,75 +149,7 @@ def remote_run(self_module, i):
     return {'return': 0}
 
 
-def update_meta_for_selected_variations(self_module, script, input_params):
-    metadata = script.meta
-    script_directory = script.path
-    script_tags = metadata.get("tags", [])
-    script_alias = metadata.get('alias', '')
-    script_uid = metadata.get('uid', '')
-    tag_values = input_params.get('tags', '').split(",")
-    variation_tags = [tag[1:] for tag in tag_values if tag.startswith("_")]
-
-    run_state = {
-        'deps': [],
-        'fake_deps': [],
-        'parent': None,
-        'script_id': f"{script_alias},{script_uid}",
-        'script_variation_tags': variation_tags
-    }
-    state_data = {}
-    env = input_params.get('env', {})
-    constant_vars = input_params.get('const', {})
-    constant_state = input_params.get('const_state', {})
-
-    remote_run_settings = metadata.get('remote_run', {})
-    remote_run_settings_default_env = remote_run_settings.get(
-        'default_env', {})
-    for key in remote_run_settings_default_env:
-        env.setdefault(key, remote_run_settings_default_env[key])
-
-    state_data['remote_run'] = remote_run_settings
-    add_deps_recursive = input_params.get('add_deps_recursive', {})
-
-    # Update state with metadata and variations
-    update_state_result = self_module.update_state_from_meta(
-        metadata, env, state_data, constant_vars, constant_state,
-        deps=[],
-        post_deps=[],
-        prehook_deps=[],
-        posthook_deps=[],
-        new_env_keys=[],
-        new_state_keys=[],
-        run_state=run_state,
-        i=input_params
-    )
-    if update_state_result['return'] > 0:
-        return update_state_result
-
-    update_variations_result = self_module._update_state_from_variations(
-        input_params, metadata, variation_tags, metadata.get(
-            'variations', {}),
-        env, state_data, constant_vars, constant_state,
-        deps=[],  # Add your dependencies if needed
-        post_deps=[],  # Add post dependencies if needed
-        prehook_deps=[],  # Add prehook dependencies if needed
-        posthook_deps=[],  # Add posthook dependencies if needed
-        new_env_keys_from_meta=[],  # Add keys from meta if needed
-        new_state_keys_from_meta=[],  # Add state keys from meta if needed
-        add_deps_recursive=add_deps_recursive,
-        run_state=run_state,
-        recursion_spaces=''
-    )
-    if update_variations_result['return'] > 0:
-        return update_variations_result
-
-    # Set Docker-specific configurations
-    remote_run_settings = state_data['remote_run']
-    return {'return': 0, 'remote_run_settings': remote_run_settings,
-            'env': env, 'state': state_data, 'meta': metadata}
-
-
-def call_remote_run_prepare(self_module, meta, script_item, env, state, i):
+def call_remote_run_prepare(self_module, meta, script_item, i):
 
     path_to_customize_py = os.path.join(script_item.path, 'customize.py')
     logger = self_module.logger
@@ -220,12 +158,8 @@ def call_remote_run_prepare(self_module, meta, script_item, env, state, i):
     # Check and run remote_run_prepare in customize.py
     if os.path.isfile(path_to_customize_py) and has_function_in_file(
             path_to_customize_py, "remote_run_prepare"):
-        r = utils.load_python_module(
-            {'path': script_item.path, 'name': 'customize'})
-        if r['return'] > 0:
-            return r
 
-        customize_code = r['code']
+        customize_code = load_customize_with_deps(path_to_customize_py)
 
         customize_common_input = {
             'input': i,
@@ -245,9 +179,9 @@ def call_remote_run_prepare(self_module, meta, script_item, env, state, i):
         }
 
         ii = copy.deepcopy(customize_common_input)
-        ii["env"] = env
-        ii["state"] = state
         ii["meta"] = meta
+        ii["env"] = self_module.env
+        ii["state"] = self_module.state
         ii["automation"] = self_module
         ii["run_script_input"] = run_script_input
 
