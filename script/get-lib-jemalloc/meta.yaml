@@ -22,6 +22,9 @@ deps:
       - jemalloc-repo
     extra_cache_tags: jemalloc,repo,jemalloc-repo
   - tags: get,generic-sys-util,_autoconf
+  - tags: get,generic-sys-util,_build-essential
+    env:
+      MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: on
 new_env_keys:
   - MLC_JEMALLOC_PATH
   - MLC_JEMALLOC_LIB_PATH

@@ -73,7 +73,7 @@ def preprocess(i):
 def detect_version(i):
     logger = i['automation'].logger
 
-    r = i['automation'].parse_version({'match_text': r'CLANG:\s(?:AOCC_)?([\d.]+(?:-[\w]+)?(?:-Build#\d+)?|Unknown-Revision)(?=[ )])',
+    r = i['automation'].parse_version({'match_text': r'CLANG:\s(?:AOCC_)?([\d.]+(?:pre)?(?:-[\w#]+)*(?:-Build#\d+)?|Unknown-Revision)(?=[ )])',
                                        'group_number': 1,
                                        'env_key': 'MLC_AOCC_VERSION',
                                        'which_env': i['env']})
@@ -140,5 +140,7 @@ def postprocess(i):
     env['MLC_LINKER_FLAGS_DEBUG'] = "-O0"
     env['MLC_COMPILER_FLAGS_DEFAULT'] = "-O2"
     env['MLC_LINKER_FLAGS_DEFAULT'] = "-O2"
+
+    env['+PATH'] = [found_path]
 
     return {'return': 0, 'version': version}

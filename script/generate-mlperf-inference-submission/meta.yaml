@@ -66,7 +66,7 @@ input_mapping:
   dashboard_wb_project: MLC_MLPERF_DASHBOARD_WANDB_PROJECT
   device: MLC_MLPERF_DEVICE
   division: MLC_MLPERF_SUBMISSION_DIVISION
-  extra_checker_args: MLC_MLPERF_SUBMISSION_CHECKER_EXTRA_ARG 
+  extra_checker_args: MLC_MLPERF_SUBMISSION_CHECKER_EXTRA_ARGS
   hw_name: MLC_HW_NAME
   hw_notes_extra: MLC_MLPERF_SUT_HW_NOTES_EXTRA
   noinfer_scenario_results: MLC_MLPERF_NOINFER_SCENARIO_RESULTS

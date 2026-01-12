@@ -22,16 +22,7 @@ def dockerfile(self_module, input_params):
     is_quiet_mode = input_params.get('quiet', False)
     is_console_output = input_params.get('out') == 'con'
 
-    # Step 2: Search for scripts
-    search_result = self_module.search(input_params.copy())
-    if search_result['return'] > 0:
-        return search_result
-
-    scripts_list = search_result['list']
-    if not scripts_list:
-        return {'return': 1, 'error': 'No scripts were found'}
-
-    # Step 3: Process Dockerfile-related configurations
+    # Step 2: Process Dockerfile-related configurations
     env = input_params.get('env', {})
     state_data = input_params.get('state', {})
     constant_vars = input_params.get('const', {})
@@ -39,190 +30,165 @@ def dockerfile(self_module, input_params):
     tag_values = input_params.get('tags', '').split(",")
     variation_tags = [tag[1:] for tag in tag_values if tag.startswith("_")]
 
-    # Step 4: Iterate over scripts and generate Dockerfile
-    for script in sorted(scripts_list, key=lambda x: x.meta.get('alias', '')):
-        metadata = script.meta
-        script_directory = script.path
-        script_tags = metadata.get("tags", [])
-        script_alias = metadata.get('alias', '')
-        script_uid = metadata.get('uid', '')
+    if is_quiet_mode:
+        env['MLC_QUIET'] = 'yes'
 
-        run_state = {
-            'deps': [],
-            'fake_deps': [],
-            'parent': None,
-            'script_id': f"{script_alias},{script_uid}",
-            'script_variation_tags': variation_tags
-        }
-        docker_settings = metadata.get('docker', {})
-        docker_settings_default_env = docker_settings.get('default_env', {})
-        for key in docker_settings_default_env:
-            env.setdefault(key, docker_settings_default_env[key])
+    r = self_module._select_script(input_params)
+    if r['return'] > 0:
+        return r
 
-        state_data['docker'] = docker_settings
-        add_deps_recursive = input_params.get('add_deps_recursive', {})
+    script = r['script']
 
-        # Update state with metadata and variations
-        update_state_result = self_module.update_state_from_meta(
-            metadata, env, state_data, constant_vars, constant_state,
-            deps=[],
-            post_deps=[],
-            prehook_deps=[],
-            posthook_deps=[],
-            new_env_keys=[],
-            new_state_keys=[],
-            run_state=run_state,
-            i=input_params
-        )
-        if update_state_result['return'] > 0:
-            return update_state_result
+    if not script:
+        return {'return': 1,
+                'error': 'No scripts were found for generating dockerfile'}
 
-        update_variations_result = self_module._update_state_from_variations(
-            input_params, metadata, variation_tags, metadata.get(
-                'variations', {}),
-            env, state_data, constant_vars, constant_state,
-            deps=[],  # Add your dependencies if needed
-            post_deps=[],  # Add post dependencies if needed
-            prehook_deps=[],  # Add prehook dependencies if needed
-            posthook_deps=[],  # Add posthook dependencies if needed
-            new_env_keys_from_meta=[],  # Add keys from meta if needed
-            new_state_keys_from_meta=[],  # Add state keys from meta if needed
-            add_deps_recursive=add_deps_recursive,
-            run_state=run_state,
-            recursion_spaces=''
-        )
-        if update_variations_result['return'] > 0:
-            return update_variations_result
+    metadata = script.meta
+    script_directory = script.path
+    script_tags = metadata.get("tags", [])
+    script_alias = metadata.get('alias', '')
+    script_uid = metadata.get('uid', '')
 
-        # Set Docker-specific configurations
-        docker_settings = state_data['docker']
+    if not hasattr(self_module, 'run_state'):
+        self_module.run_state = self_module.init_run_state(
+            input_params.get('run_state'))
 
-        if is_true(docker_settings.get('pass_docker_to_script', False)):
-            input_params['docker'] = True
-            r = self_module.run(input_params)
+    r = self_module.update_run_state_for_selected_script_and_variations(
+        script, input_params)
+
+    run_state = self_module.run_state
+
+    docker_settings = run_state.get('docker', {})
+    docker_settings_default_env = docker_settings.get('default_env', {})
+    for key in docker_settings_default_env:
+        env.setdefault(key, docker_settings_default_env[key])
+
+    if is_true(docker_settings.get('pass_docker_to_script', False)):
+        input_params['docker'] = True
+        r = self_module.run(input_params)
+        return r
+
+    if not docker_settings.get('run', True) and not input_params.get(
+            'docker_run_override', False):
+        logger.info("Docker 'run' is set to False in meta.json")
+        return {'return': 0, 'warning': 'Docker run is set to false in script meta'}
+
+    # Handle build dependencies
+    show_time = input_params.get('show_time', False)
+    deps = docker_settings.get('build_deps', [])
+    if deps:
+        r = self_module._run_deps(
+            deps, [], '', '', False, '',
+            show_time, ' ', run_state)
+        if r['return'] > 0:
             return r
 
-        if not docker_settings.get('run', True) and not input_params.get(
-                'docker_run_override', False):
-            logger.info("Docker 'run' is set to False in meta.json")
-            continue
+    # For update_meta_if_env to work
+    update_state_result = self_module.update_state_from_meta(
+        metadata,
+        run_state=run_state,
+        i=input_params
+    )
+    if update_state_result['return'] > 0:
+        return update_state_result
 
-        # Handle build dependencies
-        show_time = input_params.get('show_time', False)
-        deps = docker_settings.get('build_deps', [])
-        if deps:
-            r = self_module._run_deps(
-                deps, [], env, {}, {}, {}, add_deps_recursive, '', [], '', False, '',
-                show_time, ' ', run_state)
-            if r['return'] > 0:
-                return r
+    docker_settings = run_state.get('docker', {})
 
-        update_state_result = self_module.update_state_from_meta(
-            metadata, env, state_data, constant_vars, constant_state,
-            deps=[],
-            post_deps=[],
-            prehook_deps=[],
-            posthook_deps=[],
-            new_env_keys=[],
-            new_state_keys=[],
-            run_state=run_state,
-            i=input_params
-        )
-        if update_state_result['return'] > 0:
-            return update_state_result
-        docker_settings = state_data['docker']
+    # Prune temporary environment variables
+    run_command = copy.deepcopy(run_command_arc)
+    for key in list(run_command.get('env', {}).keys()):
+        if key.startswith("MLC_TMP_"):
+            del run_command['env'][key]
 
-        # Prune temporary environment variables
-        run_command = copy.deepcopy(run_command_arc)
-        for key in list(run_command.get('env', {}).keys()):
-            if key.startswith("MLC_TMP_"):
-                del run_command['env'][key]
+    # Regenerate script command
+    regenerate_result = regenerate_script_cmd({
+        'script_uid': script_uid,
+        'script_alias': script_alias,
+        'run_cmd': run_command,
+        'tags': script_tags,
+        'fake_run': True,
+        'docker_settings': docker_settings,
+        'docker_run_cmd_prefix': input_params.get('docker_run_cmd_prefix', docker_settings.get('run_cmd_prefix', ''))
+    })
+    if regenerate_result['return'] > 0:
+        return regenerate_result
 
-        # Regenerate script command
-        regenerate_result = regenerate_script_cmd({
-            'script_uid': script_uid,
-            'script_alias': script_alias,
-            'run_cmd': run_command,
-            'tags': script_tags,
-            'fake_run': True,
-            'docker_settings': docker_settings,
-            'docker_run_cmd_prefix': input_params.get('docker_run_cmd_prefix', docker_settings.get('run_cmd_prefix', ''))
-        })
-        if regenerate_result['return'] > 0:
-            return regenerate_result
+    run_command_string = regenerate_result['run_cmd_string']
 
-        run_command_string = regenerate_result['run_cmd_string']
+    # Prepare Docker-specific inputs
+    docker_inputs, dockerfile_path = prepare_docker_inputs(
+        input_params, docker_settings, script, False, self_module.action_object)
 
-        # Prepare Docker-specific inputs
-        docker_inputs, dockerfile_path = prepare_docker_inputs(
-            input_params, docker_settings, script_directory)
-
-        # Handle optional dependencies and comments
-        if input_params.get('print_deps'):
-            mlc_input = {
-                'action': 'run', 'automation': 'script', 'tags': input_params.get('tags'),
-                'print_deps': True, 'quiet': True, 'silent': True,
-                'fake_run': True, 'fake_deps': True
-            }
-            deps_result = self_module.action_object.access(mlc_input)
-            if deps_result['return'] > 0:
-                return deps_result
-            comments = [
-                f"#RUN {dep}" for dep in deps_result['new_state']['print_deps']]
-        else:
-            comments = []
-
-        # Push Docker image if specified
-        if input_params.get('docker_push_image') in [True, 'True', 'yes']:
-            env['MLC_DOCKER_PUSH_IMAGE'] = 'yes'
-
-        dockerfile_env = docker_inputs.get('env', {})
-        dockerfile_build_env = docker_inputs.get('build_env', {})
-
-        dockerfile_env['MLC_RUN_STATE_DOCKER'] = True
-        # Generate Dockerfile
-        mlc_docker_input = {
-            'action': 'run', 'automation': 'script', 'tags': 'build,dockerfile',
-            'fake_run_option': " " if docker_inputs.get('real_run') else " --fake_run",
-            'comments': comments, 'run_cmd': f"{run_command_string} --quiet",
-            'script_tags': input_params.get('tags'), 'env': env,
-            'dockerfile_env': dockerfile_env,
-            'dockerfile_build_env': dockerfile_build_env,
-            'quiet': True, 'real_run': True
+    # Handle optional dependencies and comments
+    if input_params.get('print_deps'):
+        mlc_input = {
+            'action': 'run', 'automation': 'script', 'tags': input_params.get('tags'),
+            'print_deps': True, 'quiet': True, 'silent': True,
+            'fake_run': True, 'fake_deps': True
         }
+        deps_result = self_module.action_object.access(mlc_input)
+        if deps_result['return'] > 0:
+            return deps_result
+        comments = [
+            f"#RUN {dep}" for dep in deps_result['new_state']['print_deps']]
+    else:
+        comments = []
 
-        docker_v = False
+    # Push Docker image if specified
+    if str(input_params.get('docker_push_image')
+           ).lower() in ['true', 'yes', '1']:
+        env['MLC_DOCKER_PUSH_IMAGE'] = 'yes'
+
+    dockerfile_env = docker_inputs.get('env', {})
+    dockerfile_build_env = docker_inputs.get('build_env', {})
+
+    dockerfile_env['MLC_RUN_STATE_DOCKER'] = True
+    # Generate Dockerfile
+    mlc_docker_input = {
+        'action': 'run', 'automation': 'script', 'tags': 'build,dockerfile',
+        'fake_run_option': " " if docker_inputs.get('real_run') else " --fake_run",
+        'comments': comments, 'run_cmd': f"{run_command_string} --quiet",
+        'script_tags': input_params.get('tags'), 'env': env,
+        'dockerfile_env': dockerfile_env,
+        'dockerfile_build_env': dockerfile_build_env,
+        'quiet': True, 'real_run': True
+    }
+
+    if docker_inputs.get('mlc_repo_path', '') != '':
+        mlc_docker_input['mlc_repo_path'] = docker_inputs['mlc_repo_path']
+
+    docker_v = False
+    docker_s = False
+    if is_true(input_params.get(
+            'docker_v', input_params.get('docker_verbose', False))):
+        docker_v = True
+    if is_true(input_params.get(
+            'docker_s', input_params.get('docker_silent', False))):
+        docker_s = True
+
+    if docker_s and docker_v:
+        logger.warning(
+            "Both verbose and silent is set to True. Verbose will take precedence.")
         docker_s = False
-        if is_true(input_params.get(
-                'docker_v', input_params.get('docker_verbose', False))):
+
+    if not docker_s and not docker_v:
+        if logger.level == logging.DEBUG:
             docker_v = True
-        if is_true(input_params.get(
-                'docker_s', input_params.get('docker_silent', False))):
+        elif logger.level == logging.WARNING:
             docker_s = True
 
-        if docker_s and docker_v:
-            logger.warning(
-                "Both verbose and silent is set to True. Verbose will take precedence.")
-            docker_s = False
+    if docker_s:
+        mlc_docker_input['run_cmd'] += ' -s'
+    elif docker_v:
+        mlc_docker_input['run_cmd'] += ' -v'
 
-        if not docker_s and not docker_v:
-            if logger.level == logging.DEBUG:
-                docker_v = True
-            elif logger.level == logging.WARNING:
-                docker_s = True
+    mlc_docker_input.update(docker_inputs)
 
-        if docker_s:
-            mlc_docker_input['run_cmd'] += ' -s'
-        elif docker_v:
-            mlc_docker_input['run_cmd'] += ' -v'
+    dockerfile_result = self_module.action_object.access(mlc_docker_input)
+    if dockerfile_result['return'] > 0:
+        return dockerfile_result
 
-        mlc_docker_input.update(docker_inputs)
-
-        dockerfile_result = self_module.action_object.access(mlc_docker_input)
-        if dockerfile_result['return'] > 0:
-            return dockerfile_result
-
-        logger.info(f"Dockerfile generated at {dockerfile_path}")
+    logger.info(f"Dockerfile generated at {dockerfile_path}")
 
     return {'return': 0}
 
@@ -247,6 +213,11 @@ def docker_run(self_module, i):
     logger = self_module.logger
     env = i.get('env', {})
 
+    self_module.env = env
+
+    if quiet:
+        env['MLC_QUIET'] = 'yes'
+
     regenerate_docker_file = not i.get('docker_noregenerate', False)
     rebuild_docker_image = i.get('docker_rebuild', False)
 
@@ -256,19 +227,17 @@ def docker_run(self_module, i):
 
     # Save current directory and prepare to search for scripts
     cur_dir = os.getcwd()
-    r = self_module.search(i.copy())
-    if r['return'] > 0:
-        return r
-
-    lst = r['list']
-    if not lst:
-        return {'return': 1, 'error': 'No scripts were found'}
 
     env['MLC_RUN_STATE_DOCKER'] = False
-    state, const, const_state = i.get(
+    self_module.state, self_module.const, self_module.const_state = i.get(
         'state', {}), i.get(
         'const', {}), i.get(
         'const_state', {})
+
+    state = self_module.state
+    const = self_module.const
+    const_state = self_module.const_state
+
     variation_tags = [t[1:]
                       for t in i.get('tags', '').split(",") if t.startswith("_")]
 
@@ -281,165 +250,151 @@ def docker_run(self_module, i):
 
     input_i = copy.deepcopy(i)
 
-    # Process each artifact
-    for artifact in sorted(lst, key=lambda x: x.meta.get('alias', '')):
-        meta, script_path = artifact.meta, artifact.path
-        tags, script_alias, script_uid = meta.get(
-            "tags", []), meta.get(
-            'alias', ''), meta.get(
-            'uid', '')
+    r = self_module._select_script(i)
+    if r['return'] > 0:
+        return r
 
-        mounts = copy.deepcopy(
-            i.get(
-                'docker_mounts',
-                []))  # do we need a copy here?
-        variations = meta.get('variations', {})
+    script = r['script']
 
-        # take the folder path as well as file path env variables from meta
-        file_path_env_keys = meta.get('file_path_env_keys', [])
-        folder_path_env_keys = meta.get('folder_path_env_keys', [])
+    if not script:
+        return {'return': 1,
+                'error': 'No scripts were found for generating dockerfile'}
 
-        docker_settings = meta.get('docker', {})
-        docker_settings_default_env = docker_settings.get('default_env', {})
-        for key in docker_settings_default_env:
-            env.setdefault(key, docker_settings_default_env[key])
+    meta, script_path = script.meta, script.path
+    tags, script_alias, script_uid = meta.get(
+        "tags", []), meta.get(
+        'alias', ''), meta.get(
+        'uid', '')
 
-        state['docker'] = docker_settings
-        run_state = {
-            'deps': [], 'fake_deps': [], 'parent': None,
-            'script_id': f"{script_alias},{script_uid}",
-            'script_variation_tags': variation_tags,
-            'file_path_env_keys': file_path_env_keys,
-            'folder_path_env_keys': folder_path_env_keys
-        }
+    mounts = copy.deepcopy(
+        i.get(
+            'docker_mounts',
+            []))  # do we need a copy here?
+    variations = meta.get('variations', {})
 
-        # Update state and handle variations
-        r = self_module.update_state_from_meta(meta, env, state, const, const_state, deps=[],
-                                               post_deps=[],
-                                               prehook_deps=[],
-                                               posthook_deps=[],
-                                               new_env_keys=[],
-                                               new_state_keys=[], run_state=run_state, i=i)
+    if not hasattr(self_module, 'run_state'):
+        self_module.run_state = self_module.init_run_state(
+            input_params.get('run_state'))
+
+    r = self_module.update_run_state_for_selected_script_and_variations(
+        script, i)
+    if r['return'] > 0:
+        return r
+
+    run_state = self_module.run_state
+
+    # take the folder path as well as file path env variables from meta
+    file_path_env_keys = run_state.get('file_path_env_keys', [])
+    folder_path_env_keys = run_state.get('folder_path_env_keys', [])
+
+    docker_settings = run_state.get('docker', {})
+
+    docker_settings_default_env = docker_settings.get('default_env', {})
+    for key in docker_settings_default_env:
+        env.setdefault(key, docker_settings_default_env[key])
+
+    deps = docker_settings.get('deps', [])
+    if deps:
+        r = self_module._run_deps(
+            deps, [], '', '', False, '',
+            show_time, ' ', run_state)
         if r['return'] > 0:
             return r
 
-        r = self_module._update_state_from_variations(
-            i, meta, variation_tags, variations, env, state, const, const_state, deps=[],
-            post_deps=[],
-            prehook_deps=[],
-            posthook_deps=[],
-            new_env_keys_from_meta=[],
-            new_state_keys_from_meta=[],
-            add_deps_recursive=add_deps_recursive, run_state=run_state, recursion_spaces='')
+    # For updating meta from update_meta_if_env
+    r = self_module.update_state_from_meta(
+        meta,
+        run_state=run_state,
+        i=i)
+    if r['return'] > 0:
+        return r
+
+    # Skip scripts marked as non-runnable
+    if not docker_settings.get('run', True) and not i.get(
+            'docker_run_override', False):
+        logger.info("docker.run set to False in meta.yaml")
+        return {'return': 0, 'warning': 'Docker run is set to false in script meta'}
+
+    if is_true(docker_settings.get('pass_docker_to_script', False)):
+        logger.info("Docker 'run' is passed to the run script")
+        i['docker'] = True
+        r = self_module.run(i)
+        return r
+
+    # Regenerate Dockerfile if required
+    if regenerate_docker_file:
+        r = dockerfile(self_module, input_i)
         if r['return'] > 0:
             return r
 
-        docker_settings = state['docker']
+    # Ensure Docker is available
+    r = self_module.action_object.access(
+        {'action': 'run', 'automation': 'script', 'tags': "get,docker", 'quiet': True})
+    if r['return'] > 0:
+        return r
 
-        deps = docker_settings.get('deps', [])
-        if deps:
-            r = self_module._run_deps(
-                deps, [], env, {}, {}, {}, add_deps_recursive, '', [], '', False, '',
-                show_time, ' ', run_state)
-            if r['return'] > 0:
-                return r
+    r = self_module._update_env_from_input(env, i)
+    if r['return'] > 0:
+        return r
 
-        # For updating meta from update_meta_if_env
-        r = self_module.update_state_from_meta(
-            meta, env, state, const, const_state, deps=[],
-            post_deps=[],
-            prehook_deps=[],
-            posthook_deps=[],
-            new_env_keys=[],
-            new_state_keys=[],
-            run_state=run_state,
-            i=i)
-        if r['return'] > 0:
-            return r
+    # Prepare Docker-specific inputs
+    docker_inputs, dockerfile_path = prepare_docker_inputs(
+        i, docker_settings, script, True, self_module.action_object)
 
-        # Skip scripts marked as non-runnable
-        if not docker_settings.get('run', True) and not i.get(
-                'docker_run_override', False):
-            logger.info("docker.run set to False in meta.yaml")
-            continue
+    if docker_inputs is None:
+        return {'return': 1, 'error': 'Error preparing Docker inputs'}
 
-        if is_true(docker_settings.get('pass_docker_to_script', False)):
-            logger.info("Docker 'run' is passed to the run script")
-            i['docker'] = True
-            r = self_module.run(i)
-            return r
+    docker_input_mapping = docker_settings.get('input_mapping')
 
-        # Regenerate Dockerfile if required
-        if regenerate_docker_file:
-            r = dockerfile(self_module, input_i)
-            if r['return'] > 0:
-                return r
+    # Update env based on docker_input_mapping if they are in input
+    if docker_input_mapping and i:
+        env.update({docker_input_mapping[key]: i[key]
+                    for key in docker_input_mapping if key in i})
 
-        # Ensure Docker is available
-        r = self_module.action_object.access(
-            {'action': 'run', 'automation': 'script', 'tags': "get,docker"})
-        if r['return'] > 0:
-            return r
+    if docker_inputs.get('user'):
+        docker_settings['user'] = docker_inputs['user']
 
-        r = self_module._update_env_from_input(env, i)
-        if r['return'] > 0:
-            return r
+    # Handle environment variable-based mounts
+    res = process_mounts(
+        mounts,
+        env,
+        docker_settings,
+        f_run_cmd,
+        run_state)
+    if res['return'] > 0:
+        return res
+    docker_inputs['mounts'] = res['mounts']
+    container_env_string = res['container_env_string']
 
-        # Prepare Docker-specific inputs
-        docker_inputs, dockerfile_path = prepare_docker_inputs(
-            i, docker_settings, script_path, True)
+    res = update_docker_environment(
+        docker_settings, env, self_module.host_env_keys, container_env_string)
+    if res['return'] > 0:
+        return res
 
-        if docker_inputs is None:
-            return {'return': 1, 'error': 'Error preparing Docker inputs'}
+    # Generate the run command
+    r = regenerate_script_cmd({'script_uid': script_uid,
+                               'script_alias': script_alias,
+                               'tags': tags,
+                               'run_cmd': f_run_cmd})
+    if r['return'] > 0:
+        return r
+    final_run_cmd = f"""{r['run_cmd_string']} {container_env_string} --docker_run_deps """
 
-        docker_input_mapping = docker_settings.get('input_mapping')
+    # Execute the Docker container
+    mlc_docker_input = {
+        'action': 'run', 'target': 'script', 'tags': 'run,docker,container',
+        'rebuild': rebuild_docker_image,
+        'env': env,
+        'script_tags': i.get('tags'), 'run_cmd': final_run_cmd,
+        'quiet': True, 'real_run': True, 'add_deps_recursive': {'build-docker-image': {'dockerfile': dockerfile_path}}
+    }
+    utils.merge_dicts({'dict1': mlc_docker_input,
+                       'dict2': docker_inputs,
+                       'append_lists': True,
+                       'append_unique': True})
 
-        # Update env based on docker_input_mapping if they are in input
-        if docker_input_mapping and i:
-            env.update({docker_input_mapping[key]: i[key]
-                       for key in docker_input_mapping if key in i})
-
-        if docker_inputs.get('user'):
-            docker_settings['user'] = docker_inputs['user']
-
-        # Handle environment variable-based mounts
-        res = process_mounts(
-            mounts,
-            env,
-            docker_settings,
-            f_run_cmd,
-            run_state)
-        if res['return'] > 0:
-            return res
-        docker_inputs['mounts'] = res['mounts']
-        container_env_string = res['container_env_string']
-
-        res = update_docker_environment(
-            docker_settings, env, self_module.host_env_keys, container_env_string)
-        if res['return'] > 0:
-            return res
-
-        # Generate the run command
-        r = regenerate_script_cmd({'script_uid': script_uid,
-                                   'script_alias': script_alias,
-                                   'tags': tags,
-                                   'run_cmd': f_run_cmd})
-        if r['return'] > 0:
-            return r
-        final_run_cmd = f"""{r['run_cmd_string']} {container_env_string} --docker_run_deps """
-
-        # Execute the Docker container
-        mlc_docker_input = {
-            'action': 'run', 'target': 'script', 'tags': 'run,docker,container',
-            'rebuild': rebuild_docker_image,
-            'env': env, 'mounts': mounts,
-            'script_tags': i.get('tags'), 'run_cmd': final_run_cmd,
-            'quiet': True, 'real_run': True, 'add_deps_recursive': {'build-docker-image': {'dockerfile': dockerfile_path}},
-            **docker_inputs
-        }
-
-        r = self_module.action_object.access(mlc_docker_input)
-        if r['return'] > 0:
-            return r
+    r = self_module.action_object.access(mlc_docker_input)
+    if r['return'] > 0:
+        return r
 
     return {'return': 0}

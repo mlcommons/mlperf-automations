@@ -2,13 +2,14 @@ alias: get-git-repo
 automation_alias: script
 automation_uid: 5b4e0237da074764
 cache: true
+cache_expiration: 5d
 category: DevOps automation
 default_env:
   MLC_GIT_CHECKOUT_FOLDER: repo
   MLC_GIT_DEPTH: --depth 4
   MLC_GIT_PATCH: 'no'
   MLC_GIT_RECURSE_SUBMODULES: ' --recurse-submodules'
-  MLC_GIT_URL: https://github.com/mlcommons/ck.git
+  MLC_GIT_URL: https://github.com/mlcommons/mlperf-automations
 deps:
 - tags: detect,os
 input_mapping:
@@ -80,6 +81,7 @@ variations:
       MLC_GIT_URL: '#'
     group: repo
   sha.#:
+    cache_expiration: 500d
     default_variations:
       git-history: full-history
     env:
@@ -94,6 +96,7 @@ variations:
     env:
       MLC_GIT_SUBMODULES: '#'
   tag.#:
+    cache_expiration: 500d
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
     group: checkout

@@ -63,6 +63,7 @@ No script specific inputs
 
 ### Download-tool
 
+- `r2-downloader`
 - `rclone` (default)
 
 ### Model-format

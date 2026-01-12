@@ -288,7 +288,7 @@ def postprocess(i):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True)
-            logger.info("Command Output:", result.stdout)
+            logger.info(f"Command Output: {result.stdout}")
         except subprocess.CalledProcessError as e:
             logger.error("Error Occurred!")
             logger.info(f"Command: {e.cmd}")

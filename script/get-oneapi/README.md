@@ -41,6 +41,7 @@ mlcr get,oneapi,compiler,get-oneapi
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
 | `--oneapi_dir` |  |  | `` |
+| `--clean` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |

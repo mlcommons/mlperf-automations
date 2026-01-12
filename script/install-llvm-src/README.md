@@ -43,6 +43,8 @@ mlcr install,src,llvm,from.src,src-llvm
 | `--targets` |  |  | `` |
 | `--target_triple` |  |  | `` |
 | `--extra_options` |  |  | `` |
+| `--per_target_runtime_dir` |  |  | `` |
+| `--clean` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -92,9 +94,24 @@ mlcr install,src,llvm,from.src,src-llvm
 - `lld` (default)
 - `no-lld`
 
+### Openmp
+
+- `no-openmp`
+- `openmp` (default)
+
+### Openmp-rt
+
+- `no-openmp-rt`
+- `openmp-rt`
+
 ### Repo
 
 - `repo.#` _(# can be substituted dynamically)_
+
+### Tests
+
+- `no-tests` (default)
+- `tests`
 
 ### Ungrouped
 

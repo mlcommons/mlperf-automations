@@ -22,7 +22,7 @@ deps:
 env:
   MLC_CLEAN_DIRS: bin
   MLC_WINDOWS_SYS_UTILS_MIN_INSTALL: yes
-  MLC_PACKAGE_WIN_URL: https://zenodo.org/records/13868077/files/cm-artifact-os-windows-32.zip?download=1
+  MLC_PACKAGE_WIN_URL: https://github.com/mlcommons/mlperf-automations/releases/download/mlperf-automations-v1.0.0/cm-artifact-os-windows-32.zip
   MLC_SUDO: sudo
 
 new_env_keys:

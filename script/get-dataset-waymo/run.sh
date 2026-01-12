@@ -9,6 +9,6 @@
 
 if [[ "$MLC_DOWNLOAD_MODE" != "dry" && "$MLC_TMP_REQUIRE_DOWNLOAD" = "yes" ]]; then
   cd "${MLC_DATASET_WAYMO_PATH}/training" || exit
-  for f in *.tar.gz; do tar -xzvf "$f"; done
+  for f in *.tar.gz; do tar --no-same-owner -xzvf "$f"; done
   cd - || exit
 fi

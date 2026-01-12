@@ -1,5 +1,6 @@
 name: Build wheel and release into PYPI (off now)
 
+
 on: 
   push:
     branches:
@@ -7,14 +8,12 @@ on:
     paths:
       - VERSION
 
-
 jobs:
   build_wheels:
     if: github.repository_owner == 'mlcommons'
     name: Build wheel
     runs-on: ubuntu-latest
     environment: release
-
     permissions:
       id-token: write
       contents: write

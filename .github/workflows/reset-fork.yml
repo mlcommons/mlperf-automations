@@ -10,7 +10,9 @@ on:
 
 jobs:
   reset-branch:
-    permissions: write-all
+    permissions: 
+      contents: write
+      actions: write
     runs-on: ubuntu-latest
 
     steps:

@@ -12,6 +12,9 @@ def preprocess(i):
     recursion_spaces = i['recursion_spaces']
     file_name_c = 'icx.exe' if os_info['platform'] == 'windows' else 'icx'
 
+    if is_true(env.get('MLC_ONEAPI_CLEAN_INSTALL')):
+        env['MLC_CLEAN_INSTALL'] = 'yes'
+
     if 'MLC_ICX_BIN_WITH_PATH' not in env:
         if env.get('MLC_ONEAPI_DIR_PATH', '') != '':
             oneapi_path = env['MLC_ONEAPI_DIR_PATH']
@@ -94,7 +97,7 @@ def postprocess(i):
     env['MLC_ONEAPI_COMPILER_WITH_PATH'] = found_file_path
     env['MLC_ONEAPI_COMPILER_FLAG_VERSION'] = 'version'
 
-    env['MLC_DEPENDENT_CACHED_PATH'] = found_file_path
+    env['MLC_GET_DEPENDENT_CACHED_PATH'] = found_file_path
 
     list_keys = ['+LD_LIBRARY_PATH']
     for key in list_keys:

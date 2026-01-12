@@ -160,6 +160,20 @@ variations:
 
   rclone:
     group: download-tool
+    prehook_deps:
+      - tags: get,rclone
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+      - tags: get,rclone-config
+        force_cache: true
+        names:
+          - rclone-config
+        enable_if_env:
+          MLC_TMP_REQUIRE_DOWNLOAD:
+          - yes
+          MLC_DOWNLOAD_SRC:
+          - mlcommons
     env:
       MLC_RCLONE_COPY_USING: copyurl
     adr:
@@ -186,28 +200,54 @@ variations:
     env:
       MLC_MODEL_FORMAT: onnx
   
-  onnx,mlc:
+  onnx,mlc,rclone:
     env:
       MLC_MODEL_RCLONE_FILEPATH: model_checkpoint_ssd/ssd_resnet50.onnx
       MLC_ML_MODEL_FILENAME: ssd_resnet50.onnx
+      MLC_DOWNLOAD_URL: 'mlc-cognata:mlc_cognata_dataset/<<<MLC_MODEL_RCLONE_FILEPATH>>>'
+      MLC_DOWNLOAD_EXTRA_OPTIONS: ' --include '
+
+  onnx,mlc,r2-downloader:
+    env:
+      MLC_ML_MODEL_FILENAME: ssd_resnet50.onnx
+      MLC_DOWNLOAD_URL: https://cognata.mlcommons-storage.org/metadata/ssd_checkpoint_onnx.uri
   
   pytorch:
     group: model-format
     env:
       MLC_MODEL_FORMAT: pth
   
-  pytorch,mlc:
+  pytorch,mlc,rclone:
     env:
       MLC_MODEL_RCLONE_FILEPATH: model_checkpoint_ssd/baseline_8MP_ss_scales_fm1_5x5_all_ep60.pth
       MLC_ML_MODEL_FILENAME: baseline_8MP_ss_scales_fm1_5x5_all_ep60.pth
+      MLC_DOWNLOAD_URL: 'mlc-cognata:mlc_cognata_dataset/<<<MLC_MODEL_RCLONE_FILEPATH>>>'
+      MLC_DOWNLOAD_EXTRA_OPTIONS: ' --include '
+  
+  pytorch,mlc,r2-downloader:
+    env:
+      MLC_ML_MODEL_FILENAME: baseline_8MP_ss_scales_fm1_5x5_all_ep60.pth
+      MLC_DOWNLOAD_URL: 'https://cognata.mlcommons-storage.org/metadata/ssd_checkpoint_pth.uri'
   
   rclone,mlc:
     group: download-tool
     add_deps_recursive:
-      dae:
+      dae-ssd:
         tags: _rclone
+      rclone-config:
+        tags: _config-name.mlc-cognata
+        env:
+          MLC_RCLONE_DRIVE_FOLDER_ID: 1u5FDoeXHVtDrd4zClE47Gmyr7iLFidz1
     env:
       MLC_RCLONE_COPY_USING: sync
+  
+  r2-downloader:
+    group: download-tool
+
+  r2-downloader,mlc:
+    adr:
+      dae-ssd:
+        tags: _r2-downloader
   
   dry-run:
     group: run-mode
@@ -218,32 +258,23 @@ variations:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
   
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  
   mlc:
     group: download-src
     prehook_deps:
-      - tags: get,rclone
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-      - tags: get,rclone-config,_config-name.mlc-cognata
-        force_cache: true
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-        env:
-          MLC_RCLONE_DRIVE_FOLDER_ID: 1u5FDoeXHVtDrd4zClE47Gmyr7iLFidz1
       - enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - 'yes'
         env:
           MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_SSD_PATH
           MLC_EXTRACT_FINAL_ENV_NAME: MLC_MLC_MODEL_SSD_PATH
-          MLC_DOWNLOAD_URL: 'mlc-cognata:mlc_cognata_dataset/<<<MLC_MODEL_RCLONE_FILEPATH>>>'
-          MLC_DOWNLOAD_EXTRA_OPTIONS: ' --include '
         extra_cache_tags: ml,model,ssd,resnet50
         force_cache: true
         names:
-          - dae
+          - dae-ssd
         tags: download-and-extract
         force_env_keys:
           - MLC_OUTDIRNAME  
@@ -258,3 +289,5 @@ tests:
   - variations_list:
       - onnx,rclone,mlc,dry-run
       - pytorch,rclone,mlc,dry-run
+      - onnx,r2-downloader,mlc,dry-run
+      - pytorch,r2-downloader,mlc,dry-run

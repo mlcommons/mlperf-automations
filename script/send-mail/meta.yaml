@@ -23,6 +23,7 @@ input_mapping:
   to_address: MLC_EMAIL_TO_ADDRESSES
   attachments: MLC_EMAIL_ATTACHMENTS
   attachment: MLC_EMAIL_ATTACHMENTS
+  use_attachment_basenames: MLC_EMAIL_USE_ATTACHMENT_BASENAMES
 tags:
 - send
 - mail

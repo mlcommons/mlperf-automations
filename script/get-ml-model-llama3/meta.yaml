@@ -74,8 +74,8 @@ variations:
         enable_if_env:
           MLC_TMP_REQUIRE_DOWNLOAD:
           - yes
-    default: true
   r2-downloader:
+    default: true
     group: download-tool
     add_deps_recursive:
       dae:

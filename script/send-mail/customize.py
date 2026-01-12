@@ -1,6 +1,7 @@
 from mlc import utils
 import os
 import subprocess
+from utils import *
 
 
 def preprocess(i):
@@ -28,6 +29,9 @@ def preprocess(i):
         args += f"--email '{env.get('MLC_EMAIL_SMPT_EMAIL', '')}' "
         args += f"--password '{env.get('MLC_EMAIL_SMTP_PASSWORD', '')}' "
         args += f"--smtp_server '{env.get('MLC_EMAIL_SMTP_SERVER', '')}' "
+
+    if is_true(env.get('MLC_EMAIL_USE_ATTACHMENT_BASENAMES')):
+        args += " --use_attachment_basenames "
 
     subject = env.get('MLC_EMAIL_SUBJECT', '')
     to_address = ",".join(env.get('MLC_EMAIL_TO_ADDRESS', []))

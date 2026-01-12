@@ -187,7 +187,7 @@ def generate_submission(env, state, inp, submission_division, logger):
     # SUT base
     system = env.get('MLC_HW_NAME', 'default').replace(' ', '_')
 
-    code_path = os.path.join(path_submission, "code")
+    src_path = os.path.join(path_submission, "src")
 
     for res in results:
         system_meta = {}
@@ -309,16 +309,11 @@ def generate_submission(env, state, inp, submission_division, logger):
             sub_res = new_res
 
         submission_path = os.path.join(path_submission, "results", sub_res)
-        measurement_path = os.path.join(
-            path_submission, "measurements", sub_res)
-        compliance_path = os.path.join(path_submission, "compliance", sub_res)
         system_path = os.path.join(path_submission, "systems")
         submission_system_path = system_path
 
         if not os.path.isdir(submission_path):
             os.makedirs(submission_path)
-        if not os.path.isdir(measurement_path):
-            os.makedirs(measurement_path)
         if not os.path.isdir(submission_system_path):
             os.makedirs(submission_system_path)
         system_file = os.path.join(submission_system_path, sub_res + ".json")
@@ -342,19 +337,17 @@ def generate_submission(env, state, inp, submission_division, logger):
             platform_info_file = None
             result_model_path = os.path.join(result_path, model)
             submission_model_path = os.path.join(submission_path, model)
-            measurement_model_path = os.path.join(measurement_path, model)
-            compliance_model_path = os.path.join(compliance_path, model)
-            code_model_path = os.path.join(code_path, model)
+            src_model_path = os.path.join(src_path, model)
             scenarios = [
                 f for f in os.listdir(result_model_path) if not os.path.isfile(
                     os.path.join(
                         result_model_path, f))]
-            submission_code_path = code_model_path
-            if not os.path.isdir(submission_code_path):
-                os.makedirs(submission_code_path)
+            submission_src_path = src_model_path
+            if not os.path.isdir(submission_src_path):
+                os.makedirs(submission_src_path)
             if not os.path.exists(os.path.join(
-                    submission_code_path, "README.md")):
-                with open(os.path.join(submission_code_path, "README.md"), mode='w') as f:
+                    submission_src_path, "README.md")):
+                with open(os.path.join(submission_src_path, "README.md"), mode='w') as f:
                     f.write("TBD")  # create an empty README
 
             logger.info('* MLPerf inference model: {}'.format(model))
@@ -367,10 +360,6 @@ def generate_submission(env, state, inp, submission_division, logger):
                     result_model_path, scenario)
                 submission_scenario_path = os.path.join(
                     submission_model_path, scenario)
-                measurement_scenario_path = os.path.join(
-                    measurement_model_path, scenario)
-                compliance_scenario_path = os.path.join(
-                    compliance_model_path, scenario)
 
                 '''
                 if duplicate and scenario == 'singlestream':
@@ -445,20 +434,11 @@ def generate_submission(env, state, inp, submission_division, logger):
                     )
                     continue
 
-                if not os.path.isdir(measurement_scenario_path):
-                    os.makedirs(measurement_scenario_path)
-
                 for mode in modes:
                     result_mode_path = os.path.join(result_scenario_path, mode)
                     submission_mode_path = os.path.join(
                         submission_scenario_path, mode)
-                    submission_measurement_path = measurement_scenario_path
-                    submission_compliance_path = os.path.join(
-                        compliance_scenario_path, mode)
-                    if mode.startswith("TEST"):
-                        submission_results_path = submission_compliance_path
-                    else:
-                        submission_results_path = submission_mode_path
+                    submission_results_path = submission_mode_path
                     if os.path.exists(submission_results_path):
                         shutil.rmtree(submission_results_path)
 
@@ -492,10 +472,10 @@ def generate_submission(env, state, inp, submission_division, logger):
 
                             shutil.copy(
                                 analyzer_settings_file, os.path.join(
-                                    submission_measurement_path, "analyzer_table.md"))
+                                    submission_scenario_path, "analyzer_table.md"))
                             shutil.copy(
                                 power_settings_file, os.path.join(
-                                    submission_measurement_path, "power_settings.md"))
+                                    submission_scenario_path, "power_settings.md"))
 
                             result_ranging_path = os.path.join(
                                 result_mode_path, 'ranging')
@@ -563,14 +543,14 @@ def generate_submission(env, state, inp, submission_division, logger):
                     if os.path.exists(user_conf_path):
                         shutil.copy(
                             user_conf_path, os.path.join(
-                                measurement_scenario_path, 'user.conf'))
+                                submission_scenario_path, 'user.conf'))
                     else:
                         user_conf_path = os.path.join(
                             result_mode_path, "user.conf")
                         if os.path.exists(user_conf_path):
                             shutil.copy(
                                 user_conf_path, os.path.join(
-                                    submission_measurement_path, 'user.conf'))
+                                    submission_scenario_path, 'user.conf'))
                         else:
                             if mode.lower() == "performance":
                                 return {
@@ -579,7 +559,7 @@ def generate_submission(env, state, inp, submission_division, logger):
                     # First check for measurements directory in scenario folder
                     measurements_json_path = os.path.join(
                         result_scenario_path, "measurements.json")
-                    target_measurement_json_path = measurement_scenario_path
+                    target_measurement_json_path = submission_scenario_path
 
                     if not os.path.exists(measurements_json_path):
                         measurements_json_path = os.path.join(
@@ -668,7 +648,7 @@ def generate_submission(env, state, inp, submission_division, logger):
                                 shutil.copy(
                                     os.path.join(
                                         result_mode_path, f), os.path.join(
-                                        submission_measurement_path, f))
+                                        submission_scenario_path, f))
                                 if f == "system_info.txt" and not platform_info_file:
                                     # the first found system_info.txt will be taken as platform info file for a specific model to be placed in
                                     # measurements-model folder when generating
@@ -679,7 +659,7 @@ def generate_submission(env, state, inp, submission_division, logger):
                                 shutil.copy(
                                     os.path.join(
                                         result_mode_path, f), os.path.join(
-                                        submission_measurement_path, mode + "_" + f))
+                                        submission_scenario_path, mode + "_" + f))
 
                     if mode == "accuracy":
                         if os.path.exists(os.path.join(
@@ -705,13 +685,12 @@ def generate_submission(env, state, inp, submission_division, logger):
                         result_scenario_path, "system_info.txt")):
                     shutil.copy(
                         os.path.join(
-                            result_scenario_path, "system_info.txt"), os.path.join(
-                            submission_measurement_path, f))
+                            result_scenario_path, "system_info.txt"), submission_scenario_path)
                     platform_info_file = os.path.join(
                         result_scenario_path, "system_info.txt")
 
                 readme_file = os.path.join(
-                    submission_measurement_path, "README.md")
+                    submission_scenario_path, "README.md")
                 if not os.path.exists(readme_file):
                     with open(readme_file, mode='w') as f:
                         f.write("TBD")  # create an empty README
@@ -741,7 +720,7 @@ def generate_submission(env, state, inp, submission_division, logger):
                 shutil.copy(
                     sys_info_file,
                     os.path.join(
-                        measurement_model_path,
+                        submission_model_path,
                         "system_info.txt"))
 
         # Copy system_info.txt to the submission measurements folder if any
@@ -757,14 +736,14 @@ def generate_submission(env, state, inp, submission_division, logger):
             shutil.copy(
                 sys_info_file,
                 os.path.join(
-                    measurement_path,
+                    submission_path,
                     "system_info.txt"))
         else:
             if env.get('MLC_GET_PLATFORM_DETAILS', '') == "yes":
                 mlc_input = {'action': 'run',
                              'automation': 'script',
                              'tags': 'get,platform,details',
-                             'env': {'MLC_PLATFORM_DETAILS_FILE_PATH': os.path.join(measurement_path, "system_info.txt")},
+                             'env': {'MLC_PLATFORM_DETAILS_FILE_PATH': os.path.join(submission_path, "system_info.txt")},
                              'quiet': True
                              }
                 mlc = i['automation'].action_object
@@ -779,7 +758,7 @@ def generate_submission(env, state, inp, submission_division, logger):
 
         logger.info(tabulate(result_table, headers=headers, tablefmt="pretty"))
 
-        sut_readme_file = os.path.join(measurement_path, "README.md")
+        sut_readme_file = os.path.join(submission_path, "README.md")
         with open(sut_readme_file, mode='w') as f:
             f.write(tabulate(result_table, headers=headers, tablefmt="github"))
 

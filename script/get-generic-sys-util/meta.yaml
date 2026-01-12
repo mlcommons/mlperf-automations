@@ -74,6 +74,17 @@ variations:
     state:
       coreutils:
         brew: coreutils
+  build-essential:
+    env:
+      MLC_SYS_UTIL_NAME: build-essential
+      MLC_SYS_UTIL_VERSION_CMD: make --version
+      MLC_SYS_UTIL_VERSION_RE: GNU Make ([\d.]+)
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 1
+    new_env_keys:
+    - MLC_MAKE_VERSION
+    state:
+      build-essential:
+        apt: build-essential
   cmake:
     env:
       MLC_SYS_UTIL_NAME: cmake
@@ -189,6 +200,18 @@ variations:
     state:
       gfortran-aarch64: # tbd: complete for other flavours of linux
         apt: gfortran-aarch64-linux-gnu
+  lcov:
+    env:
+      MLC_SYS_UTIL_NAME: lcov
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+    - MLC_LCOV_VERSION
+    state:
+      lcov:
+        apt: lcov
+        brew: ''
+        dnf: ''   
+        yum: ''
   libgl:
     env:
       MLC_SYS_UTIL_NAME: libgl # tbd: regular expression for version as well as whether its installed?
@@ -609,6 +632,9 @@ variations:
   linux-tools:
     env:
       MLC_SYS_UTIL_NAME: linux-tools
+      MLC_SYS_UTIL_VERSION_CMD: perf --version
+      MLC_SYS_UTIL_VERSION_RE: \b(\d+\.\d+(?:\.\d+)?)\b
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
     new_env_keys:
     - MLC_LINUX_TOOLS_VERSION
     state:
@@ -620,6 +646,12 @@ variations:
       MLC_SYS_UTIL_VERSION_CMD: md5sum --version | grep sha1sum
       MLC_SYS_UTIL_VERSION_RE: \b(\d+\.\d+(?:\.\d+)?)\b
       MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    update_meta_if_env:
+      - enable_if_env:
+          MLC_HOST_OS_FLAVOR:
+            - macos
+        env:
+          MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE: yes
     new_env_keys:
     - MLC_MD5SHA1SUM_VERSION
     state:
