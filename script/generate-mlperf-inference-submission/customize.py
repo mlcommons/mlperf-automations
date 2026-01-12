@@ -577,7 +577,7 @@ def generate_submission(env, state, inp, submission_division, logger):
                             target_measurement_json_path)
 
                         destination = Path(
-                            target_measurement_json_path) / f"{sub_res}.json"
+                            target_measurement_json_path) / f"measurements.json"
                         shutil.copy(measurements_json_path, destination)
                         destination = Path(
                             target_measurement_json_path) / "model-info.json"
