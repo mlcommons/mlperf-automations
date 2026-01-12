@@ -1,0 +1,58 @@
+alias: get-dataset-mlperf-inference-yolo-coco2017-filtered-dataset
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+new_env_keys:
+- MLC_ML_DATASET_MLPERF_INFERENCE_YOLO_COCO2017_FILTERED_DATASET_PATH
+- MLC_ML_DATASET_FILE_WITH_PATH
+print_env_at_the_end:
+  MLC_ML_DATASET_MLPERF_INFERENCE_YOLO_COCO2017_FILTERED_DATASET_PATH: YOLO COCO2017 filtered dataset path
+tags:
+- get
+- dataset
+- mlperf-inference
+- yolo-coco2017-filtered
+- get-dataset-mlperf-inference-yolo-coco2017-filtered-dataset
+tests:
+  run_inputs:
+  - variations_list:
+    - r2-downloader,mlc,dry-run
+uid: cf34bbb9b75c4ea4
+variations:
+  dry-run:
+    env:
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  mlc:
+    default: true
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+    group: download-src
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      env:
+        MLC_DOWNLOAD_FILENAME: yolo-coco2017-filtered-dataset
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_DATASET_MLPERF_INFERENCE_YOLO_COCO2017_FILTERED_DATASET_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_DATASET_MLPERF_INFERENCE_YOLO_COCO2017_FILTERED_DATASET_PATH
+      extra_cache_tags: ml,dataset,yolo-coco2017-filtered
+      force_cache: true
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      names:
+      - yolo-coco2017-filtered-dataset
+      tags: download-and-extract
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
+  r2-downloader:
+    adr:
+      yolo-coco2017-filtered-dataset:
+        env:
+          MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/YOLO-COCO2017-dataset.uri
+        tags: _r2-downloader
+    default: true
