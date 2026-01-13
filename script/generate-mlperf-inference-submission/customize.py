@@ -39,9 +39,15 @@ def check_dict_filled(keys, sut_info):
 # model names for MLPef Inference
 
 
-def model_in_valid_models(model, mlperf_version):
-    import submission_checker as checker
-    config = checker.MODEL_CONFIG
+def model_in_valid_models(model, mlperf_version,
+                          submission_checker_modularised):
+    # ensure backward compatibility of submission checker
+    if submission_checker_modularised:
+        import submission_checker.constants as constants
+        config = constants.MODEL_CONFIG
+    else:
+        import submission_checker as checker
+        config = checker.MODEL_CONFIG
 
     if model not in config[mlperf_version]['models']:
         internal_model_name = config[mlperf_version]["model_mapping"].get(
@@ -246,7 +252,7 @@ def generate_submission(env, state, inp, submission_division, logger):
         if division == "open" and len(model_mapping_combined) == 0:
             for model in models:
                 is_valid, returned_model_name = model_in_valid_models(
-                    model, env.get('MLC_MLPERF_LAST_RELEASE', 'v4.1'))
+                    model, env.get('MLC_MLPERF_LAST_RELEASE', 'v4.1'), is_true(env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')))
                 if not is_valid:
                     result_model_path = os.path.join(result_path, model)
                     scenarios = [
@@ -580,7 +586,7 @@ def generate_submission(env, state, inp, submission_division, logger):
                             target_measurement_json_path) / f"measurements.json"
                         shutil.copy(measurements_json_path, destination)
                         destination = Path(
-                            target_measurement_json_path) / "model-info.json"
+                            target_measurement_json_path) / "measurements.json"
                         shutil.copy(measurements_json_path, destination)
 
                     elif mode == 'performance':
@@ -796,5 +802,4 @@ def postprocess(i):
                 env, state, inp, submission_division, logger=logger)
             if r['return'] > 0:
                 return r
-
     return {'return': 0}

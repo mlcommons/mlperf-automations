@@ -352,22 +352,18 @@ def get_valid_scenarios(model, category, mlperf_version, mlperf_path):
 
     import sys
 
-    submission_checker_dir = os.path.join(mlperf_path, "tools", "submission")
+    submission_checker_dir = os.path.join(mlperf_path, "tools", "submission", "submission_checker")
 
     sys.path.append(submission_checker_dir)
-    if not os.path.exists(os.path.join(
-            submission_checker_dir, "submission_checker.py")):
-        shutil.copy(os.path.join(submission_checker_dir, "submission-checker.py"), os.path.join(submission_checker_dir,
-                                                                                                "submission_checker.py"))
 
-    import submission_checker as checker
+    import constants
 
     if "dlrm-99" in model:
         model = model.replace("dlrm-99", "dlrm-v2-99")
     if "sdxl" in model:
         model = "stable-diffusion-xl"
 
-    config = checker.MODEL_CONFIG
+    config = constants.MODEL_CONFIG
 
     internal_model_name = config[mlperf_version]["model_mapping"].get(
         model, model)

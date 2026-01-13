@@ -410,6 +410,18 @@ variations:
       mlperf-inference-nvidia-scratch-space:
         tags: _version.r5.1
 
+  r6.0:
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: '6.0'
+      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r6.0_default
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v6.0
+    group: benchmark-version
+    adr:
+      get-mlperf-inference-results-dir:
+        tags: _version.r6.0
+      get-mlperf-inference-submission-dir:
+        tags: _version.r6.0
+
   short:
     add_deps_recursive:
       submission-checker:
