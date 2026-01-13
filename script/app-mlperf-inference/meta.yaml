@@ -2312,6 +2312,17 @@ variations:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
       MLC_MLPERF_INFERENCE_VERSION: '5.1'
+  
+  r6.0-dev_default:
+    group:
+      reproducibility
+    add_deps_recursive:
+      pycuda:
+        version_min: "2024.1"
+    default_env:
+      MLC_SKIP_SYS_UTILS: 'yes'
+      MLC_REGENERATE_MEASURE_FILES: 'yes'
+      MLC_MLPERF_INFERENCE_VERSION: '6.0'
 
 invalid_variation_combinations:
   -
