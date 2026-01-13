@@ -8,6 +8,9 @@ new_env_keys:
 print_env_at_the_end:
   MLC_ML_MODEL_DLRM_V3_PATH: DLRM V3 checkpoint path
 tags:
+- get
+- ml-model
+- dlrm-v3
 - get-ml-model-dlrm-v3
 tests:
   run_inputs:
