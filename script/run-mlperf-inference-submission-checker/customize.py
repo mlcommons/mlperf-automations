@@ -148,7 +148,7 @@ def preprocess(i):
                                                               '') != '') and "skip-extra-files-in-root-check" not in extra_args:
         extra_args += " --skip-extra-files-in-root-check "
 
-    if version == "v5.1" and "skip-dataset-size-check" not in extra_args and is_true(
+    if "skip-dataset-size-check" not in extra_args and is_true(
             env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
         extra_args += " --skip-dataset-size-check "
 
