@@ -31,7 +31,6 @@ def preprocess(i):
 
     submission_checker_file = os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission",
                                            "submission_checker.py")
-
     if is_true(env['MLC_MLPERF_SHORT_RUN']):
         import shutil
         new_submission_checker_file = os.path.join(

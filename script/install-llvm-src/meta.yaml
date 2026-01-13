@@ -105,7 +105,7 @@ variations:
     group: compiler-rt
     default: true
     env:
-      +MLC_LLVM_ENABLE_PROJECTS:
+      +MLC_LLVM_ENABLE_RUNTIMES:
         - compiler-rt
   no-compiler-rt:
     group: compiler-rt

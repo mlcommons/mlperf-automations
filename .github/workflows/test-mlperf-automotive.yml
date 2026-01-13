@@ -33,4 +33,5 @@ jobs:
         run: |
           pip install mlcflow
           mlc pull repo "$REPO" --branch="$BRANCH"
-          mlc test script app,mlperf,automotive
+          mlc test script app,mlperf-inference-automotive
+

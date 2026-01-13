@@ -69,6 +69,7 @@ variations:
       MLC_ML_MODEL_ACCURACY: '0.3757'
       MLC_PACKAGE_URL: https://zenodo.org/record/6617879/files/resnext50_32x4d_fpn.onnx
       MLC_DOWNLOAD_URL1: https://armi.in/files/resnext50_32x4d_fpn.onnx
+      MLC_DOWNLOAD_URL2: https://storage.googleapis.com/resnet50_assets/resnext50_32x4d_fpn.onnx
     required_disk_space: 150
     warning: This model is downloaded from Zenodo.org
   onnx,no-nms:

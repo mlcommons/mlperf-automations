@@ -49,56 +49,19 @@ def dockerfile(self_module, input_params):
     script_alias = metadata.get('alias', '')
     script_uid = metadata.get('uid', '')
 
-    run_state = {
-        'deps': [],
-        'fake_deps': [],
-        'parent': None,
-        'script_id': f"{script_alias},{script_uid}",
-        'script_variation_tags': variation_tags
-    }
+    if not hasattr(self_module, 'run_state'):
+        self_module.run_state = self_module.init_run_state(
+            input_params.get('run_state'))
 
-    docker_settings = metadata.get('docker', {})
+    r = self_module.update_run_state_for_selected_script_and_variations(
+        script, input_params)
+
+    run_state = self_module.run_state
+
+    docker_settings = run_state.get('docker', {})
     docker_settings_default_env = docker_settings.get('default_env', {})
     for key in docker_settings_default_env:
         env.setdefault(key, docker_settings_default_env[key])
-
-    state_data['docker'] = docker_settings
-    add_deps_recursive = input_params.get('add_deps_recursive', {})
-
-    # Update state with metadata and variations
-    update_state_result = self_module.update_state_from_meta(
-        metadata, env, state_data, constant_vars, constant_state,
-        deps=[],
-        post_deps=[],
-        prehook_deps=[],
-        posthook_deps=[],
-        new_env_keys=[],
-        new_state_keys=[],
-        run_state=run_state,
-        i=input_params
-    )
-    if update_state_result['return'] > 0:
-        return update_state_result
-
-    update_variations_result = self_module._update_state_from_variations(
-        input_params, metadata, variation_tags, metadata.get(
-            'variations', {}),
-        env, state_data, constant_vars, constant_state,
-        deps=[],  # Add your dependencies if needed
-        post_deps=[],  # Add post dependencies if needed
-        prehook_deps=[],  # Add prehook dependencies if needed
-        posthook_deps=[],  # Add posthook dependencies if needed
-        new_env_keys_from_meta=[],  # Add keys from meta if needed
-        new_state_keys_from_meta=[],  # Add state keys from meta if needed
-        add_deps_recursive=add_deps_recursive,
-        run_state=run_state,
-        recursion_spaces=''
-    )
-    if update_variations_result['return'] > 0:
-        return update_variations_result
-
-    # Set Docker-specific configurations
-    docker_settings = state_data['docker']
 
     if is_true(docker_settings.get('pass_docker_to_script', False)):
         input_params['docker'] = True
@@ -115,25 +78,21 @@ def dockerfile(self_module, input_params):
     deps = docker_settings.get('build_deps', [])
     if deps:
         r = self_module._run_deps(
-            deps, [], env, {}, {}, {}, add_deps_recursive, '', [], '', False, '',
+            deps, [], '', '', False, '',
             show_time, ' ', run_state)
         if r['return'] > 0:
             return r
 
+    # For update_meta_if_env to work
     update_state_result = self_module.update_state_from_meta(
-        metadata, env, state_data, constant_vars, constant_state,
-        deps=[],
-        post_deps=[],
-        prehook_deps=[],
-        posthook_deps=[],
-        new_env_keys=[],
-        new_state_keys=[],
+        metadata,
         run_state=run_state,
         i=input_params
     )
     if update_state_result['return'] > 0:
         return update_state_result
-    docker_settings = state_data['docker']
+
+    docker_settings = run_state.get('docker', {})
 
     # Prune temporary environment variables
     run_command = copy.deepcopy(run_command_arc)
@@ -254,6 +213,8 @@ def docker_run(self_module, i):
     logger = self_module.logger
     env = i.get('env', {})
 
+    self_module.env = env
+
     if quiet:
         env['MLC_QUIET'] = 'yes'
 
@@ -268,10 +229,15 @@ def docker_run(self_module, i):
     cur_dir = os.getcwd()
 
     env['MLC_RUN_STATE_DOCKER'] = False
-    state, const, const_state = i.get(
+    self_module.state, self_module.const, self_module.const_state = i.get(
         'state', {}), i.get(
         'const', {}), i.get(
         'const_state', {})
+
+    state = self_module.state
+    const = self_module.const
+    const_state = self_module.const_state
+
     variation_tags = [t[1:]
                       for t in i.get('tags', '').split(",") if t.startswith("_")]
 
@@ -306,63 +272,38 @@ def docker_run(self_module, i):
             []))  # do we need a copy here?
     variations = meta.get('variations', {})
 
-    # take the folder path as well as file path env variables from meta
-    file_path_env_keys = meta.get('file_path_env_keys', [])
-    folder_path_env_keys = meta.get('folder_path_env_keys', [])
+    if not hasattr(self_module, 'run_state'):
+        self_module.run_state = self_module.init_run_state(
+            input_params.get('run_state'))
 
-    docker_settings = meta.get('docker', {})
+    r = self_module.update_run_state_for_selected_script_and_variations(
+        script, i)
+    if r['return'] > 0:
+        return r
+
+    run_state = self_module.run_state
+
+    # take the folder path as well as file path env variables from meta
+    file_path_env_keys = run_state.get('file_path_env_keys', [])
+    folder_path_env_keys = run_state.get('folder_path_env_keys', [])
+
+    docker_settings = run_state.get('docker', {})
+
     docker_settings_default_env = docker_settings.get('default_env', {})
     for key in docker_settings_default_env:
         env.setdefault(key, docker_settings_default_env[key])
 
-    state['docker'] = docker_settings
-    run_state = {
-        'deps': [], 'fake_deps': [], 'parent': None,
-        'script_id': f"{script_alias},{script_uid}",
-        'script_variation_tags': variation_tags,
-        'file_path_env_keys': file_path_env_keys,
-        'folder_path_env_keys': folder_path_env_keys
-    }
-
-    # Update state and handle variations
-    r = self_module.update_state_from_meta(meta, env, state, const, const_state, deps=[],
-                                           post_deps=[],
-                                           prehook_deps=[],
-                                           posthook_deps=[],
-                                           new_env_keys=[],
-                                           new_state_keys=[], run_state=run_state, i=i)
-    if r['return'] > 0:
-        return r
-
-    r = self_module._update_state_from_variations(
-        i, meta, variation_tags, variations, env, state, const, const_state, deps=[],
-        post_deps=[],
-        prehook_deps=[],
-        posthook_deps=[],
-        new_env_keys_from_meta=[],
-        new_state_keys_from_meta=[],
-        add_deps_recursive=add_deps_recursive, run_state=run_state, recursion_spaces='')
-    if r['return'] > 0:
-        return r
-
-    docker_settings = state['docker']
-
     deps = docker_settings.get('deps', [])
     if deps:
         r = self_module._run_deps(
-            deps, [], env, {}, {}, {}, add_deps_recursive, '', [], '', False, '',
+            deps, [], '', '', False, '',
             show_time, ' ', run_state)
         if r['return'] > 0:
             return r
 
     # For updating meta from update_meta_if_env
     r = self_module.update_state_from_meta(
-        meta, env, state, const, const_state, deps=[],
-        post_deps=[],
-        prehook_deps=[],
-        posthook_deps=[],
-        new_env_keys=[],
-        new_state_keys=[],
+        meta,
         run_state=run_state,
         i=i)
     if r['return'] > 0:

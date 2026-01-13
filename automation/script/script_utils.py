@@ -1,3 +1,11 @@
+import os
+import importlib
+import subprocess
+import sys
+import ast
+from script.cache_utils import *
+
+
 def get_variation_and_script_tags(tags_string):
 
     tags = [] if tags_string == '' else tags_string.split(',')
@@ -29,17 +37,18 @@ def select_script_and_cache(
     variation_tags,
     parsed_script_alias,
     quiet,
-    logger,
-    recursion_spaces,
-    remembered_selections,
     skip_remembered_selections=False,
     force_cache=False,
     force_skip_cache=False,
+    new_cache_entry=False
 ):
     """
     Search scripts by tags, resolve ambiguity, apply cache pruning,
     select a script (quiet or interactive), and return pruned cache entries.
     """
+
+    logger = self.logger
+    recursion_spaces = self.recursion_spaces
 
     # ---------------------------------------------------------
     # STEP 1: Script search
@@ -83,13 +92,13 @@ def select_script_and_cache(
     if not r["found_scripts"]:
         return {
             "return": 1,
-            "error": f"no scripts were found with tags: {tags_string} (when variations ignored)",
+            "error": f"no scripts were found with tags: {script_tags} (when variations ignored)",
         }
 
     if not list_of_found_scripts:
         return {
             "return": 16,
-            "error": f"no scripts were found with tags: {tags_string}\n{r.get('warning', '')}",
+            "error": f"no scripts were found with tags: {script_tags}\n{r.get('warning', '')}",
         }
 
     if (
@@ -115,7 +124,7 @@ def select_script_and_cache(
     # ---------------------------------------------------------
     # STEP 5: Apply remembered selection
     if not skip_remembered_selections and len(list_of_found_scripts) > 1:
-        for sel in remembered_selections:
+        for sel in self.remembered_selections:
             if (
                 sel["type"] == "script"
                 and set(sel["tags"].split(",")) == set(script_tags_string.split(","))
@@ -125,19 +134,16 @@ def select_script_and_cache(
 
     # ---------------------------------------------------------
     # STEP 6: Determine if cache preload is needed
-    preload_cached_scripts = any(
+    preload_cached_scripts = not new_cache_entry and any(
         s.meta.get("cache", False)
         or (s.meta.get("can_force_cache", False) and force_cache)
         for s in list_of_found_scripts
     )
 
-    cache_list = []
-
     # STEP: cache handling
     cache_list = []
 
-    if should_preload_cache(list_of_found_scripts,
-                            force_cache) and not force_skip_cache:
+    if preload_cached_scripts:
         rc = search_script_cache(
             self.cache_action,
             script_tags_string,
@@ -157,7 +163,6 @@ def select_script_and_cache(
         list_of_found_scripts = rc["scripts"]
         cache_list = rc["cache_list"]
 
-    # STEP: select script (unchanged)
     if len(list_of_found_scripts) > 1:
         selected_index = select_script_item(
             list_of_found_scripts,
@@ -254,18 +259,6 @@ def select_script_item(lst, text, recursion_spaces,
     return selection
 
 
-def should_preload_cache(scripts, force_cache=False):
-    """
-    Return True if at least one script requires or allows caching.
-    """
-    for script in scripts:
-        if script.meta.get("cache", False):
-            return True
-        if script.meta.get("can_force_cache", False) and force_cache:
-            return True
-    return False
-
-
 def search_script_cache(
     cache_action,
     script_tags_string,
@@ -349,5 +342,59 @@ def prune_cache_for_selected_script(cache_list, selected_script):
 
     return [
         c for c in cache_list
-        if c.meta.get("associated_script_item_uid") == selected_uid
+        if c.meta.get("associated_script_item_uid", '').strip() == selected_uid
     ]
+
+
+def install_packages(packages):
+    """
+    Install a list of packages via pip.
+    """
+    if not packages:
+        return
+    print(f"Installing missing packages: {', '.join(packages)}")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", *packages])
+
+
+def get_imported_modules(py_file_path):
+    """
+    Parse a Python file and return all top-level module names it imports.
+    """
+    with open(py_file_path, "r", encoding="utf-8") as f:
+        node = ast.parse(f.read(), filename=py_file_path)
+    modules = set()
+    for n in node.body:
+        if isinstance(n, ast.Import):
+            for alias in n.names:
+                modules.add(alias.name.split('.')[0])
+        elif isinstance(n, ast.ImportFrom) and n.module:
+            modules.add(n.module.split('.')[0])
+    return modules
+
+
+def load_customize_with_deps(path_to_customize_py):
+    """
+    Load customize.py module, automatically installing all missing dependencies in one go.
+    """
+    if not os.path.isfile(path_to_customize_py):
+        raise FileNotFoundError(f"{path_to_customize_py} not found")
+
+    # Step 1: Get all imported modules
+    imported_modules = get_imported_modules(path_to_customize_py)
+    # Step 2: Detect which are missing
+    missing_packages = []
+    for mod in imported_modules:
+        try:
+            importlib.import_module(mod)
+        except ModuleNotFoundError:
+            missing_packages.append(mod)
+
+    # Step 3: Install all missing packages at once
+    install_packages(missing_packages)
+
+    # Step 4: Load the module
+    spec = importlib.util.spec_from_file_location(
+        "customize", path_to_customize_py)
+    customize = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(customize)
+    return customize
