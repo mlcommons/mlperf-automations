@@ -193,7 +193,7 @@ def generate_submission(env, state, inp, submission_division, logger):
     # SUT base
     system = env.get('MLC_HW_NAME', 'default').replace(' ', '_')
 
-    code_path = os.path.join(path_submission, "code")
+    src_path = os.path.join(path_submission, "src")
 
     for res in results:
         system_meta = {}
@@ -343,17 +343,17 @@ def generate_submission(env, state, inp, submission_division, logger):
             platform_info_file = None
             result_model_path = os.path.join(result_path, model)
             submission_model_path = os.path.join(submission_path, model)
-            code_model_path = os.path.join(code_path, model)
+            src_model_path = os.path.join(src_path, model)
             scenarios = [
                 f for f in os.listdir(result_model_path) if not os.path.isfile(
                     os.path.join(
                         result_model_path, f))]
-            submission_code_path = code_model_path
-            if not os.path.isdir(submission_code_path):
-                os.makedirs(submission_code_path)
+            submission_src_path = src_model_path
+            if not os.path.isdir(submission_src_path):
+                os.makedirs(submission_src_path)
             if not os.path.exists(os.path.join(
-                    submission_code_path, "README.md")):
-                with open(os.path.join(submission_code_path, "README.md"), mode='w') as f:
+                    submission_src_path, "README.md")):
+                with open(os.path.join(submission_src_path, "README.md"), mode='w') as f:
                     f.write("TBD")  # create an empty README
 
             logger.info('* MLPerf inference model: {}'.format(model))
@@ -583,7 +583,7 @@ def generate_submission(env, state, inp, submission_division, logger):
                             target_measurement_json_path)
 
                         destination = Path(
-                            target_measurement_json_path) / f"{sub_res}.json"
+                            target_measurement_json_path) / f"measurements.json"
                         shutil.copy(measurements_json_path, destination)
                         destination = Path(
                             target_measurement_json_path) / "measurements.json"

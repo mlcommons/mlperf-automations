@@ -352,7 +352,8 @@ def get_valid_scenarios(model, category, mlperf_version, mlperf_path):
 
     import sys
 
-    submission_checker_dir = os.path.join(mlperf_path, "tools", "submission", "submission_checker")
+    submission_checker_dir = os.path.join(
+        mlperf_path, "tools", "submission", "submission_checker")
 
     sys.path.append(submission_checker_dir)
 
