@@ -119,7 +119,8 @@ class ScriptAutomation(Automation):
         self.run_state = self.init_run_state(
             run_args.get('run_state'))  # changes for every run call
 
-        self.main_script_force_new_cache = run_args.get('new', False) # only set for the initial script being called 
+        self.main_script_force_new_cache = run_args.get(
+            'new', False)  # only set for the initial script being called
 
     def init_run_state(self, run_state):
 
