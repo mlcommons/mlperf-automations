@@ -2313,6 +2313,30 @@ variations:
       MLC_REGENERATE_MEASURE_FILES: 'yes'
       MLC_MLPERF_INFERENCE_VERSION: '5.1'
 
+  r6.0-dev_default:
+    group:
+      reproducibility
+    add_deps_recursive:
+      nvidia-inference-common-code:
+        tags: _mlcommons,_v6.0-dev
+      nvidia-inference-server:
+        version: r5.1
+        tags: _mlcommons
+      nvidia-harness:   
+        tags: _v5.1
+      intel-harness:
+        tags: _v4.1
+      nvidia-scratch-space:
+        tags: _version.6.0-dev
+      nvidia-mitten-git-src:
+        tags: _sha.e5574192b3ae76910b6824a9275d14a4158d8afa
+      pycuda:
+        version_min: "2024.1"
+    default_env:
+      MLC_SKIP_SYS_UTILS: 'yes'
+      MLC_REGENERATE_MEASURE_FILES: 'yes'
+      MLC_MLPERF_INFERENCE_VERSION: '6.0'
+
 invalid_variation_combinations:
   -
     - retinanet
