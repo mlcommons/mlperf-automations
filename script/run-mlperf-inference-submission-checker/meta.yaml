@@ -212,5 +212,9 @@ versions:
   r5.1:
     adr:
       submission-checker-src:
+        version: r5.1
+  r6.0:
+    adr:
+      submission-checker-src:
         version: master
 
