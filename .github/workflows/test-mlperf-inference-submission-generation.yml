@@ -38,7 +38,7 @@ jobs:
         round: ["6.0"]
         folder_name: ["closed", "open"]
         action: ["run", "docker"]
-        architecture: [ "legacy", "modularized" ]
+        architecture: [ "modularized" ]
         exclude:
           - os: macos-latest
           - os: windows-latest
