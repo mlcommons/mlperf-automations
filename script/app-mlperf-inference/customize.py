@@ -593,7 +593,7 @@ def postprocess(i):
                     {'run_script_input': run_script_input, 'env': env, 'script_name': 'verify_accuracy'})
                 if r['return'] > 0:
                     return r
-        import submission_checker_main as checker
+        import submission_checker.main as checker
         is_valid = checker.check_compliance_perf_dir(
             COMPLIANCE_DIR) if test != "TEST06" else True
         state['mlc-mlperf-inference-results'][state['MLC_SUT_CONFIG_NAME']
