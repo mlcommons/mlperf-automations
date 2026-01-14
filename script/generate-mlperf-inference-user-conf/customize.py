@@ -265,19 +265,11 @@ def preprocess(i):
         else:
             audit_path = test
 
-        if env['MLC_BENCHMARK_GROUP'] == "automotive":
-            audit_full_path = os.path.join(
-                env['MLC_MLPERF_INFERENCE_SOURCE'],
-                "compliance",
-                audit_path,
-                "audit.config")
-        else:
-            audit_full_path = os.path.join(
-                env['MLC_MLPERF_INFERENCE_SOURCE'],
-                "compliance",
-                "nvidia",
-                audit_path,
-                "audit.config")
+        audit_full_path = os.path.join(
+            env['MLC_MLPERF_INFERENCE_SOURCE'],
+            "compliance",
+            audit_path,
+            "audit.config")
 
         env['MLC_MLPERF_INFERENCE_AUDIT_PATH'] = audit_full_path
         # copy the audit conf to the run directory incase the implementation is
@@ -526,17 +518,9 @@ def run_files_exist(mode, OUTPUT_DIR, run_files, env, logger):
 
         test = env['MLC_MLPERF_LOADGEN_COMPLIANCE_TEST']
 
-        if env['MLC_BENCHMARK_GROUP'] == "automotive":
-            SCRIPT_PATH = os.path.join(
+        SCRIPT_PATH = os.path.join(
                 env['MLC_MLPERF_INFERENCE_SOURCE'],
                 "compliance",
-                test,
-                "run_verification.py")
-        else:
-            SCRIPT_PATH = os.path.join(
-                env['MLC_MLPERF_INFERENCE_SOURCE'],
-                "compliance",
-                "nvidia",
                 test,
                 "run_verification.py")
 
