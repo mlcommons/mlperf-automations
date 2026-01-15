@@ -119,6 +119,9 @@ class ScriptAutomation(Automation):
         self.run_state = self.init_run_state(
             run_args.get('run_state'))  # changes for every run call
 
+        self.main_script_force_new_cache = run_args.get(
+            'new', False)  # only set for the initial script being called
+
     def init_run_state(self, run_state):
 
         run_state = run_state or {}
@@ -565,7 +568,7 @@ class ScriptAutomation(Automation):
             parsed_script_alias,
             quiet,
             skip_remembered_selections=skip_remembered_selections,
-            force_cache=force_cache,
+            force_cache=force_cache and not self.main_script_force_new_cache,
             force_skip_cache=force_skip_cache,
             new_cache_entry=new_cache_entry
         )
@@ -1068,7 +1071,7 @@ class ScriptAutomation(Automation):
 
             if not found_cached and num_found_cached_scripts == 0:
                 if i.get('only_execute_from_cache'):
-                    # useful to check valid cache entries for a script (cm show
+                    # useful to check valid cache entries for a script (mlc show
                     # cache can return invalid cache entries for a script too)
                     return {
                         'return': 1, 'error': f'No valid cache entry found for {cached_tags}'}
