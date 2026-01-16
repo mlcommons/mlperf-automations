@@ -13,7 +13,7 @@ from datetime import datetime
 # Standard category mapping to ensure consistency
 CATEGORY_MAP = {
     "AI/ML datasets": "AI/ML datasets",
-    "AI/ML frameworks": "AI/ML frameworks", 
+    "AI/ML frameworks": "AI/ML frameworks",
     "AI/ML models": "AI/ML models",
     "AI/ML optimization": "AI/ML optimization",
     "Cloud automation": "Cloud automation",
@@ -47,12 +47,14 @@ CATEGORY_MAP = {
     "Utils": "Utilities",
 }
 
+
 def normalize_category(category):
     """Normalize category name to standard form."""
     if not category:
         return "Uncategorized"
     category = category.strip('"').strip("'").strip()
     return CATEGORY_MAP.get(category, category)
+
 
 def read_meta_yaml(script_dir):
     """Read and parse meta.yaml file."""
@@ -66,31 +68,32 @@ def read_meta_yaml(script_dir):
         print(f"Warning: Error reading {meta_path}: {e}")
         return None
 
+
 def generate_readme():
     """Generate README.md from all meta.yaml files."""
     repo_root = Path(__file__).parent
     script_dir = repo_root
-    
+
     if not script_dir.exists():
         print(f"Error: script directory not found at {script_dir}")
         return
-    
+
     categories = defaultdict(list)
-    
+
     for item in sorted(script_dir.iterdir()):
         if not item.is_dir() or item.name.startswith('.') or item.name.startswith('_'):
             continue
-        
+
         meta = read_meta_yaml(item)
         if not meta:
             continue
-        
+
         script_name = item.name
         display_name = meta.get('name', script_name)
         category = normalize_category(meta.get('category', 'Uncategorized'))
         alias = meta.get('alias', script_name)
         tags = meta.get('tags', [])
-        
+
         categories[category].append({
             'name': script_name,
             'display_name': display_name,
@@ -98,9 +101,9 @@ def generate_readme():
             'tags': tags,
             'uid': meta.get('uid', ''),
         })
-    
+
     sorted_categories = sorted(categories.items())
-    
+
     readme_lines = [
         "# MLCommons Automation Scripts",
         "",
@@ -111,27 +114,28 @@ def generate_readme():
         "## Table of Contents",
         "",
     ]
-    
+
     for category, _ in sorted_categories:
         anchor = category.lower().replace(' ', '-').replace('/', '')
         readme_lines.append(f"- [{category}](#{anchor})")
-    
+
     readme_lines.extend(["", "---", ""])
-    
+
     for category, scripts in sorted_categories:
         readme_lines.append(f"## {category}")
         readme_lines.append("")
-        
+
         for script in sorted(scripts, key=lambda x: x['name']):
             alias_info = f" (alias: `{script['alias']}`)" if script['alias'] != script['name'] else ""
-            readme_lines.append(f"- **[{script['name']}]({script['name']}/)**{alias_info}")
+            readme_lines.append(
+                f"- **[{script['name']}]({script['name']}/)**{alias_info}")
             readme_lines.append(f"  - {script['display_name']}")
             if script['tags']:
                 tags_str = ', '.join([f"`{tag}`" for tag in script['tags']])
                 readme_lines.append(f"  - Tags: {tags_str}")
-        
+
         readme_lines.append("")
-    
+
     readme_lines.extend([
         "---",
         "",
@@ -156,14 +160,15 @@ def generate_readme():
         "For more information about each script, see the `meta.yaml` file in the script directory.",
         "",
     ])
-    
+
     readme_path = script_dir / "README.md"
     with open(readme_path, 'w', encoding='utf-8') as f:
         f.write('\n'.join(readme_lines))
-    
+
     print(f"✓ Generated {readme_path}")
     print(f"  - {sum(len(scripts) for scripts in categories.values())} scripts")
     print(f"  - {len(categories)} categories")
+
 
 if __name__ == "__main__":
     generate_readme()
