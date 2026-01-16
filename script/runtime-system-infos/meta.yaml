@@ -5,7 +5,7 @@ cache: false
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
-category: "MLPerf benchmark support"
+category: MLPerf benchmark support
 docker:
   real_run: False
 
