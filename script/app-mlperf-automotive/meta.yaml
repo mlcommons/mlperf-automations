@@ -4,7 +4,7 @@ uid: f7488ce376484fd2
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
-category: Modular MLPerf inference benchmark pipeline
+category: MLPerf Automotive
 
 
 # User-friendly tags to find this MLC script

@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-01-16 23:43:48*
+*Last updated: 2026-01-17 00:49:15*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -22,16 +22,14 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [MLCommons script templates](#mlcommons-script-templates)
 - [MLCommons system utilities](#mlcommons-system-utilities)
 - [MLCommons utilities](#mlcommons-utilities)
-- [MLPerf benchmark support](#mlperf-benchmark-support)
+- [MLPerf Automotive](#mlperf-automotive)
+- [MLPerf Inference](#mlperf-inference)
+- [MLPerf Training](#mlperf-training)
 - [Modular AI/ML application pipeline](#modular-aiml-application-pipeline)
-- [Modular MLPerf benchmarks](#modular-mlperf-benchmarks)
-- [Modular MLPerf inference benchmark pipeline](#modular-mlperf-inference-benchmark-pipeline)
-- [Modular MLPerf training benchmark pipeline](#modular-mlperf-training-benchmark-pipeline)
 - [Platform information](#platform-information)
 - [Python automation](#python-automation)
 - [ROCm automation](#rocm-automation)
 - [Remote automation](#remote-automation)
-- [Reproduce MLPerf benchmarks](#reproduce-mlperf-benchmarks)
 - [Reproducibility and artifact evaluation](#reproducibility-and-artifact-evaluation)
 - [Tests](#tests)
 - [TinyML automation](#tinyml-automation)
@@ -646,14 +644,68 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - parse-dmidecode-memory-info
   - Tags: `dmidecode`, `parse`, `memory`, `info`
 
-## MLPerf benchmark support
+## MLPerf Automotive
+
+- **[app-mlperf-automotive](app-mlperf-automotive/)**
+  - app-mlperf-automotive
+  - Tags: `app`, `app-mlperf-inference`, `app-mlperf-inference-automotive`, `mlperf-inference`, `mlperf-inference-automotive`, `abtf-inference`
+- **[app-mlperf-automotive-mlcommons-python](app-mlperf-automotive-mlcommons-python/)**
+  - app-mlperf-automotive-mlcommons-python
+  - Tags: `automotive`, `mlcommons`, `reference`, `run-mlperf-inference`, `object-detection`, `abtf-model`, `demo`
+- **[get-mlperf-automotive-scratch-space](get-mlperf-automotive-scratch-space/)**
+  - get-mlperf-automotive-scratch-space
+  - Tags: `get`, `abtf`, `inference`, `scratch`, `space`
+- **[get-mlperf-automotive-src](get-mlperf-automotive-src/)**
+  - get-mlperf-automotive-src
+  - Tags: `get`, `src`, `source`, `automotive`, `automotive-src`, `automotive-source`, `mlperf`, `mlcommons`
+- **[run-mlperf-automotive-app](run-mlperf-automotive-app/)**
+  - run-mlperf-automotive-app
+  - Tags: `run`, `run-abtf`, `run-abtf-inference`, `mlcommons`, `inference`, `reference`
+
+## MLPerf Inference
 
 - **[add-custom-nvidia-system](add-custom-nvidia-system/)**
   - add-custom-nvidia-system
   - Tags: `add`, `custom`, `system`, `nvidia`
+- **[app-loadgen-generic-python](app-loadgen-generic-python/)**
+  - app-loadgen-generic-python
+  - Tags: `app`, `loadgen`, `generic`, `loadgen-generic`, `python`
+- **[app-mlperf-inference](app-mlperf-inference/)**
+  - app-mlperf-inference
+  - Tags: `app`, `vision`, `language`, `mlcommons`, `mlperf`, `inference`, `generic`
+- **[app-mlperf-inference-amd](app-mlperf-inference-amd/)**
+  - app-mlperf-inference-amd
+  - Tags: `reproduce`, `mlcommons`, `mlperf`, `inference`, `harness`, `amd-harness`, `amd`
+- **[app-mlperf-inference-ctuning-cpp-tflite](app-mlperf-inference-ctuning-cpp-tflite/)**
+  - app-mlperf-inference-ctuning-cpp-tflite
+  - Tags: `app`, `mlcommons`, `mlperf`, `inference`, `tflite-cpp`
+- **[app-mlperf-inference-dummy](app-mlperf-inference-dummy/)**
+  - app-mlperf-inference-dummy
+  - Tags: `reproduce`, `mlcommons`, `mlperf`, `inference`, `harness`, `dummy-harness`, `dummy`
+- **[app-mlperf-inference-intel](app-mlperf-inference-intel/)**
+  - app-mlperf-inference-intel
+  - Tags: `reproduce`, `mlcommons`, `mlperf`, `inference`, `harness`, `intel-harness`, `intel`, `intel-harness`, `intel`
+- **[app-mlperf-inference-mlcommons-cpp](app-mlperf-inference-mlcommons-cpp/)**
+  - app-mlperf-inference-mlcommons-cpp
+  - Tags: `app`, `mlcommons`, `mlperf`, `inference`, `cpp`
+- **[app-mlperf-inference-mlcommons-python](app-mlperf-inference-mlcommons-python/)**
+  - app-mlperf-inference-mlcommons-python
+  - Tags: `app`, `vision`, `language`, `mlcommons`, `mlperf`, `inference`, `reference`, `ref`
+- **[app-mlperf-inference-nvidia](app-mlperf-inference-nvidia/)**
+  - app-mlperf-inference-nvidia
+  - Tags: `reproduce`, `mlcommons`, `mlperf`, `inference`, `harness`, `nvidia-harness`, `nvidia`
+- **[app-mlperf-inference-qualcomm](app-mlperf-inference-qualcomm/)**
+  - app-mlperf-inference-qualcomm
+  - Tags: `reproduce`, `mlcommons`, `mlperf`, `inference`, `harness`, `qualcomm-harness`, `qualcomm`, `kilt-harness`, `kilt`
+- **[app-mlperf-inference-redhat](app-mlperf-inference-redhat/)**
+  - app-mlperf-inference-redhat
+  - Tags: `reproduce`, `mlcommons`, `mlperf`, `inference`, `harness`, `redhat-harness`, `redhat`
 - **[benchmark-any-mlperf-inference-implementation](benchmark-any-mlperf-inference-implementation/)**
   - benchmark-any-mlperf-inference-implementation
   - Tags: `benchmark`, `run`, `natively`, `all`, `inference`, `any`, `mlperf`, `mlperf-implementation`, `implementation`, `mlperf-models`
+- **[benchmark-program-mlperf](benchmark-program-mlperf/)**
+  - benchmark-program-mlperf
+  - Tags: `mlperf`, `benchmark-mlperf`
 - **[build-mlperf-inference-server-nvidia](build-mlperf-inference-server-nvidia/)**
   - build-mlperf-inference-server-nvidia
   - Tags: `build`, `mlcommons`, `mlperf`, `inference`, `inference-server`, `server`, `nvidia-harness`, `nvidia`
@@ -663,18 +715,6 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[generate-mlperf-inference-user-conf](generate-mlperf-inference-user-conf/)**
   - generate-mlperf-inference-user-conf
   - Tags: `generate`, `mlperf`, `inference`, `user-conf`, `inference-user-conf`
-- **[generate-mlperf-tiny-report](generate-mlperf-tiny-report/)**
-  - generate-mlperf-tiny-report
-  - Tags: `generate`, `mlperf`, `tiny`, `mlperf-tiny`, `report`
-- **[generate-mlperf-tiny-submission](generate-mlperf-tiny-submission/)**
-  - generate-mlperf-tiny-submission
-  - Tags: `generate`, `submission`, `mlperf`, `mlperf-tiny`, `tiny`, `mlcommons`, `tiny-submission`, `mlperf-tiny-submission`, `mlcommons-tiny-submission`
-- **[get-mlperf-automotive-scratch-space](get-mlperf-automotive-scratch-space/)**
-  - get-mlperf-automotive-scratch-space
-  - Tags: `get`, `abtf`, `inference`, `scratch`, `space`
-- **[get-mlperf-automotive-src](get-mlperf-automotive-src/)**
-  - get-mlperf-automotive-src
-  - Tags: `get`, `src`, `source`, `automotive`, `automotive-src`, `automotive-source`, `mlperf`, `mlcommons`
 - **[get-mlperf-endpoints-src](get-mlperf-endpoints-src/)**
   - get-mlperf-endpoints-src
   - Tags: `get-mlperf-endpoints-src`
@@ -714,18 +754,6 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-mlperf-power-dev](get-mlperf-power-dev/)**
   - get-mlperf-power-dev
   - Tags: `get`, `src`, `source`, `power`, `power-dev`, `mlperf`, `mlcommons`
-- **[get-mlperf-tiny-eembc-energy-runner-src](get-mlperf-tiny-eembc-energy-runner-src/)**
-  - get-mlperf-tiny-eembc-energy-runner-src
-  - Tags: `get`, `src`, `source`, `eembc`, `energyrunner`, `energy-runner`, `eembc-energy-runner`, `tinymlperf-energy-runner`
-- **[get-mlperf-tiny-src](get-mlperf-tiny-src/)**
-  - get-mlperf-tiny-src
-  - Tags: `get`, `src`, `source`, `tiny`, `tiny-src`, `tiny-source`, `tinymlperf`, `tinymlperf-src`, `mlperf`, `mlcommons`
-- **[get-mlperf-training-nvidia-code](get-mlperf-training-nvidia-code/)**
-  - get-mlperf-training-nvidia-code
-  - Tags: `get`, `nvidia`, `mlperf`, `training`, `code`, `training-code`
-- **[get-mlperf-training-src](get-mlperf-training-src/)**
-  - get-mlperf-training-src
-  - Tags: `get`, `src`, `source`, `training`, `training-src`, `training-source`, `mlperf`, `mlcommons`
 - **[get-nvidia-mitten](get-nvidia-mitten/)**
   - get-nvidia-mitten
   - Tags: `get`, `nvidia`, `mitten`, `nvidia-mitten`
@@ -735,12 +763,6 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[install-mlperf-logging-from-src](install-mlperf-logging-from-src/)**
   - install-mlperf-logging-from-src
   - Tags: `install`, `mlperf`, `logging`, `from.src`
-- **[prepare-training-data-bert](prepare-training-data-bert/)**
-  - prepare-training-data-bert
-  - Tags: `prepare`, `mlperf`, `training`, `data`, `input`, `bert`
-- **[prepare-training-data-resnet](prepare-training-data-resnet/)**
-  - prepare-training-data-resnet
-  - Tags: `prepare`, `mlperf`, `training`, `data`, `input`, `resnet`
 - **[preprocess-mlperf-inference-submission](preprocess-mlperf-inference-submission/)**
   - preprocess-mlperf-inference-submission
   - Tags: `run`, `mlc`, `mlcommons`, `mlperf`, `inference`, `submission`, `mlperf-inference`, `processor`, `preprocessor`, `preprocess`
@@ -753,6 +775,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[run-all-mlperf-models](run-all-mlperf-models/)**
   - run-all-mlperf-models
   - Tags: `run`, `natively`, `all`, `mlperf-models`
+- **[run-mlperf-inference-app](run-mlperf-inference-app/)**
+  - run-mlperf-inference-app
+  - Tags: `run`, `common`, `generate-run-cmds`, `run-mlperf`, `run-mlperf-inference`, `vision`, `mlcommons`, `mlperf`, `inference`, `reference`
 - **[run-mlperf-inference-mobilenet-models](run-mlperf-inference-mobilenet-models/)**
   - run-mlperf-inference-mobilenet-models
   - Tags: `run`, `mobilenet`, `models`, `image-classification`, `mobilenet-models`, `mlperf`, `inference`
@@ -765,9 +790,6 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[run-mlperf-power-server](run-mlperf-power-server/)**
   - run-mlperf-power-server
   - Tags: `run`, `mlc`, `mlcommons`, `mlperf`, `power`, `server`, `power-server`
-- **[run-mlperf-training-submission-checker](run-mlperf-training-submission-checker/)**
-  - run-mlperf-training-submission-checker
-  - Tags: `run`, `mlc`, `mlcommons`, `mlperf`, `training`, `train`, `mlperf-training`, `submission`, `checker`, `submission-checker`, `mlc-submission-checker`
 - **[runtime-system-infos](runtime-system-infos/)**
   - runtime-system-infos
   - Tags: `runtime`, `system`, `utilisation`, `infos`
@@ -777,6 +799,33 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[truncate-mlperf-inference-accuracy-log](truncate-mlperf-inference-accuracy-log/)**
   - truncate-mlperf-inference-accuracy-log
   - Tags: `run`, `mlc`, `mlcommons`, `mlperf`, `inference`, `mlperf-inference`, `truncation`, `truncator`, `truncate`, `accuracy`, `accuracy-log`, `accuracy-log-trancation`, `accuracy-log-truncator`, `mlc-accuracy-log-trancation`, `mlc-accuracy-log-truncator`
+
+## MLPerf Training
+
+- **[app-mlperf-training-nvidia](app-mlperf-training-nvidia/)**
+  - app-mlperf-training-nvidia
+  - Tags: `app`, `vision`, `language`, `mlcommons`, `mlperf`, `training`, `nvidia`
+- **[app-mlperf-training-reference](app-mlperf-training-reference/)**
+  - app-mlperf-training-reference
+  - Tags: `app`, `vision`, `language`, `mlcommons`, `mlperf`, `training`, `reference`, `ref`
+- **[get-mlperf-training-nvidia-code](get-mlperf-training-nvidia-code/)**
+  - get-mlperf-training-nvidia-code
+  - Tags: `get`, `nvidia`, `mlperf`, `training`, `code`, `training-code`
+- **[get-mlperf-training-src](get-mlperf-training-src/)**
+  - get-mlperf-training-src
+  - Tags: `get`, `src`, `source`, `training`, `training-src`, `training-source`, `mlperf`, `mlcommons`
+- **[prepare-training-data-bert](prepare-training-data-bert/)**
+  - prepare-training-data-bert
+  - Tags: `prepare`, `mlperf`, `training`, `data`, `input`, `bert`
+- **[prepare-training-data-resnet](prepare-training-data-resnet/)**
+  - prepare-training-data-resnet
+  - Tags: `prepare`, `mlperf`, `training`, `data`, `input`, `resnet`
+- **[reproduce-mlperf-training-nvidia](reproduce-mlperf-training-nvidia/)**
+  - reproduce-mlperf-training-nvidia
+  - Tags: `reproduce`, `mlcommons`, `mlperf`, `train`, `training`, `nvidia-training`, `nvidia`
+- **[run-mlperf-training-submission-checker](run-mlperf-training-submission-checker/)**
+  - run-mlperf-training-submission-checker
+  - Tags: `run`, `mlc`, `mlcommons`, `mlperf`, `training`, `train`, `mlperf-training`, `submission`, `checker`, `submission-checker`, `mlc-submission-checker`
 
 ## Modular AI/ML application pipeline
 
@@ -798,66 +847,6 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[app-stable-diffusion-onnx-py](app-stable-diffusion-onnx-py/)**
   - app-stable-diffusion-onnx-py
   - Tags: `app`, `modular`, `stable`, `diffusion`, `stable-diffusion`, `onnx`, `python`
-
-## Modular MLPerf benchmarks
-
-- **[app-mlperf-inference-amd](app-mlperf-inference-amd/)**
-  - app-mlperf-inference-amd
-  - Tags: `reproduce`, `mlcommons`, `mlperf`, `inference`, `harness`, `amd-harness`, `amd`
-- **[app-mlperf-inference-dummy](app-mlperf-inference-dummy/)**
-  - app-mlperf-inference-dummy
-  - Tags: `reproduce`, `mlcommons`, `mlperf`, `inference`, `harness`, `dummy-harness`, `dummy`
-- **[app-mlperf-inference-intel](app-mlperf-inference-intel/)**
-  - app-mlperf-inference-intel
-  - Tags: `reproduce`, `mlcommons`, `mlperf`, `inference`, `harness`, `intel-harness`, `intel`, `intel-harness`, `intel`
-- **[app-mlperf-inference-qualcomm](app-mlperf-inference-qualcomm/)**
-  - app-mlperf-inference-qualcomm
-  - Tags: `reproduce`, `mlcommons`, `mlperf`, `inference`, `harness`, `qualcomm-harness`, `qualcomm`, `kilt-harness`, `kilt`
-- **[app-mlperf-inference-redhat](app-mlperf-inference-redhat/)**
-  - app-mlperf-inference-redhat
-  - Tags: `reproduce`, `mlcommons`, `mlperf`, `inference`, `harness`, `redhat-harness`, `redhat`
-
-## Modular MLPerf inference benchmark pipeline
-
-- **[app-loadgen-generic-python](app-loadgen-generic-python/)**
-  - app-loadgen-generic-python
-  - Tags: `app`, `loadgen`, `generic`, `loadgen-generic`, `python`
-- **[app-mlperf-automotive](app-mlperf-automotive/)**
-  - app-mlperf-automotive
-  - Tags: `app`, `app-mlperf-inference`, `app-mlperf-inference-automotive`, `mlperf-inference`, `mlperf-inference-automotive`, `abtf-inference`
-- **[app-mlperf-automotive-mlcommons-python](app-mlperf-automotive-mlcommons-python/)**
-  - app-mlperf-automotive-mlcommons-python
-  - Tags: `automotive`, `mlcommons`, `reference`, `run-mlperf-inference`, `object-detection`, `abtf-model`, `demo`
-- **[app-mlperf-inference](app-mlperf-inference/)**
-  - app-mlperf-inference
-  - Tags: `app`, `vision`, `language`, `mlcommons`, `mlperf`, `inference`, `generic`
-- **[app-mlperf-inference-ctuning-cpp-tflite](app-mlperf-inference-ctuning-cpp-tflite/)**
-  - app-mlperf-inference-ctuning-cpp-tflite
-  - Tags: `app`, `mlcommons`, `mlperf`, `inference`, `tflite-cpp`
-- **[app-mlperf-inference-mlcommons-cpp](app-mlperf-inference-mlcommons-cpp/)**
-  - app-mlperf-inference-mlcommons-cpp
-  - Tags: `app`, `mlcommons`, `mlperf`, `inference`, `cpp`
-- **[app-mlperf-inference-mlcommons-python](app-mlperf-inference-mlcommons-python/)**
-  - app-mlperf-inference-mlcommons-python
-  - Tags: `app`, `vision`, `language`, `mlcommons`, `mlperf`, `inference`, `reference`, `ref`
-- **[benchmark-program-mlperf](benchmark-program-mlperf/)**
-  - benchmark-program-mlperf
-  - Tags: `mlperf`, `benchmark-mlperf`
-- **[run-mlperf-automotive-app](run-mlperf-automotive-app/)**
-  - run-mlperf-automotive-app
-  - Tags: `run`, `run-abtf`, `run-abtf-inference`, `mlcommons`, `inference`, `reference`
-- **[run-mlperf-inference-app](run-mlperf-inference-app/)**
-  - run-mlperf-inference-app
-  - Tags: `run`, `common`, `generate-run-cmds`, `run-mlperf`, `run-mlperf-inference`, `vision`, `mlcommons`, `mlperf`, `inference`, `reference`
-
-## Modular MLPerf training benchmark pipeline
-
-- **[app-mlperf-training-nvidia](app-mlperf-training-nvidia/)**
-  - app-mlperf-training-nvidia
-  - Tags: `app`, `vision`, `language`, `mlcommons`, `mlperf`, `training`, `nvidia`
-- **[app-mlperf-training-reference](app-mlperf-training-reference/)**
-  - app-mlperf-training-reference
-  - Tags: `app`, `vision`, `language`, `mlcommons`, `mlperf`, `training`, `reference`, `ref`
 
 ## Platform information
 
@@ -907,21 +896,6 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - remote-run-commands
   - Tags: `remote`, `run`, `cmds`, `remote-run`, `remote-run-cmds`, `ssh-run`, `ssh`
 
-## Reproduce MLPerf benchmarks
-
-- **[app-mlperf-inference-nvidia](app-mlperf-inference-nvidia/)**
-  - app-mlperf-inference-nvidia
-  - Tags: `reproduce`, `mlcommons`, `mlperf`, `inference`, `harness`, `nvidia-harness`, `nvidia`
-- **[reproduce-mlperf-octoml-tinyml-results](reproduce-mlperf-octoml-tinyml-results/)**
-  - reproduce-mlperf-octoml-tinyml-results
-  - Tags: `reproduce`, `tiny`, `results`, `mlperf`, `octoml`, `mlcommons`
-- **[reproduce-mlperf-training-nvidia](reproduce-mlperf-training-nvidia/)**
-  - reproduce-mlperf-training-nvidia
-  - Tags: `reproduce`, `mlcommons`, `mlperf`, `train`, `training`, `nvidia-training`, `nvidia`
-- **[wrapper-reproduce-octoml-tinyml-submission](wrapper-reproduce-octoml-tinyml-submission/)**
-  - wrapper-reproduce-octoml-tinyml-submission
-  - Tags: `run`, `generate-tiny`, `generate`, `submission`, `tiny`, `generate-tiny-submission`, `results`, `mlcommons`, `mlperf`, `octoml`
-
 ## Reproducibility and artifact evaluation
 
 - **[get-ipol-src](get-ipol-src/)**
@@ -948,15 +922,33 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[flash-tinyml-binary](flash-tinyml-binary/)**
   - flash-tinyml-binary
   - Tags: `flash`, `tiny`, `mlperf`, `mlcommons`
+- **[generate-mlperf-tiny-report](generate-mlperf-tiny-report/)**
+  - generate-mlperf-tiny-report
+  - Tags: `generate`, `mlperf`, `tiny`, `mlperf-tiny`, `report`
+- **[generate-mlperf-tiny-submission](generate-mlperf-tiny-submission/)**
+  - generate-mlperf-tiny-submission
+  - Tags: `generate`, `submission`, `mlperf`, `mlperf-tiny`, `tiny`, `mlcommons`, `tiny-submission`, `mlperf-tiny-submission`, `mlcommons-tiny-submission`
 - **[get-microtvm](get-microtvm/)**
   - get-microtvm
   - Tags: `get`, `src`, `source`, `microtvm`, `tiny`
+- **[get-mlperf-tiny-eembc-energy-runner-src](get-mlperf-tiny-eembc-energy-runner-src/)**
+  - get-mlperf-tiny-eembc-energy-runner-src
+  - Tags: `get`, `src`, `source`, `eembc`, `energyrunner`, `energy-runner`, `eembc-energy-runner`, `tinymlperf-energy-runner`
+- **[get-mlperf-tiny-src](get-mlperf-tiny-src/)**
+  - get-mlperf-tiny-src
+  - Tags: `get`, `src`, `source`, `tiny`, `tiny-src`, `tiny-source`, `tinymlperf`, `tinymlperf-src`, `mlperf`, `mlcommons`
 - **[get-zephyr](get-zephyr/)**
   - get-zephyr
   - Tags: `get`, `zephyr`
 - **[get-zephyr-sdk](get-zephyr-sdk/)**
   - get-zephyr-sdk
   - Tags: `get`, `zephyr-sdk`
+- **[reproduce-mlperf-octoml-tinyml-results](reproduce-mlperf-octoml-tinyml-results/)**
+  - reproduce-mlperf-octoml-tinyml-results
+  - Tags: `reproduce`, `tiny`, `results`, `mlperf`, `octoml`, `mlcommons`
+- **[wrapper-reproduce-octoml-tinyml-submission](wrapper-reproduce-octoml-tinyml-submission/)**
+  - wrapper-reproduce-octoml-tinyml-submission
+  - Tags: `run`, `generate-tiny`, `generate`, `submission`, `tiny`, `generate-tiny-submission`, `results`, `mlcommons`, `mlperf`, `octoml`
 
 ## Uncategorized
 
@@ -1062,7 +1054,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 ## Statistics
 
 - **Total Scripts**: 308
-- **Categories**: 31
+- **Categories**: 29
 
 ## Usage
 
