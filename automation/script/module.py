@@ -4501,10 +4501,12 @@ def enable_or_skip_script(meta, env):
             value = str(env[key]).lower().strip()
             if set(meta_key) & set(["yes", "on", "true", "1"]):
                 # Any set value other than false is taken as set
-                if not is_false(value) and value != '' and not re.findall(r'<<<(.*?)>>>', str(value)):
+                if not is_false(value) and value != '' and not re.findall(
+                        r'<<<(.*?)>>>', str(value)):
                     continue
             elif set(meta_key) & set(["no", "off", "false", "0"]):
-                if is_false(value) or value == "" or re.findall(r'<<<(.*?)>>>', str(value)):
+                if is_false(value) or value == "" or re.findall(
+                        r'<<<(.*?)>>>', str(value)):
                     continue
             elif value in meta_key:
                 continue
@@ -4534,10 +4536,12 @@ def any_enable_or_skip_script(meta, env):
             meta_key = [str(v).lower() for v in meta[key]]
 
             if set(meta_key) & set(["yes", "on", "true", "1"]):
-                if not is_false(value) and value != '' and not re.findall(r'<<<(.*?)>>>', str(value)):
+                if not is_false(value) and value != '' and not re.findall(
+                        r'<<<(.*?)>>>', str(value)):
                     found = True
             elif set(meta_key) & set(["no", "off", "false", "0", ""]):
-                if is_false(value) or value == "" or re.findall(r'<<<(.*?)>>>', str(value)):
+                if is_false(value) or value == "" or re.findall(
+                        r'<<<(.*?)>>>', str(value)):
                     found = True
             elif value in meta_key:
                 found = True
