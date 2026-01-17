@@ -3,7 +3,7 @@ name: MLPerf inference YOLO-v11
 on:
   schedule:
     - cron: '0 0 * * *'  # Runs daily at 12 AM UTC
-  pull_request_target:
+  pull_request:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlperf-inference-yolo.yml'
