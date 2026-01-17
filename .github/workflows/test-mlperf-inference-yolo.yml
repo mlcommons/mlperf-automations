@@ -1,4 +1,6 @@
 name: MLPerf inference YOLO-v11
+permissions:
+  contents: read
 
 on:
   schedule:
