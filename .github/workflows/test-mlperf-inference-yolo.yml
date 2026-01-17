@@ -1,0 +1,49 @@
+name: MLPerf inference YOLO-v11
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs daily at 12 AM UTC
+  pull_request_target:
+    branches: [ "main", "dev" ]
+    paths:
+      - '.github/workflows/test-mlperf-inference-yolo.yml'
+      - '**'
+      - '!**.md'
+
+jobs:
+  mlc-run-with-results-upload:
+    runs-on: ${{ matrix.os }}
+    env:
+      MLC_INDEX: "on"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [ "3.13", "3.12" ]
+        backend: [ "pytorch" ]
+  
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install mlcflow
+      run: |
+        pip install mlcflow
+        pip install tabulate
+
+    - name: Pull MLOps repo
+      shell: bash
+      env:
+        REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        BRANCH: ${{ github.event.pull_request.head.ref }}
+      run: |
+        mlc pull repo "$REPO" --branch="$BRANCH"
+
+    - name: Test MLPerf Inference YOLO-v11 (Linux/macOS)
+      run: |
+        mlcr run-mlperf,inference,_submission,_full,_all-modes,_all-scenarios,_r6.0-dev --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }}x86" --model=yolo-99 --implementation=reference --category=edge --backend=${{ matrix.backend }} --framework=pytorch --device=cpu --scenario=Offline --execution_mode=valid -adr.inference-src.tags=_branch.anandhu-eng-patch-13 --adr.inference-src-loadgen.tags=_branch.anandhu-eng-patch-13 --adr.inference-src.version=custom --adr.inference-src-loadgen.version=custom --adr.loadgen.version=custom -v --quiet     

@@ -512,6 +512,8 @@ input_description:
     - rgat
     - llama3_1-405b
     - pointpainting
+    - yolo-95
+    - yolo-99
     desc: MLPerf model
     sort: 200
   precision:

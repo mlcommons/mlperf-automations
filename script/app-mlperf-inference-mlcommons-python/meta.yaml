@@ -1562,6 +1562,42 @@ variations:
       - tags: get,generic-python-lib,_package.pandas
       - tags: get,generic-python-lib,_package.numpy
       - tags: get,generic-python-lib,_package.setuptools
+  
+  yolo_:
+    deps:
+    - tags: get-ml-model-yolov11,_mlc,_r2-downloader
+      names:
+        - yolo-v11-model-download
+      skip_if_env:
+        MLC_USE_ML_MODEL_FROM_HOST: 
+        - true
+        - "yes"
+    - tags: get,dataset,mlperf-inference,yolo-coco2017-filtered,_mlc,_r2-downloader
+      names:
+        - yolo-v11-dataset-download
+      skip_if_env:
+        MLC_USE_DATASET_FROM_HOST: 
+        - true
+        - "yes"
+    - tags: get,generic-python-lib,_package.ultralytics
+    - tags: get,generic-python-lib,_package.tqdm
+    env:
+      MLC_MLPERF_MODEL_SKIP_BATCHING: true
+      MLC_ML_MODEL_DATASET_TYPE: multihot-criteo
+
+  yolo-95:
+    group: models
+    base:
+      - yolo_
+    env:
+      MLC_MODEL: yolo-95
+
+  yolo-99:
+    group: models
+    base:
+      - yolo_
+    env:
+      MLC_MODEL: yolo-99
       
   # Target devices
   cpu:
