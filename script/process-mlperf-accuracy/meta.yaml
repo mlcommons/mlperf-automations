@@ -377,6 +377,8 @@ variations:
     group: dataset
     env:
       MLC_DATASET: yolo-coco2017-filtered
+    deps:
+      - tags: get,generic-python-lib,_pycocotools
   edge:
     group: category
   datacenter:
