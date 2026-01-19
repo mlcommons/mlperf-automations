@@ -88,6 +88,7 @@ class ScriptAutomation(Automation):
                                              'extra_cache_tags': {'desc': 'Extra cache tags to be added to the cached entry when the script results are saved', 'default': ''},
                                              'skip_compile': {'desc': 'Skip compilation', 'default': False},
                                              'skip_run': {'desc': 'Skip run', 'default': False},
+                                             'skip_sudo': {'desc': 'Skip SUDO detection', 'default': False},
                                              'accept_license': {'desc': 'Accept the required license requirement to run the script', 'default': False},
                                              'skip_system_deps': {'desc': 'Skip installing any system dependencies', 'default': False},
                                              'git_ssh': {'desc': 'Use SSH for git repos', 'default': False},
