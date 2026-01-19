@@ -5,7 +5,7 @@ permissions:
 on:
   schedule:
     - cron: '0 0 * * *'  # Runs daily at 12 AM UTC
-  pull_request:
+  pull_request_target:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlperf-inference-yolo.yml'
@@ -50,3 +50,24 @@ jobs:
       run: |
         mlcr run-mlperf,inference,_full,_find-performance,_all-scenarios,_r6.0-dev --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }}x86" --model=yolo-99 --implementation=reference --category=edge --backend=${{ matrix.backend }} --framework=pytorch --device=cpu --execution_mode=test -adr.inference-src.tags=_branch.anandhu-eng-patch-13 --adr.inference-src-loadgen.tags=_branch.anandhu-eng-patch-13 --adr.inference-src.version=custom --adr.inference-src-loadgen.version=custom --adr.loadgen.version=custom -v --quiet     
         mlcr run-mlperf,inference,_submission,_full,_all-modes,_all-scenarios,_r6.0-dev --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }}x86" --model=yolo-99 --implementation=reference --category=edge --backend=${{ matrix.backend }} --framework=pytorch --device=cpu --execution_mode=valid -adr.inference-src.tags=_branch.anandhu-eng-patch-13 --adr.inference-src-loadgen.tags=_branch.anandhu-eng-patch-13 --adr.inference-src.version=custom --adr.inference-src-loadgen.version=custom --adr.loadgen.version=custom --multistream_target_latency=900 --env.MLC_MLPERF_USE_MAX_DURATION=no -v --quiet     
+
+    - name: Load secrets
+      id: op-load-secrets
+      uses: 1password/load-secrets-action@v3
+      env:
+        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        PAT: op://7basd2jirojjckncf6qnq3azai/bzbaco3uxoqs2rcyu42rvuccga/credential
+
+    - name: Push Results
+      env:
+        GITHUB_TOKEN: ${{ steps.op-load-secrets.outputs.PAT }}
+      if: github.repository_owner == 'mlcommons' && env.run_step == 'true'
+      run: |
+        git config --global user.name "mlcommons-bot"
+        git config --global user.email "mlcommons-bot@users.noreply.github.com"
+        git config --global credential.https://github.com.helper ""
+        git config --global credential.https://github.com.helper "!gh auth git-credential"
+        git config --global credential.https://gist.github.com.helper ""
+        git config --global credential.https://gist.github.com.helper "!gh auth git-credential"
+        mlcr push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=v6.0 --commit_message="Results from yolo-v11 GH action on ${{ matrix.os }}" --quiet
+   
