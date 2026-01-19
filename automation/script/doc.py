@@ -114,10 +114,10 @@ mlc pull repo {repo_location} --pat=<Your Private Access Token>
 def generate_docs(script_repo, metadata, script_path, generic_inputs):
     script_name = metadata.get('alias', metadata['uid'])
     info_doc_exists = os.path.exists(os.path.join(script_path, 'info.md'))
-    if info_doc_exists:
-        readme_line = "Edit [info.md](info.md) to add custom contents."
-    else:
-        readme_line = "Add custom content in [info.md](info.md)."
+    readme_line = "Edit [info.md](info.md) to add custom contents."
+    if not info_doc_exists:
+        with open(os.path.join(script_path, 'info.md'), "w") as f:
+            f.write("")
     readme_prefix = f"""This README is automatically generated. {readme_line} Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 """
     doc_content = f"""# README for {script_name}
