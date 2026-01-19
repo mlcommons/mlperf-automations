@@ -155,15 +155,15 @@ jobs:
   
     - name: Run MLPerf Inference Retinanet with native and virtual Python
       run: |
-        mlcr app,mlperf,inference,generic,_cpp,_retinanet,_onnxruntime,_cpu,_r6.0-dev_default  --adr.python.version_min=3.8 --adr.compiler.tags=gcc --adr.openimages-preprocessed.tags=_50 --scenario=Offline --mode=accuracy --test_query_count=10 --rerun --quiet
+        mlcr app,mlperf,inference,generic,_cpp,_retinanet,_onnxruntime,_cpu  --adr.python.version_min=3.8 --adr.compiler.tags=gcc --adr.openimages-preprocessed.tags=_50 --scenario=Offline --mode=accuracy --test_query_count=10 --rerun --quiet
 
-        mlcr app,mlperf,inference,generic,_cpp,_retinanet,_onnxruntime,_cpu,_r6.0-dev_default  --adr.python.version_min=3.8 --adr.compiler.tags=gcc --adr.openimages-preprocessed.tags=_50 --scenario=Offline --mode=performance --test_query_count=10 --rerun --quiet
+        mlcr app,mlperf,inference,generic,_cpp,_retinanet,_onnxruntime,_cpu  --adr.python.version_min=3.8 --adr.compiler.tags=gcc --adr.openimages-preprocessed.tags=_50 --scenario=Offline --mode=performance --test_query_count=10 --rerun --quiet
 
         mlcr install,python-venv --version=3.10.8 --name=mlperf --quiet
 
         export MLC_SCRIPT_EXTRA_CMD="--adr.python.name=mlperf"
 
-        mlcr run,mlperf,inference,_submission,_short,_r6.0-dev --adr.python.version_min=3.8 --adr.compiler.tags=gcc --adr.openimages-preprocessed.tags=_50 --submitter=MLCommons --implementation=cpp --hw_name=default --model=retinanet --backend=onnxruntime --device=cpu --scenario=Offline --quiet
+        mlcr run,mlperf,inference,_submission,_short --adr.python.version_min=3.8 --adr.compiler.tags=gcc --adr.openimages-preprocessed.tags=_50 --submitter=MLCommons --implementation=cpp --hw_name=default --model=retinanet --backend=onnxruntime --device=cpu --scenario=Offline --quiet
 
      # Step for Linux/MacOS
     - name: Randomly Execute Step (Linux/MacOS)

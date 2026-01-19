@@ -213,7 +213,7 @@ variations:
     default:
       true
     default_variations:
-      reproducibility: r4.1-dev_default
+      reproducibility: r6.0-dev_default
     add_deps_recursive:
       imagenet-accuracy-script:
         tags: _float32
@@ -2373,6 +2373,7 @@ variations:
       MLC_MLPERF_INFERENCE_VERSION: '5.1'
   
   r6.0-dev_default:
+    default: true
     group:
       reproducibility
     add_deps_recursive:
