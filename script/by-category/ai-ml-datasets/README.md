@@ -1,0 +1,37 @@
+# AI/ML datasets
+
+This folder contains 31 scripts in the **AI/ML datasets** category.
+
+## Scripts
+
+- [get-croissant](get-croissant/)
+- [get-dataset-cifar10](get-dataset-cifar10/)
+- [get-dataset-cnndm](get-dataset-cnndm/)
+- [get-dataset-coco](get-dataset-coco/)
+- [get-dataset-coco2014](get-dataset-coco2014/)
+- [get-dataset-cognata-mlcommons](get-dataset-cognata-mlcommons/)
+- [get-dataset-criteo](get-dataset-criteo/)
+- [get-dataset-imagenet-aux](get-dataset-imagenet-aux/)
+- [get-dataset-imagenet-calibration](get-dataset-imagenet-calibration/)
+- [get-dataset-imagenet-helper](get-dataset-imagenet-helper/)
+- [get-dataset-imagenet-train](get-dataset-imagenet-train/)
+- [get-dataset-imagenet-val](get-dataset-imagenet-val/)
+- [get-dataset-kits19](get-dataset-kits19/)
+- [get-dataset-librispeech](get-dataset-librispeech/)
+- [get-dataset-mlperf-inference-mixtral](get-dataset-mlperf-inference-mixtral/)
+- [get-dataset-openimages](get-dataset-openimages/)
+- [get-dataset-openimages-annotations](get-dataset-openimages-annotations/)
+- [get-dataset-openimages-calibration](get-dataset-openimages-calibration/)
+- [get-dataset-openorca](get-dataset-openorca/)
+- [get-dataset-squad](get-dataset-squad/)
+- [get-dataset-squad-vocab](get-dataset-squad-vocab/)
+- [get-preprocessed-dataset-cognata](get-preprocessed-dataset-cognata/)
+- [get-preprocessed-dataset-criteo](get-preprocessed-dataset-criteo/)
+- [get-preprocessed-dataset-generic](get-preprocessed-dataset-generic/)
+- [get-preprocessed-dataset-imagenet](get-preprocessed-dataset-imagenet/)
+- [get-preprocessed-dataset-kits19](get-preprocessed-dataset-kits19/)
+- [get-preprocessed-dataset-librispeech](get-preprocessed-dataset-librispeech/)
+- [get-preprocessed-dataset-nuscenes](get-preprocessed-dataset-nuscenes/)
+- [get-preprocessed-dataset-openimages](get-preprocessed-dataset-openimages/)
+- [get-preprocessed-dataset-openorca](get-preprocessed-dataset-openorca/)
+- [get-preprocessed-dataset-squad](get-preprocessed-dataset-squad/)
