@@ -58,6 +58,16 @@ jobs:
         OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
         PAT: op://7basd2jirojjckncf6qnq3azai/bzbaco3uxoqs2rcyu42rvuccga/credential
 
+    - name: Randomly Execute Step (Linux/MacOS)
+      run: |
+        RANDOM_NUMBER=$((RANDOM % 10))
+        echo "Random number is $RANDOM_NUMBER"
+        if [ "$RANDOM_NUMBER" -eq 0 ]; then
+          echo "run_step=true" >> $GITHUB_ENV
+        else
+          echo "run_step=false" >> $GITHUB_ENV
+        fi
+
     - name: Push Results
       env:
         GITHUB_TOKEN: ${{ steps.op-load-secrets.outputs.PAT }}
