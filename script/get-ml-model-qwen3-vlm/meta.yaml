@@ -1,4 +1,4 @@
-alias: get-ml-model-qwen3-vl
+alias: get-ml-model-qwen3-vlm
 automation_alias: script
 automation_uid: 5b4e0237da074764
 cache: true
