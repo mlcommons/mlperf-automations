@@ -67,28 +67,14 @@ def experiment_run(self_module, i):
     mlc_script_input = {
         'action': 'run', 'target': 'script'
     }
-    if exp:
-        for key in exp:
-            ii = {**mlc_script_input, **run_input}
-            if isinstance(exp[key], list):
-                for val in exp[key]:
-                    ii[key] = val
-                    r = run_script_and_tag_experiment(
-                        ii,
-                        self_module.action_object,
-                        experiment_action,
-                        tags,
-                        extra_exp_tags,
-                        meta,
-                        skip_state_save,
-                        logger)
-                    if r['return'] > 0:
-                        return r
-            elif isinstance(exp[key], dict):
-                return {
-                    'return': 1, 'error': 'Dictionary inputs are not supported for mlc experiment script'}
-            else:
-                ii[key] = exp[key]
+    if not exp:
+        exp['exp'] = True
+
+    for key in exp:
+        ii = {**mlc_script_input, **run_input}
+        if isinstance(exp[key], list):
+            for val in exp[key]:
+                ii[key] = val
                 r = run_script_and_tag_experiment(
                     ii,
                     self_module.action_object,
@@ -100,6 +86,22 @@ def experiment_run(self_module, i):
                     logger)
                 if r['return'] > 0:
                     return r
+        elif isinstance(exp[key], dict):
+            return {
+                'return': 1, 'error': 'Dictionary inputs are not supported for mlc experiment script'}
+        else:
+            ii[key] = exp[key]
+            r = run_script_and_tag_experiment(
+                ii,
+                self_module.action_object,
+                experiment_action,
+                tags,
+                extra_exp_tags,
+                meta,
+                skip_state_save,
+                logger)
+            if r['return'] > 0:
+                return r
 
     return {'return': 0}
 
@@ -146,7 +148,8 @@ def run_script_and_tag_experiment(
                'target': 'script',
                'tags': 'save,system,state',
                'outfile': 'system_state_before.json',
-               'quiet': True
+               'quiet': True,
+               'skip_sudo': ii.get('skip_sudo')
                }
         r = script_action.access(ssi)
         if r['return'] > 0:

@@ -94,6 +94,8 @@ def preprocess(i):
         ml_model_name = "3d-unet"
     if 'gptj' in ml_model_name:
         ml_model_name = "gptj"
+    if 'yolo' in ml_model_name:
+        ml_model_name = "yolo"
     if 'llama2-70b' in ml_model_name:
         ml_model_name = "llama2-70b"
 

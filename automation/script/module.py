@@ -88,6 +88,7 @@ class ScriptAutomation(Automation):
                                              'extra_cache_tags': {'desc': 'Extra cache tags to be added to the cached entry when the script results are saved', 'default': ''},
                                              'skip_compile': {'desc': 'Skip compilation', 'default': False},
                                              'skip_run': {'desc': 'Skip run', 'default': False},
+                                             'skip_sudo': {'desc': 'Skip SUDO detection', 'default': False},
                                              'accept_license': {'desc': 'Accept the required license requirement to run the script', 'default': False},
                                              'skip_system_deps': {'desc': 'Skip installing any system dependencies', 'default': False},
                                              'git_ssh': {'desc': 'Use SSH for git repos', 'default': False},
@@ -4501,10 +4502,12 @@ def enable_or_skip_script(meta, env):
             value = str(env[key]).lower().strip()
             if set(meta_key) & set(["yes", "on", "true", "1"]):
                 # Any set value other than false is taken as set
-                if not is_false(value) and value != '':
+                if not is_false(value) and value != '' and not re.findall(
+                        r'<<<(.*?)>>>', str(value)):
                     continue
             elif set(meta_key) & set(["no", "off", "false", "0"]):
-                if is_false(value) or value == "":
+                if is_false(value) or value == "" or re.findall(
+                        r'<<<(.*?)>>>', str(value)):
                     continue
             elif value in meta_key:
                 continue
@@ -4534,10 +4537,12 @@ def any_enable_or_skip_script(meta, env):
             meta_key = [str(v).lower() for v in meta[key]]
 
             if set(meta_key) & set(["yes", "on", "true", "1"]):
-                if not is_false(value) and value != "":
+                if not is_false(value) and value != '' and not re.findall(
+                        r'<<<(.*?)>>>', str(value)):
                     found = True
             elif set(meta_key) & set(["no", "off", "false", "0", ""]):
-                if is_false(value) or value == "":
+                if is_false(value) or value == "" or re.findall(
+                        r'<<<(.*?)>>>', str(value)):
                     found = True
             elif value in meta_key:
                 found = True
