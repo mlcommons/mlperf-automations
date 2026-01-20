@@ -1,0 +1,61 @@
+alias: get-ml-model-qwen3-vlm
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+new_env_keys:
+- MLC_ML_MODEL_QWEN3_VLM_PATH
+- MLC_ML_MODEL_FILE_WITH_PATH
+print_env_at_the_end:
+  MLC_ML_MODEL_QWEN3_VLM_PATH: Qwen3 VLM checkpoint path
+tags:
+- get-ml-model-qwen3-vl
+tests:
+  run_inputs:
+  - variations_list:
+    - r2-downloader,mlc,dry-run,235b-a22b
+uid: d52b9d6ab4f640e0
+variations:
+  dry-run:
+    env:
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  mlc:
+    default: true
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+    group: download-src
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      env:
+        MLC_DOWNLOAD_FILENAME: qwen3-vlm-checkpoint
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_QWEN3_VLM_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_MODEL_QWEN3_VLM_PATH
+      extra_cache_tags: ml,model,vlm
+      force_cache: true
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      names:
+      - qwen3-vlm-model-dae
+      tags: download-and-extract
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
+  r2-downloader:
+    default: true
+    group: download-tool
+    adr:
+      qwen3-vlm-model-dae:
+        tags: _r2-downloader
+  235b-a22b:
+    group: parameters
+    default: true
+  mlc,235b-a22b,r2-downloader:
+    adr:
+      qwen3-vlm-model-dae:
+        env:
+          MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/VLM-model.uri

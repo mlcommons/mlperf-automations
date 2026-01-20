@@ -94,6 +94,8 @@ def preprocess(i):
         ml_model_name = "3d-unet"
     if 'gptj' in ml_model_name:
         ml_model_name = "gptj"
+    if 'yolo' in ml_model_name:
+        ml_model_name = "yolo"
     if 'llama2-70b' in ml_model_name:
         ml_model_name = "llama2-70b"
 
@@ -265,19 +267,11 @@ def preprocess(i):
         else:
             audit_path = test
 
-        if env['MLC_BENCHMARK_GROUP'] == "automotive":
-            audit_full_path = os.path.join(
-                env['MLC_MLPERF_INFERENCE_SOURCE'],
-                "compliance",
-                audit_path,
-                "audit.config")
-        else:
-            audit_full_path = os.path.join(
-                env['MLC_MLPERF_INFERENCE_SOURCE'],
-                "compliance",
-                "nvidia",
-                audit_path,
-                "audit.config")
+        audit_full_path = os.path.join(
+            env['MLC_MLPERF_INFERENCE_SOURCE'],
+            "compliance",
+            audit_path,
+            "audit.config")
 
         env['MLC_MLPERF_INFERENCE_AUDIT_PATH'] = audit_full_path
         # copy the audit conf to the run directory incase the implementation is
@@ -526,19 +520,11 @@ def run_files_exist(mode, OUTPUT_DIR, run_files, env, logger):
 
         test = env['MLC_MLPERF_LOADGEN_COMPLIANCE_TEST']
 
-        if env['MLC_BENCHMARK_GROUP'] == "automotive":
-            SCRIPT_PATH = os.path.join(
-                env['MLC_MLPERF_INFERENCE_SOURCE'],
-                "compliance",
-                test,
-                "run_verification.py")
-        else:
-            SCRIPT_PATH = os.path.join(
-                env['MLC_MLPERF_INFERENCE_SOURCE'],
-                "compliance",
-                "nvidia",
-                test,
-                "run_verification.py")
+        SCRIPT_PATH = os.path.join(
+            env['MLC_MLPERF_INFERENCE_SOURCE'],
+            "compliance",
+            test,
+            "run_verification.py")
 
         if test == "TEST06":
             cmd = f"{env['MLC_PYTHON_BIN_WITH_PATH']}  {SCRIPT_PATH}  -c  {COMPLIANCE_DIR}  -o  {OUTPUT_DIR} --scenario {scenario} --dtype int32"

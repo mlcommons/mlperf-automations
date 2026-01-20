@@ -1,0 +1,61 @@
+alias: get-ml-model-wan2
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+new_env_keys:
+- MLC_ML_MODEL_WAN2_PATH
+- MLC_ML_MODEL_FILE_WITH_PATH
+print_env_at_the_end:
+  MLC_ML_MODEL_WAN2_PATH: WAN2 checkpoint path
+tags:
+- get-ml-model-wan2
+tests:
+  run_inputs:
+  - variations_list:
+    - r2-downloader,mlc,dry-run,wan2_2_t2v_a14b
+uid: d69adb00b3504163
+variations:
+  dry-run:
+    env:
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  mlc:
+    default: true
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+    group: download-src
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      env:
+        MLC_DOWNLOAD_FILENAME: wan2-checkpoint
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_WAN2_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_MODEL_WAN2_PATH
+      extra_cache_tags: ml,model,wan2
+      force_cache: true
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      names:
+      - wan2-model-dae
+      tags: download-and-extract
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
+  r2-downloader:
+    adr:
+      wan2-model-dae:
+        tags: _r2-downloader
+    default: true
+    group: download-tool
+  wan2_2_t2v_a14b:
+    group: model-variant
+    default: true
+  mlc,r2-downloader,wan2_2_t2v_a14b:
+    adr:
+      wan2-model-dae:
+        env:
+          MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/T2V-model.uri
