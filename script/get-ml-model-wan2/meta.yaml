@@ -12,7 +12,7 @@ tags:
 tests:
   run_inputs:
   - variations_list:
-    - r2-downloader,mlc,dry-run
+    - r2-downloader,mlc,dry-run,wan2_2_t2v_a14b
 uid: d69adb00b3504163
 variations:
   dry-run:
