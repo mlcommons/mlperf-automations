@@ -146,7 +146,7 @@ def postprocess(i):
 
     valid_models = get_valid_models(
         env['MLC_MLPERF_LAST_RELEASE'],
-        env['MLC_MLPERF_INFERENCE_SOURCE'])
+        env['MLC_MLPERF_INFERENCE_SOURCE'], env)
 
     state['MLC_MLPERF_INFERENCE_MODELS'] = valid_models
 
@@ -156,22 +156,33 @@ def postprocess(i):
     return {'return': 0, 'version': env['MLC_VERSION']}
 
 
-def get_valid_models(mlperf_version, mlperf_path):
+def get_valid_models(mlperf_version, mlperf_path, env):
 
     import sys
+    # for ensuring backward compatibility with the previous submission checker
+    submission_checker_modularised = False
+    submission_checker_root = os.path.join(mlperf_path, "tools", "submission")
 
-    submission_checker_dir = os.path.join(mlperf_path, "tools", "submission")
+    if os.path.isdir(os.path.join(
+            mlperf_path, "tools", "submission", "submission_checker")):
+        submission_checker_dir = os.path.join(
+            mlperf_path, "tools", "submission", "submission_checker")
+        submission_checker_modularised = True
+        env['MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER'] = 'yes'
 
-    sys.path.append(submission_checker_dir)
+    sys.path.append(submission_checker_root)
 
-    if not os.path.exists(os.path.join(
-            submission_checker_dir, "submission_checker.py")):
-        shutil.copy(os.path.join(submission_checker_dir, "submission-checker.py"), os.path.join(submission_checker_dir,
-                                                                                                "submission_checker.py"))
-
-    import submission_checker as checker
-
-    config = checker.MODEL_CONFIG
+    if not submission_checker_modularised:
+        if not os.path.exists(os.path.join(
+                submission_checker_root, "submission_checker.py")):
+            shutil.copy(os.path.join(submission_checker_root, "submission-checker.py"),
+                        os.path.join(submission_checker_root, "submission_checker.py"))
+        import submission_checker as checker
+        config = checker.MODEL_CONFIG
+    else:
+        import submission_checker.main as checker
+        import submission_checker.constants as constants
+        config = constants.MODEL_CONFIG
 
     valid_models = config[mlperf_version]["models"]
 

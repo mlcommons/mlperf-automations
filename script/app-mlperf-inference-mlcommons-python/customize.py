@@ -73,7 +73,7 @@ def preprocess(i):
             str(env['MLC_MLPERF_LOADGEN_BATCH_SIZE'])
 
     if env.get('MLC_MLPERF_LOADGEN_QUERY_COUNT', '') != '' and not env.get('MLC_TMP_IGNORE_MLPERF_QUERY_COUNT', False) and (
-            env['MLC_MLPERF_LOADGEN_MODE'] == 'accuracy' or 'gptj' in env['MLC_MODEL'] or 'llama2' in env['MLC_MODEL'] or 'mixtral' in env['MLC_MODEL'] or 'llama3' in env['MLC_MODEL'] or 'pointpainting' in env['MLC_MODEL']) and (env.get('MLC_MLPERF_RUN_STYLE', '') != "valid" or 'pointpainting' in env['MLC_MODEL']):
+            env['MLC_MLPERF_LOADGEN_MODE'] == 'accuracy' or 'gptj' in env['MLC_MODEL'] or 'llama2' in env['MLC_MODEL'] or 'yolo' in env['MLC_MODEL'] or 'mixtral' in env['MLC_MODEL'] or 'llama3' in env['MLC_MODEL'] or 'pointpainting' in env['MLC_MODEL']) and (env.get('MLC_MLPERF_RUN_STYLE', '') != "valid" or 'pointpainting' in env['MLC_MODEL']):
         env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] += " --count " + \
             env['MLC_MLPERF_LOADGEN_QUERY_COUNT']
 
@@ -630,6 +630,29 @@ def get_run_cmd_reference(
             {scenario_extra_options} {mode_extra_options}"""
 
         cmd = cmd.replace("--user_conf", "--user-conf")
+
+    elif "yolo" in env['MLC_MODEL']:
+        env['RUN_DIR'] = os.path.join(
+            env['MLC_MLPERF_INFERENCE_SOURCE'],
+            "vision",
+            "classification_and_detection",
+            "yolo")
+
+        base_cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} yolo_loadgen.py"""
+
+        cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} yolo_loadgen.py \
+            --model {x}{env['MLC_ML_MODEL_YOLOV11_PATH']}{x} \
+            --dataset-path {x}{env['MLC_ML_DATASET_MLPERF_INFERENCE_YOLO_COCO2017_FILTERED_DATASET_PATH']}{x} \
+            --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} \
+            --annotation-file {x}{env['MLC_ML_DATASET_MLPERF_INFERENCE_YOLO_COCO2017_FILTERED_DATASET_ANNOTATION_PATH']}{x} \
+            --output {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
+            {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} \
+            {scenario_extra_options} {mode_extra_options}"""
+
+        if "--accuracy" in cmd:
+            cmd = cmd.replace("--accuracy", "--AccuracyOnly")
+        else:
+            cmd += " --PerformanceOnly "
 
     if env.get('MLC_NETWORK_LOADGEN', '') in ["lon", "sut"]:
         cmd = cmd + " " + "--network " + env['MLC_NETWORK_LOADGEN']

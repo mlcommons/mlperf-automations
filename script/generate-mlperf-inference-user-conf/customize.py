@@ -26,7 +26,7 @@ def preprocess(i):
     version = env.get('MLC_MLPERF_INFERENCE_VERSION', "4.1")
 
     required_files = []
-    required_files = get_checker_files()
+    required_files = get_checker_files(env)
 
     if 'MLC_MLPERF_LOADGEN_SCENARIO' not in env:
         env['MLC_MLPERF_LOADGEN_SCENARIO'] = "Offline"
@@ -94,6 +94,8 @@ def preprocess(i):
         ml_model_name = "3d-unet"
     if 'gptj' in ml_model_name:
         ml_model_name = "gptj"
+    if 'yolo' in ml_model_name:
+        ml_model_name = "yolo"
     if 'llama2-70b' in ml_model_name:
         ml_model_name = "llama2-70b"
 
@@ -196,7 +198,7 @@ def preprocess(i):
         if scenario == "Offline":
             required_min_queries_offline = {}
             required_min_queries_offline = get_required_min_queries_offline(
-                env['MLC_MODEL'], version)
+                env['MLC_MODEL'], version, env)
 
         if mode == "compliance" and scenario == "Server":  # Adjust the server_target_qps
             test = env.get("MLC_MLPERF_LOADGEN_COMPLIANCE_TEST", "TEST01")
@@ -265,19 +267,11 @@ def preprocess(i):
         else:
             audit_path = test
 
-        if env['MLC_BENCHMARK_GROUP'] == "automotive":
-            audit_full_path = os.path.join(
-                env['MLC_MLPERF_INFERENCE_SOURCE'],
-                "compliance",
-                audit_path,
-                "audit.config")
-        else:
-            audit_full_path = os.path.join(
-                env['MLC_MLPERF_INFERENCE_SOURCE'],
-                "compliance",
-                "nvidia",
-                audit_path,
-                "audit.config")
+        audit_full_path = os.path.join(
+            env['MLC_MLPERF_INFERENCE_SOURCE'],
+            "compliance",
+            audit_path,
+            "audit.config")
 
         env['MLC_MLPERF_INFERENCE_AUDIT_PATH'] = audit_full_path
         # copy the audit conf to the run directory incase the implementation is
@@ -464,7 +458,7 @@ def preprocess(i):
 
 
 def run_files_exist(mode, OUTPUT_DIR, run_files, env, logger):
-    import submission_checker as checker
+
     from log_parser import MLPerfLog
 
     is_valid = True
@@ -526,19 +520,11 @@ def run_files_exist(mode, OUTPUT_DIR, run_files, env, logger):
 
         test = env['MLC_MLPERF_LOADGEN_COMPLIANCE_TEST']
 
-        if env['MLC_BENCHMARK_GROUP'] == "automotive":
-            SCRIPT_PATH = os.path.join(
-                env['MLC_MLPERF_INFERENCE_SOURCE'],
-                "compliance",
-                test,
-                "run_verification.py")
-        else:
-            SCRIPT_PATH = os.path.join(
-                env['MLC_MLPERF_INFERENCE_SOURCE'],
-                "compliance",
-                "nvidia",
-                test,
-                "run_verification.py")
+        SCRIPT_PATH = os.path.join(
+            env['MLC_MLPERF_INFERENCE_SOURCE'],
+            "compliance",
+            test,
+            "run_verification.py")
 
         if test == "TEST06":
             cmd = f"{env['MLC_PYTHON_BIN_WITH_PATH']}  {SCRIPT_PATH}  -c  {COMPLIANCE_DIR}  -o  {OUTPUT_DIR} --scenario {scenario} --dtype int32"
@@ -548,7 +534,14 @@ def run_files_exist(mode, OUTPUT_DIR, run_files, env, logger):
         logger.info(cmd)
         os.system(cmd)
 
-        is_valid = checker.check_compliance_perf_dir(COMPLIANCE_DIR)
+        # ensure submission checker backwards compatibility
+        if is_true(
+                env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
+            import submission_checker.utils as checker_utils
+            is_valid = checker_utils.check_compliance_perf_dir(COMPLIANCE_DIR)
+        else:
+            import submission_checker_main as checker
+            is_valid = checker.check_compliance_perf_dir(COMPLIANCE_DIR)
 
         if not is_valid and 'Stream' in env['MLC_MLPERF_LOADGEN_SCENARIO']:
             # We have the determined latency, compliance test failed, so lets
@@ -560,7 +553,11 @@ def run_files_exist(mode, OUTPUT_DIR, run_files, env, logger):
 
     if "power" in mode and not is_true(
             env.get('MLC_MLPERF_SKIP_POWER_CHECKS', 'no')):
-        from power.power_checker import check as check_power_more
+        if is_true(
+                env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
+            from submission_checker.checks.power.power_checker import check as check_power_more
+        else:
+            from power.power_checker import check as check_power_more
         try:
             is_valid = check_power_more(os.path.dirname(OUTPUT_DIR)) == 0
         except BaseException:
@@ -578,26 +575,37 @@ def measure_files_exist(OUTPUT_DIR, run_files):
     return True
 
 
-def get_checker_files():
-    import submission_checker as checker
+def get_checker_files(env):
+    if is_true(env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
+        import submission_checker.constants as constants
 
-    REQUIRED_ACC_FILES = checker.REQUIRED_ACC_FILES
-    REQUIRED_PERF_FILES = checker.REQUIRED_PERF_FILES
-    REQUIRED_POWER_FILES = checker.REQUIRED_POWER_FILES
-    REQUIRED_PERF_POWER_FILES = checker.REQUIRED_PERF_POWER_FILES
-    REQUIRED_MEASURE_FILES = checker.REQUIRED_MEASURE_FILES
+        REQUIRED_ACC_FILES = constants.REQUIRED_ACC_FILES
+        REQUIRED_PERF_FILES = constants.REQUIRED_PERF_FILES
+        REQUIRED_POWER_FILES = constants.REQUIRED_POWER_FILES
+        REQUIRED_PERF_POWER_FILES = constants.REQUIRED_PERF_POWER_FILES
+        REQUIRED_MEASURE_FILES = constants.REQUIRED_MEASURE_FILES
+    else:
+        import submission_checker as checker
+        REQUIRED_ACC_FILES = checker.REQUIRED_ACC_FILES
+        REQUIRED_PERF_FILES = checker.REQUIRED_PERF_FILES
+        REQUIRED_POWER_FILES = checker.REQUIRED_POWER_FILES
+        REQUIRED_PERF_POWER_FILES = checker.REQUIRED_PERF_POWER_FILES
+        REQUIRED_MEASURE_FILES = checker.REQUIRED_MEASURE_FILES
     return REQUIRED_ACC_FILES, REQUIRED_PERF_FILES, REQUIRED_POWER_FILES, REQUIRED_PERF_POWER_FILES, REQUIRED_MEASURE_FILES
 
 
-def get_required_min_queries_offline(model, version):
-
-    import submission_checker as checker
-
+def get_required_min_queries_offline(model, version, env):
     version_split = version.split(".")
     if int(version[0]) < 4:
         return 24756
 
-    REQUIRED_MIN_QUERIES = checker.OFFLINE_MIN_SPQ_SINCE_V4
+    if is_true(env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
+        import submission_checker.constants as constants
+        REQUIRED_MIN_QUERIES = constants.OFFLINE_MIN_SPQ_SINCE_V4
+    else:
+        import submission_checker as checker
+        REQUIRED_MIN_QUERIES = checker.OFFLINE_MIN_SPQ_SINCE_V4
+
     mlperf_model = model
     mlperf_model = mlperf_model.replace("resnet50", "resnet")
 

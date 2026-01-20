@@ -117,7 +117,7 @@ def generate_docs(script_repo, metadata, script_path, generic_inputs):
     if info_doc_exists:
         readme_line = "Edit [info.md](info.md) to add custom contents."
     else:
-        readme_line = "Add custom content in [info.md](info.md)."
+        readme_line = "Create and add custom content in info.md."
     readme_prefix = f"""This README is automatically generated. {readme_line} Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 """
     doc_content = f"""# README for {script_name}

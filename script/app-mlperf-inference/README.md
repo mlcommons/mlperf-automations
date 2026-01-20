@@ -200,6 +200,8 @@ mlcr app,vision,language,mlcommons,mlperf,inference,generic
 - `r5.0-dev_default`
 - `r5.0_default`
 - `r5.1-dev_default`
+- `r5.1_default`
+- `r6.0-dev_default`
 
 ### Ungrouped
 
