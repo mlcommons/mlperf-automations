@@ -13,10 +13,11 @@ on:
       - '!**.md'
 
 jobs:
-  mlc-run-with-results-upload:
+  mlc-run:
     runs-on: ${{ matrix.os }}
     env:
       MLC_INDEX: "on"
+      SUBMISSION_DIR: ${{ github.workspace }}/mlperf_inference_results
     strategy:
       fail-fast: false
       matrix:
@@ -28,6 +29,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
@@ -45,11 +47,59 @@ jobs:
         BRANCH: ${{ github.event.pull_request.head.ref }}
       run: |
         mlc pull repo "$REPO" --branch="$BRANCH"
-
     - name: Test MLPerf Inference YOLO-v11 (Linux/macOS)
       run: |
         mlcr run-mlperf,inference,_full,_find-performance,_all-scenarios,_r6.0-dev --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }}x86" --model=yolo-99 --implementation=reference --category=edge --backend=${{ matrix.backend }} --framework=pytorch --device=cpu --execution_mode=test -adr.inference-src.tags=_branch.anandhu-eng-patch-13 --adr.inference-src-loadgen.tags=_branch.anandhu-eng-patch-13 --adr.inference-src.version=custom --adr.inference-src-loadgen.version=custom --adr.loadgen.version=custom -v --quiet     
-        mlcr run-mlperf,inference,_submission,_full,_all-modes,_all-scenarios,_r6.0-dev --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }}x86" --model=yolo-99 --implementation=reference --category=edge --backend=${{ matrix.backend }} --framework=pytorch --device=cpu --execution_mode=valid -adr.inference-src.tags=_branch.anandhu-eng-patch-13 --adr.inference-src-loadgen.tags=_branch.anandhu-eng-patch-13 --adr.inference-src.version=custom --adr.inference-src-loadgen.version=custom --adr.loadgen.version=custom --multistream_target_latency=900 --env.MLC_MLPERF_USE_MAX_DURATION=no -v --quiet     
+        mlcr run-mlperf,inference,_submission,_full,_all-modes,_all-scenarios,_r6.0-dev --submission_dir=${{ env.SUBMISSION_DIR }} --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }}x86" --model=yolo-99 --implementation=reference --category=edge --backend=${{ matrix.backend }} --framework=pytorch --device=cpu --execution_mode=valid -adr.inference-src.tags=_branch.anandhu-eng-patch-13 --adr.inference-src-loadgen.tags=_branch.anandhu-eng-patch-13 --adr.inference-src.version=custom --adr.inference-src-loadgen.version=custom --adr.loadgen.version=custom --multistream_target_latency=900 --env.MLC_MLPERF_USE_MAX_DURATION=no -v --quiet     
+    
+    - name: upload results artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: mlperf-inference-yolo-results-${{ matrix.os }}-py${{ matrix.python-version }}-bk${{ matrix.backend }}
+        path: ${{ env.SUBMISSION_DIR }}
+  
+  upload-results-to-github:
+    needs: mlc-run
+    runs-on: ubuntu-latest
+    env:
+      MLC_INDEX: "on"
+      SUBMISSION_DIR: ${{ github.workspace }}/mlperf_inference_results
+    concurrency: 
+      group: upload-results-v6.0
+      cancel-in-progress: false
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [ "3.13" ]
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install mlcflow
+      run: |
+        pip install mlcflow
+        pip install tabulate
+
+    - name: Pull MLOps repo
+      shell: bash
+      env:
+        REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        BRANCH: ${{ github.event.pull_request.head.ref }}
+      run: |
+        mlc pull repo "$REPO" --branch="$BRANCH"
+    
+    - name: Download benchmark artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: ${{ env.SUBMISSION_DIR }}
 
     - name: Load secrets
       id: op-load-secrets
@@ -58,20 +108,10 @@ jobs:
         OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
         PAT: op://7basd2jirojjckncf6qnq3azai/bzbaco3uxoqs2rcyu42rvuccga/credential
 
-    - name: Randomly Execute Step (Linux/MacOS)
-      run: |
-        RANDOM_NUMBER=$((RANDOM % 10))
-        echo "Random number is $RANDOM_NUMBER"
-        if [ "$RANDOM_NUMBER" -eq 0 ]; then
-          echo "run_step=true" >> $GITHUB_ENV
-        else
-          echo "run_step=false" >> $GITHUB_ENV
-        fi
-
     - name: Push Results
       env:
         GITHUB_TOKEN: ${{ steps.op-load-secrets.outputs.PAT }}
-      if: github.repository_owner == 'mlcommons' && env.run_step == 'true'
+      if: github.repository_owner == 'mlcommons'
       run: |
         git config --global user.name "mlcommons-bot"
         git config --global user.email "mlcommons-bot@users.noreply.github.com"
@@ -79,5 +119,5 @@ jobs:
         git config --global credential.https://github.com.helper "!gh auth git-credential"
         git config --global credential.https://gist.github.com.helper ""
         git config --global credential.https://gist.github.com.helper "!gh auth git-credential"
-        mlcr push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=v6.0 --commit_message="Results from yolo-v11 GH action on ${{ matrix.os }}" --quiet
+        mlcr push,github,mlperf,inference,submission --submission_dir=${{ env.SUBMISSION_DIR }} --repo_url=https://github.com/mlcommons/mlperf_inference_unofficial_submissions_v5.0/ --repo_branch=v6.0 --commit_message="Results from yolo-v11 GH action on ${{ matrix.os }}" --quiet
    
