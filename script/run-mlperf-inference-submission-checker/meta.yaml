@@ -2,7 +2,7 @@ alias: run-mlperf-inference-submission-checker
 automation_alias: script
 automation_uid: 5b4e0237da074764
 cache: false
-category: MLPerf benchmark support
+category: MLPerf Inference
 clean_files: []
 default_env:
   MLC_MLPERF_SHORT_RUN: 'no'
@@ -210,6 +210,10 @@ versions:
       submission-checker-src:
         version: r5.0
   r5.1:
+    adr:
+      submission-checker-src:
+        version: r5.1
+  r6.0:
     adr:
       submission-checker-src:
         version: master

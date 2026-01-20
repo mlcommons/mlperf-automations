@@ -88,6 +88,7 @@ class ScriptAutomation(Automation):
                                              'extra_cache_tags': {'desc': 'Extra cache tags to be added to the cached entry when the script results are saved', 'default': ''},
                                              'skip_compile': {'desc': 'Skip compilation', 'default': False},
                                              'skip_run': {'desc': 'Skip run', 'default': False},
+                                             'skip_sudo': {'desc': 'Skip SUDO detection', 'default': False},
                                              'accept_license': {'desc': 'Accept the required license requirement to run the script', 'default': False},
                                              'skip_system_deps': {'desc': 'Skip installing any system dependencies', 'default': False},
                                              'git_ssh': {'desc': 'Use SSH for git repos', 'default': False},
@@ -118,6 +119,9 @@ class ScriptAutomation(Automation):
 
         self.run_state = self.init_run_state(
             run_args.get('run_state'))  # changes for every run call
+
+        self.main_script_force_new_cache = run_args.get(
+            'new', False)  # only set for the initial script being called
 
     def init_run_state(self, run_state):
 
@@ -565,10 +569,8 @@ class ScriptAutomation(Automation):
             parsed_script_alias,
             quiet,
             skip_remembered_selections=skip_remembered_selections,
-            force_cache=False,
-            # Forcing this to false as with new_cache_entry we want to exclude
-            # any force_cached cache entries
-            force_skip_cache=False,
+            force_cache=force_cache and not self.main_script_force_new_cache,
+            force_skip_cache=force_skip_cache,
             new_cache_entry=new_cache_entry
         )
         if r['return'] > 0:
@@ -1070,7 +1072,7 @@ class ScriptAutomation(Automation):
 
             if not found_cached and num_found_cached_scripts == 0:
                 if i.get('only_execute_from_cache'):
-                    # useful to check valid cache entries for a script (cm show
+                    # useful to check valid cache entries for a script (mlc show
                     # cache can return invalid cache entries for a script too)
                     return {
                         'return': 1, 'error': f'No valid cache entry found for {cached_tags}'}
@@ -4500,10 +4502,12 @@ def enable_or_skip_script(meta, env):
             value = str(env[key]).lower().strip()
             if set(meta_key) & set(["yes", "on", "true", "1"]):
                 # Any set value other than false is taken as set
-                if not is_false(value) and value != '':
+                if not is_false(value) and value != '' and not re.findall(
+                        r'<<<(.*?)>>>', str(value)):
                     continue
             elif set(meta_key) & set(["no", "off", "false", "0"]):
-                if is_false(value) or value == "":
+                if is_false(value) or value == "" or re.findall(
+                        r'<<<(.*?)>>>', str(value)):
                     continue
             elif value in meta_key:
                 continue
@@ -4533,10 +4537,12 @@ def any_enable_or_skip_script(meta, env):
             meta_key = [str(v).lower() for v in meta[key]]
 
             if set(meta_key) & set(["yes", "on", "true", "1"]):
-                if not is_false(value) and value != "":
+                if not is_false(value) and value != '' and not re.findall(
+                        r'<<<(.*?)>>>', str(value)):
                     found = True
             elif set(meta_key) & set(["no", "off", "false", "0", ""]):
-                if is_false(value) or value == "":
+                if is_false(value) or value == "" or re.findall(
+                        r'<<<(.*?)>>>', str(value)):
                     found = True
             elif value in meta_key:
                 found = True

@@ -178,10 +178,10 @@ def apply_remembered_cache_selection(
     Apply remembered cache selection if any
     '''
     if i['skip_remembered_selections'] or len(found_cached_scripts) <= 1:
-        i['logger'].debug(
-            i['recursion_spaces'] +
-            f'  - Skipping remembered cache selections...'
-        )
+        # i['logger'].debug(
+        #    i['recursion_spaces'] +
+        #    f'  - Skipping remembered cache selections...'
+        # )
         return found_cached_scripts
 
     for selection in i['remembered_selections']:
