@@ -67,6 +67,11 @@ jobs:
     concurrency: 
       group: upload-results-v6.0
       cancel-in-progress: false
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [ "3.13" ]
 
     steps:
     - uses: actions/checkout@v4
