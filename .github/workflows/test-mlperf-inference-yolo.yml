@@ -67,6 +67,11 @@ jobs:
     concurrency: 
       group: upload-results-v6.0
       cancel-in-progress: false
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [ "3.13" ]
 
     steps:
     - uses: actions/checkout@v4
@@ -114,5 +119,5 @@ jobs:
         git config --global credential.https://github.com.helper "!gh auth git-credential"
         git config --global credential.https://gist.github.com.helper ""
         git config --global credential.https://gist.github.com.helper "!gh auth git-credential"
-        mlcr push,github,mlperf,inference,submission --submission_dir=${{ env.SUBMISSION_DIR }} --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=v6.0 --commit_message="Results from yolo-v11 GH action on ${{ matrix.os }}" --quiet
+        mlcr push,github,mlperf,inference,submission --submission_dir=${{ env.SUBMISSION_DIR }} --repo_url=https://github.com/mlcommons/mlperf_inference_unofficial_submissions_v5.0/ --repo_branch=v6.0 --commit_message="Results from yolo-v11 GH action on ${{ matrix.os }}" --quiet
    
