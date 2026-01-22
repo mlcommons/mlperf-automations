@@ -686,7 +686,7 @@ class ScriptAutomation(Automation):
                            'dict2': const_state,
                            'append_lists': True,
                            'append_unique': True})
-        
+
         # for update_meta_if_env
 
         r = self.update_state_from_meta(
@@ -706,7 +706,6 @@ class ScriptAutomation(Automation):
         post_deps = run_state['post_deps']
         prehook_deps = run_state['prehook_deps']
         posthook_deps = run_state['posthook_deps']
-
 
         # STEP 800: Process variations and update env (overwrite from env and update form default_env)
         #           VARIATIONS HAS THE PRIORITY OVER
@@ -3132,16 +3131,17 @@ class ScriptAutomation(Automation):
                 # Regex to find <<<KEY>>>
                 # The group (.*?) captures the KEY inside
                 pattern = r'<<<(.*?)>>>'
-    
+
                 def replacer(match):
                     key = match.group(1)
-                    # If the KEY is present in env, return the value; 
-                    # otherwise, return the original substring (don't do anything)
+                    # If the KEY is present in env, return the value;
+                    # otherwise, return the original substring (don't do
+                    # anything)
                     return str(env.get(key, match.group(0)))
 
                 if 'tags' in d and isinstance(d['tags'], str):
                     d['tags'] = re.sub(pattern, replacer, d['tags'])
-    
+
                 return d
 
             for d in deps:
@@ -3160,10 +3160,9 @@ class ScriptAutomation(Automation):
                     if r['return'] > 0:
                         return r
 
-
                 # If the dependency has conditional meta updates, apply them
                 if d.get('update_meta_if_env'):
-                    dep_add_deps_info = {} # need to decide if its worth supporting this, for now using {}
+                    dep_add_deps_info = {}  # need to decide if its worth supporting this, for now using {}
                     dep_add_deps_recursive_info = {}
 
                     # Apply conditional meta updates
@@ -5481,14 +5480,13 @@ def update_env_from_input_mapping(env, inp, input_mapping):
             env[input_mapping[key]] = inp[key]
 
 
-
-def _apply_conditional_meta_updates(update_meta_if_env, default_env, env, const, state, const_state, 
+def _apply_conditional_meta_updates(update_meta_if_env, default_env, env, const, state, const_state,
                                     run_state, add_deps_info, add_deps_recursive_info):
     """
     Internal: Apply conditional meta updates from update_meta_if_env list.
     This function processes each conditional meta based on environment conditions
     and merges relevant settings into the provided state dictionaries.
-    
+
     Args:
         update_meta_if_env: List of conditional meta updates to process
         default_env: Default environment dictionary
@@ -5499,7 +5497,7 @@ def _apply_conditional_meta_updates(update_meta_if_env, default_env, env, const,
         run_state: Run state dictionary
         add_deps_info: Additional dependencies info
         add_deps_recursive_info: Additional recursive dependencies info
-    
+
     Returns:
         dict with 'return' key (0 for success, >0 for error)
     """
@@ -5530,19 +5528,25 @@ def _apply_conditional_meta_updates(update_meta_if_env, default_env, env, const,
         else:
             utils.merge_dicts({'dict1': c_add_deps_info, 'dict2': c_meta.get(
                 'add_deps', {}), 'append_lists': True, 'append_unique': True})
-        
+
         if c_add_deps_info:
-            utils.merge_dicts({'dict1': add_deps_info, 'dict2': c_add_deps_info, 'append_lists': True, 'append_unique': True})
-    
+            utils.merge_dicts({'dict1': add_deps_info,
+                               'dict2': c_add_deps_info,
+                               'append_lists': True,
+                               'append_unique': True})
+
         c_add_deps_recursive_info = c_meta.get('adr', {})
         if not c_add_deps_recursive_info:
             c_add_deps_recursive_info = c_meta.get('add_deps_recursive', {})
         else:
             utils.merge_dicts({'dict1': add_deps_recursive_info, 'dict2': c_meta.get(
                 'add_deps_recursive', {}), 'append_lists': True, 'append_unique': True})
-        
+
         if c_add_deps_recursive_info:
-            utils.merge_dicts({'dict1': add_deps_recursive_info, 'dict2': c_add_deps_recursive_info, 'append_lists': True, 'append_unique': True})
+            utils.merge_dicts({'dict1': add_deps_recursive_info,
+                               'dict2': c_add_deps_recursive_info,
+                               'append_lists': True,
+                               'append_unique': True})
 
     return {'return': 0}
 
@@ -5589,7 +5593,7 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
     else:
         utils.merge_dicts({'dict1': add_deps_recursive_info, 'dict2': meta.get(
             'add_deps_recursive', {}), 'append_lists': True, 'append_unique': True})
-    
+
     # Apply conditional meta updates
     r = _apply_conditional_meta_updates(
         run_state['update_meta_if_env'],
