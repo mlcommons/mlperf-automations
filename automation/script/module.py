@@ -96,6 +96,7 @@ class ScriptAutomation(Automation):
                                              'hf_token': {'desc': 'Huggingface Token', 'default': ''},
                                              'verify_ssl': {'desc': 'Verify SSL', 'default': False}
                                              }
+        self.default_env = run_args.get('default_env', {})
         self.env = run_args.get('env', {})
         self.state = run_args.get('state', {})
         self.const = run_args.get('const', {})
@@ -666,6 +667,26 @@ class ScriptAutomation(Automation):
         for key in script_item_default_env:
             env.setdefault(key, script_item_default_env[key])
 
+        # STEP 700: Overwrite env with keys from the script input (to allow user friendly CLI)
+        #           IT HAS THE PRIORITY OVER meta['default_env'] and meta['env'] but not over the meta from versions/variations
+        #           (env OVERWRITE - user enforces it from CLI)
+        #           (it becomes const)
+        if input_mapping:
+            update_env_from_input_mapping(env, i, input_mapping)
+            update_env_from_input_mapping(const, i, input_mapping)
+
+        # This mapping is done in module_misc
+        # if docker_input_mapping:
+        #    update_env_from_input_mapping(env, i, docker_input_mapping)
+        #    update_env_from_input_mapping(const, i, docker_input_mapping)
+
+        # Update env/state with cost
+        env.update(const)
+        utils.merge_dicts({'dict1': state,
+                           'dict2': const_state,
+                           'append_lists': True,
+                           'append_unique': True})
+        
         # for update_meta_if_env
 
         r = self.update_state_from_meta(
@@ -686,25 +707,6 @@ class ScriptAutomation(Automation):
         prehook_deps = run_state['prehook_deps']
         posthook_deps = run_state['posthook_deps']
 
-        # STEP 700: Overwrite env with keys from the script input (to allow user friendly CLI)
-        #           IT HAS THE PRIORITY OVER meta['default_env'] and meta['env'] but not over the meta from versions/variations
-        #           (env OVERWRITE - user enforces it from CLI)
-        #           (it becomes const)
-        if input_mapping:
-            update_env_from_input_mapping(env, i, input_mapping)
-            update_env_from_input_mapping(const, i, input_mapping)
-
-        # This mapping is done in module_misc
-        # if docker_input_mapping:
-        #    update_env_from_input_mapping(env, i, docker_input_mapping)
-        #    update_env_from_input_mapping(const, i, docker_input_mapping)
-
-        # Update env/state with cost
-        env.update(const)
-        utils.merge_dicts({'dict1': state,
-                           'dict2': const_state,
-                           'append_lists': True,
-                           'append_unique': True})
 
         # STEP 800: Process variations and update env (overwrite from env and update form default_env)
         #           VARIATIONS HAS THE PRIORITY OVER
@@ -3126,6 +3128,22 @@ class ScriptAutomation(Automation):
 
             variation_groups = run_state.get('variation_groups')
 
+            def substitute_tags(d, env):
+                # Regex to find <<<KEY>>>
+                # The group (.*?) captures the KEY inside
+                pattern = r'<<<(.*?)>>>'
+    
+                def replacer(match):
+                    key = match.group(1)
+                    # If the KEY is present in env, return the value; 
+                    # otherwise, return the original substring (don't do anything)
+                    return str(env.get(key, match.group(0)))
+
+                if 'tags' in d and isinstance(d['tags'], str):
+                    d['tags'] = re.sub(pattern, replacer, d['tags'])
+    
+                return d
+
             for d in deps:
                 if not d.get('tags'):
                     continue
@@ -3139,6 +3157,28 @@ class ScriptAutomation(Automation):
                 if d.get('env'):
                     # to update env local to a dependency
                     r = update_env_with_values(d['env'], False, env)
+                    if r['return'] > 0:
+                        return r
+
+
+                # If the dependency has conditional meta updates, apply them
+                if d.get('update_meta_if_env'):
+                    dep_add_deps_info = {} # need to decide if its worth supporting this, for now using {}
+                    dep_add_deps_recursive_info = {}
+
+                    # Apply conditional meta updates
+                    r = _apply_conditional_meta_updates(
+                        d['update_meta_if_env'],
+                        self.default_env,
+                        env,
+                        self.const,
+                        self.state,
+                        self.const_state,
+                        run_state,
+                        dep_add_deps_info,
+                        dep_add_deps_recursive_info
+                    )
+
                     if r['return'] > 0:
                         return r
 
@@ -3247,6 +3287,7 @@ class ScriptAutomation(Automation):
                     # deps should have non-empty tags
                     d['tags'] += "," + new_variation_tags_string
 
+                substitute_tags(d, env)
                 run_state['full_deps'].append(d['tags'])
 
                 if not run_state.get('fake_deps'):
@@ -5412,6 +5453,7 @@ def update_deps_from_input(deps, post_deps, prehook_deps, posthook_deps, i):
         r4 = update_deps(posthook_deps, add_deps_info_from_input, True, env)
         if r1['return'] > 0 and r2['return'] > 0 and r3['return'] > 0 and r4['return'] > 0:
             return r1
+
     if add_deps_recursive_info_from_input:
         update_deps(deps, add_deps_recursive_info_from_input, False, env)
         update_deps(post_deps, add_deps_recursive_info_from_input, False, env)
@@ -5437,6 +5479,75 @@ def update_env_from_input_mapping(env, inp, input_mapping):
     for key in input_mapping:
         if key in inp:
             env[input_mapping[key]] = inp[key]
+
+
+
+def _apply_conditional_meta_updates(update_meta_if_env, default_env, env, const, state, const_state, 
+                                    run_state, add_deps_info, add_deps_recursive_info):
+    """
+    Internal: Apply conditional meta updates from update_meta_if_env list.
+    This function processes each conditional meta based on environment conditions
+    and merges relevant settings into the provided state dictionaries.
+    
+    Args:
+        update_meta_if_env: List of conditional meta updates to process
+        default_env: Default environment dictionary
+        env: Environment dictionary
+        const: Constants dictionary
+        state: State dictionary
+        const_state: Constant state dictionary
+        run_state: Run state dictionary
+        add_deps_info: Additional dependencies info
+        add_deps_recursive_info: Additional recursive dependencies info
+    
+    Returns:
+        dict with 'return' key (0 for success, >0 for error)
+    """
+    for c_meta in update_meta_if_env:
+        if is_dep_tobe_skipped(c_meta, env):
+            continue
+        utils.merge_dicts({'dict1': default_env, 'dict2': c_meta.get(
+            'default_env', {}), 'append_lists': True, 'append_unique': True})
+        utils.merge_dicts({'dict1': env, 'dict2': c_meta.get(
+            'env', {}), 'append_lists': True, 'append_unique': True})
+        utils.merge_dicts({'dict1': const, 'dict2': c_meta.get(
+            'const', {}), 'append_lists': True, 'append_unique': True})
+        utils.merge_dicts({'dict1': state, 'dict2': c_meta.get(
+            'state', {}), 'append_lists': True, 'append_unique': True})
+        utils.merge_dicts({'dict1': const_state, 'dict2': c_meta.get(
+            'const_state', {}), 'append_lists': True, 'append_unique': True})
+        if c_meta.get('docker', {}):
+            if not run_state.get('docker', {}):
+                run_state['docker'] = {}
+            utils.merge_dicts({'dict1': run_state['docker'],
+                               'dict2': c_meta['docker'],
+                               'append_lists': True,
+                               'append_unique': True})
+
+        c_add_deps_info = c_meta.get('ad', {})
+        if not c_add_deps_info:
+            c_add_deps_info = c_meta.get('add_deps', {})
+        else:
+            utils.merge_dicts({'dict1': c_add_deps_info, 'dict2': c_meta.get(
+                'add_deps', {}), 'append_lists': True, 'append_unique': True})
+        
+        if c_add_deps_info:
+            utils.merge_dicts({'dict1': add_deps_info, 'dict2': c_add_deps_info, 'append_lists': True, 'append_unique': True})
+    
+        c_add_deps_recursive_info = c_meta.get('adr', {})
+        if not c_add_deps_recursive_info:
+            c_add_deps_recursive_info = c_meta.get('add_deps_recursive', {})
+        else:
+            utils.merge_dicts({'dict1': add_deps_recursive_info, 'dict2': c_meta.get(
+                'add_deps_recursive', {}), 'append_lists': True, 'append_unique': True})
+        
+        if c_add_deps_recursive_info:
+            utils.merge_dicts({'dict1': add_deps_recursive_info, 'dict2': c_add_deps_recursive_info, 'append_lists': True, 'append_unique': True})
+
+    return {'return': 0}
+
+
+##############################################################################
 
 ##############################################################################
 
@@ -5478,53 +5589,21 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
     else:
         utils.merge_dicts({'dict1': add_deps_recursive_info, 'dict2': meta.get(
             'add_deps_recursive', {}), 'append_lists': True, 'append_unique': True})
-
-    for c_meta in run_state['update_meta_if_env']:
-        if is_dep_tobe_skipped(c_meta, env):
-            continue
-        utils.merge_dicts({'dict1': default_env, 'dict2': c_meta.get(
-            'default_env', {}), 'append_lists': True, 'append_unique': True})
-        utils.merge_dicts({'dict1': env, 'dict2': c_meta.get(
-            'env', {}), 'append_lists': True, 'append_unique': True})
-        utils.merge_dicts({'dict1': const, 'dict2': c_meta.get(
-            'const', {}), 'append_lists': True, 'append_unique': True})
-        utils.merge_dicts({'dict1': state, 'dict2': c_meta.get(
-            'state', {}), 'append_lists': True, 'append_unique': True})
-        utils.merge_dicts({'dict1': const_state, 'dict2': c_meta.get(
-            'const_state', {}), 'append_lists': True, 'append_unique': True})
-        if c_meta.get('docker', {}):
-            if not run_state.get('docker', {}):
-                run_state['docker'] = {}
-            utils.merge_dicts({'dict1': run_state['docker'],
-                               'dict2': c_meta['docker'],
-                               'append_lists': True,
-                               'append_unique': True})
-
-        c_add_deps_info = c_meta.get('ad', {})
-        if not c_add_deps_info:
-            c_add_deps_info = c_meta.get('add_deps', {})
-        else:
-            utils.merge_dicts({'dict1': c_add_deps_info, 'dict2': c_meta.get(
-                'add_deps', {}), 'append_lists': True, 'append_unique': True})
-
-        if c_add_deps_info:
-            utils.merge_dicts({'dict1': add_deps_info,
-                               'dict2': c_add_deps_info,
-                               'append_lists': True,
-                               'append_unique': True})
-
-        c_add_deps_recursive_info = c_meta.get('adr', {})
-        if not c_add_deps_recursive_info:
-            c_add_deps_recursive_info = c_meta.get('add_deps_recursive', {})
-        else:
-            utils.merge_dicts({'dict1': add_deps_recursive_info, 'dict2': c_meta.get(
-                'add_deps_recursive', {}), 'append_lists': True, 'append_unique': True})
-
-        if c_add_deps_recursive_info:
-            utils.merge_dicts({'dict1': add_deps_recursive_info,
-                               'dict2': c_add_deps_recursive_info,
-                               'append_lists': True,
-                               'append_unique': True})
+    
+    # Apply conditional meta updates
+    r = _apply_conditional_meta_updates(
+        run_state['update_meta_if_env'],
+        default_env,
+        env,
+        const,
+        state,
+        const_state,
+        run_state,
+        add_deps_info,
+        add_deps_recursive_info
+    )
+    if r['return'] > 0:
+        return r
 
     # Updating again in case update_meta_if_env happened
     for key in default_env:
