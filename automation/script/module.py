@@ -3300,8 +3300,10 @@ class ScriptAutomation(Automation):
                         new_run_state['parent'] += " ( " + ',_'.join(
                             run_state['script_variation_tags']) + " )"
 
-                    if is_true(d.get('inherit_cache_expiration')) and run_state.get('cache_expiration') and not d.get('cache_expiration'):
-                        d['cache_expiration'] = run_state.get('cache_expiration')
+                    if is_true(d.get('inherit_cache_expiration')) and run_state.get(
+                            'cache_expiration') and not d.get('cache_expiration'):
+                        d['cache_expiration'] = run_state.get(
+                            'cache_expiration')
 
                     ii = {
                         'automation': utils.assemble_object(self.meta['alias'], self.meta['uid']),
