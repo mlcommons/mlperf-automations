@@ -22,6 +22,10 @@ deps:
 - tags: get,generic-python-lib,_numpy
 - tags: get,generic-python-lib,_opencv-python
 - tags: get,generic-python-lib,_pandas
+  names:
+    - pandas
+  version_max: 2.9
+  version_max_usable: 2.3
 - names:
   - pycocotools
   tags: get,generic-python-lib,_pycocotools
