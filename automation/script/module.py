@@ -5471,14 +5471,14 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
     else:
         utils.merge_dicts({'dict1': add_deps_info, 'dict2': meta.get(
             'add_deps', {}), 'append_lists': True, 'append_unique': True})
-    
+
     add_deps_recursive_info = meta.get('adr', {})
     if not add_deps_recursive_info:
         add_deps_recursive_info = meta.get('add_deps_recursive', {})
     else:
         utils.merge_dicts({'dict1': add_deps_recursive_info, 'dict2': meta.get(
             'add_deps_recursive', {}), 'append_lists': True, 'append_unique': True})
-    
+
     for c_meta in run_state['update_meta_if_env']:
         if is_dep_tobe_skipped(c_meta, env):
             continue
@@ -5506,19 +5506,25 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
         else:
             utils.merge_dicts({'dict1': c_add_deps_info, 'dict2': c_meta.get(
                 'add_deps', {}), 'append_lists': True, 'append_unique': True})
-        
+
         if c_add_deps_info:
-            utils.merge_dicts({'dict1': add_deps_info, 'dict2': c_add_deps_info, 'append_lists': True, 'append_unique': True})
-    
+            utils.merge_dicts({'dict1': add_deps_info,
+                               'dict2': c_add_deps_info,
+                               'append_lists': True,
+                               'append_unique': True})
+
         c_add_deps_recursive_info = c_meta.get('adr', {})
         if not c_add_deps_recursive_info:
             c_add_deps_recursive_info = c_meta.get('add_deps_recursive', {})
         else:
             utils.merge_dicts({'dict1': add_deps_recursive_info, 'dict2': c_meta.get(
                 'add_deps_recursive', {}), 'append_lists': True, 'append_unique': True})
-        
+
         if c_add_deps_recursive_info:
-            utils.merge_dicts({'dict1': add_deps_recursive_info, 'dict2': c_add_deps_recursive_info, 'append_lists': True, 'append_unique': True})
+            utils.merge_dicts({'dict1': add_deps_recursive_info,
+                               'dict2': c_add_deps_recursive_info,
+                               'append_lists': True,
+                               'append_unique': True})
 
     # Updating again in case update_meta_if_env happened
     for key in default_env:
@@ -5579,7 +5585,7 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
                 env)
         if r['return'] > 0:
             return r
-    '''    
+    '''
 
     # i would have 'input' when called through cm.access
     input_update_env = i.get('input', i)
