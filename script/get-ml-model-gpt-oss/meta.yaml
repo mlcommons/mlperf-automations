@@ -27,12 +27,10 @@ prehook_deps:
     - MLC_OUTDIRNAME  
 tags:
 - get-ml-model-gpt-oss
-# Will be enabled after the r2 downloader link is added
-# tests:
-#   needs_pat: true
-#   run_inputs:
-#   - variations_list:
-#     - r2-downloader,mlc,dry-run
+tests:
+  run_inputs:
+  - variations_list:
+    - r2-downloader,mlc,dry-run
 uid: 562047f9667c4c09
 variations:
   dry-run:
@@ -88,6 +86,12 @@ variations:
           MLC_DOWNLOAD_URL: ""
         tags: _r2-downloader
     default: true
+    group: download-tool
+  r2-downloader,mlc:
+    adr:
+      gpt-oss-model-dae:
+        env:
+          MLC_DOWNLOAD_URL: "https://inference.mlcommons-storage.org/metadata/gpt-oss-model.uri"
   hf,120b:
     adr:
       hf-zoo:

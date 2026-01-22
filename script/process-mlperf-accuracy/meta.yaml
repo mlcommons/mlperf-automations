@@ -373,6 +373,15 @@ variations:
       MLC_DATASET: librispeech_whisper
     deps:
       - tags: get,generic-python-lib,_package.openai-whisper
+  yolo-coco2017-filtered:
+    group: dataset
+    env:
+      MLC_DATASET: yolo-coco2017-filtered
+    deps:
+      - tags: get,generic-python-lib,_pycocotools
+      - tags: get,dataset,mlperf-inference,yolo-coco2017-filtered,_mlc,_r2-downloader
+        names:
+          - yolo-v11-dataset-download
   edge:
     group: category
   datacenter:
