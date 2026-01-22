@@ -3300,6 +3300,9 @@ class ScriptAutomation(Automation):
                         new_run_state['parent'] += " ( " + ',_'.join(
                             run_state['script_variation_tags']) + " )"
 
+                    if is_true(d.get('inherit_cache_expiration')) and run_state.get('cache_expiration') and not d.get('cache_expiration'):
+                        d['cache_expiration'] = run_state.get('cache_expiration')
+
                     ii = {
                         'automation': utils.assemble_object(self.meta['alias'], self.meta['uid']),
                         'recursion': True,
@@ -3313,6 +3316,9 @@ class ScriptAutomation(Automation):
                         'run_state': new_run_state
 
                     }
+
+                    if 'cache_expiration' in d:
+                        ii['cache_expiration'] = d['cache_expiration']
 
                     for key in ["env", "state", "const", "const_state"]:
                         ii['local_' + key] = d.get(key, {})
