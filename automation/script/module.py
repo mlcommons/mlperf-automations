@@ -5465,6 +5465,20 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
     run_state['update_meta_if_env'] = update_meta_if_env + \
         update_meta_if_env_from_state
 
+    add_deps_info = meta.get('ad', {})
+    if not add_deps_info:
+        add_deps_info = meta.get('add_deps', {})
+    else:
+        utils.merge_dicts({'dict1': add_deps_info, 'dict2': meta.get(
+            'add_deps', {}), 'append_lists': True, 'append_unique': True})
+    
+    add_deps_recursive_info = meta.get('adr', {})
+    if not add_deps_recursive_info:
+        add_deps_recursive_info = meta.get('add_deps_recursive', {})
+    else:
+        utils.merge_dicts({'dict1': add_deps_recursive_info, 'dict2': meta.get(
+            'add_deps_recursive', {}), 'append_lists': True, 'append_unique': True})
+    
     for c_meta in run_state['update_meta_if_env']:
         if is_dep_tobe_skipped(c_meta, env):
             continue
@@ -5485,6 +5499,26 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
                                'dict2': c_meta['docker'],
                                'append_lists': True,
                                'append_unique': True})
+
+        c_add_deps_info = c_meta.get('ad', {})
+        if not c_add_deps_info:
+            c_add_deps_info = c_meta.get('add_deps', {})
+        else:
+            utils.merge_dicts({'dict1': c_add_deps_info, 'dict2': c_meta.get(
+                'add_deps', {}), 'append_lists': True, 'append_unique': True})
+        
+        if c_add_deps_info:
+            utils.merge_dicts({'dict1': add_deps_info, 'dict2': c_add_deps_info, 'append_lists': True, 'append_unique': True})
+    
+        c_add_deps_recursive_info = c_meta.get('adr', {})
+        if not c_add_deps_recursive_info:
+            c_add_deps_recursive_info = c_meta.get('add_deps_recursive', {})
+        else:
+            utils.merge_dicts({'dict1': add_deps_recursive_info, 'dict2': c_meta.get(
+                'add_deps_recursive', {}), 'append_lists': True, 'append_unique': True})
+        
+        if c_add_deps_recursive_info:
+            utils.merge_dicts({'dict1': add_deps_recursive_info, 'dict2': c_add_deps_recursive_info, 'append_lists': True, 'append_unique': True})
 
     # Updating again in case update_meta_if_env happened
     for key in default_env:
@@ -5526,12 +5560,6 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
     if len(new_posthook_deps) > 0:
         append_deps(run_state['posthook_deps'], new_posthook_deps)
 
-    add_deps_info = meta.get('ad', {})
-    if not add_deps_info:
-        add_deps_info = meta.get('add_deps', {})
-    else:
-        utils.merge_dicts({'dict1': add_deps_info, 'dict2': meta.get(
-            'add_deps', {}), 'append_lists': True, 'append_unique': True})
     if add_deps_info:
         r1 = update_deps(run_state['deps'], add_deps_info, True, env)
         r2 = update_deps(run_state['post_deps'], add_deps_info, True, env)
@@ -5539,6 +5567,19 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
         r4 = update_deps(run_state['posthook_deps'], add_deps_info, True, env)
         if r1['return'] > 0 and r2['return'] > 0 and r3['return'] > 0 and r4['return'] > 0:
             return r1
+
+    '''
+    if add_deps_recursive_info:
+        r = update_adr_from_meta(
+                run_state['deps'],
+                run_state['post_deps'],
+                run_state['prehook_deps'],
+                run_state['posthook_deps'],
+                self.add_deps_recursive,
+                env)
+        if r['return'] > 0:
+            return r
+    '''    
 
     # i would have 'input' when called through cm.access
     input_update_env = i.get('input', i)
