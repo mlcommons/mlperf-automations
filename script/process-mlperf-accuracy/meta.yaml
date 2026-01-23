@@ -379,6 +379,9 @@ variations:
       MLC_DATASET: yolo-coco2017-filtered
     deps:
       - tags: get,generic-python-lib,_pycocotools
+      - tags: get,dataset,mlperf-inference,yolo-coco2017-filtered,_mlc,_r2-downloader
+        names:
+          - yolo-v11-dataset-download
   edge:
     group: category
   datacenter:

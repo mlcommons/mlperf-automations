@@ -1,19 +1,19 @@
-alias: get-ml-model-yolov11
+alias: get-dataset-mlperf-inference-text-to-video
 automation_alias: script
 automation_uid: 5b4e0237da074764
 cache: true
 new_env_keys:
-- MLC_ML_MODEL_YOLOV11_PATH
-- MLC_ML_MODEL_FILE_WITH_PATH
+- MLC_ML_DATASET_MLPERF_INFERENCE_TEXT_TO_VIDEO_DATASET_PATH
+- MLC_ML_DATASET_FILE_WITH_PATH
 print_env_at_the_end:
-  MLC_ML_MODEL_YOLOV11_PATH: YOLOv11 checkpoint path
+  MLC_ML_DATASET_MLPERF_INFERENCE_TEXT_TO_VIDEO_DATASET_PATH: Text-to-video dataset path
 tags:
-- get-ml-model-yolov11
+- get-dataset-mlperf-inference-text-to-video
 tests:
   run_inputs:
   - variations_list:
     - r2-downloader,mlc,dry-run
-uid: b83c7b589d274002
+uid: e93f3fe04a5c4886
 variations:
   dry-run:
     env:
@@ -32,23 +32,23 @@ variations:
         MLC_TMP_REQUIRE_DOWNLOAD:
         - 'yes'
       env:
-        MLC_DOWNLOAD_FILENAME: yolov11-checkpoint
-        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_YOLOV11_PATH
-        MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_MODEL_YOLOV11_PATH
-      extra_cache_tags: ml,model,yolov11
+        MLC_DOWNLOAD_FILENAME: text-to-video-dataset
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_DATASET_MLPERF_INFERENCE_TEXT_TO_VIDEO_DATASET_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_DATASET_MLPERF_INFERENCE_TEXT_TO_VIDEO_DATASET_PATH
+      extra_cache_tags: ml,dataset,text-to-video
       force_cache: true
       force_env_keys:
       - MLC_OUTDIRNAME
       names:
-      - yolov11-model-dae
+      - text-to-video-dataset
       tags: download-and-extract
       update_tags_from_env_with_prefix:
         _url.:
         - MLC_DOWNLOAD_URL
   r2-downloader:
     adr:
-      yolov11-model-dae:
+      text-to-video-dataset:
         env:
-          MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/YOLO-model.uri
+          MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/T2V-data.uri
         tags: _r2-downloader
     default: true

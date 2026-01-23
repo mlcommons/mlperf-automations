@@ -29,6 +29,11 @@ post_deps: []
 posthook_deps: []
 tags:
 - get-intel-sde-tool
+- get
+- intel
+- sde
+- tool
+- sde-tool
 tests:
   run_inputs:
   - {}

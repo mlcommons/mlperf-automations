@@ -29,6 +29,10 @@ post_deps: []
 posthook_deps: []
 tags:
 - get-intel-pin-tool
+- get
+- intel
+- pin-tool
+- pin
 tests:
   run_inputs:
   - {}
