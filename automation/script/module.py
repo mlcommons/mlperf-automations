@@ -78,7 +78,8 @@ class ScriptAutomation(Automation):
             "SOCKS_PROXY"]
 
         self.input_flags_converted_to_tmp_env = {
-            'path': {'desc': 'Filesystem path to search for executable', 'default': ''}}
+            'path': {'desc': 'Filesystem path to search for executable', 'default': ''},
+            'folder': {'desc': 'Folder to search first before other paths', 'default': ''}}
 
         self.input_flags_converted_to_env = {'input': {'desc': 'Input to the script passed using the env key `MLC_INPUT`', 'default': ''},
                                              'output': {'desc': 'Output from the script passed using the env key `MLC_OUTPUT`', 'default': ''},
@@ -3984,13 +3985,33 @@ pip install mlcflow
         # [] if default_path_env_key == '' else \
         #   os.environ.get(default_path_env_key,'').split(os_info['env_separator'])
 
+
+        # Check if a prioritized folder is provided
+        # Search order: MLC_TMP_PATH -> priority folder (MLC_TMP_FOLDER) -> default_path_list
+        priority_folder = env.get('MLC_TMP_FOLDER', '').strip()
+        priority_folder_paths = []
+        
+        if priority_folder and os.path.isdir(priority_folder):
+            logger.info(self.recursion_spaces + '    # Prioritizing search in folder: {}'.format(priority_folder))
+            # Add the folder and its subdirectories to priority paths (max depth to avoid NFS issues)
+            priority_folder_paths.append(priority_folder)
+            max_depth = int(env.get('MLC_TMP_FOLDER_MAX_DEPTH', '4'))
+            for root, dirs, files_in_dir in os.walk(priority_folder):
+                # Calculate current depth relative to priority_folder
+                depth = root[len(priority_folder):].count(os.sep)
+                if depth >= max_depth:
+                    # Stop descending into subdirectories at this level
+                    dirs[:] = []
+                if root not in priority_folder_paths:
+                    priority_folder_paths.append(root)
+
         if path == '':
-            path_list_tmp = default_path_list
+            path_list_tmp = priority_folder_paths + default_path_list
         else:
             logger.info(
                 self.recursion_spaces +
                 '    # Requested paths: {}'.format(path))
-            path_list_tmp = path.split(os_info['env_separator'])
+            path_list_tmp = path.split(os_info['env_separator']) + priority_folder_paths
 
         # Check soft links
         path_list_tmp2 = []
