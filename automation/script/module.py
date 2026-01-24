@@ -3985,15 +3985,18 @@ pip install mlcflow
         # [] if default_path_env_key == '' else \
         #   os.environ.get(default_path_env_key,'').split(os_info['env_separator'])
 
-
         # Check if a prioritized folder is provided
-        # Search order: MLC_TMP_PATH -> priority folder (MLC_TMP_FOLDER) -> default_path_list
+        # Search order: MLC_TMP_PATH -> priority folder (MLC_TMP_FOLDER) ->
+        # default_path_list
         priority_folder = env.get('MLC_TMP_FOLDER', '').strip()
         priority_folder_paths = []
-        
+
         if priority_folder and os.path.isdir(priority_folder):
-            logger.info(self.recursion_spaces + '    # Prioritizing search in folder: {}'.format(priority_folder))
-            # Add the folder and its subdirectories to priority paths (max depth to avoid NFS issues)
+            logger.info(
+                self.recursion_spaces +
+                '    # Prioritizing search in folder: {}'.format(priority_folder))
+            # Add the folder and its subdirectories to priority paths (max
+            # depth to avoid NFS issues)
             priority_folder_paths.append(priority_folder)
             max_depth = int(env.get('MLC_TMP_FOLDER_MAX_DEPTH', '4'))
             for root, dirs, files_in_dir in os.walk(priority_folder):
@@ -4011,7 +4014,8 @@ pip install mlcflow
             logger.info(
                 self.recursion_spaces +
                 '    # Requested paths: {}'.format(path))
-            path_list_tmp = path.split(os_info['env_separator']) + priority_folder_paths
+            path_list_tmp = path.split(
+                os_info['env_separator']) + priority_folder_paths
 
         # Check soft links
         path_list_tmp2 = []
