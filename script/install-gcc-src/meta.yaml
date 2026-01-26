@@ -38,6 +38,9 @@ post_deps:
     MLC_REQUIRE_INSTALL:
     - 'yes'
   tags: get,gcc
+  update_tags_from_env_with_prefix:
+    _path.:
+      - MLC_GCC_INSTALLED_PATH
 tags:
 - install
 - src
