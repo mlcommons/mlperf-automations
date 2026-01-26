@@ -323,6 +323,9 @@ def compare_versions(i):
 
        version1 (str): version 1
        version2 (str): version 2
+       (version_minor_skip_okay) (bool): if True, treat version1 as equal to version2
+                                         when version2 is shorter and all its parts match
+                                         (e.g., compare("9.1", "9") == 0, but compare("9", "9.1") == -1)
 
     Returns:
        (CM return dict):
@@ -335,21 +338,32 @@ def compare_versions(i):
        * (error) (str): error string if return>0
     """
 
+    import re
+
     version1 = i['version1']
     version2 = i['version2']
+    version_minor_skip_okay = i.get('version_minor_skip_okay', False)
+
+    def parse_version_part(part):
+        # Extract leading digits from version part, return 0 if no digits found
+        match = re.match(r'(\d+)', part)
+        return int(match.group(1)) if match else 0
 
     l_version1 = version1.split('.')
     l_version2 = version2.split('.')
 
-    # 3.9.6 vs 3.9
-    # 3.9 vs 3.9.6
-
-    i_version1 = [int(v) for v in l_version1 if v.isdigit()]
-    i_version2 = [int(v) for v in l_version2 if v.isdigit()]
+    i_version1 = [parse_version_part(v) for v in l_version1]
+    i_version2 = [parse_version_part(v) for v in l_version2]
 
     comparison = 0
 
-    for index in range(max(len(i_version1), len(i_version2))):
+    # If version_minor_skip_okay is True, only compare up to version2's length
+    if version_minor_skip_okay:
+        compare_length = len(i_version2)
+    else:
+        compare_length = max(len(i_version1), len(i_version2))
+
+    for index in range(compare_length):
         v1 = i_version1[index] if index < len(i_version1) else 0
         v2 = i_version2[index] if index < len(i_version2) else 0
 
