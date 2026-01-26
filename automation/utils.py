@@ -1143,7 +1143,8 @@ def parse_expiration(user_input: str) -> float:
     # Check for unit existence
     if unit not in units:
         # If the input is purely numeric (like '3600'), you might want to
-        # treat it as seconds, but per your current logic, we maintain the error:
+        # treat it as seconds, but per your current logic, we maintain the
+        # error:
         raise ValueError(f"Unknown unit '{unit}', use m/h/d")
 
     try:
