@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-01-17 00:49:15*
+*Last updated: 2026-01-23 04:05:12*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -636,10 +636,10 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 - **[get-tool-intel-pin](get-tool-intel-pin/)**
   - get-tool-intel-pin
-  - Tags: `get-intel-pin-tool`
+  - Tags: `get-intel-pin-tool`, `get`, `intel`, `pin-tool`, `pin`
 - **[get-tool-intel-sde](get-tool-intel-sde/)**
   - get-tool-intel-sde
-  - Tags: `get-intel-sde-tool`
+  - Tags: `get-intel-sde-tool`, `get`, `intel`, `sde`, `tool`, `sde-tool`
 - **[parse-dmidecode-memory-info](parse-dmidecode-memory-info/)**
   - parse-dmidecode-memory-info
   - Tags: `dmidecode`, `parse`, `memory`, `info`
