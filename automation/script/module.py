@@ -2937,7 +2937,6 @@ class ScriptAutomation(Automation):
         '''
         for key in variation_meta:
             value = variation_meta[key]
-
             if isinstance(value, list):  # deps,pre_deps...
                 for i, item in enumerate(value):
                     if isinstance(item, dict):
@@ -2984,8 +2983,8 @@ class ScriptAutomation(Automation):
                             value[item] = str(value[item]).replace(
                                 "#", variation_tag_dynamic_suffix)
 
-            else:  # scalar value, never used?
-                variation_meta[key] = variation_meta[key].replace(
+            else:  # cache_expiration
+                variation_meta[key] = str(variation_meta[key]).replace(
                     "#", variation_tag_dynamic_suffix)
 
     ##########################################################################
