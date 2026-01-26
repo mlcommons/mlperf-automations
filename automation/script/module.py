@@ -56,6 +56,7 @@ class ScriptAutomation(Automation):
                                'MLC_OUTPUT',
                                'MLC_OUTBASENAME',
                                'MLC_OUTDIRNAME',
+                               'MLC_SEARCH_FOLDER_PATH',
                                'MLC_NAME',
                                'MLC_EXTRA_CACHE_TAGS',
                                'MLC_TMP_*',
@@ -85,6 +86,7 @@ class ScriptAutomation(Automation):
                                              'output': {'desc': 'Output from the script passed using the env key `MLC_OUTPUT`', 'default': ''},
                                              'outdirname': {'desc': 'The directory to store the script output', 'default': 'cache directory ($HOME/MLC/repos/local/cache/<>) if the script is cacheable or else the current directory'},
                                              'outbasename': {'desc': 'The output file/folder name', 'default': ''},
+                                             'search_folder_path': {'desc': 'The folder path where executables of a given script need to be searched. Search is done recursively upto 4 levels.'},
                                              'name': {},
                                              'extra_cache_tags': {'desc': 'Extra cache tags to be added to the cached entry when the script results are saved', 'default': ''},
                                              'skip_compile': {'desc': 'Skip compilation', 'default': False},
@@ -3985,10 +3987,8 @@ pip install mlcflow
         # [] if default_path_env_key == '' else \
         #   os.environ.get(default_path_env_key,'').split(os_info['env_separator'])
 
-        # Check if a prioritized folder is provided
-        # Search order: MLC_TMP_PATH -> priority folder (MLC_TMP_FOLDER) ->
-        # default_path_list
-        priority_folder = env.get('MLC_TMP_FOLDER', '').strip()
+        # Search order: MLC_TMP_PATH -> priority folder (MLC_SEARCH_FOLDER_PATH) -> default_path_list
+        priority_folder = env.get('MLC_SEARCH_FOLDER_PATH', '').strip()
         priority_folder_paths = []
 
         if priority_folder and os.path.isdir(priority_folder):
@@ -3998,7 +3998,7 @@ pip install mlcflow
             # Add the folder and its subdirectories to priority paths (max
             # depth to avoid NFS issues)
             priority_folder_paths.append(priority_folder)
-            max_depth = int(env.get('MLC_TMP_FOLDER_MAX_DEPTH', '4'))
+            max_depth = int(env.get('MLC_TMP_FOLDER_MAX_DEPTH', '5'))
             for root, dirs, files_in_dir in os.walk(priority_folder):
                 # Calculate current depth relative to priority_folder
                 depth = root[len(priority_folder):].count(os.sep)
@@ -4734,8 +4734,17 @@ def check_version_constraints(i):
 
     skip = False
 
-    if version != '' and version != detected_version:
-        skip = True
+    if detected_version != '' and version != '':
+        ry = compare_versions({
+            'version1': detected_version,
+            'version2': version,
+            'version_minor_skip_okay': True
+            })
+        if ry['return'] > 0:
+            return ry
+        
+        if ry['comparison'] != 0:
+            skip = True
 
     if not skip and detected_version != '' and version_min != '':
         ry = compare_versions({
