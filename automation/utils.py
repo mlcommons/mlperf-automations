@@ -339,7 +339,7 @@ def compare_versions(i):
     """
 
     import re
-    
+
     version1 = i['version1']
     version2 = i['version2']
     version_minor_skip_okay = i.get('version_minor_skip_okay', False)
@@ -356,7 +356,7 @@ def compare_versions(i):
     i_version2 = [parse_version_part(v) for v in l_version2]
 
     comparison = 0
-    
+
     # If version_minor_skip_okay is True, only compare up to version2's length
     if version_minor_skip_okay:
         compare_length = len(i_version2)

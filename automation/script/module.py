@@ -3987,7 +3987,8 @@ pip install mlcflow
         # [] if default_path_env_key == '' else \
         #   os.environ.get(default_path_env_key,'').split(os_info['env_separator'])
 
-        # Search order: MLC_TMP_PATH -> priority folder (MLC_SEARCH_FOLDER_PATH) -> default_path_list
+        # Search order: MLC_TMP_PATH -> priority folder
+        # (MLC_SEARCH_FOLDER_PATH) -> default_path_list
         priority_folder = env.get('MLC_SEARCH_FOLDER_PATH', '').strip()
         priority_folder_paths = []
 
@@ -4739,10 +4740,10 @@ def check_version_constraints(i):
             'version1': detected_version,
             'version2': version,
             'version_minor_skip_okay': True
-            })
+        })
         if ry['return'] > 0:
             return ry
-        
+
         if ry['comparison'] != 0:
             skip = True
 
