@@ -1123,7 +1123,7 @@ def print_json(i):
 def parse_expiration(user_input: str) -> float:
     import time
     """
-    Parse user input like '10m', '2h', '3d' into a UNIX timestamp.
+    Parse user input like '10m', '2h', '3d' or '0' into a UNIX timestamp.
     """
     units = {
         'm': 60,             # minutes
@@ -1134,14 +1134,26 @@ def parse_expiration(user_input: str) -> float:
     if not user_input:
         raise ValueError("Expiration time cannot be empty")
 
+    # Handle the '0' case explicitly (no unit suffix required)
+    if user_input.strip() == "0":
+        return time.time()
+
     unit = user_input[-1].lower()
+
+    # Check for unit existence
     if unit not in units:
+        # If the input is purely numeric (like '3600'), you might want to
+        # treat it as seconds, but per your current logic, we maintain the
+        # error:
         raise ValueError(f"Unknown unit '{unit}', use m/h/d")
 
     try:
         value = int(user_input[:-1])
     except ValueError:
         raise ValueError(f"Invalid number in '{user_input}'")
+
+    if value < 0:
+        raise ValueError("Expiration time cannot be negative")
 
     seconds = value * units[unit]
     return time.time() + seconds
