@@ -651,7 +651,7 @@ def get_run_cmd_reference(
             cmd = cmd.replace("--accuracy", "--AccuracyOnly")
         else:
             cmd += " --PerformanceOnly "
-    
+
     elif "wan-2.2-t2v-a14b" in env['MLC_MODEL']:
         env['RUN_DIR'] = os.path.join(
             env['MLC_MLPERF_INFERENCE_SOURCE'],
