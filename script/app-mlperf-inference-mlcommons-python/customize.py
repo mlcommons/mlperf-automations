@@ -657,12 +657,16 @@ def get_run_cmd_reference(
             env['MLC_MLPERF_INFERENCE_SOURCE'],
             "text_to_video",
             "wan2.2-t2v-14b",)
+        
+        video_output_directory = os.path.join(env['MLC_MLPERF_OUTPUT_DIR'], "generated_videos")
+        os.makedirs(video_output_directory, exist_ok=True)
 
         cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} run_mlperf.py \
             --model-path {x}{env['MLC_ML_MODEL_WAN2_PATH']}{x} \
             --dataset {x}{env['MLC_ML_DATASET_MLPERF_INFERENCE_TEXT_TO_VIDEO_DATASET_PATH']}{x} \
             --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} \
             --output-dir {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
+            --video_output_path {x}{video_output_directory}{x} \
             {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} \
             {scenario_extra_options} {mode_extra_options}"""
 

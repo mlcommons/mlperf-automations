@@ -1602,8 +1602,14 @@ variations:
     group: models
     add_deps_recursive:
       pytorch:
-        version_max: "2.5.1"
+        version_min: "2.5.1"
         version_max_usable: "2.5.1"
+      ml-engine-transformers:
+        version_max: "4.51.3"
+        version_max_usable: "4.51.3"
+      torchvision:
+        version_max: "0.20.1"
+        version_max_usable: "0.20.1"  
     env:
       MLC_MODEL: wan-2.2-t2v-a14b
     deps:
@@ -1625,11 +1631,16 @@ variations:
     - tags: get,generic-python-lib,_package.imageio
     - tags: get,generic-python-lib,_package.imageio-ffmpeg
     - tags: get,generic-python-lib,_package.diffusers
+      version_max: "0.35.2"
+      version_max_usable: "0.35.2"
     - tags: get,generic-python-lib,_package.accelerate
     - tags: get,generic-python-lib,_package.ftfy
     - tags: get,generic-python-lib,_package.numpy
       names:
         - numpy
+    - tags: get,generic-python-lib,_package.flash-attn
+      version_min: "2.8.3"
+      version_max_usable: "2.8.3"
       
   # Target devices
   cpu:
