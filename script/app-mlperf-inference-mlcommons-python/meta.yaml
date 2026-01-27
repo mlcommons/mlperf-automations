@@ -1621,6 +1621,9 @@ variations:
     - tags: get,generic-python-lib,_package.diffusers
     - tags: get,generic-python-lib,_package.accelerate
     - tags: get,generic-python-lib,_package.ftfy
+    - tags: get,generic-python-lib,_package.numpy
+      names:
+        - numpy
       
   # Target devices
   cpu:
