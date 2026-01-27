@@ -1619,6 +1619,7 @@ variations:
     - tags: get,generic-python-lib,_package.imageio
     - tags: get,generic-python-lib,_package.imageio-ffmpeg
     - tags: get,generic-python-lib,_package.diffusers
+    - tags: get,generic-python-lib,_package.accelerate
       
   # Target devices
   cpu:
