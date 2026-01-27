@@ -514,6 +514,7 @@ input_description:
     - pointpainting
     - yolo-95
     - yolo-99
+    - wan-2.2-t2v-a14b
     desc: MLPerf model
     sort: 200
   precision:
