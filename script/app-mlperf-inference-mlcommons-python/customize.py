@@ -657,8 +657,9 @@ def get_run_cmd_reference(
             env['MLC_MLPERF_INFERENCE_SOURCE'],
             "text_to_video",
             "wan2.2-t2v-14b",)
-        
-        video_output_directory = os.path.join(env['MLC_MLPERF_OUTPUT_DIR'], "generated_videos")
+
+        video_output_directory = os.path.join(
+            env['MLC_MLPERF_OUTPUT_DIR'], "generated_videos")
         os.makedirs(video_output_directory, exist_ok=True)
 
         cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} run_mlperf.py \
