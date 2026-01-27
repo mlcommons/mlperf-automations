@@ -1967,9 +1967,9 @@ variations:
       mlperf-inference-implementation:
         tags: _cpu
 
-  cuda,reference,wan-2.2-t2v-a14b:
-    docker:
-      base_image: pytorch/pytorch:2.5.1-cuda12.1-cudnn9-devel
+  # cuda,reference,wan-2.2-t2v-a14b:
+  #   docker:
+  #     base_image: pytorch/pytorch:2.5.1-cuda12.1-cudnn9-devel
 
   cuda,reference:
     docker:
