@@ -659,8 +659,8 @@ def get_run_cmd_reference(
             "wan2.2-t2v-14b",)
 
         cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} run_mlperf.py \
-            --model-path {x}{env['MLC_ML_MODEL_YOLOV11_PATH']}{x} \
-            --dataset {x}{env['MLC_ML_DATASET_MLPERF_INFERENCE_YOLO_COCO2017_FILTERED_DATASET_PATH']}{x} \
+            --model-path {x}{env['MLC_ML_MODEL_WAN2_PATH']}{x} \
+            --dataset {x}{env['MLC_ML_DATASET_MLPERF_INFERENCE_TEXT_TO_VIDEO_DATASET_PATH']}{x} \
             --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} \
             --output-dir {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
             {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} \
