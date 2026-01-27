@@ -719,7 +719,6 @@ class ScriptAutomation(Automation):
         version_max = r['version_max']
         version_max_usable = r['version_max_usable']
         versions = r['versions']
-        
 
         # STEP 800: Process variations and update env (overwrite from env and update form default_env)
         #           VARIATIONS HAS THE PRIORITY OVER
@@ -730,8 +729,10 @@ class ScriptAutomation(Automation):
         # const)
 
         variations = script_item.meta.get('variations', {})
-        if version and f"version.{version}" not in variation_tags and ( f"version.{version}" in variations or "version.#" in variations):
-            logger.debug(f"version.{version} added as a variation tag from input version")
+        if version and f"version.{version}" not in variation_tags and (
+                f"version.{version}" in variations or "version.#" in variations):
+            logger.debug(
+                f"version.{version} added as a variation tag from input version")
             variation_tags.append(f"version.{version}")
 
         run_state['docker'] = meta.get('docker', {})
@@ -752,7 +753,6 @@ class ScriptAutomation(Automation):
 
         variation_tags_string = r['variation_tags_string']
         explicit_variation_tags = r['explicit_variation_tags']
-
 
         # STEP 1100: Update deps from input -? is this needed as we update adr
         # from meta anyway
