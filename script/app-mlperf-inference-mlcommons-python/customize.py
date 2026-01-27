@@ -73,7 +73,7 @@ def preprocess(i):
             str(env['MLC_MLPERF_LOADGEN_BATCH_SIZE'])
 
     if env.get('MLC_MLPERF_LOADGEN_QUERY_COUNT', '') != '' and not env.get('MLC_TMP_IGNORE_MLPERF_QUERY_COUNT', False) and (
-            env['MLC_MLPERF_LOADGEN_MODE'] == 'accuracy' or 'gptj' in env['MLC_MODEL'] or 'llama2' in env['MLC_MODEL'] or 'yolo' in env['MLC_MODEL'] or 'mixtral' in env['MLC_MODEL'] or 'llama3' in env['MLC_MODEL'] or 'pointpainting' in env['MLC_MODEL']) and (env.get('MLC_MLPERF_RUN_STYLE', '') != "valid" or 'pointpainting' in env['MLC_MODEL']):
+            env['MLC_MLPERF_LOADGEN_MODE'] == 'accuracy' or 'gptj' in env['MLC_MODEL'] or 'llama2' in env['MLC_MODEL'] or 'yolo' in env['MLC_MODEL'] or 'mixtral' in env['MLC_MODEL'] or 'llama3' in env['MLC_MODEL'] or 'pointpainting' in env['MLC_MODEL'] or 'wan-2.2-t2v-a14b' in env['MLC_MODEL']) and (env.get('MLC_MLPERF_RUN_STYLE', '') != "valid" or 'pointpainting' in env['MLC_MODEL']):
         env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] += " --count " + \
             env['MLC_MLPERF_LOADGEN_QUERY_COUNT']
 
