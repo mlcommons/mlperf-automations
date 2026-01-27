@@ -1600,6 +1600,10 @@ variations:
 
   wan-2.2-t2v-a14b:
     group: models
+    add_deps_recursive:
+      pytorch:
+        version_max: "2.5.1"
+        version_max_usable: "2.5.1"
     env:
       MLC_MODEL: wan-2.2-t2v-a14b
     deps:
@@ -1616,6 +1620,8 @@ variations:
         MLC_RUN_STATE_DOCKER:
         - "yes"
     - tags: get,generic-python-lib,_package.opencv-python
+      version_max: "4.11.0.86"
+      version_max_usable: "4.11.0.86"
     - tags: get,generic-python-lib,_package.imageio
     - tags: get,generic-python-lib,_package.imageio-ffmpeg
     - tags: get,generic-python-lib,_package.diffusers
