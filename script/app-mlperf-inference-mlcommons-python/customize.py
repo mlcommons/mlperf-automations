@@ -662,7 +662,12 @@ def get_run_cmd_reference(
             env['MLC_MLPERF_OUTPUT_DIR'], "generated_videos")
         os.makedirs(video_output_directory, exist_ok=True)
 
-        cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} run_mlperf.py \
+        torch_distributed_cmd = ""
+
+        if int(env.get('MLC_MLPERF_INFERENCE_NUM_PROCESSES_PER_GPU_NODE', 1)) > 1:
+            torch_distributed_cmd = f"torch.distributed.run --nproc_per_node={env.get('MLC_MLPERF_INFERENCE_NUM_PROCESSES_PER_GPU_NODE')}"
+            
+        cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} {torch_distributed_cmd} run_mlperf.py \
             --model-path {x}{env['MLC_ML_MODEL_WAN2_PATH']}{x} \
             --dataset {x}{env['MLC_ML_DATASET_MLPERF_INFERENCE_TEXT_TO_VIDEO_DATASET_PATH']}{x} \
             --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} \
