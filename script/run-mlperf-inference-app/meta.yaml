@@ -109,6 +109,7 @@ input_mapping:
   target_latency: MLC_MLPERF_LOADGEN_TARGET_LATENCY
   target_qps: MLC_MLPERF_LOADGEN_TARGET_QPS
   test_query_count: MLC_TEST_QUERY_COUNT
+  test_qps: MLC_MLPERF_INFERENCE_TEST_QPS
   threads: MLC_NUM_THREADS
   sut: MLC_MLPERF_INFERENCE_SUT_VARIATION
   nvidia_llama2_dataset_file_path: MLC_NVIDIA_LLAMA_DATASET_FILE_PATH
