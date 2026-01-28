@@ -1603,11 +1603,13 @@ variations:
     add_deps_recursive:
       pytorch:
         version_min: "2.5.1"
+        version_max: "2.5.1"
         version_max_usable: "2.5.1"
       ml-engine-transformers:
         version_max: "4.51.3"
         version_max_usable: "4.51.3"
       torchvision:
+        version_min: "0.20.1"
         version_max: "0.20.1"
         version_max_usable: "0.20.1"  
     env:
