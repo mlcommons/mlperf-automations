@@ -21,6 +21,7 @@ default_env:
 input_mapping:
   all_gpus: MLC_DOCKER_ADD_ALL_GPUS
   num_gpus: MLC_DOCKER_ADD_NUM_GPUS
+  gpu_devices: MLC_DOCKER_GPU_DEVICE_IDS
   base: MLC_DOCKER_IMAGE_BASE
   cache: MLC_DOCKER_CACHE
   mlc_repo: MLC_MLOPS_REPO
