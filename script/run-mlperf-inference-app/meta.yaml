@@ -76,6 +76,7 @@ input_mapping:
   model: MLC_MLPERF_MODEL
   multistream_target_latency: MLC_MLPERF_LOADGEN_MULTISTREAM_TARGET_LATENCY
   network: MLC_NETWORK_LOADGEN
+  number_of_processes_per_gpu_node: MLC_MLPERF_INFERENCE_NUM_PROCESSES_PER_GPU_NODE
   nvidia_system_name: MLC_NVIDIA_SYSTEM_NAME
   offline_target_qps: MLC_MLPERF_LOADGEN_OFFLINE_TARGET_QPS
   output_dir: OUTPUT_BASE_DIR
