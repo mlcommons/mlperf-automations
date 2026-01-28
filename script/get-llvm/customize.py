@@ -83,7 +83,7 @@ def postprocess(i):
 
     found_path = os.path.dirname(found_file_path)
 
-    env['MLC_LLVM_CLANG_BIN_PATH'] = found_path 
+    env['MLC_LLVM_CLANG_BIN_PATH'] = found_path
     env['MLC_LLVM_INSTALLED_PATH'] = os.path.dirname(
         found_path)  # /usr in case of /usr/bin/clang
 
