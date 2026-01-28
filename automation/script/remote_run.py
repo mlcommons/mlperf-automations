@@ -261,7 +261,7 @@ def regenerate_script_cmd(i):
         keys = sorted(command_dict.keys(), key=lambda x: x != "tags")
 
         for key in keys:
-            #if key in ["input", "output", "outdirname"]:
+            # if key in ["input", "output", "outdirname"]:
             #    continue  # We have the corresponding env keys in container env string
             # Construct the full key with the prefix.
             full_key = f"{prefix}.{key}" if prefix else key
