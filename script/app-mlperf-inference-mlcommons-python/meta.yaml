@@ -1581,6 +1581,8 @@ variations:
         - "yes"
     - tags: get,generic-python-lib,_package.ultralytics
     - tags: get,generic-python-lib,_package.tqdm
+    - tags: get,generic-sys-util,_libgl
+    - tags: get,generic-sys-util,_libglib
     env:
       MLC_MLPERF_MODEL_SKIP_BATCHING: true
       MLC_ML_MODEL_DATASET_TYPE: multihot-criteo

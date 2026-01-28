@@ -226,6 +226,20 @@ variations:
         brew: ''
         dnf: mesa-libGL   
         yum: mesa-libGL
+  libglib:
+    env:
+      MLC_SYS_UTIL_NAME: libglib
+      MLC_SYS_UTIL_CHECK_CMD: 'ldconfig -p | grep -i libglib-2.0.so'
+    default_env:
+      MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: yes
+    new_env_keys:
+    - MLC_LIBGLIB_VERSION
+    state:
+      libglib:  # tbd: complete for other flavours of linux
+        apt: libglib2.0-0
+        brew: glib
+        dnf: glib2
+        yum: glib2
   libgl1-mesa-glx:
     env:
       MLC_SYS_UTIL_NAME: libgl1-mesa-glx # tbd: regular expression for version as well as whether its installed?

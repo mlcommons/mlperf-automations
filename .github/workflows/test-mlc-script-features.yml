@@ -136,7 +136,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12", "3.13"]
 
     steps:
     - uses: actions/checkout@v4
@@ -155,16 +155,16 @@ jobs:
   
     - name: Run MLPerf Inference Retinanet with native and virtual Python
       run: |
-        mlcr app,mlperf,inference,generic,_cpp,_retinanet,_onnxruntime,_cpu  --adr.python.version_min=3.8 --adr.compiler.tags=gcc --adr.openimages-preprocessed.tags=_50 --scenario=Offline --mode=accuracy --test_query_count=10 --rerun --quiet
-
-        mlcr app,mlperf,inference,generic,_cpp,_retinanet,_onnxruntime,_cpu  --adr.python.version_min=3.8 --adr.compiler.tags=gcc --adr.openimages-preprocessed.tags=_50 --scenario=Offline --mode=performance --test_query_count=10 --rerun --quiet
+        mlcr app,mlperf,inference,generic,_reference,_yolo-95,_pytorch,_cpu --adr.python.version_min=3.12 --scenario=Offline --mode=accuracy --test_query_count=10 --rerun --quiet --category=edge -v   
+    
+        mlcr app,mlperf,inference,generic,_reference,_yolo-95,_pytorch,_cpu --adr.python.version_min=3.12 --scenario=Offline --mode=performance --test_query_count=10 --rerun --quiet --category=edge -v
 
         mlcr install,python-venv --version=3.10.8 --name=mlperf --quiet
 
         export MLC_SCRIPT_EXTRA_CMD="--adr.python.name=mlperf"
 
-        mlcr run,mlperf,inference,_submission,_short --adr.python.version_min=3.8 --adr.compiler.tags=gcc --adr.openimages-preprocessed.tags=_50 --submitter=MLCommons --implementation=cpp --hw_name=default --model=retinanet --backend=onnxruntime --device=cpu --scenario=Offline --quiet
-
+        mlcr run-mlperf,inference,_submission,_short --adr.python.version_min=3.12 --submitter="MLCommons" --hw_name="default" --model=yolo-99 --implementation=reference --category=edge --backend=pytorch --framework=pytorch --device=cpu -v --quiet     
+    
      # Step for Linux/MacOS
     - name: Randomly Execute Step (Linux/MacOS)
       if: runner.os != 'Windows'
@@ -207,4 +207,4 @@ jobs:
         git config --global credential.https://github.com.helper "!gh auth git-credential"
         git config --global credential.https://gist.github.com.helper ""
         git config --global credential.https://gist.github.com.helper "!gh auth git-credential"
-        mlcr push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from R50 GH action on ${{ matrix.os }}" --quiet
+        mlcr push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions --repo_branch=auto-update --commit_message="Results from R50 GH action on ${{ matrix.os }}" --quiet
