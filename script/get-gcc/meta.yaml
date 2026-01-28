@@ -34,3 +34,6 @@ variations:
   path.#:
     env:
       MLC_GCC_DIR_PATH: '#'
+  version.#:
+    group: version
+

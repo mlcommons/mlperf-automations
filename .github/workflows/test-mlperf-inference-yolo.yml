@@ -24,6 +24,7 @@ jobs:
         os: [ubuntu-latest]
         python-version: [ "3.13", "3.12" ]
         backend: [ "pytorch" ]
+        division: [ "open" ]
   
     steps:
     - uses: actions/checkout@v4
@@ -55,7 +56,7 @@ jobs:
     - name: upload results artifact
       uses: actions/upload-artifact@v4
       with:
-        name: mlperf-inference-yolo-results-${{ matrix.os }}-py${{ matrix.python-version }}-bk${{ matrix.backend }}
+        name: ${{ matrix.division }}
         path: ${{ env.SUBMISSION_DIR }}
   
   upload-results-to-github:

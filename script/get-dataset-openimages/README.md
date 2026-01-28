@@ -1,4 +1,4 @@
-# README for install-gcc-src
+# README for get-dataset-openimages
 This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,17 +33,10 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr install,src,gcc,src-gcc
+mlcr get,dataset,openimages,open-images,object-detection,original
 ```
 
-### Script Inputs
-
-| Name | Description | Choices | Default |
-|------|-------------|---------|------|
-| `--targets` |  |  | `` |
-| `--host` |  |  | `` |
-| `--build` |  |  | `` |
-| `--extra` |  |  | `` |
+No script specific inputs
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -52,7 +45,6 @@ mlcr install,src,gcc,src-gcc
 | `--output` | Output from the script passed using the env key `MLC_OUTPUT` |  | `` |
 | `--outdirname` | The directory to store the script output |  | `cache directory ($HOME/MLC/repos/local/cache/<>) if the script is cacheable or else the current directory` |
 | `--outbasename` | The output file/folder name |  | `` |
-| `--search_folder_path` | The folder path where executables of a given script need to be searched. Search is done recursively upto 4 levels. |  | `` |
 | `--name` |  |  | `` |
 | `--extra_cache_tags` | Extra cache tags to be added to the cached entry when the script results are saved |  | `` |
 | `--skip_compile` | Skip compilation |  | `False` |
@@ -66,19 +58,25 @@ mlcr install,src,gcc,src-gcc
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
-### Repo
+### Annotations
 
-- `darwin`
-- `mainline` (default)
+- `custom-annotations`
+- `default-annotations` (default)
+
+### Dataset-type
+
+- `calibration`
+- `validation` (default)
+
+### Size
+
+- `50` (default)
+- `500`
+- `full`
+- `size.#` _(# can be substituted dynamically)_
 
 ### Ungrouped
 
-- `enable-multilib`
-- `extra.#` _(# can be substituted dynamically)_
-- `lang.#` _(# can be substituted dynamically)_
-
-### Version
-
-- `branch.#` _(# can be substituted dynamically)_
-- `master`
-- `version.#` _(# can be substituted dynamically)_
+- `filter`
+- `filter-size.#` _(# can be substituted dynamically)_
+- `using-fiftyone`
