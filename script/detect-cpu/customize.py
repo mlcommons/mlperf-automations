@@ -40,12 +40,13 @@ def postprocess(i):
             else:
                 keys = {}
                 j = 0
-                # Try UTF-8 first (PowerShell), fallback to system encoding (WMIC)
+                # Try UTF-8 first (PowerShell), fallback to system encoding
+                # (WMIC)
                 try:
                     csvfile = open(f, 'r', encoding='utf-8-sig')
-                except:
+                except BaseException:
                     csvfile = open(f, 'r')
-                    
+
                 with csvfile as csvf:
                     for s in csv.reader(csvf):
                         if j == 0:
@@ -76,11 +77,11 @@ def postprocess(i):
 
                 keys = {}
                 j = 0
-                
+
                 # Try UTF-8 first (PowerShell), fallback to UTF-16 (WMIC)
                 try:
                     csvfile = open(f, 'r', encoding='utf-8-sig')
-                except:
+                except BaseException:
                     csvfile = open(f, 'r', encoding='utf16')
 
                 with csvfile as csvf:
@@ -153,7 +154,8 @@ def postprocess(i):
     }
 
     vkeys = []
-    if env.get('MLC_HOST_OS_TYPE', '') == 'linux' or os_info['platform'] == 'windows':
+    if env.get('MLC_HOST_OS_TYPE',
+               '') == 'linux' or os_info['platform'] == 'windows':
         vkeys = ['Architecture', 'Model name', 'Vendor ID', 'CPU family', 'NUMA node(s)', 'CPU(s)',
                  'On-line CPU(s) list', 'Socket(s)', 'Core(s) per socket', 'Core(s) per cluster', 'Thread(s) per core', 'L1d cache', 'L1i cache', 'L2 cache',
                  'L3 cache', 'CPU max MHz']
@@ -162,7 +164,8 @@ def postprocess(i):
                  'hw.l2cachesize']
     if vkeys:
         for s in ss.split('\n'):
-            v = s.split(':', 1)  # Split only on first colon to handle values with colons
+            # Split only on first colon to handle values with colons
+            v = s.split(':', 1)
             if len(v) < 2:
                 continue
             key = v[0].strip()
