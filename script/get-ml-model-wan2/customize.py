@@ -23,6 +23,8 @@ def postprocess(i):
     env = i['env']
 
     if env.get('MLC_DOWNLOAD_MODE', '') != 'dry':
+        env['MLC_ML_MODEL_WAN2_PATH'] = os.path.join(
+            env['MLC_ML_MODEL_WAN2_PATH'], 'Wan2.2-T2V-A14B-Diffusers')
         env['MLC_ML_MODEL_FILE_WITH_PATH'] = env['MLC_ML_MODEL_WAN2_PATH']
 
     return {'return': 0}

@@ -24,6 +24,8 @@ def postprocess(i):
     env = i['env']
 
     if env.get('MLC_DOWNLOAD_MODE', '') != 'dry':
+        env['MLC_ML_DATASET_MLPERF_INFERENCE_TEXT_TO_VIDEO_DATASET_PATH'] = os.path.join(
+            env['MLC_ML_DATASET_MLPERF_INFERENCE_TEXT_TO_VIDEO_DATASET_PATH'], 'vbench_prompts.txt')
         env['MLC_ML_DATASET_FILE_WITH_PATH'] = env['MLC_ML_DATASET_MLPERF_INFERENCE_TEXT_TO_VIDEO_DATASET_PATH']
 
     return {'return': 0}

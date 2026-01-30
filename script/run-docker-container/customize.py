@@ -176,7 +176,10 @@ def postprocess(i):
     if is_true(env.get('MLC_DOCKER_PRIVILEGED_MODE', '')):
         run_opts += " --privileged "
 
-    if env.get('MLC_DOCKER_ADD_NUM_GPUS', '') != '':
+    if env.get("MLC_DOCKER_GPU_DEVICES"):
+        for d in env["MLC_DOCKER_GPU_DEVICES"].split(","):
+            run_opts += f" --gpus device={d}"
+    elif env.get('MLC_DOCKER_ADD_NUM_GPUS', '') != '':
         run_opts += " --gpus={}".format(env['MLC_DOCKER_ADD_NUM_GPUS'])
     elif env.get('MLC_DOCKER_ADD_ALL_GPUS', '') != '':
         if env.get('MLC_CONTAINER_TOOL') == "podman":
