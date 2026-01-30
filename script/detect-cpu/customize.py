@@ -40,7 +40,13 @@ def postprocess(i):
             else:
                 keys = {}
                 j = 0
-                with open(f, 'r') as csvf:
+                # Try UTF-8 first (PowerShell), fallback to system encoding (WMIC)
+                try:
+                    csvfile = open(f, 'r', encoding='utf-8-sig')
+                except:
+                    csvfile = open(f, 'r')
+                    
+                with csvfile as csvf:
                     for s in csv.reader(csvf):
                         if j == 0:
                             keys = s
@@ -70,8 +76,14 @@ def postprocess(i):
 
                 keys = {}
                 j = 0
+                
+                # Try UTF-8 first (PowerShell), fallback to UTF-16 (WMIC)
+                try:
+                    csvfile = open(f, 'r', encoding='utf-8-sig')
+                except:
+                    csvfile = open(f, 'r', encoding='utf16')
 
-                with open(f, 'r', encoding='utf16') as csvf:
+                with csvfile as csvf:
                     for s in csv.reader(csvf):
                         if j == 1:
                             keys = s
@@ -96,13 +108,8 @@ def postprocess(i):
         state['host_device_raw_info'] = {
             'sys': sys, 'sys1': sys1, 'cpu': cpu, 'cpu1': cpu1}
 
-        logger.warning(
-            'WARNING: need to unify system and cpu output on Windows')
-
-        return {'return': 0}
-
     ##########################################################################
-    # Linux
+    # Process lscpu output (both Linux and Windows)
     if not os.path.isfile(lscpu_out):
         logger.warning('lscpu.out file was not generated!')
 
@@ -145,17 +152,21 @@ def postprocess(i):
         'MLC_CPUINFO_hw_l2cachesize': 'MLC_HOST_CPU_L2_CACHE_SIZE'
     }
 
-    if env['MLC_HOST_OS_TYPE'] == 'linux':
+    vkeys = []
+    if env.get('MLC_HOST_OS_TYPE', '') == 'linux' or os_info['platform'] == 'windows':
         vkeys = ['Architecture', 'Model name', 'Vendor ID', 'CPU family', 'NUMA node(s)', 'CPU(s)',
                  'On-line CPU(s) list', 'Socket(s)', 'Core(s) per socket', 'Core(s) per cluster', 'Thread(s) per core', 'L1d cache', 'L1i cache', 'L2 cache',
                  'L3 cache', 'CPU max MHz']
-    elif env['MLC_HOST_OS_FLAVOR'] == 'macos':
+    elif env.get('MLC_HOST_OS_FLAVOR', '') == 'macos':
         vkeys = ['hw.physicalcpu', 'hw.logicalcpu', 'hw.packages', 'hw.ncpu', 'hw.memsize', 'hw.l1icachesize',
                  'hw.l2cachesize']
     if vkeys:
         for s in ss.split('\n'):
-            v = s.split(':')
-            key = v[0]
+            v = s.split(':', 1)  # Split only on first colon to handle values with colons
+            if len(v) < 2:
+                continue
+            key = v[0].strip()
+            value = v[1].strip()
             if key in vkeys:
                 env_key = 'MLC_CPUINFO_' + key.replace(
                     " ",
@@ -169,9 +180,9 @@ def postprocess(i):
                     '.',
                     '_')
                 if env_key in unified_env:
-                    env[unified_env[env_key]] = v[1].strip()
+                    env[unified_env[env_key]] = value
                 else:
-                    env[env_key] = v[1].strip()
+                    env[env_key] = value
 
     # get start cores
     matches = re.findall(r"NUMA node\d+ CPU\(s\):\s+([\d,-]+)", ss)
