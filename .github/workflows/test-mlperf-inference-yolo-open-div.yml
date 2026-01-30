@@ -56,7 +56,7 @@ jobs:
     - name: upload results artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ matrix.division }}
+        name: mlperf-inference-yolo-results-${{ matrix.os }}-py${{ matrix.python-version }}-bk${{ matrix.backend }}
         path: ${{ env.SUBMISSION_DIR }}
   
   upload-results-to-github:
@@ -100,7 +100,7 @@ jobs:
     - name: Download benchmark artifacts
       uses: actions/download-artifact@v4
       with:
-        path: ${{ env.SUBMISSION_DIR }}
+        path: "${{ env.SUBMISSION_DIR }}/open"
 
     - name: Load secrets
       id: op-load-secrets
