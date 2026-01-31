@@ -11,9 +11,13 @@ for /f "tokens=4-7 delims=[.] " %%i in ('ver') do (
     set WIN_VERSION=%%i.%%j
 )
 
-REM Get OS caption and version
-for /f "tokens=2 delims==" %%i in ('wmic os get Caption /value ^| find "="') do set OS_CAPTION=%%i
-for /f "tokens=2 delims==" %%i in ('wmic os get Version /value ^| find "="') do set OS_VERSION=%%i
+REM Get OS caption and version from systeminfo output
+for /f "tokens=2* delims=:" %%i in ('systeminfo ^| findstr /B /C:"OS Name"') do set OS_CAPTION=%%j
+for /f "tokens=2* delims=:" %%i in ('systeminfo ^| findstr /B /C:"OS Version"') do set OS_VERSION=%%j
+
+REM Trim leading spaces
+for /f "tokens=* delims= " %%i in ("%OS_CAPTION%") do set OS_CAPTION=%%i
+for /f "tokens=* delims= " %%i in ("%OS_VERSION%") do set OS_VERSION=%%i
 
 REM Determine OS flavor
 echo %OS_CAPTION% | findstr /i "Windows 11" >nul
