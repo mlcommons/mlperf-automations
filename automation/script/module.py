@@ -2117,7 +2117,7 @@ class ScriptAutomation(Automation):
             variation_tags_string = ','.join(['_' + t for t in variation_tags])
 
             logger.debug(self.recursion_spaces +
-                f" - Prepared variations: {variation_tags_string}")
+                         f" - Prepared variations: {variation_tags_string}")
 
             # Apply individual variations
             for variation_tag in variation_tags:
