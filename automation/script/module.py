@@ -2116,10 +2116,10 @@ class ScriptAutomation(Automation):
         if variation_tags:
             variation_tags_string = ','.join(['_' + t for t in variation_tags])
 
-            logger.debug(
-                f"{self.recursion_spaces}Prepared variations: {variation_tags_string}")
+            logger.debug(self.recursion_spaces +
+                f" - Prepared variations: {variation_tags_string}")
 
-            # 2️⃣ Apply individual variations
+            # Apply individual variations
             for variation_tag in variation_tags:
                 r = self._apply_single_variation(
                     variation_tag, variations,
@@ -2128,7 +2128,7 @@ class ScriptAutomation(Automation):
                 if r['return'] > 0:
                     return r
 
-            # 3️⃣ Apply combined variations
+            # Apply combined variations
             r = self._apply_combined_variations(
                 variations, variation_tags,
                 run_state, i, meta, required_disk_space, warnings
