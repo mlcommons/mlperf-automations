@@ -61,6 +61,7 @@ This project is made possible through the generous support of:
 - [cKnowledge.org](https://cKnowledge.org)
 - [cTuning Foundation](https://cTuning.org)
 - [GATEOverflow](https://gateoverflow.in)
+- [AMD](https://www.amd.com)
 - [MLCommons](https://mlcommons.org)
 
 We appreciate their contributions and sponsorship!
