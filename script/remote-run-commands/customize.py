@@ -11,7 +11,7 @@ def preprocess(i):
     env = i['env']
 
     cmd_string = ''
-    
+
     is_windows = os_info['platform'] == 'windows'
 
     # pre_run_cmds = env.get('MLC_SSH_PRE_RUN_CMDS', ['source $HOME/mlcflow/bin/activate'])
@@ -20,7 +20,8 @@ def preprocess(i):
     files_to_copy = env.get('MLC_SSH_FILES_TO_COPY', [])
 
     if "<<<HOME>>>" in env.get('MLC_SSH_KEY_FILE', ''):
-        env['MLC_SSH_KEY_FILE'] = env['MLC_SSH_KEY_FILE'].replace("<<<HOME>>>", os.path.expanduser("~"))
+        env['MLC_SSH_KEY_FILE'] = env['MLC_SSH_KEY_FILE'].replace(
+            "<<<HOME>>>", os.path.expanduser("~"))
 
     run_cmds = env.get('MLC_SSH_RUN_COMMANDS', [])
 
@@ -34,9 +35,10 @@ def preprocess(i):
 
     # Use semicolon for Unix-like systems, the remote server will handle it
     cmd_string += " ; ".join(run_cmds)
-    
+
     # Get username - on Windows, USERNAME is the env var, not USER
-    user = env.get('MLC_SSH_USER', os.environ.get('USER') or os.environ.get('USERNAME'))
+    user = env.get('MLC_SSH_USER', os.environ.get(
+        'USER') or os.environ.get('USERNAME'))
     password = env.get('MLC_SSH_PASSWORD', None)
     host = env.get('MLC_SSH_HOST')
     port = env.get('MLC_SSH_PORT', '22')
@@ -60,7 +62,8 @@ def preprocess(i):
 
     ssh_cmd_str = " ".join(ssh_cmd)
 
-    # Use double quotes on Windows, single quotes on Unix for better compatibility
+    # Use double quotes on Windows, single quotes on Unix for better
+    # compatibility
     quote_char = '"' if is_windows else "'"
     ssh_run_command = ssh_cmd_str + " " + user + "@" + host + \
         password_string + " " + quote_char + cmd_string + quote_char
@@ -79,15 +82,16 @@ def preprocess(i):
         # Check if rsync is available
         rsync_available = True
         try:
-            subprocess.run(["rsync", "--version"], capture_output=True, check=True)
+            subprocess.run(["rsync", "--version"],
+                           capture_output=True, check=True)
         except (subprocess.CalledProcessError, FileNotFoundError):
             rsync_available = False
-            
+
         if not rsync_available:
             print(f"⚠️  rsync not found. Skipping file copy for {file}")
             print("   On Windows, install rsync via WSL, Cygwin, or use Git Bash")
             continue
-        
+
         cmd = [
             "rsync",
             "-avz",
