@@ -31,7 +31,7 @@ At its core, MLCFlow relies on a single powerful automation, the Script, which i
 ## 🤝 Contributing
 We welcome contributions from the community! To contribute:
 1. Submit pull requests (PRs) to the **`dev`** branch.
-2. Review our [CONTRIBUTORS.md](here) for guidelines and best practices.
+2. See [here](CONTRIBUTORS.md) for guidelines and best practices on contribution.
 3. Explore more about MLPerf Inference automation in the official [MLPerf Inference Documentation](https://docs.mlcommons.org/inference/).
 
 Your contributions help drive the project forward!
