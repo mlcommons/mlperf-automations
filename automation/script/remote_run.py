@@ -9,6 +9,7 @@ import time
 import copy
 from datetime import datetime
 from script.script_utils import *
+import platform
 
 
 def remote_run(self_module, i):
@@ -86,6 +87,13 @@ def remote_run(self_module, i):
 
     run_cmds = []
     remote_mlc_python_venv = i.get('remote_python_venv', 'mlcflow')
+
+    # Determine if the local system is Windows to adjust command formatting
+    is_windows = platform.system() == 'Windows'
+
+    # Note: The remote activation command uses Unix syntax because we're SSHing into a (likely) Unix server
+    # Even if we're running from Windows locally, the remote commands execute
+    # on the remote server
     run_cmds.append(f". {remote_mlc_python_venv}/bin/activate")
     if i.get('remote_pull_mlc_repos', False):
         run_cmds.append("mlc pull repo")
@@ -96,10 +104,9 @@ def remote_run(self_module, i):
     for key in env_keys_to_copy:
         if key in env and os.path.exists(env[key]):
             files_to_copy.append(env[key])
-            remote_env[key] = os.path.join(
-                "mlc-remote-artifacts",
-                os.path.basename(
-                    env[key]))
+            # Use forward slashes for remote path (Unix/Linux servers)
+            remote_env[key] = "mlc-remote-artifacts/" + \
+                os.path.basename(env[key])
 
             for k, value in input_mapping.items():
                 if value == key and k in run_input:
@@ -203,9 +210,14 @@ def regenerate_script_cmd(i):
             value = env[key]
 
             # Check if the value is a string containing the specified paths
+            # Use both forward and backward slashes for Windows compatibility
             if isinstance(value, str) and (
                     os.path.join("local", "cache", "") in value or
+                    "local/cache/" in value or
+                    "local\\cache\\" in value or
                     os.path.join("MLC", "repos", "") in value or
+                    "MLC/repos/" in value or
+                    "MLC\\repos\\" in value or
                     "<<<" in value
             ):
                 del env[key]
@@ -217,8 +229,12 @@ def regenerate_script_cmd(i):
                     val for val in value
                     if isinstance(val, str) and (
                         os.path.join("local", "cache", "") in val or
+                        "local/cache/" in val or
+                        "local\\cache\\" in val or
                         os.path.join("MLC", "repos", "") in val or
-                        "<<<" in value
+                        "MLC/repos/" in val or
+                        "MLC\\repos\\" in val or
+                        "<<<" in val
                     )
                 ]
 
