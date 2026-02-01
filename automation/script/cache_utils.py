@@ -438,24 +438,27 @@ def fix_cache_paths(cached_path, env):
         """Helper to normalize and replace cache paths in a string."""
         # Normalize the path to use the current OS separators
         normalized = os.path.normpath(path_str)
-        
+
         # Check if path contains local/cache or local\cache pattern
         path_parts = normalized.split(os.sep)
-        
+
         try:
             local_idx = path_parts.index("local")
-            if local_idx + 1 < len(path_parts) and path_parts[local_idx + 1] == "cache":
+            if local_idx + \
+                    1 < len(path_parts) and path_parts[local_idx + 1] == "cache":
                 # Extract the loaded cache path (up to and including "cache")
                 loaded_cache_path = os.sep.join(path_parts[:local_idx + 2])
                 loaded_cache_path_norm = os.path.normpath(loaded_cache_path)
-                
-                if loaded_cache_path_norm != current_cache_path and os.path.exists(current_cache_path):
+
+                if loaded_cache_path_norm != current_cache_path and os.path.exists(
+                        current_cache_path):
                     # Replace old cache path with current cache path
-                    return normalized.replace(loaded_cache_path_norm, current_cache_path)
+                    return normalized.replace(
+                        loaded_cache_path_norm, current_cache_path)
         except (ValueError, IndexError):
             # "local" not in path or malformed path
             pass
-        
+
         return normalized
 
     for key, val in new_env.items():
@@ -469,7 +472,8 @@ def fix_cache_paths(cached_path, env):
             for i, val2 in enumerate(val):
                 if isinstance(val2, str):
                     # Check if path contains cache directory pattern
-                    normalized_val2 = val2.replace('\\', os.sep).replace('/', os.sep)
+                    normalized_val2 = val2.replace(
+                        '\\', os.sep).replace('/', os.sep)
                     if os.sep.join(['local', 'cache']) in normalized_val2:
                         new_env[key][i] = normalize_and_replace_path(val2)
 
