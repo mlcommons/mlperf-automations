@@ -430,40 +430,52 @@ def find_cached_script(i):
 
 def fix_cache_paths(cached_path, env):
 
-    current_cache_path = cached_path
+    current_cache_path = os.path.normpath(cached_path)
 
     new_env = env  # just a reference
 
-    for key, val in new_env.items():
-        # Check for a path separator in a string and determine the
-        # separator
-        if isinstance(val, str) and any(sep in val for sep in [
-                "/local/cache/", "\\local\\cache\\"]):
-            sep = "/" if "/local/cache/" in val else "\\"
+    def normalize_and_replace_path(path_str):
+        """Helper to normalize and replace cache paths in a string."""
+        # Normalize the path to use the current OS separators
+        normalized = os.path.normpath(path_str)
 
-            path_split = val.split(sep)
-            repo_entry_index = path_split.index("local")
-            loaded_cache_path = sep.join(
-                path_split[0:repo_entry_index + 2])
-            if loaded_cache_path != current_cache_path and os.path.exists(
-                    current_cache_path):
-                new_env[key] = val.replace(
-                    loaded_cache_path, current_cache_path).replace(sep, "/")
+        # Check if path contains local/cache or local\cache pattern
+        path_parts = normalized.split(os.sep)
+
+        try:
+            local_idx = path_parts.index("local")
+            if local_idx + \
+                    1 < len(path_parts) and path_parts[local_idx + 1] == "cache":
+                # Extract the loaded cache path (up to and including "cache")
+                loaded_cache_path = os.sep.join(path_parts[:local_idx + 2])
+                loaded_cache_path_norm = os.path.normpath(loaded_cache_path)
+
+                if loaded_cache_path_norm != current_cache_path and os.path.exists(
+                        current_cache_path):
+                    # Replace old cache path with current cache path
+                    return normalized.replace(
+                        loaded_cache_path_norm, current_cache_path)
+        except (ValueError, IndexError):
+            # "local" not in path or malformed path
+            pass
+
+        return normalized
+
+    for key, val in new_env.items():
+        if isinstance(val, str):
+            # Check if path contains cache directory pattern
+            normalized_val = val.replace('\\', os.sep).replace('/', os.sep)
+            if os.sep.join(['local', 'cache']) in normalized_val:
+                new_env[key] = normalize_and_replace_path(val)
 
         elif isinstance(val, list):
             for i, val2 in enumerate(val):
-                if isinstance(val2, str) and any(sep in val2 for sep in [
-                        "/local/cache/", "\\local\\cache\\"]):
-                    sep = "/" if "/local/cache/" in val2 else "\\"
-
-                    path_split = val2.split(sep)
-                    repo_entry_index = path_split.index("local")
-                    loaded_cache_path = sep.join(
-                        path_split[0:repo_entry_index + 2])
-                    if loaded_cache_path != current_cache_path and os.path.exists(
-                            current_cache_path):
-                        new_env[key][i] = val2.replace(
-                            loaded_cache_path, current_cache_path).replace(sep, "/")
+                if isinstance(val2, str):
+                    # Check if path contains cache directory pattern
+                    normalized_val2 = val2.replace(
+                        '\\', os.sep).replace('/', os.sep)
+                    if os.sep.join(['local', 'cache']) in normalized_val2:
+                        new_env[key][i] = normalize_and_replace_path(val2)
 
     return {'return': 0, 'new_env': new_env}
 
