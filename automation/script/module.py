@@ -3315,7 +3315,7 @@ class ScriptAutomation(Automation):
 
                     ii = {
                         'automation': utils.assemble_object(self.meta['alias'], self.meta['uid']),
-                        'recursion_spaces': recursion_spaces,# + extra_recursion_spaces,
+                        'recursion_spaces': recursion_spaces,  # + extra_recursion_spaces,
                         'recursion': True,
                         'debug_script_tags': debug_script_tags,
                         'env': env,
