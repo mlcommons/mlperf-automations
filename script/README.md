@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-01-23 04:05:12*
+*Last updated: 2026-02-04 18:34:12*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -970,9 +970,18 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-dataset-mlperf-inference-dlrmv3-synthetic-streaming](get-dataset-mlperf-inference-dlrmv3-synthetic-streaming/)**
   - get-dataset-mlperf-inference-dlrmv3-synthetic-streaming
   - Tags: `get`, `dataset`, `mlperf`, `inference`, `dlrmv3`, `synthetic-streaming`, `get-dataset-mlperf-inference-dlrmv3-synthetic-streaming`
+- **[get-dataset-mlperf-inference-gpt-oss](get-dataset-mlperf-inference-gpt-oss/)**
+  - get-dataset-mlperf-inference-gpt-oss
+  - Tags: `get-dataset-mlperf-inference-gpt-oss`
 - **[get-dataset-mlperf-inference-llama3](get-dataset-mlperf-inference-llama3/)**
   - get-dataset-mlperf-inference-llama3
   - Tags: `get`, `dataset`, `mlperf`, `llama3`, `inference`
+- **[get-dataset-mlperf-inference-shopify-catalogue](get-dataset-mlperf-inference-shopify-catalogue/)**
+  - get-dataset-mlperf-inference-shopify-catalogue
+  - Tags: `get-dataset-mlperf-inference-shopify-catalogue`
+- **[get-dataset-mlperf-inference-text-to-video](get-dataset-mlperf-inference-text-to-video/)**
+  - get-dataset-mlperf-inference-text-to-video
+  - Tags: `get-dataset-mlperf-inference-text-to-video`
 - **[get-dataset-mlperf-inference-yolo-coco2017-filtered-dataset](get-dataset-mlperf-inference-yolo-coco2017-filtered-dataset/)**
   - get-dataset-mlperf-inference-yolo-coco2017-filtered-dataset
   - Tags: `get`, `dataset`, `mlperf-inference`, `yolo-coco2017-filtered`, `get-dataset-mlperf-inference-yolo-coco2017-filtered-dataset`
@@ -1012,6 +1021,15 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-ml-model-pointpainting](get-ml-model-pointpainting/)** (alias: `get-ml-model-pointpillars`)
   - get-ml-model-pointpainting
   - Tags: `get`, `ml-model`, `ml`, `model`, `pointpainting`
+- **[get-ml-model-qwen3-vlm](get-ml-model-qwen3-vlm/)**
+  - get-ml-model-qwen3-vlm
+  - Tags: `get-ml-model-qwen3-vl`
+- **[get-ml-model-wan2](get-ml-model-wan2/)**
+  - get-ml-model-wan2
+  - Tags: `get-ml-model-wan2`
+- **[get-ml-model-yolov11](get-ml-model-yolov11/)**
+  - get-ml-model-yolov11
+  - Tags: `get-ml-model-yolov11`
 - **[get-mlperf-automotive-utils](get-mlperf-automotive-utils/)**
   - get-mlperf-automotive-utils
   - Tags: `get`, `mlperf`, `automotive`, `util`, `utils`, `functions`
@@ -1053,7 +1071,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 308
+- **Total Scripts**: 314
 - **Categories**: 29
 
 ## Usage
