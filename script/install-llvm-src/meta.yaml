@@ -36,12 +36,21 @@ deps:
     - MLC_GIT_CHECKOUT_TAG
     _tag.llvmorg-:
     - MLC_VERSION
+- tags: pull,git,repo
+  env:
+    MLC_GIT_CHECKOUT_PATH: '<<<MLC_LLVM_SRC_REPO_PATH>>>'
+  enable_if_env:
+    MLC_LLVM_REPO_PULL_CHANGES:
+      - 'yes'
+
 input_mapping:
   targets: MLC_LLVM_TARGETS_TO_BUILD
   target_triple: MLC_LLVM_TARGET_TRIPLE
   extra_options: MLC_LLVM_EXTRA_CMAKE_OPTIONS
   per_target_runtime_dir: MLC_LLVM_PER_TARGET_RUNTIME_DIR
   clean: MLC_CLEAN
+  pull_changes: MLC_LLVM_REPO_PULL_CHANGES
+
 env:
   MLC_GIT_URL: https://github.com/llvm/llvm-project
 name: Build LLVM compiler from sources (can take >30 min)
