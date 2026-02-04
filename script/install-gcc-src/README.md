@@ -44,6 +44,7 @@ mlcr install,src,gcc,src-gcc
 | `--host` |  |  | `` |
 | `--build` |  |  | `` |
 | `--extra` |  |  | `` |
+| `--pull_changes` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
