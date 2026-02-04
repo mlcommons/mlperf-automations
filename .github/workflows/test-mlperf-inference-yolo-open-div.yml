@@ -6,7 +6,7 @@ on:
   schedule:
     - cron: '0 0 * * *'  # Runs daily at 12 AM UTC
   pull_request_target:
-    branches: [ "main", "dev" ]
+    branches: [ "main_off", "dev_off" ]
     paths:
       - '.github/workflows/test-mlperf-inference-yolo.yml'
       - '**'
