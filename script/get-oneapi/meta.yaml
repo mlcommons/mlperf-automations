@@ -4,7 +4,7 @@ automation_uid: 5b4e0237da074764
 cache: true
 category: Compiler automation
 clean_files: []
-default_version: 2025.3.1
+default_version: 2025.3.2
 deps:
 - tags: detect,os
 name: Detect or install OneAPI compiler
@@ -36,6 +36,17 @@ tests:
       - fortran
 
 versions:
+  2025.3.2:
+    env:
+      MLC_ONEAPI_INSTALL_URL_BASE: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/6caa93ca-e10a-4cc5-b210-68f385feea9e
+      MLC_ONEAPI_INSTALL_FILENAME: intel-oneapi-base-toolkit-2025.3.1.36_offline.sh
+      MLC_ONEAPI_CXX_COMPILER_URL_BASE: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/0d61d48a-4fe8-4cb2-bd9d-94d2c19c6227
+      MLC_ONEAPI_CXX_COMPILER_FILENAME: intel-dpcpp-cpp-compiler-2025.3.2.26_offline.sh
+      MLC_ONEAPI_FORTRAN_COMPILER_URL_BASE: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/3e53d136-2870-4836-adb1-892b558fa34a
+      MLC_ONEAPI_FORTRAN_COMPILER_FILENAME: intel-fortran-compiler-2025.3.2.25_offline.sh
+      MLC_ONEAPI_INSTALL_VERSION_PREFIX: '2025.3'
+      MLC_VERSION: '2025.3.2'
+      MLC_ONEAPI_CXX: 'yes'
   2025.3.1:
     env:
       MLC_ONEAPI_INSTALL_URL_BASE: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/d640da34-77cc-4ab2-8019-ac5592f4ec19
