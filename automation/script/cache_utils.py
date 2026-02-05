@@ -77,6 +77,7 @@ def prepare_cache_tags(i):
                 cached_tags.append(x)
 
     explicit_cached_tags = cached_tags.copy()
+    explicit_cached_tags.append("-tmp")
 
     # explicit variations
     if len(i['explicit_variation_tags']) > 0:
@@ -161,12 +162,15 @@ def search_cache(i, explicit_cached_tags):
     i['logger'].debug(
         i['recursion_spaces'] +
         '    - Pruning cache list outputs with the following tags: {}'.format(explicit_cached_tags))
-
     cache_list = i['cache_list']
+
+    n_tags = [p[1:] for p in explicit_cached_tags if p.startswith("-")]
+    p_tags = [p for p in explicit_cached_tags if not p.startswith("-")]
+
     pruned_cache_list = [
         item
         for item in cache_list
-        if set(explicit_cached_tags) <= set(item.meta.get('tags', []))
+        if set(p_tags) <= set(item.meta.get('tags', [])) and set(n_tags).isdisjoint(set(item.meta.get('tags', [])))
     ]
 
     return pruned_cache_list
@@ -214,9 +218,19 @@ def validate_cached_scripts(i, found_cached_scripts):
     '''
     valid = []
     if len(found_cached_scripts) > 0:
+
+        # We can consider doing quiet here if noise is too much
+        # import logging
+        # logger = i['logger']
+        # logger_level_saved = logger.level
+        # logger.setLevel(logging.ERROR)
+        # saved_quiet = i['env'].get('MLC_QUIET', False)
+        # i['env']['MLC_QUIET'] = True
         for cached_script in found_cached_scripts:
             if is_cached_entry_valid(i, cached_script):
                 valid.append(cached_script)
+        # logger.setLevel(logger_level_saved)
+        # i['env']['MLC_QUIET'] = saved_quiet
 
     return valid
 
@@ -417,9 +431,7 @@ def find_cached_script(i):
         i, explicit_cached_tags, found_cached_scripts)
     found_cached_scripts = validate_cached_scripts(i, found_cached_scripts)
 
-    search_tags = '-tmp'
-    if len(explicit_cached_tags) > 0:
-        search_tags += ',' + ','.join(explicit_cached_tags)
+    search_tags = ','.join(explicit_cached_tags)
 
     return {'return': 0, 'cached_tags': cached_tags,
             'search_tags': search_tags, 'found_cached_scripts': found_cached_scripts}

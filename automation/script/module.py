@@ -492,9 +492,9 @@ class ScriptAutomation(Automation):
         quiet = i.get(
             'quiet',
             False) if 'quiet' in i else (
-            env.get(
+            str(env.get(
                 'MLC_QUIET',
-                '').lower() == 'yes')
+                '')).lower() in ["1", "true", "yes", "on"])
         if quiet:
             env['MLC_QUIET'] = 'yes'
 
