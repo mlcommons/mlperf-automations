@@ -676,8 +676,10 @@ class ScriptAutomation(Automation):
         #           (env OVERWRITE - user enforces it from CLI)
         #           (it becomes const)
         if input_mapping:
-            update_env_from_input_mapping(env, i, input_mapping, input_description)
-            update_env_from_input_mapping(const, i, input_mapping, input_description)
+            update_env_from_input_mapping(
+                env, i, input_mapping, input_description)
+            update_env_from_input_mapping(
+                const, i, input_mapping, input_description)
 
         # This mapping is done in docker script
         # if docker_input_mapping:
@@ -5521,13 +5523,15 @@ def update_deps_from_input(deps, post_deps, prehook_deps, posthook_deps, i):
 
 
 ##############################################################################
-def update_env_from_input_mapping(env, inp, input_mapping, input_description={}):
+def update_env_from_input_mapping(
+        env, inp, input_mapping, input_description={}):
     """
     Internal: update env from input and input_mapping
     """
     for key in input_mapping:
         if key in inp:
-            if key in input_description and str(input_description[key].get('is_path', '')).lower() in ['1', 'yes', 'on', 'true']:
+            if key in input_description and str(input_description[key].get(
+                    'is_path', '')).lower() in ['1', 'yes', 'on', 'true']:
                 env[input_mapping[key]] = os.path.expanduser(inp[key])
             else:
                 env[input_mapping[key]] = inp[key]
@@ -5728,7 +5732,11 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
 
     input_mapping = meta.get('input_mapping', {})
     if input_mapping:
-        update_env_from_input_mapping(env, input_update_env, input_mapping, meta.get('input_description'))
+        update_env_from_input_mapping(
+            env,
+            input_update_env,
+            input_mapping,
+            meta.get('input_description'))
 
     # handle dynamic env values
     r = update_env_with_values(env)
