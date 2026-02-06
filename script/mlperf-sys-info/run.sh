@@ -33,7 +33,9 @@ fi
 
 # Host memory
 echo "host_memory_capacity: $(free -h | grep Mem: | awk '{print $2}')" >> "$OUTPUT_FILE"
-echo "host_memory_configuration: $(sudo dmidecode --type memory 2>/dev/null | grep -i 'Type: LPDDR5X' -A 5 | grep -i 'Size' | head -1 | awk '{print $2 " " $3}' || echo "LPDDR5X")" >> "$OUTPUT_FILE"
+if [[ ${MLC_SUDO_USER} == "yes" ]]; then
+    echo "host_memory_configuration: $(sudo dmidecode --type memory 2>/dev/null | grep -i 'Type: LPDDR5X' -A 5 | grep -i 'Size' | head -1 | awk '{print $2 " " $3}' || echo "LPDDR5X")" >> "$OUTPUT_FILE"
+fi
 
 # Network
 echo "host_network_card_count: $(lspci | grep -iE 'Mellanox|ConnectX|BlueField|Ethernet|Network' | wc -l) cards detected ($(lspci | grep -iE 'Mellanox|ConnectX|BlueField' || echo 'No Mellanox/BlueField detected'))" >> "$OUTPUT_FILE"
@@ -56,8 +58,9 @@ echo "nvidia-smi -q summary:" >> "$OUTPUT_FILE"
 nvidia-smi -q 2>/dev/null | head -n 60 >> "$OUTPUT_FILE" || echo "nvidia-smi not found" >> "$OUTPUT_FILE"
 
 echo "dmidecode memory (sudo):" >> "$OUTPUT_FILE"
-sudo dmidecode --type memory 2>/dev/null >> "$OUTPUT_FILE" || echo "sudo dmidecode failed" >> "$OUTPUT_FILE"
-
+if [[ ${MLC_SUDO_USER} == "yes" ]]; then
+    sudo dmidecode --type memory 2>/dev/null >> "$OUTPUT_FILE" || echo "sudo dmidecode failed" >> "$OUTPUT_FILE"
+fi
 echo "lspci network devices:" >> "$OUTPUT_FILE"
 lspci | grep -iE 'ethernet|network|infiniband|mellanox|connectx|bluefield' >> "$OUTPUT_FILE"
 
