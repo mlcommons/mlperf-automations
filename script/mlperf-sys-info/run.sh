@@ -68,3 +68,7 @@ echo "lsblk storage:" >> "$OUTPUT_FILE"
 lsblk -o NAME,SIZE,TYPE,MOUNTPOINT,FSTYPE >> "$OUTPUT_FILE"
 
 echo "System information collection complete."
+
+echo "Parsing the collected system info..."
+
+${MLC_PYTHON_BIN_WITH_PATH} "${MLC_TMP_CURRENT_SCRIPT_PATH}/parse.py" 

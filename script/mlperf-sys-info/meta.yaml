@@ -5,6 +5,10 @@ cache: false
 category: Platform information
 deps:
 - tags: detect,os
+- tags: get,python
+  names:
+  - python
+  - python3
 - skip_if_env:
     MLC_HOST_OS_TYPE:
     - windows
