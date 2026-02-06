@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OUTPUT_FILE="${MLC_PLATFORM_DETAILS_FILE_PATH:-system-info.txt}"
+OUTPUT_FILE="${MLC_MLPERF_SYSTEM_INFO_FILE_PATH:-system-info.txt}"
 echo "Collecting system info to: $OUTPUT_FILE"
 echo "WARNING: Some commands require sudo (dmidecode, sysctl, etc.)"
 
