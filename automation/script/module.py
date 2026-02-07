@@ -5736,7 +5736,7 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
             env,
             input_update_env,
             input_mapping,
-            meta.get('input_description'))
+            meta.get('input_description', {}))
 
     # handle dynamic env values
     r = update_env_with_values(env)
