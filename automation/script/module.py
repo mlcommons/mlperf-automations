@@ -641,6 +641,7 @@ class ScriptAutomation(Automation):
         docker_settings = run_state['docker']
 
         input_mapping = meta.get('input_mapping', {})
+        input_description = meta.get('input_description', {})
 
         docker_settings = meta.get('docker')
 
@@ -675,10 +676,12 @@ class ScriptAutomation(Automation):
         #           (env OVERWRITE - user enforces it from CLI)
         #           (it becomes const)
         if input_mapping:
-            update_env_from_input_mapping(env, i, input_mapping)
-            update_env_from_input_mapping(const, i, input_mapping)
+            update_env_from_input_mapping(
+                env, i, input_mapping, input_description)
+            update_env_from_input_mapping(
+                const, i, input_mapping, input_description)
 
-        # This mapping is done in module_misc
+        # This mapping is done in docker script
         # if docker_input_mapping:
         #    update_env_from_input_mapping(env, i, docker_input_mapping)
         #    update_env_from_input_mapping(const, i, docker_input_mapping)
@@ -5520,13 +5523,18 @@ def update_deps_from_input(deps, post_deps, prehook_deps, posthook_deps, i):
 
 
 ##############################################################################
-def update_env_from_input_mapping(env, inp, input_mapping):
+def update_env_from_input_mapping(
+        env, inp, input_mapping, input_description={}):
     """
     Internal: update env from input and input_mapping
     """
     for key in input_mapping:
         if key in inp:
-            env[input_mapping[key]] = inp[key]
+            if key in input_description and str(input_description[key].get(
+                    'is_path', '')).lower() in ['1', 'yes', 'on', 'true']:
+                env[input_mapping[key]] = os.path.expanduser(inp[key])
+            else:
+                env[input_mapping[key]] = inp[key]
 
 
 def _apply_conditional_meta_updates(update_meta_if_env, default_env, env, const, state, const_state,
@@ -5724,7 +5732,11 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
 
     input_mapping = meta.get('input_mapping', {})
     if input_mapping:
-        update_env_from_input_mapping(env, input_update_env, input_mapping)
+        update_env_from_input_mapping(
+            env,
+            input_update_env,
+            input_mapping,
+            meta.get('input_description', {}))
 
     # handle dynamic env values
     r = update_env_with_values(env)
