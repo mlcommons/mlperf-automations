@@ -57,16 +57,21 @@ def postprocess(i):
         data = {}
 
     if env.get('MLC_ACCELERATOR_BACKEND', '') == 'cuda':
-        data['accelerator_model_name'] = env.get('MLC_CUDA_DEVICE_PROP_GPU_NAME', '')
+        data['accelerator_model_name'] = env.get(
+            'MLC_CUDA_DEVICE_PROP_GPU_NAME', '')
         data['accelerators_per_node'] = int(env.get('MLC_CUDA_NUM_DEVICES', 0))
 
         if 'MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY' in env:
-            data['accelerator_memory_capacity'] = int(env['MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY'])
+            data['accelerator_memory_capacity'] = int(
+                env['MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY'])
 
-        data['accelerator_memory_type'] = env.get('MLC_ACCELERATOR_MEMORY_TYPE', '')
-        data['accelerator_host_interconnect'] = env.get('MLC_ACCELERATOR_HOST_INTERCONNECT', '')
-        data['accelerator_interconnect'] = env.get('MLC_ACCELERATOR_INTERCONNECT', '')
-    
+        data['accelerator_memory_type'] = env.get(
+            'MLC_ACCELERATOR_MEMORY_TYPE', '')
+        data['accelerator_host_interconnect'] = env.get(
+            'MLC_ACCELERATOR_HOST_INTERCONNECT', '')
+        data['accelerator_interconnect'] = env.get(
+            'MLC_ACCELERATOR_INTERCONNECT', '')
+
     with open(json_path, 'w') as f:
         json.dump(data, f, indent=2)
 
