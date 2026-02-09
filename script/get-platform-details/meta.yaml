@@ -67,3 +67,10 @@ tags:
 - details
 - platform-details
 uid: f0801943c17f4e48
+variations:
+  cuda:
+    group: gpu-driver
+    deps:
+    - tags: get,cuda-devices
+    env:
+      MLC_ACCELERATOR_BACKEND: "cuda"

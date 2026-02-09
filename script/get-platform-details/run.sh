@@ -75,7 +75,38 @@ add_entry "dmi_entries" "ls /sys/devices/virtual/dmi/id" yes
 add_entry "dmidecode_full" "dmidecode" yes
 add_entry "bios_info" "dmidecode -t bios" yes
 
+# -------- Accelerator interconnect detection (CUDA only) --------
+
+if [[ "$MLC_ACCELERATOR_BACKEND" == "cuda" ]]; then
+
+  INTERCONNECT="unknown"
+  INTERCONNECT_ERROR=""
+
+  if command -v nvidia-smi >/dev/null 2>&1; then
+    TOPO_OUT="$(nvidia-smi topo -m 2>&1)"
+
+    if echo "$TOPO_OUT" | grep -q "NV"; then
+      INTERCONNECT="NVLink"
+    else
+      INTERCONNECT="PCIe"
+    fi
+  else
+    INTERCONNECT_ERROR="nvidia-smi not found; cannot detect accelerator_interconnect"
+  fi
+
+  # Append to JSON
+  echo "," >> "$OUTPUT_FILE"
+  cat >> "$OUTPUT_FILE" <<EOF
+  "accelerator_interconnect": {
+    "value": "$(printf '%s' "$INTERCONNECT")",
+    "error": "$(printf '%s' "$INTERCONNECT_ERROR")"
+  }
+EOF
+
+fi
+
 echo
 echo "}" >> "$OUTPUT_FILE"
 
 echo "System information written to $OUTPUT_FILE"
+
