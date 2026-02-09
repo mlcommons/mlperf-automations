@@ -1,153 +1,81 @@
 #!/bin/bash
 
 OUTPUT_FILE="$MLC_PLATFORM_DETAILS_FILE_PATH"
-#set -e
-#echo "${OUTPUT_FILE}"
-echo "WARNING: sudo permission is needed for some of the below commands"
 
-echo "Platform Details" > "${OUTPUT_FILE}"
-echo "" >> "${OUTPUT_FILE}"
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-echo "1. uname -a" >> "${OUTPUT_FILE}"
-eval "uname -a" >> "${OUTPUT_FILE}"
-test $? -eq 0 || exit $?
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
+echo "{" > "$OUTPUT_FILE"
+FIRST=true
 
-echo "2. w" >> "${OUTPUT_FILE}"
-eval "w" >> "${OUTPUT_FILE}"
-test $? -eq 0 || exit $?
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
+add_entry () {
+    local key="$1"
+    local cmd="$2"
+    local needs_sudo="$3"
 
-echo "3. Username" >> "${OUTPUT_FILE}"
-eval "whoami" >> "${OUTPUT_FILE}"
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
+    local output
 
-echo "4. ulimit -a" >> "${OUTPUT_FILE}"
-eval "ulimit -a" >> "${OUTPUT_FILE}"
-test $? -eq 0 || exit $?
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
+    if [[ "$needs_sudo" == "yes" ]]; then
+      if [[ ${MLC_SUDO_USER} == "yes" ]]; then
+        output="$(${MLC_SUDO} bash -c "$cmd" 2>&1 || echo "FAILED (sudo): $cmd")"
+      else
+        output="sudo not available"
+      fi
+    else
+      output="$(bash -c "$cmd" 2>&1 || echo "FAILED: $cmd")"
+    fi
 
-echo "5. sysinfo process ancestry" >> "${OUTPUT_FILE}"
-eval "pstree" >> "${OUTPUT_FILE}"
-test $? -eq 0 || exit $?
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
+    local cmd_json
+    local output_json
+    cmd_json=$(printf '%s' "$cmd" | jq -Rs .)
+    output_json=$(printf '%s' "$output" | jq -Rs .)
 
-echo "6. /proc/cpuinfo" >> "${OUTPUT_FILE}"
-eval "cat /proc/cpuinfo" >> "${OUTPUT_FILE}"
-test $? -eq 0 || exit $?
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
+    if [ "$FIRST" = true ]; then
+      FIRST=false
+    else
+      echo "," >> "$OUTPUT_FILE"
+    fi
 
-echo "7. lscpu" >> "${OUTPUT_FILE}"
-eval "lscpu" >> "${OUTPUT_FILE}"
-test $? -eq 0 || exit $?
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
+    cat >> "$OUTPUT_FILE" <<EOF
+    "$key": {
+      "command": $cmd_json,
+      "output": $output_json
+    }
+EOF
+}
 
-echo "8. lscpu --cache" >> "${OUTPUT_FILE}"
-eval "lscpu --cache" >> "${OUTPUT_FILE}"
-test $? -eq 0 || exit $?
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
+# -------- Non-sudo commands --------
+add_entry "kernel_and_arch" "uname -a" no
+add_entry "logged_in_users" "w" no
+add_entry "current_user" "whoami" no
+add_entry "ulimit_settings" "ulimit -a" no
+add_entry "process_tree" "pstree" no
+add_entry "cpuinfo" "cat /proc/cpuinfo" no
+add_entry "lscpu" "lscpu" no
+add_entry "cpu_cache" "lscpu --cache" no
+add_entry "memory_info" "cat /proc/meminfo" no
+add_entry "runlevel" "who -r" no
+add_entry "systemd_version" "systemctl --version | head -n 1" no
+add_entry "systemd_units" "systemctl list-unit-files" no
+add_entry "kernel_cmdline" "cat /proc/cmdline" no
+add_entry "thp_enabled" "cat /sys/kernel/mm/transparent_hugepage/enabled" no
+add_entry "thp_defrag" "cat /sys/kernel/mm/transparent_hugepage/khugepaged/defrag" no
+add_entry "os_release" "cat /etc/os-release" no
+add_entry "disk_layout" "lsblk" no
+add_entry "lsb_release" "lsb_release -d" no
+add_entry "etc_versions" "cat /etc/*version*" no
+add_entry "etc_releases" "cat /etc/*release*" no
+add_entry "cpu_vulnerabilities" "grep . /sys/devices/system/cpu/vulnerabilities/*" no
+add_entry "numa_topology" "numactl --hardware" no
+add_entry "cpu_frequency" "cpupower frequency-info" no
+add_entry "memory_free_human" "free -h" no
+add_entry "pci_devices" "lspci" no
+add_entry "infiniband_status" "ibstat" no   # requires Infiniband drivers; will fail gracefully if not present
 
-echo "9. numactl --hardware" >> "${OUTPUT_FILE}"
-if [[ ${MLC_SUDO_USER} == "yes" ]]; then
-    echo "${MLC_SUDO} numactl --hardware"
-    eval "${MLC_SUDO} numactl --hardware" >> "${OUTPUT_FILE}"
-    #test $? -eq 0 || exit $?
-else
-    echo "Requires SUDO permission" >> "${OUTPUT_FILE}"
-fi
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
+# -------- Sudo-required commands --------
+add_entry "sysctl_all" "sysctl -a" yes
+add_entry "dmi_entries" "ls /sys/devices/virtual/dmi/id" yes
+add_entry "dmidecode_full" "dmidecode" yes
+add_entry "bios_info" "dmidecode -t bios" yes
 
-echo "10. /proc/meminfo" >> "${OUTPUT_FILE}"
-eval "cat /proc/meminfo" >> "${OUTPUT_FILE}"
-test $? -eq 0 || exit $?
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-echo "11. who -r" >> "${OUTPUT_FILE}"
-eval "who -r" >> "${OUTPUT_FILE}"
-test $? -eq 0 || exit $?
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-echo "12. Systemd service manager version" >> "${OUTPUT_FILE}"
-eval "systemctl --version | head -n 1" >> "${OUTPUT_FILE}"
-#test $? -eq 0 || exit $?
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-echo "13. Services, from systemctl list-unit-files" >> "${OUTPUT_FILE}"
-eval "systemctl list-unit-files" >> "${OUTPUT_FILE}"
-#test $? -eq 0 || exit $?
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-echo "14. Linux kernel boot-time arguments, from /proc/cmdline" >> "${OUTPUT_FILE}"
-eval "cat /proc/cmdline" >> "${OUTPUT_FILE}"
-test $? -eq 0 || exit $?
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-echo "15. cpupower frequency-info" >> "${OUTPUT_FILE}"
-eval "cpupower frequency-info" >> "${OUTPUT_FILE}"
-test $? -eq 0 || echo "FAILED: cpupower frequency-info" >> "${OUTPUT_FILE}"
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
+echo
+echo "}" >> "$OUTPUT_FILE"
 
-echo "16. sysctl" >> "${OUTPUT_FILE}"
-if [[ ${MLC_SUDO_USER} == "yes" ]]; then
-    echo "${MLC_SUDO} sysctl -a"
-    eval "${MLC_SUDO} sysctl -a" >> "${OUTPUT_FILE}"
-    #test $? -eq 0 || exit $?
-else
-    echo "Requires SUDO permission" >> "${OUTPUT_FILE}"
-fi
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-echo "17. /sys/kernel/mm/transparent_hugepage" >> "${OUTPUT_FILE}"
-eval "cat /sys/kernel/mm/transparent_hugepage/enabled" >> "${OUTPUT_FILE}"
-#test $? -eq 0 || exit $?
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-echo "18. /sys/kernel/mm/transparent_hugepage/khugepaged" >> "${OUTPUT_FILE}"
-eval "cat /sys/kernel/mm/transparent_hugepage/khugepaged/defrag" >> "${OUTPUT_FILE}"
-#test $? -eq 0 || exit $?
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-echo "19. OS release" >> "${OUTPUT_FILE}"
-eval "cat /etc/os-release" >> "${OUTPUT_FILE}"
-test $? -eq 0 || exit $?
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-echo "20. Disk information" >> "${OUTPUT_FILE}"
-eval "lsblk" >> "${OUTPUT_FILE}"
-test $? -eq 0 || exit $?
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-echo "21. /sys/devices/virtual/dmi/id" >> "${OUTPUT_FILE}"
-eval "ls /sys/devices/virtual/dmi/id" >> "${OUTPUT_FILE}"
-#test $? -eq 0 || exit $?
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-
-echo "22. /usr/bin/lsb_release -d" >> "${OUTPUT_FILE}"
-eval "/usr/bin/lsb_release -d" >> "${OUTPUT_FILE}"
-test $? -eq 0 || exit $?
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-
-echo "23. cat /etc/*version*" >> "${OUTPUT_FILE}"
-eval "cat /etc/*version*" >> "${OUTPUT_FILE}"
-test $? -eq 0 || echo "FAILED: cat /etc/*version*" >> "${OUTPUT_FILE}"
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-
-echo "24. cat /etc/*release*" >> "${OUTPUT_FILE}"
-eval "cat /etc/*release*" >> "${OUTPUT_FILE}"
-test $? -eq 0 || echo "FAILED: cat /etc/*release*" >> "${OUTPUT_FILE}"
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-
-echo "25. Kernel self-reported vulnerability status:" >> "${OUTPUT_FILE}"
-eval "grep . /sys/devices/system/cpu/vulnerabilities/*" >> "${OUTPUT_FILE}"
-test $? -eq 0 || echo "FAILED: grep /sys/devices/system/cpu/vulnerabilities/*" >> "${OUTPUT_FILE}"
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-
-echo "26. dmidecode" >> "${OUTPUT_FILE}"
-if [[ ${MLC_SUDO_USER} == "yes" ]]; then
-    eval "${MLC_SUDO} dmidecode" >> "${OUTPUT_FILE}"
-    test $? -eq 0 || echo "FAILED: dmidecode" >> "${OUTPUT_FILE}"
-else
-    echo "Requires SUDO permission" >> "${OUTPUT_FILE}"
-fi
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-
-echo "27. BIOS" >> "${OUTPUT_FILE}"
-if [[ ${MLC_SUDO_USER} == "yes" ]]; then
-    eval "${MLC_SUDO} dmidecode -t bios" >> "${OUTPUT_FILE}"
-    test $? -eq 0 || echo "FAILED: dmidecode -t bios" >> "${OUTPUT_FILE}"
-else
-    echo "Requires SUDO permission" >> "${OUTPUT_FILE}"
-fi
-echo "------------------------------------------------------------" >> "${OUTPUT_FILE}"
-
-echo "System information has been saved to "${OUTPUT_FILE}""
+echo "System information written to $OUTPUT_FILE"

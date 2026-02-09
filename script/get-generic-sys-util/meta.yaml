@@ -810,6 +810,21 @@ variations:
         dnf: screen
         yum: screen
         zypper: rsync
+  jq:
+    env:
+      MLC_SYS_UTIL_NAME: jq
+      MLC_SYS_UTIL_VERSION_CMD: jq --version
+      MLC_SYS_UTIL_VERSION_RE: jq-([\d.]+)
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+      - MLC_JQ_VERSION
+    state:
+      jq:
+        apt: jq
+        brew: jq
+        dnf: jq
+        yum: jq
+        zypper: jq
   sox:
     env:
       MLC_SYS_UTIL_NAME: sox
