@@ -5,6 +5,27 @@ OUTPUT_FILE="$MLC_PLATFORM_DETAILS_FILE_PATH"
 echo "{" > "$OUTPUT_FILE"
 FIRST=true
 
+add_kv () {
+  local key="$1"
+  local cmd_json="$2"
+  local output_json="$3"
+
+  if [ "$FIRST" = true ]; then
+    FIRST=false
+  else
+    echo "," >> "$OUTPUT_FILE"
+  fi
+
+  cat >> "$OUTPUT_FILE" <<EOF
+    "$key": {
+      "command": $cmd_json,
+      "output": $output_json
+    }
+EOF
+
+  printf '  "%s": %s\n' "$key" "$(printf '%s' "$value" | jq -Rs .)" >> "$OUTPUT_FILE"
+}
+
 add_entry () {
     local key="$1"
     local cmd="$2"
@@ -27,18 +48,7 @@ add_entry () {
     cmd_json=$(printf '%s' "$cmd" | jq -Rs .)
     output_json=$(printf '%s' "$output" | jq -Rs .)
 
-    if [ "$FIRST" = true ]; then
-      FIRST=false
-    else
-      echo "," >> "$OUTPUT_FILE"
-    fi
-
-    cat >> "$OUTPUT_FILE" <<EOF
-    "$key": {
-      "command": $cmd_json,
-      "output": $output_json
-    }
-EOF
+    add_kv "$key" "$cmd_json" "$output_json"
 }
 
 # -------- Non-sudo commands --------
@@ -74,6 +84,58 @@ add_entry "sysctl_all" "sysctl -a" yes
 add_entry "dmi_entries" "ls /sys/devices/virtual/dmi/id" yes
 add_entry "dmidecode_full" "dmidecode" yes
 add_entry "bios_info" "dmidecode -t bios" yes
+
+# -------------------------------------------------------------------
+# Accelerator detection (CUDA only)
+# -------------------------------------------------------------------
+if [[ "$MLC_ACCELERATOR_BACKEND" == "cuda" ]]; then
+
+  if command -v nvidia-smi >/dev/null 2>&1; then
+
+    GPU_NAME="$(nvidia-smi --query-gpu=name --format=csv,noheader | head -n1)"
+    GPU_COUNT="$(nvidia-smi -L | wc -l)"
+    GPU_MEM_BYTES="$(nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits | head -n1)"
+
+    # Convert MiB → bytes
+    GPU_MEM_BYTES=$((GPU_MEM_BYTES * 1024 * 1024))
+
+    # Memory type (derived from model)
+    if echo "$GPU_NAME" | grep -qi "HBM"; then
+      MEM_TYPE="HBM"
+    else
+      MEM_TYPE="GDDR"
+    fi
+
+    # Host interconnect (PCIe vs SXM)
+    if echo "$GPU_NAME" | grep -qi "SXM"; then
+      HOST_INTERCONNECT="NVLink"
+    else
+      HOST_INTERCONNECT="PCIe"
+    fi
+
+    # GPU↔GPU interconnect
+    if nvidia-smi topo -m | grep -q "NV"; then
+      GPU_INTERCONNECT="NVLink"
+    else
+      GPU_INTERCONNECT="PCIe"
+    fi
+
+    add_kv "accelerator_model_name" "nvidia-smi --query-gpu=name --format=csv,noheader" "$GPU_NAME"
+    add_kv "accelerators_per_node" "nvidia-smi -L | wc -l" "$GPU_COUNT"
+    add_kv "accelerator_memory_capacity" "nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits" "$GPU_MEM_BYTES"
+    add_kv "accelerator_memory_type" "nvidia-smi --query-gpu=name --format=csv,noheader" "$MEM_TYPE"
+    add_kv "accelerator_host_interconnect" "nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits" "$HOST_INTERCONNECT"
+    add_kv "accelerator_interconnect" "nvidia-smi topo -m" "$GPU_INTERCONNECT"
+
+  else
+    add_kv "accelerator_model_name" "nvidia-smi --query-gpu=name --format=csv,noheader" "nvidia-smi not found; cannot detect CUDA accelerator details"
+    add_kv "accelerators_per_node" "nvidia-smi -L | wc -l" "nvidia-smi not found; cannot detect CUDA accelerator details"
+    add_kv "accelerator_memory_capacity" "nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits" "nvidia-smi not found; cannot detect CUDA accelerator details"
+    add_kv "accelerator_memory_type" "nvidia-smi --query-gpu=name --format=csv,noheader" "nvidia-smi not found; cannot detect CUDA accelerator details"
+    add_kv "accelerator_host_interconnect" "nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits" "nvidia-smi not found; cannot detect CUDA accelerator details"
+    add_kv "accelerator_interconnect" "nvidia-smi topo -m" "nvidia-smi not found; cannot detect CUDA accelerator details"
+  fi
+fi
 
 # -------- Accelerator interconnect detection (CUDA only) --------
 
