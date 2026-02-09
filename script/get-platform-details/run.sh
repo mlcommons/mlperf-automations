@@ -22,8 +22,6 @@ add_kv () {
       "output": $output_json
     }
 EOF
-
-  printf '  "%s": %s\n' "$key" "$(printf '%s' "$value" | jq -Rs .)" >> "$OUTPUT_FILE"
 }
 
 add_entry () {
