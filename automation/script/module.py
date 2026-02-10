@@ -492,9 +492,9 @@ class ScriptAutomation(Automation):
         quiet = i.get(
             'quiet',
             False) if 'quiet' in i else (
-            env.get(
+            str(env.get(
                 'MLC_QUIET',
-                '').lower() == 'yes')
+                '')).lower() in ["1", "true", "yes", "on"])
         if quiet:
             env['MLC_QUIET'] = 'yes'
 
@@ -641,6 +641,7 @@ class ScriptAutomation(Automation):
         docker_settings = run_state['docker']
 
         input_mapping = meta.get('input_mapping', {})
+        input_description = meta.get('input_description', {})
 
         docker_settings = meta.get('docker')
 
@@ -675,10 +676,12 @@ class ScriptAutomation(Automation):
         #           (env OVERWRITE - user enforces it from CLI)
         #           (it becomes const)
         if input_mapping:
-            update_env_from_input_mapping(env, i, input_mapping)
-            update_env_from_input_mapping(const, i, input_mapping)
+            update_env_from_input_mapping(
+                env, i, input_mapping, input_description)
+            update_env_from_input_mapping(
+                const, i, input_mapping, input_description)
 
-        # This mapping is done in module_misc
+        # This mapping is done in docker script
         # if docker_input_mapping:
         #    update_env_from_input_mapping(env, i, docker_input_mapping)
         #    update_env_from_input_mapping(const, i, docker_input_mapping)
@@ -2116,10 +2119,10 @@ class ScriptAutomation(Automation):
         if variation_tags:
             variation_tags_string = ','.join(['_' + t for t in variation_tags])
 
-            logger.debug(
-                f"{self.recursion_spaces}Prepared variations: {variation_tags_string}")
+            logger.debug(self.recursion_spaces +
+                         f"  - Prepared variations: {variation_tags_string}")
 
-            # 2️⃣ Apply individual variations
+            # Apply individual variations
             for variation_tag in variation_tags:
                 r = self._apply_single_variation(
                     variation_tag, variations,
@@ -2128,7 +2131,7 @@ class ScriptAutomation(Automation):
                 if r['return'] > 0:
                     return r
 
-            # 3️⃣ Apply combined variations
+            # Apply combined variations
             r = self._apply_combined_variations(
                 variations, variation_tags,
                 run_state, i, meta, required_disk_space, warnings
@@ -3315,6 +3318,7 @@ class ScriptAutomation(Automation):
 
                     ii = {
                         'automation': utils.assemble_object(self.meta['alias'], self.meta['uid']),
+                        'recursion_spaces': recursion_spaces,  # + extra_recursion_spaces,
                         'recursion': True,
                         'debug_script_tags': debug_script_tags,
                         'env': env,
@@ -5519,13 +5523,18 @@ def update_deps_from_input(deps, post_deps, prehook_deps, posthook_deps, i):
 
 
 ##############################################################################
-def update_env_from_input_mapping(env, inp, input_mapping):
+def update_env_from_input_mapping(
+        env, inp, input_mapping, input_description={}):
     """
     Internal: update env from input and input_mapping
     """
     for key in input_mapping:
         if key in inp:
-            env[input_mapping[key]] = inp[key]
+            if key in input_description and str(input_description[key].get(
+                    'is_path', '')).lower() in ['1', 'yes', 'on', 'true']:
+                env[input_mapping[key]] = os.path.expanduser(inp[key])
+            else:
+                env[input_mapping[key]] = inp[key]
 
 
 def _apply_conditional_meta_updates(update_meta_if_env, default_env, env, const, state, const_state,
@@ -5723,7 +5732,11 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
 
     input_mapping = meta.get('input_mapping', {})
     if input_mapping:
-        update_env_from_input_mapping(env, input_update_env, input_mapping)
+        update_env_from_input_mapping(
+            env,
+            input_update_env,
+            input_mapping,
+            meta.get('input_description', {}))
 
     # handle dynamic env values
     r = update_env_with_values(env)

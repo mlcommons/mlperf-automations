@@ -24,11 +24,19 @@ deps:
     - MLC_GIT_CHECKOUT_SHA
     _tag.:
     - MLC_GIT_CHECKOUT_TAG
+- tags: pull,git,repo
+  env:
+    MLC_GIT_CHECKOUT_PATH: '<<<MLC_GCC_SRC_REPO_PATH>>>'
+  enable_if_env:
+    MLC_GCC_REPO_PULL_CHANGES:
+      - 'yes'
+
 input_mapping:
   targets: MLC_GCC_TARGET 
   host: MLC_GCC_HOST
   build: MLC_GCC_BUILD
   extra: MLC_GCC_EXTRA_CONFIGURE_STRING
+  pull_changes: MLC_GCC_REPO_PULL_CHANGES
 
 
 new_env_keys:
