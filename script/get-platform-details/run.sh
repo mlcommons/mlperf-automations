@@ -2,27 +2,18 @@
 
 OUTPUT_FILE="$MLC_PLATFORM_DETAILS_FILE_PATH"
 
-echo "{" > "$OUTPUT_FILE"
-FIRST=true
-
-add_kv () {
-  local key="$1"
-  local cmd_json="$2"
-  local output_json="$3"
-
-  if [ "$FIRST" = true ]; then
-    FIRST=false
-  else
-    echo "," >> "$OUTPUT_FILE"
-  fi
-
-  cat >> "$OUTPUT_FILE" <<EOF
-    "$key": {
-      "command": $cmd_json,
-      "output": $output_json
-    }
-EOF
-}
+# Start with empty JSON object. We are using jq to populate the JSON file with a structure like:
+# {
+#   "key1": {
+#     "command": "the command we ran",
+#     "output": "the output of the command"
+#   },
+#   "key2": {
+#     "command": "another command",
+#     "output": "its output"
+#   }
+# }
+JSON_OBJ='{}'
 
 add_entry () {
     local key="$1"
@@ -41,12 +32,10 @@ add_entry () {
       output="$(bash -c "$cmd" 2>&1 || echo "FAILED: $cmd")"
     fi
 
-    local cmd_json
-    local output_json
-    cmd_json=$(printf '%s' "$cmd" | jq -Rs .)
-    output_json=$(printf '%s' "$output" | jq -Rs .)
-
-    add_kv "$key" "$cmd_json" "$output_json"
+    JSON_OBJ=$(echo "$JSON_OBJ" | jq --arg k "$key" \
+                                  --arg c "$cmd" \
+                                  --arg o "$output" \
+      '. + {($k): {"command": $c, "output": $o}}')
 }
 
 # -------- Non-sudo commands --------
@@ -90,83 +79,33 @@ if [[ "$MLC_ACCELERATOR_BACKEND" == "cuda" ]]; then
 
   if command -v nvidia-smi >/dev/null 2>&1; then
 
-    GPU_NAME="$(nvidia-smi --query-gpu=name --format=csv,noheader | head -n1)"
-    GPU_COUNT="$(nvidia-smi -L | wc -l)"
-    GPU_MEM_BYTES="$(nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits | head -n1)"
+    add_entry "accelerator_model_name" \
+      "nvidia-smi --query-gpu=name --format=csv,noheader | head -n1" no
 
-    # Convert MiB → bytes
-    GPU_MEM_BYTES=$((GPU_MEM_BYTES * 1024 * 1024))
+    add_entry "accelerators_per_node" \
+      "nvidia-smi -L | wc -l" no
 
-    # Memory type (derived from model)
-    if echo "$GPU_NAME" | grep -qi "HBM"; then
-      MEM_TYPE="HBM"
-    else
-      MEM_TYPE="GDDR"
-    fi
+    add_entry "accelerator_memory_capacity" \
+      "nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits | head -n1 | awk '{print \$1*1024*1024}'" no
 
-    # Host interconnect (PCIe vs SXM)
-    if echo "$GPU_NAME" | grep -qi "SXM"; then
-      HOST_INTERCONNECT="NVLink"
-    else
-      HOST_INTERCONNECT="PCIe"
-    fi
+    add_entry "accelerator_memory_type" \
+      "nvidia-smi --query-gpu=name --format=csv,noheader | head -n1 | grep -qi HBM && echo HBM || echo GDDR" no
 
-    # GPU↔GPU interconnect
-    if nvidia-smi topo -m | grep -q "NV"; then
-      GPU_INTERCONNECT="NVLink"
-    else
-      GPU_INTERCONNECT="PCIe"
-    fi
+    add_entry "accelerator_interconnect" \
+      "nvidia-smi topo -m | grep -q NV && echo NVLink || echo PCIe" no
 
-    add_kv "accelerator_model_name" "nvidia-smi --query-gpu=name --format=csv,noheader" "$GPU_NAME"
-    add_kv "accelerators_per_node" "nvidia-smi -L | wc -l" "$GPU_COUNT"
-    add_kv "accelerator_memory_capacity" "nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits" "$GPU_MEM_BYTES"
-    add_kv "accelerator_memory_type" "nvidia-smi --query-gpu=name --format=csv,noheader" "$MEM_TYPE"
-    add_kv "accelerator_host_interconnect" "nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits" "$HOST_INTERCONNECT"
-    add_kv "accelerator_interconnect" "nvidia-smi topo -m" "$GPU_INTERCONNECT"
+    add_entry "accelerator_host_interconnect" \
+      "GEN=\$(nvidia-smi --query-gpu=pcie.link.gen.current --format=csv,noheader,nounits | head -n1); echo PCIe\ Gen\$GEN" no
 
   else
-    add_kv "accelerator_model_name" "nvidia-smi --query-gpu=name --format=csv,noheader" "nvidia-smi not found; cannot detect CUDA accelerator details"
-    add_kv "accelerators_per_node" "nvidia-smi -L | wc -l" "nvidia-smi not found; cannot detect CUDA accelerator details"
-    add_kv "accelerator_memory_capacity" "nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits" "nvidia-smi not found; cannot detect CUDA accelerator details"
-    add_kv "accelerator_memory_type" "nvidia-smi --query-gpu=name --format=csv,noheader" "nvidia-smi not found; cannot detect CUDA accelerator details"
-    add_kv "accelerator_host_interconnect" "nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits" "nvidia-smi not found; cannot detect CUDA accelerator details"
-    add_kv "accelerator_interconnect" "nvidia-smi topo -m" "nvidia-smi not found; cannot detect CUDA accelerator details"
+    add_entry "accelerator_error" \
+      "echo nvidia-smi not found; cannot detect CUDA accelerator details" no
   fi
-fi
-
-# -------- Accelerator interconnect detection (CUDA only) --------
-
-if [[ "$MLC_ACCELERATOR_BACKEND" == "cuda" ]]; then
-
-  INTERCONNECT="unknown"
-  INTERCONNECT_ERROR=""
-
-  if command -v nvidia-smi >/dev/null 2>&1; then
-    TOPO_OUT="$(nvidia-smi topo -m 2>&1)"
-
-    if echo "$TOPO_OUT" | grep -q "NV"; then
-      INTERCONNECT="NVLink"
-    else
-      INTERCONNECT="PCIe"
-    fi
-  else
-    INTERCONNECT_ERROR="nvidia-smi not found; cannot detect accelerator_interconnect"
-  fi
-
-  # Append to JSON
-  echo "," >> "$OUTPUT_FILE"
-  cat >> "$OUTPUT_FILE" <<EOF
-  "accelerator_interconnect": {
-    "value": "$(printf '%s' "$INTERCONNECT")",
-    "error": "$(printf '%s' "$INTERCONNECT_ERROR")"
-  }
-EOF
-
 fi
 
 echo
-echo "}" >> "$OUTPUT_FILE"
+# echo "}" >> "$OUTPUT_FILE"
+
+echo "$JSON_OBJ" | jq '.' > "$OUTPUT_FILE"
 
 echo "System information written to $OUTPUT_FILE"
-
