@@ -2377,6 +2377,13 @@ variations:
     group:
       reproducibility
     add_deps_recursive:
+      nvidia-inference-common-code:
+        tags: _mlcommons,_v6.0-dev
+      nvidia-inference-server:
+        version: r5.0
+        tags: _mlcommons
+      nvidia-harness:   
+        tags: _v5.0
       pycuda:
         version_min: "2024.1"
     default_env:
