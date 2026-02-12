@@ -67,7 +67,7 @@ EXTRACT_RULES = {
     },
 
     # ---------------- Networking ----------------
-     "host_network_card_count": {
+    "host_network_card_count": {
         "candidates": ["pci_devices"],
         "regex": r"(Ethernet controller:|Network controller:|Infiniband controller:)"
     },
@@ -111,6 +111,7 @@ EXTRACT_RULES = {
 
 # -------------------------------------------------------------------
 
+
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--input", required=True)
@@ -118,6 +119,7 @@ def parse_args():
     return p.parse_args()
 
 # -------------------------------------------------------------------
+
 
 def extract_value(system_info, rule):
     collected = []
@@ -150,6 +152,7 @@ def extract_value(system_info, rule):
 
 # -------------------------------------------------------------------
 
+
 def main():
     args = parse_args()
 
@@ -170,7 +173,8 @@ def main():
         try:
             ensemble_type_subpart = ""
             # get ensemble type subpart
-            if target_key in ["host_processor_model_name", "host_processors_per_node", "host_processor_core_count", "host_processor_vcpu_count"]:
+            if target_key in ["host_processor_model_name", "host_processors_per_node",
+                              "host_processor_core_count", "host_processor_vcpu_count"]:
                 ensemble_type_subpart = "processor"
             elif target_key in ["host_memory_capacity", "host_memory_configuration"]:
                 ensemble_type_subpart = "host_memory"
@@ -184,23 +188,28 @@ def main():
                 ensemble_type_subpart = "other"
 
             # get ensemble type
-            if ensemble_type_subpart in ["processor", "host_memory", "accelerator", "networking", "storage", "other"]:
+            if ensemble_type_subpart in [
+                    "processor", "host_memory", "accelerator", "networking", "storage", "other"]:
                 ensemble_type = "hardware"
                 if ensemble_type not in parsed:
                     parsed[ensemble_type] = {}
                 if ensemble_type_subpart not in parsed[ensemble_type]:
                     parsed[ensemble_type][ensemble_type_subpart] = {}
-                parsed[ensemble_type][ensemble_type_subpart][target_key] = extract_value(system_info, rule)
+                parsed[ensemble_type][ensemble_type_subpart][target_key] = extract_value(
+                    system_info, rule)
             elif target_key in ["framework", "operating_system", "filesystem", "other_software_stack", "sw_notes"]:
                 ensemble_type = "software"
                 if ensemble_type not in parsed:
                     print("no")
                     parsed[ensemble_type] = {}
                     print(parsed)
-                parsed[ensemble_type][target_key] = extract_value(system_info, rule)
+                parsed[ensemble_type][target_key] = extract_value(
+                    system_info, rule)
         except Exception as e:
             parsed[target_key] = ""
-            print(f"[WARN] Failed to extract {target_key}: {e}", file=sys.stderr)
+            print(
+                f"[WARN] Failed to extract {target_key}: {e}",
+                file=sys.stderr)
 
     with open(output_path, "w") as f:
         json.dump(parsed, f, indent=2)
@@ -208,6 +217,7 @@ def main():
     print(f"[INFO] Parsed system info written to {output_path}")
 
 # -------------------------------------------------------------------
+
 
 if __name__ == "__main__":
     main()

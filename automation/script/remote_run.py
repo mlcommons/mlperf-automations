@@ -110,7 +110,8 @@ def remote_run(self_module, i):
             files_to_copy.append(env[key])
             # Use forward slashes for remote path (Unix/Linux servers)
             remote_env[key] = "mlc-remote-artifacts/" + \
-                os.path.basename(env[key])  # if host path is /home/user/file.txt, remote path will be mlc-remote-artifacts/file.txt
+                os.path.basename(
+                env[key])  # if host path is /home/user/file.txt, remote path will be mlc-remote-artifacts/file.txt
 
             for k, value in input_mapping.items():
                 if value == key and k in run_input:
@@ -144,7 +145,7 @@ def remote_run(self_module, i):
             "mlc-remote-artifacts")
         remote_inputs['files_to_copy'] = files_to_copy
         remote_inputs['copy_directory'] = remote_copy_directory
-    
+
     if files_to_copy_back:
         remote_inputs['files_to_copy_back'] = files_to_copy_back
 

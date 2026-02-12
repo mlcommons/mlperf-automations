@@ -2,6 +2,7 @@ from mlc import utils
 import os
 import subprocess
 
+
 def preprocess(i):
 
     os_info = i['os_info']
@@ -13,7 +14,7 @@ def preprocess(i):
         if env.get('MLC_SINGLE_NODE_SYSTEM_INFO_FILE_NAME', '') == '':
             env['MLC_SINGLE_NODE_SYSTEM_INFO_FILE_NAME'] = f"mlperf-system-info-single-node-{env.get('MLC_SINGLE_NODE_SYSTEM_ID', '')}.json"
         env['MLC_SINGLE_NODE_SYSTEM_INFO_FILE_PATH'] = os.path.join(
-            env['MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH'], env['MLC_SINGLE_NODE_SYSTEM_INFO_FILE_NAME'])    
+            env['MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH'], env['MLC_SINGLE_NODE_SYSTEM_INFO_FILE_NAME'])
 
     if not os.path.exists(env['MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH']):
         os.makedirs(env['MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH'], exist_ok=True)
