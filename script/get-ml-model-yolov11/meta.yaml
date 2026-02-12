@@ -10,6 +10,7 @@ print_env_at_the_end:
 tags:
 - get-ml-model-yolov11
 tests:
+  needs_pat: true
   run_inputs:
   - variations_list:
     - r2-downloader,mlc,dry-run
