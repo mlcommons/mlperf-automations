@@ -79,6 +79,9 @@ def remote_run(self_module, i):
         return r
 
     files_to_copy = r.get('files_to_copy', [])
+    files_to_copy_back = r.get('files_to_copy_back', [])
+    path_to_copy_back_files = r.get('path_to_copy_back_files', '')
+
     remote_env = r.get('remote_env', {})
 
     mlc_script_input = {
@@ -103,10 +106,11 @@ def remote_run(self_module, i):
 
     for key in env_keys_to_copy:
         if key in env and os.path.exists(env[key]):
+            # the files_to_copy list contains the path to files in host
             files_to_copy.append(env[key])
             # Use forward slashes for remote path (Unix/Linux servers)
             remote_env[key] = "mlc-remote-artifacts/" + \
-                os.path.basename(env[key])
+                os.path.basename(env[key])  # if host path is /home/user/file.txt, remote path will be mlc-remote-artifacts/file.txt
 
             for k, value in input_mapping.items():
                 if value == key and k in run_input:
@@ -140,6 +144,12 @@ def remote_run(self_module, i):
             "mlc-remote-artifacts")
         remote_inputs['files_to_copy'] = files_to_copy
         remote_inputs['copy_directory'] = remote_copy_directory
+    
+    if files_to_copy_back:
+        remote_inputs['files_to_copy_back'] = files_to_copy_back
+
+    if path_to_copy_back_files:
+        remote_inputs['path_to_copy_back_files'] = path_to_copy_back_files
 
     # Execute the remote command
     mlc_remote_input = {

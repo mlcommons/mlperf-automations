@@ -65,6 +65,7 @@ add_entry "cpu_frequency" "cpupower frequency-info" no
 add_entry "memory_free_human" "free -h" no
 add_entry "pci_devices" "lspci" no
 add_entry "infiniband_status" "ibstat" no   # requires Infiniband drivers; will fail gracefully if not present
+add_entry "operating_system" "echo $MLC_HOST_OS_TYPE-$MLC_HOST_OS_FLAVOR_LIKE-$MLC_HOST_OS_FLAVOR-$MLC_HOST_OS_VERSION" no
 
 # -------- Sudo-required commands --------
 add_entry "sysctl_all" "sysctl -a" yes
