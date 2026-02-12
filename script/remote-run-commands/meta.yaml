@@ -15,6 +15,8 @@ input_mapping:
   port: MLC_SSH_PORT
   run_cmds: MLC_SSH_RUN_COMMANDS
   files_to_copy: MLC_SSH_FILES_TO_COPY
+  files_to_copy_back: MLC_SSH_FILES_TO_COPY_BACK
+  path_to_copy_back_files: MLC_SSH_PATH_TO_COPY_BACK_FILES
   skip_host_verify: MLC_SSH_SKIP_HOST_VERIFY
   ssh_key_file: MLC_SSH_KEY_FILE
   user: MLC_SSH_USER
