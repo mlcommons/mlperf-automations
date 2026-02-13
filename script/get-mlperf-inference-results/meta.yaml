@@ -47,6 +47,11 @@ variations:
       inference-results-repo:
         tags: _branch.mlc-code-only-for-v5.1
     group: repo-branch
+  code-only-for-v6.0:
+    adr:
+      inference-results-repo:
+        tags: _branch.mlc-code-only-for-v6.0
+    group: repo-branch
   ctuning:
     env:
       GITHUB_REPO_OWNER: ctuning
@@ -93,6 +98,12 @@ variations:
       MLC_GIT_URL: https://github.com/<<<GITHUB_REPO_OWNER>>>/inference_results_v5.1.git
       MLC_MLPERF_INFERENCE_RESULTS_VERSION_NAME: v5.1
       MLC_VERSION: "v5.1"
+  v6.0-dev:
+    group: version
+    env:
+      MLC_GIT_URL: https://github.com/<<<GITHUB_REPO_OWNER>>>/inference_results_v5.0.git
+      MLC_MLPERF_INFERENCE_RESULTS_VERSION_NAME: v6.0-dev
+      MLC_VERSION: "v5.0"
 versions:
   v2.1:
     env:
