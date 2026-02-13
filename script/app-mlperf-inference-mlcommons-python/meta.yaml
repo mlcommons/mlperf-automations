@@ -311,6 +311,7 @@ deps:
         - bert-99.9
         - gptj-99
         - gptj-99.9
+        - wan-2.2-t2v-a14b
 
   ## Tensorflow
   - tags: get,generic-python-lib,_tensorflow
@@ -1569,15 +1570,13 @@ variations:
       names:
         - yolo-v11-model-download
       skip_if_env:
-        MLC_USE_ML_MODEL_FROM_HOST: 
-        - true
+        MLC_RUN_STATE_DOCKER:
         - "yes"
     - tags: get,dataset,mlperf-inference,yolo-coco2017-filtered,_mlc,_r2-downloader
       names:
         - yolo-v11-dataset-download
       skip_if_env:
-        MLC_USE_DATASET_FROM_HOST: 
-        - true
+        MLC_RUN_STATE_DOCKER:
         - "yes"
     - tags: get,generic-python-lib,_package.ultralytics
     - tags: get,generic-python-lib,_package.tqdm
@@ -1598,6 +1597,52 @@ variations:
       - yolo_
     env:
       MLC_MODEL: yolo-99
+
+  wan-2.2-t2v-a14b:
+    group: models
+    add_deps_recursive:
+      pytorch:
+        version_min: "2.5.1"
+        version_max: "2.5.1"
+        version_max_usable: "2.5.1"
+      ml-engine-transformers:
+        version_max: "4.51.3"
+        version_max_usable: "4.51.3"
+      torchvision:
+        version_min: "0.20.1"
+        version_max: "0.20.1"
+        version_max_usable: "0.20.1"  
+    env:
+      MLC_MODEL: wan-2.2-t2v-a14b
+    deps:
+    - tags: get-ml-model-wan2,_mlc,_r2-downloader,_wan2_2_t2v_a14b
+      names:
+        - wan2-model-download
+      skip_if_env:
+        MLC_RUN_STATE_DOCKER:
+        - "yes"
+    - tags: get-dataset-mlperf-inference-text-to-video,_mlc,_r2-downloader
+      names:
+        - wan2-dataset-download
+      skip_if_env:
+        MLC_RUN_STATE_DOCKER:
+        - "yes"
+    - tags: get,generic-python-lib,_package.opencv-python
+      version_max: "4.11.0.86"
+      version_max_usable: "4.11.0.86"
+    - tags: get,generic-python-lib,_package.imageio
+    - tags: get,generic-python-lib,_package.imageio-ffmpeg
+    - tags: get,generic-python-lib,_package.diffusers
+      version_max: "0.35.2"
+      version_max_usable: "0.35.2"
+    - tags: get,generic-python-lib,_package.accelerate
+    - tags: get,generic-python-lib,_package.ftfy
+    - tags: get,generic-python-lib,_package.numpy
+      names:
+        - numpy
+    - tags: get,generic-python-lib,_package.flash-attn
+      version_min: "2.8.3"
+      version_max_usable: "2.8.3"
       
   # Target devices
   cpu:
