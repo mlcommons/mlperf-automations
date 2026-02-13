@@ -471,6 +471,35 @@ variations:
         docker:
           base_image: nvcr.io/nvidia/mlperf/mlperf-inference:mlpinf-v5.0-cuda12.8-pytorch25.01-ubuntu24.04-aarch64-Grace-release
 
+  nvidia-original,r6.0-dev_default:
+    env:
+      MLC_NVIDIA_MITTEN_FROM_SRC: 'yes'
+    docker:
+      os_version: "24.04"
+      user: 'ubuntu'
+      build_deps:
+        - tags: detect,os
+      image_name: mlperf-inference-nvidia-v5.0-common
+      build_env:
+        ENV: release
+    deps:
+    - names:
+      - numpy
+      tags: get,generic-python-lib,_package.numpy
+      version_max: "1.26.999"
+      version_max_usable: "1.26.4"
+    update_meta_if_env:
+      - enable_if_env:
+          MLC_HOST_PLATFORM_FLAVOR:
+            - x86_64
+        docker:
+          base_image: nvcr.io/nvidia/mlperf/mlperf-inference:mlpinf-v5.0-cuda12.8-pytorch25.01-ubuntu24.04-x86_64-release
+      - skip_if_env:
+          MLC_HOST_PLATFORM_FLAVOR:
+            - x86_64
+        docker:
+          base_image: nvcr.io/nvidia/mlperf/mlperf-inference:mlpinf-v5.0-cuda12.8-pytorch25.01-ubuntu24.04-aarch64-Grace-release
+
   nvidia-original,r5.1_default:
     env:
       MLC_NVIDIA_MITTEN_FROM_SRC: 'yes'
@@ -2425,6 +2454,13 @@ variations:
     group:
       reproducibility
     add_deps_recursive:
+      nvidia-inference-common-code:
+        tags: _mlcommons,_v6.0-dev
+      nvidia-inference-server:
+        version: r5.0
+        tags: _mlcommons
+      nvidia-harness:   
+        tags: _v5.0
       pycuda:
         version_min: "2024.1"
     default_env:
