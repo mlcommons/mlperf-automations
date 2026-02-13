@@ -97,3 +97,6 @@ versions:
   12.9.1:
     env:
       MLC_CUDA_LINUX_FILENAME: cuda_12.9.1_575.57.08_linux.run
+  13.1.1:
+    env:
+      MLC_CUDA_LINUX_FILENAME: cuda_13.1.1_590.48.01_linux.run

@@ -54,7 +54,11 @@ int main(int argc, char *argv[])
      printf("CUDA runtime version: %d.%d\n", rtver/1000, (rtver%100)/10);
 
      printf("Global memory: %llu\n", (unsigned long long) features.totalGlobalMem);
-     printf("Max clock rate: %f MHz\n", features.clockRate * 0.001);
+
+     int clock;
+     cudaDeviceGetAttribute(&clock, cudaDevAttrClockRate, id);
+
+     printf("Max clock rate: %f MHz\n", 0.001 * clock);
 
      printf("Total amount of shared memory per block: %lu\n", features.sharedMemPerBlock);
      printf("Total number of registers available per block: %d\n", features.regsPerBlock);
