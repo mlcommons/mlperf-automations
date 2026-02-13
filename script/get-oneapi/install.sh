@@ -11,6 +11,10 @@ function run() {
   # Check if it was already installed
   if echo "$OUTPUT" | grep -q "already installed"; then
      echo "OneAPI is already installed. Exiting."
+     echo "Try rm -rf $HOME/intel to clear existing installation"
+     echo "**********************"
+     echo " "
+
      exit 0
   fi
 

@@ -56,6 +56,7 @@ class ScriptAutomation(Automation):
                                'MLC_OUTPUT',
                                'MLC_OUTBASENAME',
                                'MLC_OUTDIRNAME',
+                               'MLC_SEARCH_FOLDER_PATH',
                                'MLC_NAME',
                                'MLC_EXTRA_CACHE_TAGS',
                                'MLC_TMP_*',
@@ -78,12 +79,14 @@ class ScriptAutomation(Automation):
             "SOCKS_PROXY"]
 
         self.input_flags_converted_to_tmp_env = {
-            'path': {'desc': 'Filesystem path to search for executable', 'default': ''}}
+            'path': {'desc': 'Filesystem path to search for executable', 'default': ''},
+            'folder': {'desc': 'Folder to search first before other paths', 'default': ''}}
 
         self.input_flags_converted_to_env = {'input': {'desc': 'Input to the script passed using the env key `MLC_INPUT`', 'default': ''},
                                              'output': {'desc': 'Output from the script passed using the env key `MLC_OUTPUT`', 'default': ''},
                                              'outdirname': {'desc': 'The directory to store the script output', 'default': 'cache directory ($HOME/MLC/repos/local/cache/<>) if the script is cacheable or else the current directory'},
                                              'outbasename': {'desc': 'The output file/folder name', 'default': ''},
+                                             'search_folder_path': {'desc': 'The folder path where executables of a given script need to be searched. Search is done recursively upto 4 levels.'},
                                              'name': {},
                                              'extra_cache_tags': {'desc': 'Extra cache tags to be added to the cached entry when the script results are saved', 'default': ''},
                                              'skip_compile': {'desc': 'Skip compilation', 'default': False},
@@ -489,9 +492,9 @@ class ScriptAutomation(Automation):
         quiet = i.get(
             'quiet',
             False) if 'quiet' in i else (
-            env.get(
+            str(env.get(
                 'MLC_QUIET',
-                '').lower() == 'yes')
+                '')).lower() in ["1", "true", "yes", "on"])
         if quiet:
             env['MLC_QUIET'] = 'yes'
 
@@ -638,6 +641,7 @@ class ScriptAutomation(Automation):
         docker_settings = run_state['docker']
 
         input_mapping = meta.get('input_mapping', {})
+        input_description = meta.get('input_description', {})
 
         docker_settings = meta.get('docker')
 
@@ -672,10 +676,12 @@ class ScriptAutomation(Automation):
         #           (env OVERWRITE - user enforces it from CLI)
         #           (it becomes const)
         if input_mapping:
-            update_env_from_input_mapping(env, i, input_mapping)
-            update_env_from_input_mapping(const, i, input_mapping)
+            update_env_from_input_mapping(
+                env, i, input_mapping, input_description)
+            update_env_from_input_mapping(
+                const, i, input_mapping, input_description)
 
-        # This mapping is done in module_misc
+        # This mapping is done in docker script
         # if docker_input_mapping:
         #    update_env_from_input_mapping(env, i, docker_input_mapping)
         #    update_env_from_input_mapping(const, i, docker_input_mapping)
@@ -707,6 +713,16 @@ class ScriptAutomation(Automation):
         prehook_deps = run_state['prehook_deps']
         posthook_deps = run_state['posthook_deps']
 
+        r = self._update_state_from_version(meta, run_state, i)
+        if r['return'] > 0:
+            return r
+
+        version = r['version']
+        version_min = r['version_min']
+        version_max = r['version_max']
+        version_max_usable = r['version_max_usable']
+        versions = r['versions']
+
         # STEP 800: Process variations and update env (overwrite from env and update form default_env)
         #           VARIATIONS HAS THE PRIORITY OVER
         # MULTIPLE VARIATIONS (THAT CAN BE TURNED ON AT THE SAME TIME) SHOULD
@@ -716,6 +732,12 @@ class ScriptAutomation(Automation):
         # const)
 
         variations = script_item.meta.get('variations', {})
+        if version and f"version.{version}" not in variation_tags and (
+                f"version.{version}" in variations or "version.#" in variations):
+            logger.debug(
+                f"version.{version} added as a variation tag from input version")
+            variation_tags.append(f"version.{version}")
+
         run_state['docker'] = meta.get('docker', {})
 
         r = self._update_state_from_variations(
@@ -734,16 +756,6 @@ class ScriptAutomation(Automation):
 
         variation_tags_string = r['variation_tags_string']
         explicit_variation_tags = r['explicit_variation_tags']
-
-        r = self._update_state_from_version(meta, run_state, i)
-        if r['return'] > 0:
-            return r
-
-        version = r['version']
-        version_min = r['version_min']
-        version_max = r['version_max']
-        version_max_usable = r['version_max_usable']
-        versions = r['versions']
 
         # STEP 1100: Update deps from input -? is this needed as we update adr
         # from meta anyway
@@ -2107,10 +2119,10 @@ class ScriptAutomation(Automation):
         if variation_tags:
             variation_tags_string = ','.join(['_' + t for t in variation_tags])
 
-            logger.debug(
-                f"{self.recursion_spaces}Prepared variations: {variation_tags_string}")
+            logger.debug(self.recursion_spaces +
+                         f"  - Prepared variations: {variation_tags_string}")
 
-            # 2️⃣ Apply individual variations
+            # Apply individual variations
             for variation_tag in variation_tags:
                 r = self._apply_single_variation(
                     variation_tag, variations,
@@ -2119,7 +2131,7 @@ class ScriptAutomation(Automation):
                 if r['return'] > 0:
                     return r
 
-            # 3️⃣ Apply combined variations
+            # Apply combined variations
             r = self._apply_combined_variations(
                 variations, variation_tags,
                 run_state, i, meta, required_disk_space, warnings
@@ -2934,7 +2946,6 @@ class ScriptAutomation(Automation):
         '''
         for key in variation_meta:
             value = variation_meta[key]
-
             if isinstance(value, list):  # deps,pre_deps...
                 for i, item in enumerate(value):
                     if isinstance(item, dict):
@@ -2981,8 +2992,8 @@ class ScriptAutomation(Automation):
                             value[item] = str(value[item]).replace(
                                 "#", variation_tag_dynamic_suffix)
 
-            else:  # scalar value, never used?
-                variation_meta[key] = variation_meta[key].replace(
+            else:  # cache_expiration
+                variation_meta[key] = str(variation_meta[key]).replace(
                     "#", variation_tag_dynamic_suffix)
 
     ##########################################################################
@@ -3307,6 +3318,7 @@ class ScriptAutomation(Automation):
 
                     ii = {
                         'automation': utils.assemble_object(self.meta['alias'], self.meta['uid']),
+                        'recursion_spaces': recursion_spaces,  # + extra_recursion_spaces,
                         'recursion': True,
                         'debug_script_tags': debug_script_tags,
                         'env': env,
@@ -3984,13 +3996,36 @@ pip install mlcflow
         # [] if default_path_env_key == '' else \
         #   os.environ.get(default_path_env_key,'').split(os_info['env_separator'])
 
+        # Search order: MLC_TMP_PATH -> priority folder
+        # (MLC_SEARCH_FOLDER_PATH) -> default_path_list
+        priority_folder = env.get('MLC_SEARCH_FOLDER_PATH', '').strip()
+        priority_folder_paths = []
+
+        if priority_folder and os.path.isdir(priority_folder):
+            logger.info(
+                self.recursion_spaces +
+                '    # Prioritizing search in folder: {}'.format(priority_folder))
+            # Add the folder and its subdirectories to priority paths (max
+            # depth to avoid NFS issues)
+            priority_folder_paths.append(priority_folder)
+            max_depth = int(env.get('MLC_TMP_FOLDER_MAX_DEPTH', '5'))
+            for root, dirs, files_in_dir in os.walk(priority_folder):
+                # Calculate current depth relative to priority_folder
+                depth = root[len(priority_folder):].count(os.sep)
+                if depth >= max_depth:
+                    # Stop descending into subdirectories at this level
+                    dirs[:] = []
+                if root not in priority_folder_paths:
+                    priority_folder_paths.append(root)
+
         if path == '':
-            path_list_tmp = default_path_list
+            path_list_tmp = priority_folder_paths + default_path_list
         else:
             logger.info(
                 self.recursion_spaces +
                 '    # Requested paths: {}'.format(path))
-            path_list_tmp = path.split(os_info['env_separator'])
+            path_list_tmp = path.split(
+                os_info['env_separator']) + priority_folder_paths
 
         # Check soft links
         path_list_tmp2 = []
@@ -4709,8 +4744,17 @@ def check_version_constraints(i):
 
     skip = False
 
-    if version != '' and version != detected_version:
-        skip = True
+    if detected_version != '' and version != '':
+        ry = compare_versions({
+            'version1': detected_version,
+            'version2': version,
+            'version_minor_skip_okay': True
+        })
+        if ry['return'] > 0:
+            return ry
+
+        if ry['comparison'] != 0:
+            skip = True
 
     if not skip and detected_version != '' and version_min != '':
         ry = compare_versions({
@@ -5479,13 +5523,18 @@ def update_deps_from_input(deps, post_deps, prehook_deps, posthook_deps, i):
 
 
 ##############################################################################
-def update_env_from_input_mapping(env, inp, input_mapping):
+def update_env_from_input_mapping(
+        env, inp, input_mapping, input_description={}):
     """
     Internal: update env from input and input_mapping
     """
     for key in input_mapping:
         if key in inp:
-            env[input_mapping[key]] = inp[key]
+            if key in input_description and str(input_description[key].get(
+                    'is_path', '')).lower() in ['1', 'yes', 'on', 'true']:
+                env[input_mapping[key]] = os.path.expanduser(inp[key])
+            else:
+                env[input_mapping[key]] = inp[key]
 
 
 def _apply_conditional_meta_updates(update_meta_if_env, default_env, env, const, state, const_state,
@@ -5683,7 +5732,11 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
 
     input_mapping = meta.get('input_mapping', {})
     if input_mapping:
-        update_env_from_input_mapping(env, input_update_env, input_mapping)
+        update_env_from_input_mapping(
+            env,
+            input_update_env,
+            input_mapping,
+            meta.get('input_description', {}))
 
     # handle dynamic env values
     r = update_env_with_values(env)

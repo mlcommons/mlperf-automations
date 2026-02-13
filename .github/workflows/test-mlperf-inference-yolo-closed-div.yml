@@ -1,4 +1,4 @@
-name: MLPerf inference YOLO-v11
+name: MLPerf inference YOLO-v11 Closed Division
 permissions:
   contents: read
 
@@ -6,7 +6,7 @@ on:
   schedule:
     - cron: '0 0 * * *'  # Runs daily at 12 AM UTC
   pull_request_target:
-    branches: [ "main", "dev" ]
+    branches: [ "main_off", "dev_off" ]
     paths:
       - '.github/workflows/test-mlperf-inference-yolo.yml'
       - '**'
@@ -50,13 +50,13 @@ jobs:
         mlc pull repo "$REPO" --branch="$BRANCH"
     - name: Test MLPerf Inference YOLO-v11 (Linux/macOS)
       run: |
-        mlcr run-mlperf,inference,_full,_find-performance,_all-scenarios,_r6.0-dev --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }}x86" --model=yolo-99 --implementation=reference --category=edge --backend=${{ matrix.backend }} --framework=pytorch --device=cpu --execution_mode=test -adr.inference-src.tags=_branch.anandhu-eng-patch-13 --adr.inference-src-loadgen.tags=_branch.anandhu-eng-patch-13 --adr.inference-src.version=custom --adr.inference-src-loadgen.version=custom --adr.loadgen.version=custom -v --quiet     
-        mlcr run-mlperf,inference,_submission,_full,_all-modes,_all-scenarios,_r6.0-dev --submission_dir=${{ env.SUBMISSION_DIR }} --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }}x86" --model=yolo-99 --implementation=reference --category=edge --backend=${{ matrix.backend }} --framework=pytorch --device=cpu --execution_mode=valid -adr.inference-src.tags=_branch.anandhu-eng-patch-13 --adr.inference-src-loadgen.tags=_branch.anandhu-eng-patch-13 --adr.inference-src.version=custom --adr.inference-src-loadgen.version=custom --adr.loadgen.version=custom --multistream_target_latency=900 --env.MLC_MLPERF_USE_MAX_DURATION=no -v --quiet     
+        mlcr run-mlperf,inference,_full,_find-performance,_all-scenarios,_r6.0-dev --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }}x86" --model=yolo-99 --implementation=reference --category=edge --backend=${{ matrix.backend }} --framework=pytorch --device=cpu --execution_mode=test -v --quiet     
+        mlcr run-mlperf,inference,_submission,_full,_all-modes,_all-scenarios,_r6.0-dev --division=closed --submission_dir=${{ env.SUBMISSION_DIR }} --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_${{ matrix.os }}x86" --model=yolo-99 --implementation=reference --category=edge --backend=${{ matrix.backend }} --framework=pytorch --device=cpu --execution_mode=valid --multistream_target_latency=900 --env.MLC_MLPERF_USE_MAX_DURATION=no -v --quiet     
     
     - name: upload results artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ matrix.division }}
+        name: mlperf-inference-yolo-results-${{ matrix.os }}-py${{ matrix.python-version }}-bk${{ matrix.backend }}
         path: ${{ env.SUBMISSION_DIR }}
   
   upload-results-to-github:
@@ -100,7 +100,7 @@ jobs:
     - name: Download benchmark artifacts
       uses: actions/download-artifact@v4
       with:
-        path: ${{ env.SUBMISSION_DIR }}
+        path: "${{ env.SUBMISSION_DIR }}/closed"
 
     - name: Load secrets
       id: op-load-secrets
