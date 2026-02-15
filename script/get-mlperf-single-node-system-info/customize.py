@@ -19,7 +19,7 @@ def preprocess(i):
     if not os.path.exists(env['MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH']):
         os.makedirs(env['MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH'], exist_ok=True)
 
-    CMD = """{MLC_PYTHON_BIN_WITH_PATH} {MLC_TMP_CURRENT_SCRIPT_PATH}/parse.py --input {MLC_PLATFORM_DETAILS_FILE_PATH} --output {MLC_SINGLE_NODE_SYSTEM_INFO_FILE_PATH}"""
+    CMD = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {env['MLC_TMP_CURRENT_SCRIPT_PATH']}/parse.py --input {env['MLC_PLATFORM_DETAILS_FILE_PATH']} --output {env['MLC_SINGLE_NODE_SYSTEM_INFO_FILE_PATH']}"""
 
     env['MLC_RUN_CMD'] = CMD
 
