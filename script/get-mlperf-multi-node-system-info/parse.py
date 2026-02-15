@@ -67,7 +67,7 @@ EXTRACT_RULES = {
     },
 
     # ---------------- Networking ----------------
-     "host_network_card_count": {
+    "host_network_card_count": {
         "candidates": ["pci_devices"],
         "regex": r"(Ethernet controller:|Network controller:|Infiniband controller:)"
     },
@@ -89,6 +89,7 @@ EXTRACT_RULES = {
 
 # -------------------------------------------------------------------
 
+
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--input", required=True)
@@ -96,6 +97,7 @@ def parse_args():
     return p.parse_args()
 
 # -------------------------------------------------------------------
+
 
 def extract_value(system_info, rule):
     collected = []
@@ -128,6 +130,7 @@ def extract_value(system_info, rule):
 
 # -------------------------------------------------------------------
 
+
 def main():
     args = parse_args()
 
@@ -149,7 +152,9 @@ def main():
             parsed[target_key] = extract_value(system_info, rule)
         except Exception as e:
             parsed[target_key] = ""
-            print(f"[WARN] Failed to extract {target_key}: {e}", file=sys.stderr)
+            print(
+                f"[WARN] Failed to extract {target_key}: {e}",
+                file=sys.stderr)
 
     with open(output_path, "w") as f:
         json.dump(parsed, f, indent=2)
@@ -157,6 +162,7 @@ def main():
     print(f"[INFO] Parsed system info written to {output_path}")
 
 # -------------------------------------------------------------------
+
 
 if __name__ == "__main__":
     main()
