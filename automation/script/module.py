@@ -3297,7 +3297,7 @@ class ScriptAutomation(Automation):
                 substitute_tags(d, env)
                 run_state['full_deps'].append(d['tags'])
 
-                if  is_false(run_state.get('fake_deps')):
+                if is_false(run_state.get('fake_deps')):
                     new_run_state = {}
 
                     new_run_state['full_deps'] = []
