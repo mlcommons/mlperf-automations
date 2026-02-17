@@ -190,7 +190,7 @@ def main():
             # get ensemble type
             if ensemble_type_subpart in [
                     "processor", "host_memory", "accelerator", "networking", "storage", "other"]:
-                ensemble_type = "hardware"
+                ensemble_type = "hardware_ensemble"
                 if ensemble_type not in parsed:
                     parsed[ensemble_type] = {}
                 if ensemble_type_subpart not in parsed[ensemble_type]:
@@ -198,7 +198,7 @@ def main():
                 parsed[ensemble_type][ensemble_type_subpart][target_key] = extract_value(
                     system_info, rule)
             elif target_key in ["framework", "operating_system", "filesystem", "other_software_stack", "sw_notes"]:
-                ensemble_type = "software"
+                ensemble_type = "software_ensemble"
                 if ensemble_type not in parsed:
                     print("no")
                     parsed[ensemble_type] = {}
