@@ -10,6 +10,7 @@ print_env_at_the_end:
 tags:
 - get-ml-model-yolov11
 tests:
+  needs_pat: true
   run_inputs:
   - variations_list:
     - r2-downloader,mlc,dry-run
@@ -49,6 +50,6 @@ variations:
     adr:
       yolov11-model-dae:
         env:
-          MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/YOLO-model.uri
+          MLC_DOWNLOAD_URL: https://yolo.mlcommons-storage.org/metadata/YOLO-model.uri
         tags: _r2-downloader
     default: true
