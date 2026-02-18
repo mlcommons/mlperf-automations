@@ -163,7 +163,7 @@ jobs:
 
         export MLC_SCRIPT_EXTRA_CMD="--adr.python.name=mlperf"
 
-        mlcr run,mlperf,inference,_submission,_short --adr.python.version_min=3.8 --adr.compiler.tags=gcc --adr.openimages-preprocessed.tags=_50 --submitter=MLCommons --implementation=cpp --hw_name=default --model=retinanet --backend=onnxruntime --device=cpu --scenario=Offline --quiet
+        mlcr run,mlperf,inference --adr.python.version_min=3.8 --adr.compiler.tags=gcc --adr.openimages-preprocessed.tags=_50 --submitter=MLCommons --implementation=cpp --hw_name=default --model=retinanet --backend=onnxruntime --device=cpu --scenario=Offline --quiet
 
      # Step for Linux/MacOS
     - name: Randomly Execute Step (Linux/MacOS)
