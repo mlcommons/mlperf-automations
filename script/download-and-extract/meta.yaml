@@ -90,7 +90,7 @@ variations:
     default: 'true'
     env:
       MLC_EXTRACT_REMOVE_EXTRACTED: 'no'
-    adr:
+    add_deps:
       extract-script:
         tags:
           _keep
@@ -99,7 +99,7 @@ variations:
     env:
       MLC_EXTRACT_REMOVE_EXTRACTED: 'yes'
     group: keep
-    adr:
+    add_deps:
       extract-script:
         tags:
           _remove-extracted
