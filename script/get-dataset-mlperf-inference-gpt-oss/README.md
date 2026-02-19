@@ -1,4 +1,4 @@
-# README for get-one-api
+# README for get-dataset-mlperf-inference-gpt-oss
 This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,15 +33,10 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr get,oneapi,compiler,get-oneapi
+mlcr get-dataset-mlperf-inference-gpt-oss
 ```
 
-### Script Inputs
-
-| Name | Description | Choices | Default |
-|------|-------------|---------|------|
-| `--oneapi_dir` |  |  | `` |
-| `--clean` |  |  | `` |
+No script specific inputs
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -50,7 +45,6 @@ mlcr get,oneapi,compiler,get-oneapi
 | `--output` | Output from the script passed using the env key `MLC_OUTPUT` |  | `` |
 | `--outdirname` | The directory to store the script output |  | `cache directory ($HOME/MLC/repos/local/cache/<>) if the script is cacheable or else the current directory` |
 | `--outbasename` | The output file/folder name |  | `` |
-| `--search_folder_path` | The folder path where executables of a given script need to be searched. Search is done recursively upto 4 levels. |  | `` |
 | `--name` |  |  | `` |
 | `--extra_cache_tags` | Extra cache tags to be added to the cached entry when the script results are saved |  | `` |
 | `--skip_compile` | Skip compilation |  | `False` |
@@ -64,7 +58,14 @@ mlcr get,oneapi,compiler,get-oneapi
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
+### Download-src
+
+- `mlc` (default)
+
+### Run-mode
+
+- `dry-run`
+
 ### Ungrouped
 
-- `fortran`
-- `path.#` _(# can be substituted dynamically)_
+- `r2-downloader`

@@ -11,6 +11,10 @@ function run() {
   # Check if it was already installed
   if echo "$OUTPUT" | grep -q "already installed"; then
      echo "OneAPI is already installed. Exiting."
+     echo "Try rm -rf $HOME/intel to clear existing installation"
+     echo "**********************"
+     echo " "
+
      exit 0
   fi
 
@@ -34,14 +38,14 @@ mkdir install
 CMD="bash ./${MLC_ONEAPI_INSTALL_FILENAME} -a --silent --cli --eula accept  --install-dir ${PWD}/install"
 run "$CMD"
 
-if [[ ${MLC_ONEAPI_CXX} == 'yes' ]] then
+if [[ ${MLC_ONEAPI_CXX} == 'yes' ]]; then
   wget -nc ${MLC_ONEAPI_CXX_COMPILER_URL_BASE}/${MLC_ONEAPI_CXX_COMPILER_FILENAME}
   test $? -eq 0 || exit $?
   CMD="bash ./${MLC_ONEAPI_CXX_COMPILER_FILENAME} -a --silent --cli --eula accept --install-dir ${PWD}/install"
   run "$CMD"
 fi
 
-if [[ ${MLC_ONEAPI_FORTRAN} == 'yes' ]] then
+if [[ ${MLC_ONEAPI_FORTRAN} == 'yes' ]]; then
   wget -nc ${MLC_ONEAPI_FORTRAN_COMPILER_URL_BASE}/${MLC_ONEAPI_FORTRAN_COMPILER_FILENAME}
   test $? -eq 0 || exit $?
   CMD="bash ./${MLC_ONEAPI_FORTRAN_COMPILER_FILENAME} -a --silent --cli --eula accept --install-dir ${PWD}/install"
