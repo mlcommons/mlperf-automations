@@ -1,0 +1,84 @@
+name: Reassign PR Commits
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  reassign:
+    # Only run if the comment is "/reassign" on a Pull Request
+    if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/reassign')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Parse Username
+        id: parse
+        run: |
+          # Get the text after /reassign. Default to PR creator if empty.
+          COMMENT_BODY="${{ github.event.comment.body }}"
+          REQUESTED_USER=$(echo "$COMMENT_BODY" | awk '{print $2}')
+          
+          if [ -z "$REQUESTED_USER" ]; then
+            REQUESTED_USER="${{ github.event.issue.user.login }}"
+          fi
+          
+          echo "target_user=$REQUESTED_USER" >> $GITHUB_OUTPUT
+
+      - name: Get User Email from GitHub API
+        id: user_info
+        run: |
+          # Fetch the public email for the target user
+          USER_EMAIL=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/users/${{ steps.parse.outputs.target_user }}" | jq -r '.email')
+          
+          if [ "$USER_EMAIL" == "null" ] || [ -z "$USER_EMAIL" ]; then
+            # Fallback to the GitHub no-reply email format if public email is hidden
+            USER_EMAIL="${{ steps.parse.outputs.target_user }}@users.noreply.github.com"
+          fi
+          
+          echo "email=$USER_EMAIL" >> $GITHUB_OUTPUT
+
+      - name: Checkout PR Branch
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Rewrite History
+        run: |
+          # Configure Git
+          git config user.name "${{ steps.parse.outputs.target_user }}"
+          git config user.email "${{ steps.user_info.outputs.email }}"
+          
+          # Use gh CLI to checkout the PR branch locally
+          gh pr checkout ${{ github.event.issue.number }}
+          
+          # Identify the base branch (usually main)
+          BASE_BRANCH=$(gh pr view ${{ github.event.issue.number }} --json baseRefName --template '{{.baseRefName}}')
+          
+          # Rewrite all commits from the point where the PR branched off
+          git filter-branch -f --env-filter "
+            export GIT_AUTHOR_NAME='${{ steps.parse.outputs.target_user }}'
+            export GIT_AUTHOR_EMAIL='${{ steps.user_info.outputs.email }}'
+            export GIT_COMMITTER_NAME='${{ steps.parse.outputs.target_user }}'
+            export GIT_COMMITTER_EMAIL='${{ steps.user_info.outputs.email }}'
+          " origin/$BASE_BRANCH..HEAD
+
+          # Force push the rewritten history
+          git push origin HEAD --force
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: React to Comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'rocket'
+            })
