@@ -11,7 +11,7 @@ def preprocess(i):
 
     os_info = i['os_info']
 
-    cmake_command = f"""{env['MLC_CMAKE_BIN_WITH_PATH']} .. """
+    cmake_command = f"""{env['MLC_CMAKE_BIN_WITH_PATH']} {env['MLC_MIMALLOC_SRC_PATH']} """
 
     if env.get('MLC_MIMALLOC_CONFIG', '') != '':
         cmake_command += f""" {env['MLC_MIMALLOC_CONFIG'].replace("'", "")} """
@@ -28,7 +28,7 @@ def postprocess(i):
 
     os_info = i['os_info']
 
-    lib_path = os.path.join(os.getcwd(), "obj", "lib")
+    lib_path = os.path.join(os.getcwd(), "lib")
 
     env['+LD_LIBRARY_PATH'] = [lib_path]
     env['MLC_MIMALLOC_PATH'] = os.path.dirname(lib_path)
