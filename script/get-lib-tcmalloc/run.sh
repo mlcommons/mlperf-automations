@@ -17,7 +17,7 @@ cc_binary(
     linkshared = 1,
     linkstatic = 1,
 )' >> tcmalloc/BUILD
-    echo "Added ${MLC_TCMALLOC_BUILD_NAME}.so target to tcmalloc/BUILD"
+    echo "Added lib${MLC_TCMALLOC_BUILD_NAME}.so target to tcmalloc/BUILD"
 else
     echo "libtcmalloc.so target already exists in tcmalloc/BUILD, skipping..."
 fi
@@ -26,8 +26,9 @@ fi
 # Define the compilation mode
 COMP_MODE="opt"
 
+bazel clean
 # Build with opt
-bazel build -c $COMP_MODE  //tcmalloc:${MLC_TCMALLOC_BUILD_NAME}.so
+bazel build -c $COMP_MODE  //tcmalloc:lib${MLC_TCMALLOC_BUILD_NAME}.so
 
 # Get the path for THAT SPECIFIC mode
 BIN_DIR=$(bazel info -c $COMP_MODE bazel-bin)

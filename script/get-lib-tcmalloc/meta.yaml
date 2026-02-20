@@ -44,9 +44,12 @@ tests:
     - branch.master
 uid: bc454a366fed44f2
 variations:
+  static:
+    default: true
+    env:
+      MLC_TCMALLOC_BUILD_TYPE: static
   full:
     group: build-type
-    default: true
     env:
       MLC_TCMALLOC_BUILD_NAME: tcmalloc
   minimal:
