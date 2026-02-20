@@ -1,4 +1,4 @@
-# README for download-and-extract
+# README for install-cuda-prebuilt
 This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,21 +33,17 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr download-and-extract file
+mlcr install,prebuilt,cuda,prebuilt-cuda,install-prebuilt-cuda
 ```
 
 ### Script Inputs
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
-| `--download_path` |  |  | `` |
-| `--extra_folder` |  |  | `` |
-| `--extract_path` |  |  | `` |
-| `--from` |  |  | `` |
-| `--local_path` | Alias for from |  | `` |
-| `--store` | Alias for download_path |  | `` |
-| `--to` | Alias for extract_path |  | `` |
-| `--url` |  |  | `` |
+| `--install_prefix` |  |  | `` |
+| `--local_run_file_path` |  |  | `` |
+| `--override-driver-check` |  |  | `` |
+| `--skip_sudo` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -70,23 +66,7 @@ mlcr download-and-extract file
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
-### Download-tool
+### Install-driver
 
-- `curl`
-- `gdown`
-- `mlcutil` (alias: cmutil) (default)
-- `r2-downloader`
-- `rclone`
-- `torrent`
-- `wget`
-
-### Keep
-
-- `keep` (default)
-- `remove-extracted`
-
-### Ungrouped
-
-- `extract`
-- `extract-to-download-dir`
-- `url.#` _(# can be substituted dynamically)_
+- `driver`
+- `no-driver` (default)
