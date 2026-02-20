@@ -1,4 +1,4 @@
-# README for download-and-extract
+# README for get-ml-model-llama3
 This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,21 +33,14 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr download-and-extract file
+mlcr get,raw,ml-model,language-processing,llama3,llama3-405b
 ```
 
 ### Script Inputs
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
-| `--download_path` |  |  | `` |
-| `--extra_folder` |  |  | `` |
-| `--extract_path` |  |  | `` |
-| `--from` |  |  | `` |
-| `--local_path` | Alias for from |  | `` |
-| `--store` | Alias for download_path |  | `` |
-| `--to` | Alias for extract_path |  | `` |
-| `--url` |  |  | `` |
+| `--outdirname` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -70,23 +63,37 @@ mlcr download-and-extract file
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
+### Download-src
+
+- `hf`
+- `mlc` (default)
+
 ### Download-tool
 
-- `curl`
-- `gdown`
-- `mlcutil` (alias: cmutil) (default)
-- `r2-downloader`
+- `r2-downloader` (default)
 - `rclone`
-- `torrent`
-- `wget`
 
-### Keep
+### Framework
 
-- `keep` (default)
-- `remove-extracted`
+- `vllm` (default)
 
-### Ungrouped
+### Huggingface-stub
 
-- `extract`
-- `extract-to-download-dir`
-- `url.#` _(# can be substituted dynamically)_
+- `meta-llama/Llama-3.1-405B-Instruct` (base: 405b)
+- `meta-llama/Llama-3.1-8B-Instruct` (base: 8b)
+- `meta-llama/Llama-3.2-8B-Instruct` (base: 3b)
+- `stub.#` _(# can be substituted dynamically)_
+
+### Model-size
+
+- `3b`
+- `405b` (default)
+- `8b`
+
+### Precision
+
+- `fp16` (default)
+
+### Run-mode
+
+- `dry-run`

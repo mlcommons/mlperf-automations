@@ -317,6 +317,10 @@ variations:
   reference,yolo_:
     default_variations:
       backend: pytorch
+  
+  reference,wan-2.2-t2v-a14b:
+    default_variations:
+      backend: pytorch
 
   all-models,nvidia-original:
     docker:
@@ -439,6 +443,35 @@ variations:
           base_image: nvcr.io/nvidia/mlperf/mlperf-inference:mlpinf-v5.0-cuda12.8-pytorch25.01-ubuntu24.04-aarch64-Grace-release
 
   nvidia-original,r5.1-dev_default:
+    env:
+      MLC_NVIDIA_MITTEN_FROM_SRC: 'yes'
+    docker:
+      os_version: "24.04"
+      user: 'ubuntu'
+      build_deps:
+        - tags: detect,os
+      image_name: mlperf-inference-nvidia-v5.0-common
+      build_env:
+        ENV: release
+    deps:
+    - names:
+      - numpy
+      tags: get,generic-python-lib,_package.numpy
+      version_max: "1.26.999"
+      version_max_usable: "1.26.4"
+    update_meta_if_env:
+      - enable_if_env:
+          MLC_HOST_PLATFORM_FLAVOR:
+            - x86_64
+        docker:
+          base_image: nvcr.io/nvidia/mlperf/mlperf-inference:mlpinf-v5.0-cuda12.8-pytorch25.01-ubuntu24.04-x86_64-release
+      - skip_if_env:
+          MLC_HOST_PLATFORM_FLAVOR:
+            - x86_64
+        docker:
+          base_image: nvcr.io/nvidia/mlperf/mlperf-inference:mlpinf-v5.0-cuda12.8-pytorch25.01-ubuntu24.04-aarch64-Grace-release
+
+  nvidia-original,r6.0-dev_default:
     env:
       MLC_NVIDIA_MITTEN_FROM_SRC: 'yes'
     docker:
@@ -1669,22 +1702,22 @@ variations:
         MLC_ML_MODEL_FILE_WITH_PATH: "on"
 
   yolo_:
-    deps:
-    - tags: get-ml-model-yolov11,_mlc,_r2-downloader
-      names:
-        - yolo-v11-model-download
-      skip_if_env:
-        MLC_USE_ML_MODEL_FROM_HOST: 
-        - true
-        - "yes"
-    - tags: get,dataset,mlperf-inference,yolo-coco2017-filtered,_mlc,_r2-downloader
-      names:
-        - yolo-v11-dataset-download
-      skip_if_env:
-        MLC_USE_DATASET_FROM_HOST: 
-        - true
-        - "yes"
     docker:
+      deps:
+      - tags: get-ml-model-yolov11,_mlc,_r2-downloader
+        names:
+          - yolo-v11-model-download
+        enable_if_env:
+          MLC_USE_ML_MODEL_FROM_HOST: 
+          - true
+          - "yes"
+      - tags: get,dataset,mlperf-inference,yolo-coco2017-filtered,_mlc,_r2-downloader
+        names:
+          - yolo-v11-dataset-download
+        enable_if_env:
+          MLC_USE_DATASET_FROM_HOST: 
+          - true
+          - "yes"
       mounts:
         - "${{ MLC_ML_MODEL_YOLOV11_PATH }}:${{ MLC_ML_MODEL_YOLOV11_PATH }}"
         - "${{ MLC_DATASET_YOLO_COCO2017_FILTERED_PATH }}:${{ MLC_DATASET_YOLO_COCO2017_FILTERED_PATH }}"
@@ -1723,6 +1756,46 @@ variations:
     add_deps_recursive:
       mlperf-inference-implementation:
         tags: _yolo-99
+  
+  wan-2.2-t2v-a14b:
+    group:
+      model
+    env:
+      MLC_MODEL:
+        wan-2.2-t2v-a14b
+    add_deps_recursive:
+      mlperf-inference-implementation:
+        tags: _wan-2.2-t2v-a14b
+    docker:
+      deps:
+      - tags: get-ml-model-wan2,_mlc,_r2-downloader,_wan2_2_t2v_a14b
+        names:
+          - wan2-model-download
+        enable_if_env:
+          MLC_USE_ML_MODEL_FROM_HOST: 
+          - true
+          - "yes"
+      - tags: get-dataset-mlperf-inference-text-to-video,_mlc,_r2-downloader
+        names:
+          - wan2-dataset-download
+        enable_if_env:
+          MLC_USE_DATASET_FROM_HOST: 
+          - true
+          - "yes"
+      mounts:
+        - "${{ MLC_ML_MODEL_WAN2_PATH }}:${{ MLC_ML_MODEL_WAN2_PATH }}"
+        - "${{ MLC_ML_DATASET_MLPERF_INFERENCE_TEXT_TO_VIDEO_DATASET_PATH }}:${{ MLC_ML_DATASET_MLPERF_INFERENCE_TEXT_TO_VIDEO_DATASET_PATH }}"
+    # posthook_deps:
+    # - enable_if_env:
+    #     MLC_MLPERF_LOADGEN_MODE:
+    #     - accuracy
+    #     - all
+    #     MLC_MLPERF_ACCURACY_RESULTS_DIR:
+    #     - 'on'
+    #   names:
+    #   - mlperf-accuracy-script
+    #   - wan-accuracy-script
+    #   tags: run,accuracy,mlperf,_wan
 
   mobilenet:
     group:
@@ -1922,6 +1995,10 @@ variations:
     add_deps_recursive:
       mlperf-inference-implementation:
         tags: _cpu
+
+  # cuda,reference,wan-2.2-t2v-a14b:
+  #   docker:
+  #     base_image: pytorch/pytorch:2.5.1-cuda12.1-cudnn9-devel
 
   cuda,reference:
     docker:
@@ -2377,6 +2454,13 @@ variations:
     group:
       reproducibility
     add_deps_recursive:
+      nvidia-inference-common-code:
+        tags: _mlcommons,_v6.0-dev
+      nvidia-inference-server:
+        version: r5.0
+        tags: _mlcommons
+      nvidia-harness:   
+        tags: _v5.0
       pycuda:
         version_min: "2024.1"
     default_env:

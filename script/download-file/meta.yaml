@@ -7,6 +7,7 @@ category: DevOps automation
 default_env:
   MLC_RCLONE_COPY_USING: sync
   MLC_EXTRACT_REMOVE_EXTRACTED: no
+  MLC_DOWNLOAD_RETRY_COUNT: 2
 deps:
 - tags: detect,os
 - enable_if_env:
