@@ -29,14 +29,16 @@ def preprocess(i):
             env.get('MLC_EXCLUDE_CURRENT_NODE', False)):
         return {'return': 1, 'error': 'Either MLC_EXCLUDE_CURRENT_NODE should be False or MLC_MULTINODE_SYSTEM_SSH_IDS should be provided'}
     elif env.get('MLC_MULTINODE_SYSTEM_SSH_IDS', '') != '':
-        # set the run state dictionary to copy back the single node system info to all nodes after remote runs are done
+        # set the run state dictionary to copy back the single node system info
+        # to all nodes after remote runs are done
         if not 'run_state' in i:
             i['run_state'] = {}
         run_state = i['run_state']
         if not 'remote_run' in run_state:
             run_state['remote_run'] = {}
         run_state['remote_run']['env_keys_to_copy_back'] = []
-        run_state['remote_run']['env_keys_to_copy_back'].append('MLC_SINGLE_NODE_SYSTEM_INFO_FILE_PATH')
+        run_state['remote_run']['env_keys_to_copy_back'].append(
+            'MLC_SINGLE_NODE_SYSTEM_INFO_FILE_PATH')
         i['run_state'] = run_state
 
         # set remote run tags
@@ -45,7 +47,7 @@ def preprocess(i):
             rr_tags += ",_cuda"
         ssh_ids = [
             s.strip() for s in env['MLC_MULTINODE_SYSTEM_SSH_IDS'].split(',') if s.strip()]
-        
+
         env['MLC_REMOTE_RUN_SSH_ID_COUNT'] = len(ssh_ids)
 
         for index, sshid in enumerate(ssh_ids):
@@ -56,7 +58,8 @@ def preprocess(i):
                 port = sshid_parts[1]
             else:
                 port = '22'  # default SSH port
-            sshid_parts = [part.strip() for part in sshid_parts[0].split('@') if part.strip()]
+            sshid_parts = [part.strip()
+                           for part in sshid_parts[0].split('@') if part.strip()]
             if len(sshid_parts) > 1:
                 user = sshid_parts[0]
                 host = sshid_parts[1]
@@ -83,9 +86,11 @@ def preprocess(i):
             })
 
             if r['return'] > 0:
-                logger.error(f"Error obtaining information from remote node {sshid}!")
+                logger.error(
+                    f"Error obtaining information from remote node {sshid}!")
             else:
-                logger.info(f"Successfully obtained information from remote node {sshid}")
+                logger.info(
+                    f"Successfully obtained information from remote node {sshid}")
 
     return {'return': 0}
 
@@ -152,11 +157,10 @@ def postprocess(i):
         node_details['hardware_ensemble'] = single_node_system_info['hardware_ensemble']
         node_details['software_ensemble'] = single_node_system_info['software_ensemble']
 
-
         # ---- Check for duplicate system_node_name ----
         existing_entry = next(
             (entry for entry in parsed_node_details
-            if entry['system_node_name'] == node_details['system_node_name']),
+             if entry['system_node_name'] == node_details['system_node_name']),
             None
         )
         if existing_entry:
@@ -164,7 +168,7 @@ def postprocess(i):
             existing_entry['number_of_nodes'] += 1
         else:
             parsed_node_details.append(node_details)
-    
+
     # Scenario where the host system is not being excluded
     if not is_true('MLC_EXCLUDE_CURRENT_NODE', False):
         logger.info("Obtaining system information from the host system")
@@ -181,7 +185,7 @@ def postprocess(i):
         "organization_metadata": organization_metadata,
         "system_under_test": sut,
         "model_metadata": model_metadata,
-        "dataset_metadata": dataset_metadata,    
+        "dataset_metadata": dataset_metadata,
     }
 
     try:
@@ -189,6 +193,7 @@ def postprocess(i):
             json.dump(parsed_multinode_system_info, f, indent=2)
         logger.info("Successfully compiled the system informtion")
     except Exception as e:
-        logger.error(f"Exception {e} occured when compiling the system information")
-            
+        logger.error(
+            f"Exception {e} occured when compiling the system information")
+
     return {'return': 0}
