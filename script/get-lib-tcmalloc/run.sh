@@ -26,7 +26,7 @@ fi
 COMP_MODE="opt"
 
 # Build with opt
-bazel build -c $COMP_MODE --copt=-march=native //tcmalloc:libtcmalloc.so
+bazel build -c $COMP_MODE  //tcmalloc:libtcmalloc.so
 
 # Get the path for THAT SPECIFIC mode
 BIN_DIR=$(bazel info -c $COMP_MODE bazel-bin)
