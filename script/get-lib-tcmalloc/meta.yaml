@@ -6,7 +6,7 @@ category: Detection or installation of tools and artifacts
 deps:
 - env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_TCMALLOC_SRC_PATH
-  extra_cache_tags: mimalloc,repo,mimalloc-repo
+  extra_cache_tags: tcmalloc,repo,tcmalloc-repo
   force_env_keys:
   - MLC_GIT_*
   names:

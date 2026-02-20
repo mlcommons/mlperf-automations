@@ -12,9 +12,10 @@ cd ${MLC_TCMALLOC_SRC_PATH}
 if ! grep -q "${MLC_TCMALLOC_BUILD_NAME}.so" tcmalloc/BUILD; then
     echo '
 cc_binary(
-    name = "'$MLC_TCMALLOC_BUILD_NAME'.so",
+    name = "lib'$MLC_TCMALLOC_BUILD_NAME'.so",
     deps = [":tcmalloc"],
     linkshared = 1,
+    linkstatic = 1,
 )' >> tcmalloc/BUILD
     echo "Added ${MLC_TCMALLOC_BUILD_NAME}.so target to tcmalloc/BUILD"
 else
