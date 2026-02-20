@@ -9,14 +9,14 @@ CUR=$PWD
 cd ${MLC_TCMALLOC_SRC_PATH}
 
 # Check if "libtcmalloc.so" exists in the BUILD file
-if ! grep -q "libtcmalloc.so" tcmalloc/BUILD; then
+if ! grep -q "${MLC_TCMALLOC_BUILD_NAME}.so" tcmalloc/BUILD; then
     echo '
 cc_binary(
-    name = "libtcmalloc.so",
+    name = "'$MLC_TCMALLOC_BUILD_NAME'.so",
     deps = [":tcmalloc"],
     linkshared = 1,
 )' >> tcmalloc/BUILD
-    echo "Added libtcmalloc.so target to tcmalloc/BUILD"
+    echo "Added ${MLC_TCMALLOC_BUILD_NAME}.so target to tcmalloc/BUILD"
 else
     echo "libtcmalloc.so target already exists in tcmalloc/BUILD, skipping..."
 fi
@@ -26,7 +26,7 @@ fi
 COMP_MODE="opt"
 
 # Build with opt
-bazel build -c $COMP_MODE  //tcmalloc:libtcmalloc.so
+bazel build -c $COMP_MODE  //tcmalloc:${MLC_TCMALLOC_BUILD_NAME}.so
 
 # Get the path for THAT SPECIFIC mode
 BIN_DIR=$(bazel info -c $COMP_MODE bazel-bin)

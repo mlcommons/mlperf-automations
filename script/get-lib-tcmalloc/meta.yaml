@@ -44,6 +44,16 @@ tests:
     - branch.master
 uid: bc454a366fed44f2
 variations:
+  full:
+    group: build-type
+    default: true
+    env:
+      MLC_TCMALLOC_BUILD_NAME: tcmalloc
+  minimal:
+    group: build-type
+    env:
+      MLC_TCMALLOC_BUILD_NAME: tcmalloc_minimal
+
   branch.#:
     env:
       MLC_GIT_CHECKOUT: '#'
