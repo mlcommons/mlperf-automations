@@ -3,12 +3,14 @@ from utils import is_true
 import os
 import shutil
 
+
 def _get_hf_cli():
     """Return the available Hugging Face CLI command, preferring 'hf' over the deprecated 'huggingface-cli'."""
     for cmd in ('hf', 'huggingface-cli'):
         if shutil.which(cmd) is not None:
             return cmd
     raise EnvironmentError("Neither 'hf' nor 'huggingface-cli' found on PATH.")
+
 
 def preprocess(i):
     env = i['env']
