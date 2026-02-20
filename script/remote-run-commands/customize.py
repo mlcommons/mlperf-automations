@@ -2,7 +2,44 @@ from mlc import utils
 import os
 import subprocess
 import platform
+from utils import is_true
+import shlex
 
+def copy_over_ssh(file, ssh_cmd, user, host, target_directory, logger):
+    # Check if rsync is available
+    rsync_available = True
+    try:
+        subprocess.run(["rsync", "--version"],
+                       capture_output=True, check=True)
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        rsync_available = False
+    if not rsync_available:
+        logger.info(f"⚠️  rsync not found. Skipping file copy for {file}")
+        logger.info("   On Windows, install rsync via WSL, Cygwin, or use Git Bash")
+        return {"error": 1, "error_msg": "rsync not found", "skip": "true"}
+    cmd = [
+        "rsync",
+        "-avz",
+        "-e", " ".join(ssh_cmd),   # rsync expects a single string here
+        file,
+        f"{user}@{host}:{target_directory}/"
+    ]
+    logger.info("Executing:", " ".join(cmd))
+    result = subprocess.run(
+        cmd,
+        env=os.environ,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"❌ rsync failed for {file}\n"
+            f"STDOUT:\n{result.stdout}\n"
+            f"STDERR:\n{result.stderr}"
+        )
+    logger.info(f"✅ Copied {file} successfully")
+    return {"error": 0, "error_msg": "", "skip": "false"}
 
 def preprocess(i):
 
@@ -11,6 +48,8 @@ def preprocess(i):
     env = i['env']
 
     cmd_string = ''
+
+    logger = i["automation"].logger
 
     is_windows = os_info['platform'] == 'windows'
 
@@ -57,8 +96,10 @@ def preprocess(i):
                     "-o", f"UserKnownHostsFile={null_device}"]
 
     key_file = env.get("MLC_SSH_KEY_FILE")
-    if key_file:
-        ssh_cmd += ["-i", key_file]
+
+    if not is_true(env.get('MLC_SKIP_SSH_KEY_FILE', '')):
+        if key_file:
+            ssh_cmd += ["-i", key_file]
 
     ssh_cmd_str = " ".join(ssh_cmd)
 
@@ -79,45 +120,7 @@ def preprocess(i):
 
     # ---- Execute copy commands ----
     for file in files_to_copy:
-        # Check if rsync is available
-        rsync_available = True
-        try:
-            subprocess.run(["rsync", "--version"],
-                           capture_output=True, check=True)
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            rsync_available = False
-
-        if not rsync_available:
-            print(f"⚠️  rsync not found. Skipping file copy for {file}")
-            print("   On Windows, install rsync via WSL, Cygwin, or use Git Bash")
-            continue
-
-        cmd = [
-            "rsync",
-            "-avz",
-            "-e", " ".join(ssh_cmd),   # rsync expects a single string here
-            file,
-            f"{user}@{host}:{target_directory}/"
-        ]
-
-        print("Executing:", " ".join(cmd))
-
-        result = subprocess.run(
-            cmd,
-            env=os.environ,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
-
-        if result.returncode != 0:
-            raise RuntimeError(
-                f"❌ rsync failed for {file}\n"
-                f"STDOUT:\n{result.stdout}\n"
-                f"STDERR:\n{result.stderr}"
-            )
-
-        print(f"✅ Copied {file} successfully")
+        r = copy_over_ssh(file, ssh_cmd, user, host, target_directory, logger)
 
     return {'return': 0}
 
@@ -128,7 +131,7 @@ def postprocess(i):
 
     env = i['env']
 
-    cmd_string = ''
+    logger = i["automation"].logger
 
     is_windows = os_info['platform'] == 'windows'
 
@@ -159,47 +162,8 @@ def postprocess(i):
         rsync_base = ["sshpass", "-p", password] + rsync_base
 
     target_directory = env.get('MLC_SSH_PATH_TO_COPY_BACK_FILES', '')
-
     # ---- Execute copy commands ----
     for file in files_to_copy_back:
-        # Check if rsync is available
-        rsync_available = True
-        try:
-            subprocess.run(["rsync", "--version"],
-                           capture_output=True, check=True)
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            rsync_available = False
-
-        if not rsync_available:
-            print(f"⚠️  rsync not found. Skipping file copy for {file}")
-            print("   On Windows, install rsync via WSL, Cygwin, or use Git Bash")
-            continue
-
-        cmd = [
-            "rsync",
-            "-avz",
-            "-e", " ".join(ssh_cmd),   # rsync expects a single string here
-            f"{user}@{host}:{file}",
-            f"{target_directory}/{os.path.basename(file)}"
-        ]
-
-        print("Executing:", " ".join(cmd))
-
-        result = subprocess.run(
-            cmd,
-            env=os.environ,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
-
-        if result.returncode != 0:
-            raise RuntimeError(
-                f"❌ rsync failed for {file}\n"
-                f"STDOUT:\n{result.stdout}\n"
-                f"STDERR:\n{result.stderr}"
-            )
-
-        print(f"✅ Copied {file} successfully")
+        r = copy_over_ssh(file, ssh_cmd, user, host, target_directory, logger)
 
     return {'return': 0}

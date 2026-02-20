@@ -21,6 +21,7 @@ input_mapping:
   ssh_key_file: MLC_SSH_KEY_FILE
   user: MLC_SSH_USER
   copy_directory: MLC_SSH_TARGET_COPY_DIRECTORY
+  skip_ssh_key_file: MLC_SKIP_SSH_KEY_FILE
 tags:
 - remote
 - run
