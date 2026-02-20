@@ -200,9 +200,7 @@ def main():
             elif target_key in ["framework", "operating_system", "filesystem", "other_software_stack", "sw_notes"]:
                 ensemble_type = "software_ensemble"
                 if ensemble_type not in parsed:
-                    print("no")
                     parsed[ensemble_type] = {}
-                    print(parsed)
                 parsed[ensemble_type][target_key] = extract_value(
                     system_info, rule)
         except Exception as e:

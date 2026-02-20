@@ -7,7 +7,6 @@ def preprocess(i):
 
     os_info = i['os_info']
     env = i['env']
-    print(env['MLC_PYTHON_BIN_WITH_PATH'])
     if env.get('MLC_SINGLE_NODE_SYSTEM_INFO_FILE_PATH', '') == '':
         if env.get('MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH', '') == '':
             env['MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH'] = os.getcwd()
