@@ -5,6 +5,7 @@ import platform
 from utils import is_true
 import shlex
 
+
 def copy_over_ssh(file, ssh_cmd, user, host, target_directory, logger):
     # Check if rsync is available
     rsync_available = True
@@ -15,7 +16,8 @@ def copy_over_ssh(file, ssh_cmd, user, host, target_directory, logger):
         rsync_available = False
     if not rsync_available:
         logger.info(f"⚠️  rsync not found. Skipping file copy for {file}")
-        logger.info("   On Windows, install rsync via WSL, Cygwin, or use Git Bash")
+        logger.info(
+            "   On Windows, install rsync via WSL, Cygwin, or use Git Bash")
         return {"error": 1, "error_msg": "rsync not found", "skip": "true"}
     cmd = [
         "rsync",
@@ -40,6 +42,7 @@ def copy_over_ssh(file, ssh_cmd, user, host, target_directory, logger):
         )
     logger.info(f"✅ Copied {file} successfully")
     return {"error": 0, "error_msg": "", "skip": "false"}
+
 
 def preprocess(i):
 
