@@ -16,9 +16,10 @@ jobs:
     steps:
       - name: Parse Username
         id: parse
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
         run: |
           # Get the text after /reassign. Default to PR creator if empty.
-          COMMENT_BODY="${{ github.event.comment.body }}"
           REQUESTED_USER=$(echo "$COMMENT_BODY" | awk '{print $2}')
           
           if [ -z "$REQUESTED_USER" ]; then
