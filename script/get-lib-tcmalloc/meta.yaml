@@ -41,7 +41,7 @@ tags:
 tests:
   run_inputs:
   - variations_list:
-    - branch.main
+    - branch.master
 uid: bc454a366fed44f2
 variations:
   branch.#:
