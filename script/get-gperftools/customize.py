@@ -11,7 +11,6 @@ def preprocess(i):
 
     os_info = i['os_info']
 
-
     return {'return': 0}
 
 
