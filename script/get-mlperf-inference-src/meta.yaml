@@ -15,6 +15,9 @@ deps:
   - python
   - python3
   tags: get,python3
+- names:
+  - loguru
+  tags: get,generic-python-lib,_package.loguru
 new_env_keys:
 - MLC_MLPERF_INFERENCE_3DUNET_PATH
 - MLC_MLPERF_INFERENCE_BERT_PATH
