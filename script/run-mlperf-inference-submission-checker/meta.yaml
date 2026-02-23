@@ -26,7 +26,7 @@ deps:
   version_min: 1.0.0
 - names:
   - loguru
-  tags: get,generic-python-lib,_loguru
+  tags: get,generic-python-lib,_package.loguru
 - names:
   - get-mlperf-submission-dir
   skip_if_env:
