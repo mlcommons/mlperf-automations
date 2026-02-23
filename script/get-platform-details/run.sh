@@ -55,7 +55,7 @@ add_entry "kernel_cmdline" "cat /proc/cmdline" no
 add_entry "thp_enabled" "cat /sys/kernel/mm/transparent_hugepage/enabled" no
 add_entry "thp_defrag" "cat /sys/kernel/mm/transparent_hugepage/khugepaged/defrag" no
 add_entry "os_release" "cat /etc/os-release" no
-add_entry "disk_layout" "lsblk" no
+add_entry "disk_layout" "lsblk -d -n -o NAME,TYPE,SIZE,MODEL,TRAN,ROTA,VENDOR" no
 add_entry "lsb_release" "lsb_release -d" no
 add_entry "etc_versions" "cat /etc/*version*" no
 add_entry "etc_releases" "cat /etc/*release*" no
@@ -80,23 +80,11 @@ if [[ "$MLC_ACCELERATOR_BACKEND" == "cuda" ]]; then
 
   if command -v nvidia-smi >/dev/null 2>&1; then
 
-    add_entry "accelerator_model_name" \
-      "nvidia-smi --query-gpu=name --format=csv,noheader | head -n1" no
+    add_entry "nvidia_smi_topo" \
+      "nvidia-smi topo -m" no
 
-    add_entry "accelerators_per_node" \
-      "nvidia-smi -L | wc -l" no
-
-    add_entry "accelerator_memory_capacity" \
-      "nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits | head -n1 | awk '{print \$1*1024*1024}'" no
-
-    add_entry "accelerator_memory_type" \
-      "nvidia-smi --query-gpu=name --format=csv,noheader | head -n1 | grep -qi HBM && echo HBM || echo GDDR" no
-
-    add_entry "accelerator_interconnect" \
-      "nvidia-smi topo -m | grep -q NV && echo NVLink || echo PCIe" no
-
-    add_entry "accelerator_host_interconnect" \
-      "GEN=\$(nvidia-smi --query-gpu=pcie.link.gen.current --format=csv,noheader,nounits | head -n1); echo PCIe\ Gen\$GEN" no
+    add_entry "nvidia_smi_full" \
+      "nvidia-smi -q" no
 
   else
     add_entry "accelerator_error" \
