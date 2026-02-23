@@ -56,9 +56,9 @@ def get_gpu_info():
             "NVIDIA Tesla V100": "HBM2",
             "NVIDIA TITAN RTX": "GDDR6",
         }
-        
 
-        memory_type = memory_type_map.get(device.name(), "Unknown / Not in lookup table")
+        memory_type = memory_type_map.get(
+            device.name(), "Unknown / Not in lookup table")
 
         gpu_info = {
             "GPU Device ID": device.pci_bus_id(),

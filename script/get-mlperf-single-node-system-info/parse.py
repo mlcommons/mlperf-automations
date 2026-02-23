@@ -56,7 +56,8 @@ EXTRACT_RULES = {
     },
     "accelerator_memory_capacity": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY"],   # Get the value as decimal gigabytes
+        # Get the value as decimal gigabytes
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY"],
     },
     "accelerator_memory_type": {
         "source": "env",
@@ -135,7 +136,7 @@ def extract_value(system_info, rule, field_key):
             return None
         with open(path, "r") as f:
             return f.read().strip()
-    
+
     collected = []
 
     if rule.get("source", "") == "env":
@@ -152,7 +153,7 @@ def extract_value(system_info, rule, field_key):
                     elif "cuda_driver" in candidate.lower():
                         value += f"Cuda driver version {env_output} ; "
             return value
-        
+
         for candidate in rule["candidates"]:
             value += f" {os.environ.get(candidate, "")}"
             if field_key == "accelerator_memory_capacity":
@@ -160,8 +161,9 @@ def extract_value(system_info, rule, field_key):
                 if value_bytes == "":
                     return ""
                 else:
-                    return f"{int(value_bytes/(1000**3))}GB" #get as decimal gigabytes as marketed by the vendors  
-        
+                    # get as decimal gigabytes as marketed by the vendors
+                    return f"{int(value_bytes/(1000**3))}GB"
+
         return value.strip()
     else:
         for candidate in rule["candidates"]:
@@ -172,7 +174,8 @@ def extract_value(system_info, rule, field_key):
                         continue
 
                     # Handle list of regex (for derived fields)
-                    regex_list = rule["regex"] if isinstance(rule["regex"], list) else [rule["regex"]]
+                    regex_list = rule["regex"] if isinstance(
+                        rule["regex"], list) else [rule["regex"]]
 
                     for regex in regex_list:
                         matches = re.findall(regex, output, re.IGNORECASE)
@@ -184,9 +187,10 @@ def extract_value(system_info, rule, field_key):
                                 else:
                                     collected.append(m.strip())
 
-        if not collected and field_key not in ["host_memory_configuration", "accelerator_interconnect", "host_network_card_count", "host_networking", "host_storage_type"]:
+        if not collected and field_key not in [
+                "host_memory_configuration", "accelerator_interconnect", "host_network_card_count", "host_networking", "host_storage_type"]:
             return ""
-        
+
         if field_key == "host_storage_type":
             output = ""
             for candidate in rule["candidates"]:
@@ -213,13 +217,14 @@ def extract_value(system_info, rule, field_key):
                 if len(parts) < 5:
                     continue  # too short → skip garbage
 
-                name   = parts[0]
+                name = parts[0]
                 dev_type = parts[1]
-                size   = parts[2]
+                size = parts[2]
                 # model may contain spaces → join until we reach the last two columns
-                # last two are TRAN and ROTA (VENDOR may be missing or multi-word)
-                tran   = parts[-2] if len(parts) >= 6 else "unknown"
-                rota   = parts[-1] if len(parts) >= 6 else "unknown"
+                # last two are TRAN and ROTA (VENDOR may be missing or
+                # multi-word)
+                tran = parts[-2] if len(parts) >= 6 else "unknown"
+                rota = parts[-1] if len(parts) >= 6 else "unknown"
 
                 if dev_type != "disk":
                     continue
@@ -235,7 +240,8 @@ def extract_value(system_info, rule, field_key):
                     # rare fallback — look at model if available
                     model_start = 3
                     model_end = len(parts) - 2
-                    model = " ".join(parts[model_start:model_end]) if model_end > model_start else ""
+                    model = " ".join(
+                        parts[model_start:model_end]) if model_end > model_start else ""
                     if "SSD" in model.upper():
                         types_found.add("SSD")
                     elif "HDD" in model.upper() or any(x in model for x in ["ST", "WD", "HGST", "Toshiba", "Seagate"]):
@@ -253,7 +259,7 @@ def extract_value(system_info, rule, field_key):
                     ordered.append(t)
 
             return " + ".join(ordered)
-        
+
         if field_key == "host_networking":
             if not os.path.isdir("/sys/class/infiniband"):
                 return "Ethernet"
@@ -270,7 +276,7 @@ def extract_value(system_info, rule, field_key):
             if not results:
                 return "RDMA devices found but no link layer info"
             return "; ".join(results)
-        
+
         if field_key == "host_network_card_count":
             count = 0
             for ifname in os.listdir("/sys/class/net"):
@@ -282,7 +288,7 @@ def extract_value(system_info, rule, field_key):
                     if '/virtual/' not in target:
                         count += 1
             return str(count)
-        
+
         if field_key == "accelerator_interconnect":
             topo_output = ""
             for candidate in rule["candidates"]:
@@ -290,7 +296,7 @@ def extract_value(system_info, rule, field_key):
                     if candidate in dump_key:
                         topo_output = dump.get("output", "")
                         break
-                    
+
             if not topo_output:
                 return ""
 
@@ -305,18 +311,22 @@ def extract_value(system_info, rule, field_key):
                 if "nvidia_smi_full" in dump_key:
                     smi_output = dump.get("output", "")
                     break
-                
+
             if not smi_output:
                 return ""
 
-            gen_match = re.search(r"PCIe Generation\s*\n\s*Max\s*:\s*\d+\s*\n\s*Current\s*:\s*(\d+)", smi_output)
-            width_match = re.search(r"Link Width\s*\n\s*Max\s*:\s*\d+x\s*\n\s*Current\s*:\s*(\d+)x", smi_output)
+            gen_match = re.search(
+                r"PCIe Generation\s*\n\s*Max\s*:\s*\d+\s*\n\s*Current\s*:\s*(\d+)",
+                smi_output)
+            width_match = re.search(
+                r"Link Width\s*\n\s*Max\s*:\s*\d+x\s*\n\s*Current\s*:\s*(\d+)x",
+                smi_output)
 
             if gen_match and width_match:
                 return f"PCIe Gen{gen_match.group(1)} x{width_match.group(1)}"
 
             return "PCIe"
-        
+
         if field_key == "host_memory_configuration":
             try:
                 # Find full dmidecode output
@@ -330,7 +340,10 @@ def extract_value(system_info, rule, field_key):
                 if not dmidecode_output:
                     return ""
 
-                dimm_blocks = re.split(r"Memory Device", dmidecode_output, flags=re.IGNORECASE)
+                dimm_blocks = re.split(
+                    r"Memory Device",
+                    dmidecode_output,
+                    flags=re.IGNORECASE)
 
                 sizes = []
                 types = []
@@ -340,9 +353,12 @@ def extract_value(system_info, rule, field_key):
                     if "No Module Installed" in block:
                         continue
 
-                    size_match = re.search(r"Size:\s+(\d+)\s+GB", block, re.IGNORECASE)
-                    type_match = re.search(r"Type:\s+(DDR\d+)", block, re.IGNORECASE)
-                    speed_match = re.search(r"(Configured Clock Speed|Speed):\s+(\d+)\s+MT/s", block, re.IGNORECASE)
+                    size_match = re.search(
+                        r"Size:\s+(\d+)\s+GB", block, re.IGNORECASE)
+                    type_match = re.search(
+                        r"Type:\s+(DDR\d+)", block, re.IGNORECASE)
+                    speed_match = re.search(
+                        r"(Configured Clock Speed|Speed):\s+(\d+)\s+MT/s", block, re.IGNORECASE)
 
                     if size_match:
                         sizes.append(size_match.group(1))
@@ -361,7 +377,8 @@ def extract_value(system_info, rule, field_key):
                 dimm_type = types[0] if types else ""
                 dimm_speed = speeds[0] if speeds else ""
 
-                return f"{dimm_count} x {dimm_size}GB {dimm_type}-{dimm_speed}".rstrip("-")
+                return f"{dimm_count} x {dimm_size}GB {dimm_type}-{dimm_speed}".rstrip(
+                    "-")
 
             except Exception:
                 return ""
