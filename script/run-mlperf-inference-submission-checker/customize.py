@@ -54,7 +54,7 @@ def preprocess(i):
         if is_true(
                 env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
             new_constants_file = os.path.join(
-                os.path.dirname(submission_checker_file), "constants1.py")
+                os.path.dirname(submission_checker_file), "constants_mod.py")
             with open(constants_file, 'r') as file:
                 constants_data = file.read()
             constants_data = constants_data.replace(
@@ -103,7 +103,7 @@ def preprocess(i):
                 env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
             data = data.replace(
                 ".constants",
-                ".constants1").replace(
+                ".constants_mod").replace(
                 ".checks.performance_check",
                 ".checks.performance_check1").replace(
                 ".checks.accuracy_check",
