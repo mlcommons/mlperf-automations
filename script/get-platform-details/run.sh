@@ -13,7 +13,7 @@ OUTPUT_FILE="$MLC_PLATFORM_DETAILS_FILE_PATH"
 #     "output": "its output"
 #   }
 # }
-JSON_OBJ='{}'
+echo '{}' > "$OUTPUT_FILE"
 
 add_entry () {
     local key="$1"
@@ -21,21 +21,26 @@ add_entry () {
     local needs_sudo="$3"
 
     local output
+    local tmpfile
+    tmpfile=$(mktemp)
 
     if [[ "$needs_sudo" == "yes" ]]; then
       if [[ ${MLC_SUDO_USER} == "yes" ]]; then
-        output="$(${MLC_SUDO} bash -c "$cmd" 2>&1 || echo "FAILED (sudo): $cmd")"
+        ${MLC_SUDO} bash -c "$cmd" > "$tmpfile" 2>&1 || echo "FAILED (sudo): $cmd" > "$tmpfile"
       else
-        output="sudo not available"
+        echo "sudo not available" > "$tmpfile"
       fi
     else
-      output="$(bash -c "$cmd" 2>&1 || echo "FAILED: $cmd")"
+      bash -c "$cmd" > "$tmpfile" 2>&1 || echo "FAILED: $cmd" > "$tmpfile"
     fi
 
-    JSON_OBJ=$(echo "$JSON_OBJ" | jq --arg k "$key" \
-                                  --arg c "$cmd" \
-                                  --arg o "$output" \
-      '. + {($k): {"command": $c, "output": $o}}')
+    jq --arg k "$key" \
+       --arg c "$cmd" \
+       --rawfile o "$tmpfile" \
+       '. + {($k): {"command": $c, "output": $o}}' \
+       "$OUTPUT_FILE" > "$OUTPUT_FILE.tmp" && mv "$OUTPUT_FILE.tmp" "$OUTPUT_FILE"
+    
+    rm -f "$tmpfile"
 }
 
 # -------- Non-sudo commands --------
@@ -91,10 +96,5 @@ if [[ "$MLC_ACCELERATOR_BACKEND" == "cuda" ]]; then
       "echo nvidia-smi not found; cannot detect CUDA accelerator details" no
   fi
 fi
-
-echo
-# echo "}" >> "$OUTPUT_FILE"
-
-echo "$JSON_OBJ" | jq '.' > "$OUTPUT_FILE"
 
 echo "System information written to $OUTPUT_FILE"
