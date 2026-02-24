@@ -84,10 +84,9 @@ def postprocess(i):
     version_string = generate_src_version_string(env)
     env['MLC_GIT_REPO_VERSION_STRING'] = version_string
 
-    
     if (env.get('MLC_GIT_REPO_VERSION_ENV_NAME', '') != ''):
         env[env['MLC_GIT_REPO_VERSION_ENV_NAME']] = version_string
-    
+
     return {'return': 0}
 
 
@@ -111,28 +110,27 @@ def update_env(env, key, env_key, var):
     return
 
 
-
 def generate_src_version_string(env):
     """
-    Generates a descriptive version string including checkout state, 
+    Generates a descriptive version string including checkout state,
     date, short hash, and modifiers (PRs, cherry-picks, patches).
     """
-    
+
     # 1. Base Components
     checkout = env.get("MLC_GIT_CHECKOUT", "unknown")
     sha = env.get("MLC_GIT_SHA", "00000000")
-    
+
     # Generate the date string (e.g., 20260224)
-    # This uses the current build/checkout date. 
+    # This uses the current build/checkout date.
     date_str = datetime.now().strftime("%Y%m%d")
-    
+
     # Sanitize checkout string (e.g., "feature/login" -> "feature-login")
     safe_checkout = re.sub(r'[^a-zA-Z0-9]', '-', checkout).strip('-').lower()
     short_sha = sha[:8]
-    
+
     # Start building the string parts: Branch + Date + Hash
     version_parts = [f"{safe_checkout}-{date_str}-g{short_sha}"]
-    
+
     # 2. Add Pull Request info
     pr = env.get("MLC_GIT_APPLIED_PR")
     if pr:
@@ -140,22 +138,20 @@ def generate_src_version_string(env):
         pr_num = re.search(r'\d+', pr)
         pr_str = pr_num.group(0) if pr_num else "pr"
         version_parts.append(f"pr{pr_str}")
-        
+
     # 3. Add Cherry-pick info
     cps = env.get("MLC_GIT_APPLIED_CHERRYPICKS")
     if cps:
         cp_list = [cp for cp in cps.split(';') if cp.strip()]
         if cp_list:
             version_parts.append(f"cp{len(cp_list)}")
-            
+
     # 4. Add Patch info
     patches = env.get("MLC_GIT_APPLIED_PATCHES")
     if patches:
         patch_list = [p for p in patches.split(';') if p.strip()]
         if patch_list:
             version_parts.append(f"p{len(patch_list)}")
-            
+
     # Assemble the final string
     return "-".join(version_parts)
-
-
