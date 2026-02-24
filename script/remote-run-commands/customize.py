@@ -6,7 +6,7 @@ from utils import is_true
 import shlex
 
 
-def copy_over_ssh(file, ssh_cmd, user, host, target_directory, logger):
+def copy_over_ssh(file, ssh_cmd, user, host, target_directory, logger, copy_back=False):
     # Check if rsync is available
     rsync_available = True
     try:
@@ -19,14 +19,23 @@ def copy_over_ssh(file, ssh_cmd, user, host, target_directory, logger):
         logger.info(
             "   On Windows, install rsync via WSL, Cygwin, or use Git Bash")
         return {"error": 1, "error_msg": "rsync not found", "skip": "true"}
-    cmd = [
-        "rsync",
-        "-avz",
-        "-e", " ".join(ssh_cmd),   # rsync expects a single string here
-        file,
-        f"{user}@{host}:{target_directory}/"
-    ]
-    logger.info("Executing:", " ".join(cmd))
+    if copy_back:
+        cmd = [
+            "rsync",
+            "-avz",
+            "-e", " ".join(ssh_cmd),   # rsync expects a single string here
+            f"{user}@{host}:{file}",
+            target_directory
+        ]
+    else:
+        cmd = [
+            "rsync",
+            "-avz",
+            "-e", " ".join(ssh_cmd),   # rsync expects a single string here
+            file,
+            f"{user}@{host}:{target_directory}/"
+        ]
+    logger.info(f"Executing: {" ".join(cmd)}")
     result = subprocess.run(
         cmd,
         env=os.environ,
@@ -154,9 +163,10 @@ def postprocess(i):
         ssh_cmd += ["-o", "StrictHostKeyChecking=no",
                     "-o", f"UserKnownHostsFile={null_device}"]
 
-    key_file = env.get("MLC_SSH_KEY_FILE")
-    if key_file:
-        ssh_cmd += ["-i", key_file]
+    if not is_true(env.get('MLC_SKIP_SSH_KEY_FILE', '')):
+        key_file = env.get("MLC_SSH_KEY_FILE")
+        if key_file:
+            ssh_cmd += ["-i", key_file]
 
     # ---- Use sshpass if password is provided (only on Unix-like systems) ----
     rsync_base = ["rsync", "-avz"]
@@ -167,6 +177,6 @@ def postprocess(i):
     target_directory = env.get('MLC_SSH_PATH_TO_COPY_BACK_FILES', '')
     # ---- Execute copy commands ----
     for file in files_to_copy_back:
-        r = copy_over_ssh(file, ssh_cmd, user, host, target_directory, logger)
+        r = copy_over_ssh(file, ssh_cmd, user, host, target_directory, logger, copy_back=True)
 
     return {'return': 0}

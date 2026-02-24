@@ -170,7 +170,7 @@ def postprocess(i):
             parsed_node_details.append(node_details)
 
     # Scenario where the host system is not being excluded
-    if not is_true('MLC_EXCLUDE_CURRENT_NODE', False):
+    if not is_true(env.get('MLC_EXCLUDE_CURRENT_NODE', False)):
         logger.info("Obtaining system information from the host system")
         update_parsed_node_details(node_id="current")
 

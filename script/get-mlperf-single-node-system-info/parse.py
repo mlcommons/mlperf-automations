@@ -155,7 +155,7 @@ def extract_value(system_info, rule, field_key):
             return value
 
         for candidate in rule["candidates"]:
-            value += f" {os.environ.get(candidate, "")}"
+            value += f" {os.environ.get(candidate, '')}"
             if field_key == "accelerator_memory_capacity":
                 value_bytes = float(os.environ.get(candidate, ""))
                 if value_bytes == "":
