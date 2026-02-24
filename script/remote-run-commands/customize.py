@@ -6,7 +6,8 @@ from utils import is_true
 import shlex
 
 
-def copy_over_ssh(file, ssh_cmd, user, host, target_directory, logger, copy_back=False):
+def copy_over_ssh(file, ssh_cmd, user, host,
+                  target_directory, logger, copy_back=False):
     # Check if rsync is available
     rsync_available = True
     try:
@@ -177,6 +178,13 @@ def postprocess(i):
     target_directory = env.get('MLC_SSH_PATH_TO_COPY_BACK_FILES', '')
     # ---- Execute copy commands ----
     for file in files_to_copy_back:
-        r = copy_over_ssh(file, ssh_cmd, user, host, target_directory, logger, copy_back=True)
+        r = copy_over_ssh(
+            file,
+            ssh_cmd,
+            user,
+            host,
+            target_directory,
+            logger,
+            copy_back=True)
 
     return {'return': 0}
