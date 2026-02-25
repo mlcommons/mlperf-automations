@@ -6,6 +6,7 @@ category: Detection or installation of tools and artifacts
 deps:
 - env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_TCMALLOC_SRC_PATH
+    MLC_GIT_REPO_VERSION_ENV_NAME: MLC_TCMALLOC_VERSION
   extra_cache_tags: tcmalloc,repo,tcmalloc-repo
   force_env_keys:
   - MLC_GIT_*
@@ -28,6 +29,7 @@ deps:
   tags: get,generic-sys-util,_build-essential
 new_env_keys:
 - MLC_TCMALLOC_PATH
+- MLC_TCMALLOC_VERSION
 - MLC_TCMALLOC_LIB_PATH
 - +LD_LIBRARY_PATH
 new_state_keys: []

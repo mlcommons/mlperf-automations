@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-02-21 18:41:18*
+*Last updated: 2026-02-26 03:04:40*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -994,6 +994,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-dataset-mlperf-inference-yolo-coco2017-filtered-dataset](get-dataset-mlperf-inference-yolo-coco2017-filtered-dataset/)**
   - get-dataset-mlperf-inference-yolo-coco2017-filtered-dataset
   - Tags: `get`, `dataset`, `mlperf-inference`, `yolo-coco2017-filtered`, `get-dataset-mlperf-inference-yolo-coco2017-filtered-dataset`
+- **[get-dataset-mmlu](get-dataset-mmlu/)**
+  - get-dataset-mmlu
+  - Tags: `get-dataset-mmlu`
 - **[get-dataset-nuscenes](get-dataset-nuscenes/)**
   - get-dataset-nuscenes
   - Tags: `get`, `dataset`, `nuscenes`
@@ -1080,7 +1083,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 317
+- **Total Scripts**: 318
 - **Categories**: 29
 
 ## Usage
