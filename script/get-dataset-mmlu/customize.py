@@ -14,7 +14,8 @@ def preprocess(i):
               env['MLC_MLPERF_INFERENCE_SOURCE'] + "'")
         downloader_path = os.path.join(
             env['MLC_MLPERF_INFERENCE_SOURCE'], 'automotive', 'llm', 'download_data.py')
-        env['MLC_DATASET_MMLU_PATH'] = os.path.join(env.get('MLC_DATASET_MMLU_OUT_PATH', os.getcwd()), "mmlu.json")
+        env['MLC_DATASET_MMLU_PATH'] = os.path.join(
+            env.get('MLC_DATASET_MMLU_OUT_PATH', os.getcwd()), "mmlu.json")
         run_cmd = f"{env['MLC_PYTHON_BIN_WITH_PATH']} {downloader_path} --output {env['MLC_DATASET_MMLU_PATH']}"
         if env.get('MLC_DATASET_MMLU_COUNT', '') != '':
             run_cmd += f" --count {int(env['MLC_DATASET_MMLU_COUNT'])})"
