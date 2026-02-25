@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-02-21 03:34:11*
+*Last updated: 2026-02-21 18:41:18*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -436,6 +436,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-google-test](get-google-test/)**
   - get-google-test
   - Tags: `get`, `google-test`, `googletest`, `gtest`, `test`, `google`
+- **[get-gperftools](get-gperftools/)**
+  - get-gperftools
+  - Tags: `get-gperftools`, `get`, `gperftools`
 - **[get-java](get-java/)**
   - get-java
   - Tags: `get`, `java`
@@ -1077,7 +1080,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 316
+- **Total Scripts**: 317
 - **Categories**: 29
 
 ## Usage
