@@ -43,14 +43,15 @@ def postprocess(i):
     env['+LD_LIBRARY_PATH'] = [lib_path]
     env['MLC_JEMALLOC_PATH'] = os.path.dirname(lib_path)
     env['MLC_JEMALLOC_LIB_PATH'] = lib_path
-    
+
     ext = None
     if env.get('MLC_HOST_OS_TYPE', '') == 'darwin':
-      ext = ".dylib"
+        ext = ".dylib"
     elif env.get('MLC_HOST_OS_TYPE', '') == 'linux':
-      ext = ".so"
+        ext = ".so"
 
     if ext:
-      env['MLC_DEPENDENT_CACHED_PATH'] = os.path.join(lib_path, f"libjemalloc.{ext}")
+        env['MLC_DEPENDENT_CACHED_PATH'] = os.path.join(
+            lib_path, f"libjemalloc.{ext}")
 
     return {'return': 0}
