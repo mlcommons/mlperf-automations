@@ -284,6 +284,22 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
 
         cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --output {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {backend} --dataset cognata --device {"cuda" if device == "gpu" else "cpu"} --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} --checkpoint {env['MLC_ML_MODEL_DEEPLABV3_PLUS_PATH']} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
 
+    elif env['MLC_MODEL'] in ['llm', 'llama3_2-3b']:
+        run_dir = env['MLC_MLPERF_INFERENCE_LLAMA3_2_3B_PATH']
+
+        env['RUN_DIR'] = run_dir
+
+        env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
+
+        if env['MLC_MLPERF_LOADGEN_SCENARIO'].lower() != "singlestream":
+            return {'return': 1, "error": "LLm Benchmark Llama 3.2 8b only supports SingleStream scenario!"}
+
+        backend = "onnx" if env.get(
+            'MLC_MLPERF_BACKEND') == "onnxruntime" else env.get('MLC_MLPERF_BACKEND')
+
+        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --model_path {env['LLAMA3_CHECKPOINT_PATH']} --dataset_path {env['MLC_DATASET_MMLU_PATH']} --output_dir {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {backend} --dataset cognata --device {"cuda" if device == "gpu" else "cpu"} --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
+
+        cmd = cmd.replace("--user_conf", "--user-conf")
     ##########################################################################
 
     return cmd, run_dir

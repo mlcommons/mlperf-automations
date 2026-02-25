@@ -368,6 +368,45 @@ variations:
       - mlperf-accuracy-script
       - cognata-deeplab-accuracy-script
       tags: run,accuracy,mlperf,_cognata_deeplab
+  
+  llama3_2-3b:
+    group:
+      models
+    default_env:
+      MLC_USE_DATASET_FROM_HOST: yes
+    env:
+      MLC_MODEL: llama3_2-3b
+    docker:
+      deps:
+        - tags: get-dataset-mmlu
+          names:
+            - dataset-mmlu
+          enable_if_env:
+            MLC_USE_DATASET_FROM_HOST:
+              - "yes"
+        - tags:  get,ml-model,llama3,_3b,_meta-llama/Llama-3.2-8B-Instruct,_hf
+          enable_if_env:
+            MLC_USE_MODEL_FROM_HOST:
+              - "yes"
+          names:
+            - ml-model-llama3_2
+      mounts:
+        - "${{ MLC_DATASET_MMLU_PATH }}:${{ MLC_DATASET_MMLU_PATH }}"
+        - "${{ LLAMA3_CHECKPOINT_PATH }}:${{ LLAMA3_CHECKPOINT_PATH }}"
+    add_deps_recursive:
+      abtf-inference-implementation:
+        tags: _llama3_2-3b
+    posthook_deps:
+    - enable_if_env:
+        MLC_MLPERF_LOADGEN_MODE:
+        - accuracy
+        - all
+        MLC_MLPERF_ACCURACY_RESULTS_DIR:
+        - 'on'
+      names:
+      - mlperf-accuracy-script
+      - cognata-deeplab-accuracy-script
+      tags: run,accuracy,mlperf,_mmlu
 
   # Target devices
   cpu:
