@@ -19,18 +19,6 @@ else
     echo "MLC_HOST_MEMORY_CAPACITY=$memory_capacity">>tmp-run-env.out
     disk_capacity=`df -h --total -l |grep total |tr -s ' '|cut -d' ' -f2`
     echo "MLC_HOST_DISK_CAPACITY=$disk_capacity">>tmp-run-env.out
-    filesystems=$(
-      awk '
-        $3 !~ /^(autofs|bpf|cgroup|cgroup2|configfs|devpts|devtmpfs|efivarfs|fusectl|hugetlbfs|debugfs|binfmt_misc|mqueue|nsfs|pstore|proc|rpc_pipefs|securityfs|sysfs|tmpfs|tracefs)$/ &&
-        $3 !~ /^(overlay|aufs|squashfs|fuse\..*|cgroup.*)$/ {
-          print $3
-        }
-      ' /proc/mounts \
-      | sort -u \
-      | tr '\n' ' ' \
-      | sed 's/ $//'
-    )
-    echo "MLC_HOST_FILESYSTEMS=$filesystems">>tmp-run-env.out
 
     # extract cpu information which are not there in lscpu
     MLC_HOST_CPU_WRITE_PROTECT_SUPPORT=$(extract_field "wp" "Not Found")

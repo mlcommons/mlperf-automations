@@ -16,7 +16,6 @@ new_env_keys:
 - MLC_HOST_CPU_*
 - MLC_HOST_MEMORY_CAPACITY
 - MLC_HOST_DISK_CAPACITY
-- MLC_HOST_FILESYSTEMS
 new_state_keys:
 - host_device_raw_info
 tags:
