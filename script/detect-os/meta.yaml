@@ -13,6 +13,7 @@ new_env_keys:
 - MLC_HOST_PYTHON_*
 - MLC_HOST_SYSTEM_NAME
 - MLC_RUN_STATE_DOCKER
+- MLC_HOST_FILESYSTEMS
 - +PATH
 new_state_keys:
 - os_uname_*
