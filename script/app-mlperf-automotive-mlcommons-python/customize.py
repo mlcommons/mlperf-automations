@@ -292,7 +292,8 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
         env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
 
         if env['MLC_MLPERF_LOADGEN_SCENARIO'].lower() != "singlestream":
-            return {'return': 1, "error": "LLm Benchmark Llama 3.2 8b only supports SingleStream scenario!"}
+            return {
+                'return': 1, "error": "LLm Benchmark Llama 3.2 8b only supports SingleStream scenario!"}
 
         cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --model_path {env['LLAMA3_CHECKPOINT_PATH']} --dataset_path {env['MLC_DATASET_MMLU_PATH']} --output_dir {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --device {"cuda" if device == "gpu" else "cpu"} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
 
