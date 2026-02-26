@@ -74,11 +74,16 @@ def remote_run(self_module, i):
     env = self_module.env
     state = self_module.state
 
+    files_to_copy_back = i.get('files_to_copy_back', [])
+    path_to_copy_back_files = i.get('path_to_copy_back_files', '')
+    skip_ssh_key_file = i.get('skip_ssh_key_file', '')
+
     r = call_remote_run_prepare(self_module, meta, script, i)
     if r['return'] > 0:
         return r
 
     files_to_copy = r.get('files_to_copy', [])
+
     remote_env = r.get('remote_env', {})
 
     mlc_script_input = {
@@ -103,10 +108,12 @@ def remote_run(self_module, i):
 
     for key in env_keys_to_copy:
         if key in env and os.path.exists(env[key]):
+            # the files_to_copy list contains the path to files in host
             files_to_copy.append(env[key])
             # Use forward slashes for remote path (Unix/Linux servers)
             remote_env[key] = "mlc-remote-artifacts/" + \
-                os.path.basename(env[key])
+                os.path.basename(
+                env[key])  # if host path is /home/user/file.txt, remote path will be mlc-remote-artifacts/file.txt
 
             for k, value in input_mapping.items():
                 if value == key and k in run_input:
@@ -140,6 +147,15 @@ def remote_run(self_module, i):
             "mlc-remote-artifacts")
         remote_inputs['files_to_copy'] = files_to_copy
         remote_inputs['copy_directory'] = remote_copy_directory
+
+    if files_to_copy_back:
+        remote_inputs['files_to_copy_back'] = files_to_copy_back
+
+    if path_to_copy_back_files:
+        remote_inputs['path_to_copy_back_files'] = path_to_copy_back_files
+
+    if skip_ssh_key_file:
+        remote_inputs['skip_ssh_key_file'] = skip_ssh_key_file
 
     # Execute the remote command
     mlc_remote_input = {
@@ -291,19 +307,21 @@ def regenerate_script_cmd(i):
 
             # Recursively process nested dictionaries.
             if isinstance(value, dict):
-                command_line += rebuild_flags(
-                    value,
-                    is_fake_run,
-                    skip_keys_for_fake_run,
-                    quote_keys,
-                    full_key
-                )
+                if value:
+                    command_line += rebuild_flags(
+                        value,
+                        is_fake_run,
+                        skip_keys_for_fake_run,
+                        quote_keys,
+                        full_key
+                    )
             # Process lists by concatenating values with commas.
             elif isinstance(value, list):
-                list_values = ",".join(
-                    quote_if_needed(
-                        item, quote) for item in value)
-                command_line += f" --{full_key},={list_values}"
+                if value:
+                    list_values = ",".join(
+                        quote_if_needed(
+                            item, quote) for item in value)
+                    command_line += f" --{full_key},={list_values}"
             # Process scalar values.
             else:
                 if full_key in ['s', 'v']:

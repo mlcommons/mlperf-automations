@@ -27,7 +27,7 @@ def preprocess(i):
         if env.get('MLC_PLATFORM_DETAILS_DIR_PATH', '') == '':
             env['MLC_PLATFORM_DETAILS_DIR_PATH'] = os.getcwd()
         if env.get('MLC_PLATFORM_DETAILS_FILE_NAME', '') == '':
-            env['MLC_PLATFORM_DETAILS_FILE_NAME'] = "system-info.txt"
+            env['MLC_PLATFORM_DETAILS_FILE_NAME'] = "system-info.json"
         env['MLC_PLATFORM_DETAILS_FILE_PATH'] = os.path.join(
             env['MLC_PLATFORM_DETAILS_DIR_PATH'], env['MLC_PLATFORM_DETAILS_FILE_NAME'])
 
