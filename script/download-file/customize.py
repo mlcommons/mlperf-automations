@@ -171,20 +171,40 @@ def preprocess(i):
                 mlcutil_require_download = 1
 
             if mlcutil_require_download == 1:
-                for i in range(1, 5):
-                    r = download_file({
-                        'url': url,
-                        'verify': verify_ssl})
-                    if r['return'] == 0:
+                retry_count = int(env.get('MLC_DOWNLOAD_RETRY_COUNT', '1'))
+                download_success = False
+                r = {'return': 1}  # Initialize with failure
+
+                for retry_attempt in range(1, retry_count + 1):
+                    if retry_attempt > 1:
+                        logger.info(
+                            f"Retry attempt {retry_attempt} of {retry_count}")
+
+                    # Reset url to the original for each retry attempt
+                    url = env.get('MLC_DOWNLOAD_URL', '')
+
+                    for i in range(1, 5):
+                        r = download_file({
+                            'url': url,
+                            'verify': verify_ssl})
+                        if r['return'] == 0:
+                            download_success = True
+                            break
+                        oldurl = url
+                        url = env.get('MLC_DOWNLOAD_URL' + str(i), '')
+                        if url == '':
+                            break
+                        logger.error(
+                            f"Download from {oldurl} failed, trying from {url}")
+
+                    if download_success:
                         break
-                    oldurl = url
-                    url = env.get('MLC_DOWNLOAD_URL' + str(i), '')
-                    if url == '':
-                        break
-                    logger.error(
-                        f"Download from {oldurl} failed, trying from {url}")
+                    elif retry_attempt < retry_count:
+                        logger.error(f"All URLs failed. Retrying...")
 
                 if r['return'] > 0:
+                    logger.error(
+                        f"Download failed after {retry_count} attempt(s)")
                     return r
 
                 env['MLC_DOWNLOAD_CMD'] = ""

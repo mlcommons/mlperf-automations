@@ -566,6 +566,29 @@ variations:
         names:
           - ml-model-deeplabv3-plus
 
+  llama3_2-3b:
+    group: models
+    add_deps_recursive:
+      pytorch:
+        version_min: "2.1.0"
+    deps:
+
+      - tags: get,generic-python-lib,_package.accelerate
+      - tags: get,generic-python-lib,_package.transformers
+        version_min: 4.40.0
+      - tags: get-dataset-mmlu
+        skip_if_env:
+          MLC_RUN_STATE_DOCKER:
+            - "yes"
+        names:
+          - dataset-mmlu
+      - tags: get,ml-model,llama3,_3b,_meta-llama/Llama-3.2-8B-Instruct,_hf
+        skip_if_env:
+          MLC_RUN_STATE_DOCKER:
+            - "yes"
+        names:
+          - ml-model-llama3_2
+
   # Target devices
   cpu:
     group: device
@@ -620,6 +643,10 @@ variations:
     default_env:
       MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: "99.9"
       MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT: 6636
+
+  llama3_2-3b,singlestream:
+    default_env:
+      MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: "90"
 
   mvp_demo:
     env:

@@ -44,9 +44,34 @@ if [[ ${require_download} == 1 ]]; then
     eval "${MLC_PRE_DOWNLOAD_CLEAN_CMD}" || exit $?
   fi
 
-  # Execute the download command
-  echo "Downloading: ${MLC_DOWNLOAD_CMD}"
-  eval "${MLC_DOWNLOAD_CMD}" || exit $?
+  # Execute the download command with retry logic
+  retry_count=${MLC_DOWNLOAD_RETRY_COUNT:-1}
+  attempt=1
+  download_success=0
+  
+  while [[ $attempt -le $retry_count ]]; do
+    if [[ $attempt -gt 1 ]]; then
+      echo "Retry attempt $attempt of $retry_count"
+    fi
+    
+    echo "Downloading: ${MLC_DOWNLOAD_CMD}"
+    eval "${MLC_DOWNLOAD_CMD}"
+    
+    if [[ $? -eq 0 ]]; then
+      download_success=1
+      break
+    else
+      if [[ $attempt -lt $retry_count ]]; then
+        echo "Download failed. Retrying..."
+      fi
+      ((attempt++))
+    fi
+  done
+  
+  if [[ $download_success -eq 0 ]]; then
+    echo "Download failed after $retry_count attempt(s)."
+    exit 1
+  fi
 fi
 
 # Verify checksum again if necessary

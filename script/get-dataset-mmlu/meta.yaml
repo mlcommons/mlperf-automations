@@ -1,0 +1,38 @@
+alias: get-dataset-mmlu
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+deps:
+- names:
+  - python
+  tags: get,python
+  skip_if_env:
+    MLC_DATASET_DOWNLOAD_SRC: mlcommons
+- names:
+  - automotive-src
+  tags: mlperf,automotive,source
+  skip_if_env:
+    MLC_DATASET_DOWNLOAD_SRC: mlcommons # skip if download happens from mlc infrastructure
+- tags: get,generic-python-lib,_package.tqdm
+  skip_if_env:
+    MLC_DATASET_DOWNLOAD_SRC: mlcommons
+- tags: get,generic-python-lib,_package.datasets
+  skip_if_env:
+    MLC_DATASET_DOWNLOAD_SRC: mlcommons
+input_mapping:
+  out_path: MLC_DATASET_MMLU_OUT_PATH
+new_env_keys:
+- MLC_DATASET_MMLU_PATH
+tags:
+- get-dataset-mmlu
+uid: 137c805565214b95
+variations:
+  # calibration:
+  #   env:
+  #     MLC_IGBH_CALIBRATION_FLAG: --calibration
+  no-of-samples.#:
+    env:
+      MLC_DATASET_MMLU_COUNT: '#'
+  mlc:
+    env:
+      MLC_DATASET_DOWNLOAD_SRC: mlcommons

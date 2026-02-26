@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-02-05 19:23:12*
+*Last updated: 2026-02-21 18:41:18*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -436,6 +436,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-google-test](get-google-test/)**
   - get-google-test
   - Tags: `get`, `google-test`, `googletest`, `gtest`, `test`, `google`
+- **[get-gperftools](get-gperftools/)**
+  - get-gperftools
+  - Tags: `get-gperftools`, `get`, `gperftools`
 - **[get-java](get-java/)**
   - get-java
   - Tags: `get`, `java`
@@ -454,12 +457,18 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-lib-jemalloc](get-lib-jemalloc/)**
   - get-lib-jemalloc
   - Tags: `get`, `lib`, `lib-jemalloc`, `jemalloc`
+- **[get-lib-mimalloc](get-lib-mimalloc/)**
+  - get-lib-mimalloc
+  - Tags: `get-lib-mimalloc`, `get`, `lib`, `mimalloc`
 - **[get-lib-protobuf](get-lib-protobuf/)**
   - get-lib-protobuf
   - Tags: `get`, `google-protobuf`, `protobuf`, `lib`, `lib-protobuf`, `google`
 - **[get-lib-qaic-api](get-lib-qaic-api/)**
   - get-lib-qaic-api
   - Tags: `get`, `api`, `lib-qaic-api`, `lib`, `qaic`
+- **[get-lib-tcmalloc](get-lib-tcmalloc/)**
+  - get-lib-tcmalloc
+  - Tags: `tcmalloc`, `get`, `lib`
 - **[get-nvidia-docker](get-nvidia-docker/)**
   - get-nvidia-docker
   - Tags: `get`, `install`, `nvidia`, `nvidia-container-toolkit`, `nvidia-docker`, `engine`
@@ -1071,7 +1080,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 314
+- **Total Scripts**: 317
 - **Categories**: 29
 
 ## Usage

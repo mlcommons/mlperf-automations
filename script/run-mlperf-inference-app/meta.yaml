@@ -76,6 +76,7 @@ input_mapping:
   model: MLC_MLPERF_MODEL
   multistream_target_latency: MLC_MLPERF_LOADGEN_MULTISTREAM_TARGET_LATENCY
   network: MLC_NETWORK_LOADGEN
+  number_of_processes_per_gpu_node: MLC_MLPERF_INFERENCE_NUM_PROCESSES_PER_GPU_NODE
   nvidia_system_name: MLC_NVIDIA_SYSTEM_NAME
   offline_target_qps: MLC_MLPERF_LOADGEN_OFFLINE_TARGET_QPS
   output_dir: OUTPUT_BASE_DIR
@@ -103,12 +104,14 @@ input_mapping:
   skip_truncation: MLC_SKIP_TRUNCATE_ACCURACY
   submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
   submitter: MLC_MLPERF_SUBMITTER
+  submitter_id: MLC_MLPERF_SUBMITTER_ID
   sut_servers: MLC_NETWORK_LOADGEN_SUT_SERVERS
   sw_notes_extra: MLC_MLPERF_SUT_SW_NOTES_EXTRA
   system_type: MLC_MLPERF_SUBMISSION_SYSTEM_TYPE
   target_latency: MLC_MLPERF_LOADGEN_TARGET_LATENCY
   target_qps: MLC_MLPERF_LOADGEN_TARGET_QPS
   test_query_count: MLC_TEST_QUERY_COUNT
+  test_qps: MLC_MLPERF_INFERENCE_TEST_QPS
   threads: MLC_NUM_THREADS
   sut: MLC_MLPERF_INFERENCE_SUT_VARIATION
   nvidia_llama2_dataset_file_path: MLC_NVIDIA_LLAMA_DATASET_FILE_PATH
@@ -514,6 +517,7 @@ input_description:
     - pointpainting
     - yolo-95
     - yolo-99
+    - wan-2.2-t2v-a14b
     desc: MLPerf model
     sort: 200
   precision:

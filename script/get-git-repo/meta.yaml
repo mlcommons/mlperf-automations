@@ -25,6 +25,7 @@ new_env_keys:
 - MLC_GIT_CHECKOUT_PATH
 - MLC_GIT_REPO_*
 - <<<MLC_GIT_CHECKOUT_PATH_ENV_NAME>>>
+- <<<MLC_GIT_REPO_VERSION_ENV_NAME>>>
 post_deps:
 - dynamic: true
   enable_if_env:

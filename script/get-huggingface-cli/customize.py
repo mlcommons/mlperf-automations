@@ -1,13 +1,25 @@
 from mlc import utils
 from utils import is_true
 import os
+import shutil
+
+
+def _get_hf_cli():
+    """Return the available Hugging Face CLI command, preferring 'hf' over the deprecated 'huggingface-cli'."""
+    for cmd in ('hf', 'huggingface-cli'):
+        if shutil.which(cmd) is not None:
+            return cmd
+    raise EnvironmentError("Neither 'hf' nor 'huggingface-cli' found on PATH.")
 
 
 def preprocess(i):
     env = i['env']
     if env.get('MLC_HF_TOKEN', '') != '':
-        env['MLC_HF_LOGIN_CMD'] = f"""git config --global credential.helper store && huggingface-cli login --token {env['MLC_HF_TOKEN']} --add-to-git-credential
-"""
+        hf_cli = _get_hf_cli()
+        env['MLC_HF_LOGIN_CMD'] = (
+            f"git config --global credential.helper store && "
+            f"{hf_cli} login --token {env['MLC_HF_TOKEN']} --add-to-git-credential\n"
+        )
     elif is_true(str(env.get('MLC_HF_DO_LOGIN'))):
         env['MLC_HF_LOGIN_CMD'] = f"""git config --global credential.helper store && huggingface-cli login
 """

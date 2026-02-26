@@ -7,6 +7,7 @@ deps:
   - tags: get,git,repo
     env:
       MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_JEMALLOC_SRC_PATH
+      MLC_GIT_REPO_VERSION_ENV_NAME: MLC_JEMALLOC_VERSION
     force_env_keys:
       - MLC_GIT_*
     update_tags_from_env_with_prefix:
@@ -28,6 +29,7 @@ deps:
 new_env_keys:
   - MLC_JEMALLOC_PATH
   - MLC_JEMALLOC_LIB_PATH
+  - MLC_JEMALLOC_VERSION
   - +LD_LIBRARY_PATH
 new_state_keys: []
 post_deps: []
@@ -56,9 +58,15 @@ variations:
       MLC_GIT_URL: '#'
   url.official:
     group: version
-    default: true
     env:
       MLC_GIT_URL: https://github.com/jemalloc/jemalloc.git
+      MLC_JEMALLOC_VERSION_PREFIX: 'jemalloc-dev'
+  url.facebook:
+    group: version
+    default: true
+    env:
+      MLC_GIT_URL: https://github.com/facebook/jemalloc.git
+      MLC_JEMALLOC_VERSION_PREFIX: 'facebook-dev'
   branch.#:
     env:
       MLC_GIT_CHECKOUT: '#'
