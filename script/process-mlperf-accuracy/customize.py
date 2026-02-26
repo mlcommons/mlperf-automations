@@ -240,7 +240,7 @@ def preprocess(i):
                 result_dir, "mlperf_log_accuracy.json") + "' --coco-dir '" + env['MLC_ML_DATASET_MLPERF_INFERENCE_YOLO_COCO2017_FILTERED_DATASET_PATH'] + "' > '" + out_file + "'"
 
         elif dataset == "mmlu":
-            CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "automotive", "llm", "tools", "accuracy_checker.py") + "' --log_file '" + os.path.join(
+            CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "automotive", "llm", "accuracy_checker.py") + "' --log_file '" + os.path.join(
                 result_dir, "mlperf_log_accuracy.json") + "' --dataset_file '" + env['MLC_DATASET_MMLU_PATH'] + "' > '" + out_file + "'"
 
         else:

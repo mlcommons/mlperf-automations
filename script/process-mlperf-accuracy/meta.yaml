@@ -18,6 +18,7 @@ deps:
       - nuscenes
       - cognata_deeplab
       - cognata_ssd
+      - mmlu
 - names:
   - automotive-src
   - accuracy-check-src
@@ -27,6 +28,7 @@ deps:
       - nuscenes
       - cognata_deeplab
       - cognata_ssd
+      - mmlu
 input_mapping:
   rerun: MLC_RERUN
   result_dir: MLC_MLPERF_ACCURACY_RESULTS_DIR

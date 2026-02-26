@@ -568,20 +568,14 @@ variations:
 
   llama3_2-3b:
     group: models
-    # add_deps_recursive:
-    #   pytorch:
-    #     version_max: "2.3.1"
-    #     version_max_usable: "2.3.1"
-    #   ml-engine-torchvision:
-    #     version_max: "0.18.1"
-    #     version_max_usable": "0.18.1"
-    #   torchaudio:
-    #     version_max: "2.3.1"
-    #     version_max_usable": "2.3.1"
+    add_deps_recursive:
+      pytorch:
+        version_min: "2.1.0"
     deps:
 
       - tags: get,generic-python-lib,_package.accelerate
       - tags: get,generic-python-lib,_package.transformers
+        version_min: 4.40.0
       - tags: get-dataset-mmlu
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
@@ -649,6 +643,10 @@ variations:
     default_env:
       MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: "99.9"
       MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT: 6636
+
+  llama3_2-3b,singlestream:
+    default_env:
+      MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: "90"
 
   mvp_demo:
     env:

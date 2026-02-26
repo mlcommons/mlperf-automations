@@ -62,7 +62,7 @@ def preprocess(i):
             env['MLC_NUM_THREADS'] = env.get('MLC_HOST_CPU_TOTAL_CORES', '1')
 
     if env.get('MLC_MLPERF_LOADGEN_MAX_BATCHSIZE', '') != '' and not env.get(
-            'MLC_MLPERF_MODEL_SKIP_BATCHING', False):
+            'MLC_MLPERF_MODEL_SKIP_BATCHING', False) and env['MLC_MODEL'] != "llama3_2-3b":
         env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] += " --max-batchsize " + \
             str(env['MLC_MLPERF_LOADGEN_MAX_BATCHSIZE'])
 
@@ -71,7 +71,7 @@ def preprocess(i):
             str(env['MLC_MLPERF_LOADGEN_BATCH_SIZE'])
 
     if env.get('MLC_MLPERF_LOADGEN_QUERY_COUNT', '') != '' and not env.get(
-            'MLC_TMP_IGNORE_MLPERF_QUERY_COUNT', False) and env.get('MLC_MLPERF_RUN_STYLE', '') != "valid":
+            'MLC_TMP_IGNORE_MLPERF_QUERY_COUNT', False) and env.get('MLC_MLPERF_RUN_STYLE', '') != "valid" and env['MLC_MODEL'] != "llama3_2-3b":
         env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] += " --count " + \
             env['MLC_MLPERF_LOADGEN_QUERY_COUNT']
 
@@ -294,10 +294,7 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
         if env['MLC_MLPERF_LOADGEN_SCENARIO'].lower() != "singlestream":
             return {'return': 1, "error": "LLm Benchmark Llama 3.2 8b only supports SingleStream scenario!"}
 
-        backend = "onnx" if env.get(
-            'MLC_MLPERF_BACKEND') == "onnxruntime" else env.get('MLC_MLPERF_BACKEND')
-
-        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --model_path {env['LLAMA3_CHECKPOINT_PATH']} --dataset_path {env['MLC_DATASET_MMLU_PATH']} --output_dir {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --backend {backend} --dataset cognata --device {"cuda" if device == "gpu" else "cpu"} --dataset-path {env['MLC_PREPROCESSED_DATASET_COGNATA_PATH']} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
+        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --model_path {env['LLAMA3_CHECKPOINT_PATH']} --dataset_path {env['MLC_DATASET_MMLU_PATH']} --output_dir {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --device {"cuda" if device == "gpu" else "cpu"} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
 
         cmd = cmd.replace("--user_conf", "--user-conf")
     ##########################################################################
