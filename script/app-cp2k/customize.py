@@ -16,10 +16,10 @@ def preprocess(i):
 
     if "+LIBRARY_PATH" not in env:
         env["+LIBRARY_PATH"] = []
-    
+
     if "+PATH" not in env:
         env["+PATH"] = []
-    
+
     aocc_lib_path = env['MLC_AOCC_LIB_PATH']
     blas_lib_path = os.path.join(env['MLC_BLAS_INSTALL_PATH'], "lib")
     blas_bin_path = os.path.join(env['MLC_BLAS_INSTALL_PATH'], "bin")
@@ -29,9 +29,9 @@ def preprocess(i):
 
     env['+LD_LIBRARY_PATH'].append(os.path.abspath(blas_lib_path))
     env['+LIBRARY_PATH'].append(os.path.abspath(blas_lib_path))
-    #print(env)
+    # print(env)
     env['+PATH'].append(os.path.abspath(blas_bin_path))
-    
+
     return {'return': 0}
 
 
