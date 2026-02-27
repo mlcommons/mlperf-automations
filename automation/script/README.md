@@ -46,6 +46,15 @@ MLC Script Automation is the engine that makes native shell scripts (bash/bat) *
 - **Docker integration** — scripts can be transparently run inside Docker containers.
 - **Experiment tracking** — results can be recorded with system state snapshots for reproducibility.
 
+> **Historical Note:** This automation framework was originally developed using
+> the **CMIng** Python package (`cmind`) as its interface layer. The project has
+> since migrated to the **MLCFlow** interface (`mlcflow`), which serves as the
+> current command-line and programmatic entry point. Scripts and metadata authored
+> for CMIng remain structurally compatible — the core execution lifecycle,
+> caching, and dependency resolution architecture are preserved — but all new
+> development and user-facing commands now use the `mlc` / `mlcr` CLI provided
+> by MLCFlow.
+
 ---
 
 ## Running a Script
