@@ -5652,9 +5652,11 @@ def _apply_conditional_meta_updates(update_meta_if_env, default_env, env, const,
         if c_default_variations:
             if 'conditional_default_variations' not in run_state:
                 run_state['conditional_default_variations'] = {}
-            # Later entries don't overwrite earlier ones (first match wins per group)
+            # Later entries don't overwrite earlier ones (first match wins per
+            # group)
             for group, variation in c_default_variations.items():
-                run_state['conditional_default_variations'].setdefault(group, variation)
+                run_state['conditional_default_variations'].setdefault(
+                    group, variation)
 
     return {'return': 0}
 
