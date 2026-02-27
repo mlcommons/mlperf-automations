@@ -2093,13 +2093,25 @@ class ScriptAutomation(Automation):
         if not variation_tags and default_variation and default_variation not in excluded_variation_tags:
             variation_tags = [default_variation]
 
-        # Process default_variations from script meta (highest priority)
-        # then version meta (medium priority) BEFORE per-variation defaults.
+        # Process default_variations from all sources BEFORE per-variation defaults.
+        # Priority order (highest first):
+        #   1. update_meta_if_env conditional default_variations
+        #   2. Script-level default_variations (top-level meta)
+        #   3. Version-level default_variations (version meta)
+        #   4. Per-variation default_variations (handled in _update_variation_tags_from_variations below)
+        #
         # Since _get_variation_tags_from_default_variations only fills groups
-        # not already covered, processing script-level first gives it the
-        # highest priority, followed by version-level, then variation-level
-        # (which runs inside _update_variation_tags_from_variations below).
-        for extra_meta_source in [meta, run_state.get('version_meta', {})]:
+        # not already covered, processing higher-priority sources first ensures
+        # they win for each group.
+        conditional_dv = run_state.get('conditional_default_variations', {})
+        extra_meta_sources = []
+        if conditional_dv:
+            extra_meta_sources.append({'default_variations': conditional_dv})
+        extra_meta_sources.append(meta)
+        version_meta = run_state.get('version_meta', {})
+        if version_meta:
+            extra_meta_sources.append(version_meta)
+        for extra_meta_source in extra_meta_sources:
             if extra_meta_source and 'default_variations' in extra_meta_source:
                 tmp_vt_static = copy.deepcopy(variation_tags)
                 for vi in range(len(tmp_vt_static)):
@@ -5632,6 +5644,17 @@ def _apply_conditional_meta_updates(update_meta_if_env, default_env, env, const,
                                'dict2': c_add_deps_recursive_info,
                                'append_lists': True,
                                'append_unique': True})
+
+        # Accumulate default_variations from conditional meta updates.
+        # These will be picked up in _update_state_from_variations with
+        # the highest priority (above script-level default_variations).
+        c_default_variations = c_meta.get('default_variations', {})
+        if c_default_variations:
+            if 'conditional_default_variations' not in run_state:
+                run_state['conditional_default_variations'] = {}
+            # Later entries don't overwrite earlier ones (first match wins per group)
+            for group, variation in c_default_variations.items():
+                run_state['conditional_default_variations'].setdefault(group, variation)
 
     return {'return': 0}
 
