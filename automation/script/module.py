@@ -2104,7 +2104,8 @@ class ScriptAutomation(Automation):
                 tmp_vt_static = copy.deepcopy(variation_tags)
                 for vi in range(len(tmp_vt_static)):
                     if tmp_vt_static[vi] not in variations:
-                        vs = self._get_name_for_dynamic_variation_tag(tmp_vt_static[vi])
+                        vs = self._get_name_for_dynamic_variation_tag(
+                            tmp_vt_static[vi])
                         if vs:
                             tmp_vt_static[vi] = vs
                 r = self._get_variation_tags_from_default_variations(
