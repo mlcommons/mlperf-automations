@@ -18,7 +18,7 @@ def preprocess(i):
         hf_cli = _get_hf_cli()
         env['MLC_HF_LOGIN_CMD'] = (
             f"git config --global credential.helper store && "
-            f"{hf_cli} login --token {env['MLC_HF_TOKEN']} --add-to-git-credential\n"
+            f"{hf_cli} auth login --token {env['MLC_HF_TOKEN']} --add-to-git-credential\n"
         )
     elif is_true(str(env.get('MLC_HF_DO_LOGIN'))):
         env['MLC_HF_LOGIN_CMD'] = f"""git config --global credential.helper store && huggingface-cli login
