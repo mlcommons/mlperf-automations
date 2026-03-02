@@ -36,7 +36,7 @@ def postprocess(i):
     gpu_id = -1
 
     for line in lst:
-        print (line)
+        print(line)
 
         j = line.find(':')
         print(j)
