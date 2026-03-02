@@ -28,8 +28,8 @@ variations:
         tags: _rclone
       dae_ac:
         tags: _rclone
-    default: true
   r2-downloader:
+    default: true
     env:
       MLC_DOWNLOAD_TOOL: r2-downloader
     add_deps_recursive:
@@ -155,6 +155,7 @@ variations:
   validation,mlc,r2-downloader:
     env:
       MLC_DOWNLOAD_URL: https://nuscenes.mlcommons-storage.org/metadata/nuscenes-dataset.uri
+      MLC_DOWNLOAD_FILENAME: nuscenes_dataset
   calibration,mlc,r2-downloader:
       MLC_DOWNLOAD_URL: https://nuscenes.mlcommons-storage.org/metadata/nuscenes-dataset.uri
 tests:
@@ -164,6 +165,5 @@ tests:
       - validation,prebuilt,rclone,mlc,dry-run
       - calibration,prebuilt,rclone,mlc,dry-run
       - validation,prebuilt,r2-downloader,mlc,dry-run
-
       - calibration,prebuilt,r2-downloader,mlc,dry-run
 
