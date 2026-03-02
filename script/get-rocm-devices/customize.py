@@ -59,6 +59,7 @@ def postprocess(i):
 
     state['mlc_romlc_num_devices'] = gpu_id + 1
     env['MLC_ROMLC_NUM_DEVICES'] = gpu_id + 1
+    print(env)
 
     state['mlc_romlc_device_prop'] = p
     state['mlc_romlc_devices_prop'] = gpu

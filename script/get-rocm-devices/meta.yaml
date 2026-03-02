@@ -11,7 +11,7 @@ tags:
 cache: false
 
 new_env_keys:
-- MLC_ROMLC_DEVICE_PROP_*
+- MLC_ROMLC_*
 
 can_force_cache: true
 
