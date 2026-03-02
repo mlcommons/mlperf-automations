@@ -53,3 +53,8 @@ if __name__ == "__main__":
             print(f"GPU {idx}:")
             for key, value in gpu_info.items():
                 f.write(f"{key}: {value}\n")
+    with open("tmp-run1.out", "w") as f:
+        for idx, gpu_info in enumerate(gpu_info_list):
+            print(f"GPU {idx}:")
+            for key, value in gpu_info.items():
+                f.write(f"{key}: {value}\n")
