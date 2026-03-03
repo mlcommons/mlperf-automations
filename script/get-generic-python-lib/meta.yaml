@@ -171,6 +171,11 @@ variations:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: google-generativeai
     new_env_keys:
     - MLC_GOOGLE_GENERATIVEAI_VERSION
+  google-genai:
+    env:
+      MLC_GENERIC_PYTHON_PACKAGE_NAME: google-genai
+    new_env_keys:
+    - MLC_GOOGLE_GENAI_VERSION
   groq:
     env:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: groq
