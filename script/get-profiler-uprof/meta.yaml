@@ -48,6 +48,7 @@ tags:
 - get-uprof
 - get
 - uprof
+- profiler
 - uprof-profiler
 tests:
   run_inputs:
@@ -57,7 +58,7 @@ uid: 1530bfcddc3f4fa1
 variations:
   download-and-install:
     # currently not supported as EULA needs to be approved manually
-    default_version: 5.1
+    default_version: 5.2
     env:
       MLC_UPROF_DOWNLOAD: true
     group: install-type
@@ -73,6 +74,11 @@ variations:
       MLC_UPROF_DIR_PATH: '#'
 
 versions:
+  5.2:
+    env:
+      MLC_UPROF_NEEDS_TAR: true
+      MLC_UPROF_URL: https://download.amd.com/developer/eula/uprof/uprof-5-2/AMDuProf_Linux_x64_5.2.606.tar.bz2
+      MLC_VERSION: 5.2.606
   5.1:
     env:
       MLC_UPROF_NEEDS_TAR: true

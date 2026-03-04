@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-02-26 03:04:40*
+*Last updated: 2026-03-05 03:08:19*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -17,6 +17,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [Detection or installation of tools and artifacts](#detection-or-installation-of-tools-and-artifacts)
 - [DevOps automation](#devops-automation)
 - [Docker automation](#docker-automation)
+- [HPC Application](#hpc-application)
 - [MLCommons automation](#mlcommons-automation)
 - [MLCommons interface](#mlcommons-interface)
 - [MLCommons script templates](#mlcommons-script-templates)
@@ -345,7 +346,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - Tags: `get`, `oneapi`, `compiler`, `get-oneapi`
 - **[get-profiler-uprof](get-profiler-uprof/)**
   - Detect or install AMD uprof
-  - Tags: `get-uprof`, `get`, `uprof`, `uprof-profiler`
+  - Tags: `get-uprof`, `get`, `uprof`, `profiler`, `uprof-profiler`
 - **[install-diffusers-from-src](install-diffusers-from-src/)**
   - Build diffusers from sources
   - Tags: `install`, `get`, `src`, `from.src`, `diffusers`, `src-diffusers`
@@ -415,6 +416,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-bazel](get-bazel/)**
   - get-bazel
   - Tags: `get`, `bazel`, `get-bazel`
+- **[get-blas](get-blas/)**
+  - get-blas
+  - Tags: `get`, `lib`, `blas`
 - **[get-blis](get-blis/)**
   - get-blis
   - Tags: `get`, `lib`, `blis`
@@ -604,6 +608,12 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[run-docker-container](run-docker-container/)**
   - run-docker-container
   - Tags: `run`, `docker`, `container`
+
+## HPC Application
+
+- **[app-cp2k](app-cp2k/)**
+  - app-cp2k
+  - Tags: `app`, `cp2k`
 
 ## MLCommons automation
 
@@ -865,6 +875,12 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[detect-os](detect-os/)**
   - detect-os
   - Tags: `detect-os`, `detect`, `os`, `info`
+- **[get-mlperf-multi-node-system-info](get-mlperf-multi-node-system-info/)**
+  - get-mlperf-multi-node-system-info
+  - Tags: `get-mlperf-multi-node-system-info`
+- **[get-mlperf-single-node-system-info](get-mlperf-single-node-system-info/)**
+  - get-mlperf-single-node-system-info
+  - Tags: `get`, `mlperf`, `single-node`, `system-info`
 - **[get-platform-details](get-platform-details/)**
   - get-platform-details
   - Tags: `get`, `platform`, `details`, `platform-details`
@@ -1083,8 +1099,8 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 318
-- **Categories**: 29
+- **Total Scripts**: 322
+- **Categories**: 30
 
 ## Usage
 
