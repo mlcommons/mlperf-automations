@@ -8,9 +8,11 @@ def preprocess(i):
 
     env = i['env']
 
-    if is_true(str(env.get('MLC_DETECT_USING_HIP-PYTHON', ''))):
+    if is_true(str(env.get('MLC_DETECT_USING_HIP_PYTHON', ''))):
+        print("yeah mahn")
         i['run_script_input']['script_name'] = 'detect'
-
+    else:
+        print("hei")
     return {'return': 0}
 
 
@@ -36,10 +38,7 @@ def postprocess(i):
     gpu_id = -1
 
     for line in lst:
-        print (line)
-
         j = line.find(':')
-        print(j)
 
         if j >= 0:
             key = line[:j].strip()
@@ -60,8 +59,6 @@ def postprocess(i):
 
     state['mlc_romlc_num_devices'] = gpu_id + 1
     env['MLC_ROMLC_NUM_DEVICES'] = gpu_id + 1
-    print(gpu)
-    print(env)
 
     state['mlc_romlc_device_prop'] = p
     state['mlc_romlc_devices_prop'] = gpu
