@@ -28,7 +28,7 @@ def preprocess(i):
 
     # Determine platform and architecture for download URL
     if os_info['platform'] == 'windows':
-        # Windows: direct exe download, no extraction needed
+        # Windows: setup exe, installed via run.bat
         package_name = f"Geekbench-{need_version}-WindowsSetup.exe"
         env['MLC_GEEKBENCH_NEED_EXTRACT'] = 'no'
     elif os_info['platform'] == 'linux':
@@ -49,8 +49,7 @@ def preprocess(i):
 
     logger.info(f"{recursion_spaces}    # Prepared package URL: {base_url}")
 
-    # Set env vars that will be picked up by the download-and-extract prehook
-    # dep
+    # Set env vars that will be picked up by the download-and-extract prehook dep
     env['MLC_GEEKBENCH_PACKAGE_URL'] = base_url
     env['MLC_GEEKBENCH_PACKAGE_NAME'] = package_name
     env['MLC_GEEKBENCH_VERSION_MAJOR'] = version_major
@@ -81,14 +80,25 @@ def postprocess(i):
         'MLC_GEEKBENCH_VERSION_MAJOR', need_version.split('.')[0])
 
     if os_info['platform'] == 'windows':
-        # Windows: direct exe, no extraction - use the downloaded file path
-        download_path = env.get('MLC_GEEKBENCH_DOWNLOAD_PATH', '')
-        if download_path == '':
-            return {'return': 1,
-                    'error': 'MLC_GEEKBENCH_DOWNLOAD_PATH not set - download may have failed'}
+        # Windows: run.bat ran the installer and exported paths via tmp-run-env.out
+        # MLC_GEEKBENCH_BIN_WITH_PATH is set from tmp-run-env.out
+        geekbench_bin = env.get('MLC_GEEKBENCH_BIN_WITH_PATH', '')
+        install_dir = env.get('MLC_GEEKBENCH_WINDOWS_INSTALL_DIR', '')
 
-        geekbench_bin = download_path
-        geekbench_dir = os.path.dirname(download_path)
+        if geekbench_bin == '' or not os.path.isfile(geekbench_bin):
+            # Fallback: try to find in the install dir
+            if install_dir and os.path.isdir(install_dir):
+                for f in os.listdir(install_dir):
+                    if f.lower().startswith('geekbench') and f.lower().endswith('.exe'):
+                        geekbench_bin = os.path.join(install_dir, f)
+                        break
+
+        if geekbench_bin == '' or not os.path.isfile(geekbench_bin):
+            return {'return': 1,
+                    'error': 'Geekbench binary not found after installation. '
+                             'The setup installer may have failed.'}
+
+        geekbench_dir = os.path.dirname(geekbench_bin)
 
     else:
         # Linux / macOS: extracted archive
