@@ -26,7 +26,8 @@ tags:
 uid: eec4b864cb654974
 tests:
   run_inputs:
-  - variations_list: upload
+  - variations_list:
+      - upload
 variations:
   cpu:
     default: true
