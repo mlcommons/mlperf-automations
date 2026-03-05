@@ -90,7 +90,7 @@ def postprocess(i):
             # Fallback: try to find in the install dir
             if install_dir and os.path.isdir(install_dir):
                 for f in os.listdir(install_dir):
-                    if f.lower().startswith('geekbench') and f.lower().endswith('.exe'):
+                    if f.lower().startswith('geekbench6') and f.lower().endswith('.exe'):
                         geekbench_bin = os.path.join(install_dir, f)
                         break
 
