@@ -13,7 +13,7 @@ def preprocess(i):
     geekbench_bin = env.get('MLC_GEEKBENCH_BIN_WITH_PATH', '')
     if geekbench_bin == '' or not os.path.isfile(geekbench_bin):
         return {'return': 1,
-                'error': 'Geekbench binary not found. Ensure get-geekbench dependency ran successfully.'}
+                'error': f'Geekbench binary {geekbench_bin} not found. Ensure get-geekbench dependency ran successfully.'}
 
     q = '"' if os_info['platform'] == 'windows' else "'"
 
