@@ -2,20 +2,23 @@
 
 # Benchmark Program - Geekbench (Unix)
 
+CUR_DIR=$PWD
+
 if [ -z "${MLC_RUN_DIR}" ]; then
   echo "MLC_RUN_DIR is not set"
   exit 1
 fi
 
-cd "${MLC_RUN_DIR}"
+cd "${MLC_RUN_DIR}" || exit 1
 
-# Register license if provided
-if [ -n "${MLC_GEEKBENCH_UNLOCK_CMD}" ]; then
+# Register license if key is provided
+if [ -n "${MLC_GEEKBENCH_LICENSE_KEY}" ]; then
   echo ""
   echo "Registering Geekbench license..."
-  eval ${MLC_GEEKBENCH_UNLOCK_CMD}
-  if [ $? -ne 0 ]; then
-    echo "WARNING: Geekbench license registration failed (continuing anyway)"
+  "${MLC_GEEKBENCH_BIN_WITH_PATH}" --unlock "${MLC_GEEKBENCH_LICENSE_EMAIL}" "${MLC_GEEKBENCH_LICENSE_KEY}"
+  unlock_status=$?
+  if [ ${unlock_status} -ne 0 ]; then
+    echo "WARNING: Geekbench license registration failed (exit code: ${unlock_status}), continuing anyway"
   else
     echo "Geekbench license registered successfully."
   fi

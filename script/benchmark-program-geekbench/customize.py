@@ -17,16 +17,18 @@ def preprocess(i):
 
     q = '"' if os_info['platform'] == 'windows' else "'"
 
-    # License registration (geekbench6 --unlock <email> <key>)
+    # License registration
     license_key = env.get('MLC_GEEKBENCH_LICENSE_KEY', '').strip()
     license_email = env.get('MLC_GEEKBENCH_LICENSE_EMAIL', '').strip()
     if license_key:
         if not license_email:
             return {'return': 1,
                     'error': 'MLC_GEEKBENCH_LICENSE_EMAIL is required when MLC_GEEKBENCH_LICENSE_KEY is provided'}
-        unlock_cmd = f"{q}{geekbench_bin}{q} --unlock {license_email} {license_key}"
-        env['MLC_GEEKBENCH_UNLOCK_CMD'] = unlock_cmd
-        logger.info(f"Geekbench unlock command prepared: {unlock_cmd}")
+        # Pass parts separately so shell scripts can construct the command
+        # without quoting issues
+        env['MLC_GEEKBENCH_LICENSE_KEY'] = license_key
+        env['MLC_GEEKBENCH_LICENSE_EMAIL'] = license_email
+        logger.info("Geekbench license key provided, will register before benchmark")
 
     # Build the run command
     args = []
