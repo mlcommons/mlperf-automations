@@ -26,7 +26,7 @@ def preprocess(i):
                     'error': 'MLC_GEEKBENCH_LICENSE_EMAIL is required when MLC_GEEKBENCH_LICENSE_KEY is provided'}
         unlock_cmd = f"{q}{geekbench_bin}{q} --unlock {license_email} {license_key}"
         env['MLC_GEEKBENCH_UNLOCK_CMD'] = unlock_cmd
-        logger.info("Geekbench unlock command prepared")
+        logger.info(f"Geekbench unlock command prepared: {unlock_cmd}")
 
     # Build the run command
     args = []

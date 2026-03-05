@@ -98,17 +98,17 @@ def postprocess(i):
 
     elif os_info['platform'] == 'darwin':
         # macOS: binary is inside the .app bundle
-        # e.g. Geekbench 6.app/Contents/MacOS/Geekbench 6
+        # e.g. Geekbench 6.app/Contents/Resources/geekbench6
         app_pattern = os.path.join(extracted_path, 'Geekbench*.app')
         app_matches = glob.glob(app_pattern)
         if app_matches:
             app_dir = app_matches[0]
-            macos_dir = os.path.join(app_dir, 'Contents', 'MacOS')
+            macos_dir = os.path.join(app_dir, 'Contents', 'Resources')
             # Find the binary inside MacOS dir
             geekbench_bin = None
             if os.path.isdir(macos_dir):
                 for f in os.listdir(macos_dir):
-                    if f.lower().startswith('geekbench'):
+                    if f.lower().startswith('geekbench6') and "." not in f:
                         geekbench_bin = os.path.join(macos_dir, f)
                         break
             if geekbench_bin is None:
@@ -125,7 +125,6 @@ def postprocess(i):
         bin_name = f"geekbench{version_major}"
         geekbench_bin = os.path.join(geekbench_dir, bin_name)
 
-    print(os_info)
     # Make executable on Unix
     if os_info['platform'] != 'windows' and os.path.isfile(geekbench_bin):
         os.chmod(geekbench_bin, 0o755)
