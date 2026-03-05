@@ -1,6 +1,7 @@
 from mlc import utils
 import os
 import platform
+import glob
 
 
 def preprocess(i):
@@ -90,13 +91,38 @@ def postprocess(i):
                 geekbench_dir = full
                 break
 
-    # Determine binary name based on platform
+    # Determine binary path based on platform
     if os_info['platform'] == 'windows':
         bin_name = f"geekbench{version_major}.exe"
-    else:
-        bin_name = f"geekbench{version_major}"
+        geekbench_bin = os.path.join(geekbench_dir, bin_name)
 
-    geekbench_bin = os.path.join(geekbench_dir, bin_name)
+    elif os_info['platform'] == 'darwin':
+        # macOS: binary is inside the .app bundle
+        # e.g. Geekbench 6.app/Contents/MacOS/Geekbench 6
+        app_pattern = os.path.join(geekbench_dir, 'Geekbench*.app')
+        app_matches = glob.glob(app_pattern)
+        if app_matches:
+            app_dir = app_matches[0]
+            macos_dir = os.path.join(app_dir, 'Contents', 'MacOS')
+            # Find the binary inside MacOS dir
+            geekbench_bin = None
+            if os.path.isdir(macos_dir):
+                for f in os.listdir(macos_dir):
+                    if f.lower().startswith('geekbench'):
+                        geekbench_bin = os.path.join(macos_dir, f)
+                        break
+            if geekbench_bin is None:
+                geekbench_bin = os.path.join(macos_dir, f"Geekbench {version_major}")
+            geekbench_dir = macos_dir
+        else:
+            # Fallback: try flat binary name
+            bin_name = f"geekbench{version_major}"
+            geekbench_bin = os.path.join(geekbench_dir, bin_name)
+
+    else:
+        # Linux
+        bin_name = f"geekbench{version_major}"
+        geekbench_bin = os.path.join(geekbench_dir, bin_name)
 
     # Make executable on Unix
     if os_info['platform'] != 'windows' and os.path.isfile(geekbench_bin):
@@ -111,5 +137,7 @@ def postprocess(i):
 
     logger.info(
         f"{recursion_spaces}    # Geekbench {need_version} installed to {geekbench_dir}")
+    logger.info(
+        f"{recursion_spaces}    # Geekbench binary: {geekbench_bin}")
 
     return {'return': 0, 'version': need_version}
