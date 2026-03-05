@@ -9,6 +9,18 @@ fi
 
 cd "${MLC_RUN_DIR}"
 
+# Register license if provided
+if [ -n "${MLC_GEEKBENCH_UNLOCK_CMD}" ]; then
+  echo ""
+  echo "Registering Geekbench license..."
+  eval ${MLC_GEEKBENCH_UNLOCK_CMD}
+  if [ $? -ne 0 ]; then
+    echo "WARNING: Geekbench license registration failed (continuing anyway)"
+  else
+    echo "Geekbench license registered successfully."
+  fi
+fi
+
 echo ""
 echo "***********************************************************************"
 echo "Running Geekbench benchmark..."

@@ -1,17 +1,7 @@
 #!/bin/bash
 
-# Geekbench get script - version detection
-# The actual download and extraction is handled in customize.py preprocess
+# get-geekbench run script
+# Download and extraction is handled by the download-and-extract prehook dependency.
+# Path setup is handled in postprocess() of customize.py.
 
-GEEKBENCH_BIN="${MLC_GEEKBENCH_BIN_WITH_PATH}"
-
-if [ ! -f "${GEEKBENCH_BIN}" ]; then
-  echo "ERROR: Geekbench binary not found at ${GEEKBENCH_BIN}"
-  exit 1
-fi
-
-echo "Geekbench binary found at: ${GEEKBENCH_BIN}"
-
-# Detect version
-${GEEKBENCH_BIN} --version > tmp-ver.out 2>&1 || true
-test -f tmp-ver.out || exit 1
+echo "Geekbench download and extraction completed via download-and-extract dependency."

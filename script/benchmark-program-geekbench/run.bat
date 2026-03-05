@@ -10,6 +10,18 @@ if "%MLC_RUN_DIR%" == "" (
 
 cd /d "%MLC_RUN_DIR%"
 
+rem Register license if provided
+if not "%MLC_GEEKBENCH_UNLOCK_CMD%" == "" (
+  echo.
+  echo Registering Geekbench license...
+  %MLC_GEEKBENCH_UNLOCK_CMD%
+  if !ERRORLEVEL! NEQ 0 (
+    echo WARNING: Geekbench license registration failed ^(continuing anyway^)
+  ) else (
+    echo Geekbench license registered successfully.
+  )
+)
+
 echo.
 echo ***********************************************************************
 echo Running Geekbench benchmark...
@@ -38,5 +50,3 @@ if exist "%MLC_GEEKBENCH_RESULTS_FILE%" (
   echo.
   echo WARNING: Geekbench results file not found at %MLC_GEEKBENCH_RESULTS_FILE%
 )
-
-exit /b 0

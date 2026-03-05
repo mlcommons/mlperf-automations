@@ -12,7 +12,10 @@ deps:
   - get-geekbench
   tags: get,geekbench
 input_mapping:
+  license_email: MLC_GEEKBENCH_LICENSE_EMAIL
+  license_key: MLC_GEEKBENCH_LICENSE_KEY
   workload: MLC_GEEKBENCH_WORKLOAD
+  local_file: MLC_GEEKBENCH_LOCAL_FILE
 new_env_keys:
 - MLC_GEEKBENCH_*
 tags:
@@ -69,3 +72,7 @@ versions:
     adr:
       get-geekbench:
         tags: _version.6.4.0
+  6.6.0:
+    adr:
+      get-geekbench:
+        tags: _version.6.6.0

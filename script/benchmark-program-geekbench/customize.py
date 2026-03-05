@@ -15,6 +15,19 @@ def preprocess(i):
         return {'return': 1,
                 'error': 'Geekbench binary not found. Ensure get-geekbench dependency ran successfully.'}
 
+    q = '"' if os_info['platform'] == 'windows' else "'"
+
+    # License registration (geekbench6 --unlock <email> <key>)
+    license_key = env.get('MLC_GEEKBENCH_LICENSE_KEY', '').strip()
+    license_email = env.get('MLC_GEEKBENCH_LICENSE_EMAIL', '').strip()
+    if license_key:
+        if not license_email:
+            return {'return': 1,
+                    'error': 'MLC_GEEKBENCH_LICENSE_EMAIL is required when MLC_GEEKBENCH_LICENSE_KEY is provided'}
+        unlock_cmd = f"{q}{geekbench_bin}{q} --unlock {license_email} {license_key}"
+        env['MLC_GEEKBENCH_UNLOCK_CMD'] = unlock_cmd
+        logger.info("Geekbench unlock command prepared")
+
     # Build the run command
     args = []
 
@@ -39,8 +52,6 @@ def preprocess(i):
 
     env['MLC_GEEKBENCH_RESULTS_FILE'] = results_file
     env['MLC_GEEKBENCH_RESULTS_DIR'] = results_dir
-
-    q = '"' if os_info['platform'] == 'windows' else "'"
 
     cmd = f"{q}{geekbench_bin}{q} {' '.join(args)}"
 

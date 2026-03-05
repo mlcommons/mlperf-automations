@@ -1,14 +1,7 @@
 @echo off
 
-set GEEKBENCH_BIN=%MLC_GEEKBENCH_BIN_WITH_PATH%
+rem get-geekbench run script
+rem Download and extraction is handled by the download-and-extract prehook dependency.
+rem Path setup is handled in postprocess() of customize.py.
 
-if not exist "%GEEKBENCH_BIN%" (
-  echo ERROR: Geekbench binary not found at %GEEKBENCH_BIN%
-  exit /b 1
-)
-
-echo Geekbench binary found at: %GEEKBENCH_BIN%
-
-rem Detect version
-"%GEEKBENCH_BIN%" --version > tmp-ver.out 2>&1
-IF %ERRORLEVEL% NEQ 0 EXIT %ERRORLEVEL%
+echo Geekbench download and extraction completed via download-and-extract dependency.

@@ -44,11 +44,21 @@ def preprocess(i):
 
     logger.info(f"{recursion_spaces}    # Prepared package URL: {base_url}")
 
-    # Set env vars that will be picked up by the download-and-extract prehook
-    # dep
+    # Set env vars that will be picked up by the download-and-extract prehook dep
     env['MLC_GEEKBENCH_PACKAGE_URL'] = base_url
     env['MLC_GEEKBENCH_PACKAGE_NAME'] = package_name
     env['MLC_GEEKBENCH_VERSION_MAJOR'] = version_major
+
+    # If a local file is provided, pass it to download-and-extract
+    # so it skips downloading and uses the local file directly
+    local_file = env.get('MLC_GEEKBENCH_LOCAL_FILE', '')
+    if local_file:
+        if not os.path.isfile(local_file):
+            return {'return': 1,
+                    'error': f"Local file not found: {local_file}"}
+        logger.info(
+            f"{recursion_spaces}    # Using local file: {local_file}")
+        env['MLC_DOWNLOAD_LOCAL_FILE_PATH'] = local_file
 
     return {'return': 0}
 
