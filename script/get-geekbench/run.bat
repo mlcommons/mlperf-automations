@@ -37,7 +37,7 @@ if %exitstatus% NEQ 0 (
 
 rem Verify installation and find geekbench exe
 set "GEEKBENCH_BIN="
-for %%f in ("%INSTALL_DIR%\geekbench*.exe") do (
+for %%f in ("%INSTALL_DIR%\geekbench6*.exe") do (
   if "!GEEKBENCH_BIN!" == "" (
     set "GEEKBENCH_BIN=%%f"
   )
