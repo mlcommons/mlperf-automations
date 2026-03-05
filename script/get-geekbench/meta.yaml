@@ -5,7 +5,7 @@ cache: true
 category: Detection or installation of tools and artifacts
 default_env:
   MLC_GEEKBENCH_VERSION_MAJOR: '6'
-default_version: 6.4.0
+default_version: 6.6.0
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -42,5 +42,8 @@ versions:
     env:
       MLC_GEEKBENCH_VERSION_MAJOR: '6'
   6.4.0:
+    env:
+      MLC_GEEKBENCH_VERSION_MAJOR: '6'
+  6.6.0:
     env:
       MLC_GEEKBENCH_VERSION_MAJOR: '6'

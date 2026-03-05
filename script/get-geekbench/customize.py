@@ -36,7 +36,7 @@ def preprocess(i):
             arch_suffix = 'Linux'
         package_name = f"Geekbench-{need_version}-{arch_suffix}.tar.gz"
     elif os_info['platform'] == 'darwin':
-        package_name = f"Geekbench-{need_version}-Mac.tar.gz"
+        package_name = f"Geekbench-{need_version}-Mac.zip"
     else:
         return {'return': 1,
                 'error': f"Unsupported platform: {os_info['platform']}"}
@@ -99,7 +99,7 @@ def postprocess(i):
     elif os_info['platform'] == 'darwin':
         # macOS: binary is inside the .app bundle
         # e.g. Geekbench 6.app/Contents/MacOS/Geekbench 6
-        app_pattern = os.path.join(geekbench_dir, 'Geekbench*.app')
+        app_pattern = os.path.join(extracted_path, 'Geekbench*.app')
         app_matches = glob.glob(app_pattern)
         if app_matches:
             app_dir = app_matches[0]
@@ -124,6 +124,7 @@ def postprocess(i):
         bin_name = f"geekbench{version_major}"
         geekbench_bin = os.path.join(geekbench_dir, bin_name)
 
+    print(os_info)
     # Make executable on Unix
     if os_info['platform'] != 'windows' and os.path.isfile(geekbench_bin):
         os.chmod(geekbench_bin, 0o755)
