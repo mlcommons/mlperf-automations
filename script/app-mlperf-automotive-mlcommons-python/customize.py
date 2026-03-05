@@ -62,7 +62,7 @@ def preprocess(i):
             env['MLC_NUM_THREADS'] = env.get('MLC_HOST_CPU_TOTAL_CORES', '1')
 
     if env.get('MLC_MLPERF_LOADGEN_MAX_BATCHSIZE', '') != '' and not env.get(
-            'MLC_MLPERF_MODEL_SKIP_BATCHING', False) and env['MLC_MODEL'] != "llama3_2-3b":
+            'MLC_MLPERF_MODEL_SKIP_BATCHING', False) and env['MLC_MODEL'] != "llama3_1-8b":
         env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] += " --max-batchsize " + \
             str(env['MLC_MLPERF_LOADGEN_MAX_BATCHSIZE'])
 
