@@ -96,7 +96,7 @@ def postprocess(i):
         automotive_root, 'automotive', '2d-object-detection')
     env['MLC_MLPERF_INFERENCE_DEEPLABV3PLUS_PATH'] = os.path.join(
         automotive_root, 'automotive', 'semantic-segmentation')
-    env['MLC_MLPERF_INFERENCE_LLAMA3_2_3B_PATH'] = os.path.join(
+    env['MLC_MLPERF_INFERENCE_LLAMA3_1_8B_PATH'] = os.path.join(
         automotive_root, 'automotive', 'llm')
 
     env['MLC_GET_DEPENDENT_CACHED_PATH'] = automotive_root
