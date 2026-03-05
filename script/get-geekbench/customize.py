@@ -30,15 +30,17 @@ def preprocess(i):
     if os_info['platform'] == 'windows':
         # Windows: direct exe download, no extraction needed
         package_name = f"Geekbench-{need_version}-WindowsSetup.exe"
-        env['MLC_DAE_EXTRACT_DOWNLOADED'] = 'no'
+        env['MLC_GEEKBENCH_NEED_EXTRACT'] = 'no'
     elif os_info['platform'] == 'linux':
         if host_os_machine in ('aarch64', 'arm64'):
             arch_suffix = 'LinuxARMPreview'
         else:
             arch_suffix = 'Linux'
         package_name = f"Geekbench-{need_version}-{arch_suffix}.tar.gz"
+        env['MLC_GEEKBENCH_NEED_EXTRACT'] = 'yes'
     elif os_info['platform'] == 'darwin':
         package_name = f"Geekbench-{need_version}-Mac.zip"
+        env['MLC_GEEKBENCH_NEED_EXTRACT'] = 'yes'
     else:
         return {'return': 1,
                 'error': f"Unsupported platform: {os_info['platform']}"}

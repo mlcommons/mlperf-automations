@@ -17,7 +17,11 @@ new_env_keys:
 - MLC_GET_DEPENDENT_CACHED_PATH
 - +PATH
 prehook_deps:
-- env:
+# Download and extract for Linux/macOS
+- enable_if_env:
+    MLC_GEEKBENCH_NEED_EXTRACT:
+    - 'yes'
+  env:
     MLC_DAE_EXTRACT_DOWNLOADED: 'yes'
     MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_GEEKBENCH_DOWNLOAD_PATH
     MLC_EXTRACT_FINAL_ENV_NAME: MLC_GEEKBENCH_EXTRACTED_PATH
@@ -26,6 +30,20 @@ prehook_deps:
   names:
   - download-geekbench
   tags: download-and-extract,_extract
+  update_tags_from_env_with_prefix:
+    _url.:
+    - MLC_GEEKBENCH_PACKAGE_URL
+# Download only for Windows (direct exe)
+- enable_if_env:
+    MLC_GEEKBENCH_NEED_EXTRACT:
+    - 'no'
+  env:
+    MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_GEEKBENCH_DOWNLOAD_PATH
+  extra_cache_tags: geekbench
+  force_cache: true
+  names:
+  - download-geekbench
+  tags: download-and-extract
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_GEEKBENCH_PACKAGE_URL
