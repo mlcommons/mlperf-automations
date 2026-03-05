@@ -24,6 +24,9 @@ tags:
 - benchmark-geekbench
 - benchmark-program-geekbench
 uid: eec4b864cb654974
+tests:
+  run_inputs:
+  - variations_list: upload
 variations:
   cpu:
     default: true
