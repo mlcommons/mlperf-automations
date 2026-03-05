@@ -44,7 +44,8 @@ def preprocess(i):
 
     logger.info(f"{recursion_spaces}    # Prepared package URL: {base_url}")
 
-    # Set env vars that will be picked up by the download-and-extract prehook dep
+    # Set env vars that will be picked up by the download-and-extract prehook
+    # dep
     env['MLC_GEEKBENCH_PACKAGE_URL'] = base_url
     env['MLC_GEEKBENCH_PACKAGE_NAME'] = package_name
     env['MLC_GEEKBENCH_VERSION_MAJOR'] = version_major
