@@ -112,7 +112,8 @@ def postprocess(i):
                         geekbench_bin = os.path.join(macos_dir, f)
                         break
             if geekbench_bin is None:
-                geekbench_bin = os.path.join(macos_dir, f"Geekbench {version_major}")
+                geekbench_bin = os.path.join(
+                    macos_dir, f"Geekbench {version_major}")
             geekbench_dir = macos_dir
         else:
             # Fallback: try flat binary name
