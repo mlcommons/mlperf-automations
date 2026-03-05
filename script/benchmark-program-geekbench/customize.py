@@ -28,7 +28,8 @@ def preprocess(i):
         # without quoting issues
         env['MLC_GEEKBENCH_LICENSE_KEY'] = license_key
         env['MLC_GEEKBENCH_LICENSE_EMAIL'] = license_email
-        logger.info("Geekbench license key provided, will register before benchmark")
+        logger.info(
+            "Geekbench license key provided, will register before benchmark")
 
     # Build the run command
     args = []
