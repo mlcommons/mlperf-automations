@@ -1,0 +1,71 @@
+alias: benchmark-program-geekbench
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: Benchmarking
+cache: true
+default_env:
+  MLC_GEEKBENCH_WORKLOAD: ''
+deps:
+- tags: detect,os
+- tags: detect,cpu
+- names:
+  - get-geekbench
+  tags: get,geekbench
+input_mapping:
+  workload: MLC_GEEKBENCH_WORKLOAD
+new_env_keys:
+- MLC_GEEKBENCH_*
+tags:
+- benchmark
+- geekbench
+- benchmark-geekbench
+- benchmark-program-geekbench
+uid: eec4b864cb654974
+variations:
+  cpu:
+    default: true
+    env:
+      MLC_GEEKBENCH_WORKLOAD: ''
+    group: workload
+  compute:
+    env:
+      MLC_GEEKBENCH_WORKLOAD: '--compute'
+    group: workload
+  gpu-opencl:
+    env:
+      MLC_GEEKBENCH_WORKLOAD: '--compute OpenCL'
+    group: workload
+  gpu-vulkan:
+    env:
+      MLC_GEEKBENCH_WORKLOAD: '--compute Vulkan'
+    group: workload
+  gpu-cuda:
+    env:
+      MLC_GEEKBENCH_WORKLOAD: '--compute CUDA'
+    group: workload
+  gpu-metal:
+    env:
+      MLC_GEEKBENCH_WORKLOAD: '--compute Metal'
+    group: workload
+  no-upload:
+    default: true
+    env:
+      MLC_GEEKBENCH_NO_UPLOAD: 'yes'
+    group: upload-mode
+  upload:
+    env:
+      MLC_GEEKBENCH_NO_UPLOAD: 'no'
+    group: upload-mode
+versions:
+  5.5.1:
+    adr:
+      get-geekbench:
+        tags: _version.5.5.1
+  6.3.0:
+    adr:
+      get-geekbench:
+        tags: _version.6.3.0
+  6.4.0:
+    adr:
+      get-geekbench:
+        tags: _version.6.4.0

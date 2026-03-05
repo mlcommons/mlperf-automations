@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-03-05 03:08:19*
+*Last updated: 2026-03-05 16:16:11*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -10,6 +10,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [AI/ML frameworks](#aiml-frameworks)
 - [AI/ML models](#aiml-models)
 - [AI/ML optimization](#aiml-optimization)
+- [Benchmarking](#benchmarking)
 - [CUDA automation](#cuda-automation)
 - [Cloud automation](#cloud-automation)
 - [Compiler automation](#compiler-automation)
@@ -267,6 +268,12 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - prune-bert-models
   - Tags: `prune`, `bert-models`, `bert-prune`, `prune-bert-models`
 
+## Benchmarking
+
+- **[benchmark-program-geekbench](benchmark-program-geekbench/)**
+  - benchmark-program-geekbench
+  - Tags: `benchmark`, `geekbench`, `benchmark-geekbench`, `benchmark-program-geekbench`
+
 ## CUDA automation
 
 - **[get-cuda](get-cuda/)**
@@ -434,6 +441,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-docker](get-docker/)**
   - get-docker
   - Tags: `get`, `install`, `docker`, `engine`
+- **[get-geekbench](get-geekbench/)**
+  - get-geekbench
+  - Tags: `get`, `geekbench`, `get-geekbench`
 - **[get-generic-sys-util](get-generic-sys-util/)**
   - get-generic-sys-util
   - Tags: `get`, `sys-util`, `generic`, `generic-sys-util`
@@ -1099,8 +1109,8 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 322
-- **Categories**: 30
+- **Total Scripts**: 324
+- **Categories**: 31
 
 ## Usage
 
