@@ -44,6 +44,7 @@ mlcr benchmark,geekbench,benchmark-geekbench,benchmark-program-geekbench
 | `--license_key` |  |  | `` |
 | `--workload` |  |  | `` |
 | `--local_file` |  |  | `` |
+| `--export_json` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
