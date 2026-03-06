@@ -47,13 +47,10 @@ MLC Script Automation is the engine that makes native shell scripts (bash/bat) *
 - **Experiment tracking** — results can be recorded with system state snapshots for reproducibility.
 
 > **Historical Note:** This automation framework was originally developed using
-> the **CMIng** Python package (`cmind`) as its interface layer. The project has
+> the **CMind** Python package (`cmind`) as its interface layer. The project has
 > since migrated to the **MLCFlow** interface (`mlcflow`), which serves as the
-> current command-line and programmatic entry point. Scripts and metadata authored
-> for CMIng remain structurally compatible — the core execution lifecycle,
-> caching, and dependency resolution architecture are preserved — but all new
-> development and user-facing commands now use the `mlc` / `mlcr` CLI provided
-> by MLCFlow.
+> current command-line and programmatic entry point. All the old scripts and metadata 
+> for MLPerf automations have been made compatible for **MLCFlow**.
 
 ---
 
@@ -857,7 +854,6 @@ mlcr "benchmark,program" --experiment --exp.batch_size=1,2,4,8
 | `--dirty` | Don't clean temporary files |
 | `--save_env` | Save env and state to files |
 | `--json` / `-j` | Print output as JSON |
-| `--docker` | Generate Dockerfile |
 | `--docker_run` | Run inside Docker |
 | `--experiment` | Enable experiment tracking |
 | `--help` | Show help for a specific script |
