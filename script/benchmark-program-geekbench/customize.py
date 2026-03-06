@@ -43,15 +43,17 @@ def preprocess(i):
     if is_true(env.get('MLC_GEEKBENCH_NO_UPLOAD', 'yes')):
         args.append('--no-upload')
 
+    results_dir = env.get('MLC_GEEKBENCH_RESULTS_DIR', os.getcwd())
+    
     # Export results as JSON
     if is_true(env.get('MLC_GEEKBENCH_EXPORT_JSON', 'no')):
-        results_dir = env.get('MLC_GEEKBENCH_RESULTS_DIR', os.getcwd())
         os.makedirs(results_dir, exist_ok=True)
         results_file = os.path.join(results_dir, 'geekbench_results.json')
         args.append('--export-json')
         args.append(f'"{results_file}"')
 
         env['MLC_GEEKBENCH_RESULTS_FILE'] = results_file
+        logger.info(f"Results will be saved to: {results_file}")
         env['MLC_GEEKBENCH_RESULTS_DIR'] = results_dir
 
     cmd = f"{q}{geekbench_bin}{q} {' '.join(args)}"
@@ -60,7 +62,6 @@ def preprocess(i):
     env['MLC_RUN_DIR'] = results_dir
 
     logger.info(f"Geekbench command: {cmd}")
-    logger.info(f"Results will be saved to: {results_file}")
 
     return {'return': 0}
 
