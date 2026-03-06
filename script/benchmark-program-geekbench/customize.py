@@ -44,7 +44,7 @@ def preprocess(i):
         args.append('--no-upload')
 
     results_dir = env.get('MLC_GEEKBENCH_RESULTS_DIR', os.getcwd())
-    
+
     # Export results as JSON
     if is_true(env.get('MLC_GEEKBENCH_EXPORT_JSON', 'no')):
         os.makedirs(results_dir, exist_ok=True)
