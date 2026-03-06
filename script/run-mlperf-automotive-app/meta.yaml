@@ -224,6 +224,11 @@ variations:
     env:
       MLC_MLPERF_INFERENCE_VERSION: v0.5
 
+  v1.0:
+    group: benchmark-version
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: v1.0
+
   performance-and-accuracy:
     default: true
     base:
