@@ -16,6 +16,10 @@ deps:
     MLC_SUDO_USER:
     - 'no'
   tags: get,sys-util,generic,_psmisc
+- skip_if_any_env:
+    MLC_HOST_OS_TYPE:
+    - windows
+  tags: get,sys-util,generic,_jq
 - enable_if_env:
     MLC_HOST_OS_TYPE:
     - linux
@@ -33,6 +37,8 @@ deps:
 input_mapping:
   out_dir_path: MLC_PLATFORM_DETAILS_DIR_PATH
   out_file_name: MLC_PLATFORM_DETAILS_FILE_NAME
+new_env_keys:
+  - MLC_PLATFORM_DETAILS_FILE_PATH
 prehook_deps:
 - enable_if_env:
     MLC_HOST_OS_TYPE:
@@ -61,3 +67,10 @@ tags:
 - details
 - platform-details
 uid: f0801943c17f4e48
+variations:
+  cuda:
+    group: gpu-driver
+    deps:
+    - tags: get,cuda-devices
+    env:
+      MLC_ACCELERATOR_BACKEND: "cuda"

@@ -38,6 +38,12 @@ input_mapping:
   extra: MLC_GCC_EXTRA_CONFIGURE_STRING
   pull_changes: MLC_GCC_REPO_PULL_CHANGES
 
+update_meta_if_env:
+  - default_variations:
+      repo: darwin
+    enable_if_env:
+      MLC_HOST_OS_TYPE:
+        - darwin
 
 new_env_keys:
   - MLC_GCC_*

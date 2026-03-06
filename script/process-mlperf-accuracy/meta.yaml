@@ -18,6 +18,7 @@ deps:
       - nuscenes
       - cognata_deeplab
       - cognata_ssd
+      - mmlu
 - names:
   - automotive-src
   - accuracy-check-src
@@ -27,6 +28,7 @@ deps:
       - nuscenes
       - cognata_deeplab
       - cognata_ssd
+      - mmlu
 input_mapping:
   rerun: MLC_RERUN
   result_dir: MLC_MLPERF_ACCURACY_RESULTS_DIR
@@ -382,6 +384,17 @@ variations:
       - tags: get,dataset,mlperf-inference,yolo-coco2017-filtered,_mlc,_r2-downloader
         names:
           - yolo-v11-dataset-download
+  mmlu:
+    group: dataset
+    env:
+      MLC_DATASET: mmlu
+    deps:
+      - tags: get-dataset-mmlu
+        skip_if_env:
+          MLC_RUN_STATE_DOCKER:
+            - "yes"
+        names:
+          - dataset-mmlu
   edge:
     group: category
   datacenter:

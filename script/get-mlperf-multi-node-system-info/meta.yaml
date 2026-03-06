@@ -1,0 +1,81 @@
+alias: get-mlperf-multi-node-system-info
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: false
+category: Platform information
+deps:
+- tags: detect,os
+- names:
+  - python
+  - python3
+  tags: get,python
+prehook_deps:
+- tags: get,mlperf,single-node,system-info
+  names:
+  - mlperf-single-node-system-info
+  skip_if_env:
+    MLC_EXCLUDE_CURRENT_NODE:
+    - 'True'
+  env:
+    MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH: <<<MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH>>>
+    MLC_SINGLE_NODE_SYSTEM_INFO_FILE_NAME: mlperf-system-info-single-node-current.json
+input_mapping:
+  # NOTE: some of the fields are automatically detected. Need to decide how to handle if user also specifies one.
+  ########## Organization Metadata ############
+  submitter_org_name: MLC_MLPERF_SUBMITTER # eg;NVIDIA; Dell + Broadcom
+  submitter_contact: MLC_MLPERF_SUBMITTER_CONTACT # eg; ARealPerson@mlcommons.org
+  submission_id: MLC_MLPERF_SUBMISSION_ID # eg; # 42cf4c09-e67b-4546-88fe-2877add2b449
+  submission_date: MLC_MLPERF_SUBMISSION_DATE # eg; ideally should be populated by the submission infrastructure
+  publish_date: MLC_MLPERF_PUBLISH_DATE # eg; ideally should be populated by the submission infrastructure
+  ######################################
+  ########## System Metadata ############
+  system_name: MLC_MLPERF_SYSTEM_NAME # eg; NVIDIA DGX A100
+  category: MLC_MLPERF_SUBMISSION_SYSTEM_TYPE # eg; datacenter, edge, etc
+  system_type_detail: MLC_MLPERF_SUBMISSION_SYSTEM_TYPE_DETAIL # eg; for datacenter: cloud, on-premises, etc and for edge: edge-server or edge-device
+  status: MLC_MLPERF_SUBMISSION_SYSTEM_STATUS # eg; Available, Preview, Research_internal_development(RDI)
+  system_size: MLC_MLPERF_SYSTEM_SIZE # eg; 8x GB300 + 12x GB300
+  system_node_ensemble_count: MLC_MLPERF_SYSTEM_NODE_ENSEMBLE_COUNT # eg; 4
+  system_node_ensemble_total: MLC_MLPERF_SYSTEM_NODE_ENSEMBLE_TOTAL # eg; 32
+  ######################################
+  other_hardware: MLC_MLPERF_OTHER_HARDWARE # Describes any other performance relevant hardware in the node, freeform field.
+  cooling: MLC_MLPERF_COOLING # eg; air, liquid, etc
+  hw_notes: MLC_MLPERF_HARDWARE_NOTES # Any other relevant notes about the hardware, freeform field
+  ########## Model Metadata ############
+  division: MLC_MLPERF_SUBMISSION_DIVISION # eg; closed, open
+  model_id: MLC_MLPERF_MODEL_ID
+  model_name: MLC_MLPERF_MODEL
+  model_precision: MLC_MLPERF_MODEL_PRECISION
+  link_to_model: MLC_MLPERF_MODEL_LINK
+  link_to_model_transformation: MLC_MLPERF_MODEL_TRANSFORMATION_LINK
+  model_notes: MLC_MLPERF_MODEL_NOTES
+  ######################################
+  ########## Dataset MetaData ##########
+  dataset_id: MLC_MLPERF_DATASET_ID
+  dataset_name: MLC_MLPERF_DATASET_NAME
+  input_token_average: MLC_MLPERF_DATASET_INPUT_TOKEN_AVERAGE
+  output_token_average: MLC_MLPERF_DATASET_OUTPUT_TOKEN_AVERAGE 
+  link_to_dataset: MLC_MLPERF_DATASET_LINK
+  dataset_type: MLC_MLPERF_DATASET_TYPE
+  ######################################
+  ssh_ids: MLC_MULTINODE_SYSTEM_SSH_IDS 
+  out_dir_path: MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH
+  out_file_name: MLC_MULTI_NODE_SYSTEM_INFO_FILE_NAME
+  skip_ssh_key_file: MLC_SKIP_SSH_KEY_FILE
+tags:
+- get-mlperf-multi-node-system-info
+new_env_keys:
+- MLC_REMOTE_RUN_SSH_ID_COUNT
+- MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH
+print_env_at_the_end:
+  MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH: Path to the generated multi-node system info file.
+uid: 1e4bc0644f554bc2
+variations:
+  cuda:
+    adr:
+      mlperf-single-node-system-info:
+        tags: _cuda
+    env:
+      MLC_ACCELERATOR_BACKEND: cuda
+  exclude_current_node:
+    env:
+      MLC_EXCLUDE_CURRENT_NODE: 'True'

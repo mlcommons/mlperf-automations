@@ -138,11 +138,6 @@ def postprocess(i):
 
     env['MLC_MLPERF_INFERENCE_CONF_PATH'] = os.path.join(
         inference_root, 'mlperf.conf')
-    env['+PYTHONPATH'].append(
-        os.path.join(
-            env['MLC_MLPERF_INFERENCE_SOURCE'],
-            'tools',
-            'submission'))
 
     valid_models = get_valid_models(
         env['MLC_MLPERF_LAST_RELEASE'],

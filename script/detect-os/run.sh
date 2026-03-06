@@ -19,3 +19,16 @@ else
    echo "MLC_HOST_OS_KERNEL_VERSION=`uname -r`" >> tmp-run-env.out
    echo "MLC_HOST_PLATFORM_FLAVOR=`uname -m `" >> tmp-run-env.out
 fi
+filesystems=$(
+      awk '
+        $3 !~ /^(autofs|bpf|cgroup|cgroup2|configfs|devpts|devtmpfs|efivarfs|fusectl|hugetlbfs|debugfs|binfmt_misc|mqueue|nsfs|pstore|proc|rpc_pipefs|securityfs|sysfs|tmpfs|tracefs)$/ &&
+        $3 !~ /^(overlay|aufs|squashfs|fuse\..*|cgroup.*)$/ {
+          print $3
+        }
+      ' /proc/mounts \
+      | sort -u \
+      | tr '\n' ' ' \
+      | sed 's/ $//'
+    )
+echo "MLC_HOST_FILESYSTEMS=$filesystems">>tmp-run-env.out
+
