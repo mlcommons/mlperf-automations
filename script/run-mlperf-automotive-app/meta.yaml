@@ -225,7 +225,7 @@ variations:
       MLC_MLPERF_INFERENCE_VERSION: v0.5
     adr:
       automotive-src:
-        tags: _version.v0.5
+        version: v0.5
 
   v1.0:
     group: benchmark-version
@@ -233,8 +233,8 @@ variations:
       MLC_MLPERF_INFERENCE_VERSION: v1.0
     adr:
       automotive-src:
-        tags: _version.v1.0
-        
+        version: v1.0
+
   performance-and-accuracy:
     default: true
     base:
