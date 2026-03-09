@@ -26,6 +26,8 @@ new_env_keys:
 tags:
 - get-dataset-mmlu
 uid: 137c805565214b95
+print_env_at_the_end:
+  MLC_DATASET_MMLU_PATH: MMLU Dataset path
 variations:
   # calibration:
   #   env:
