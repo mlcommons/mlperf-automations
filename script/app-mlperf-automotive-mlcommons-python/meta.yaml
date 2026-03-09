@@ -577,6 +577,7 @@ variations:
         version_min: 4.40.0
       - tags: get,generic-python-lib,_package.protobuf
       - tags: get,generic-python-lib,_package.sentencepiece
+      - tags: get,generic-python-lib,_package.tokenizers
       - tags: get-dataset-mmlu
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
