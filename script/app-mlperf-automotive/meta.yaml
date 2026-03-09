@@ -126,7 +126,6 @@ docker:
   real_run: false
   user: mlcuser
   interactive: True
-  mlc_repos_off: 'mlc pull repo mlcommons@cm4abtf --branch=poc'
   pre_run_cmds:
     - mlc pull repo
   deps:

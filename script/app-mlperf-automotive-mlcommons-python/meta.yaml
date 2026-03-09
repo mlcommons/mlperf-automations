@@ -572,7 +572,6 @@ variations:
       pytorch:
         version_min: "2.1.0"
     deps:
-
       - tags: get,generic-python-lib,_package.accelerate
       - tags: get,generic-python-lib,_package.transformers
         version_min: 4.40.0

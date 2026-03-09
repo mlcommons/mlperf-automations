@@ -6,7 +6,7 @@ automation_uid: 5b4e0237da074764
 
 category: MLPerf Automotive
 
-developers: "[Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Grigori Fursin](https://cKnowledge.org/gfursin)"
+developers: "[Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Grigori Fursin](https://cKnowledge.org/gfursin), [Anandhu S](https://www.linkedin.com/in/anandhu-s-2337661b7/)"
 
 
 clean_output_files:
@@ -26,7 +26,7 @@ tags_help: "run-abtf,inference"
 
 default_env:
   MLC_MLPERF_IMPLEMENTATION: reference
-  MLC_MLPERF_MODEL: retinanet
+  MLC_MLPERF_MODEL: retinanet   # we need to modify the default model to something updated and runs within a reasonable time on CPU.
   MLC_MLPERF_RUN_STYLE: test
 
 input_mapping:
@@ -223,12 +223,18 @@ variations:
     group: benchmark-version
     env:
       MLC_MLPERF_INFERENCE_VERSION: v0.5
+    adr:
+      automotive-src:
+        tags: _version.v0.5
 
   v1.0:
     group: benchmark-version
     env:
       MLC_MLPERF_INFERENCE_VERSION: v1.0
-
+    adr:
+      automotive-src:
+        tags: _version.v1.0
+        
   performance-and-accuracy:
     default: true
     base:
