@@ -178,7 +178,7 @@ def postprocess(i):
 
     if env.get("MLC_DOCKER_GPU_DEVICES"):
         if env.get('MLC_CONTAINER_TOOL') == "podman":
-                run_opts += f" --device nvidia.com/gpu={len(env['MLC_DOCKER_GPU_DEVICES'].split(','))} -e NVIDIA_VISIBLE_DEVICES={env['MLC_DOCKER_GPU_DEVICES']}"
+            run_opts += f" --device nvidia.com/gpu={len(env['MLC_DOCKER_GPU_DEVICES'].split(','))} -e NVIDIA_VISIBLE_DEVICES={env['MLC_DOCKER_GPU_DEVICES']}"
         else:
             for d in env["MLC_DOCKER_GPU_DEVICES"].split(","):
                 run_opts += f" --gpus device={d}"
