@@ -9,6 +9,11 @@ def preprocess(i):
 
     env = i['env']
 
+    if env.get('MLC_DATASET_MMLU_PATH', '') != '':
+        print(
+            f"Using user defined MMLU dataset path from environment variable 'MLC_DATASET_MMLU_PATH': {env['MLC_DATASET_MMLU_PATH']}")
+        return {'return': 0}
+    
     if env.get('MLC_DATASET_DOWNLOAD_SRC', '') != "mlcommons":
         print("Using MLCommons Inference source from '" +
               env['MLC_MLPERF_INFERENCE_SOURCE'] + "'")
