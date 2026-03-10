@@ -224,6 +224,7 @@ variations:
     group: benchmark-version
     env:
       MLC_MLPERF_INFERENCE_VERSION: v0.5
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v0.5
     adr:
       automotive-src:
         version: v0.5
@@ -232,6 +233,7 @@ variations:
     group: benchmark-version
     env:
       MLC_MLPERF_INFERENCE_VERSION: v1.0
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v1.0
     adr:
       automotive-src:
         version: v1.0
