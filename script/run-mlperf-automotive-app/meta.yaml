@@ -91,6 +91,7 @@ input_mapping:
   threads: MLC_NUM_THREADS
   batch_size: MLC_MLPERF_LOADGEN_MAX_BATCHSIZE
   sut: MLC_MLPERF_INFERENCE_SUT_VARIATION
+  category: MLC_MLPERF_SUBMISSION_SYSTEM_TYPE
 
 new_state_keys:
 - app_mlperf_inference_*
