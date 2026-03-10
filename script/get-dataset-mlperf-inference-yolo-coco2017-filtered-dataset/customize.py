@@ -24,10 +24,12 @@ def postprocess(i):
     env = i['env']
 
     if env.get('MLC_DOWNLOAD_MODE', '') != 'dry':
-        items_in_path = os.listdir(env['MLC_ML_DATASET_MLPERF_INFERENCE_YOLO_COCO2017_FILTERED_DATASET_PATH'])
+        items_in_path = os.listdir(
+            env['MLC_ML_DATASET_MLPERF_INFERENCE_YOLO_COCO2017_FILTERED_DATASET_PATH'])
         print(items_in_path)
         if "val2017_safe" in items_in_path:
-            env['MLC_ML_DATASET_MLPERF_INFERENCE_YOLO_COCO2017_FILTERED_DATASET_PATH'] = os.path.join(env['MLC_ML_DATASET_MLPERF_INFERENCE_YOLO_COCO2017_FILTERED_DATASET_PATH'], "val2017_safe")
+            env['MLC_ML_DATASET_MLPERF_INFERENCE_YOLO_COCO2017_FILTERED_DATASET_PATH'] = os.path.join(
+                env['MLC_ML_DATASET_MLPERF_INFERENCE_YOLO_COCO2017_FILTERED_DATASET_PATH'], "val2017_safe")
         env['MLC_ML_DATASET_FILE_WITH_PATH'] = env['MLC_ML_DATASET_MLPERF_INFERENCE_YOLO_COCO2017_FILTERED_DATASET_PATH']
         env['MLC_ML_DATASET_MLPERF_INFERENCE_YOLO_COCO2017_FILTERED_DATASET_ANNOTATION_PATH'] = os.path.join(
             env['MLC_ML_DATASET_FILE_WITH_PATH'], "annotations", "instances_val2017.json")
