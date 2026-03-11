@@ -27,7 +27,8 @@ def postprocess(i):
     env = i['env']
 
     if env.get('MLC_DOWNLOAD_MODE', '') != "dry":
-        if env.get('MLC_DOWNLOAD_TOOL', '') == "rclone"  and is_true(env.get('MLC_TMP_REQUIRE_DOWNLOAD', '')):
+        if env.get('MLC_DOWNLOAD_TOOL', '') == "rclone" and is_true(
+                env.get('MLC_TMP_REQUIRE_DOWNLOAD', '')):
             env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'] = os.path.join(
                 env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'],
                 env['MLC_DATASET_NUSCENES_EXTRACTED_FOLDER_NAME'])
@@ -41,7 +42,7 @@ def postprocess(i):
                         os.path.dirname(
                             env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'].rstrip("/")),
                         env['MLC_DATASET_NUSCENES_SCENE_PICKLE_FILENAME']))
-                
+
         elif env.get('MLC_DOWNLOAD_TOOL', '') == "r2-downloader" or not is_true(env.get('MLC_TMP_REQUIRE_DOWNLOAD', '')):
             env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'] = os.path.join(
                 env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'],
