@@ -17,7 +17,8 @@ def preprocess(i):
             if os.path.exists(env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH']):
                 return {'return': 0}
             else:
-                logger.warning(f"Provided Nuscenes path {env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH']} does not exist. Proceeding for download...")
+                logger.warning(
+                    f"Provided Nuscenes path {env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH']} does not exist. Proceeding for download...")
                 env['MLC_TMP_REQUIRE_DOWNLOAD'] = "yes"
 
     return {'return': 0}
