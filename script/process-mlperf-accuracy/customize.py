@@ -212,6 +212,10 @@ def preprocess(i):
             CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_BEVFORMER_PATH'], "accuracy_nuscenes_cpu.py") + "' --mlperf-accuracy-file '" + os.path.join(
                 result_dir, "mlperf_log_accuracy.json") + "' --nuscenes-dir '" + env['MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH'] + "' --config '" + os.path.join(env['MLC_MLPERF_INFERENCE_BEVFORMER_PATH'], "projects" + "configs" + "bevformer" + "bevformer_tiny.py") + "' > '" + out_file + "'"
 
+        elif dataset == "nuscenes-uniad":
+            CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_UNIAD_PATH'], "accuracy.py") + "' --log-file '" + os.path.join(
+                result_dir, "mlperf_log_accuracy.json") + "' --dataset-path '" + env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'] + "' --config '" + os.path.join(env['MLC_MLPERF_INFERENCE_BEVFORMER_PATH'], "projects" + "configs" + "bevformer" + "bevformer_tiny.py") + "' > '" + out_file + "'"
+
         elif dataset == "cognata_ssd":
             CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + " '" + os.path.join(env['MLC_MLPERF_INFERENCE_SSD_RESNET50_PATH'], "accuracy_cognata.py") + "' --mlperf-accuracy-file '" + os.path.join(
                 result_dir, "mlperf_log_accuracy.json") + "' --dataset-path '" + env['MLC_PREPROCESSED_DATASET_COGNATA_PATH'] + "' --config '" + "baseline_8MP_ss_scales_fm1_5x5_all" + "' > '" + out_file + "'"

@@ -180,7 +180,11 @@ def postprocess(i):
         for d in env["MLC_DOCKER_GPU_DEVICES"].split(","):
             run_opts += f" --gpus device={d}"
     elif env.get('MLC_DOCKER_ADD_NUM_GPUS', '') != '':
-        run_opts += " --gpus={}".format(env['MLC_DOCKER_ADD_NUM_GPUS'])
+        if env.get('MLC_CONTAINER_TOOL') == "podman":
+            for i in range(int(env['MLC_DOCKER_ADD_NUM_GPUS'])):
+                run_opts += f" --device nvidia.com/gpu={i}"
+        else:
+            run_opts += " --gpus={}".format(env['MLC_DOCKER_ADD_NUM_GPUS'])
     elif env.get('MLC_DOCKER_ADD_ALL_GPUS', '') != '':
         if env.get('MLC_CONTAINER_TOOL') == "podman":
             run_opts += " --device nvidia.com/gpu=all"
