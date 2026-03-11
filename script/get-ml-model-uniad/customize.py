@@ -20,7 +20,7 @@ def preprocess(i):
         if os.path.exists(env['MLC_ML_MODEL_UNIAD_PATH']):
             return {'return': 0}
         else:
-            logger.warning(f'Provided UNIAD path {env['MLC_ML_MODEL_UNIAD_PATH']} does not exist. Proceeding for download...')
+            logger.warning(f"Provided UNIAD path {env['MLC_ML_MODEL_UNIAD_PATH']} does not exist. Proceeding for download...")
             env['MLC_TMP_REQUIRE_DOWNLOAD'] = "yes"
 
     return {'return': 0}
