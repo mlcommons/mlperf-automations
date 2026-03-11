@@ -306,7 +306,8 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
 
         env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
 
-        if env['MLC_MLPERF_LOADGEN_SCENARIO'].lower() not in ["singlestream", "constantstream"]:
+        if env['MLC_MLPERF_LOADGEN_SCENARIO'].lower(
+        ) not in ["singlestream", "constantstream"]:
             return {
                 'return': 1, "error": "UNIAD Benchmark only supports SingleStream and ConstantStream scenario!"}
 
