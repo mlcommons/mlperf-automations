@@ -9,8 +9,8 @@ def preprocess(i):
 
     # skip download and register in cache if the llama3 checkpoint path is
     # already defined by the user
-    if env.get('MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH', '') != '':
-        env['LLAMA3_CHECKPOINT_PATH'] = env['MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH']
+    if env.get('LLAMA3_CHECKPOINT_PATH', '') != '':
+        env['MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH'] = env['LLAMA3_CHECKPOINT_PATH']
         return {'return': 0}
 
     path = env.get('MLC_OUTDIRNAME', '').strip()
@@ -32,6 +32,8 @@ def postprocess(i):
     if env.get('MLC_DOWNLOAD_MODE', '') != "dry":
         if env.get('MLC_ML_MODEL_PATH', '') != '':
             env['LLAMA3_CHECKPOINT_PATH'] = env['MLC_ML_MODEL_PATH']
+        else:
+            env['MLC_ML_MODEL_PATH'] = env['LLAMA3_CHECKPOINT_PATH']
         env['MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH'] = env['LLAMA3_CHECKPOINT_PATH']
         env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_ML_MODEL_LLAMA3_CHECKPOINT_PATH']
 

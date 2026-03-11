@@ -126,7 +126,6 @@ docker:
   real_run: false
   user: mlcuser
   interactive: True
-  mlc_repos_off: 'mlc pull repo mlcommons@cm4abtf --branch=poc'
   pre_run_cmds:
     - mlc pull repo
   deps:
@@ -369,13 +368,13 @@ variations:
       - cognata-deeplab-accuracy-script
       tags: run,accuracy,mlperf,_cognata_deeplab
   
-  llama3_2-3b:
+  llama3_1-8b:
     group:
       models
     default_env:
       MLC_USE_DATASET_FROM_HOST: yes
     env:
-      MLC_MODEL: llama3_2-3b
+      MLC_MODEL: llama3_1-8b
     docker:
       deps:
         - tags: get-dataset-mmlu
@@ -384,18 +383,18 @@ variations:
           enable_if_env:
             MLC_USE_DATASET_FROM_HOST:
               - "yes"
-        - tags:  get,ml-model,llama3,_3b,_meta-llama/Llama-3.2-8B-Instruct,_hf
+        - tags:  get,ml-model,llama3,_mlc,_8b,_r2-downloader
           enable_if_env:
             MLC_USE_MODEL_FROM_HOST:
               - "yes"
           names:
-            - ml-model-llama3_2
+            - ml-model-llama3_1-8b
       mounts:
         - "${{ MLC_DATASET_MMLU_PATH }}:${{ MLC_DATASET_MMLU_PATH }}"
         - "${{ LLAMA3_CHECKPOINT_PATH }}:${{ LLAMA3_CHECKPOINT_PATH }}"
     add_deps_recursive:
       abtf-inference-implementation:
-        tags: _llama3_2-3b
+        tags: _llama3_1-8b
     posthook_deps:
     - enable_if_env:
         MLC_MLPERF_LOADGEN_MODE:
@@ -440,11 +439,18 @@ variations:
 
   v0.5: {}
 
+  v1.0: {}
+
   mvp-demo: {}
 
   poc-demo: {}
 
   v0.5,mlcommons-python,cpu:
+    docker:
+      base_image: ubuntu:22.04
+      os_version: 22.04
+
+  v1.0,mlcommons-python,cpu:
     docker:
       base_image: ubuntu:22.04
       os_version: 22.04
