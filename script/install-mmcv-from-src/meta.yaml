@@ -1,4 +1,4 @@
-alias: install-mmdetection-from-src
+alias: install-mmcv-from-src
 automation_alias: script
 automation_uid: 5b4e0237da074764
 cache: true
@@ -14,10 +14,10 @@ deps:
     - 'yes'
   tags: get,python3
 - env:
-    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_MMDET_SRC_REPO_PATH
-  extra_cache_tags: mmdetection,src,mmdetection-src-repo
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_MMCV_SRC_REPO_PATH
+  extra_cache_tags: mmdetection,src,mmcv-src-repo
   names:
-  - mmdetection-src-repo
+  - mmcv-src-repo
   tags: get,git,repo
   update_tags_from_env_with_prefix:
     _branch.:
@@ -34,27 +34,19 @@ deps:
   tags: get,generic-python-lib,_pip
 - tags: get,generic-python-lib,_setuptools
 env:
-  MLC_GIT_URL: https://github.com/open-mmlab/mmdetection.git
-name: Build mmdetection from sources
+  MLC_GIT_URL: https://github.com/open-mmlab/mmcv.git
+name: Build mmcv from sources
 new_env_keys:
-- MLC_MMDETECTION_*
+- MLC_mmcv_*
 prehook_deps: []
 sort: 1000
 tags:
-- install-mmdetection-from-src
-uid: e7fdadb5591748e9
+- install-mmcv-from-src
+uid: 797dfce5d9cf49aa
 variations:
   branch.#:
     env:
       MLC_GIT_CHECKOUT: '#'
-  uniad-automotive:
-    group: task
-    default: true
-    env:
-      FORCE_CUDA: 1
-      MLC_GIT_CHECKOUT_TAG: v2.25.1 
-      MMCV_WITH_OPS: 1
-      MLC_MMDET_TASK: automotive
   pr-to-apply.#:
     env: {}
   repo.#:
@@ -67,4 +59,12 @@ variations:
   tag.#:
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
+  uniad-automotive:
+    default: true
+    env:
+      FORCE_CUDA: 1
+      MLC_GIT_CHECKOUT_TAG: v1.5.0
+      MLC_MMDET_TASK: automotive
+      MMCV_WITH_OPS: 1
+    group: task
 versions: {}
