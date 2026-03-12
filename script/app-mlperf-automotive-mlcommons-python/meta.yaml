@@ -607,6 +607,7 @@ variations:
       - tags: get,generic-python-lib,_package.mmcv
         version_max: 1.5.0
         version_max_usable: 1.5.0
+      - tags: install-mmdetection-from-src
       - tags: get,generic-python-lib,_package.mmsegmentation
         version_max: 0.20.0
         version_max_usable: 0.20.0
