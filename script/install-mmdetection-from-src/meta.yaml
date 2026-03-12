@@ -52,8 +52,7 @@ variations:
     default: true
     env:
       FORCE_CUDA: 1
-      MLC_GIT_CHECKOUT_TAG: v2.25.1 
-      MMCV_WITH_OPS: 1
+      MLC_GIT_CHECKOUT_TAG: v2.25.1
       MLC_MMDET_TASK: automotive
   pr-to-apply.#:
     env: {}
