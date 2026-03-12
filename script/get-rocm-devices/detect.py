@@ -20,17 +20,20 @@ hipDeviceAttributeWarpSize = 87
 
 def get_gpu_info():
 
-
     num_gpus = hip.hipGetDeviceCount()[1]
     all_gpu_info = []
 
     for i in range(num_gpus):
 
-        try: 
-            gpu_result = subprocess.run(["amd-smi" ,"static", "--gpu",str(i),"--json"], capture_output=True, text=True)
-            interconnect_result = subprocess.run(["amd-smi", "xgmi", "--gpu", str(i), "--json"], capture_output=True, text=True)       
-            host_interconnect_result = json.loads(gpu_result.stdout)["gpu_data"][0]["bus"]["pcie_interface_version"]
-            gpu_interconnect_result = json.loads(interconnect_result.stdout)["xgmi_metric"][0][0]["link_metrics"]["link_type"]
+        try:
+            gpu_result = subprocess.run(
+                ["amd-smi", "static", "--gpu", str(i), "--json"], capture_output=True, text=True)
+            interconnect_result = subprocess.run(
+                ["amd-smi", "xgmi", "--gpu", str(i), "--json"], capture_output=True, text=True)
+            host_interconnect_result = json.loads(
+                gpu_result.stdout)["gpu_data"][0]["bus"]["pcie_interface_version"]
+            gpu_interconnect_result = json.loads(interconnect_result.stdout)[
+                "xgmi_metric"][0][0]["link_metrics"]["link_type"]
         except subprocess.CalledProcessError:
             print(f"Error occurred while fetching info for GPU {i}")
 
