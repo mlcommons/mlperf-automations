@@ -13,7 +13,8 @@ def preprocess(i):
     env = i['env']
 
     if env.get('MLC_MMDET_TASK', '') == "automotive":
-        env['MLC_MMDET_TARGET_DIR'] = os.path.join(env['MLC_GIT_CHECKOUT_PATH'], "mmcv")
+        env['MLC_MMDET_TARGET_DIR'] = os.path.join(
+            env['MLC_GIT_CHECKOUT_PATH'], "mmcv")
         pip_version = env.get('MLC_PIP_VERSION', '').strip().split('.')
         if pip_version and len(pip_version) > 1 and int(pip_version[0]) >= 23:
             env['MLC_PYTHON_PIP_COMMON_EXTRA'] = " --break-system-packages"
