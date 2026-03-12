@@ -174,6 +174,13 @@ deps:
       - 3d-unet-99.9
       - resnet50
 
+  - tags: get,generic-python-lib,_package.typing-extensions
+    names:
+      - typing-extensions
+    enable_if_env:
+      MLC_MODEL: 
+        - uniad
+
   ## Pytorch (CPU)
   - tags: get,generic-python-lib,_torch
     names:
@@ -604,6 +611,9 @@ variations:
         # version_max_usable: "0.13.1"
         env:
           MLC_GENERIC_PYTHON_PIP_INDEX_URL: https://download.pytorch.org/whl/cu116
+      typing-extensions:
+        version_max: 4.13.2
+        version_max_usable: 4.13.2
     deps:
       - tags: get,generic-python-lib,_package.opencv_python
         version_max: 4.6.0.66
