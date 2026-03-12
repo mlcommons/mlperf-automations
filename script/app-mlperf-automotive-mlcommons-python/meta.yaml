@@ -595,8 +595,8 @@ variations:
     group: models
     add_deps_recursive:
       pytorch:
-        version_max: "1.21.1"
-        version_max_usable: "1.21.1"
+        version_max: "1.12.1"
+        version_max_usable: "1.12.1"
         env:
           MLC_GENERIC_PYTHON_PIP_EXTRA_INDEX_URL: https://download.pytorch.org/whl/cu116
       ml-engine-torchvision:
