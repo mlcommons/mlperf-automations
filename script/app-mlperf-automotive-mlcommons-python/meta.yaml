@@ -108,6 +108,11 @@ deps:
   # Use cmind inside MLC scripts
   - tags: get,generic-python-lib,_package.cmind
 
+  # install mmcv for uniad
+  - tags: install-mmcv-from-src
+    enable_if_env:
+      MLC_MODEL:
+        - uniad
 
   # CUDA
   - tags: get,cuda
@@ -618,10 +623,6 @@ variations:
       - tags: get,generic-python-lib,_package.opencv_python
         version_max: 4.6.0.66
         version_max_usable: 4.6.0.66
-      - tags: get,generic-python-lib,_package.mmcv
-        version_max: 1.5.0
-        version_max_usable: 1.5.0
-      - tags: install-mmcv-from-src
       - tags: install-mmdetection-from-src
       - tags: get,generic-python-lib,_package.mmsegmentation
         version_min: 0.20.0
