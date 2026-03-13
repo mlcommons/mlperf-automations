@@ -23,6 +23,8 @@ def preprocess(i):
 
     recursion_spaces = i['recursion_spaces']
 
+    # assigning CUDA HOME with empty string so that mmcv would take it from pytorch inbuilt CUDA bundle
+    env['CUDA_HOME'] = ""
     env['MLC_RUN_CMD'] = run_cmd
 
     return {'return': 0}
