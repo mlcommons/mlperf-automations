@@ -298,6 +298,20 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options,
         cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --model_path {env['LLAMA3_CHECKPOINT_PATH']} --dataset_path {env['MLC_DATASET_MMLU_PATH']} --output_dir {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} --device {"cuda" if device == "gpu" else "cpu"} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
 
         cmd = cmd.replace("--user_conf", "--user-conf")
+
+    elif env['MLC_MODEL'] in ['uniad']:
+        run_dir = env['MLC_MLPERF_INFERENCE_UNIAD_PATH']
+
+        env['RUN_DIR'] = run_dir
+
+        env['OUTPUT_DIR'] = env['MLC_MLPERF_OUTPUT_DIR']
+
+        if env['MLC_MLPERF_LOADGEN_SCENARIO'].lower(
+        ) not in ["singlestream", "constantstream"]:
+            return {
+                'return': 1, "error": "UNIAD Benchmark only supports SingleStream and ConstantStream scenario!"}
+
+        cmd = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {os.path.join(run_dir, "main.py")} --config {os.path.join(run_dir, "projects", "configs", "stage2_e2e", "tiny_imgx0.25_e2e.py")} --checkpoint {env['MLC_ML_MODEL_UNIAD_PATH']} --dataset_path {env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH']} --log-dir {env['OUTPUT_DIR']} --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options} {dataset_options}"""
     ##########################################################################
 
     return cmd, run_dir

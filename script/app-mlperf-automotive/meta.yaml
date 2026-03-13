@@ -266,6 +266,8 @@ variations:
     docker:
       deps:
         - tags: get,preprocessed,dataset,nuscenes,_mlc,_validation
+          names:
+            - preprocessed-dataset-nuscenes
           enable_if_env:
             MLC_USE_DATASET_FROM_HOST:
               - "yes"
@@ -373,6 +375,7 @@ variations:
       models
     default_env:
       MLC_USE_DATASET_FROM_HOST: yes
+      MLC_USE_MODEL_FROM_HOST: yes
     env:
       MLC_MODEL: llama3_1-8b
     docker:
@@ -404,8 +407,47 @@ variations:
         - 'on'
       names:
       - mlperf-accuracy-script
-      - cognata-deeplab-accuracy-script
+      - mmlu-accuracy-script
       tags: run,accuracy,mlperf,_mmlu
+
+  uniad:
+    group:
+      models
+    default_env:
+      MLC_USE_DATASET_FROM_HOST: yes
+    env:
+      MLC_MODEL: uniad
+    docker:
+      deps:
+        - tags: get,preprocessed,dataset,nuscenes,_mlc,_validation
+          names:
+            - preprocessed-dataset-nuscenes
+          enable_if_env:
+            MLC_USE_DATASET_FROM_HOST:
+              - "yes"
+        - tags:  get-ml-model-uniad,_mlc,_r2-downloader
+          enable_if_env:
+            MLC_USE_MODEL_FROM_HOST:
+              - "yes"
+          names:
+            - ml-model-uniad
+      mounts:
+        - "${{ MLC_PREPROCESSED_DATASET_NUSCENES_PATH }}:${{ MLC_PREPROCESSED_DATASET_NUSCENES_PATH }}"
+        - "${{ MLC_ML_MODEL_UNIAD_PATH }}:${{ MLC_ML_MODEL_UNIAD_PATH }}"
+    add_deps_recursive:
+      abtf-inference-implementation:
+        tags: _uniad
+    posthook_deps:
+    - enable_if_env:
+        MLC_MLPERF_LOADGEN_MODE:
+        - accuracy
+        - all
+        MLC_MLPERF_ACCURACY_RESULTS_DIR:
+        - 'on'
+      names:
+      - mlperf-accuracy-script
+      - nuscenes-accuracy-script
+      tags: run,accuracy,mlperf,_nuscenes-uniad
 
   # Target devices
   cpu:
@@ -436,6 +478,10 @@ variations:
       all_gpus: 'yes'
       base_image: nvcr.io/nvidia/pytorch:24.08-py3
       os_version: 22.04
+  
+  cuda,uniad:
+    docker:
+      base_image: nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
 
   v0.5: {}
 

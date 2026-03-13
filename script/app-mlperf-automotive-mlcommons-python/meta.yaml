@@ -174,6 +174,13 @@ deps:
       - 3d-unet-99.9
       - resnet50
 
+  - tags: get,generic-python-lib,_package.typing-extensions
+    names:
+      - typing-extensions
+    enable_if_env:
+      MLC_MODEL: 
+        - uniad
+
   ## Pytorch (CPU)
   - tags: get,generic-python-lib,_torch
     names:
@@ -595,11 +602,26 @@ variations:
     group: models
     add_deps_recursive:
       pytorch:
-        version_max: "1.21.1"
-        version_max_usable: "1.21.1"
+        version_max: "1.12.1+cu116"
+        # version_max_usable: "1.12.1"
+        env:
+          MLC_GENERIC_PYTHON_PIP_INDEX_URL: https://download.pytorch.org/whl/cu116
+      ml-engine-torchvision:
+        version: "0.13.1+cu116"
+        # version_max_usable: "0.13.1"
+        env:
+          MLC_GENERIC_PYTHON_PIP_INDEX_URL: https://download.pytorch.org/whl/cu116
+      typing-extensions:
+        version_max: 4.13.2
+        version_max_usable: 4.13.2
     deps:
       - tags: get,generic-python-lib,_package.opencv_python
-        version_min: 4.40.0
+        version_max: 4.6.0.66
+        version_max_usable: 4.6.0.66
+      - tags: install-mmcv-from-src
+      - tags: install-mmdetection-from-src
+      - tags: get,generic-python-lib,_package.mmsegmentation
+        version_min: 0.20.0
       - tags: get,preprocessed,dataset,nuscenes,_mlc,_validation
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
@@ -671,6 +693,10 @@ variations:
   llama3_1-8b,singlestream:
     default_env:
       MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: "90"
+  
+  uniad,singlestream:
+    default_env:
+      MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: "99.9"
 
   mvp_demo:
     env:
