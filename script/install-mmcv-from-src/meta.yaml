@@ -62,9 +62,9 @@ variations:
   uniad-automotive:
     default: true
     env:
-      FORCE_CUDA: 1
+      FORCE_CUDA: "1"
       MLC_GIT_CHECKOUT_TAG: v1.5.0
       MLC_MMDET_TASK: automotive
-      MMCV_WITH_OPS: 0
+      MMCV_WITH_OPS: 1
     group: task
 versions: {}

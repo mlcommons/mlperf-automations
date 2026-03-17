@@ -418,6 +418,8 @@ variations:
     env:
       MLC_MODEL: uniad
     docker:
+      env:
+        FORCE_CUDA: "1"
       deps:
         - tags: get,preprocessed,dataset,nuscenes,_mlc,_validation
           names:
