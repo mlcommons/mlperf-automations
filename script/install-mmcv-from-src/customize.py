@@ -17,7 +17,7 @@ def preprocess(i):
         pip_version = env.get('MLC_PIP_VERSION', '').strip().split('.')
         if pip_version and len(pip_version) > 1 and int(pip_version[0]) >= 23:
             env['MLC_PYTHON_PIP_COMMON_EXTRA'] = " --break-system-packages"
-        run_cmd = f"pip3 install -r requirements/optional.txt && MMCV_WITH_OPS={env['MMCV_WITH_OPS']} pip3 install -e . {env.get('MLC_PYTHON_PIP_COMMON_EXTRA', '')}"
+        run_cmd = f"{env['MLC_PYTHON_BIN_WITH_PATH']} -m pip3 install -r requirements/optional.txt && MMCV_WITH_OPS={env['MMCV_WITH_OPS']} pip3 install -e . {env.get('MLC_PYTHON_PIP_COMMON_EXTRA', '')}"
 
     automation = i['automation']
 
