@@ -1,4 +1,5 @@
 #!/bin/bash
+nvidia-smi
 ${MLC_PYTHON_BIN_WITH_PATH} -m pip freeze | grep torch
 cd ${MLC_MMDET_TARGET_DIR}
 
