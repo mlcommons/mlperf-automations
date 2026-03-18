@@ -5577,18 +5577,20 @@ def update_env_from_input_mapping(
     for key in input_mapping:
         if key in inp:
             if key in input_description and str(input_description[key].get(
-                'is_path', '')).lower() in ['1', 'yes', 'on', 'true']:
+                    'is_path', '')).lower() in ['1', 'yes', 'on', 'true']:
 
                 # 1. Expand the '~' if it exists
                 path_val = os.path.expanduser(inp[key])
 
                 # 2. Check if the path is NOT already absolute
                 if not os.path.isabs(path_val):
-                    # Safely get the base dir (fallback to current working dir just in case)
+                    # Safely get the base dir (fallback to current working dir
+                    # just in case)
                     base_dir = env.get("MLC_USER_RUN_DIR", os.getcwd())
 
                     # Join the base dir with the relative path and normalize it
-                    path_val = os.path.abspath(os.path.join(base_dir, path_val))
+                    path_val = os.path.abspath(
+                        os.path.join(base_dir, path_val))
 
                 env[input_mapping[key]] = path_val
             else:
