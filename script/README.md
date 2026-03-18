@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-02-18 17:10:51*
+*Last updated: 2026-03-06 15:50:52*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -10,6 +10,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [AI/ML frameworks](#aiml-frameworks)
 - [AI/ML models](#aiml-models)
 - [AI/ML optimization](#aiml-optimization)
+- [Benchmarking](#benchmarking)
 - [CUDA automation](#cuda-automation)
 - [Cloud automation](#cloud-automation)
 - [Compiler automation](#compiler-automation)
@@ -17,6 +18,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [Detection or installation of tools and artifacts](#detection-or-installation-of-tools-and-artifacts)
 - [DevOps automation](#devops-automation)
 - [Docker automation](#docker-automation)
+- [HPC Application](#hpc-application)
 - [MLCommons automation](#mlcommons-automation)
 - [MLCommons interface](#mlcommons-interface)
 - [MLCommons script templates](#mlcommons-script-templates)
@@ -266,6 +268,12 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - prune-bert-models
   - Tags: `prune`, `bert-models`, `bert-prune`, `prune-bert-models`
 
+## Benchmarking
+
+- **[benchmark-program-geekbench](benchmark-program-geekbench/)**
+  - benchmark-program-geekbench
+  - Tags: `benchmark`, `geekbench`, `benchmark-geekbench`, `benchmark-program-geekbench`
+
 ## CUDA automation
 
 - **[get-cuda](get-cuda/)**
@@ -345,7 +353,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - Tags: `get`, `oneapi`, `compiler`, `get-oneapi`
 - **[get-profiler-uprof](get-profiler-uprof/)**
   - Detect or install AMD uprof
-  - Tags: `get-uprof`, `get`, `uprof`, `uprof-profiler`
+  - Tags: `get-uprof`, `get`, `uprof`, `profiler`, `uprof-profiler`
 - **[install-diffusers-from-src](install-diffusers-from-src/)**
   - Build diffusers from sources
   - Tags: `install`, `get`, `src`, `from.src`, `diffusers`, `src-diffusers`
@@ -415,6 +423,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-bazel](get-bazel/)**
   - get-bazel
   - Tags: `get`, `bazel`, `get-bazel`
+- **[get-blas](get-blas/)**
+  - get-blas
+  - Tags: `get`, `lib`, `blas`
 - **[get-blis](get-blis/)**
   - get-blis
   - Tags: `get`, `lib`, `blis`
@@ -430,12 +441,18 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-docker](get-docker/)**
   - get-docker
   - Tags: `get`, `install`, `docker`, `engine`
+- **[get-geekbench](get-geekbench/)**
+  - get-geekbench
+  - Tags: `get`, `geekbench`, `get-geekbench`
 - **[get-generic-sys-util](get-generic-sys-util/)**
   - get-generic-sys-util
   - Tags: `get`, `sys-util`, `generic`, `generic-sys-util`
 - **[get-google-test](get-google-test/)**
   - get-google-test
   - Tags: `get`, `google-test`, `googletest`, `gtest`, `test`, `google`
+- **[get-gperftools](get-gperftools/)**
+  - get-gperftools
+  - Tags: `get-gperftools`, `get`, `gperftools`
 - **[get-java](get-java/)**
   - get-java
   - Tags: `get`, `java`
@@ -454,12 +471,18 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-lib-jemalloc](get-lib-jemalloc/)**
   - get-lib-jemalloc
   - Tags: `get`, `lib`, `lib-jemalloc`, `jemalloc`
+- **[get-lib-mimalloc](get-lib-mimalloc/)**
+  - get-lib-mimalloc
+  - Tags: `get-lib-mimalloc`, `get`, `lib`, `mimalloc`
 - **[get-lib-protobuf](get-lib-protobuf/)**
   - get-lib-protobuf
   - Tags: `get`, `google-protobuf`, `protobuf`, `lib`, `lib-protobuf`, `google`
 - **[get-lib-qaic-api](get-lib-qaic-api/)**
   - get-lib-qaic-api
   - Tags: `get`, `api`, `lib-qaic-api`, `lib`, `qaic`
+- **[get-lib-tcmalloc](get-lib-tcmalloc/)**
+  - get-lib-tcmalloc
+  - Tags: `tcmalloc`, `get`, `lib`
 - **[get-nvidia-docker](get-nvidia-docker/)**
   - get-nvidia-docker
   - Tags: `get`, `install`, `nvidia`, `nvidia-container-toolkit`, `nvidia-docker`, `engine`
@@ -595,6 +618,12 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[run-docker-container](run-docker-container/)**
   - run-docker-container
   - Tags: `run`, `docker`, `container`
+
+## HPC Application
+
+- **[app-cp2k](app-cp2k/)**
+  - app-cp2k
+  - Tags: `app`, `cp2k`
 
 ## MLCommons automation
 
@@ -856,6 +885,12 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[detect-os](detect-os/)**
   - detect-os
   - Tags: `detect-os`, `detect`, `os`, `info`
+- **[get-mlperf-multi-node-system-info](get-mlperf-multi-node-system-info/)**
+  - get-mlperf-multi-node-system-info
+  - Tags: `get-mlperf-multi-node-system-info`
+- **[get-mlperf-single-node-system-info](get-mlperf-single-node-system-info/)**
+  - get-mlperf-single-node-system-info
+  - Tags: `get`, `mlperf`, `single-node`, `system-info`
 - **[get-platform-details](get-platform-details/)**
   - get-platform-details
   - Tags: `get`, `platform`, `details`, `platform-details`
@@ -985,6 +1020,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-dataset-mlperf-inference-yolo-coco2017-filtered-dataset](get-dataset-mlperf-inference-yolo-coco2017-filtered-dataset/)**
   - get-dataset-mlperf-inference-yolo-coco2017-filtered-dataset
   - Tags: `get`, `dataset`, `mlperf-inference`, `yolo-coco2017-filtered`, `get-dataset-mlperf-inference-yolo-coco2017-filtered-dataset`
+- **[get-dataset-mmlu](get-dataset-mmlu/)**
+  - get-dataset-mmlu
+  - Tags: `get-dataset-mmlu`
 - **[get-dataset-nuscenes](get-dataset-nuscenes/)**
   - get-dataset-nuscenes
   - Tags: `get`, `dataset`, `nuscenes`
@@ -1071,8 +1109,8 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 314
-- **Categories**: 29
+- **Total Scripts**: 324
+- **Categories**: 31
 
 ## Usage
 

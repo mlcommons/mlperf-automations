@@ -13,6 +13,8 @@ extract_field() {
 
 if [[ ${MLC_HOST_OS_FLAVOR} == "macos" ]]; then
     sysctl -a | grep hw > tmp-lscpu.out
+    cpu_model_name=$(sysctl -n machdep.cpu.brand_string)
+    echo "MLC_HOST_CPU_MODEL_NAME=$cpu_model_name">>tmp-run-env.out
 else
     lscpu > tmp-lscpu.out
     memory_capacity=`free -h --si | grep Mem: | tr -s ' ' | cut -d' ' -f2`

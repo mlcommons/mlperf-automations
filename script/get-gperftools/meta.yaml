@@ -1,0 +1,63 @@
+alias: get-gperftools
+automation_alias: script
+automation_uid: 5b4e0237da074764
+cache: true
+category: Detection or installation of tools and artifacts
+deps:
+- env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_GPERFTOOLS_SRC_PATH
+  extra_cache_tags: gperftools,repo,gperftools-repo
+  force_env_keys:
+  - MLC_GIT_*
+  names:
+  - gperftools-repo
+  tags: get,git,repo
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_URL
+    _sha.:
+    - MLC_GIT_SHA
+    _submodules.:
+    - MLC_GIT_SUBMODULES
+- tags: get,generic-sys-util,_autoconf
+- env:
+    MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
+  tags: get,generic-sys-util,_build-essential
+- tags: detect,cpu
+new_env_keys:
+- MLC_GPERFTOOLS_PATH
+- MLC_GPERFTOOLS_LIB_PATH
+- MLC_TCMALLOC_LIB_PATH
+- +LD_LIBRARY_PATH
+new_state_keys: []
+post_deps: []
+posthook_deps: []
+prehook_deps: []
+tags:
+- get-gperftools
+- get
+- gperftools
+tests:
+  run_inputs: []
+uid: 4e91b103c5a04204
+variations:
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+  sha.#:
+    env:
+      MLC_GIT_SHA: '#'
+  url.#:
+    env:
+      MLC_GIT_URL: '#'
+    group: version
+  url.official:
+    default: true
+    env:
+      MLC_GIT_URL: https://github.com/gperftools/gperftools.git
+    group: version
+  version.official:
+    base:
+    - url.official
