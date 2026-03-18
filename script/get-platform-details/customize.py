@@ -139,7 +139,8 @@ def _parse_lscpu(text):
     caches = {}
     for label in ['L1d cache', 'L1i cache', 'L2 cache', 'L3 cache']:
         if label in kv:
-            caches[label.replace(' cache', '').replace(' ', '_').lower()] = kv[label]
+            caches[label.replace(' cache', '').replace(
+                ' ', '_').lower()] = kv[label]
     cpu['caches'] = caches
 
     # NUMA
@@ -288,12 +289,16 @@ def _parse_cpu_frequency(text):
     m = re.search(r'available cpufreq governors:\s+(.+)', text)
     if m:
         result['available_governors'] = m.group(1).strip().split()
-    m = re.search(r'current CPU frequency:.*?(\d[\d.]+\s*\w+)\s*\(asserted', text)
+    m = re.search(
+        r'current CPU frequency:.*?(\d[\d.]+\s*\w+)\s*\(asserted', text)
     if m:
         result['current_frequency'] = m.group(1).strip()
 
     # Current policy
-    m = re.search(r'current policy:.*?frequency should be within (.+?) and ([\d.]+ [A-Za-z]+)', text, re.DOTALL)
+    m = re.search(
+        r'current policy:.*?frequency should be within (.+?) and ([\d.]+ [A-Za-z]+)',
+        text,
+        re.DOTALL)
     if m:
         result['policy_min'] = m.group(1).strip()
         result['policy_max'] = m.group(2).strip()
@@ -350,10 +355,10 @@ def _parse_dmidecode_memory(text):
             continue
         dimm = {}
         for key in ['Size', 'Form Factor', 'Locator', 'Bank Locator', 'Type',
-                     'Speed', 'Manufacturer', 'Part Number', 'Rank',
-                     'Configured Memory Speed', 'Minimum Voltage', 'Maximum Voltage',
-                     'Configured Voltage', 'Memory Technology', 'Total Width', 'Data Width',
-                     'Serial Number']:
+                    'Speed', 'Manufacturer', 'Part Number', 'Rank',
+                    'Configured Memory Speed', 'Minimum Voltage', 'Maximum Voltage',
+                    'Configured Voltage', 'Memory Technology', 'Total Width', 'Data Width',
+                    'Serial Number']:
             if key in kv:
                 dimm[key.lower().replace(' ', '_')] = kv[key]
         dimms.append(dimm)
@@ -373,13 +378,15 @@ def _parse_dmidecode_system(text):
                 if key in kv:
                     val = kv[key]
                     if val != 'Default string':
-                        sys_info[key.lower().replace(' ', '_').replace('-', '_')] = val
+                        sys_info[key.lower().replace(
+                            ' ', '_').replace('-', '_')] = val
             if sys_info:
                 result['system'] = sys_info
         elif 'Base Board Information' in section:
             kv = _parse_key_value_colon(section)
             board = {}
-            for key in ['Manufacturer', 'Product Name', 'Version', 'Serial Number', 'Type']:
+            for key in ['Manufacturer', 'Product Name',
+                        'Version', 'Serial Number', 'Type']:
                 if key in kv:
                     val = kv[key]
                     if val != 'Default string':
@@ -503,7 +510,8 @@ def _parse_system_profiler(text):
                 'Memory', 'System Firmware Version', 'OS Loader Version',
                 'Serial Number (system)', 'Hardware UUID', 'Provisioning UDID']:
         if key in kv:
-            result[key.lower().replace(' ', '_').replace('(', '').replace(')', '')] = kv[key]
+            result[key.lower().replace(' ', '_').replace(
+                '(', '').replace(')', '')] = kv[key]
     return result
 
 
@@ -527,7 +535,8 @@ def _parse_diskutil(text):
             current_disk = {'device': m.group(1), 'type': m.group(2)}
             disks.append(current_disk)
         elif current_disk and line.strip():
-            m2 = re.match(r'\s+\d+:\s+(\S+)\s+(.+?)\s+([\d.]+\s+\S+)\s+(\S+)', line)
+            m2 = re.match(
+                r'\s+\d+:\s+(\S+)\s+(.+?)\s+([\d.]+\s+\S+)\s+(\S+)', line)
             if m2:
                 current_disk.setdefault('partitions', []).append({
                     'type': m2.group(1),
@@ -572,7 +581,8 @@ def _parse_systeminfo(text):
                 'Boot Device', 'System Directory', 'Original Install Date',
                 'System Boot Time', 'Time Zone']:
         if key in kv:
-            result[key.lower().replace(' ', '_').replace(':', '_').replace('__', '_')] = kv[key]
+            result[key.lower().replace(' ', '_').replace(
+                ':', '_').replace('__', '_')] = kv[key]
     return result
 
 
@@ -630,7 +640,7 @@ def _parse_windows_memory(text):
         if capacity:
             dimm['size_gb'] = round(capacity / (1024 ** 3), 2)
         for k in ['manufacturer', 'partnumber', 'speed', 'memorytype',
-                   'formfactor', 'banklabel', 'devicelocator', 'serialnumber']:
+                  'formfactor', 'banklabel', 'devicelocator', 'serialnumber']:
             if k in d:
                 dimm[k] = d[k]
         if dimm:
@@ -664,7 +674,8 @@ def _parse_windows_disk(text):
         size = _safe_int(d.get('size', '0'))
         if size:
             disk['size_gb'] = round(size / (1024 ** 3), 2)
-        for k in ['model', 'mediatype', 'interfacetype', 'serialnumber', 'caption']:
+        for k in ['model', 'mediatype',
+                  'interfacetype', 'serialnumber', 'caption']:
             if k in d:
                 disk[k] = d[k]
         if disk:
@@ -707,7 +718,8 @@ def _build_linux(raw, structured):
 
     vuln_text = _get_output(raw, 'cpu_vulnerabilities')
     if vuln_text:
-        structured['cpu_vulnerabilities'] = _parse_cpu_vulnerabilities(vuln_text)
+        structured['cpu_vulnerabilities'] = _parse_cpu_vulnerabilities(
+            vuln_text)
 
     # Memory
     meminfo_text = _get_output(raw, 'memory_info')
@@ -795,7 +807,10 @@ def _build_linux(raw, structured):
         enabled = len(re.findall(r'\s+enabled\s', units_text))
         disabled = len(re.findall(r'\s+disabled\s', units_text))
         static = len(re.findall(r'\s+static\s', units_text))
-        systemd['unit_counts'] = {'enabled': enabled, 'disabled': disabled, 'static': static}
+        systemd['unit_counts'] = {
+            'enabled': enabled,
+            'disabled': disabled,
+            'static': static}
     if systemd:
         structured['systemd'] = systemd
 
