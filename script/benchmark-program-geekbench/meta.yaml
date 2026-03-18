@@ -3,23 +3,43 @@ automation_alias: script
 automation_uid: 5b4e0237da074764
 category: Benchmarking
 cache: false
-
 default_env:
   MLC_GEEKBENCH_WORKLOAD: ''
-
+  MLC_GEEKBENCH_ITERATIONS: '3'
+  MLC_GEEKBENCH_NUM_RUNS: '1'
+  MLC_GEEKBENCH_CORE_PINNING: 'no'
+  MLC_GEEKBENCH_PINNED_CORE: '0'
+  MLC_GEEKBENCH_EXTRA_ARGS: ''
 deps:
 - tags: detect,os
 - tags: detect,cpu
 - names:
   - get-geekbench
   tags: get,geekbench
-
+- names:
+  - get-platform-details
+  tags: get,platform,details
 input_mapping:
   license_email: MLC_GEEKBENCH_LICENSE_EMAIL
   license_key: MLC_GEEKBENCH_LICENSE_KEY
   workload: MLC_GEEKBENCH_WORKLOAD
-  local_file: MLC_GEEKBENCH_LOCAL_FILE
-  export_json: MLC_GEEKBENCH_EXPORT_JSON
+  iterations: MLC_GEEKBENCH_ITERATIONS
+  num_runs: MLC_GEEKBENCH_NUM_RUNS
+  core_pinning: MLC_GEEKBENCH_CORE_PINNING
+  pinned_core: MLC_GEEKBENCH_PINNED_CORE
+  results_dir: MLC_GEEKBENCH_RESULTS_DIR
+  extra_args: MLC_GEEKBENCH_EXTRA_ARGS
+  save: MLC_GEEKBENCH_SAVE_FILE
+  load: MLC_GEEKBENCH_LOAD_FILE
+  export_html: MLC_GEEKBENCH_EXPORT_HTML
+  export_xml: MLC_GEEKBENCH_EXPORT_XML
+  export_text: MLC_GEEKBENCH_EXPORT_TEXT
+  gpu_platform_id: MLC_GEEKBENCH_GPU_PLATFORM_ID
+  gpu_device_id: MLC_GEEKBENCH_GPU_DEVICE_ID
+  section: MLC_GEEKBENCH_SECTION
+  workload_ids: MLC_GEEKBENCH_WORKLOAD_IDS
+  cpu_workers: MLC_GEEKBENCH_CPU_WORKERS
+  workload_gap: MLC_GEEKBENCH_WORKLOAD_GAP
 new_env_keys:
 - MLC_GEEKBENCH_*
 tags:
@@ -36,25 +56,45 @@ variations:
   cpu:
     default: true
     env:
-      MLC_GEEKBENCH_WORKLOAD: ''
+      MLC_GEEKBENCH_WORKLOAD: '--cpu'
+    group: workload
+  gpu:
+    env:
+      MLC_GEEKBENCH_WORKLOAD: '--gpu'
+    group: workload
+  gpu-vulkan:
+    env:
+      MLC_GEEKBENCH_WORKLOAD: '--gpu Vulkan'
+    group: workload
+  gpu-opencl:
+    env:
+      MLC_GEEKBENCH_WORKLOAD: '--gpu OpenCL'
+    group: workload
+  gpu-cuda:
+    env:
+      MLC_GEEKBENCH_WORKLOAD: '--gpu CUDA'
+    group: workload
+  gpu-metal:
+    env:
+      MLC_GEEKBENCH_WORKLOAD: '--gpu Metal'
     group: workload
   compute:
     env:
       MLC_GEEKBENCH_WORKLOAD: '--compute'
     group: workload
-  gpu-opencl:
+  compute-opencl:
     env:
       MLC_GEEKBENCH_WORKLOAD: '--compute OpenCL'
     group: workload
-  gpu-vulkan:
+  compute-vulkan:
     env:
       MLC_GEEKBENCH_WORKLOAD: '--compute Vulkan'
     group: workload
-  gpu-cuda:
+  compute-cuda:
     env:
       MLC_GEEKBENCH_WORKLOAD: '--compute CUDA'
     group: workload
-  gpu-metal:
+  compute-metal:
     env:
       MLC_GEEKBENCH_WORKLOAD: '--compute Metal'
     group: workload
@@ -67,6 +107,31 @@ variations:
     env:
       MLC_GEEKBENCH_NO_UPLOAD: 'no'
     group: upload-mode
+  single-core:
+    env:
+      MLC_GEEKBENCH_SINGLE_CORE: 'yes'
+      MLC_GEEKBENCH_MULTI_CORE: ''
+    group: core-mode
+  multi-core:
+    env:
+      MLC_GEEKBENCH_SINGLE_CORE: ''
+      MLC_GEEKBENCH_MULTI_CORE: 'yes'
+    group: core-mode
+  all-cores:
+    default: true
+    env:
+      MLC_GEEKBENCH_SINGLE_CORE: ''
+      MLC_GEEKBENCH_MULTI_CORE: ''
+    group: core-mode
+  sysinfo:
+    env:
+      MLC_GEEKBENCH_SYSINFO_ONLY: 'yes'
+  gpu-list:
+    env:
+      MLC_GEEKBENCH_GPU_LIST: 'yes'
+  workload-list:
+    env:
+      MLC_GEEKBENCH_WORKLOAD_LIST: 'yes'
 versions:
   5.5.1:
     adr:
