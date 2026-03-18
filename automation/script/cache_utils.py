@@ -328,8 +328,6 @@ def run_validate_cache_if_present(i, cached_script):
     env_saved = copy.deepcopy(env)
     state_saved = copy.deepcopy(state)
 
-
-
     path_to_cached_state_file = os.path.join(
         cached_script.path,
         i['self'].file_with_cached_state
@@ -388,7 +386,7 @@ def run_validate_cache_if_present(i, cached_script):
 
     i['self'].env = env_saved
     i['self'].state = state_saved
-    
+
     if r['return'] > 0:
         return None
 
