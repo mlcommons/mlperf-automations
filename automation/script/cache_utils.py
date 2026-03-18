@@ -323,8 +323,8 @@ def run_validate_cache_if_present(i, cached_script):
     )
 
     # reconstruct env/state from cached metadata
-    env = i['self'].env
-    state = i['self'].state
+    env = i['env']
+    state = i['state']
     env_saved = copy.deepcopy(env)
     state_saved = copy.deepcopy(state)
 
@@ -384,8 +384,8 @@ def run_validate_cache_if_present(i, cached_script):
         'detect_version': True
     })
 
-    i['self'].env = env_saved
-    i['self'].state = state_saved
+    i['env'] = env_saved
+    i['state'] = state_saved
 
     if r['return'] > 0:
         return None
