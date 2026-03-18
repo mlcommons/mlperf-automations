@@ -127,6 +127,11 @@ class ScriptAutomation(Automation):
         self.main_script_force_new_cache = run_args.get(
             'new', False)  # only set for the initial script being called
 
+        current_path = os.path.abspath(os.getcwd())
+        r = _update_env(self.env, 'MLC_USER_RUN_DIR', current_path)
+        if r['return'] > 0:
+            return r
+
     def init_run_state(self, run_state):
 
         run_state = run_state or {}
@@ -5568,11 +5573,26 @@ def update_env_from_input_mapping(
     """
     Internal: update env from input and input_mapping
     """
+
     for key in input_mapping:
         if key in inp:
             if key in input_description and str(input_description[key].get(
                     'is_path', '')).lower() in ['1', 'yes', 'on', 'true']:
-                env[input_mapping[key]] = os.path.expanduser(inp[key])
+
+                # 1. Expand the '~' if it exists
+                path_val = os.path.expanduser(inp[key])
+
+                # 2. Check if the path is NOT already absolute
+                if not os.path.isabs(path_val):
+                    # Safely get the base dir (fallback to current working dir
+                    # just in case)
+                    base_dir = env.get("MLC_USER_RUN_DIR", os.getcwd())
+
+                    # Join the base dir with the relative path and normalize it
+                    path_val = os.path.abspath(
+                        os.path.join(base_dir, path_val))
+
+                env[input_mapping[key]] = path_val
             else:
                 env[input_mapping[key]] = inp[key]
 
