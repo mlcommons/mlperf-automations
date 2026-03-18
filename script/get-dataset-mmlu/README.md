@@ -1,4 +1,4 @@
-# README for benchmark-program-geekbench
+# README for get-dataset-mmlu
 This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,18 +33,14 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr benchmark,geekbench,benchmark-geekbench,benchmark-program-geekbench
+mlcr get-dataset-mmlu
 ```
 
 ### Script Inputs
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
-| `--license_email` |  |  | `` |
-| `--license_key` |  |  | `` |
-| `--workload` |  |  | `` |
-| `--local_file` |  |  | `` |
-| `--export_json` |  |  | `` |
+| `--out_path` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -67,16 +63,7 @@ mlcr benchmark,geekbench,benchmark-geekbench,benchmark-program-geekbench
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
-### Upload-mode
+### Ungrouped
 
-- `no-upload` (default)
-- `upload`
-
-### Workload
-
-- `compute`
-- `cpu` (default)
-- `gpu-cuda`
-- `gpu-metal`
-- `gpu-opencl`
-- `gpu-vulkan`
+- `mlc`
+- `no-of-samples.#` _(# can be substituted dynamically)_

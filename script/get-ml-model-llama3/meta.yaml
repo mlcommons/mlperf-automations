@@ -82,6 +82,8 @@ variations:
   r2-downloader:
     default: true
     group: download-tool
+    env:
+      MLC_DOWNLOAD_FILENAME: <<<MLC_ML_MODEL_NAME>>>
     add_deps_recursive:
       dae:
         tags: _r2-downloader
