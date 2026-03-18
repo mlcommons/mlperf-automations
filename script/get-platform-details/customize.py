@@ -19,10 +19,10 @@ def preprocess(i):
     os_info = i['os_info']
     env = i['env']
 
-    if not check_installation("numactl", os_info):
-        env['MLC_INSTALL_NUMACTL'] = 'True'
-
-    env['MLC_INSTALL_CPUPOWER'] = 'True'
+    if os_info['platform'] == 'linux':
+        if not check_installation("numactl", os_info):
+            env['MLC_INSTALL_NUMACTL'] = 'True'
+        env['MLC_INSTALL_CPUPOWER'] = 'True'
 
     if env.get('MLC_PLATFORM_DETAILS_FILE_PATH', '') == '':
         if env.get('MLC_PLATFORM_DETAILS_DIR_PATH', '') == '':
@@ -31,6 +31,10 @@ def preprocess(i):
             env['MLC_PLATFORM_DETAILS_FILE_NAME'] = "system-info.json"
         env['MLC_PLATFORM_DETAILS_FILE_PATH'] = os.path.join(
             env['MLC_PLATFORM_DETAILS_DIR_PATH'], env['MLC_PLATFORM_DETAILS_FILE_NAME'])
+
+    # Derive the raw file path from the parsed file path
+    base, ext = os.path.splitext(env['MLC_PLATFORM_DETAILS_FILE_PATH'])
+    env['MLC_PLATFORM_DETAILS_RAW_FILE_PATH'] = base + '-raw' + ext
 
     return {'return': 0}
 
@@ -42,7 +46,9 @@ def postprocess(i):
     os_info = i['os_info']
     automation = i['automation']
 
-    raw_path = env.get('MLC_PLATFORM_DETAILS_FILE_PATH', '')
+    raw_path = env.get('MLC_PLATFORM_DETAILS_RAW_FILE_PATH', '')
+    parsed_path = env.get('MLC_PLATFORM_DETAILS_FILE_PATH', '')
+
     if not raw_path or not os.path.isfile(raw_path):
         return {'return': 0}
 
@@ -52,20 +58,10 @@ def postprocess(i):
     except Exception:
         return {'return': 0}
 
-    # If already processed, use _raw for re-processing
-    if '_raw' in raw:
-        raw = raw['_raw']
+    structured = _build_structured(raw, os_info.get('platform', 'linux'))
 
-    structured = _build_structured(raw)
-
-    # Write back the structured JSON, keeping the raw data under "_raw"
-    output = {
-        **structured,
-        '_raw': raw,
-    }
-
-    with open(raw_path, 'w') as f:
-        json.dump(output, f, indent=2)
+    with open(parsed_path, 'w') as f:
+        json.dump(structured, f, indent=2)
 
     return {'return': 0}
 
@@ -109,6 +105,10 @@ def _parse_key_value_colon(text):
     return result
 
 
+# =====================================================================
+# Linux parsers
+# =====================================================================
+
 def _parse_lscpu(text):
     """Parse lscpu output into a structured dict."""
     kv = _parse_key_value_colon(text)
@@ -139,8 +139,7 @@ def _parse_lscpu(text):
     caches = {}
     for label in ['L1d cache', 'L1i cache', 'L2 cache', 'L3 cache']:
         if label in kv:
-            caches[label.replace(' cache', '').replace(
-                ' ', '_').lower()] = kv[label]
+            caches[label.replace(' cache', '').replace(' ', '_').lower()] = kv[label]
     cpu['caches'] = caches
 
     # NUMA
@@ -167,16 +166,13 @@ def _parse_meminfo(text):
     for line in text.splitlines():
         m = re.match(r'(\S+):\s+(\d+)\s*(\S*)', line)
         if m:
-            key = m.group(1)
-            val = _safe_int(m.group(2))
-            unit = m.group(3)
-            raw_entries[key] = val if unit != 'kB' else val
+            raw_entries[m.group(1)] = _safe_int(m.group(2))
 
     def _kb_to_gb(key):
         v = raw_entries.get(key, 0)
         return round(v / 1048576, 2) if v else 0
 
-    result = {
+    return {
         'total_kb': raw_entries.get('MemTotal', 0),
         'total_gb': _kb_to_gb('MemTotal'),
         'free_kb': raw_entries.get('MemFree', 0),
@@ -196,11 +192,9 @@ def _parse_meminfo(text):
         'shmem_kb': raw_entries.get('Shmem', 0),
     }
 
-    return result
-
 
 def _parse_os_release(text):
-    """Parse /etc/os-release into a dict."""
+    """Parse /etc/os-release or macOS sw_vers style output into a dict."""
     result = {}
     for line in text.splitlines():
         if '=' in line:
@@ -294,22 +288,17 @@ def _parse_cpu_frequency(text):
     m = re.search(r'available cpufreq governors:\s+(.+)', text)
     if m:
         result['available_governors'] = m.group(1).strip().split()
-    m = re.search(
-        r'current CPU frequency:.*?(\d[\d.]+\s*\w+)\s*\(asserted', text)
+    m = re.search(r'current CPU frequency:.*?(\d[\d.]+\s*\w+)\s*\(asserted', text)
     if m:
         result['current_frequency'] = m.group(1).strip()
 
-    # current policy
-    m = re.search(
-        r'current policy:.*?frequency should be within (.+?) and ([\d.]+ [A-Za-z]+)',
-        text,
-        re.DOTALL)
+    # Current policy
+    m = re.search(r'current policy:.*?frequency should be within (.+?) and ([\d.]+ [A-Za-z]+)', text, re.DOTALL)
     if m:
         result['policy_min'] = m.group(1).strip()
         result['policy_max'] = m.group(2).strip()
 
-    # Boost info - use regex that matches "N.NN GHz" (digits, dot, digits,
-    # space, unit)
+    # Boost info
     boost = {}
     m = re.search(r'Supported:\s+(yes|no)', text)
     if m:
@@ -349,25 +338,22 @@ def _parse_dmidecode_bios(text):
 def _parse_dmidecode_memory(text):
     """Parse dmidecode output for Memory Device entries (DMI type 17)."""
     dimms = []
-    # Split into sections by Handle
     sections = re.split(r'\nHandle ', text)
     for section in sections:
         if 'Memory Device' not in section:
             continue
-        # Only parse actual DIMM entries (have Size field)
         kv = _parse_key_value_colon(section)
         size = kv.get('Size', '')
         if not size or size == 'No Module Installed':
             continue
-        # Skip Memory Device Mapped Address entries (they don't have Type)
         if 'Type' not in kv:
             continue
         dimm = {}
         for key in ['Size', 'Form Factor', 'Locator', 'Bank Locator', 'Type',
-                    'Speed', 'Manufacturer', 'Part Number', 'Rank',
-                    'Configured Memory Speed', 'Minimum Voltage', 'Maximum Voltage',
-                    'Configured Voltage', 'Memory Technology', 'Total Width', 'Data Width',
-                    'Serial Number']:
+                     'Speed', 'Manufacturer', 'Part Number', 'Rank',
+                     'Configured Memory Speed', 'Minimum Voltage', 'Maximum Voltage',
+                     'Configured Voltage', 'Memory Technology', 'Total Width', 'Data Width',
+                     'Serial Number']:
             if key in kv:
                 dimm[key.lower().replace(' ', '_')] = kv[key]
         dimms.append(dimm)
@@ -375,7 +361,7 @@ def _parse_dmidecode_memory(text):
 
 
 def _parse_dmidecode_system(text):
-    """Parse dmidecode for System Information (DMI type 1) and Base Board (DMI type 2)."""
+    """Parse dmidecode for System Information, Base Board, and Chassis."""
     result = {}
     sections = re.split(r'\nHandle ', text)
     for section in sections:
@@ -387,15 +373,13 @@ def _parse_dmidecode_system(text):
                 if key in kv:
                     val = kv[key]
                     if val != 'Default string':
-                        sys_info[key.lower().replace(
-                            ' ', '_').replace('-', '_')] = val
+                        sys_info[key.lower().replace(' ', '_').replace('-', '_')] = val
             if sys_info:
                 result['system'] = sys_info
         elif 'Base Board Information' in section:
             kv = _parse_key_value_colon(section)
             board = {}
-            for key in ['Manufacturer', 'Product Name',
-                        'Version', 'Serial Number', 'Type']:
+            for key in ['Manufacturer', 'Product Name', 'Version', 'Serial Number', 'Type']:
                 if key in kv:
                     val = kv[key]
                     if val != 'Default string':
@@ -427,12 +411,9 @@ def _parse_cpu_vulnerabilities(text):
     """Parse /sys/devices/system/cpu/vulnerabilities/ output."""
     result = {}
     for line in text.splitlines():
-        # Format: /sys/devices/system/cpu/vulnerabilities/NAME:STATUS
         m = re.match(r'.*/vulnerabilities/(\S+):(.+)', line)
         if m:
-            name = m.group(1).strip()
-            status = m.group(2).strip()
-            result[name] = status
+            result[m.group(1).strip()] = m.group(2).strip()
     return result
 
 
@@ -468,70 +449,290 @@ def _parse_sysctl_key_settings(text):
         'net.core.somaxconn', 'net.core.rmem_max', 'net.core.wmem_max',
         'net.ipv4.tcp_max_syn_backlog', 'net.ipv4.ip_local_port_range',
     ]
-    settings = {}
     kv = {}
     for line in text.splitlines():
         if ' = ' in line:
             key, _, val = line.partition(' = ')
             kv[key.strip()] = val.strip()
-    for k in interesting_keys:
-        if k in kv:
-            settings[k] = kv[k]
-    return settings
+    return {k: kv[k] for k in interesting_keys if k in kv}
 
 
-def _build_structured(raw):
+# =====================================================================
+# macOS parsers
+# =====================================================================
+
+def _parse_sysctl_hw(text):
+    """Parse macOS 'sysctl hw' output into a CPU/hardware dict."""
+    kv = {}
+    for line in text.splitlines():
+        if ':' in line:
+            key, _, val = line.partition(':')
+            kv[key.strip()] = val.strip()
+
+    cpu = {
+        'model_name': kv.get('machdep.cpu.brand_string', ''),
+        'total_cpus': _safe_int(kv.get('hw.ncpu', kv.get('hw.logicalcpu', ''))),
+        'physical_cpus': _safe_int(kv.get('hw.physicalcpu', '')),
+        'logical_cpus': _safe_int(kv.get('hw.logicalcpu', '')),
+        'cpu_family': kv.get('machdep.cpu.family', ''),
+        'cpu_model': kv.get('machdep.cpu.model', ''),
+        'stepping': kv.get('machdep.cpu.stepping', ''),
+        'vendor_id': kv.get('machdep.cpu.vendor', ''),
+        'cpu_freq_hz': _safe_int(kv.get('hw.cpufrequency', '')),
+        'l1d_cache': _safe_int(kv.get('hw.l1dcachesize', '')),
+        'l1i_cache': _safe_int(kv.get('hw.l1icachesize', '')),
+        'l2_cache': _safe_int(kv.get('hw.l2cachesize', '')),
+        'l3_cache': _safe_int(kv.get('hw.l3cachesize', '')),
+        'memory_bytes': _safe_int(kv.get('hw.memsize', '')),
+    }
+
+    mem_bytes = cpu.pop('memory_bytes', 0)
+    memory = {}
+    if mem_bytes:
+        memory['total_bytes'] = mem_bytes
+        memory['total_gb'] = round(mem_bytes / (1024 ** 3), 2)
+
+    return cpu, memory
+
+
+def _parse_system_profiler(text):
+    """Parse macOS system_profiler SPHardwareDataType output."""
+    kv = _parse_key_value_colon(text)
+    result = {}
+    for key in ['Model Name', 'Model Identifier', 'Chip', 'Total Number of Cores',
+                'Memory', 'System Firmware Version', 'OS Loader Version',
+                'Serial Number (system)', 'Hardware UUID', 'Provisioning UDID']:
+        if key in kv:
+            result[key.lower().replace(' ', '_').replace('(', '').replace(')', '')] = kv[key]
+    return result
+
+
+def _parse_sw_vers(text):
+    """Parse macOS sw_vers output."""
+    result = {}
+    for line in text.splitlines():
+        if ':' in line:
+            key, _, val = line.partition(':')
+            result[key.strip().lower().replace(' ', '_')] = val.strip()
+    return result
+
+
+def _parse_diskutil(text):
+    """Parse macOS diskutil list output into a simple list."""
+    disks = []
+    current_disk = None
+    for line in text.splitlines():
+        m = re.match(r'^(/dev/\S+)\s+\((\w+).*?\):', line)
+        if m:
+            current_disk = {'device': m.group(1), 'type': m.group(2)}
+            disks.append(current_disk)
+        elif current_disk and line.strip():
+            m2 = re.match(r'\s+\d+:\s+(\S+)\s+(.+?)\s+([\d.]+\s+\S+)\s+(\S+)', line)
+            if m2:
+                current_disk.setdefault('partitions', []).append({
+                    'type': m2.group(1),
+                    'name': m2.group(2).strip(),
+                    'size': m2.group(3),
+                    'identifier': m2.group(4),
+                })
+    return disks
+
+
+def _parse_macos_sysctl_settings(text):
+    """Extract interesting macOS sysctl settings."""
+    interesting_keys = [
+        'kern.maxproc', 'kern.maxfiles', 'kern.maxfilesperproc',
+        'kern.hostname', 'kern.ostype', 'kern.osrelease', 'kern.osrevision',
+        'kern.version', 'kern.boottime', 'vm.swapusage',
+        'machdep.cpu.core_count', 'machdep.cpu.thread_count',
+        'machdep.cpu.features', 'machdep.cpu.leaf7_features',
+    ]
+    kv = {}
+    for line in text.splitlines():
+        if ':' in line:
+            key, _, val = line.partition(':')
+            kv[key.strip()] = val.strip()
+    return {k: kv[k] for k in interesting_keys if k in kv}
+
+
+# =====================================================================
+# Windows parsers
+# =====================================================================
+
+def _parse_systeminfo(text):
+    """Parse Windows systeminfo output."""
+    kv = _parse_key_value_colon(text)
+    result = {}
+    for key in ['Host Name', 'OS Name', 'OS Version', 'OS Manufacturer',
+                'OS Configuration', 'OS Build Type', 'Registered Owner',
+                'System Manufacturer', 'System Model', 'System Type',
+                'BIOS Version', 'Total Physical Memory', 'Available Physical Memory',
+                'Virtual Memory: Max Size', 'Virtual Memory: Available',
+                'Virtual Memory: In Use', 'Domain', 'Logon Server',
+                'Boot Device', 'System Directory', 'Original Install Date',
+                'System Boot Time', 'Time Zone']:
+        if key in kv:
+            result[key.lower().replace(' ', '_').replace(':', '_').replace('__', '_')] = kv[key]
+    return result
+
+
+def _parse_windows_cpu(text):
+    """Parse Windows CPU info (from Get-CimInstance or wmic)."""
+    result = {}
+    kv = _parse_key_value_colon(text)
+    for key in ['Name', 'Manufacturer', 'MaxClockSpeed', 'CurrentClockSpeed',
+                'NumberOfCores', 'NumberOfLogicalProcessors', 'L2CacheSize',
+                'L3CacheSize', 'Architecture', 'Caption', 'DeviceID',
+                'ProcessorId', 'SocketDesignation', 'AddressWidth',
+                'VirtualizationFirmwareEnabled']:
+        if key in kv:
+            result[key.lower()] = kv[key]
+    # Unify
+    cpu = {
+        'model_name': result.get('name', result.get('caption', '')),
+        'manufacturer': result.get('manufacturer', ''),
+        'total_cpus': _safe_int(result.get('numberoflogicalprocessors', '')),
+        'cores': _safe_int(result.get('numberofcores', '')),
+        'max_clock_mhz': _safe_int(result.get('maxclockspeed', '')),
+        'current_clock_mhz': _safe_int(result.get('currentclockspeed', '')),
+        'l2_cache_kb': _safe_int(result.get('l2cachesize', '')),
+        'l3_cache_kb': _safe_int(result.get('l3cachesize', '')),
+        'socket': result.get('socketdesignation', ''),
+        'address_width': _safe_int(result.get('addresswidth', '')),
+    }
+    return cpu
+
+
+def _parse_windows_memory(text):
+    """Parse Windows memory info (from Get-CimInstance Win32_PhysicalMemory)."""
+    dimms = []
+    current = {}
+    for line in text.splitlines():
+        line = line.strip()
+        if not line:
+            if current:
+                dimms.append(current)
+                current = {}
+            continue
+        if ':' in line:
+            key, _, val = line.partition(':')
+            key = key.strip().lower()
+            val = val.strip()
+            if key and val:
+                current[key] = val
+    if current:
+        dimms.append(current)
+
+    result = []
+    for d in dimms:
+        dimm = {}
+        capacity = _safe_int(d.get('capacity', '0'))
+        if capacity:
+            dimm['size_gb'] = round(capacity / (1024 ** 3), 2)
+        for k in ['manufacturer', 'partnumber', 'speed', 'memorytype',
+                   'formfactor', 'banklabel', 'devicelocator', 'serialnumber']:
+            if k in d:
+                dimm[k] = d[k]
+        if dimm:
+            result.append(dimm)
+    return result
+
+
+def _parse_windows_disk(text):
+    """Parse Windows disk info (from Get-CimInstance Win32_DiskDrive)."""
+    disks = []
+    current = {}
+    for line in text.splitlines():
+        line = line.strip()
+        if not line:
+            if current:
+                disks.append(current)
+                current = {}
+            continue
+        if ':' in line:
+            key, _, val = line.partition(':')
+            key = key.strip().lower()
+            val = val.strip()
+            if key and val:
+                current[key] = val
+    if current:
+        disks.append(current)
+
+    result = []
+    for d in disks:
+        disk = {}
+        size = _safe_int(d.get('size', '0'))
+        if size:
+            disk['size_gb'] = round(size / (1024 ** 3), 2)
+        for k in ['model', 'mediatype', 'interfacetype', 'serialnumber', 'caption']:
+            if k in d:
+                disk[k] = d[k]
+        if disk:
+            result.append(disk)
+    return result
+
+
+# =====================================================================
+# Build structured JSON
+# =====================================================================
+
+def _build_structured(raw, platform='linux'):
     """Build a well-structured JSON from the raw command outputs."""
-    structured = {}
+    structured = {'platform': platform}
 
-    # ---- CPU ----
+    if platform == 'linux':
+        _build_linux(raw, structured)
+    elif platform == 'darwin':
+        _build_macos(raw, structured)
+    elif platform == 'windows':
+        _build_windows(raw, structured)
+
+    return structured
+
+
+def _build_linux(raw, structured):
+    """Parse Linux command outputs."""
+    # CPU
     lscpu_text = _get_output(raw, 'lscpu')
     if lscpu_text:
         structured['cpu'] = _parse_lscpu(lscpu_text)
 
-    # ---- CPU Cache ----
     cache_text = _get_output(raw, 'cpu_cache')
     if cache_text:
         structured['cpu_cache_topology'] = _parse_cpu_cache_table(cache_text)
 
-    # ---- CPU Frequency ----
     freq_text = _get_output(raw, 'cpu_frequency')
     if freq_text:
         structured['cpu_frequency'] = _parse_cpu_frequency(freq_text)
 
-    # ---- CPU Vulnerabilities (from /sys) ----
     vuln_text = _get_output(raw, 'cpu_vulnerabilities')
     if vuln_text:
-        structured['cpu_vulnerabilities'] = _parse_cpu_vulnerabilities(
-            vuln_text)
+        structured['cpu_vulnerabilities'] = _parse_cpu_vulnerabilities(vuln_text)
 
-    # ---- Memory ----
+    # Memory
     meminfo_text = _get_output(raw, 'memory_info')
     if meminfo_text:
         structured['memory'] = _parse_meminfo(meminfo_text)
 
-    # ---- Memory human-readable (free -h) ----
     memfree_text = _get_output(raw, 'memory_free_human')
     if memfree_text:
         structured['memory_human'] = _parse_memory_free_human(memfree_text)
 
-    # ---- Memory DIMMs (from dmidecode) ----
+    # DMI
     dmi_text = _get_output(raw, 'dmidecode_full')
     if dmi_text:
         dimms = _parse_dmidecode_memory(dmi_text)
         if dimms:
             structured['memory_dimms'] = dimms
-        # System & baseboard info
         hw_info = _parse_dmidecode_system(dmi_text)
         if hw_info:
             structured['hardware'] = hw_info
 
-    # ---- BIOS ----
     bios_text = _get_output(raw, 'bios_info')
     if bios_text:
         structured['bios'] = _parse_dmidecode_bios(bios_text)
 
-    # ---- Operating System ----
+    # OS
     os_release_text = _get_output(raw, 'os_release')
     if os_release_text:
         structured['os'] = _parse_os_release(os_release_text)
@@ -544,7 +745,7 @@ def _build_structured(raw):
     if lsb:
         structured.setdefault('os', {})['lsb_description'] = lsb
 
-    # ---- Kernel ----
+    # Kernel
     kernel = {}
     uname = _get_output(raw, 'kernel_and_arch')
     if uname:
@@ -558,12 +759,12 @@ def _build_structured(raw):
     if kernel:
         structured['kernel'] = kernel
 
-    # ---- NUMA ----
+    # NUMA
     numa_text = _get_output(raw, 'numa_topology')
     if numa_text:
         structured['numa'] = _parse_numa(numa_text)
 
-    # ---- Transparent Huge Pages ----
+    # THP
     thp = {}
     thp_enabled = _get_output(raw, 'thp_enabled')
     if thp_enabled:
@@ -574,42 +775,38 @@ def _build_structured(raw):
     if thp:
         structured['transparent_hugepages'] = thp
 
-    # ---- Disks ----
+    # Disks
     disk_text = _get_output(raw, 'disk_layout')
     if disk_text:
         structured['disks'] = _parse_disk_layout(disk_text)
 
-    # ---- ulimit ----
+    # ulimit
     ulimit_text = _get_output(raw, 'ulimit_settings')
     if ulimit_text:
         structured['ulimits'] = _parse_ulimit(ulimit_text)
 
-    # ---- Systemd ----
+    # Systemd
     systemd = {}
     ver = _get_output(raw, 'systemd_version')
     if ver:
         systemd['version'] = ver
     units_text = _get_output(raw, 'systemd_units')
     if units_text:
-        # Count enabled/disabled services
         enabled = len(re.findall(r'\s+enabled\s', units_text))
         disabled = len(re.findall(r'\s+disabled\s', units_text))
         static = len(re.findall(r'\s+static\s', units_text))
-        systemd['unit_counts'] = {
-            'enabled': enabled,
-            'disabled': disabled,
-            'static': static}
+        systemd['unit_counts'] = {'enabled': enabled, 'disabled': disabled, 'static': static}
     if systemd:
         structured['systemd'] = systemd
 
-    # ---- Sysctl (key settings only) ----
+    # Sysctl
     sysctl_text = _get_output(raw, 'sysctl_all')
     if sysctl_text:
         sysctl = _parse_sysctl_key_settings(sysctl_text)
         if sysctl:
             structured['sysctl'] = sysctl
 
-    # ---- Current user / uptime ----
+    # User / uptime
     user = _get_output(raw, 'current_user')
     if user:
         structured['current_user'] = user
@@ -623,14 +820,14 @@ def _build_structured(raw):
         if m:
             structured['load_average'] = m.group(1).strip()
 
-    # ---- Runlevel ----
+    # Runlevel
     runlevel_text = _get_output(raw, 'runlevel')
     if runlevel_text:
         m = re.search(r'run-level\s+(\d+)', runlevel_text)
         if m:
             structured['runlevel'] = _safe_int(m.group(1))
 
-    # ---- PCI devices ----
+    # PCI devices
     pci_text = _get_output(raw, 'pci_devices')
     if pci_text and 'FAILED' not in pci_text:
         devices = []
@@ -645,12 +842,130 @@ def _build_structured(raw):
         if devices:
             structured['pci_devices'] = devices
 
-    # ---- Infiniband ----
+    # Infiniband
     ib_text = _get_output(raw, 'infiniband_status')
     if ib_text and 'FAILED' not in ib_text and 'not found' not in ib_text.lower():
         structured['infiniband'] = ib_text
 
-    # ---- GPU (CUDA) ----
+    # GPU (CUDA)
+    _parse_gpu_entries(raw, structured)
+
+
+def _build_macos(raw, structured):
+    """Parse macOS command outputs."""
+    # CPU from sysctl hw
+    hw_text = _get_output(raw, 'sysctl_hw')
+    if hw_text:
+        cpu, memory = _parse_sysctl_hw(hw_text)
+        structured['cpu'] = cpu
+        if memory:
+            structured['memory'] = memory
+
+    # System profiler
+    profiler_text = _get_output(raw, 'system_profiler')
+    if profiler_text:
+        structured['hardware'] = _parse_system_profiler(profiler_text)
+
+    # sw_vers
+    swvers_text = _get_output(raw, 'sw_vers')
+    if swvers_text:
+        structured['os'] = _parse_sw_vers(swvers_text)
+
+    op_sys = _get_output(raw, 'operating_system')
+    if op_sys:
+        structured.setdefault('os', {})['mlc_os_string'] = op_sys
+
+    # Kernel
+    uname = _get_output(raw, 'kernel_and_arch')
+    if uname:
+        parts = uname.split()
+        structured['kernel'] = {
+            'uname': uname,
+            'version': parts[2] if len(parts) >= 3 else '',
+        }
+
+    # Disks
+    disk_text = _get_output(raw, 'diskutil')
+    if disk_text:
+        structured['disks'] = _parse_diskutil(disk_text)
+
+    # ulimit
+    ulimit_text = _get_output(raw, 'ulimit_settings')
+    if ulimit_text:
+        structured['ulimits'] = _parse_ulimit(ulimit_text)
+
+    # Sysctl settings
+    sysctl_text = _get_output(raw, 'sysctl_all')
+    if sysctl_text:
+        sysctl = _parse_macos_sysctl_settings(sysctl_text)
+        if sysctl:
+            structured['sysctl'] = sysctl
+
+    # User / uptime
+    user = _get_output(raw, 'current_user')
+    if user:
+        structured['current_user'] = user
+
+    w_text = _get_output(raw, 'logged_in_users')
+    if w_text:
+        m = re.search(r'up\s+(.+?),\s+\d+\s+user', w_text)
+        if m:
+            structured['uptime'] = m.group(1).strip()
+        m = re.search(r'load average[s]?:\s+(.+)', w_text)
+        if m:
+            structured['load_average'] = m.group(1).strip()
+
+    # GPU
+    _parse_gpu_entries(raw, structured)
+
+
+def _build_windows(raw, structured):
+    """Parse Windows command outputs."""
+    # systeminfo
+    sysinfo_text = _get_output(raw, 'systeminfo')
+    if sysinfo_text:
+        structured['system'] = _parse_systeminfo(sysinfo_text)
+
+    # CPU
+    cpu_text = _get_output(raw, 'cpu_info')
+    if cpu_text:
+        structured['cpu'] = _parse_windows_cpu(cpu_text)
+
+    # OS
+    os_text = _get_output(raw, 'os_info')
+    if os_text:
+        structured['os'] = _parse_key_value_colon(os_text)
+
+    op_sys = _get_output(raw, 'operating_system')
+    if op_sys:
+        structured.setdefault('os', {})['mlc_os_string'] = op_sys
+
+    # Memory
+    mem_text = _get_output(raw, 'memory_info')
+    if mem_text:
+        structured['memory_dimms'] = _parse_windows_memory(mem_text)
+
+    # Disks
+    disk_text = _get_output(raw, 'disk_info')
+    if disk_text:
+        structured['disks'] = _parse_windows_disk(disk_text)
+
+    # Kernel
+    uname = _get_output(raw, 'kernel_and_arch')
+    if uname:
+        structured['kernel'] = {'version': uname}
+
+    # User
+    user = _get_output(raw, 'current_user')
+    if user:
+        structured['current_user'] = user
+
+    # GPU
+    _parse_gpu_entries(raw, structured)
+
+
+def _parse_gpu_entries(raw, structured):
+    """Parse GPU/accelerator entries (shared across platforms)."""
     gpu_topo = _get_output(raw, 'nvidia_smi_topo')
     gpu_full = _get_output(raw, 'nvidia_smi_full')
     if gpu_topo or gpu_full:
@@ -660,5 +975,3 @@ def _build_structured(raw):
         if gpu_full:
             gpu['nvidia_smi_query'] = gpu_full
         structured['gpu'] = gpu
-
-    return structured
