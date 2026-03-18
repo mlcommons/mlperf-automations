@@ -1010,8 +1010,8 @@ class ScriptAutomation(Automation):
                             '    - Checking prehook dependencies on other MLC scripts:')
 
                         r = self._call_run_deps(prehook_deps, self.local_env_keys, local_env_keys_from_meta,
-                                            self.recursion_spaces + extra_recursion_spaces,
-                                            variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
+                                                self.recursion_spaces + extra_recursion_spaces,
+                                                variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
                         if r['return'] > 0:
                             return r
 
@@ -1060,8 +1060,9 @@ class ScriptAutomation(Automation):
                                        'append_unique': True})
 
                     if not fake_run:
-                            
-                        clean_env_keys_post_deps = meta.get('clean_env_keys_post_deps', [])
+
+                        clean_env_keys_post_deps = meta.get(
+                            'clean_env_keys_post_deps', [])
 
                         # Check chain of posthook dependencies on other MLC scripts. We consider them same as postdeps when
                         # script is in cache
@@ -1071,8 +1072,8 @@ class ScriptAutomation(Automation):
                                 '    - Checking posthook dependencies on other MLC scripts:')
 
                             r = self._call_run_deps(posthook_deps, self.local_env_keys, clean_env_keys_post_deps,
-                                                self.recursion_spaces + extra_recursion_spaces,
-                                                variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
+                                                    self.recursion_spaces + extra_recursion_spaces,
+                                                    variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
                             if r['return'] > 0:
                                 return r
 
@@ -1081,10 +1082,11 @@ class ScriptAutomation(Automation):
                                 self.recursion_spaces +
                                 '    - Checking post dependencies on other MLC scripts:')
 
-                            # Check chain of post dependencies on other MLC scripts
+                            # Check chain of post dependencies on other MLC
+                            # scripts
                             r = self._call_run_deps(post_deps, self.local_env_keys, clean_env_keys_post_deps,
-                                                self.recursion_spaces + extra_recursion_spaces,
-                                                variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
+                                                    self.recursion_spaces + extra_recursion_spaces,
+                                                    variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
                             if r['return'] > 0:
                                 return r
 
@@ -1540,7 +1542,6 @@ class ScriptAutomation(Automation):
             if r['return'] > 0:
                 return r
 
-            
             # Check chain of pre hook dependencies on other MLC scripts
             if len(prehook_deps) > 0:
                 logger.debug(
@@ -1892,7 +1893,6 @@ class ScriptAutomation(Automation):
             import json
             logger.info(json.dumps(rr, indent=2))
 
-
         if not recursion and show_space:
             stop_disk_stats = shutil.disk_usage("/")
 
@@ -1914,7 +1914,8 @@ class ScriptAutomation(Automation):
 
                 v = new_env.get(p, None)
 
-                logger.info(self.recursion_spaces + '  * {}: {}'.format(t, str(v)))
+                logger.info(self.recursion_spaces +
+                            '  * {}: {}'.format(t, str(v)))
 
         # Check if print nice versions
         if print_versions:
@@ -1932,7 +1933,7 @@ class ScriptAutomation(Automation):
                 '  - running time of script "{}": {:.2f} sec.'.format(
                     ','.join(found_script_tags),
                     elapsed_time))
-        
+
         # Check if pause (useful if running a given script in a new terminal
         # that may close automatically)
         if i.get('pause', False):

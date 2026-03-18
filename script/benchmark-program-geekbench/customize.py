@@ -81,7 +81,8 @@ def merge_sc_mc_results(sc_result, mc_result):
     The merged result looks like a normal full run with both sections."""
     merged = dict(sc_result)  # Start from SC as base
     # Combine sections from both
-    merged['sections'] = list(sc_result.get('sections', [])) + list(mc_result.get('sections', []))
+    merged['sections'] = list(sc_result.get(
+        'sections', [])) + list(mc_result.get('sections', []))
     # Set top-level scores from both
     if 'score' in sc_result:
         merged['score'] = sc_result['score']
@@ -106,7 +107,8 @@ def compute_stats(values):
         'count': len(values)
     }
     if result['mean'] != 0:
-        result['cv_percent'] = round((result['stdev'] / abs(result['mean'])) * 100, 2)
+        result['cv_percent'] = round(
+            (result['stdev'] / abs(result['mean'])) * 100, 2)
     else:
         result['cv_percent'] = 0
     return result
@@ -155,7 +157,8 @@ def preprocess(i):
                     'error': 'MLC_GEEKBENCH_LICENSE_EMAIL is required when MLC_GEEKBENCH_LICENSE_KEY is provided'}
         env['MLC_GEEKBENCH_LICENSE_KEY'] = license_key
         env['MLC_GEEKBENCH_LICENSE_EMAIL'] = license_email
-        logger.info("Geekbench license key provided, will register before benchmark")
+        logger.info(
+            "Geekbench license key provided, will register before benchmark")
 
     # Results directory
     results_dir = env.get('MLC_GEEKBENCH_RESULTS_DIR', os.getcwd())
@@ -305,32 +308,37 @@ def preprocess(i):
             env['MLC_GEEKBENCH_AFFINITY_MASK'] = affinity_mask
             env['MLC_GEEKBENCH_CORE_PINNING'] = 'yes'
 
-        logger.info(f"Split SC/MC mode enabled with core pinning on core {pinned_core}")
+        logger.info(
+            f"Split SC/MC mode enabled with core pinning on core {pinned_core}")
         logger.info(f"  SC command: {sc_cmd}")
         logger.info(f"  MC command: {mc_cmd}")
     else:
         env['MLC_GEEKBENCH_SPLIT_SC_MC'] = 'no'
         base_cmd = f"{q}{geekbench_bin}{q} {' '.join(args)}{extra_exports}"
 
-        # Apply core pinning to the single command (only sensible for --single-core)
+        # Apply core pinning to the single command (only sensible for
+        # --single-core)
         if core_pinning:
             if explicit_multi_core:
                 logger.warning("Core pinning with --multi-core will pin all threads to one core. "
                                "Consider using split mode (all-cores + core_pinning) instead.")
             if platform == 'linux':
                 base_cmd = f"taskset -c {pinned_core} {base_cmd}"
-                logger.info(f"Core pinning enabled (Linux): taskset -c {pinned_core}")
+                logger.info(
+                    f"Core pinning enabled (Linux): taskset -c {pinned_core}")
             elif platform == 'windows':
                 core_num = int(pinned_core)
                 affinity_mask = f"{1 << core_num:x}"
                 env['MLC_GEEKBENCH_AFFINITY_MASK'] = affinity_mask
                 env['MLC_GEEKBENCH_CORE_PINNING'] = 'yes'
-                logger.info(f"Core pinning enabled (Windows): affinity mask 0x{affinity_mask} (core {core_num})")
+                logger.info(
+                    f"Core pinning enabled (Windows): affinity mask 0x{affinity_mask} (core {core_num})")
 
         env['MLC_GEEKBENCH_BASE_CMD'] = base_cmd
         logger.info(f"Geekbench command: {base_cmd}")
 
-    logger.info(f"Native iterations per workload: {iterations}, Number of runs: {num_runs}")
+    logger.info(
+        f"Native iterations per workload: {iterations}, Number of runs: {num_runs}")
     logger.info(f"Results directory: {results_dir}")
 
     return {'return': 0}
@@ -391,7 +399,8 @@ def postprocess(i):
                 result['_split_mode'] = True
                 all_results.append(result)
                 # Save merged JSON for reference
-                merged_file = os.path.join(results_dir, f'geekbench_run{run}.json')
+                merged_file = os.path.join(
+                    results_dir, f'geekbench_run{run}.json')
                 with open(merged_file, 'w') as f:
                     json.dump(result, f, indent=2)
                 logger.info(f"Merged SC+MC results saved: {merged_file}")
@@ -406,7 +415,8 @@ def postprocess(i):
 
             # Load timing data for both SC and MC
             for phase in ['sc', 'mc']:
-                timing_file = os.path.join(results_dir, f'geekbench_run{run}_{phase}_timing.json')
+                timing_file = os.path.join(
+                    results_dir, f'geekbench_run{run}_{phase}_timing.json')
                 if os.path.isfile(timing_file):
                     try:
                         with open(timing_file, 'r') as f:
@@ -422,7 +432,8 @@ def postprocess(i):
                         logger.warning(f"Could not parse {timing_file}: {e}")
 
             # Also load total run timing
-            timing_file = os.path.join(results_dir, f'geekbench_run{run}_timing.json')
+            timing_file = os.path.join(
+                results_dir, f'geekbench_run{run}_timing.json')
             if os.path.isfile(timing_file):
                 try:
                     with open(timing_file, 'r') as f:
@@ -452,7 +463,8 @@ def postprocess(i):
                 logger.warning(f"Results file not found: {json_file}")
 
             # Load timing data
-            timing_file = os.path.join(results_dir, f'geekbench_run{run}_timing.json')
+            timing_file = os.path.join(
+                results_dir, f'geekbench_run{run}_timing.json')
             if os.path.isfile(timing_file):
                 try:
                     with open(timing_file, 'r') as f:
@@ -488,15 +500,21 @@ def postprocess(i):
     for r in all_results:
         sections = extract_workload_scores(r)
         for sec_name, sec_info in sections.items():
-            section_scores.setdefault(sec_name, []).append(sec_info['section_score'])
+            section_scores.setdefault(
+                sec_name, []).append(
+                sec_info['section_score'])
             if sec_name not in workload_data:
                 workload_data[sec_name] = {}
             for wl_name, wl_info in sec_info['workloads'].items():
                 if wl_name not in workload_data[sec_name]:
-                    workload_data[sec_name][wl_name] = {'score': [], 'runtime': [], 'runtimes': []}
-                workload_data[sec_name][wl_name]['score'].append(wl_info['score'])
-                workload_data[sec_name][wl_name]['runtime'].append(wl_info['runtime'])
-                workload_data[sec_name][wl_name]['runtimes'].append(wl_info['runtimes'])
+                    workload_data[sec_name][wl_name] = {
+                        'score': [], 'runtime': [], 'runtimes': []}
+                workload_data[sec_name][wl_name]['score'].append(
+                    wl_info['score'])
+                workload_data[sec_name][wl_name]['runtime'].append(
+                    wl_info['runtime'])
+                workload_data[sec_name][wl_name]['runtimes'].append(
+                    wl_info['runtimes'])
 
     # Compute per-workload statistics
     workload_stats = {}
@@ -518,12 +536,15 @@ def postprocess(i):
     # --- Runtime statistics ---
     # For split mode, compute separate SC/MC/total stats
     runtime_stats = {}
-    total_durations = [d['duration_sec'] for d in run_durations if d['phase'] == 'total']
+    total_durations = [d['duration_sec']
+                       for d in run_durations if d['phase'] == 'total']
     if total_durations:
         runtime_stats['total'] = compute_stats(total_durations)
     if split_mode:
-        sc_durations = [d['duration_sec'] for d in run_durations if d['phase'] == 'SC']
-        mc_durations = [d['duration_sec'] for d in run_durations if d['phase'] == 'MC']
+        sc_durations = [d['duration_sec']
+                        for d in run_durations if d['phase'] == 'SC']
+        mc_durations = [d['duration_sec']
+                        for d in run_durations if d['phase'] == 'MC']
         if sc_durations:
             runtime_stats['single_core'] = compute_stats(sc_durations)
         if mc_durations:
@@ -680,7 +701,9 @@ def _print_results_table(summary):
 
                 max_iters = 0
                 for wl_info in sec_info['workloads'].values():
-                    max_iters = max(max_iters, wl_info.get('iterations_scored', 0))
+                    max_iters = max(
+                        max_iters, wl_info.get(
+                            'iterations_scored', 0))
 
                 headers = ['Workload', 'Score', 'Warmup (s)', 'Mean RT (s)']
                 for it in range(1, max_iters + 1):
@@ -717,7 +740,16 @@ def _print_results_table(summary):
     runtime_stats = summary.get('runtime_statistics', {})
 
     if overall:
-        headers = ['Metric', 'Mean', 'Median', 'Olympic', 'Stdev', 'CV%', 'Min', 'Max', 'Count']
+        headers = [
+            'Metric',
+            'Mean',
+            'Median',
+            'Olympic',
+            'Stdev',
+            'CV%',
+            'Min',
+            'Max',
+            'Count']
         rows = []
         for metric, stats in overall.items():
             rows.append([
@@ -767,14 +799,14 @@ def _print_results_table(summary):
             print("")
             print("=" * 78)
             print(f"  WORKLOAD STATISTICS (across runs) | {sec_name}{pinned_note}"
-                        f" (section score: mean={sec_stats.get('mean', '-')},"
-                        f" stdev={sec_stats.get('stdev', '-')},"
-                        f" cv={sec_stats.get('cv_percent', '-')}%)")
+                  f" (section score: mean={sec_stats.get('mean', '-')},"
+                  f" stdev={sec_stats.get('stdev', '-')},"
+                  f" cv={sec_stats.get('cv_percent', '-')}%)")
             print("=" * 78)
             headers = ['Workload',
-                        'Score Mean', 'Score Stdev', 'Score CV%',
-                        'RT Mean', 'RT Stdev', 'RT CV%',
-                        'Iter RT Mean', 'Iter RT Stdev', 'Iter RT CV%']
+                       'Score Mean', 'Score Stdev', 'Score CV%',
+                       'RT Mean', 'RT Stdev', 'RT CV%',
+                       'Iter RT Mean', 'Iter RT Stdev', 'Iter RT CV%']
             rows = []
             for wl_name, wl_stats in sec_info['workloads'].items():
                 s = wl_stats.get('score', {})
@@ -782,9 +814,12 @@ def _print_results_table(summary):
                 ir = wl_stats.get('iteration_runtimes', {})
                 rows.append([
                     wl_name,
-                    s.get('mean', '-'), s.get('stdev', '-'), s.get('cv_percent', '-'),
-                    r.get('mean', '-'), r.get('stdev', '-'), r.get('cv_percent', '-'),
-                    ir.get('mean', '-'), ir.get('stdev', '-'), ir.get('cv_percent', '-'),
+                    s.get('mean', '-'), s.get('stdev',
+                                              '-'), s.get('cv_percent', '-'),
+                    r.get('mean', '-'), r.get('stdev',
+                                              '-'), r.get('cv_percent', '-'),
+                    ir.get('mean', '-'), ir.get('stdev',
+                                                '-'), ir.get('cv_percent', '-'),
                 ])
             _print_table(headers, rows)
 
@@ -801,10 +836,10 @@ def _print_results_table(summary):
             print("")
             print("=" * 78)
             print(f"  WORKLOAD RESULTS | {sec_name}{pinned_note}"
-                        f" (section score: {sec_stats.get('mean', '-')})")
+                  f" (section score: {sec_stats.get('mean', '-')})")
             print("=" * 78)
             headers = ['Workload', 'Score', 'Mean RT (s)',
-                        'Iter RT Stdev', 'Iter RT CV%', 'Iters Scored']
+                       'Iter RT Stdev', 'Iter RT CV%', 'Iters Scored']
             rows = []
             for wl_name, wl_stats in sec_info['workloads'].items():
                 s = wl_stats.get('score', {})
@@ -836,12 +871,16 @@ def _write_summary_csv(summary, csv_path):
             score_keys = sorted(
                 summary['individual_results'][0]['scores'].keys())
             run_durations = summary.get('individual_runtimes', [])
-            total_dur = {d['run']: d['duration_sec'] for d in run_durations if d['phase'] == 'total'}
-            sc_dur = {d['run']: d['duration_sec'] for d in run_durations if d['phase'] == 'SC'}
-            mc_dur = {d['run']: d['duration_sec'] for d in run_durations if d['phase'] == 'MC'}
+            total_dur = {d['run']: d['duration_sec']
+                         for d in run_durations if d['phase'] == 'total'}
+            sc_dur = {d['run']: d['duration_sec']
+                      for d in run_durations if d['phase'] == 'SC'}
+            mc_dur = {d['run']: d['duration_sec']
+                      for d in run_durations if d['phase'] == 'MC'}
             header = ['run'] + score_keys
             if split_mode:
-                header.extend(['sc_duration_sec', 'mc_duration_sec', 'total_duration_sec'])
+                header.extend(
+                    ['sc_duration_sec', 'mc_duration_sec', 'total_duration_sec'])
             elif total_dur:
                 header.append('duration_sec')
             writer.writerow(header)
@@ -850,7 +889,8 @@ def _write_summary_csv(summary, csv_path):
                 row = [run_num]
                 row.extend(entry['scores'].get(k, '') for k in score_keys)
                 if split_mode:
-                    row.extend([sc_dur.get(run_num, ''), mc_dur.get(run_num, ''), total_dur.get(run_num, '')])
+                    row.extend([sc_dur.get(run_num, ''), mc_dur.get(
+                        run_num, ''), total_dur.get(run_num, '')])
                 elif total_dur:
                     row.append(total_dur.get(run_num, ''))
                 writer.writerow(row)
@@ -863,10 +903,19 @@ def _write_summary_csv(summary, csv_path):
             for sec_name, sec_info in sections.items():
                 pinned_note = ""
                 if split_mode:
-                    pinned_note = " [PINNED]" if 'single' in sec_name.lower() else " [UNPINNED]"
-                writer.writerow([f'Run {entry["run"]} | {sec_name}{pinned_note} (section score: {sec_info["section_score"]})'])
-                max_iters = max((wl['iterations_scored'] for wl in sec_info['workloads'].values()), default=0)
-                header = ['workload', 'score', 'warmup_runtime', 'mean_runtime']
+                    pinned_note = " [PINNED]" if 'single' in sec_name.lower(
+                    ) else " [UNPINNED]"
+                writer.writerow(
+                    [f'Run {entry["run"]} | {sec_name}{pinned_note} (section score: {sec_info["section_score"]})'])
+                max_iters = max(
+                    (wl['iterations_scored']
+                     for wl in sec_info['workloads'].values()),
+                    default=0)
+                header = [
+                    'workload',
+                    'score',
+                    'warmup_runtime',
+                    'mean_runtime']
                 for it in range(1, max_iters + 1):
                     header.append(f'iter_{it}_runtime')
                 if max_iters >= 2:
@@ -878,7 +927,10 @@ def _write_summary_csv(summary, csv_path):
                            round(wl_info.get('runtime_warmup', 0), 6),
                            round(wl_info['runtime'], 6)]
                     for it in range(max_iters):
-                        row.append(round(iters[it], 6) if it < len(iters) else '')
+                        row.append(
+                            round(
+                                iters[it],
+                                6) if it < len(iters) else '')
                     if max_iters >= 2:
                         if len(iters) >= 2:
                             row.append(round(statistics.stdev(iters), 6))
@@ -889,7 +941,8 @@ def _write_summary_csv(summary, csv_path):
 
         # --- Overall statistics ---
         writer.writerow(['Overall Statistics'])
-        writer.writerow(['metric', 'mean', 'median', 'olympic', 'stdev', 'cv_percent', 'min', 'max', 'count'])
+        writer.writerow(['metric', 'mean', 'median', 'olympic',
+                        'stdev', 'cv_percent', 'min', 'max', 'count'])
         for metric, stats in summary.get('overall_statistics', {}).items():
             writer.writerow([metric, stats.get('mean', ''), stats.get('median', ''),
                              stats.get('olympic', ''), stats.get('stdev', ''),
@@ -897,10 +950,14 @@ def _write_summary_csv(summary, csv_path):
                              stats.get('max', ''), stats.get('count', '')])
         for phase, rstats in summary.get('runtime_statistics', {}).items():
             writer.writerow([f'runtime_{phase}_sec', rstats.get('mean', ''),
-                             rstats.get('median', ''), rstats.get('olympic', ''),
-                             rstats.get('stdev', ''), rstats.get('cv_percent', ''),
-                             rstats.get('min', ''), rstats.get('max', ''),
-                             rstats.get('count', '')])
+                             rstats.get(
+                'median', ''), rstats.get(
+                'olympic', ''),
+                rstats.get(
+                'stdev', ''), rstats.get(
+                'cv_percent', ''),
+                rstats.get('min', ''), rstats.get('max', ''),
+                rstats.get('count', '')])
         writer.writerow([])
 
         # --- Per-workload statistics ---
@@ -908,7 +965,8 @@ def _write_summary_csv(summary, csv_path):
         if workload_stats:
             for sec_name, sec_info in workload_stats.items():
                 sec_ss = sec_info.get('section_score_stats', {})
-                writer.writerow([f'Workload Statistics | {sec_name} (section score mean: {sec_ss.get("mean", "")})'])
+                writer.writerow(
+                    [f'Workload Statistics | {sec_name} (section score mean: {sec_ss.get("mean", "")})'])
                 writer.writerow(['workload',
                                  'score_mean', 'score_median', 'score_olympic',
                                  'score_stdev', 'score_cv_percent',
@@ -921,11 +979,20 @@ def _write_summary_csv(summary, csv_path):
                     ir = wl_stats.get('iteration_runtimes', {})
                     writer.writerow([
                         wl_name,
-                        s.get('mean', ''), s.get('median', ''), s.get('olympic', ''),
+                        s.get(
+                            'mean', ''), s.get(
+                            'median', ''), s.get(
+                            'olympic', ''),
                         s.get('stdev', ''), s.get('cv_percent', ''),
-                        r.get('mean', ''), r.get('median', ''), r.get('olympic', ''),
+                        r.get(
+                            'mean', ''), r.get(
+                            'median', ''), r.get(
+                            'olympic', ''),
                         r.get('stdev', ''), r.get('cv_percent', ''),
-                        ir.get('mean', ''), ir.get('stdev', ''), ir.get('cv_percent', ''),
+                        ir.get(
+                            'mean', ''), ir.get(
+                            'stdev', ''), ir.get(
+                            'cv_percent', ''),
                     ])
                 writer.writerow([])
 
@@ -939,7 +1006,8 @@ def _write_benchmark_db_entry(env, summary, db_json_path, logger):
         try:
             with open(platform_details_file, 'r') as f:
                 platform_details = json.load(f)
-            logger.info(f"Loaded platform details from: {platform_details_file}")
+            logger.info(
+                f"Loaded platform details from: {platform_details_file}")
         except Exception as e:
             logger.warning(f"Could not load platform details: {e}")
     else:
