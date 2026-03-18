@@ -127,10 +127,19 @@ class ScriptAutomation(Automation):
         self.main_script_force_new_cache = run_args.get(
             'new', False)  # only set for the initial script being called
 
-        current_path = os.path.abspath(os.getcwd())
-        r = _update_env(self.env, 'MLC_USER_RUN_DIR', current_path)
-        if r['return'] > 0:
-            return r
+        if self.env.get('MLC_USER_RUN_DIR', '') == '':
+            current_path = os.path.abspath(os.getcwd())
+            r = _update_env(self.env, 'MLC_USER_RUN_DIR', current_path)
+            if r['return'] > 0:
+                return r
+
+        if self.const.get('MLC_USER_RUN_DIR', '') == '':
+            r = _update_env(
+                self.const,
+                'MLC_USER_RUN_DIR',
+                self.env['MLC_USER_RUN_DIR'])
+            if r['return'] > 0:
+                return r
 
     def init_run_state(self, run_state):
 
@@ -5583,10 +5592,9 @@ def update_env_from_input_mapping(
                 path_val = os.path.expanduser(inp[key])
 
                 # 2. Check if the path is NOT already absolute
-                if not os.path.isabs(path_val):
-                    # Safely get the base dir (fallback to current working dir
-                    # just in case)
-                    base_dir = env.get("MLC_USER_RUN_DIR", os.getcwd())
+                if not os.path.isabs(path_val) and env.get(
+                        'MLC_USER_RUN_DIR', '') != '':
+                    base_dir = env["MLC_USER_RUN_DIR"]
 
                     # Join the base dir with the relative path and normalize it
                     path_val = os.path.abspath(
