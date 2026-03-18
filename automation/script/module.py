@@ -1002,17 +1002,18 @@ class ScriptAutomation(Automation):
                         if r['return'] > 0:
                             return r
 
-                    # Check chain of prehook dependencies on other MLC scripts.
-                    # (No execution of customize.py for cached scripts)
-                    logger.debug(
-                        self.recursion_spaces +
-                        '    - Checking prehook dependencies on other MLC scripts:')
+                    if len(prehook_deps):
+                        # Check chain of prehook dependencies on other MLC scripts.
+                        # (No execution of customize.py for cached scripts)
+                        logger.debug(
+                            self.recursion_spaces +
+                            '    - Checking prehook dependencies on other MLC scripts:')
 
-                    r = self._call_run_deps(prehook_deps, self.local_env_keys, local_env_keys_from_meta,
+                        r = self._call_run_deps(prehook_deps, self.local_env_keys, local_env_keys_from_meta,
                                             self.recursion_spaces + extra_recursion_spaces,
                                             variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
-                    if r['return'] > 0:
-                        return r
+                        if r['return'] > 0:
+                            return r
 
                     # Continue with the selected cached script
                     cached_script = found_cached_scripts[selection]
@@ -1052,38 +1053,40 @@ class ScriptAutomation(Automation):
                                        'append_unique': True})
 
                     utils.merge_dicts(
-                        {'dict1': new_env, 'dict2': const, 'append_lists': True, 'append_unique': True})
-                    utils.merge_dicts({'dict1': new_state,
+                        {'dict1': env, 'dict2': const, 'append_lists': True, 'append_unique': True})
+                    utils.merge_dicts({'dict1': state,
                                        'dict2': const_state,
                                        'append_lists': True,
                                        'append_unique': True})
 
                     if not fake_run:
+                            
+                        clean_env_keys_post_deps = meta.get('clean_env_keys_post_deps', [])
+
                         # Check chain of posthook dependencies on other MLC scripts. We consider them same as postdeps when
                         # script is in cache
-                        logger.debug(
-                            self.recursion_spaces +
-                            '    - Checking posthook dependencies on other MLC scripts:')
+                        if len(posthook_deps):
+                            logger.debug(
+                                self.recursion_spaces +
+                                '    - Checking posthook dependencies on other MLC scripts:')
 
-                        clean_env_keys_post_deps = meta.get(
-                            'clean_env_keys_post_deps', [])
-
-                        r = self._call_run_deps(posthook_deps, self.local_env_keys, clean_env_keys_post_deps,
+                            r = self._call_run_deps(posthook_deps, self.local_env_keys, clean_env_keys_post_deps,
                                                 self.recursion_spaces + extra_recursion_spaces,
                                                 variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
-                        if r['return'] > 0:
-                            return r
+                            if r['return'] > 0:
+                                return r
 
-                        logger.debug(
-                            self.recursion_spaces +
-                            '    - Checking post dependencies on other MLC scripts:')
+                        if len(post_deps):
+                            logger.debug(
+                                self.recursion_spaces +
+                                '    - Checking post dependencies on other MLC scripts:')
 
-                        # Check chain of post dependencies on other MLC scripts
-                        r = self._call_run_deps(post_deps, self.local_env_keys, clean_env_keys_post_deps,
+                            # Check chain of post dependencies on other MLC scripts
+                            r = self._call_run_deps(post_deps, self.local_env_keys, clean_env_keys_post_deps,
                                                 self.recursion_spaces + extra_recursion_spaces,
                                                 variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
-                        if r['return'] > 0:
-                            return r
+                            if r['return'] > 0:
+                                return r
 
             if renew or (not found_cached and num_found_cached_scripts == 0):
                 # Add more tags to cached tags
@@ -1537,6 +1540,7 @@ class ScriptAutomation(Automation):
             if r['return'] > 0:
                 return r
 
+            
             # Check chain of pre hook dependencies on other MLC scripts
             if len(prehook_deps) > 0:
                 logger.debug(
@@ -1888,18 +1892,6 @@ class ScriptAutomation(Automation):
             import json
             logger.info(json.dumps(rr, indent=2))
 
-        if show_time:
-            logger.info(
-                self.recursion_spaces +
-                '  - running time of script "{}": {:.2f} sec.'.format(
-                    ','.join(found_script_tags),
-                    elapsed_time))
-        else:
-            logger.debug(
-                self.recursion_spaces +
-                '  - running time of script "{}": {:.2f} sec.'.format(
-                    ','.join(found_script_tags),
-                    elapsed_time))
 
         if not recursion and show_space:
             stop_disk_stats = shutil.disk_usage("/")
@@ -1922,12 +1914,25 @@ class ScriptAutomation(Automation):
 
                 v = new_env.get(p, None)
 
-                logger.info('{}: {}'.format(t, str(v)))
+                logger.info(self.recursion_spaces + '  * {}: {}'.format(t, str(v)))
 
         # Check if print nice versions
         if print_versions:
             self._print_versions(run_state)
 
+        if show_time:
+            logger.info(
+                self.recursion_spaces +
+                '  - running time of script "{}": {:.2f} sec.'.format(
+                    ','.join(found_script_tags),
+                    elapsed_time))
+        else:
+            logger.debug(
+                self.recursion_spaces +
+                '  - running time of script "{}": {:.2f} sec.'.format(
+                    ','.join(found_script_tags),
+                    elapsed_time))
+        
         # Check if pause (useful if running a given script in a new terminal
         # that may close automatically)
         if i.get('pause', False):
