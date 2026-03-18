@@ -132,9 +132,12 @@ class ScriptAutomation(Automation):
             r = _update_env(self.env, 'MLC_USER_RUN_DIR', current_path)
             if r['return'] > 0:
                 return r
-        
+
         if self.const.get('MLC_USER_RUN_DIR', '') == '':
-            r = _update_env(self.const, 'MLC_USER_RUN_DIR', self.env['MLC_USER_RUN_DIR'])
+            r = _update_env(
+                self.const,
+                'MLC_USER_RUN_DIR',
+                self.env['MLC_USER_RUN_DIR'])
             if r['return'] > 0:
                 return r
 
@@ -5589,7 +5592,8 @@ def update_env_from_input_mapping(
                 path_val = os.path.expanduser(inp[key])
 
                 # 2. Check if the path is NOT already absolute
-                if not os.path.isabs(path_val) and env.get('MLC_USER_RUN_DIR', '') != '':
+                if not os.path.isabs(path_val) and env.get(
+                        'MLC_USER_RUN_DIR', '') != '':
                     base_dir = env["MLC_USER_RUN_DIR"]
 
                     # Join the base dir with the relative path and normalize it
