@@ -323,8 +323,12 @@ def run_validate_cache_if_present(i, cached_script):
     )
 
     # reconstruct env/state from cached metadata
-    env_tmp = copy.deepcopy(i['env'])
-    state_tmp = copy.deepcopy(i['state'])
+    env = i['self'].env
+    state = i['self'].state
+    env_saved = copy.deepcopy(env)
+    state_saved = copy.deepcopy(state)
+
+
 
     path_to_cached_state_file = os.path.join(
         cached_script.path,
@@ -340,10 +344,10 @@ def run_validate_cache_if_present(i, cached_script):
         return None
     new_env = cached_meta.get("new_env", {})
     if new_env:
-        env_tmp.update(new_env)
+        env.update(new_env)
     new_state = cached_meta.get("new_state", {})
     if new_state:
-        state_tmp.update(new_state)
+        state.update(new_state)
 
     # re-run deps
     deps = i['meta'].get('deps')
@@ -377,11 +381,14 @@ def run_validate_cache_if_present(i, cached_script):
 
     r = i['self'].run_native_script({
         'run_script_input': run_script_input,
-        'env': env_tmp,
+        'env': env,
         'script_name': 'validate_cache',
         'detect_version': True
     })
 
+    i['self'].env = env_saved
+    i['self'].state = state_saved
+    
     if r['return'] > 0:
         return None
 
