@@ -67,6 +67,9 @@ tags:
 - details
 - platform-details
 uid: f0801943c17f4e48
+tests:
+  run_inputs:
+    - quiet: true
 variations:
   cuda:
     group: gpu-driver
