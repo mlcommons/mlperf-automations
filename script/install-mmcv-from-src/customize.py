@@ -17,7 +17,7 @@ def preprocess(i):
         pip_version = env.get('MLC_PIP_VERSION', '').strip().split('.')
         if pip_version and len(pip_version) > 1 and int(pip_version[0]) >= 23:
             env['MLC_PYTHON_PIP_COMMON_EXTRA'] = " --break-system-packages"
-        run_cmd = f"{env['MLC_PYTHON_BIN_WITH_PATH']} -m pip install -r requirements/optional.txt && MMCV_WITH_OPS={env['MMCV_WITH_OPS']} {env['MLC_PYTHON_BIN_WITH_PATH']} -m pip install -e . {env.get('MLC_PYTHON_PIP_COMMON_EXTRA', '')}"
+        run_cmd = f"{env['MLC_PYTHON_BIN_WITH_PATH']} -m pip install -r requirements/optional.txt && TORCH_CUDA_ARCH_LIST='7.0;7.5;6.1;8.0;8.6' MMCV_WITH_OPS={env['MMCV_WITH_OPS']} {env['MLC_PYTHON_BIN_WITH_PATH']} -m pip install -e . {env.get('MLC_PYTHON_PIP_COMMON_EXTRA', '')}"
 
     automation = i['automation']
 
