@@ -690,6 +690,7 @@ def _print_results_table(summary):
             for sec_name, sec_info in sections.items():
                 print("")
                 print("-" * 78)
+                pinned_note = ""
                 if split_mode:
                     if 'single' in sec_name.lower():
                         pinned_note = " [PINNED]"
