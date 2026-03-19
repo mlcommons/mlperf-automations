@@ -32,8 +32,9 @@ if [ "${MLC_GEEKBENCH_INFO_ONLY_MODE}" == "yes" ]; then
   exit $?
 fi
 
+
 # Reuse logs mode: skip benchmark execution, postprocess will parse existing results
-if [ "${MLC_GEEKBENCH_REUSE_LOGS}" == "yes" ] || [ "${MLC_GEEKBENCH_REUSE_LOGS}" == "true" ] || [ "${MLC_GEEKBENCH_REUSE_LOGS}" == "on" ] || [ "${MLC_GEEKBENCH_REUSE_LOGS}" == "1" ]; then
+if [ "${MLC_GEEKBENCH_REUSE_LOGS}" == "yes" ] || [ "${MLC_GEEKBENCH_REUSE_LOGS}" == "True" ] || [ "${MLC_GEEKBENCH_REUSE_LOGS}" == "on" ] || [ "${MLC_GEEKBENCH_REUSE_LOGS}" == "1" ]; then
   echo ""
   echo "Reuse logs mode: skipping benchmark execution"
   exit 0
