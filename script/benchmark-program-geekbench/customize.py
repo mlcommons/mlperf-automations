@@ -48,7 +48,7 @@ def extract_scores(result):
 def extract_workload_scores(result):
     """Extract per-section and per-workload scores from a geekbench result dict.
     Returns a dict keyed by section name, each containing section score and
-    a dict of workload name -> {score, runtime, runtimes, runtime_warmup}.
+    per-workload details including per-iteration runtimes.
 
     Geekbench's --iterations N flag results in 1 warmup iteration + (N-1)
     scored iterations. The 'runtimes' list contains per-scored-iteration
@@ -94,21 +94,21 @@ def merge_sc_mc_results(sc_result, mc_result):
 
 
 def compute_stats(values):
-    """Compute mean, median, olympic, stdev, min, max for a list of numeric values."""
+    """Compute mean, median, olympic, cv_percent, min, max for a list of numeric values."""
     if not values:
         return {}
+    mean_val = round(statistics.mean(values), 2)
+    stdev_val = round(statistics.stdev(values), 2) if len(values) >= 2 else 0
     result = {
-        'mean': round(statistics.mean(values), 2),
+        'mean': mean_val,
         'median': round(statistics.median(values), 2),
         'olympic': round(compute_olympic_score(values), 2),
-        'stdev': round(statistics.stdev(values), 2) if len(values) >= 2 else 0,
         'min': round(min(values), 2),
         'max': round(max(values), 2),
         'count': len(values)
     }
-    if result['mean'] != 0:
-        result['cv_percent'] = round(
-            (result['stdev'] / abs(result['mean'])) * 100, 2)
+    if mean_val != 0:
+        result['cv_percent'] = round((stdev_val / abs(mean_val)) * 100, 2)
     else:
         result['cv_percent'] = 0
     return result
@@ -140,6 +140,14 @@ def preprocess(i):
     os_info = i['os_info']
     env = i['env']
     logger = i['automation'].logger
+
+    # Check if platform details should be skipped
+    skip_platform_details = is_true(
+        env.get('MLC_GEEKBENCH_SKIP_PLATFORM_DETAILS', 'no'))
+    if skip_platform_details:
+        logger.info(
+            "Platform details collection will be skipped (skip_platform_details=yes)")
+        env['MLC_SKIP_DEPENDENCY_get-platform-details'] = 'yes'
 
     geekbench_bin = env.get('MLC_GEEKBENCH_BIN_WITH_PATH', '')
     if geekbench_bin == '' or not os.path.isfile(geekbench_bin):
@@ -189,6 +197,13 @@ def preprocess(i):
         env['MLC_GEEKBENCH_INFO_ONLY_MODE'] = 'yes'
         return {'return': 0}
 
+    # --- Reuse logs mode (skip execution, just re-run postprocess) ---
+    if is_true(env.get('MLC_GEEKBENCH_REUSE_LOGS', '')):
+        env['MLC_RUN_CMD'] = ' '
+        logger.info(
+            "Reuse logs mode: skipping benchmark execution, will parse existing results")
+        return {'return': 0}
+
     # --- Build the base benchmark command ---
     args = []
 
@@ -223,8 +238,10 @@ def preprocess(i):
         args.append(f'--workload {workload_ids}')
 
     # Iterations (native geekbench: --iterations N)
-    iterations = env.get('MLC_GEEKBENCH_ITERATIONS', '3').strip()
-    args.append(f'--iterations {iterations}')
+    # Only pass --iterations if explicitly set; otherwise use geekbench default
+    iterations = env.get('MLC_GEEKBENCH_ITERATIONS', '').strip()
+    if iterations:
+        args.append(f'--iterations {iterations}')
 
     # Workload gap (Pro: --workload-gap N milliseconds)
     workload_gap = env.get('MLC_GEEKBENCH_WORKLOAD_GAP', '').strip()
@@ -281,11 +298,6 @@ def preprocess(i):
     platform = os_info['platform']
 
     # --- Split SC/MC mode: core_pinning + all-cores ---
-    # When core pinning is enabled and neither --single-core nor --multi-core
-    # was explicitly chosen, we split into two invocations per run:
-    #   1) Single-core with core pinning
-    #   2) Multi-core without core pinning
-    # The shell scripts handle the split and postprocess merges the results.
     if core_pinning and all_cores_mode:
         env['MLC_GEEKBENCH_SPLIT_SC_MC'] = 'yes'
 
@@ -316,8 +328,7 @@ def preprocess(i):
         env['MLC_GEEKBENCH_SPLIT_SC_MC'] = 'no'
         base_cmd = f"{q}{geekbench_bin}{q} {' '.join(args)}{extra_exports}"
 
-        # Apply core pinning to the single command (only sensible for
-        # --single-core)
+        # Apply core pinning to the single command
         if core_pinning:
             if explicit_multi_core:
                 logger.warning("Core pinning with --multi-core will pin all threads to one core. "
@@ -337,8 +348,9 @@ def preprocess(i):
         env['MLC_GEEKBENCH_BASE_CMD'] = base_cmd
         logger.info(f"Geekbench command: {base_cmd}")
 
+    iter_display = iterations if iterations else 'default (geekbench built-in)'
     logger.info(
-        f"Native iterations per workload: {iterations}, Number of runs: {num_runs}")
+        f"Native iterations per workload: {iter_display}, Number of runs: {num_runs}")
     logger.info(f"Results directory: {results_dir}")
 
     return {'return': 0}
@@ -357,7 +369,7 @@ def postprocess(i):
 
     results_dir = env.get('MLC_GEEKBENCH_RESULTS_DIR', '')
     num_runs = int(env.get('MLC_GEEKBENCH_NUM_RUNS', '1'))
-    iterations_cfg = env.get('MLC_GEEKBENCH_ITERATIONS', '3')
+    iterations_cfg = env.get('MLC_GEEKBENCH_ITERATIONS', 'default')
     split_mode = is_true(env.get('MLC_GEEKBENCH_SPLIT_SC_MC', 'no'))
 
     all_results = []
@@ -534,7 +546,6 @@ def postprocess(i):
             }
 
     # --- Runtime statistics ---
-    # For split mode, compute separate SC/MC/total stats
     runtime_stats = {}
     total_durations = [d['duration_sec']
                        for d in run_durations if d['phase'] == 'total']
@@ -572,17 +583,34 @@ def postprocess(i):
         'individual_runtimes': run_durations,
     }
 
+    # Add platform details if available and not skipped
+    skip_platform_details = is_true(
+        env.get('MLC_GEEKBENCH_SKIP_PLATFORM_DETAILS', 'no'))
+    if not skip_platform_details:
+        platform_details_file = env.get('MLC_PLATFORM_DETAILS_FILE_PATH', '')
+        if platform_details_file and os.path.isfile(platform_details_file):
+            try:
+                with open(platform_details_file, 'r') as f:
+                    platform_details = json.load(f)
+                summary['platform_details'] = platform_details
+                logger.info(
+                    f"Platform details loaded from: {platform_details_file}")
+            except Exception as e:
+                logger.warning(f"Failed to load platform details: {e}")
+    else:
+        logger.info(
+            "Platform details collection skipped (skip_platform_details=yes)")
+
     # Log key results
     for key, stat in overall_stats.items():
         logger.info(
             f"Overall {key}: mean={stat['mean']}, "
             f"median={stat['median']}, olympic={stat['olympic']}, "
-            f"stdev={stat['stdev']}, cv={stat['cv_percent']}%")
+            f"cv={stat['cv_percent']}%")
 
     for phase, rstats in runtime_stats.items():
         logger.info(
             f"Runtime {phase} (sec): mean={rstats['mean']}, "
-            f"stdev={rstats['stdev']}, "
             f"cv={rstats['cv_percent']}%, "
             f"min={rstats['min']}, max={rstats['max']}")
 
@@ -612,11 +640,6 @@ def postprocess(i):
     # --- Print results in tabular format ---
     _print_results_table(summary)
 
-    # --- Create benchmark database entry JSON ---
-    db_json_path = os.path.join(results_dir, 'geekbench_benchmark_entry.json')
-    _write_benchmark_db_entry(env, summary, db_json_path, logger)
-    env['MLC_GEEKBENCH_BENCHMARK_ENTRY_JSON'] = db_json_path
-
     state['geekbench_results'] = all_results
     state['geekbench_summary'] = summary
 
@@ -644,6 +667,12 @@ def _print_results_table(summary):
             sc_dur[run] = d['duration_sec']
         elif d['phase'] == 'MC':
             mc_dur[run] = d['duration_sec']
+
+    # Print CV description
+    print("")
+    print("  Note: CV% (Coefficient of Variation) = (StdDev / Mean) * 100.")
+    print("  Lower CV% indicates more consistent/reproducible results.")
+    print("  CV% < 1% is excellent, 1-5% is good, > 5% may need investigation.")
 
     # ============================================================
     # 1. Individual Run Top-Level Scores
@@ -709,7 +738,7 @@ def _print_results_table(summary):
                 for it in range(1, max_iters + 1):
                     headers.append(f'Iter {it} (s)')
                 if max_iters >= 2:
-                    headers.append('Iter Stdev')
+                    headers.append('Iter CV%')
 
                 rows = []
                 for wl_name, wl_info in sec_info['workloads'].items():
@@ -727,7 +756,12 @@ def _print_results_table(summary):
                             row.append('-')
                     if max_iters >= 2:
                         if len(iters) >= 2:
-                            row.append(round(statistics.stdev(iters), 6))
+                            mean_rt = statistics.mean(iters)
+                            std_rt = statistics.stdev(iters)
+                            cv_pct = round(
+                                (std_rt / abs(mean_rt)) * 100,
+                                2) if mean_rt != 0 else 0
+                            row.append(cv_pct)
                         else:
                             row.append('-')
                     rows.append(row)
@@ -745,7 +779,6 @@ def _print_results_table(summary):
             'Mean',
             'Median',
             'Olympic',
-            'Stdev',
             'CV%',
             'Min',
             'Max',
@@ -757,7 +790,6 @@ def _print_results_table(summary):
                 stats.get('mean', '-'),
                 stats.get('median', '-'),
                 stats.get('olympic', '-'),
-                stats.get('stdev', '-'),
                 stats.get('cv_percent', '-'),
                 stats.get('min', '-'),
                 stats.get('max', '-'),
@@ -769,7 +801,6 @@ def _print_results_table(summary):
                 rstats.get('mean', '-'),
                 rstats.get('median', '-'),
                 rstats.get('olympic', '-'),
-                rstats.get('stdev', '-'),
                 rstats.get('cv_percent', '-'),
                 rstats.get('min', '-'),
                 rstats.get('max', '-'),
@@ -800,13 +831,12 @@ def _print_results_table(summary):
             print("=" * 78)
             print(f"  WORKLOAD STATISTICS (across runs) | {sec_name}{pinned_note}"
                   f" (section score: mean={sec_stats.get('mean', '-')},"
-                  f" stdev={sec_stats.get('stdev', '-')},"
                   f" cv={sec_stats.get('cv_percent', '-')}%)")
             print("=" * 78)
             headers = ['Workload',
-                       'Score Mean', 'Score Stdev', 'Score CV%',
-                       'RT Mean', 'RT Stdev', 'RT CV%',
-                       'Iter RT Mean', 'Iter RT Stdev', 'Iter RT CV%']
+                       'Score Mean', 'Score CV%',
+                       'RT Mean', 'RT CV%',
+                       'Iter RT Mean', 'Iter RT CV%']
             rows = []
             for wl_name, wl_stats in sec_info['workloads'].items():
                 s = wl_stats.get('score', {})
@@ -814,12 +844,9 @@ def _print_results_table(summary):
                 ir = wl_stats.get('iteration_runtimes', {})
                 rows.append([
                     wl_name,
-                    s.get('mean', '-'), s.get('stdev',
-                                              '-'), s.get('cv_percent', '-'),
-                    r.get('mean', '-'), r.get('stdev',
-                                              '-'), r.get('cv_percent', '-'),
-                    ir.get('mean', '-'), ir.get('stdev',
-                                                '-'), ir.get('cv_percent', '-'),
+                    s.get('mean', '-'), s.get('cv_percent', '-'),
+                    r.get('mean', '-'), r.get('cv_percent', '-'),
+                    ir.get('mean', '-'), ir.get('cv_percent', '-'),
                 ])
             _print_table(headers, rows)
 
@@ -835,11 +862,13 @@ def _print_results_table(summary):
                     pinned_note = " [UNPINNED]"
             print("")
             print("=" * 78)
-            print(f"  WORKLOAD RESULTS | {sec_name}{pinned_note}"
+            print(f"  ITERATION VARIANCE | {sec_name}{pinned_note}"
                   f" (section score: {sec_stats.get('mean', '-')})")
+            print("  (Variance is between iterations within a single run."
+                  " Geekbench reports per-iteration runtimes only, not scores.)")
             print("=" * 78)
             headers = ['Workload', 'Score', 'Mean RT (s)',
-                       'Iter RT Stdev', 'Iter RT CV%', 'Iters Scored']
+                       'Iter RT CV%', 'Iters Scored']
             rows = []
             for wl_name, wl_stats in sec_info['workloads'].items():
                 s = wl_stats.get('score', {})
@@ -849,7 +878,6 @@ def _print_results_table(summary):
                     wl_name,
                     s.get('mean', '-'),
                     r.get('mean', '-'),
-                    ir.get('stdev', '-'),
                     ir.get('cv_percent', '-'),
                     ir.get('count', '-'),
                 ])
@@ -919,7 +947,7 @@ def _write_summary_csv(summary, csv_path):
                 for it in range(1, max_iters + 1):
                     header.append(f'iter_{it}_runtime')
                 if max_iters >= 2:
-                    header.append('iter_stdev')
+                    header.append('iter_cv_percent')
                 writer.writerow(header)
                 for wl_name, wl_info in sec_info['workloads'].items():
                     iters = wl_info.get('runtimes', [])
@@ -933,7 +961,12 @@ def _write_summary_csv(summary, csv_path):
                                 6) if it < len(iters) else '')
                     if max_iters >= 2:
                         if len(iters) >= 2:
-                            row.append(round(statistics.stdev(iters), 6))
+                            mean_rt = statistics.mean(iters)
+                            std_rt = statistics.stdev(iters)
+                            cv_pct = round(
+                                (std_rt / abs(mean_rt)) * 100,
+                                2) if mean_rt != 0 else 0
+                            row.append(cv_pct)
                         else:
                             row.append('')
                     writer.writerow(row)
@@ -942,10 +975,10 @@ def _write_summary_csv(summary, csv_path):
         # --- Overall statistics ---
         writer.writerow(['Overall Statistics'])
         writer.writerow(['metric', 'mean', 'median', 'olympic',
-                        'stdev', 'cv_percent', 'min', 'max', 'count'])
+                        'cv_percent', 'min', 'max', 'count'])
         for metric, stats in summary.get('overall_statistics', {}).items():
             writer.writerow([metric, stats.get('mean', ''), stats.get('median', ''),
-                             stats.get('olympic', ''), stats.get('stdev', ''),
+                             stats.get('olympic', ''),
                              stats.get('cv_percent', ''), stats.get('min', ''),
                              stats.get('max', ''), stats.get('count', '')])
         for phase, rstats in summary.get('runtime_statistics', {}).items():
@@ -953,9 +986,7 @@ def _write_summary_csv(summary, csv_path):
                              rstats.get(
                 'median', ''), rstats.get(
                 'olympic', ''),
-                rstats.get(
-                'stdev', ''), rstats.get(
-                'cv_percent', ''),
+                rstats.get('cv_percent', ''),
                 rstats.get('min', ''), rstats.get('max', ''),
                 rstats.get('count', '')])
         writer.writerow([])
@@ -969,10 +1000,10 @@ def _write_summary_csv(summary, csv_path):
                     [f'Workload Statistics | {sec_name} (section score mean: {sec_ss.get("mean", "")})'])
                 writer.writerow(['workload',
                                  'score_mean', 'score_median', 'score_olympic',
-                                 'score_stdev', 'score_cv_percent',
+                                 'score_cv_percent',
                                  'runtime_mean', 'runtime_median', 'runtime_olympic',
-                                 'runtime_stdev', 'runtime_cv_percent',
-                                 'iter_rt_mean', 'iter_rt_stdev', 'iter_rt_cv_percent'])
+                                 'runtime_cv_percent',
+                                 'iter_rt_mean', 'iter_rt_cv_percent'])
                 for wl_name, wl_stats in sec_info['workloads'].items():
                     s = wl_stats.get('score', {})
                     r = wl_stats.get('runtime', {})
@@ -983,64 +1014,12 @@ def _write_summary_csv(summary, csv_path):
                             'mean', ''), s.get(
                             'median', ''), s.get(
                             'olympic', ''),
-                        s.get('stdev', ''), s.get('cv_percent', ''),
+                        s.get('cv_percent', ''),
                         r.get(
                             'mean', ''), r.get(
                             'median', ''), r.get(
                             'olympic', ''),
-                        r.get('stdev', ''), r.get('cv_percent', ''),
-                        ir.get(
-                            'mean', ''), ir.get(
-                            'stdev', ''), ir.get(
-                            'cv_percent', ''),
+                        r.get('cv_percent', ''),
+                        ir.get('mean', ''), ir.get('cv_percent', ''),
                     ])
                 writer.writerow([])
-
-
-def _write_benchmark_db_entry(env, summary, db_json_path, logger):
-    """Create a JSON file combining benchmark results with platform details."""
-
-    platform_details = {}
-    platform_details_file = env.get('MLC_PLATFORM_DETAILS_FILE_PATH', '')
-    if platform_details_file and os.path.isfile(platform_details_file):
-        try:
-            with open(platform_details_file, 'r') as f:
-                platform_details = json.load(f)
-            logger.info(
-                f"Loaded platform details from: {platform_details_file}")
-        except Exception as e:
-            logger.warning(f"Could not load platform details: {e}")
-    else:
-        logger.warning(
-            "Platform details file not found. "
-            "Benchmark DB entry will not include platform information.")
-
-    db_entry = {
-        'benchmark': 'geekbench',
-        'timestamp': datetime.datetime.now(datetime.timezone.utc).isoformat(),
-        'configuration': {
-            'workload': env.get('MLC_GEEKBENCH_WORKLOAD', ''),
-            'iterations': env.get('MLC_GEEKBENCH_ITERATIONS', '3'),
-            'num_runs': env.get('MLC_GEEKBENCH_NUM_RUNS', '1'),
-            'core_pinning': env.get('MLC_GEEKBENCH_CORE_PINNING', 'no'),
-            'pinned_core': env.get('MLC_GEEKBENCH_PINNED_CORE', '0'),
-            'split_sc_mc': env.get('MLC_GEEKBENCH_SPLIT_SC_MC', 'no'),
-            'single_core': env.get('MLC_GEEKBENCH_SINGLE_CORE', ''),
-            'multi_core': env.get('MLC_GEEKBENCH_MULTI_CORE', ''),
-            'cpu_workers': env.get('MLC_GEEKBENCH_CPU_WORKERS', ''),
-            'extra_args': env.get('MLC_GEEKBENCH_EXTRA_ARGS', ''),
-        },
-        'results': {
-            'individual_results': summary.get('individual_results', []),
-            'overall_statistics': summary.get('overall_statistics', {}),
-            'workload_statistics': summary.get('workload_statistics', {}),
-            'runtime_statistics': summary.get('runtime_statistics', {}),
-            'individual_runtimes': summary.get('individual_runtimes', []),
-        },
-        'platform_details': platform_details,
-    }
-
-    with open(db_json_path, 'w') as f:
-        json.dump(db_entry, f, indent=2)
-
-    logger.info(f"Benchmark DB entry saved to: {db_json_path}")

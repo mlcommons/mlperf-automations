@@ -1,18 +1,8 @@
 #!/bin/bash
 
-OUTPUT_FILE="$MLC_PLATFORM_DETAILS_FILE_PATH"
+OUTPUT_FILE="$MLC_PLATFORM_DETAILS_RAW_FILE_PATH"
 
-# Start with empty JSON object. We are using jq to populate the JSON file with a structure like:
-# {
-#   "key1": {
-#     "command": "the command we ran",
-#     "output": "the output of the command"
-#   },
-#   "key2": {
-#     "command": "another command",
-#     "output": "its output"
-#   }
-# }
+# Start with empty JSON object
 echo '{}' > "$OUTPUT_FILE"
 
 add_entry () {
@@ -20,7 +10,6 @@ add_entry () {
     local cmd="$2"
     local needs_sudo="$3"
 
-    local output
     local tmpfile
     tmpfile=$(mktemp)
 
@@ -39,7 +28,7 @@ add_entry () {
        --rawfile o "$tmpfile" \
        '. + {($k): {"command": $c, "output": $o}}' \
        "$OUTPUT_FILE" > "$OUTPUT_FILE.tmp" && mv "$OUTPUT_FILE.tmp" "$OUTPUT_FILE"
-    
+
     rm -f "$tmpfile"
 }
 
@@ -69,7 +58,7 @@ add_entry "numa_topology" "numactl --hardware" no
 add_entry "cpu_frequency" "cpupower frequency-info" no
 add_entry "memory_free_human" "free -h" no
 add_entry "pci_devices" "lspci" no
-add_entry "infiniband_status" "ibstat" no   # requires Infiniband drivers; will fail gracefully if not present
+add_entry "infiniband_status" "ibstat" no
 add_entry "operating_system" "echo $MLC_HOST_OS_TYPE-$MLC_HOST_OS_FLAVOR_LIKE-$MLC_HOST_OS_FLAVOR-$MLC_HOST_OS_VERSION" no
 
 # -------- Sudo-required commands --------
@@ -82,19 +71,13 @@ add_entry "bios_info" "dmidecode -t bios" yes
 # Accelerator detection (CUDA only)
 # -------------------------------------------------------------------
 if [[ "$MLC_ACCELERATOR_BACKEND" == "cuda" ]]; then
-
   if command -v nvidia-smi >/dev/null 2>&1; then
-
-    add_entry "nvidia_smi_topo" \
-      "nvidia-smi topo -m" no
-
-    add_entry "nvidia_smi_full" \
-      "nvidia-smi -q" no
-
+    add_entry "nvidia_smi_topo" "nvidia-smi topo -m" no
+    add_entry "nvidia_smi_full" "nvidia-smi -q" no
   else
     add_entry "accelerator_error" \
       "echo nvidia-smi not found; cannot detect CUDA accelerator details" no
   fi
 fi
 
-echo "System information written to $OUTPUT_FILE"
+echo "Raw system information written to $OUTPUT_FILE"

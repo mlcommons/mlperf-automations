@@ -6,10 +6,10 @@
 [![MLPerf Inference ABTF POC Test](https://github.com/mlcommons/mlperf-automations/actions/workflows/test-mlperf-inference-abtf-poc.yml/badge.svg)](https://github.com/mlcommons/mlperf-automations/actions/workflows/test-mlperf-inference-abtf-poc.yml)
 
 
+
 Welcome to the **MLPerf Automations and Scripts** repository! This repository is your go-to resource for tools, automations, and scripts designed to streamline the execution of **MLPerf benchmarks**—with a strong emphasis on **MLPerf Inference benchmarks**.
 
 Starting **January 2025**, MLPerf automation scripts is powered by [MLCFlow](https://github.com/mlcommons/mlcflow) automation interface. This new and simplified framework replaces the previous [Collective Mind (CM)](https://github.com/mlcommons/ck/tree/master/cm), providing a more robust, efficient, and self-contained solution for benchmarking workflows, making MLPerf automations independent of any external projects. 
-
 
 ---
 

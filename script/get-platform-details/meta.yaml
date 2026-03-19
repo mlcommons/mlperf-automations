@@ -8,6 +8,7 @@ deps:
 - skip_if_env:
     MLC_HOST_OS_TYPE:
     - windows
+    - darwin
   tags: detect,sudo
 - skip_if_any_env:
     MLC_HOST_OS_TYPE:
@@ -19,6 +20,7 @@ deps:
 - skip_if_any_env:
     MLC_HOST_OS_TYPE:
     - windows
+    - darwin
   tags: get,sys-util,generic,_jq
 - enable_if_env:
     MLC_HOST_OS_TYPE:
@@ -39,6 +41,7 @@ input_mapping:
   out_file_name: MLC_PLATFORM_DETAILS_FILE_NAME
 new_env_keys:
   - MLC_PLATFORM_DETAILS_FILE_PATH
+  - MLC_PLATFORM_DETAILS_RAW_FILE_PATH
 prehook_deps:
 - enable_if_env:
     MLC_HOST_OS_TYPE:
@@ -67,6 +70,9 @@ tags:
 - details
 - platform-details
 uid: f0801943c17f4e48
+tests:
+  run_inputs:
+    - quiet: true
 variations:
   cuda:
     group: gpu-driver
