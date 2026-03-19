@@ -44,6 +44,13 @@ NUM_RUNS=${MLC_GEEKBENCH_NUM_RUNS:-1}
 RESULTS_DIR=${MLC_GEEKBENCH_RESULTS_DIR:-.}
 SPLIT_SC_MC=${MLC_GEEKBENCH_SPLIT_SC_MC:-no}
 
+# --export-json/csv require a license
+if [ -n "${MLC_GEEKBENCH_LICENSE_KEY}" ]; then
+  HAS_LICENSE=yes
+else
+  HAS_LICENSE=no
+fi
+
 echo ""
 echo "***********************************************************************"
 echo "Running Geekbench benchmark"
@@ -72,7 +79,10 @@ for run in $(seq 1 ${NUM_RUNS}); do
     SC_JSON="${RESULTS_DIR}/geekbench_run${run}_sc.json"
     SC_CSV="${RESULTS_DIR}/geekbench_run${run}_sc.csv"
     SC_TIMING="${RESULTS_DIR}/geekbench_run${run}_sc_timing.json"
-    SC_EXPORT=" --export-json '${SC_JSON}' --export-csv '${SC_CSV}'"
+    SC_EXPORT=""
+    if [ "${HAS_LICENSE}" == "yes" ]; then
+      SC_EXPORT=" --export-json '${SC_JSON}' --export-csv '${SC_CSV}'"
+    fi
     SC_FULL="${MLC_GEEKBENCH_BASE_CMD_SC}${SC_EXPORT}"
 
     echo ""
@@ -104,7 +114,10 @@ for run in $(seq 1 ${NUM_RUNS}); do
     MC_JSON="${RESULTS_DIR}/geekbench_run${run}_mc.json"
     MC_CSV="${RESULTS_DIR}/geekbench_run${run}_mc.csv"
     MC_TIMING="${RESULTS_DIR}/geekbench_run${run}_mc_timing.json"
-    MC_EXPORT=" --export-json '${MC_JSON}' --export-csv '${MC_CSV}'"
+    MC_EXPORT=""
+    if [ "${HAS_LICENSE}" == "yes" ]; then
+      MC_EXPORT=" --export-json '${MC_JSON}' --export-csv '${MC_CSV}'"
+    fi
     MC_FULL="${MLC_GEEKBENCH_BASE_CMD_MC}${MC_EXPORT}"
 
     echo ""
@@ -137,7 +150,10 @@ for run in $(seq 1 ${NUM_RUNS}); do
 
     JSON_FILE="${RESULTS_DIR}/geekbench_run${run}.json"
     CSV_FILE="${RESULTS_DIR}/geekbench_run${run}.csv"
-    EXPORT_ARGS=" --export-json '${JSON_FILE}' --export-csv '${CSV_FILE}'"
+    EXPORT_ARGS=""
+    if [ "${HAS_LICENSE}" == "yes" ]; then
+      EXPORT_ARGS=" --export-json '${JSON_FILE}' --export-csv '${CSV_FILE}'"
+    fi
     FULL_CMD="${MLC_GEEKBENCH_BASE_CMD}${EXPORT_ARGS}"
 
     echo "Command: ${FULL_CMD}"

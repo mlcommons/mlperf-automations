@@ -40,6 +40,8 @@ if "%NUM_RUNS%" == "" set NUM_RUNS=1
 if "%RESULTS_DIR%" == "" set RESULTS_DIR=.
 if "%SPLIT_SC_MC%" == "" set SPLIT_SC_MC=no
 
+set "HAS_LICENSE=no"
+if defined MLC_GEEKBENCH_LICENSE_KEY set "HAS_LICENSE=yes"
 echo.
 echo ***********************************************************************
 echo Running Geekbench benchmark
@@ -69,7 +71,8 @@ for /L %%R in (1,1,%NUM_RUNS%) do (
     set "SC_JSON=%RESULTS_DIR%\geekbench_run%%R_sc.json"
     set "SC_CSV=%RESULTS_DIR%\geekbench_run%%R_sc.csv"
     set "SC_TIMING=%RESULTS_DIR%\geekbench_run%%R_sc_timing.json"
-    set "SC_EXPORT=--export-json "!SC_JSON!" --export-csv "!SC_CSV!""
+    set "SC_EXPORT="
+    if "!HAS_LICENSE!"=="yes" set "SC_EXPORT=--export-json "!SC_JSON!" --export-csv "!SC_CSV!"
 
     echo.
     echo --- Single-Core ^(pinned^) ---
@@ -114,7 +117,8 @@ for /L %%R in (1,1,%NUM_RUNS%) do (
     set "MC_JSON=%RESULTS_DIR%\geekbench_run%%R_mc.json"
     set "MC_CSV=%RESULTS_DIR%\geekbench_run%%R_mc.csv"
     set "MC_TIMING=%RESULTS_DIR%\geekbench_run%%R_mc_timing.json"
-    set "MC_EXPORT=--export-json "!MC_JSON!" --export-csv "!MC_CSV!""
+    set "MC_EXPORT="
+    if "!HAS_LICENSE!"=="yes" set "MC_EXPORT=--export-json "!MC_JSON!" --export-csv "!MC_CSV!"
     set "MC_FULL=%MLC_GEEKBENCH_BASE_CMD_MC% !MC_EXPORT!"
 
     echo.
@@ -155,7 +159,8 @@ for /L %%R in (1,1,%NUM_RUNS%) do (
 
     set "JSON_FILE=%RESULTS_DIR%\geekbench_run%%R.json"
     set "CSV_FILE=%RESULTS_DIR%\geekbench_run%%R.csv"
-    set "EXPORT_ARGS=--export-json "!JSON_FILE!" --export-csv "!CSV_FILE!""
+    set "EXPORT_ARGS="
+    if "!HAS_LICENSE!"=="yes" set "EXPORT_ARGS=--export-json "!JSON_FILE!" --export-csv "!CSV_FILE!"
 
     if "%CORE_PINNING%" == "yes" (
       set "FULL_CMD=start "" /b /wait /affinity %AFFINITY_MASK% %MLC_GEEKBENCH_BASE_CMD% !EXPORT_ARGS!"
