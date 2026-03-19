@@ -8,6 +8,7 @@ deps:
 - skip_if_env:
     MLC_HOST_OS_TYPE:
     - windows
+    - darwin
   tags: detect,sudo
 - skip_if_any_env:
     MLC_HOST_OS_TYPE:
