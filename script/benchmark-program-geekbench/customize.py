@@ -191,9 +191,8 @@ def preprocess(i):
 
     # --- Reuse logs mode (skip execution, just re-run postprocess) ---
     if is_true(env.get('MLC_GEEKBENCH_REUSE_LOGS', '')):
-        logger.info(
-            "Reuse logs mode: skipping benchmark execution, will parse existing results")
         env['MLC_RUN_CMD'] = ' '
+        logger.info("Reuse logs mode: skipping benchmark execution, will parse existing results")
         return {'return': 0}
 
     # --- Build the base benchmark command ---
