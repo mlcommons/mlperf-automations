@@ -191,7 +191,8 @@ def preprocess(i):
 
     # --- Reuse logs mode (skip execution, just re-run postprocess) ---
     if is_true(env.get('MLC_GEEKBENCH_REUSE_LOGS', '')):
-        logger.info("Reuse logs mode: skipping benchmark execution, will parse existing results")
+        logger.info(
+            "Reuse logs mode: skipping benchmark execution, will parse existing results")
         env['MLC_RUN_CMD'] = ' '
         return {'return': 0}
 
@@ -730,7 +731,9 @@ def _print_results_table(summary):
                         if len(iters) >= 2:
                             mean_rt = statistics.mean(iters)
                             std_rt = statistics.stdev(iters)
-                            cv_pct = round((std_rt / abs(mean_rt)) * 100, 2) if mean_rt != 0 else 0
+                            cv_pct = round(
+                                (std_rt / abs(mean_rt)) * 100,
+                                2) if mean_rt != 0 else 0
                             row.append(cv_pct)
                         else:
                             row.append('-')
@@ -933,7 +936,9 @@ def _write_summary_csv(summary, csv_path):
                         if len(iters) >= 2:
                             mean_rt = statistics.mean(iters)
                             std_rt = statistics.stdev(iters)
-                            cv_pct = round((std_rt / abs(mean_rt)) * 100, 2) if mean_rt != 0 else 0
+                            cv_pct = round(
+                                (std_rt / abs(mean_rt)) * 100,
+                                2) if mean_rt != 0 else 0
                             row.append(cv_pct)
                         else:
                             row.append('')
@@ -951,10 +956,12 @@ def _write_summary_csv(summary, csv_path):
                              stats.get('max', ''), stats.get('count', '')])
         for phase, rstats in summary.get('runtime_statistics', {}).items():
             writer.writerow([f'runtime_{phase}_sec', rstats.get('mean', ''),
-                             rstats.get('median', ''), rstats.get('olympic', ''),
-                             rstats.get('cv_percent', ''),
-                             rstats.get('min', ''), rstats.get('max', ''),
-                             rstats.get('count', '')])
+                             rstats.get(
+                'median', ''), rstats.get(
+                'olympic', ''),
+                rstats.get('cv_percent', ''),
+                rstats.get('min', ''), rstats.get('max', ''),
+                rstats.get('count', '')])
         writer.writerow([])
 
         # --- Per-workload statistics ---
@@ -976,14 +983,16 @@ def _write_summary_csv(summary, csv_path):
                     ir = wl_stats.get('iteration_runtimes', {})
                     writer.writerow([
                         wl_name,
-                        s.get('mean', ''), s.get('median', ''), s.get('olympic', ''),
+                        s.get(
+                            'mean', ''), s.get(
+                            'median', ''), s.get(
+                            'olympic', ''),
                         s.get('cv_percent', ''),
-                        r.get('mean', ''), r.get('median', ''), r.get('olympic', ''),
+                        r.get(
+                            'mean', ''), r.get(
+                            'median', ''), r.get(
+                            'olympic', ''),
                         r.get('cv_percent', ''),
                         ir.get('mean', ''), ir.get('cv_percent', ''),
                     ])
                 writer.writerow([])
-
-
-
-
