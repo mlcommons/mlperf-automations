@@ -40,6 +40,7 @@ input_mapping:
   cpu_workers: MLC_GEEKBENCH_CPU_WORKERS
   workload_gap: MLC_GEEKBENCH_WORKLOAD_GAP
   reuse_logs: MLC_GEEKBENCH_REUSE_LOGS
+  skip_platform_details: MLC_GEEKBENCH_SKIP_PLATFORM_DETAILS
 new_env_keys:
 - MLC_GEEKBENCH_*
 tags:

@@ -141,6 +141,12 @@ def preprocess(i):
     env = i['env']
     logger = i['automation'].logger
 
+    # Check if platform details should be skipped
+    skip_platform_details = is_true(env.get('MLC_GEEKBENCH_SKIP_PLATFORM_DETAILS', 'no'))
+    if skip_platform_details:
+        logger.info("Platform details collection will be skipped (skip_platform_details=yes)")
+        env['MLC_SKIP_DEPENDENCY_get-platform-details'] = 'yes'
+
     geekbench_bin = env.get('MLC_GEEKBENCH_BIN_WITH_PATH', '')
     if geekbench_bin == '' or not os.path.isfile(geekbench_bin):
         return {'return': 1,
@@ -574,6 +580,21 @@ def postprocess(i):
         'individual_results': individual_results,
         'individual_runtimes': run_durations,
     }
+
+    # Add platform details if available and not skipped
+    skip_platform_details = is_true(env.get('MLC_GEEKBENCH_SKIP_PLATFORM_DETAILS', 'no'))
+    if not skip_platform_details:
+        platform_details_file = env.get('MLC_PLATFORM_DETAILS_FILE_PATH', '')
+        if platform_details_file and os.path.isfile(platform_details_file):
+            try:
+                with open(platform_details_file, 'r') as f:
+                    platform_details = json.load(f)
+                summary['platform_details'] = platform_details
+                logger.info(f"Platform details loaded from: {platform_details_file}")
+            except Exception as e:
+                logger.warning(f"Failed to load platform details: {e}")
+    else:
+        logger.info("Platform details collection skipped (skip_platform_details=yes)")
 
     # Log key results
     for key, stat in overall_stats.items():
