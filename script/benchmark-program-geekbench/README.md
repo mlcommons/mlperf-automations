@@ -43,7 +43,7 @@ mlcr benchmark,geekbench,benchmark-geekbench,benchmark-program-geekbench
 | `--license_email` |  |  | `` |
 | `--license_key` |  |  | `` |
 | `--workload` |  |  | `` |
-| `--iterations` |  |  | `3` |
+| `--iterations` |  |  | `` |
 | `--num_runs` |  |  | `1` |
 | `--core_pinning` |  |  | `no` |
 | `--pinned_core` |  |  | `0` |
@@ -60,6 +60,8 @@ mlcr benchmark,geekbench,benchmark-geekbench,benchmark-program-geekbench
 | `--workload_ids` |  |  | `` |
 | `--cpu_workers` |  |  | `` |
 | `--workload_gap` |  |  | `` |
+| `--reuse_logs` |  |  | `` |
+| `--skip_platform_details` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
