@@ -619,8 +619,7 @@ variations:
         version_max: 4.6.0.66
         version_max_usable: 4.6.0.66
       - tags: get,generic-python-lib,_package.setuptools
-        version_max: 59.8.0
-        version_max_usable: 59.8.0
+        version_min: 59.8.0
       - tags: install-mmcv-from-src
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
