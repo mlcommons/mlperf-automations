@@ -621,13 +621,7 @@ variations:
       - tags: get,generic-python-lib,_package.setuptools
         version_min: 59.8.0
       - tags: install-mmcv-from-src
-        skip_if_env:
-          MLC_RUN_STATE_DOCKER:
-          - "yes"
       - tags: install-mmdetection-from-src
-        skip_if_env:
-          MLC_RUN_STATE_DOCKER:
-          - "yes"
       - tags: get,generic-python-lib,_package.mmsegmentation
         version_min: 0.20.0
       - tags: get,preprocessed,dataset,nuscenes,_mlc,_validation
