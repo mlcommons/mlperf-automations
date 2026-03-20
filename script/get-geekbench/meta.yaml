@@ -10,7 +10,6 @@ deps:
 - tags: detect,os
 - tags: detect,cpu
 input_mapping:
-  version: MLC_VERSION
   local_file: MLC_GEEKBENCH_LOCAL_FILE
 new_env_keys:
 - MLC_GEEKBENCH_*

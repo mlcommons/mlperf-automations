@@ -32,12 +32,6 @@ def preprocess(i):
         package_name = f"Geekbench-{need_version}-WindowsSetup.exe"
         env['MLC_GEEKBENCH_NEED_EXTRACT'] = 'no'
     elif os_info['platform'] == 'linux':
-        if env.get('MLC_GEEKBENCH_INSTALLED_PATH', '') != '':
-            build_path = os.path.join(
-                env['MLC_GEEKBENCH_INSTALLED_PATH'],
-                f"build.{host_os_machine}")
-            if os.path.exists(build_path):
-                env['MLC_GEEKBENCH_INSTALLED_PATH'] = build_path
         if host_os_machine in ('aarch64', 'arm64'):
             arch_suffix = 'LinuxARMPreview'
         else:
