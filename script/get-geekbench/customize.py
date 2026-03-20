@@ -33,7 +33,9 @@ def preprocess(i):
         env['MLC_GEEKBENCH_NEED_EXTRACT'] = 'no'
     elif os_info['platform'] == 'linux':
         if env.get('MLC_GEEKBENCH_INSTALLED_PATH', '') != '':
-            build_path = os.path.join(env['MLC_GEEKBENCH_INSTALLED_PATH'], f"build.{host_os_machine}")
+            build_path = os.path.join(
+                env['MLC_GEEKBENCH_INSTALLED_PATH'],
+                f"build.{host_os_machine}")
             if os.path.exists(build_path):
                 env['MLC_GEEKBENCH_INSTALLED_PATH'] = build_path
         if host_os_machine in ('aarch64', 'arm64'):
@@ -94,7 +96,8 @@ def postprocess(i):
             # Fallback: try to find in the install dir
             if install_dir and os.path.isdir(install_dir):
                 for f in os.listdir(install_dir):
-                    if f.lower().startswith(f'geekbench{env["MLC_GEEKBENCH_VERSION_MAJOR"]}') and f.lower().endswith('.exe'):
+                    if f.lower().startswith(
+                            f'geekbench{env["MLC_GEEKBENCH_VERSION_MAJOR"]}') and f.lower().endswith('.exe'):
                         geekbench_bin = os.path.join(install_dir, f)
                         break
 
@@ -107,8 +110,11 @@ def postprocess(i):
 
     else:
         # Linux / macOS: extracted archive
-        geekbench_dir = env.get('MLC_GEEKBENCH_INSTALLED_PATH', env.get('MLC_GEEKBENCH_EXTRACTED_PATH', ''))
-        if geekbench_dir == '' and env.get('MLC_GEEKBENCH_INSTALLED_PATH', '') == '':
+        geekbench_dir = env.get(
+            'MLC_GEEKBENCH_INSTALLED_PATH', env.get(
+                'MLC_GEEKBENCH_EXTRACTED_PATH', ''))
+        if geekbench_dir == '' and env.get(
+                'MLC_GEEKBENCH_INSTALLED_PATH', '') == '':
             return {'return': 1,
                     'error': 'MLC_GEEKBENCH_EXTRACTED_PATH not set - download-and-extract may have failed'}
 
