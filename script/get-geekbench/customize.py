@@ -84,13 +84,14 @@ def postprocess(i):
         # Windows: run.bat ran the installer and exported paths via tmp-run-env.out
         # MLC_GEEKBENCH_BIN_WITH_PATH is set from tmp-run-env.out
         geekbench_bin = env.get('MLC_GEEKBENCH_BIN_WITH_PATH', '')
-        install_dir = env.get('MLC_GEEKBENCH_WINDOWS_INSTALL_DIR', '')
+        install_dir = env.get('MLC_GEEKBENCH_INSTALLED_PATH', '')
 
         if geekbench_bin == '' or not os.path.isfile(geekbench_bin):
             # Fallback: try to find in the install dir
             if install_dir and os.path.isdir(install_dir):
                 for f in os.listdir(install_dir):
-                    if f.lower().startswith('geekbench6') and f.lower().endswith('.exe'):
+                    if f.lower().startswith(
+                            f'geekbench{env["MLC_GEEKBENCH_VERSION_MAJOR"]}') and f.lower().endswith('.exe'):
                         geekbench_bin = os.path.join(install_dir, f)
                         break
 
@@ -103,16 +104,18 @@ def postprocess(i):
 
     else:
         # Linux / macOS: extracted archive
-        extracted_path = env.get('MLC_GEEKBENCH_EXTRACTED_PATH', '')
-        if extracted_path == '':
+        geekbench_dir = env.get(
+            'MLC_GEEKBENCH_INSTALLED_PATH', env.get(
+                'MLC_GEEKBENCH_EXTRACTED_PATH', ''))
+        if geekbench_dir == '' and env.get(
+                'MLC_GEEKBENCH_INSTALLED_PATH', '') == '':
             return {'return': 1,
                     'error': 'MLC_GEEKBENCH_EXTRACTED_PATH not set - download-and-extract may have failed'}
 
         # Find the Geekbench directory inside the extracted path
-        geekbench_dir = extracted_path
-        if os.path.isdir(extracted_path):
-            for d in sorted(os.listdir(extracted_path)):
-                full = os.path.join(extracted_path, d)
+        if os.path.isdir(geekbench_dir):
+            for d in sorted(os.listdir(geekbench_dir)):
+                full = os.path.join(geekbench_dir, d)
                 if os.path.isdir(full) and d.lower().startswith('geekbench'):
                     geekbench_dir = full
                     break
@@ -120,7 +123,7 @@ def postprocess(i):
         if os_info['platform'] == 'darwin':
             # macOS: binary is inside the .app bundle
             # e.g. Geekbench 6.app/Contents/MacOS/Geekbench 6
-            app_pattern = os.path.join(extracted_path, 'Geekbench*.app')
+            app_pattern = os.path.join(geekbench_dir, 'Geekbench*.app')
             app_matches = glob.glob(app_pattern)
             if app_matches:
                 app_dir = app_matches[0]
@@ -146,6 +149,9 @@ def postprocess(i):
         # Make executable on Unix
         if os.path.isfile(geekbench_bin):
             os.chmod(geekbench_bin, 0o755)
+
+    if not os.path.exists(geekbench_dir):
+        return {'return': 1, 'error': f'{geekbench_dir} is not existing'}
 
     env['MLC_GEEKBENCH_BIN_WITH_PATH'] = geekbench_bin
     env['MLC_GEEKBENCH_INSTALLED_PATH'] = geekbench_dir
