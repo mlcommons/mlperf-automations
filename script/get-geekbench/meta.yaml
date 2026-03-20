@@ -21,6 +21,9 @@ prehook_deps:
 - enable_if_env:
     MLC_GEEKBENCH_NEED_EXTRACT:
     - 'yes'
+  skip_if_env:
+    MLC_GEEKBENCH_INSTALLED_PATH:
+      - on
   env:
     MLC_DAE_EXTRACT_DOWNLOADED: 'yes'
     MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_GEEKBENCH_DOWNLOAD_PATH
@@ -37,6 +40,9 @@ prehook_deps:
 - enable_if_env:
     MLC_GEEKBENCH_NEED_EXTRACT:
     - 'no'
+  skip_if_env:
+    MLC_GEEKBENCH_INSTALLED_PATH:
+      - on
   env:
     MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_GEEKBENCH_DOWNLOAD_PATH
   extra_cache_tags: geekbench
@@ -65,3 +71,8 @@ versions:
   6.6.0:
     env:
       MLC_GEEKBENCH_VERSION_MAJOR: '6'
+variations:
+  path.#:
+    env:
+      MLC_GEEKBENCH_INSTALLED_PATH: '#'
+    default_version: ''
