@@ -11,6 +11,7 @@ def preprocess(i):
     logger = i['automation'].logger
 
     print(env['MLC_RUN_STATE_DOCKER'])
+    print(f"path got:{env.get('MLC_PREPROCESSED_DATASET_NUSCENES_PATH')}")
     from time import sleep
     sleep(5)
 
