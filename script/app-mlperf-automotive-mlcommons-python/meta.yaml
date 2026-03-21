@@ -629,13 +629,13 @@ variations:
           - preprocessed-dataset-nuscenes
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
-            - "yes"
+          - "yes"
       - tags: get-ml-model-uniad,_mlc,_r2-downloader
         names:
           - ml-model-uniad
         skip_if_env:
           MLC_RUN_STATE_DOCKER:
-            - "yes"
+          - "yes"
 
   # Target devices
   cpu:
