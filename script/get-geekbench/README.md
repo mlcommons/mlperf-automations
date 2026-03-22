@@ -1,4 +1,4 @@
-# README for benchmark-program-geekbench
+# README for get-geekbench
 This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,35 +33,14 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr benchmark,geekbench,benchmark-geekbench,benchmark-program-geekbench
+mlcr get,geekbench,get-geekbench
 ```
 
 ### Script Inputs
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
-| `--license_email` |  |  | `` |
-| `--license_key` |  |  | `` |
-| `--workload` |  |  | `` |
-| `--iterations` |  |  | `` |
-| `--num_runs` |  |  | `1` |
-| `--core_pinning` |  |  | `no` |
-| `--pinned_core` |  |  | `0` |
-| `--results_dir` |  |  | `` |
-| `--extra_args` |  |  | `` |
-| `--save` |  |  | `` |
-| `--load` |  |  | `` |
-| `--export_html` |  |  | `` |
-| `--export_xml` |  |  | `` |
-| `--export_text` |  |  | `` |
-| `--gpu_platform_id` |  |  | `` |
-| `--gpu_device_id` |  |  | `` |
-| `--section` |  |  | `` |
-| `--workload_ids` |  |  | `` |
-| `--cpu_workers` |  |  | `` |
-| `--workload_gap` |  |  | `` |
-| `--reuse_logs` |  |  | `` |
-| `--skip_platform_details` |  |  | `` |
+| `--local_file` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -84,33 +63,6 @@ mlcr benchmark,geekbench,benchmark-geekbench,benchmark-program-geekbench
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
-### Core-mode
-
-- `all-cores` (default)
-- `multi-core`
-- `single-core`
-
 ### Ungrouped
 
-- `gpu-list`
-- `sysinfo`
-- `workload-list`
-
-### Upload-mode
-
-- `no-upload` (default)
-- `upload`
-
-### Workload
-
-- `compute`
-- `compute-cuda`
-- `compute-metal`
-- `compute-opencl`
-- `compute-vulkan`
-- `cpu` (default)
-- `gpu`
-- `gpu-cuda`
-- `gpu-metal`
-- `gpu-opencl`
-- `gpu-vulkan`
+- `path.#` _(# can be substituted dynamically)_

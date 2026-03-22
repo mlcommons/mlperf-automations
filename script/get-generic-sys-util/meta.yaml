@@ -694,6 +694,20 @@ variations:
         brew: ''
         dnf: ntpdate
         yum: ntpdate
+  nasm:
+    env:
+      MLC_SYS_UTIL_NAME: nasm
+      MLC_SYS_UTIL_VERSION_CMD: nasm --version
+      MLC_SYS_UTIL_VERSION_RE: NASM version ([\d.]+)
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+    - MLC_NASM_VERSION
+    state:
+      nasm:
+        apt: nasm
+        brew: nasm
+        dnf: nasm
+        yum: nasm
   crossbuild-essential-arm64:
     env:
       MLC_SYS_UTIL_NAME: crossbuild-essential-arm64
