@@ -19,6 +19,8 @@ deps:
         - MLC_GIT_SHA
       _submodules.:
         - MLC_GIT_SUBMODULES
+      _tag.:
+        - MLC_GIT_CHECKOUT_TAG
     names:
       - jemalloc-repo
     extra_cache_tags: jemalloc,repo,jemalloc-repo
@@ -52,17 +54,20 @@ variations:
   version.official:
     base:
       - url.official
+  version.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
   url.#:
-    group: version
+    group: repo
     env:
       MLC_GIT_URL: '#'
   url.official:
-    group: version
+    group: repo
     env:
       MLC_GIT_URL: https://github.com/jemalloc/jemalloc.git
       MLC_JEMALLOC_VERSION_PREFIX: 'jemalloc-dev'
   url.facebook:
-    group: version
+    group: repo
     default: true
     env:
       MLC_GIT_URL: https://github.com/facebook/jemalloc.git
