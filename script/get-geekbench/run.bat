@@ -5,6 +5,10 @@ rem get-geekbench run script (Windows)
 rem Download is handled by the download-and-extract prehook dependency.
 rem This script runs the setup installer silently and exports the installed path.
 
+if not "%MLC_GEEKBENCH_INSTALLED_PATH%" == "" (
+  exit /b 0
+)
+
 if "%MLC_GEEKBENCH_DOWNLOAD_PATH%" == "" (
   echo MLC_GEEKBENCH_DOWNLOAD_PATH is not set
   exit /b 1

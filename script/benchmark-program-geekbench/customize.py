@@ -97,7 +97,7 @@ def compute_stats(values):
     """Compute mean, median, olympic, cv_percent, min, max for a list of numeric values."""
     if not values:
         return {}
-    mean_val = round(statistics.mean(values), 2)
+    mean_val = round(statistics.mean(values), 3)
     stdev_val = round(statistics.stdev(values), 2) if len(values) >= 2 else 0
     result = {
         'mean': mean_val,
