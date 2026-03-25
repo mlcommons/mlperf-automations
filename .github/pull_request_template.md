@@ -16,4 +16,3 @@
 - [ ] No secrets or credentials are committed
 - [ ] Paths, shell commands, and environment handling are safe and portable
 
-

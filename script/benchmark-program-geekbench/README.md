@@ -43,8 +43,25 @@ mlcr benchmark,geekbench,benchmark-geekbench,benchmark-program-geekbench
 | `--license_email` |  |  | `` |
 | `--license_key` |  |  | `` |
 | `--workload` |  |  | `` |
-| `--local_file` |  |  | `` |
-| `--export_json` |  |  | `` |
+| `--iterations` |  |  | `` |
+| `--num_runs` |  |  | `1` |
+| `--core_pinning` |  |  | `no` |
+| `--pinned_core` |  |  | `0` |
+| `--results_dir` |  |  | `` |
+| `--extra_args` |  |  | `` |
+| `--save` |  |  | `` |
+| `--load` |  |  | `` |
+| `--export_html` |  |  | `` |
+| `--export_xml` |  |  | `` |
+| `--export_text` |  |  | `` |
+| `--gpu_platform_id` |  |  | `` |
+| `--gpu_device_id` |  |  | `` |
+| `--section` |  |  | `` |
+| `--workload_ids` |  |  | `` |
+| `--cpu_workers` |  |  | `` |
+| `--workload_gap` |  |  | `` |
+| `--reuse_logs` |  |  | `` |
+| `--skip_platform_details` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -67,6 +84,18 @@ mlcr benchmark,geekbench,benchmark-geekbench,benchmark-program-geekbench
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
+### Core-mode
+
+- `all-cores` (default)
+- `multi-core`
+- `single-core`
+
+### Ungrouped
+
+- `gpu-list`
+- `sysinfo`
+- `workload-list`
+
 ### Upload-mode
 
 - `no-upload` (default)
@@ -75,7 +104,12 @@ mlcr benchmark,geekbench,benchmark-geekbench,benchmark-program-geekbench
 ### Workload
 
 - `compute`
+- `compute-cuda`
+- `compute-metal`
+- `compute-opencl`
+- `compute-vulkan`
 - `cpu` (default)
+- `gpu`
 - `gpu-cuda`
 - `gpu-metal`
 - `gpu-opencl`

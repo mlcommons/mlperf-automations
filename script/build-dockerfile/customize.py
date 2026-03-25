@@ -22,6 +22,9 @@ def preprocess(i):
     with open(os.path.join(path, "dockerinfo.json")) as f:
         config = json.load(f)
 
+    if env['MLC_CONTAINER_TOOL'] == "podman":
+        config['USER'] = "root"
+
     build_args = []
     build_args_default = {}
     input_args = []

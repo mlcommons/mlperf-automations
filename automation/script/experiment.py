@@ -40,6 +40,12 @@ def experiment_run(self_module, i):
         return prune_result
 
     run_input = prune_result['new_input']
+
+    if 'env' not in run_input:
+        run_input['env'] = {}
+    current_path = os.path.abspath(os.getcwd())
+    run_input['env']['MLC_USER_RUN_DIR'] = current_path
+
     if run_input.get('exp'):
         del (run_input['exp'])
 

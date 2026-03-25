@@ -1,4 +1,4 @@
-# README for get-lib-jemalloc
+# README for get-dataset-mmlu
 This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,10 +33,14 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr get,lib,lib-jemalloc,jemalloc
+mlcr get-dataset-mmlu
 ```
 
-No script specific inputs
+### Script Inputs
+
+| Name | Description | Choices | Default |
+|------|-------------|---------|------|
+| `--out_path` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -59,21 +63,7 @@ No script specific inputs
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
-### Repo
-
-- `url.#` _(# can be substituted dynamically)_
-- `url.facebook` (default)
-- `url.official`
-
 ### Ungrouped
 
-- `branch.#` _(# can be substituted dynamically)_
-- `config.#` _(# can be substituted dynamically)_
-- `enable-prof`
-- `enable-stats`
-- `lg-hugepage.#` _(# can be substituted dynamically)_
-- `lg-page.#` _(# can be substituted dynamically)_
-- `lg-quantum.#` _(# can be substituted dynamically)_
-- `sha.#` _(# can be substituted dynamically)_
-- `version.#` _(# can be substituted dynamically)_
-- `version.official` (base: url.official)
+- `mlc`
+- `no-of-samples.#` _(# can be substituted dynamically)_

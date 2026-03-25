@@ -177,10 +177,18 @@ def postprocess(i):
         run_opts += " --privileged "
 
     if env.get("MLC_DOCKER_GPU_DEVICES"):
-        for d in env["MLC_DOCKER_GPU_DEVICES"].split(","):
-            run_opts += f" --gpus device={d}"
+        if env.get('MLC_CONTAINER_TOOL') == "podman":
+            run_opts += f" -e NVIDIA_VISIBLE_DEVICES={env['MLC_DOCKER_GPU_DEVICES']}"
+            for d in env["MLC_DOCKER_GPU_DEVICES"].split(","):
+                run_opts += f" --device nvidia.com/gpu={d}"
+        else:
+            for d in env["MLC_DOCKER_GPU_DEVICES"].split(","):
+                run_opts += f" --gpus device={d}"
     elif env.get('MLC_DOCKER_ADD_NUM_GPUS', '') != '':
-        run_opts += " --gpus={}".format(env['MLC_DOCKER_ADD_NUM_GPUS'])
+        if env.get('MLC_CONTAINER_TOOL') == "podman":
+            run_opts += f" --device nvidia.com/gpu={env['MLC_DOCKER_ADD_NUM_GPUS']}"
+        else:
+            run_opts += " --gpus={}".format(env['MLC_DOCKER_ADD_NUM_GPUS'])
     elif env.get('MLC_DOCKER_ADD_ALL_GPUS', '') != '':
         if env.get('MLC_CONTAINER_TOOL') == "podman":
             run_opts += " --device nvidia.com/gpu=all"
