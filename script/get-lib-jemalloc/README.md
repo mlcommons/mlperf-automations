@@ -59,6 +59,12 @@ No script specific inputs
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
+### Repo
+
+- `url.#` _(# can be substituted dynamically)_
+- `url.facebook` (default)
+- `url.official`
+
 ### Ungrouped
 
 - `branch.#` _(# can be substituted dynamically)_
@@ -69,10 +75,5 @@ No script specific inputs
 - `lg-page.#` _(# can be substituted dynamically)_
 - `lg-quantum.#` _(# can be substituted dynamically)_
 - `sha.#` _(# can be substituted dynamically)_
+- `version.#` _(# can be substituted dynamically)_
 - `version.official` (base: url.official)
-
-### Version
-
-- `url.#` _(# can be substituted dynamically)_
-- `url.facebook` (default)
-- `url.official`
