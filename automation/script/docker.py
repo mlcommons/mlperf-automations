@@ -139,18 +139,25 @@ def dockerfile(self_module, input_params):
            ).lower() in ['true', 'yes', '1']:
         env['MLC_DOCKER_PUSH_IMAGE'] = 'yes'
 
-    dockerfile_env = docker_inputs.get('env', {})
+    dockerfile_env = docker_inputs.get('env')
+    if dockerfile_env:
+        dockerfile_env = dockerfile_env.copy()
+    else:
+        dockerfile_env = {}
     dockerfile_build_env = docker_inputs.get('build_env', {})
 
     dockerfile_env['MLC_RUN_STATE_DOCKER'] = True
+    state = {}
+    state['dockerfile_env'] = dockerfile_env
+    state['dockerfile_build_env'] = dockerfile_build_env
     # Generate Dockerfile
     mlc_docker_input = {
         'action': 'run', 'automation': 'script', 'tags': 'build,dockerfile',
         'fake_run_option': " " if docker_inputs.get('real_run') else " --fake_run",
         'comments': comments, 'run_cmd': f"{run_command_string} --quiet",
-        'script_tags': input_params.get('tags'), 'env': env,
-        'dockerfile_env': dockerfile_env,
-        'dockerfile_build_env': dockerfile_build_env,
+        'script_tags': input_params.get('tags'), 
+        'env': env,
+        'state': state,
         'quiet': True, 'real_run': True
     }
 
@@ -184,7 +191,7 @@ def dockerfile(self_module, input_params):
 
     mlc_docker_input.update(docker_inputs)
 
-    dockerfile_result = self_module.action_object.access(mlc_docker_input)
+    dockerfile_result = self_module.action_object.run(mlc_docker_input)
     if dockerfile_result['return'] > 0:
         return dockerfile_result
 
