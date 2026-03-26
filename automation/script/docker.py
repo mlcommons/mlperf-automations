@@ -155,7 +155,7 @@ def dockerfile(self_module, input_params):
         'action': 'run', 'automation': 'script', 'tags': 'build,dockerfile',
         'fake_run_option': " " if docker_inputs.get('real_run') else " --fake_run",
         'comments': comments, 'run_cmd': f"{run_command_string} --quiet",
-        'script_tags': input_params.get('tags'), 
+        'script_tags': input_params.get('tags'),
         'env': env,
         'state': state,
         'quiet': True, 'real_run': True

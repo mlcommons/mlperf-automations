@@ -302,7 +302,6 @@ def preprocess(i):
             docker_env_key + "=" + \
             str(dockerfile_env[docker_env_key]).replace("\n", "\\n")
 
-
     workdir = env.get('WORKDIR', '')
     if workdir == '':
         workdir = f"""/home/{docker_user}"""

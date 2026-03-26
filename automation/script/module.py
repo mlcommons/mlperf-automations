@@ -368,7 +368,7 @@ class ScriptAutomation(Automation):
                 'add_deps_recursive', {}), 'append_lists': True, 'append_unique': True})
 
         env = self.env
-        
+
         state = self.state
         const = self.const
         const_state = self.const_state
@@ -690,7 +690,7 @@ class ScriptAutomation(Automation):
         #           IT HAS THE PRIORITY OVER meta['default_env'] and meta['env'] but not over the meta from versions/variations
         #           (env OVERWRITE - user enforces it from CLI)
         #           (it becomes const)
-        
+
         if input_mapping:
             update_env_from_input_mapping(
                 env, i, input_mapping, input_description)
@@ -717,7 +717,6 @@ class ScriptAutomation(Automation):
             i)
         if r['return'] > 0:
             return r
-        
 
         # taking from meta or else deps with same names will be ignored
         run_state['deps'] = meta.get('deps', [])
