@@ -7,6 +7,7 @@ deps:
 - tags: detect,os
 - tags: detect,cpu
 - tags: get,cuda-devices
+- tags: get,rocm-devices
 - skip_if_env:
     MLC_HOST_OS_TYPE:
     - windows

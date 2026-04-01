@@ -48,27 +48,27 @@ EXTRACT_RULES = {
     # ---------------- Accelerator ----------------
     "accelerator_model_name": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_NAME"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_NAME", "MLC_ROMLC_DEVICE_PROP_GPU_NAME"],
     },
     "accelerators_per_node": {
         "source": "env",
-        "candidates": ["MLC_CUDA_NUM_DEVICES"],
+        "candidates": ["MLC_CUDA_NUM_DEVICES", "MLC_ROMLC_NUM_DEVICES"],
     },
     "accelerator_memory_capacity": {
         "source": "env",
         # Get the value as decimal gigabytes
-        "candidates": ["MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "MLC_ROMLC_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB"],
     },
     "accelerator_memory_type": {
         "source": "env",
         "candidates": ["MLC_CUDA_DEVICE_PROP_MEMORY_TYPE"],
     },
     "accelerator_interconnect": {
-        "candidates": ["nvidia_smi_topo"],
+        "candidates": ["nvidia_smi_topo", "MLC_ROMLC_DEVICE_PROP_GPU_INTERCONNECT_TYPE"],
         "regex": r".*"
     },
     "accelerator_host_interconnect": {
-        "candidates": [""],
+        "candidates": ["MLC_ROMLC_DEVICE_PROP_HOST_INTERCONNECT_TYPE",""],
         "regex": r".*"
     },
 
@@ -156,14 +156,25 @@ def extract_value(system_info, rule, field_key):
 
         for candidate in rule["candidates"]:
             value += f" {os.environ.get(candidate, '')}"
-            if field_key == "accelerator_memory_capacity":
-                value_bytes = float(os.environ.get(candidate, ""))
-                if value_bytes == "":
-                    return ""
-                else:
-                    # get as decimal gigabytes as marketed by the vendors
-                    return f"{int(value_bytes/(1000**3))}GB"
+        
+        if field_key == "accelerators_per_node":
+            value = sum(int(elem) for elem in value.split())
 
+        if field_key == "accelerator_memory_capacity":
+            value = value.strip()
+            if len(value.split()) == 2:
+                value = value.split()[0]
+            print("AA",value)
+            value_bytes = float(value)
+            print("BB",value_bytes)
+            if value_bytes == 0:
+                return ""
+            else:
+                # get as decimal gigabytes as marketed by the vendors
+                if value_bytes >= 1000**3:
+                    return f"{int(value_bytes/(1000**3))}GB"
+                else:
+                    return f"{int(value_bytes)}GB"
         return value.strip()
     else:
         for candidate in rule["candidates"]:
@@ -292,13 +303,14 @@ def extract_value(system_info, rule, field_key):
         if field_key == "accelerator_interconnect":
             topo_output = ""
             for candidate in rule["candidates"]:
+                topo_output_rocm = os.environ.get(candidate, "")
                 for dump_key, dump in system_info.items():
                     if candidate in dump_key:
                         topo_output = dump.get("output", "")
                         break
 
             if not topo_output:
-                return ""
+                return topo_output_rocm if topo_output_rocm != "N/A" else ""
 
             if re.search(r"\bNV\d+\b", topo_output):
                 return "NVLink"
@@ -306,6 +318,10 @@ def extract_value(system_info, rule, field_key):
             return "PCIe"
 
         if field_key == "accelerator_host_interconnect":
+            for candidate in rule["candidates"]:
+                rocm_output = os.environ.get(candidate, "")
+                if rocm_output and rocm_output != "N/A":
+                    return "PCIe " + rocm_output
             smi_output = ""
             for dump_key, dump in system_info.items():
                 if "nvidia_smi_full" in dump_key:
@@ -406,6 +422,7 @@ def main():
 
     with open(input_path) as f:
         system_info = json.load(f)
+        print(system_info.keys())
 
     parsed = {}
 
