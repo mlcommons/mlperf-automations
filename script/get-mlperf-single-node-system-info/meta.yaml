@@ -7,11 +7,20 @@ deps:
 - tags: detect,os
 - tags: detect,cpu
 - tags: get,cuda-devices
-- tags: get,rocm-devices
-- skip_if_env:
+  enable_if_env:
+    MLC_GPU_PLATFORM: 
+      - cuda
+  skip_if_env:
     MLC_HOST_OS_TYPE:
     - windows
-  tags: detect,sudo
+- tags: get,rocm-devices
+  enable_if_env:
+    MLC_GPU_PLATFORM:
+    - rocm
+  skip_if_env:
+    MLC_HOST_OS_TYPE:
+    - windows
+- tags: detect,sudo
 - tags: get,python
   names:
   - python
@@ -31,6 +40,13 @@ tags:
 uid: fe91d73029c94ec1
 variations:
   cuda:
+    group: gpu-platform
+    env:
+      MLC_GPU_PLATFORM: cuda
     adr:
       platform-details:
         tags: _cuda
+  rocm:
+    group: gpu-platform
+    env:
+      MLC_GPU_PLATFORM: rocm
