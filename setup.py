@@ -45,8 +45,7 @@ def check_prerequisites():
     """Check if Git and python-venv are installed on the system. """
     try:
         # Check for Git
-        subprocess.run(["git", "--version"], check=True,
-                       stdout=subprocess.DEVNULL)
+        subprocess.run(["git", "--version"], check=True, stdout=subprocess.DEVNULL)
     except FileNotFoundError:
         sys.exit(
             "Error: Git is not installed on the system. Please install Git and try again.")
