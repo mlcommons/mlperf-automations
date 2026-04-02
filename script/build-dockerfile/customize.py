@@ -11,6 +11,7 @@ def preprocess(i):
 
     os_info = i['os_info']
     env = i['env']
+    state = i['state']
     logger = i['automation'].logger
 
     if env["MLC_DOCKER_OS"] not in ["ubuntu", "rhel", "arch"]:
@@ -252,7 +253,7 @@ def preprocess(i):
     for key, value in config['ENV'].items():
         f.write('ENV ' + key + "=\"" + value + "\"" + EOL)
 
-    dockerfile_build_env = env.get('MLC_DOCKERFILE_BUILD_ENV', {})
+    dockerfile_build_env = state.get('dockerfile_build_env', {})
     for key in dockerfile_build_env:
         value = dockerfile_build_env[key]
         f.write('ENV ' + key + "=\"" + value + "\"" + EOL)
@@ -294,7 +295,7 @@ def preprocess(i):
     else:
         f.write('ENV HOME=/root' + EOL)
 
-    dockerfile_env = env.get('MLC_DOCKERFILE_ENV', {})
+    dockerfile_env = state.get('dockerfile_env', {})
     dockerfile_env_input_string = ""
     for docker_env_key in dockerfile_env:
         dockerfile_env_input_string = dockerfile_env_input_string + " --env." + \

@@ -90,6 +90,8 @@ def postprocess(i):
     env['MLC_GCC_INSTALLED_PATH'] = os.path.dirname(
         found_path)  # /usr in case of /usr/bin/gcc
 
+    env['MLC_GCC_DIR_PATH'] = env['MLC_GCC_INSTALLED_PATH']
+
     file_name_c = os.path.basename(found_file_path)
     # G: changed next line to handle cases like gcc-8
     file_name_cpp = file_name_c.replace('gcc', 'g++')
@@ -114,5 +116,7 @@ def postprocess(i):
     env['MLC_LINKER_FLAGS_DEBUG'] = "-O0"
     env['MLC_COMPILER_FLAGS_DEFAULT'] = "-O2"
     env['MLC_LINKER_FLAGS_DEFAULT'] = "-O2"
+
+    env['+PATH'] = [found_path]
 
     return {'return': 0, 'version': version}
