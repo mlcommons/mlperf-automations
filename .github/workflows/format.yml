@@ -10,7 +10,7 @@ env:
 
 jobs:
   format-code:
-    if: github.actor != 'mlc-automations[bot]'
+    if: github.actor != 'mlc-automations'
     runs-on: ubuntu-latest
     permissions:
       contents: write
