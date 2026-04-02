@@ -65,8 +65,8 @@ jobs:
           HAS_CHANGES=$(git diff --staged --name-only)
           if [ ${#HAS_CHANGES} -gt 0 ]; then
             # Use the GitHub actor's name and email
-            git config --global user.name mlc-automations
-            git config --global user.email "mlc-automations@users.noreply.github.com"
+            git config --global user.name my-app
+            git config --global user.email "24300713+my-app@users.noreply.github.com"
             # Commit changes
             git commit -m '[Automated Commit] Format Codebase'
             git push 
