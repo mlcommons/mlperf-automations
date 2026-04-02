@@ -145,7 +145,6 @@ def extract_value(system_info, rule, field_key):
         if field_key == "framework":
             value = ""
             for candidate in rule["candidates"]:
-                print(candidate)
                 env_output = os.environ.get(candidate, "")
                 if env_output:
                     if "cuda_runtime" in candidate.lower():
@@ -159,14 +158,13 @@ def extract_value(system_info, rule, field_key):
 
         if field_key == "accelerators_per_node":
             value = sum(int(elem) for elem in value.split())
+            value = str(value)
 
         if field_key == "accelerator_memory_capacity":
             value = value.strip()
             if len(value.split()) == 2:
                 value = value.split()[0]
-            print("AA", value)
             value_bytes = float(value)
-            print("BB", value_bytes)
             if value_bytes == 0:
                 return ""
             else:
