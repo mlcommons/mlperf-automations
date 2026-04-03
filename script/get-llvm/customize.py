@@ -28,11 +28,14 @@ def preprocess(i):
                         env['MLC_LLVM_DIR_PATH'] = llvm_path
                         env['MLC_TMP_PATH'] = os.path.join(llvm_path, 'bin')
 
+        detect_version = True if 'MLC_LLVM_FORCE_VERSION' not in env else False
+
         r = i['automation'].find_artifact({'file_name': file_name_c,
                                            'env': env,
                                            'os_info': os_info,
                                            'default_path_env_key': 'PATH',
-                                           'detect_version': True,
+                                           'detect_version': detect_version,
+                                           'force_given_path': env.get('MLC_TMP_LLVM_FORCE_GIVEN_PATH', False),
                                            'env_path_key': 'MLC_LLVM_CLANG_BIN_WITH_PATH',
                                            'run_script_input': i['run_script_input'],
                                            'recursion_spaces': recursion_spaces})

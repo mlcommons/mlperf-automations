@@ -55,6 +55,7 @@ variations:
   path.#:
     env:
       MLC_LLVM_DIR_PATH: '#'
+      MLC_TMP_LLVM_FORCE_GIVEN_PATH: 'yes'
   release: {}
   version.#: {}
   branch.#: {}
