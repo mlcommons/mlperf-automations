@@ -4044,7 +4044,7 @@ pip install mlcflow
                 if path_tmp.strip() != '' and not os.path.isdir(path_tmp):
                     return {'return': 1,
                             'error': 'path {} doesn\'t exist'.format(path_tmp)}
-        
+
         if path != '':
             force_given_path = i.get('force_given_path', False)
 
@@ -4059,7 +4059,8 @@ pip install mlcflow
             file_name = os.path.basename(forced_file)
             path = os.path.dirname(forced_file)
 
-        default_path_list = self.get_default_path_list(i) if not force_given_path else []
+        default_path_list = self.get_default_path_list(
+            i) if not force_given_path else []
         # [] if default_path_env_key == '' else \
         #   os.environ.get(default_path_env_key,'').split(os_info['env_separator'])
 
@@ -4068,7 +4069,8 @@ pip install mlcflow
         priority_folder = env.get('MLC_SEARCH_FOLDER_PATH', '').strip()
         priority_folder_paths = []
 
-        if priority_folder and os.path.isdir(priority_folder) and not force_given_path:
+        if priority_folder and os.path.isdir(
+                priority_folder) and not force_given_path:
             logger.info(
                 self.recursion_spaces +
                 '    # Prioritizing search in folder: {}'.format(priority_folder))
