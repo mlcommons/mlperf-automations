@@ -9,10 +9,8 @@ def preprocess(i):
     env = i['env']
 
     if is_true(str(env.get('MLC_DETECT_USING_HIP_PYTHON', ''))):
-        print("yeah mahn")
         i['run_script_input']['script_name'] = 'detect'
-    else:
-        print("hei")
+    
     return {'return': 0}
 
 

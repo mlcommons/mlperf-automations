@@ -36,6 +36,11 @@ def get_gpu_info():
                 "xgmi_metric"][0][0]["link_metrics"]["link_type"]
         except subprocess.CalledProcessError:
             print(f"Error occurred while fetching info for GPU {i}")
+        
+        except exception as e:
+            print(f"Some other error occurred: {str(e)}")
+            host_interconnect_result = ""
+            gpu_interconnect_result = ""
 
         gpu_info = {
             "GPU Device ID": hip.hipDeviceGetPCIBusId(STRINGLENGTH, i)[1],
