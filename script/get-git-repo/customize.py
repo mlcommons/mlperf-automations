@@ -121,7 +121,8 @@ def generate_src_version_string(env):
     checkout = env.get("MLC_GIT_CHECKOUT", "unknown")
     sha = env.get("MLC_GIT_SHA", "00000000")
 
-    # Generate the date string (e.g., 20260224) from the last commit in the checkout
+    # Generate the date string (e.g., 20260224) from the last commit in the
+    # checkout
     git_checkout_path = env.get("MLC_GIT_CHECKOUT_PATH", "")
     try:
         date_str = subprocess.check_output(
