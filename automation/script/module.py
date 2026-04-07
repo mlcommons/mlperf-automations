@@ -1104,7 +1104,7 @@ class ScriptAutomation(Automation):
                 for x in meta.get('tags', []):
                     if x not in cached_tags:
                         cached_tags.append(x)
-                
+
             if not found_cached and num_found_cached_scripts == 0:
                 if i.get('only_execute_from_cache'):
                     # useful to check valid cache entries for a script (mlc show
