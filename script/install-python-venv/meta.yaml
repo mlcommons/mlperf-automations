@@ -23,6 +23,10 @@ tags:
 - get-python-venv
 - python-venv
 uid: 7633ebada4584c6c
+tests:
+  run_inputs:
+  # Test 1: Create a virtual environment using system python
+  - variations_list: []
 variations:
   lto: {}
   optimized: {}

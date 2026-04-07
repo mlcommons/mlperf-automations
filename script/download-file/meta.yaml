@@ -83,4 +83,21 @@ variations:
       MLC_DOWNLOAD_TOOL: r2-downloader
     group: download-tool
     
+tests:
+  run_inputs:
+  # Test 1: Basic download using default tool (mlcutil)
+  - variations_list:
+      - url.https://raw.githubusercontent.com/octocat/Hello-World/refs/heads/master/README
+    env:
+      MLC_DOWNLOAD_FILENAME: test-readme.md
+  # Test 2: Download using wget
+  - variations_list:
+      - wget,url.https://raw.githubusercontent.com/octocat/Hello-World/refs/heads/master/README
+    env:
+      MLC_DOWNLOAD_FILENAME: test-readme-wget.md
+  # Test 3: Download using curl
+  - variations_list:
+      - curl,url.https://raw.githubusercontent.com/octocat/Hello-World/refs/heads/master/README
+    env:
+      MLC_DOWNLOAD_FILENAME: test-readme-curl.md
 versions: {}

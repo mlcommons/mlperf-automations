@@ -63,6 +63,11 @@ tags:
 - src-python3
 - src-python
 uid: 12d3a608afe14a1e
+tests:
+  run_inputs:
+  # Test 1: Install default Python version from source with SSL
+  - variations_list:
+      - with-ssl
 variations:
   lto:
     env:

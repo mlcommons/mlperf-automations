@@ -28,6 +28,10 @@ tags:
 - get-python
 - get-python3
 uid: d0b5dd74373f4a62
+tests:
+  run_inputs:
+  # Test 1: Detect system python3
+  - variations_list: []
 variations:
   conda.#:
     adr:

@@ -49,4 +49,6 @@ variations:
   path.#:
     env:
       MLC_EXTRACT_FILEPATH: '#'
+tests:
+  run_inputs: []
 versions: {}
