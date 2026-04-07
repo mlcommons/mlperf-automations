@@ -770,6 +770,7 @@ class ScriptAutomation(Automation):
         if len(r.get('warnings', [])) > 0:
             warnings += r['warnings']
 
+        variation_tags = r['variation_tags']
         variation_tags_string = r['variation_tags_string']
         explicit_variation_tags = r['explicit_variation_tags']
 
@@ -4018,6 +4019,8 @@ pip install mlcflow
         logger = self.action_object.logger
         run_script_input = i.get('run_script_input', {})
         extra_paths = i.get('extra_paths', {})
+        force_given_path = False
+        i.get('force_given_path', False)
 
         # Create and work on a copy to avoid contamination
         env_copy = copy.deepcopy(env)
@@ -4043,6 +4046,9 @@ pip install mlcflow
                     return {'return': 1,
                             'error': 'path {} doesn\'t exist'.format(path_tmp)}
 
+        if path != '':
+            force_given_path = i.get('force_given_path', False)
+
         # Check if forced path and file name from --input (MLC_INPUT - local env
         # - will not be visible for higher-level script)
         forced_file = env.get('MLC_INPUT', '').strip()
@@ -4054,7 +4060,8 @@ pip install mlcflow
             file_name = os.path.basename(forced_file)
             path = os.path.dirname(forced_file)
 
-        default_path_list = self.get_default_path_list(i)
+        default_path_list = self.get_default_path_list(
+            i) if not force_given_path else []
         # [] if default_path_env_key == '' else \
         #   os.environ.get(default_path_env_key,'').split(os_info['env_separator'])
 
@@ -4063,7 +4070,8 @@ pip install mlcflow
         priority_folder = env.get('MLC_SEARCH_FOLDER_PATH', '').strip()
         priority_folder_paths = []
 
-        if priority_folder and os.path.isdir(priority_folder):
+        if priority_folder and os.path.isdir(
+                priority_folder) and not force_given_path:
             logger.info(
                 self.recursion_spaces +
                 '    # Prioritizing search in folder: {}'.format(priority_folder))
