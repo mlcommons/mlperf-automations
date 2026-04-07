@@ -135,4 +135,12 @@ variations:
       download-script:
         tags: _r2-downloader
     group: download-tool
+tests:
+  run_inputs:
+  # Test 1: Download and extract a tar.gz archive (default tool)
+  - variations_list:
+      - url.https://github.com/octocat/Hello-World/archive/refs/heads/master.tar.gz,extract
+  # Test 2: Download only (no extraction)
+  - variations_list:
+      - url.https://raw.githubusercontent.com/octocat/Hello-World/refs/heads/master/README
 versions: {}

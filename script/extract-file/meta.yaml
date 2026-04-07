@@ -49,4 +49,20 @@ variations:
   path.#:
     env:
       MLC_EXTRACT_FILEPATH: '#'
+tests:
+  run_inputs:
+  # Test 1: Extract a tar.gz file (keep extracted)
+  - variations_list:
+      - keep
+    env:
+      MLC_EXTRACT_FILEPATH: <<< MLC_DOWNLOAD_DOWNLOADED_PATH
+    deps:
+    - tags: download,file,_url.https://github.com/octocat/Hello-World/archive/refs/heads/master.tar.gz
+  # Test 2: Extract and remove archive
+  - variations_list:
+      - remove-extracted
+    env:
+      MLC_EXTRACT_FILEPATH: <<< MLC_DOWNLOAD_DOWNLOADED_PATH
+    deps:
+    - tags: download,file,_url.https://github.com/octocat/Hello-World/archive/refs/heads/master.tar.gz
 versions: {}
