@@ -45,6 +45,23 @@ tags:
 - repo
 - repository
 - clone
+tests:
+  run_inputs:
+  # Test 1: Basic clone of a small public repo with default settings
+  - variations_list:
+      - repo.https://github.com/octocat/Hello-World,no-recurse-submodules
+  # Test 2: Clone with specific branch checkout
+  - variations_list:
+      - repo.https://github.com/octocat/Hello-World,branch.test,no-recurse-submodules
+  # Test 3: Clone with specific SHA (auto-selects full-history)
+  - variations_list:
+      - repo.https://github.com/octocat/Hello-World,sha.7fd1a60b01f91b314f59955a4e4d4e80d8edf11d,no-recurse-submodules
+  # Test 4: Clone with full git history
+  - variations_list:
+      - repo.https://github.com/octocat/Hello-World,full-history,no-recurse-submodules
+  # Test 5: Clone with specific tag
+  - variations_list:
+      - repo.https://github.com/pallets/click,tag.8.3.2,short-history,no-recurse-submodules
 uid: ed603e7292974f10
 variations:
   branch.#:
