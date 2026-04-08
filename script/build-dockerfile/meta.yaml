@@ -74,6 +74,73 @@ post_deps:
   - build-docker-image
   tags: build,docker,image
 
+tests:
+  run_inputs:
+  # Test: ubuntu 20.04
+  - env:
+      MLC_DOCKER_OS: 'ubuntu'
+      MLC_DOCKER_OS_VERSION: '20.04'
+  # Test: ubuntu 22.04
+  - env:
+      MLC_DOCKER_OS: 'ubuntu'
+      MLC_DOCKER_OS_VERSION: '22.04'
+  # Test: ubuntu 24.04
+  - env:
+      MLC_DOCKER_OS: 'ubuntu'
+      MLC_DOCKER_OS_VERSION: '24.04'
+  # Test: ubuntu 25.04
+  - env:
+      MLC_DOCKER_OS: 'ubuntu'
+      MLC_DOCKER_OS_VERSION: '25.04'
+  # Test: ubuntu 25.10
+  - env:
+      MLC_DOCKER_OS: 'ubuntu'
+      MLC_DOCKER_OS_VERSION: '25.10'
+  # Test: rhel 8
+  - env:
+      MLC_DOCKER_OS: 'rhel'
+      MLC_DOCKER_OS_VERSION: '8'
+  # Test: rhel 9
+  - env:
+      MLC_DOCKER_OS: 'rhel'
+      MLC_DOCKER_OS_VERSION: '9'
+  # Test: arch latest
+  - env:
+      MLC_DOCKER_OS: 'arch'
+      MLC_DOCKER_OS_VERSION: 'latest'
+  # Test: sles 15.4
+  - env:
+      MLC_DOCKER_OS: 'sles'
+      MLC_DOCKER_OS_VERSION: '15.4'
+  # Test: sles 15.5
+  - env:
+      MLC_DOCKER_OS: 'sles'
+      MLC_DOCKER_OS_VERSION: '15.5'
+  # Test: sles 15.6
+  - env:
+      MLC_DOCKER_OS: 'sles'
+      MLC_DOCKER_OS_VERSION: '15.6'
+  # Test: debian 11
+  - env:
+      MLC_DOCKER_OS: 'debian'
+      MLC_DOCKER_OS_VERSION: '11'
+  # Test: debian 12
+  - env:
+      MLC_DOCKER_OS: 'debian'
+      MLC_DOCKER_OS_VERSION: '12'
+  # Test: rocky 8
+  - env:
+      MLC_DOCKER_OS: 'rocky'
+      MLC_DOCKER_OS_VERSION: '8'
+  # Test: rocky 9
+  - env:
+      MLC_DOCKER_OS: 'rocky'
+      MLC_DOCKER_OS_VERSION: '9'
+  # Test: amazonlinux 2023
+  - env:
+      MLC_DOCKER_OS: 'amazonlinux'
+      MLC_DOCKER_OS_VERSION: '2023'
+
 variations:
   slim:
     env:

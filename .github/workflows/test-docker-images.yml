@@ -1,0 +1,66 @@
+name: Test Docker images (detect-cpu)
+
+on:
+  pull_request:
+    branches: [ "main", "dev" ]
+    paths:
+      - 'script/build-dockerfile/**'
+      - 'script/detect-cpu/**'
+      - 'script/detect-os/**'
+      - 'automation/script/docker_utils.py'
+      - '.github/workflows/test-docker-images.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate matrix from dockerinfo.json
+        id: set-matrix
+        run: |
+          matrix=$(python3 -c "
+          import json
+          with open('script/build-dockerfile/dockerinfo.json') as f:
+              config = json.load(f)
+          includes = []
+          for distro, info in config['distros'].items():
+              for ver in info['versions']:
+                  includes.append({'docker_os': distro, 'docker_os_version': str(ver)})
+          print(json.dumps({'include': includes}))
+          ")
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
+  test-docker:
+    needs: generate-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.generate-matrix.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install mlcflow
+        run: |
+          pip install mlcflow tabulate
+
+      - name: Pull repo
+        run: |
+          mlc pull repo ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }} --branch=${{ github.event.pull_request.head.ref || github.ref_name }}
+
+      - name: Test detect-cpu in Docker (${{ matrix.docker_os }} ${{ matrix.docker_os_version }})
+        run: |
+          mlcd detect,cpu -j --docker_os=${{ matrix.docker_os }} --docker_os_version=${{ matrix.docker_os_version }} --docker_cache=no --quiet
