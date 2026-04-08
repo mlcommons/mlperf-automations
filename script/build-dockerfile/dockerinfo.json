@@ -41,7 +41,8 @@
         "systemctl",
         "unzip",
         "ca-certificates",
-        "ssl-cert"
+        "ssl-cert",
+        "binutils"
       ],
       "versions": {
         "20.04": {
@@ -50,17 +51,8 @@
         "22.04": {
           "FROM": "ubuntu:22.04"
         },
-        "23.04": {
-          "FROM": "ubuntu:23.04"
-        },
-        "23.10": {
-          "FROM": "ubuntu:23.10"
-        },
         "24.04": {
           "FROM": "ubuntu:24.04"
-        },
-        "24.10": {
-          "FROM": "ubuntu:24.10"
         },
         "25.04": {
           "FROM": "ubuntu:25.04"
@@ -142,10 +134,38 @@
       ],
       "versions": {
         "15.4": {
-          "FROM": "registry.suse.com/bci/bci-base:15.4"
+          "FROM": "registry.suse.com/bci/bci-base:15.4",
+          "packages": [
+            "python310",
+            "python310-pip",
+            "git",
+            "wget",
+            "sudo",
+            "unzip",
+            "ca-certificates",
+            "gzip",
+            "tar",
+            "gawk",
+            "binutils"
+          ],
+          "PYTHON": "python3.10"
         },
         "15.5": {
-          "FROM": "registry.suse.com/bci/bci-base:15.5"
+          "FROM": "registry.suse.com/bci/bci-base:15.5",
+          "packages": [
+            "python311",
+            "python311-pip",
+            "git",
+            "wget",
+            "sudo",
+            "unzip",
+            "ca-certificates",
+            "gzip",
+            "tar",
+            "gawk",
+            "binutils"
+          ],
+          "PYTHON": "python3.11"
         },
         "15.6": {
           "FROM": "registry.suse.com/bci/bci-base:15.6"
@@ -193,7 +213,22 @@
       ],
       "versions": {
         "8": {
-          "FROM": "rockylinux:8"
+          "FROM": "rockylinux:8",
+          "packages": [
+            "python39",
+            "python39-pip",
+            "git",
+            "wget",
+            "sudo",
+            "binutils"
+          ],
+          "python-packages": [
+            "mlcflow",
+            "requests",
+            "giturlparse",
+            "tabulate"
+          ],
+          "PYTHON": "python3.9"
         },
         "9": {
           "FROM": "rockylinux:9"
@@ -213,7 +248,8 @@
         "sudo",
         "tar",
         "gzip",
-        "unzip"
+        "unzip",
+        "binutils"
       ],
       "versions": {
         "2023": {

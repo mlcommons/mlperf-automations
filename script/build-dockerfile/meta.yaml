@@ -84,22 +84,10 @@ tests:
   - env:
       MLC_DOCKER_OS: 'ubuntu'
       MLC_DOCKER_OS_VERSION: '22.04'
-  # Test: ubuntu 23.04
-  - env:
-      MLC_DOCKER_OS: 'ubuntu'
-      MLC_DOCKER_OS_VERSION: '23.04'
-  # Test: ubuntu 23.10
-  - env:
-      MLC_DOCKER_OS: 'ubuntu'
-      MLC_DOCKER_OS_VERSION: '23.10'
   # Test: ubuntu 24.04
   - env:
       MLC_DOCKER_OS: 'ubuntu'
       MLC_DOCKER_OS_VERSION: '24.04'
-  # Test: ubuntu 24.10
-  - env:
-      MLC_DOCKER_OS: 'ubuntu'
-      MLC_DOCKER_OS_VERSION: '24.10'
   # Test: ubuntu 25.04
   - env:
       MLC_DOCKER_OS: 'ubuntu'
