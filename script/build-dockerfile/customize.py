@@ -63,7 +63,8 @@ def preprocess(i):
 
     if not env.get("MLC_DOCKER_OS_VERSION", ""):
         distro_config = config['distros'].get(env['MLC_DOCKER_OS'], {})
-        env["MLC_DOCKER_OS_VERSION"] = distro_config.get('default_version', list(distro_config.get('versions', {}).keys())[-1] if distro_config.get('versions') else '24.04')
+        env["MLC_DOCKER_OS_VERSION"] = distro_config.get('default_version', list(
+            distro_config.get('versions', {}).keys())[-1] if distro_config.get('versions') else '24.04')
 
     docker_image_base = get_value(env, config, 'FROM', 'MLC_DOCKER_IMAGE_BASE')
     if not docker_image_base:

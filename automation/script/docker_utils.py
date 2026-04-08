@@ -172,12 +172,17 @@ def prepare_docker_inputs(input_params, docker_settings,
     # Resolve default os_version from dockerinfo.json if not specified
     if not docker_inputs.get('os_version', ''):
         try:
-            build_dockerfile_scripts = mlc.access({'action': 'search', 'target': 'script', 'tags': 'build,dockerfile'})
+            build_dockerfile_scripts = mlc.access(
+                {'action': 'search', 'target': 'script', 'tags': 'build,dockerfile'})
             if build_dockerfile_scripts.get('list'):
-                dockerinfo_path = os.path.join(build_dockerfile_scripts['list'][0].path, 'dockerinfo.json')
+                dockerinfo_path = os.path.join(
+                    build_dockerfile_scripts['list'][0].path, 'dockerinfo.json')
                 with open(dockerinfo_path) as _f:
                     dockerinfo = json.load(_f)
-                distro_config = dockerinfo.get('distros', {}).get(docker_inputs.get('os', ''), {})
+                distro_config = dockerinfo.get(
+                    'distros', {}).get(
+                    docker_inputs.get(
+                        'os', ''), {})
                 docker_inputs['os_version'] = distro_config.get(
                     'default_version',
                     list(distro_config['versions'].keys())[-1] if distro_config.get('versions') else '')
