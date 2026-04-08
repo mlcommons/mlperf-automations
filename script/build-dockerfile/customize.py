@@ -14,14 +14,15 @@ def preprocess(i):
     state = i['state']
     logger = i['automation'].logger
 
-    if env["MLC_DOCKER_OS"] not in ["ubuntu", "rhel", "arch"]:
-        return {
-            'return': 1, 'error': f"Specified docker OS: {env['MLC_DOCKER_OS']}. Currently only ubuntu, rhel and arch are supported in MLC docker"}
-
     path = i['run_script_input']['path']
 
     with open(os.path.join(path, "dockerinfo.json")) as f:
         config = json.load(f)
+
+    supported_distros = list(config.get('distros', {}).keys())
+    if env["MLC_DOCKER_OS"] not in supported_distros:
+        return {
+            'return': 1, 'error': f"Specified docker OS: {env['MLC_DOCKER_OS']}. Supported: {', '.join(supported_distros)}"}
 
     if env['MLC_CONTAINER_TOOL'] == "podman":
         config['USER'] = "root"
@@ -60,8 +61,9 @@ def preprocess(i):
                 # build_args.append(arg)
                 # input_args.append("--"+input_+"="+"$"+env_)
 
-    if "MLC_DOCKER_OS_VERSION" not in env:
-        env["MLC_DOCKER_OS_VERSION"] = "20.04"
+    if not env.get("MLC_DOCKER_OS_VERSION", ""):
+        distro_config = config['distros'].get(env['MLC_DOCKER_OS'], {})
+        env["MLC_DOCKER_OS_VERSION"] = distro_config.get('default_version', list(distro_config.get('versions', {}).keys())[-1] if distro_config.get('versions') else '24.04')
 
     docker_image_base = get_value(env, config, 'FROM', 'MLC_DOCKER_IMAGE_BASE')
     if not docker_image_base:
@@ -320,6 +322,10 @@ def preprocess(i):
     # f.write('RUN . /opt/venv/mlc/bin/activate' + EOL)
 
     f.write('ENV PATH="$PATH:$HOME/.local/bin"' + EOL)
+
+    f.write(
+        'RUN {} -m pip install --upgrade pip setuptools'.format(python) +
+        ' ' + pip_extra_flags + ' ' + EOL)
 
     f.write(
         'RUN {} -m pip install '.format(python) +
