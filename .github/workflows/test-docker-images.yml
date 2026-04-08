@@ -183,7 +183,7 @@ jobs:
           mlcd detect,cpu -j \
             --docker_os=ubuntu --docker_os_version=24.04 \
             --docker_cache=yes \
-            --docker_mounts="/tmp/docker-test-output:/mnt/host-output" \
+            --docker_mounts,="/tmp/docker-test-output:/mnt/host-output" \
             --docker_pre_run_cmds="echo WRITTEN_BY_CONTAINER=true > /mnt/host-output/container-result.txt" \
             --quiet
 
@@ -208,7 +208,7 @@ jobs:
           mlcd detect,os -j \
             --docker_os=ubuntu --docker_os_version=24.04 \
             --docker_cache=yes \
-            --docker_mounts="/tmp/docker-test-bidir:/mnt/shared" \
+            --docker_mounts,="/tmp/docker-test-bidir:/mnt/shared" \
             --docker_pre_run_cmds="cat /mnt/shared/input.txt && echo OUTPUT_VALUE=84 > /mnt/shared/output.txt" \
             --quiet
 
