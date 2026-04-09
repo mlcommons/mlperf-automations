@@ -269,7 +269,8 @@ def postprocess(i):
         # Escape single quotes inside run_cmd for bash -c '...' wrapping
         escaped_run_cmd = run_cmd.replace("'", "'\\''")
         if existing_container_id:
-            CMD = f"""ID={existing_container_id} && {env['MLC_CONTAINER_TOOL']} exec $ID bash -c '""" + escaped_run_cmd + "'"
+            CMD = f"""ID={existing_container_id} && {env['MLC_CONTAINER_TOOL']} exec $ID bash -c '""" + \
+                escaped_run_cmd + "'"
         else:
             CONTAINER = f"""{env['MLC_CONTAINER_TOOL']} run -dt {run_opts} --rm  {docker_image_repo}/{docker_image_name}:{docker_image_tag} bash"""
             CMD = f"""ID=`{CONTAINER}` && {env['MLC_CONTAINER_TOOL']} exec $ID bash -c '{escaped_run_cmd}'"""
