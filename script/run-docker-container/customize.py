@@ -340,7 +340,7 @@ def postprocess(i):
             " " + docker_image_repo + "/" + docker_image_name + ":" + docker_image_tag
         # Escape quotes inside run_cmd for bash -c wrapping
         if x == "'":
-            escaped_run_cmd = run_cmd.replace("'", "'\''")
+            escaped_run_cmd = run_cmd.replace("'", "'\\''")
         else:
             escaped_run_cmd = run_cmd.replace('"', '\\"')
         CMD = CONTAINER + " bash -c " + x + run_cmd_prefix + escaped_run_cmd + x2 + x
