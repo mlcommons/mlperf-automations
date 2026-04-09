@@ -174,7 +174,7 @@ jobs:
           mlcd detect,os -j \
             --docker_os=ubuntu --docker_os_version=24.04 \
             --docker_cache=no \
-            --docker_mounts="/tmp/docker-test-input:/mnt/host-input" \
+            --docker_mounts,="/tmp/docker-test-input:/mnt/host-input" \
             --docker_pre_run_cmds="cat /mnt/host-input/host-data.txt" \
             --quiet
 
