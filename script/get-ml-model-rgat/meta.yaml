@@ -88,6 +88,7 @@ variations:
       MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/R-GAT/RGAT.pt
       MLC_DOWNLOAD_FILENAME: RGAT
 tests:
+  needs_pat: true
   run_inputs:
   - variations_list:
     - rclone,mlcommons,fp32,dry-run

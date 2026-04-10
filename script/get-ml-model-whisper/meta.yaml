@@ -20,6 +20,7 @@ tags:
 - whisper
 - speech-recognition
 tests:
+  needs_pat: true
   run_inputs:
   - variations_list:
     - rclone,mlc,dry-run

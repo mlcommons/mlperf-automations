@@ -186,6 +186,7 @@ variations:
       original-dataset:
         tags: _validation
 tests:
+  needs_pat: true
   run_inputs:
   - variations_list:
     - r2-downloader,mlc,dry-run

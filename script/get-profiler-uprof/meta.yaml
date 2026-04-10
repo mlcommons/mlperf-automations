@@ -50,9 +50,6 @@ tags:
 - uprof
 - profiler
 - uprof-profiler
-tests:
-  run_inputs:
-  - accept_eula: true
 uid: 1530bfcddc3f4fa1
 variations:
   download-and-install:

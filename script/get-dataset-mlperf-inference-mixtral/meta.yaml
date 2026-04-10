@@ -102,6 +102,7 @@ variations:
     env:
       MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/mixtral_8x7b/09292024_mixtral_15k_mintoken2_v1.pkl
 tests:
+  needs_pat: true
   run_inputs:
   - variations_list:
     - r2-downloader,calibration,dry-run

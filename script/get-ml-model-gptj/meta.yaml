@@ -35,6 +35,7 @@ prehook_deps:
     _url.:
     - MLC_DOWNLOAD_URL
 tests:
+  needs_pat: true
   run_inputs:
   - variations_list:
     - fp32,pytorch,r2-downloader,dry-run
