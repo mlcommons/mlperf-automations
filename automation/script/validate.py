@@ -62,6 +62,7 @@ def validate_scripts(self_module, input_params):
     print("")
 
     if total_errors > 0:
-        return {'return': 1, 'error': f'{total_errors} validation error(s) found'}
+        return {'return': 1,
+                'error': f'{total_errors} validation error(s) found'}
 
     return {'return': 0}

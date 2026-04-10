@@ -96,7 +96,8 @@ def print_script_help(metadata, script_path, generic_inputs, env, self_module):
     if os.path.exists(customize_path):
         print(f"""    Script customize file path: {customize_path}""")
     else:
-        print(f"""    Script customize file can be created at: {customize_path}""")
+        print(
+            f"""    Script customize file can be created at: {customize_path}""")
 
     run_script_name = self_module._get_script_name(env, script_path)
     run_script_path = os.path.join(script_path, run_script_name)
@@ -180,7 +181,8 @@ def _print_alias_table(alias_inputs):
     target_w = max(len(r[1]) for r in rows) + 2
 
     for flag, target, env_key in rows:
-        print(f"    {flag.ljust(flag_w)}\u2192 {target.ljust(target_w)}({env_key})")
+        print(
+            f"    {flag.ljust(flag_w)}\u2192 {target.ljust(target_w)}({env_key})")
 
 
 def _wrap_text(text, width, indent):
@@ -305,7 +307,8 @@ def print_variations_help(variations):
         if group == "ungrouped":
             print(f"    {group.capitalize()} Variations:")
         else:
-            print(f"    {group.capitalize()} Variations (only one can be selected at a time):")
+            print(
+                f"    {group.capitalize()} Variations (only one can be selected at a time):")
         for line in grouped_output[group]:
             print(f"        - {line}")
         print("")  # Blank line between groups
