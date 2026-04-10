@@ -21,12 +21,6 @@ tags:
 - get-conda
 uid: 6600115f41324c7b
 variations:
-  name.#:
-    adr:
-      conda-package:
-        tags: _name.#
-    env:
-      MLC_CONDA_PREFIX_NAME: '#'
   python-3.#:
     env:
       MLC_CONDA_PYTHON_VERSION: 3.#
@@ -35,3 +29,9 @@ variations:
     env:
       MLC_CONDA_PYTHON_VERSION: '3.8'
     group: conda-python
+  name.#:
+    adr:
+      conda-package:
+        tags: _name.#
+    env:
+      MLC_CONDA_PREFIX_NAME: '#'

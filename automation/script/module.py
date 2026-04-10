@@ -4458,6 +4458,12 @@ pip install mlcflow
 
     ############################################################
 
+    def validate(self, i):
+        from script.validate import validate_scripts
+        return validate_scripts(self, i)
+
+    ############################################################
+
     def dockerfile(self, i):
         from script.docker import dockerfile
         return dockerfile(self, i)

@@ -60,9 +60,18 @@ variations:
     env:
       MLC_GIT_CHECKOUT: '#'
     group: checkout
+  sha.#:
+    env:
+      MLC_GIT_SHA: '#'
+    group: checkout
   full-history:
     env:
       MLC_GIT_DEPTH: ''
+    group: git-history
+  short-history:
+    default: true
+    env:
+      MLC_GIT_DEPTH: --depth 10
     group: git-history
   no-recurse-submodules:
     env:
@@ -82,15 +91,6 @@ variations:
   repo.#:
     env:
       MLC_GIT_URL: '#'
-  sha.#:
-    env:
-      MLC_GIT_SHA: '#'
-    group: checkout
-  short-history:
-    default: true
-    env:
-      MLC_GIT_DEPTH: --depth 10
-    group: git-history
   submodules.#:
     env:
       MLC_GIT_SUBMODULES: '#'

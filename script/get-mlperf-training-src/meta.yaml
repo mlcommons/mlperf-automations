@@ -47,15 +47,32 @@ variations:
     env:
       MLC_GIT_CHECKOUT: '#'
     group: checkout
+  sha.#:
+    env:
+      MLC_GIT_SHA: '#'
+    group: checkout
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: checkout
+  full-history:
+    env:
+      MLC_GIT_DEPTH: ''
+    group: git-history
+  short-history:
+    default: true
+    env:
+      MLC_GIT_DEPTH: --depth 5
+    group: git-history
+  repo.#:
+    env:
+      MLC_GIT_URL: '#'
+    group: repo
   cknowledge:
     default: true
     env:
       MLC_GIT_URL: https://github.com/cknowledge/training.git
     group: src
-  full-history:
-    env:
-      MLC_GIT_DEPTH: ''
-    group: git-history
   mlcommons:
     env:
       MLC_GIT_URL: https://github.com/mlcommons/training.git
@@ -71,23 +88,6 @@ variations:
   patch:
     env:
       MLC_GIT_PATCH: 'yes'
-  repo.#:
-    env:
-      MLC_GIT_URL: '#'
-    group: repo
-  sha.#:
-    env:
-      MLC_GIT_SHA: '#'
-    group: checkout
-  short-history:
-    default: true
-    env:
-      MLC_GIT_DEPTH: --depth 5
-    group: git-history
-  tag.#:
-    env:
-      MLC_GIT_CHECKOUT_TAG: '#'
-    group: checkout
 versions:
   custom:
     env:

@@ -3,8 +3,8 @@ automation_alias: script
 automation_uid: 5b4e0237da074764
 cache: true
 input_mapping:
-  with_token: MLC_GH_AUTH_TOKEN
   with-token: MLC_GH_AUTH_TOKEN
+  with_token: MLC_GH_AUTH_TOKEN
 tags:
 - auth
 - authenticate
@@ -13,4 +13,4 @@ tags:
 - cli
 uid: 7b57673ac14a4337
 deps:
-  - tags: get,gh,cli
+- tags: get,gh,cli

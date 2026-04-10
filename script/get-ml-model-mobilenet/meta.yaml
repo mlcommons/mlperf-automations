@@ -25,31 +25,21 @@ tags:
 - image-classification
 uid: ce46675a3ab249e4
 variations:
-  fp32:
+  onnx:
+    env:
+      MLC_ML_MODEL_DATA_LAYOUT: NCHW
+      MLC_ML_MODEL_FRAMEWORK: onnx
+    group: framework
+  tf:
     default: true
+    default_variations:
+      source: from.google
     env:
-      MLC_ML_MODEL_INPUTS_DATA_TYPE: fp32
-      MLC_ML_MODEL_MOBILENET_PRECISION: float
-      MLC_ML_MODEL_PRECISION: fp32
-      MLC_ML_MODEL_WEIGHTS_DATA_TYPE: fp32
-    group: precision
-  from.google:
-    env:
-      MLC_DOWNLOAD_SOURCE: google
-    group: source
-  from.zenodo:
-    env:
-      MLC_DOWNLOAD_SOURCE: zenodo
-    group: source
-  int8:
-    base:
-    - quantized_
-    env:
-      MLC_ML_MODEL_INPUTS_DATA_TYPE: int8
-      MLC_ML_MODEL_MOBILENET_PRECISION: int8
-      MLC_ML_MODEL_PRECISION: int8
-      MLC_ML_MODEL_WEIGHTS_DATA_TYPE: int8
-    group: precision
+      MLC_ML_MODEL_DATA_LAYOUT: NHWC
+      MLC_ML_MODEL_INPUT_LAYER_NAME: input
+      MLC_ML_MODEL_NORMALIZE_DATA: 'yes'
+      MLC_ML_MODEL_SUBTRACT_MEANS: 'no'
+    group: framework
   large:
     env:
       MLC_ML_MODEL_MOBILENET_KIND: large
@@ -57,6 +47,16 @@ variations:
   large-minimalistic:
     env:
       MLC_ML_MODEL_MOBILENET_KIND: large-minimalistic
+    group: kind
+  small:
+    env:
+      MLC_ML_MODEL_MOBILENET_KIND: small
+    group: kind
+  small-minimalistic:
+    default_variations:
+      precision: fp32
+    env:
+      MLC_ML_MODEL_MOBILENET_KIND: small-minimalistic
     group: kind
   multiplier-0.25:
     env:
@@ -83,35 +83,6 @@ variations:
       MLC_ML_MODEL_MOBILENET_MULTIPLIER: '1.0'
       MLC_ML_MODEL_MOBILENET_MULTIPLIER_PERCENTAGE: '100'
     group: multiplier
-  onnx:
-    env:
-      MLC_ML_MODEL_DATA_LAYOUT: NCHW
-      MLC_ML_MODEL_FRAMEWORK: onnx
-    group: framework
-  onnx,fp32,v1:
-    env:
-      MLC_ML_MODEL_INPUT_LAYER_NAME: input:0
-      MLC_ML_MODEL_NORMALIZE_DATA: 'yes'
-      MLC_ML_MODEL_OUTPUT_LAYER_NAME: MobilenetV1/Predictions/Reshape_1:0
-      MLC_ML_MODEL_SUBTRACT_MEANS: 'no'
-      MLC_ML_MODEL_VER: '1_1.0_224'
-  onnx,int8,v1:
-    env:
-      MLC_ML_MODEL_FILE: mobilenet_sym_no_bn.onnx
-      MLC_ML_MODEL_GIVEN_CHANNEL_MEANS: 128.0 128.0 128.0
-      MLC_ML_MODEL_INPUT_LAYER_NAME: '0'
-      MLC_ML_MODEL_NORMALIZE_DATA: 'no'
-      MLC_ML_MODEL_OUTPUT_LAYER_NAME: '169'
-      MLC_ML_MODEL_SUBTRACT_MEANS: 'yes'
-      MLC_ML_MODEL_VER: 1_1.0_224_quant
-      MLC_PACKAGE_URL: https://zenodo.org/record/3353417/files/Quantized%20MobileNet.zip
-      MLC_UNZIP: 'yes'
-  onnx,opset-11,fp32,v1:
-    env:
-      MLC_PACKAGE_URL: https://zenodo.org/record/4735651/files/mobilenet_v1_1.0_224.onnx
-  onnx,opset-8,fp32,v1:
-    env:
-      MLC_PACKAGE_URL: https://zenodo.org/record/3157894/files/mobilenet_v1_1.0_224.onnx
   opset-11:
     env:
       MLC_ML_MODEL_ONNX_OPSET: '11'
@@ -120,10 +91,32 @@ variations:
     env:
       MLC_ML_MODEL_ONNX_OPSET: '8'
     group: opset-version
-  quantized_:
+  fp32:
+    default: true
     env:
-      MLC_ML_MODEL_MOBILENET_NAME_SUFFIX: _quant
-      MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'yes'
+      MLC_ML_MODEL_INPUTS_DATA_TYPE: fp32
+      MLC_ML_MODEL_MOBILENET_PRECISION: float
+      MLC_ML_MODEL_PRECISION: fp32
+      MLC_ML_MODEL_WEIGHTS_DATA_TYPE: fp32
+    group: precision
+  int8:
+    base:
+    - quantized_
+    env:
+      MLC_ML_MODEL_INPUTS_DATA_TYPE: int8
+      MLC_ML_MODEL_MOBILENET_PRECISION: int8
+      MLC_ML_MODEL_PRECISION: int8
+      MLC_ML_MODEL_WEIGHTS_DATA_TYPE: int8
+    group: precision
+  uint8:
+    base:
+    - quantized_
+    env:
+      MLC_ML_MODEL_INPUTS_DATA_TYPE: uint8
+      MLC_ML_MODEL_MOBILENET_PRECISION: uint8
+      MLC_ML_MODEL_PRECISION: uint8
+      MLC_ML_MODEL_WEIGHTS_DATA_TYPE: uint8
+    group: precision
   resolution-128:
     env:
       MLC_DATASET_PREPROCESSED_IMAGENET_DEP_TAGS: _resolution.128
@@ -152,26 +145,69 @@ variations:
       MLC_ML_MODEL_IMAGE_WIDTH: '224'
       MLC_ML_MODEL_MOBILENET_RESOLUTION: '224'
     group: resolution
-  small:
+  from.google:
     env:
-      MLC_ML_MODEL_MOBILENET_KIND: small
-    group: kind
-  small-minimalistic:
+      MLC_DOWNLOAD_SOURCE: google
+    group: source
+  from.zenodo:
+    env:
+      MLC_DOWNLOAD_SOURCE: zenodo
+    group: source
+  v1:
     default_variations:
-      precision: fp32
+      multiplier: multiplier-1.0
+      resolution: resolution-224
     env:
-      MLC_ML_MODEL_MOBILENET_KIND: small-minimalistic
-    group: kind
-  tf:
+      MLC_ML_MODEL_FULL_NAME: mobilenet-v1-precision_<<<MLC_ML_MODEL_MOBILENET_PRECISION>>>-<<<MLC_ML_MODEL_MOBILENET_MULTIPLIER>>>-<<<MLC_ML_MODEL_MOBILENET_RESOLUTION>>>
+      MLC_ML_MODEL_MOBILENET_VERSION: '1'
+    group: version
+  v2:
+    default_variations:
+      multiplier: multiplier-1.0
+      resolution: resolution-224
+    env:
+      MLC_ML_MODEL_FULL_NAME: mobilenet-v2-precision_<<<MLC_ML_MODEL_MOBILENET_PRECISION>>>-<<<MLC_ML_MODEL_MOBILENET_MULTIPLIER>>>-<<<MLC_ML_MODEL_MOBILENET_RESOLUTION>>>
+      MLC_ML_MODEL_MOBILENET_VERSION: '2'
+      MLC_ML_MODEL_VER: '2'
+    group: version
+  v3:
     default: true
     default_variations:
-      source: from.google
+      multiplier: multiplier-1.0
+      resolution: resolution-224
     env:
-      MLC_ML_MODEL_DATA_LAYOUT: NHWC
-      MLC_ML_MODEL_INPUT_LAYER_NAME: input
+      MLC_ML_MODEL_FULL_NAME: mobilenet-v3-precision_<<<MLC_ML_MODEL_MOBILENET_PRECISION>>>-<<<MLC_ML_MODEL_MOBILENET_KIND>>>-<<<MLC_ML_MODEL_MOBILENET_RESOLUTION>>>
+      MLC_ML_MODEL_MOBILENET_VERSION: '3'
+      MLC_ML_MODEL_VER: '3'
+    group: version
+  onnx,fp32,v1:
+    env:
+      MLC_ML_MODEL_INPUT_LAYER_NAME: input:0
       MLC_ML_MODEL_NORMALIZE_DATA: 'yes'
+      MLC_ML_MODEL_OUTPUT_LAYER_NAME: MobilenetV1/Predictions/Reshape_1:0
       MLC_ML_MODEL_SUBTRACT_MEANS: 'no'
-    group: framework
+      MLC_ML_MODEL_VER: '1_1.0_224'
+  onnx,int8,v1:
+    env:
+      MLC_ML_MODEL_FILE: mobilenet_sym_no_bn.onnx
+      MLC_ML_MODEL_GIVEN_CHANNEL_MEANS: 128.0 128.0 128.0
+      MLC_ML_MODEL_INPUT_LAYER_NAME: '0'
+      MLC_ML_MODEL_NORMALIZE_DATA: 'no'
+      MLC_ML_MODEL_OUTPUT_LAYER_NAME: '169'
+      MLC_ML_MODEL_SUBTRACT_MEANS: 'yes'
+      MLC_ML_MODEL_VER: 1_1.0_224_quant
+      MLC_PACKAGE_URL: https://zenodo.org/record/3353417/files/Quantized%20MobileNet.zip
+      MLC_UNZIP: 'yes'
+  onnx,opset-11,fp32,v1:
+    env:
+      MLC_PACKAGE_URL: https://zenodo.org/record/4735651/files/mobilenet_v1_1.0_224.onnx
+  onnx,opset-8,fp32,v1:
+    env:
+      MLC_PACKAGE_URL: https://zenodo.org/record/3157894/files/mobilenet_v1_1.0_224.onnx
+  quantized_:
+    env:
+      MLC_ML_MODEL_MOBILENET_NAME_SUFFIX: _quant
+      MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'yes'
   tf,fp32,v1,resolution-224,multiplier-1.0:
     env:
       MLC_ML_MODEL_ACCURACY: '71.676'
@@ -242,39 +278,3 @@ variations:
   tflite:
     base:
     - tf
-  uint8:
-    base:
-    - quantized_
-    env:
-      MLC_ML_MODEL_INPUTS_DATA_TYPE: uint8
-      MLC_ML_MODEL_MOBILENET_PRECISION: uint8
-      MLC_ML_MODEL_PRECISION: uint8
-      MLC_ML_MODEL_WEIGHTS_DATA_TYPE: uint8
-    group: precision
-  v1:
-    default_variations:
-      multiplier: multiplier-1.0
-      resolution: resolution-224
-    env:
-      MLC_ML_MODEL_FULL_NAME: mobilenet-v1-precision_<<<MLC_ML_MODEL_MOBILENET_PRECISION>>>-<<<MLC_ML_MODEL_MOBILENET_MULTIPLIER>>>-<<<MLC_ML_MODEL_MOBILENET_RESOLUTION>>>
-      MLC_ML_MODEL_MOBILENET_VERSION: '1'
-    group: version
-  v2:
-    default_variations:
-      multiplier: multiplier-1.0
-      resolution: resolution-224
-    env:
-      MLC_ML_MODEL_FULL_NAME: mobilenet-v2-precision_<<<MLC_ML_MODEL_MOBILENET_PRECISION>>>-<<<MLC_ML_MODEL_MOBILENET_MULTIPLIER>>>-<<<MLC_ML_MODEL_MOBILENET_RESOLUTION>>>
-      MLC_ML_MODEL_MOBILENET_VERSION: '2'
-      MLC_ML_MODEL_VER: '2'
-    group: version
-  v3:
-    default: true
-    default_variations:
-      multiplier: multiplier-1.0
-      resolution: resolution-224
-    env:
-      MLC_ML_MODEL_FULL_NAME: mobilenet-v3-precision_<<<MLC_ML_MODEL_MOBILENET_PRECISION>>>-<<<MLC_ML_MODEL_MOBILENET_KIND>>>-<<<MLC_ML_MODEL_MOBILENET_RESOLUTION>>>
-      MLC_ML_MODEL_MOBILENET_VERSION: '3'
-      MLC_ML_MODEL_VER: '3'
-    group: version

@@ -55,16 +55,6 @@ valid_variation_combinations:
 - - lite4
   - resolution-300
 variations:
-  fp32:
-    default: true
-    env:
-      MLC_ML_MODEL_EFFICIENTNET_LITE_PRECISION: fp32
-      MLC_ML_MODEL_INPUTS_DATA_TYPE: fp32
-      MLC_ML_MODEL_PRECISION: fp32
-      MLC_ML_MODEL_WEIGHTS_DATA_TYPE: fp32
-    group: precision
-  int8:
-    alias: uint8
   lite0:
     base:
     - resolution-224
@@ -96,6 +86,21 @@ variations:
     env:
       MLC_ML_MODEL_EFFICIENTNET_LITE_KIND: lite4
     group: kind
+  fp32:
+    default: true
+    env:
+      MLC_ML_MODEL_EFFICIENTNET_LITE_PRECISION: fp32
+      MLC_ML_MODEL_INPUTS_DATA_TYPE: fp32
+      MLC_ML_MODEL_PRECISION: fp32
+      MLC_ML_MODEL_WEIGHTS_DATA_TYPE: fp32
+    group: precision
+  uint8:
+    env:
+      MLC_ML_MODEL_EFFICIENTNET_LITE_PRECISION: int8
+      MLC_ML_MODEL_INPUTS_DATA_TYPE: uint8
+      MLC_ML_MODEL_PRECISION: uint8
+      MLC_ML_MODEL_WEIGHTS_DATA_TYPE: uint8
+    group: precision
   resolution-224:
     default: true
     env:
@@ -132,11 +137,6 @@ variations:
       MLC_ML_MODEL_IMAGE_WIDTH: '300'
       MLC_ML_MODEL_MOBILENET_RESOLUTION: '300'
     group: resolution
+  int8:
+    alias: uint8
   tflite: {}
-  uint8:
-    env:
-      MLC_ML_MODEL_EFFICIENTNET_LITE_PRECISION: int8
-      MLC_ML_MODEL_INPUTS_DATA_TYPE: uint8
-      MLC_ML_MODEL_PRECISION: uint8
-      MLC_ML_MODEL_WEIGHTS_DATA_TYPE: uint8
-    group: precision

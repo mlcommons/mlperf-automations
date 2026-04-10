@@ -20,20 +20,18 @@ tags:
 - whisper
 - speech-recognition
 tests:
+  needs_pat: true
   run_inputs:
   - variations_list:
     - rclone,mlc,dry-run
     - r2-downloader,mlc,dry-run
-    # - huggingface
-
 uid: 3bea2356e97f47b1
-
 prehook_deps:
 - enable_if_env:
     MLC_TMP_REQUIRE_DOWNLOAD:
     - 'yes'
     MLC_DOWNLOAD_SRC:
-    - 'huggingface'
+    - huggingface
   env: {}
   extra_cache_tags: whisper
   force_env_keys:
@@ -41,49 +39,11 @@ prehook_deps:
   names:
   - hf-zoo
   tags: get,ml-model,huggingface,zoo,_clone-repo
-
 variations:
-  fp32:
-    default: true
-    env:
-      MLC_ML_MODEL_INPUT_DATA_TYPES: fp32
-      MLC_ML_MODEL_PRECISION: fp32
-      MLC_ML_MODEL_WEIGHT_DATA_TYPES: fp32
-    group: precision
-
   huggingface:
     group: download-src
     env:
       MLC_DOWNLOAD_SRC: huggingface
-
-  large-v3:
-    env:
-      MLC_GIT_CHECKOUT_FOLDER: whisper-large-v3
-    group: model-size
-    default: true
-    default_variations:
-      huggingface-stub: openai/whisper-large-v3
-
-  openai/whisper-large-v3:
-    base:
-      - large-v3
-    adr:
-      hf-zoo:
-        tags: _model-stub.openai/whisper-large-v3
-    env:
-      MLC_MODEL_ZOO_ENV_KEY: WHISPER
-    group: huggingface-stub
-
-  dry-run:
-    env:
-      MLC_DOWNLOAD_MODE: dry
-    group: run-mode
-  dry-run,rclone:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  dry-run,r2-downloader:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   mlc:
     default: true
     env:
@@ -106,12 +66,19 @@ variations:
       update_tags_from_env_with_prefix:
         _url.:
         - MLC_DOWNLOAD_URL
+  r2-downloader:
+    adr:
+      whisper-model-dae:
+        tags: _r2-downloader
+        env:
+          MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/whisper-model.uri
+    group: download-tool
   rclone:
     adr:
       whisper-model-dae:
         tags: _rclone
         env:
-          MLC_DOWNLOAD_URL: 'mlc-inference:mlcommons-inference-wg-public/Whisper/model/'
+          MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/Whisper/model/
     prehook_deps:
     - enable_if_env:
         MLC_TMP_REQUIRE_DOWNLOAD:
@@ -126,10 +93,36 @@ variations:
       tags: get,rclone-config,_mlc-inference
     default: true
     group: download-tool
-  r2-downloader:
+  openai/whisper-large-v3:
+    base:
+    - large-v3
     adr:
-      whisper-model-dae:
-        tags: _r2-downloader
-        env:
-          MLC_DOWNLOAD_URL: 'https://inference.mlcommons-storage.org/metadata/whisper-model.uri'
-    group: download-tool
+      hf-zoo:
+        tags: _model-stub.openai/whisper-large-v3
+    env:
+      MLC_MODEL_ZOO_ENV_KEY: WHISPER
+    group: huggingface-stub
+  large-v3:
+    env:
+      MLC_GIT_CHECKOUT_FOLDER: whisper-large-v3
+    group: model-size
+    default: true
+    default_variations:
+      huggingface-stub: openai/whisper-large-v3
+  fp32:
+    default: true
+    env:
+      MLC_ML_MODEL_INPUT_DATA_TYPES: fp32
+      MLC_ML_MODEL_PRECISION: fp32
+      MLC_ML_MODEL_WEIGHT_DATA_TYPES: fp32
+    group: precision
+  dry-run:
+    env:
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run

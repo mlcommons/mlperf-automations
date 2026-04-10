@@ -47,6 +47,15 @@ tags:
 - src-pytorch-kineto
 uid: 98a4b061712d4483
 variations:
+  repo.#:
+    env:
+      MLC_GIT_URL: '#'
+    group: repo
+  repo.https://github.com/pytorch/kineto:
+    default: true
+    env:
+      MLC_GIT_URL: https://github.com/pytorch/kineto
+    group: repo
   branch.#:
     env:
       MLC_GIT_CHECKOUT: '#'
@@ -64,15 +73,6 @@ variations:
       TORCH_CXX_FLAGS: -D_GLIBCXX_USE_CXX11_ABI=1
       USE_CUDA: '1'
       USE_CUDNN: '1'
-  repo.#:
-    env:
-      MLC_GIT_URL: '#'
-    group: repo
-  repo.https://github.com/pytorch/kineto:
-    default: true
-    env:
-      MLC_GIT_URL: https://github.com/pytorch/kineto
-    group: repo
   sha.#:
     env:
       MLC_GIT_CHECKOUT_SHA: '#'

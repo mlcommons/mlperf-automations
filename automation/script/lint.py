@@ -3,6 +3,7 @@ import yaml
 import copy
 from mlc import utils
 from utils import *
+from script.meta_schema import validate_meta
 
 
 def lint_meta(self_module, input_params):
@@ -67,6 +68,15 @@ def lint_meta(self_module, input_params):
                 logger.info(
                     f"No input mapping or variations keys to be sorted for {script_alias}")
 
+        # Validate meta against schema
+        meta_errors, meta_warnings = validate_meta(metadata, script_directory)
+        if meta_errors:
+            for e in meta_errors:
+                logger.error(f"[{script_alias}] {e}")
+        if meta_warnings and not quiet:
+            for w in meta_warnings:
+                logger.warning(f"[{script_alias}] {w}")
+
     return {'return': 0}
 
 
@@ -111,27 +121,33 @@ def sort_meta_yaml_file(script_directory, quiet=False):
         if 'input_mapping' in data and isinstance(data['input_mapping'], dict):
             data['input_mapping'] = dict(sorted(data['input_mapping'].items()))
 
-        # Sort variations: with 'group' first, then without 'group'
+        # Sort variations: grouped consecutively by group name, then ungrouped
         if 'variations' in data and isinstance(data['variations'], dict):
             variations = data['variations']
 
-            # Separate variations with and without 'group' key
+            # Separate variations by group
             with_group = []
             without_group = []
 
             for key, value in variations.items():
                 if isinstance(value, dict) and 'group' in value:
-                    with_group.append((key, value))
+                    group = value['group']
+                    if isinstance(group, list):
+                        group = group[0] if group else ''
+                    with_group.append((key, value, group))
                 else:
                     without_group.append((key, value))
 
-            # Sort both lists alphabetically by key
-            with_group.sort(key=lambda x: x[0])
+            # Sort grouped variations by (group_name, variation_name)
+            # so variations within the same group are consecutive
+            with_group.sort(key=lambda x: (x[2], x[0]))
             without_group.sort(key=lambda x: x[0])
 
-            # Combine them: with_group first, then without_group
+            # Combine: grouped first (consecutive by group), then ungrouped
             sorted_variations = {}
-            for key, value in with_group + without_group:
+            for key, value, _ in with_group:
+                sorted_variations[key] = value
+            for key, value in without_group:
                 sorted_variations[key] = value
 
             data['variations'] = sorted_variations

@@ -52,9 +52,6 @@ tags:
 - sdk
 uid: 9701bdda97fa4045
 variations:
-  branch.#:
-    env:
-      MLC_GIT_CHECKOUT: '#'
   debug:
     env:
       MLC_QAIC_COMPUTE_SDK_INSTALL_MODE: debug
@@ -77,4 +74,7 @@ variations:
     env:
       MLC_GIT_URL: https://github.com/quic/software-kit-for-qualcomm-cloud-ai-100-cc
     group: repo-source
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
 versions: {}

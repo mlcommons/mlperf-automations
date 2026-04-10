@@ -46,15 +46,6 @@ tests:
     - branch.main
 uid: 81d0dc1269fe41cc
 variations:
-  branch.#:
-    env:
-      MLC_GIT_CHECKOUT: '#'
-  config.#:
-    env:
-      MLC_MIMALLOC_CONFIG: '#'
-  sha.#:
-    env:
-      MLC_GIT_SHA: '#'
   url.#:
     env:
       MLC_GIT_URL: '#'
@@ -64,6 +55,15 @@ variations:
     env:
       MLC_GIT_URL: https://github.com/microsoft/mimalloc.git
     group: version
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+  config.#:
+    env:
+      MLC_MIMALLOC_CONFIG: '#'
+  sha.#:
+    env:
+      MLC_GIT_SHA: '#'
   version.official:
     base:
     - url.official

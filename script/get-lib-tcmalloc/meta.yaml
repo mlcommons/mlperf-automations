@@ -46,9 +46,6 @@ tests:
     - branch.master
 uid: bc454a366fed44f2
 variations:
-  static:
-    env:
-      MLC_TCMALLOC_BUILD_TYPE: static
   full:
     group: build-type
     env:
@@ -58,16 +55,6 @@ variations:
     default: true
     env:
       MLC_TCMALLOC_BUILD_NAME: tcmalloc_minimal
-
-  branch.#:
-    env:
-      MLC_GIT_CHECKOUT: '#'
-  config.#:
-    env:
-      MLC_TCMALLOC_CONFIG: '#'
-  sha.#:
-    env:
-      MLC_GIT_SHA: '#'
   url.#:
     env:
       MLC_GIT_URL: '#'
@@ -77,6 +64,18 @@ variations:
     env:
       MLC_GIT_URL: https://github.com/google/tcmalloc.git
     group: version
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+  config.#:
+    env:
+      MLC_TCMALLOC_CONFIG: '#'
+  sha.#:
+    env:
+      MLC_GIT_SHA: '#'
+  static:
+    env:
+      MLC_TCMALLOC_BUILD_TYPE: static
   version.official:
     base:
     - url.official

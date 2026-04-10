@@ -9,11 +9,52 @@ tags:
 - get-ml-model-bevformer
 uid: 438a053f666443bd
 new_env_keys:
-  - MLC_ML_MODEL_BEVFORMER_PATH
-  - MLC_ML_MODEL_FILE_WITH_PATH
+- MLC_ML_MODEL_BEVFORMER_PATH
+- MLC_ML_MODEL_FILE_WITH_PATH
 print_env_at_the_end:
   MLC_ML_MODEL_BEVFORMER_PATH: BevFormer checkpoint path
 variations:
+  mlc:
+    group: download-src
+    default: true
+    prehook_deps:
+    - tags: get,rclone
+      enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+    - tags: get,rclone-config,_config-name.mlc-nuscenes
+      force_cache: true
+      enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+      env:
+        MLC_RCLONE_DRIVE_FOLDER_ID: 17CpM5eU8tjrxh_LpH_BTNTeT37PhzcnC
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      env:
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_BEVFORMER_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_MODEL_BEVFORMER_PATH
+        MLC_DOWNLOAD_URL: mlc-nuscenes:<<<MLC_MODEL_RCLONE_FILEPATH>>>
+        MLC_DOWNLOAD_EXTRA_OPTIONS: ' --include '
+      extra_cache_tags: ml,model,bevformer
+      force_cache: true
+      names:
+      - dae
+      tags: download-and-extract
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+  rclone:
+    group: download-tool
+    add_deps_recursive:
+      dae:
+        tags: _rclone
+    default: true
   onnx:
     group: model-format
     default: true
@@ -27,47 +68,6 @@ variations:
       MLC_MODEL_FORMAT: pth
       MLC_MODEL_RCLONE_FILEPATH: model_checkpoint_bevformer/bevformer_tiny_epoch_24.pth
       MLC_ML_MODEL_FILENAME: bevformer_tiny_epoch_24.pth
-  mlc:
-    group: download-src
-    default: true
-    prehook_deps:
-      - tags: get,rclone
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-      - tags: get,rclone-config,_config-name.mlc-nuscenes
-        force_cache: true
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-        env:
-          MLC_RCLONE_DRIVE_FOLDER_ID: 17CpM5eU8tjrxh_LpH_BTNTeT37PhzcnC
-      - enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - 'yes'
-        env:
-          MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_BEVFORMER_PATH
-          MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_MODEL_BEVFORMER_PATH
-          MLC_DOWNLOAD_URL: 'mlc-nuscenes:<<<MLC_MODEL_RCLONE_FILEPATH>>>'
-          MLC_DOWNLOAD_EXTRA_OPTIONS: ' --include '
-        extra_cache_tags: ml,model,bevformer
-        force_cache: true
-        names:
-          - dae
-        tags: download-and-extract
-        force_env_keys:
-          - MLC_OUTDIRNAME  
-        update_tags_from_env_with_prefix:
-          _url.:
-            - MLC_DOWNLOAD_URL
-    env:
-      MLC_DOWNLOAD_SRC: mlcommons
-  rclone:
-    group: download-tool
-    add_deps_recursive:
-      dae:
-        tags: _rclone
-    default: true
   dry-run:
     group: run-mode
     env:
@@ -79,5 +79,5 @@ tests:
   needs_pat: true
   run_inputs:
   - variations_list:
-      - onnx,rclone,mlc,dry-run
-      - pytorch,rclone,mlc,dry-run
+    - onnx,rclone,mlc,dry-run
+    - pytorch,rclone,mlc,dry-run

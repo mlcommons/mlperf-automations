@@ -61,20 +61,22 @@ def print_script_help(metadata, script_path, generic_inputs, env, self_module):
     print(f"Tags: {', '.join(metadata.get('tags', []))}")
     # Print the run commands
     print_run_commands(metadata)
-    print("")
-    print("Script Inputs:")
-    print("")
 
     input_mapping = metadata.get('input_mapping', {})
     input_description = metadata.get('input_description', {})
     default_env = metadata.get('default_env', {})
 
-    print_input_details(input_mapping, input_description, default_env)
+    print("")
+    print("=" * 60)
+    script_name = metadata.get('alias', metadata['uid'])
+    print(f"  INPUTS FOR '{script_name}'")
+    print("=" * 60)
+    print("")
 
-    print("")
-    print("Generic Inputs for all Scripts:")
-    print("")
-    print_input_descriptions(generic_inputs)
+    if input_mapping:
+        print_input_details(input_mapping, input_description, default_env)
+    else:
+        print(f"    No inputs defined for '{script_name}'.")
 
     variations = metadata.get('variations', {})
 
@@ -83,22 +85,31 @@ def print_script_help(metadata, script_path, generic_inputs, env, self_module):
     else:
         print("    - No variations.")
 
-    print("\n" + "=" * 60 + "\n")  # Separator for clarity
+    print("\n" + "=" * 60)
+    print("  SCRIPT FILE PATHS")
+    print("=" * 60)
+    print("")
 
     print(
-        f"""Script meta file path: {os.path.join(script_path, "meta.yaml")}""")
+        f"""    Script meta file path: {os.path.join(script_path, "meta.yaml")}""")
     customize_path = os.path.join(script_path, "customize.py")
     if os.path.exists(customize_path):
-        print(f"""Script customize file path: {customize_path}""")
+        print(f"""    Script customize file path: {customize_path}""")
     else:
-        print(f"""Script customize file can be created at: {customize_path}""")
+        print(f"""    Script customize file can be created at: {customize_path}""")
 
     run_script_name = self_module._get_script_name(env, script_path)
     run_script_path = os.path.join(script_path, run_script_name)
     if os.path.exists(run_script_path):
-        print(f"""Script run file path: {run_script_path}""")
+        print(f"""    Script run file path: {run_script_path}""")
 
-    print("\n" + "=" * 60 + "\n")  # Separator for clarity
+    print("\n" + "=" * 60)
+    print("  GENERIC INPUTS (common to all scripts)")
+    print("=" * 60)
+    print("")
+    print("    To see all generic script inputs, run:")
+    print("      $ mlc run script --help")
+    print("")
 
 
 def print_input_details(input_mapping, input_description, default_env):
@@ -115,6 +126,9 @@ def print_input_details(input_mapping, input_description, default_env):
     for key in keys_to_delete:
         del input_description[key]
 
+    main_inputs = {}
+    alias_inputs = {}
+
     if input_description:
         reverse_map = defaultdict(list)
         for k, v in input_mapping.items():
@@ -124,7 +138,7 @@ def print_input_details(input_mapping, input_description, default_env):
             if i in input_mapping and input_mapping[i] in default_env:
                 input_description[i]['default'] = default_env[input_mapping[i]]
 
-        # Add alias entries
+        # Identify aliases
         for mapped_env, keys in reverse_map.items():
             if len(keys) > 1:
                 canonical = keys[0]
@@ -132,42 +146,95 @@ def print_input_details(input_mapping, input_description, default_env):
                     if alias in input_description:
                         input_description[alias] = {}
                         input_description[alias]['alias'] = canonical
-                        input_description[alias]['desc'] = f"""Alias for --{canonical}"""
+                        input_description[alias]['desc'] = f"Alias for --{canonical}"
                         input_description[alias]['env_key'] = mapped_env
 
-    print_input_descriptions(input_description)
+        # Separate main inputs from aliases
+        for key, field in input_description.items():
+            if field.get('alias'):
+                alias_inputs[key] = field
+            else:
+                main_inputs[key] = field
+
+    print_input_table(main_inputs)
+
+    if alias_inputs:
+        print("")
+        print("    Aliases:")
+        print("")
+        _print_alias_table(alias_inputs)
+
+    return
+
+
+def _print_alias_table(alias_inputs):
+    """Print aliases in a compact grouped format."""
+    rows = []
+    for key in sorted(alias_inputs):
+        field = alias_inputs[key]
+        canonical = field.get('alias', '')
+        env_key = field.get('env_key', '')
+        rows.append((f"--{key}", f"--{canonical}", env_key))
+
+    flag_w = max(len(r[0]) for r in rows) + 2
+    target_w = max(len(r[1]) for r in rows) + 2
+
+    for flag, target, env_key in rows:
+        print(f"    {flag.ljust(flag_w)}\u2192 {target.ljust(target_w)}({env_key})")
+
+
+def _wrap_text(text, width, indent):
+    """Wrap text to width with indent on continuation lines."""
+    import textwrap
+    lines = textwrap.wrap(text, width=width)
+    if not lines:
+        return ""
+    return lines[0] + "".join(f"\n{indent}{l}" for l in lines[1:])
+
+
+def print_input_table(input_descriptions):
+    """Print inputs in a simple readable format."""
+    if not input_descriptions:
+        print("    No inputs")
+        return
+
+    # Compute alignment: all "or" keywords line up
+    keys = sorted(input_descriptions)
+    flag_w = max(len(f"--{k}") for k in keys) + 2
+
+    detail_prefix = "        \u2514\u2500 "
+    detail_indent = "           "
+    wrap_width = 80
+
+    for key in keys:
+        field = input_descriptions[key]
+        env_key = field.get('env_key', f"MLC_TMP_{key.upper()}")
+        desc = field.get('desc', '')
+        default = str(field['default']) if field.get('default') else ''
+        choices = field.get("choices", "")
+
+        # Main line: --flag  <aligned>  or  --env.ENV_KEY
+        flag = f"--{key}"
+        print(f"    {flag.ljust(flag_w)}or --env.{env_key}")
+
+        # Detail lines for default, choices, description on separate lines
+        if default:
+            print(f"{detail_prefix}Default: {default}")
+        if choices:
+            detail_text = f"Choices: {choices}"
+            wrapped = _wrap_text(detail_text, wrap_width, detail_indent)
+            print(f"{detail_prefix}{wrapped}")
+        if desc:
+            wrapped = _wrap_text(desc, wrap_width, detail_indent)
+            print(f"{detail_prefix}{wrapped}")
+
+        print("")  # Blank line between entries
 
     return
 
 
 def print_input_descriptions(input_descriptions):
-
-    if not input_descriptions:
-        print("\tNo inputs")
-
-    for key in sorted(input_descriptions):
-        field = input_descriptions[key]
-        env_key = field.get('env_key', f"""MLC_TMP_{key.upper()}""")
-        desc = field.get('desc')
-        default = field.get('default', None)
-        choices = field.get("choices", "")
-        dtype = infer_type(field)
-
-        line = []
-
-        # Use .ljust(15) to ensure the key occupies 15 characters minimum
-        line.append(f"--{key.ljust(26)}: maps to --env.{env_key}")
-        if default:
-            line.append(f"{' '.ljust(30)}Default: {default}")
-        # if dtype:
-        #    line.append(f"{' '.ljust(30)}Type: {dtype}")
-        if choices:
-            line.append(f"{' '.ljust(30)}Choices: {choices}")
-        if desc:
-            line.append(f"{' '.ljust(30)}Desc: {desc}")
-
-        print("\t" + "\t\n\t".join(line))
-        print("")
+    print_input_table(input_descriptions)
 
 
 def print_variations_help(variations):
@@ -225,11 +292,22 @@ def print_variations_help(variations):
         grouped_output[group].append(output)
 
     # Console output structure
-    print("\nVariations:\n")
+    print("")
+    print("=" * 60)
+    print("  VARIATIONS")
+    print("=" * 60)
+    print("")
+    print("    Use variations by adding them with a _ prefix to the script tags.")
+    print("    Example: mlcr <tags>,_<variation_name>")
+    print("")
+
     for group in sorted(grouped_output):
-        print(f"\t{group.capitalize()} Variations:")
+        if group == "ungrouped":
+            print(f"    {group.capitalize()} Variations:")
+        else:
+            print(f"    {group.capitalize()} Variations (only one can be selected at a time):")
         for line in grouped_output[group]:
-            print(f"\t    - {line}")
+            print(f"        - {line}")
         print("")  # Blank line between groups
 
 
