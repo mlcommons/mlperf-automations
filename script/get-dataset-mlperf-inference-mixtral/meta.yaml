@@ -8,45 +8,30 @@ new_env_keys:
 prehook_deps:
 - env:
     MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_PREPROCESSED_PATH
-  extra_cache_tags: mixtral,get-mixtral-dataset  
+  extra_cache_tags: mixtral,get-mixtral-dataset
   force_cache: true
   tags: download-and-extract
   force_env_keys:
-    - MLC_OUTDIRNAME  
+  - MLC_OUTDIRNAME
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_PACKAGE_URL
   names:
-    - download-file-mixtral-dataset
+  - download-file-mixtral-dataset
 tags:
 - get
 - dataset-mixtral
 - openorca-mbxp-gsm8k-combined
 uid: 89e7c91444804775
 variations:
-  rclone:
-    group: download-tool
+  calibration:
+    group: dataset-type
     adr:
       download-file-mixtral-dataset:
-        tags: _rclone
+        extra_cache_tags: mixtral,get-mixtral-dataset,calibration
     env:
-      MLC_DOWNLOAD_TOOL: rclone
-      MLC_RCLONE_COPY_USING: copyurl
-  r2-downloader:
-    group: download-tool
-    default: true
-    adr:
-      download-file-mixtral-dataset:
-        tags: _r2-downloader
-    env:
-      MLC_DOWNLOAD_TOOL: r2-downloader
-  wget:
-    group: download-tool
-    adr:
-      download-file-mixtral-dataset:
-        tags: _wget
-    env:
-      MLC_DOWNLOAD_TOOL: wget
+      ML_MODEL_STARTING_WEIGHTS_FILENAME: https://github.com/mlcommons/inference/tree/master/language/mixtral-8x7b#calibration-dataset
+      MLC_DATASET_TYPE: calibration
   validation:
     default: true
     group: dataset-type
@@ -56,32 +41,51 @@ variations:
     env:
       ML_MODEL_STARTING_WEIGHTS_FILENAME: https://github.com/mlcommons/inference/tree/master/language/mixtral-8x7b#preprocessed
       MLC_DATASET_TYPE: validation
-  validation,rclone:
-    env:
-      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/mixtral_8x7b/09292024_mixtral_15k_mintoken2_v1.pkl
-  validation,r2-downloader:
-    env:
-      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/mixtral-8x7b-validation-dataset.uri
-  calibration:
-    group: dataset-type
-    adr:
-      download-file-mixtral-dataset:
-        extra_cache_tags: mixtral,get-mixtral-dataset,calibration
-    env:
-      ML_MODEL_STARTING_WEIGHTS_FILENAME: https://github.com/mlcommons/inference/tree/master/language/mixtral-8x7b#calibration-dataset
-      MLC_DATASET_TYPE: calibration
-  calibration,rclone:
-    env:
-      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/mixtral_8x7b%2F2024.06.06_mixtral_15k_calibration_v4.pkl
-  calibration,r2-downloader:
-    env:
-      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/mixtral-8x7b-calibration-dataset.uri
   mlcommons-storage:
     env:
       MLC_DOWNLOAD_CHECKSUM: 78823c13e0e73e518872105c4b09628b
       MLC_DOWNLOAD_FILENAME: 2024.06.06_mixtral_15k_v4.pkl
       MLC_PACKAGE_URL: https://inference.mlcommons-storage.org/mixtral_8x7b%2F2024.06.06_mixtral_15k_v4.pkl
     group: download-source
+  r2-downloader:
+    group: download-tool
+    default: true
+    adr:
+      download-file-mixtral-dataset:
+        tags: _r2-downloader
+    env:
+      MLC_DOWNLOAD_TOOL: r2-downloader
+  rclone:
+    group: download-tool
+    adr:
+      download-file-mixtral-dataset:
+        tags: _rclone
+    env:
+      MLC_DOWNLOAD_TOOL: rclone
+      MLC_RCLONE_COPY_USING: copyurl
+  wget:
+    group: download-tool
+    adr:
+      download-file-mixtral-dataset:
+        tags: _wget
+    env:
+      MLC_DOWNLOAD_TOOL: wget
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
+  calibration,r2-downloader:
+    env:
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/mixtral-8x7b-calibration-dataset.uri
+  calibration,rclone:
+    env:
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/mixtral_8x7b%2F2024.06.06_mixtral_15k_calibration_v4.pkl
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
   size.#:
     base:
     - mlcommons-storage
@@ -91,20 +95,16 @@ variations:
     env:
       MLC_DATASET_MIXTRAL_GENERATE_TEST_DATA: 'yes'
       MLC_DATASET_MIXTRAL_TEST_DATA_SIZE: '#'
-  dry-run:
-    group: run-mode
+  validation,r2-downloader:
     env:
-      MLC_DOWNLOAD_MODE: dry
-  dry-run,r2-downloader:
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/mixtral-8x7b-validation-dataset.uri
+  validation,rclone:
     env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
-  dry-run,rclone:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/mixtral_8x7b/09292024_mixtral_15k_mintoken2_v1.pkl
 tests:
   run_inputs:
   - variations_list:
-      - r2-downloader,calibration,dry-run
-      - rclone,calibration,dry-run
-      - r2-downloader,validation,dry-run
-      - rclone,validation,dry-run
+    - r2-downloader,calibration,dry-run
+    - rclone,calibration,dry-run
+    - r2-downloader,validation,dry-run
+    - rclone,validation,dry-run

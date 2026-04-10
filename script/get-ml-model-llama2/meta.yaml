@@ -10,9 +10,9 @@ env:
   MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'no'
 input_mapping:
   checkpoint: LLAMA2_CHECKPOINT_PATH
-  use_service_account: MLC_AUTH_USING_SERVICE_ACCOUNT
   client_id: CF_ACCESS_CLIENT_ID
   client_secret: CF_ACCESS_CLIENT_SECRET
+  use_service_account: MLC_AUTH_USING_SERVICE_ACCOUNT
 new_env_keys:
 - MLC_ML_MODEL_*
 - LLAMA2_CHECKPOINT_PATH
@@ -24,16 +24,14 @@ prehook_deps:
     MLC_TMP_REQUIRE_DOWNLOAD:
     - 'yes'
     MLC_DOWNLOAD_SRC:
-    - 'huggingface'
+    - huggingface
   env: {}
   extra_cache_tags: llama2,llama-2
   force_env_keys:
-  - MLC_GIT_CHECKOUT_FOLDER
+  - MLC_OUTDIRNAME
   names:
   - hf-zoo
   tags: get,ml-model,huggingface,zoo,_clone-repo
-  force_env_keys:
-    - MLC_OUTDIRNAME  
 print_env_at_the_end:
   LLAMA2_CHECKPOINT_PATH: LLAMA2 checkpoint path
 tags:
@@ -52,35 +50,82 @@ tests:
     - r2-downloader,70b,mlc,dry-run
     - r2-downloader,7b,mlc,dry-run
 variations:
-  pre-quantized:
-    group: quantization
-    deps:
-      - enable_if_env:
-          MLC_TMP_ML_MODEL_PRE_QUANTIZED:
-          - 'yes'
-        skip_if_env:
-          LLAMA2_QUANTIZED_CHECKPOINT_PATH:
-          - 'yes'
-        env:
-          MLC_DOWNLOAD_FINAL_ENV_NAME: LLAMA2_QUANTIZED_CHECKPOINT_PATH
-          MLC_EXTRACT_FINAL_ENV_NAME: LLAMA2_QUANTIZED_CHECKPOINT_PATH
-        force_cache: true
-        extra_cache_tags: llama2,llama2-model,llama2-checkpoint,llama2-70b
-        names:
-          - dae-quantized-models
-        tags: download-and-extract
-        force_env_keys:
-          - MLC_OUTDIRNAME  
-        update_tags_from_env_with_prefix:
-          _url.:
-            - MLC_DOWNLOAD_URL
+  hf:
+    group: download-source
     env:
-      MLC_TMP_ML_MODEL_PRE_QUANTIZED: 'yes'
-  quantize-locally:
+      MLC_DOWNLOAD_SRC: huggingface
+  mlc:
+    group: download-source
     default: true
-    group: quantization
     env:
-      MLC_TMP_ML_MODEL_QUANTIZE_LOCALLY: 'yes'
+      MLC_DOWNLOAD_SRC: mlcommons
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      env:
+        MLC_DOWNLOAD_FINAL_ENV_NAME: LLAMA2_CHECKPOINT_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: LLAMA2_CHECKPOINT_PATH
+      force_cache: true
+      names:
+      - dae
+      tags: download-and-extract
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
+  r2-downloader:
+    group: download-tool
+    default: true
+    add_deps_recursive:
+      dae:
+        tags: _r2-downloader
+  rclone:
+    group: download-tool
+    add_deps_recursive:
+      dae:
+        tags: _rclone
+    prehook_deps:
+    - tags: get,rclone
+      enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+    - tags: get,rclone-config,_mlperf-llama2
+      force_cache: true
+      enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+  pytorch:
+    default: true
+    env:
+      MLC_ML_MODEL_FRAMEWORK: pytorch
+    group: framework
+  meta-llama/Llama-2-70b-chat-hf:
+    base:
+    - 70b
+    adr:
+      hf-zoo:
+        tags: _model-stub.meta-llama/Llama-2-70b-chat-hf
+    env:
+      MLC_MODEL_ZOO_ENV_KEY: LLAMA2
+    group: huggingface-stub
+  meta-llama/Llama-2-7b-chat-hf:
+    base:
+    - 7b
+    adr:
+      hf-zoo:
+        tags: _model-stub.meta-llama/Llama-2-7b-chat-hf
+    env:
+      MLC_MODEL_ZOO_ENV_KEY: LLAMA2
+    group: huggingface-stub
+  stub.#:
+    adr:
+      hf-zoo:
+        tags: _model-stub.#
+    env:
+      MLC_MODEL_ZOO_ENV_KEY: LLAMA2
+    group: huggingface-stub
   amd:
     default_env:
       MLC_LLAMA2_QUANTIZATION_DEVICE: ''
@@ -93,9 +138,41 @@ variations:
     new_env_keys:
     - MLC_LLAMA2_FINAL_SAFE_TENSORS_ROOT
     - MLC_LLAMA2_FINAL_SAFE_TENSORS_PATH
-  batch_size.#:
+  nvidia:
+    default_variations:
+      framework: pytorch
     env:
-      MLC_ML_MODEL_BATCH_SIZE: '#'
+      MLC_TMP_ML_MODEL_PROVIDER: nvidia
+    deps:
+    - tags: get,nvidia,scratch,space
+      names:
+      - mlperf-inference-nvidia-scratch-space
+    - env: {}
+      force_new_env_keys:
+      - LLAMA2_CHECKPOINT_PATH
+      tags: get,ml-model,llama2-70b,_fp32,_pytorch
+    group: model-provider
+  70b:
+    env:
+      MLC_GIT_CHECKOUT_FOLDER: Llama-2-70b-chat-hf
+    group: model-size
+    default: true
+    default_variations:
+      huggingface-stub: meta-llama/Llama-2-70b-chat-hf
+  70b-fused-qkv:
+    env:
+      MLC_GIT_CHECKOUT_FOLDER: Llama-2-70b-fused-qkv-mlperf
+    group: model-size
+  7b:
+    env:
+      MLC_GIT_CHECKOUT_FOLDER: Llama-2-7b-chat-hf
+    group: model-size
+    default_variations:
+      huggingface-stub: meta-llama/Llama-2-7b-chat-hf
+  pp-size.#:
+    env:
+      MLC_NVIDIA_PP_SIZE: '#'
+    group: pp-size
   fp32:
     default: true
     env:
@@ -115,139 +192,81 @@ variations:
       MLC_ML_MODEL_PRECISION: int8
       MLC_ML_MODEL_WEIGHT_DATA_TYPES: int8
     group: precision
-  rclone:
-    group: download-tool
-    add_deps_recursive:
-      dae:
-        tags: _rclone
-    prehook_deps:
-      - tags: get,rclone
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-      - tags: get,rclone-config,_mlperf-llama2
-        force_cache: yes
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-  r2-downloader:
-    group: download-tool
+  uint8:
+    env:
+      MLC_ML_MODEL_INPUT_DATA_TYPES: uint8
+      MLC_ML_MODEL_PRECISION: uint8
+      MLC_ML_MODEL_WEIGHT_DATA_TYPES: uint8
+    group: precision
+  pre-quantized:
+    group: quantization
+    deps:
+    - enable_if_env:
+        MLC_TMP_ML_MODEL_PRE_QUANTIZED:
+        - 'yes'
+      skip_if_env:
+        LLAMA2_QUANTIZED_CHECKPOINT_PATH:
+        - 'yes'
+      env:
+        MLC_DOWNLOAD_FINAL_ENV_NAME: LLAMA2_QUANTIZED_CHECKPOINT_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: LLAMA2_QUANTIZED_CHECKPOINT_PATH
+      force_cache: true
+      extra_cache_tags: llama2,llama2-model,llama2-checkpoint,llama2-70b
+      names:
+      - dae-quantized-models
+      tags: download-and-extract
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
+    env:
+      MLC_TMP_ML_MODEL_PRE_QUANTIZED: 'yes'
+  quantize-locally:
     default: true
-    add_deps_recursive:
-      dae:
-        tags: _r2-downloader
+    group: quantization
+    env:
+      MLC_TMP_ML_MODEL_QUANTIZE_LOCALLY: 'yes'
   dry-run:
     group: run-mode
     env:
       MLC_DOWNLOAD_MODE: dry
-  dry-run,rclone:
+  tp-size.#:
     env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+      MLC_NVIDIA_TP_SIZE: '#'
+    group: tp-size
+  v5.0:
+    group: version
+    default: true
+  v5.1:
+    group: version
+  batch_size.#:
+    env:
+      MLC_ML_MODEL_BATCH_SIZE: '#'
   dry-run,r2-downloader:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
-  mlc:
-    group: download-source
-    default: true
+  dry-run,rclone:
     env:
-      MLC_DOWNLOAD_SRC: mlcommons
-    prehook_deps:
-      - enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - 'yes'
-        env:
-          MLC_DOWNLOAD_FINAL_ENV_NAME: LLAMA2_CHECKPOINT_PATH
-          MLC_EXTRACT_FINAL_ENV_NAME: LLAMA2_CHECKPOINT_PATH
-        force_cache: true
-        names:
-          - dae
-        tags: download-and-extract
-        force_env_keys:
-          - MLC_OUTDIRNAME  
-        update_tags_from_env_with_prefix:
-          _url.:
-            - MLC_DOWNLOAD_URL
-  mlc,rclone,70b,quantize-locally:
-    env:
-      MLC_DOWNLOAD_URL: mlc-llama2:Llama-2-70b-chat-hf
-  mlc,rclone,7b,quantize-locally:
-    env:
-      MLC_DOWNLOAD_URL: mlc-llama2:Llama-2-7b-chat-hf
-  mlc,r2-downloader,70b,quantize-locally:
-    env:
-      MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama-2-70b-chat-hf.uri
-  mlc,r2-downloader,7b,quantize-locally:
-    env:
-      MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama-2-7b-chat-hf.uri
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
   mlc,r2-downloader,70b,pre-quantized,fp8:
     add_deps_recursive:
       dae-quantized-models:
         tags: _r2-downloader
     env:
       MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama2-70b-chat-hf-tp<<<MLC_NVIDIA_TP_SIZE>>>pp<<<MLC_NVIDIA_PP_SIZE>>>-<<<MLC_ML_MODEL_PRECISION>>>.uri
-  hf:
-    group: download-source
+  mlc,r2-downloader,70b,quantize-locally:
     env:
-      MLC_DOWNLOAD_SRC: huggingface
-  70b:
+      MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama-2-70b-chat-hf.uri
+  mlc,r2-downloader,7b,quantize-locally:
     env:
-      MLC_GIT_CHECKOUT_FOLDER: Llama-2-70b-chat-hf
-    group: model-size
-    default: true
-    default_variations:
-      huggingface-stub: meta-llama/Llama-2-70b-chat-hf
-  7b:
+      MLC_DOWNLOAD_URL: https://llama2.mlcommons-storage.org/metadata/llama-2-7b-chat-hf.uri
+  mlc,rclone,70b,quantize-locally:
     env:
-      MLC_GIT_CHECKOUT_FOLDER: Llama-2-7b-chat-hf
-    group: model-size    
-    default_variations:
-      huggingface-stub: meta-llama/Llama-2-7b-chat-hf
-
-  70b-fused-qkv:
+      MLC_DOWNLOAD_URL: mlc-llama2:Llama-2-70b-chat-hf
+  mlc,rclone,7b,quantize-locally:
     env:
-      MLC_GIT_CHECKOUT_FOLDER: Llama-2-70b-fused-qkv-mlperf
-    group: model-size
-
-  meta-llama/Llama-2-70b-chat-hf:
-    base:
-      - 70b
-    adr:
-      hf-zoo:
-        tags: _model-stub.meta-llama/Llama-2-70b-chat-hf
-    env:
-      MLC_MODEL_ZOO_ENV_KEY: LLAMA2
-    group: huggingface-stub
-
-  meta-llama/Llama-2-7b-chat-hf:
-    base:
-      - 7b
-    adr:
-      hf-zoo:
-        tags: _model-stub.meta-llama/Llama-2-7b-chat-hf
-    env:
-      MLC_MODEL_ZOO_ENV_KEY: LLAMA2
-    group: huggingface-stub
-  
-
-  nvidia:
-    default_variations:
-      framework: pytorch
-    env:
-      MLC_TMP_ML_MODEL_PROVIDER: nvidia
-    deps:
-      - tags: get,nvidia,scratch,space
-        names:
-        - mlperf-inference-nvidia-scratch-space
-      - env: {}
-        force_new_env_keys:
-        - LLAMA2_CHECKPOINT_PATH
-        tags: get,ml-model,llama2-70b,_fp32,_pytorch
-    group: model-provider
-  pytorch:
-    default: true
-    env:
-      MLC_ML_MODEL_FRAMEWORK: pytorch
-    group: framework
+      MLC_DOWNLOAD_URL: mlc-llama2:Llama-2-7b-chat-hf
   pytorch,amd:
     default_variations:
       gpu: generic
@@ -272,18 +291,6 @@ variations:
     - tags: get,generic-python-lib,_package.compressed_tensors
   pytorch,fp32:
     env: {}
-  pytorch,nvidia,v5.0,quantize-locally:
-    deps:
-      - env:
-          MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_TENSORRT_LLM_CHECKOUT_PATH
-        extra_cache_tags: tensorrt-llm
-        tags: get,git,repo,_repo.https://github.com/NVIDIA/TensorRT-LLM.git,_sha.2ea17cdad28bed0f30e80eea5b1380726a7c6493,_submodules.3rdparty/NVTX;3rdparty/cutlass;3rdparty/cxxopts;3rdparty/json;3rdparty/pybind11;3rdparty/ucxx;3rdparty/xgrammar
-  pytorch,nvidia,v5.1,quantize-locally:
-    deps:
-      - env:
-          MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_TENSORRT_LLM_CHECKOUT_PATH
-        extra_cache_tags: tensorrt-llm
-        tags: get,git,repo,_repo.https://github.com/NVIDIA/TensorRT-LLM.git,_branch.1.0-mlpinf,_sha.18c0333e96ea7a2c37caded8a310d05c5f095e88,_submodules.3rdparty/NVTX;3rdparty/cutlass;3rdparty/cxxopts;3rdparty/json;3rdparty/pybind11;3rdparty/ucxx;3rdparty/xgrammar
   pytorch,nvidia,quantize-locally:
     default_variations:
       precision: fp8
@@ -302,29 +309,15 @@ variations:
       - python
       - python3
       tags: get,python3
-  stub.#:
-    adr:
-      hf-zoo:
-        tags: _model-stub.#
-    env:
-      MLC_MODEL_ZOO_ENV_KEY: LLAMA2
-    group: huggingface-stub
-  tp-size.#:
-    env:
-      MLC_NVIDIA_TP_SIZE: '#'
-    group: tp-size
-  pp-size.#:
-    env:
-      MLC_NVIDIA_PP_SIZE: '#'
-    group: pp-size
-  uint8:
-    env:
-      MLC_ML_MODEL_INPUT_DATA_TYPES: uint8
-      MLC_ML_MODEL_PRECISION: uint8
-      MLC_ML_MODEL_WEIGHT_DATA_TYPES: uint8
-    group: precision
-  v5.0:
-    group: version
-    default: true
-  v5.1:
-    group: version
+  pytorch,nvidia,v5.0,quantize-locally:
+    deps:
+    - env:
+        MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_TENSORRT_LLM_CHECKOUT_PATH
+      extra_cache_tags: tensorrt-llm
+      tags: get,git,repo,_repo.https://github.com/NVIDIA/TensorRT-LLM.git,_sha.2ea17cdad28bed0f30e80eea5b1380726a7c6493,_submodules.3rdparty/NVTX;3rdparty/cutlass;3rdparty/cxxopts;3rdparty/json;3rdparty/pybind11;3rdparty/ucxx;3rdparty/xgrammar
+  pytorch,nvidia,v5.1,quantize-locally:
+    deps:
+    - env:
+        MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_TENSORRT_LLM_CHECKOUT_PATH
+      extra_cache_tags: tensorrt-llm
+      tags: get,git,repo,_repo.https://github.com/NVIDIA/TensorRT-LLM.git,_branch.1.0-mlpinf,_sha.18c0333e96ea7a2c37caded8a310d05c5f095e88,_submodules.3rdparty/NVTX;3rdparty/cutlass;3rdparty/cxxopts;3rdparty/json;3rdparty/pybind11;3rdparty/ucxx;3rdparty/xgrammar

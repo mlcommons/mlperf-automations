@@ -3,10 +3,10 @@ automation_alias: script
 automation_uid: 5b4e0237da074764
 category: MLC Script Template
 deps:
-  - tags: get,python3
-    names:
-    - python
-    - python3
+- tags: get,python3
+  names:
+  - python
+  - python3
 new_env_keys: []
 new_state_keys:
 - MLC_GEMINI_RESPONSE
@@ -19,9 +19,9 @@ tags:
 input_mapping:
   api_key: MLC_GEMINI_API_KEY
   config_path: MLC_GEMINI_CONFIG_PATH
+  model: MLC_GEMINI_MODEL
   system_prompt: MLC_GEMINI_SYSTEM_PROMPT
   user_prompt: MLC_GEMINI_USER_PROMPT
-  model: MLC_GEMINI_MODEL
 tests:
   run_inputs: []
 uid: 1cfe3d0658364a2b
@@ -30,7 +30,4 @@ variations:
     group: api_provider
     default: true
     env:
-      MLC_GEMINI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='
-
-
-
+      MLC_GEMINI_API_URL: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=

@@ -15,13 +15,6 @@ tests:
     - r2-downloader,mlc,dry-run
 uid: ca5cbb485e044ac4
 variations:
-  dry-run:
-    env:
-      MLC_DOWNLOAD_MODE: dry
-    group: run-mode
-  dry-run,r2-downloader:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   mlc:
     default: true
     env:
@@ -53,3 +46,10 @@ variations:
         tags: _r2-downloader
     default: true
     group: download-tool
+  dry-run:
+    env:
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x

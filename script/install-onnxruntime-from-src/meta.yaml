@@ -49,6 +49,11 @@ tags:
 - src-onnxruntime
 uid: 9798c7e7a5944cee
 variations:
+  repo.https://github.com/Microsoft/onnxruntime:
+    default: true
+    env:
+      MLC_GIT_URL: https://github.com/Microsoft/onnxruntime
+    group: repo
   branch.#:
     env:
       MLC_GIT_CHECKOUT: '#'
@@ -59,11 +64,6 @@ variations:
       tags: get,cuda,_cudnn
     env:
       MLC_ONNXRUNTIME_GPU: 'yes'
-  repo.https://github.com/Microsoft/onnxruntime:
-    default: true
-    env:
-      MLC_GIT_URL: https://github.com/Microsoft/onnxruntime
-    group: repo
   sha.#:
     env:
       MLC_GIT_CHECKOUT_SHA: '#'

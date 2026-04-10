@@ -44,77 +44,6 @@ tags:
 - qaic-compile
 uid: 3f0f43b5d0304d1c
 variations:
-  bert-99:
-    adr:
-      model-src:
-        tags: bert-large,_onnx,_packed
-    deps:
-    - names:
-      - bert-profile
-      - qaic-profile
-      tags: calibrate,qaic,_bert-99
-    env:
-      MLC_COMPILE_BERT: 'on'
-      MLC_QAIC_MODEL_COMPILER_ARGS: ''
-      MLC_QAIC_MODEL_COMPILER_PARAMS_BASE: -aic-hw -aic-hw-version=2.0 -execute-nodes-in-fp16=Add,Div,Erf,Softmax
-        -quantization-schema=symmetric_with_uint8 -quantization-precision=Int8 -quantization-precision-bias=Int32
-        -vvv -compile-only -onnx-define-symbol=batch_size,1 -onnx-define-symbol=seg_length,384
-        -multicast-weights -combine-inputs=false -combine-outputs=false
-      MLC_QAIC_MODEL_TO_CONVERT: calibrate_bert_mlperf
-  bert-99,offline:
-    env:
-      MLC_QAIC_MODEL_COMPILER_ARGS: -allocator-dealloc-delay=2 -size-split-granularity=1536
-        -vtcm-working-set-limit-ratio=1
-      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=1 -mos=1 -ols=2
-  bert-99,offline,nsp.14:
-    env:
-      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=1 -mos=1 -ols=3
-  bert-99,offline,nsp.16:
-    env:
-      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=1 -mos=1 -ols=2
-  bert-99,server:
-    env:
-      MLC_QAIC_MODEL_COMPILER_ARGS: -allocator-dealloc-delay=2 -size-split-granularity=1536
-        -vtcm-working-set-limit-ratio=1
-      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=1 -mos=1 -ols=3
-  bert-99,server,nsp.14:
-    env:
-      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=1 -mos=1 -ols=3
-  bert-99,singlestream:
-    env:
-      MLC_QAIC_MODEL_COMPILER_ARGS: ''
-      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=8 -mos=8 -ols=1
-  bert-99,singlestream,nsp.14:
-    env:
-      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=8 -mos=8 -ols=1
-  bert-99.9:
-    adr:
-      model-src:
-        tags: bert-large,_onnx,_packed
-    base:
-    - no-quantized
-    env:
-      MLC_COMPILE_BERT: 'on'
-      MLC_QAIC_MODEL_COMPILER_ARGS: ''
-      MLC_QAIC_MODEL_COMPILER_PARAMS_BASE: -aic-hw -aic-hw-version=2.0 -convert-to-fp16
-        -vvv -compile-only -onnx-define-symbol=batch_size,1 -onnx-define-symbol=seg_length,384
-        -combine-inputs=false -combine-outputs=false
-      MLC_QAIC_MODEL_TO_CONVERT: bert_mlperf
-  bert-99.9,offline:
-    env:
-      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=2 -mos=1 -ols=2
-  bert-99.9,offline,nsp.14:
-    env:
-      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=2 -mos=1 -ols=2
-  bert-99.9,offline,nsp.16:
-    env:
-      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=2 -mos=1 -ols=2
-  bert-99.9,server:
-    env:
-      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=2
-  bert-99.9,server,nsp.14:
-    env:
-      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=2
   bs.#:
     adr:
       qaic-profile:
@@ -136,10 +65,15 @@ variations:
     group: calib-dataset-filter-size
   multistream:
     group: mlperf-scenario
-  no-quantized:
-    env:
-      MLC_QAIC_MODEL_QUANTIZATION: 'no'
-    group: quantization
+  offline:
+    group: mlperf-scenario
+  server:
+    group: mlperf-scenario
+  singlestream:
+    default: true
+    group: mlperf-scenario
+  tf:
+    group: model-framework
   nsp.14:
     group: nsp
   nsp.16:
@@ -148,18 +82,84 @@ variations:
     group: nsp
   nsp.9:
     group: nsp
-  offline:
-    group: mlperf-scenario
   pc.#:
     env:
       MLC_QAIC_MODEL_COMPILER_PERCENTILE_CALIBRATION_VALUE: '#'
       MLC_QAIC_MODEL_COMPILER_QUANTIZATION_PARAMS: -quantization-calibration=Percentile  -percentile-calibration-value=<<<MLC_QAIC_MODEL_COMPILER_PERCENTILE_CALIBRATION_VALUE>>>
     group: percentile-calibration
+  no-quantized:
+    env:
+      MLC_QAIC_MODEL_QUANTIZATION: 'no'
+    group: quantization
   quantized:
     default: true
     env:
       MLC_QAIC_MODEL_QUANTIZATION: 'yes'
     group: quantization
+  bert-99:
+    adr:
+      model-src:
+        tags: bert-large,_onnx,_packed
+    deps:
+    - names:
+      - bert-profile
+      - qaic-profile
+      tags: calibrate,qaic,_bert-99
+    env:
+      MLC_COMPILE_BERT: 'on'
+      MLC_QAIC_MODEL_COMPILER_ARGS: ''
+      MLC_QAIC_MODEL_COMPILER_PARAMS_BASE: -aic-hw -aic-hw-version=2.0 -execute-nodes-in-fp16=Add,Div,Erf,Softmax -quantization-schema=symmetric_with_uint8 -quantization-precision=Int8 -quantization-precision-bias=Int32 -vvv -compile-only -onnx-define-symbol=batch_size,1 -onnx-define-symbol=seg_length,384 -multicast-weights -combine-inputs=false -combine-outputs=false
+      MLC_QAIC_MODEL_TO_CONVERT: calibrate_bert_mlperf
+  bert-99,offline:
+    env:
+      MLC_QAIC_MODEL_COMPILER_ARGS: -allocator-dealloc-delay=2 -size-split-granularity=1536 -vtcm-working-set-limit-ratio=1
+      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=1 -mos=1 -ols=2
+  bert-99,offline,nsp.14:
+    env:
+      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=1 -mos=1 -ols=3
+  bert-99,offline,nsp.16:
+    env:
+      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=1 -mos=1 -ols=2
+  bert-99,server:
+    env:
+      MLC_QAIC_MODEL_COMPILER_ARGS: -allocator-dealloc-delay=2 -size-split-granularity=1536 -vtcm-working-set-limit-ratio=1
+      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=1 -mos=1 -ols=3
+  bert-99,server,nsp.14:
+    env:
+      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=1 -mos=1 -ols=3
+  bert-99,singlestream:
+    env:
+      MLC_QAIC_MODEL_COMPILER_ARGS: ''
+      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=8 -mos=8 -ols=1
+  bert-99,singlestream,nsp.14:
+    env:
+      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=8 -mos=8 -ols=1
+  bert-99.9:
+    adr:
+      model-src:
+        tags: bert-large,_onnx,_packed
+    base:
+    - no-quantized
+    env:
+      MLC_COMPILE_BERT: 'on'
+      MLC_QAIC_MODEL_COMPILER_ARGS: ''
+      MLC_QAIC_MODEL_COMPILER_PARAMS_BASE: -aic-hw -aic-hw-version=2.0 -convert-to-fp16 -vvv -compile-only -onnx-define-symbol=batch_size,1 -onnx-define-symbol=seg_length,384 -combine-inputs=false -combine-outputs=false
+      MLC_QAIC_MODEL_TO_CONVERT: bert_mlperf
+  bert-99.9,offline:
+    env:
+      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=2 -mos=1 -ols=2
+  bert-99.9,offline,nsp.14:
+    env:
+      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=2 -mos=1 -ols=2
+  bert-99.9,offline,nsp.16:
+    env:
+      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=2 -mos=1 -ols=2
+  bert-99.9,server:
+    env:
+      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=2
+  bert-99.9,server,nsp.14:
+    env:
+      MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=2
   resnet50:
     adr:
       model-src:
@@ -168,8 +168,7 @@ variations:
       model-framework: tf
     env:
       MLC_COMPILE_RESNET: 'on'
-      MLC_QAIC_MODEL_COMPILER_PARAMS_BASE: -aic-hw -aic-hw-version=2.0 -quantization-schema=symmetric_with_uint8
-        -quantization-precision=Int8 -output-node-name=ArgMax -vvv -compile-only -use-producer-dma=1
+      MLC_QAIC_MODEL_COMPILER_PARAMS_BASE: -aic-hw -aic-hw-version=2.0 -quantization-schema=symmetric_with_uint8 -quantization-precision=Int8 -output-node-name=ArgMax -vvv -compile-only -use-producer-dma=1
       MLC_QAIC_MODEL_TO_CONVERT: compile_resnet50_tf
   resnet50,multistream:
     env:
@@ -225,10 +224,7 @@ variations:
     env:
       MLC_COMPILE_RETINANET: 'on'
       MLC_QAIC_MODEL_COMPILER_ARGS: -aic-enable-depth-first
-      MLC_QAIC_MODEL_COMPILER_PARAMS_BASE: -aic-hw -aic-hw-version=2.0 -compile-only
-        -enable-channelwise -onnx-define-symbol=batch_size,1 -node-precision-info=<<<MLC_ML_MODEL_RETINANET_QAIC_NODE_PRECISION_INFO_FILE_PATH>>>
-        -quantization-schema-constants=symmetric_with_uint8 -quantization-schema-activations=asymmetric
-        -quantization-calibration=None
+      MLC_QAIC_MODEL_COMPILER_PARAMS_BASE: -aic-hw -aic-hw-version=2.0 -compile-only -enable-channelwise -onnx-define-symbol=batch_size,1 -node-precision-info=<<<MLC_ML_MODEL_RETINANET_QAIC_NODE_PRECISION_INFO_FILE_PATH>>> -quantization-schema-constants=symmetric_with_uint8 -quantization-schema-activations=asymmetric -quantization-calibration=None
       MLC_QAIC_MODEL_TO_CONVERT: calibrate_retinanet_no_nms_mlperf
     new_env_keys:
     - MLC_QAIC_MODEL_RETINANET_*
@@ -248,10 +244,3 @@ variations:
   retinanet,singlestream,nsp.14:
     env:
       MLC_QAIC_MODEL_COMPILER_ARGS_SUT: -aic-num-cores=8 -mos=1 -ols=1
-  server:
-    group: mlperf-scenario
-  singlestream:
-    default: true
-    group: mlperf-scenario
-  tf:
-    group: model-framework

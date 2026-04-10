@@ -44,17 +44,6 @@ tests:
   run_inputs: []
 uid: 06ee7deaf8fd4b9d
 variations:
-  with-amd:
-    deps:
-    - tags: get,aocc
-      names:
-      - aocc
-  branch.#:
-    env:
-      MLC_GIT_CHECKOUT: '#'
-  sha.#:
-    env:
-      MLC_GIT_SHA: '#'
   url.#:
     env:
       MLC_GIT_URL: '#'
@@ -64,6 +53,17 @@ variations:
     env:
       MLC_GIT_URL: https://github.com/cp2k/cp2k
     group: version
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+  sha.#:
+    env:
+      MLC_GIT_SHA: '#'
   version.official:
     base:
     - url.official
+  with-amd:
+    deps:
+    - tags: get,aocc
+      names:
+      - aocc

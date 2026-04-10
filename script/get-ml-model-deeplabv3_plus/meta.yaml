@@ -10,46 +10,101 @@ tags:
 - deeplabv3-plus
 uid: cfb2d53b9dbc4dc0
 new_env_keys:
-  - MLC_ML_MODEL_DEEPLABV3_PLUS_PATH
-  - MLC_ML_MODEL_FILE_WITH_PATH
+- MLC_ML_MODEL_DEEPLABV3_PLUS_PATH
+- MLC_ML_MODEL_FILE_WITH_PATH
 print_env_at_the_end:
   MLC_ML_MODEL_DEEPLABV3_PLUS_PATH: DeepLabV3+ checkpoint path
 variations:
+  mlc:
+    group: download-src
+    default: true
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      env:
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_DEEPLABV3_PLUS_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_MODEL_DEEPLABV3_PLUS_PATH
+      extra_cache_tags: ml,model,deeplabv3,plus
+      force_cache: true
+      names:
+      - dae-deplabv3+
+      tags: download-and-extract
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+  r2-downloader:
+    group: download-tool
+    add_deps_recursive:
+      dae-deplabv3+:
+        tags: _r2-downloader
+  rclone:
+    group: download-tool
+    prehook_deps:
+    - tags: get,rclone
+      enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+    - tags: get,rclone-config
+      force_cache: true
+      names:
+      - rclone-config
+      enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+    add_deps_recursive:
+      dae-deplabv3+:
+        tags: _rclone
+    default: true
   onnx:
     group: model-format
     default: true
     env:
       MLC_MODEL_FORMAT: onnx
       MLC_ML_MODEL_FILENAME: deeplabv3+_8mp.onnx
-  onnx,mlc,rclone:
-    env:
-      MLC_MODEL_RCLONE_FILEPATH: model_checkpoint_deeplab/deeplabv3+_8mp.onnx
-  onnx,mlc,r2-downloader:
-    env:
-      MLC_DOWNLOAD_URL: https://cognata.mlcommons-storage.org/metadata/deeplab_onnx.uri
-  dynamic: {}
   onnx,dynamic:
     group: model-format
     env:
       MLC_MODEL_FORMAT: onnx
       MLC_ML_MODEL_FILENAME: deeplabv3+_dynamic.onnx
-  onnx,dynamic,mlc,rclone:
-    env:
-      MLC_MODEL_RCLONE_FILEPATH: model_checkpoint_deeplab/deeplabv3+_dynamic.onnx
-  onnx,dynamic,mlc,r2-downloader:
-    env:
-      MLC_DOWNLOAD_URL: https://cognata.mlcommons-storage.org/metadata/deeplab_dynamic_onnx.uri
   pytorch:
     group: model-format
     env:
       MLC_MODEL_FORMAT: pth
       MLC_ML_MODEL_FILENAME: latest_deeplabv3plus_resnet50_cognata_os16_it100000.pth
-  pytorch,mlc,rclone:
+  dry-run:
+    group: run-mode
     env:
-      MLC_MODEL_RCLONE_FILEPATH: model_checkpoint_deeplab/latest_deeplabv3plus_resnet50_cognata_os16_it100000.pth
+      MLC_DOWNLOAD_MODE: dry
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  dynamic: {}
+  onnx,dynamic,mlc,r2-downloader:
+    env:
+      MLC_DOWNLOAD_URL: https://cognata.mlcommons-storage.org/metadata/deeplab_dynamic_onnx.uri
+  onnx,dynamic,mlc,rclone:
+    env:
+      MLC_MODEL_RCLONE_FILEPATH: model_checkpoint_deeplab/deeplabv3+_dynamic.onnx
+  onnx,mlc,r2-downloader:
+    env:
+      MLC_DOWNLOAD_URL: https://cognata.mlcommons-storage.org/metadata/deeplab_onnx.uri
+  onnx,mlc,rclone:
+    env:
+      MLC_MODEL_RCLONE_FILEPATH: model_checkpoint_deeplab/deeplabv3+_8mp.onnx
   pytorch,mlc,r2-downlaoder:
     env:
       MLC_DOWNLOAD_URL: https://cognata.mlcommons-storage.org/metadata/deeplab_checkpoint.uri
+  pytorch,mlc,rclone:
+    env:
+      MLC_MODEL_RCLONE_FILEPATH: model_checkpoint_deeplab/latest_deeplabv3plus_resnet50_cognata_os16_it100000.pth
   rclone,mlc:
     add_deps_recursive:
       rclone-config:
@@ -58,69 +113,14 @@ variations:
           MLC_RCLONE_DRIVE_FOLDER_ID: 1u5FDoeXHVtDrd4zClE47Gmyr7iLFidz1
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: ' --include '
-      MLC_DOWNLOAD_URL: 'mlc-cognata:mlc_cognata_dataset/<<<MLC_MODEL_RCLONE_FILEPATH>>>'
-  mlc:
-    group: download-src
-    default: true
-    prehook_deps:
-      - enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - 'yes'
-        env:
-          MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_DEEPLABV3_PLUS_PATH
-          MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_MODEL_DEEPLABV3_PLUS_PATH
-        extra_cache_tags: ml,model,deeplabv3,plus
-        force_cache: true
-        names:
-          - dae-deplabv3+
-        tags: download-and-extract
-        force_env_keys:
-          - MLC_OUTDIRNAME  
-        update_tags_from_env_with_prefix:
-          _url.:
-            - MLC_DOWNLOAD_URL
-    env:
-      MLC_DOWNLOAD_SRC: mlcommons
-  rclone:
-    group: download-tool
-    prehook_deps:
-      - tags: get,rclone
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-      - tags: get,rclone-config
-        force_cache: true
-        names:
-          - rclone-config
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-    add_deps_recursive:
-      dae-deplabv3+:
-        tags: _rclone
-    default: true
-  r2-downloader:
-    group: download-tool
-    add_deps_recursive:
-      dae-deplabv3+:
-        tags: _r2-downloader
-  dry-run:
-    group: run-mode
-    env:
-      MLC_DOWNLOAD_MODE: dry
-  dry-run,rclone:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  dry-run,r2-downloader:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+      MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/<<<MLC_MODEL_RCLONE_FILEPATH>>>
 tests:
   needs_pat: true
   run_inputs:
   - variations_list:
-      - onnx,rclone,mlc,dry-run
-      - onnx_dynamic,rclone,mlc,dry-run
-      - pytorch,rclone,mlc,dry-run
-      - onnx,r2-downloader,mlc,dry-run
-      - onnx_dynamic,r2-downloader,mlc,dry-run
-      - pytorch,r2-downloader,mlc,dry-run
+    - onnx,rclone,mlc,dry-run
+    - onnx_dynamic,rclone,mlc,dry-run
+    - pytorch,rclone,mlc,dry-run
+    - onnx,r2-downloader,mlc,dry-run
+    - onnx_dynamic,r2-downloader,mlc,dry-run
+    - pytorch,r2-downloader,mlc,dry-run

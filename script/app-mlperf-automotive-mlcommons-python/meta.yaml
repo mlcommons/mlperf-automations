@@ -1,13 +1,8 @@
 alias: app-mlperf-automotive-mlcommons-python
 uid: 621240c5d30a437c
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
-
 category: MLPerf Automotive
-
-
-# User-friendly tags to find this MLC script
 tags:
 - automotive
 - mlcommons
@@ -16,9 +11,6 @@ tags:
 - object-detection
 - abtf-model
 - demo
-
-
-# Default environment
 default_env:
   MLC_MLPERF_LOADGEN_MODE: accuracy
   MLC_MLPERF_LOADGEN_SCENARIO: Offline
@@ -26,314 +18,237 @@ default_env:
   MLC_OUTPUT_FOLDER_NAME: test_results
   MLC_MLPERF_RUN_STYLE: test
   MLC_TEST_QUERY_COUNT: '10'
-  MLC_MLPERF_QUANTIZATION: off
+  MLC_MLPERF_QUANTIZATION: false
   MLC_MLPERF_SUT_NAME_IMPLEMENTATION_PREFIX: reference
   MLC_MLPERF_SUT_NAME_RUN_CONFIG_SUFFIX: ''
-
-
-# Map script inputs to environment variables
 input_mapping:
-  device: MLC_MLPERF_DEVICE
+  clean: MLC_MLPERF_CLEAN_SUBMISSION_DIR
+  constantstream_target_qps: MLC_MLPERF_LOADGEN_CONSTANTSTREAM_TARGET_QPS
   count: MLC_MLPERF_LOADGEN_QUERY_COUNT
+  dataset: MLC_MLPERF_VISION_DATASET_OPTION
+  dataset_args: MLC_MLPERF_EXTRA_DATASET_ARGS
+  device: MLC_MLPERF_DEVICE
   docker: MLC_RUN_DOCKER_CONTAINER
   hw_name: MLC_HW_NAME
   imagenet_path: IMAGENET_PATH
+  max_amps: MLC_MLPERF_POWER_MAX_AMPS
   max_batchsize: MLC_MLPERF_LOADGEN_MAX_BATCHSIZE
+  max_volts: MLC_MLPERF_POWER_MAX_VOLTS
   mode: MLC_MLPERF_LOADGEN_MODE
-  num_threads: MLC_NUM_THREADS
-  threads: MLC_NUM_THREADS
-  dataset: MLC_MLPERF_VISION_DATASET_OPTION
   model: MLC_MLPERF_CUSTOM_MODEL_PATH
+  multistream_target_latency: MLC_MLPERF_LOADGEN_MULTISTREAM_TARGET_LATENCY
+  ntp_server: MLC_MLPERF_POWER_NTP_SERVER
+  num_threads: MLC_NUM_THREADS
+  offline_target_qps: MLC_MLPERF_LOADGEN_OFFLINE_TARGET_QPS
+  output: MLC_MLPERF_OUTPUT_DIR
   output_dir: OUTPUT_BASE_DIR
   power: MLC_MLPERF_POWER
   power_server: MLC_MLPERF_POWER_SERVER_ADDRESS
-  ntp_server: MLC_MLPERF_POWER_NTP_SERVER
-  max_amps: MLC_MLPERF_POWER_MAX_AMPS
-  max_volts: MLC_MLPERF_POWER_MAX_VOLTS
   regenerate_files: MLC_REGENERATE_MEASURE_FILES
   rerun: MLC_RERUN
   scenario: MLC_MLPERF_LOADGEN_SCENARIO
-  test_query_count: MLC_TEST_QUERY_COUNT
-  clean: MLC_MLPERF_CLEAN_SUBMISSION_DIR
-  dataset_args: MLC_MLPERF_EXTRA_DATASET_ARGS
-  target_qps: MLC_MLPERF_LOADGEN_TARGET_QPS
-  target_latency: MLC_MLPERF_LOADGEN_TARGET_LATENCY
-  offline_target_qps: MLC_MLPERF_LOADGEN_OFFLINE_TARGET_QPS
   server_target_qps: MLC_MLPERF_LOADGEN_SERVER_TARGET_QPS
-  constantstream_target_qps: MLC_MLPERF_LOADGEN_CONSTANTSTREAM_TARGET_QPS
   singlestream_target_latency: MLC_MLPERF_LOADGEN_SINGLESTREAM_TARGET_LATENCY
-  multistream_target_latency: MLC_MLPERF_LOADGEN_MULTISTREAM_TARGET_LATENCY
-  output: MLC_MLPERF_OUTPUT_DIR
-
-# Duplicate MLC environment variables to the ones used in native apps
+  target_latency: MLC_MLPERF_LOADGEN_TARGET_LATENCY
+  target_qps: MLC_MLPERF_LOADGEN_TARGET_QPS
+  test_query_count: MLC_TEST_QUERY_COUNT
+  threads: MLC_NUM_THREADS
 env_key_mappings:
   MLC_HOST_: HOST_
   MLC_ML_: ML_
   MLC_MLPERF_TVM: MLPERF_TVM
   MLC_MLPERF_DELETE: MLPERF_DELETE
-
-# Env keys which are exposed to higher level scripts
 new_env_keys:
-  - MLC_MLPERF_*
-  - MLC_DATASET_*
-  - MLC_PREPROCESSED_DATASET_*
-  - MLC_HW_NAME
-  - MLC_COGNATA_ACCURACY_DUMP_FILE
-  - MLC_OUTPUT_PREDICTIONS_PATH
-  - MLC_ML_MODEL_*
-  - MLC_MAX_EXAMPLES
-
+- MLC_MLPERF_*
+- MLC_DATASET_*
+- MLC_PREPROCESSED_DATASET_*
+- MLC_HW_NAME
+- MLC_COGNATA_ACCURACY_DUMP_FILE
+- MLC_OUTPUT_PREDICTIONS_PATH
+- MLC_ML_MODEL_*
+- MLC_MAX_EXAMPLES
 new_state_keys:
-  - mlperf-inference-implementation
-  - MLC_SUT_*
-
-# Dependencies on other MLC scripts
+- mlperf-inference-implementation
+- MLC_SUT_*
 deps:
-
-  # Detect host OS features
-  - tags: detect,os
-
-  # Detect host CPU features
-  - tags: detect,cpu
-
-  # Install system dependencies on a given host
-  - tags: get,sys-utils-mlc
-
-  # Detect/install python
-  - tags: get,python
-    names:
-    - python
-    - python3
-
-  # Use cmind inside MLC scripts
-  - tags: get,generic-python-lib,_package.cmind
-
-
-  # CUDA
-  - tags: get,cuda
-    enable_if_env:
-      USE_CUDA:
-      - yes
-    names:
-    - cuda
-
-
-
-  ########################################################################
-  # Install ML engines via MLC
-
-  ## Onnx CPU Runtime
-  - tags: get,generic-python-lib,_onnxruntime
-    names:
-    - ml-engine-onnxruntime
+- tags: detect,os
+- tags: detect,cpu
+- tags: get,sys-utils-mlc
+- tags: get,python
+  names:
+  - python
+  - python3
+- tags: get,generic-python-lib,_package.cmind
+- tags: get,cuda
+  enable_if_env:
+    USE_CUDA:
+    - true
+  names:
+  - cuda
+- tags: get,generic-python-lib,_onnxruntime
+  names:
+  - ml-engine-onnxruntime
+  - onnxruntime
+  enable_if_env:
+    MLC_MLPERF_BACKEND:
     - onnxruntime
-    enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - onnxruntime
-      - tvm-onnx
-      MLC_MLPERF_DEVICE:
-      - cpu
-      - rocm
-
-  ## Onnx CUDA Runtime
-  - tags: get,generic-python-lib,_onnxruntime_gpu
-    names:
-    - ml-engine-onnxruntime-cuda
-    enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - onnxruntime
-      - tvm-onnx
-      MLC_MLPERF_DEVICE:
-      - gpu
-    skip_if_env:
-      MLC_MODEL:
-      - 3d-unet-99
-      - 3d-unet-99.9
-
-  ## resnet50 and 3d-unet need both onnxruntime and onnxruntime_gpu on cuda
-  - tags: get,generic-python-lib,_onnxruntime
-    enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - onnxruntime
-      MLC_MLPERF_DEVICE:
-      - gpu
-      MLC_MODEL:
-      - 3d-unet-99
-      - 3d-unet-99.9
-      - resnet50
-  - tags: get,generic-python-lib,_onnxruntime_gpu
-    env:
-      MLC_GENERIC_PYTHON_PIP_UNINSTALL_DEPS: ""
-    enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - onnxruntime
-      MLC_MLPERF_DEVICE:
-      - gpu
-      MLC_MODEL:
-      - 3d-unet-99
-      - 3d-unet-99.9
-      - resnet50
-
-  ## Pytorch (CPU)
-  - tags: get,generic-python-lib,_torch
-    names:
-    - ml-engine-pytorch
+    - tvm-onnx
+    MLC_MLPERF_DEVICE:
+    - cpu
+    - rocm
+- tags: get,generic-python-lib,_onnxruntime_gpu
+  names:
+  - ml-engine-onnxruntime-cuda
+  enable_if_env:
+    MLC_MLPERF_BACKEND:
+    - onnxruntime
+    - tvm-onnx
+    MLC_MLPERF_DEVICE:
+    - gpu
+  skip_if_env:
+    MLC_MODEL:
+    - 3d-unet-99
+    - 3d-unet-99.9
+- tags: get,generic-python-lib,_onnxruntime
+  enable_if_env:
+    MLC_MLPERF_BACKEND:
+    - onnxruntime
+    MLC_MLPERF_DEVICE:
+    - gpu
+    MLC_MODEL:
+    - 3d-unet-99
+    - 3d-unet-99.9
+    - resnet50
+- tags: get,generic-python-lib,_onnxruntime_gpu
+  env:
+    MLC_GENERIC_PYTHON_PIP_UNINSTALL_DEPS: ''
+  enable_if_env:
+    MLC_MLPERF_BACKEND:
+    - onnxruntime
+    MLC_MLPERF_DEVICE:
+    - gpu
+    MLC_MODEL:
+    - 3d-unet-99
+    - 3d-unet-99.9
+    - resnet50
+- tags: get,generic-python-lib,_torch
+  names:
+  - ml-engine-pytorch
+  - pytorch
+  skip_if_env:
+    MLC_MLPERF_DEVICE:
+    - gpu
+- tags: get,generic-python-lib,_torch_cuda
+  names:
+  - ml-engine-pytorch
+  - pytorch
+  skip_if_env:
+    MLC_MLPERF_DEVICE:
+    - cpu
+    - rocm
+- tags: get,generic-python-lib,_torchvision
+  names:
+  - ml-engine-torchvision
+  enable_if_env:
+    MLC_MLPERF_BACKEND:
     - pytorch
-    skip_if_env:
-      MLC_MLPERF_DEVICE:
-        - gpu
-
-  ## Pytorch (CUDA)
-  - tags: get,generic-python-lib,_torch_cuda
-    names:
-    - ml-engine-pytorch
+    - tvm-pytorch
+    MLC_MLPERF_DEVICE:
+    - cpu
+- tags: get,generic-python-lib,_torchvision_cuda
+  names:
+  - ml-engine-torchvision
+  enable_if_env:
+    MLC_MLPERF_BACKEND:
     - pytorch
-    skip_if_env:
-      MLC_MLPERF_DEVICE:
-      - cpu
-      - rocm
-
-  ## Torchvision (CPU)
-  - tags: get,generic-python-lib,_torchvision
-    names:
-    - ml-engine-torchvision
-    enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - pytorch
-      - tvm-pytorch
-      MLC_MLPERF_DEVICE:
-      - cpu
-
-  ## Torchvision (CUDA)
-  - tags: get,generic-python-lib,_torchvision_cuda
-    names:
-    - ml-engine-torchvision
-    enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - pytorch
-      - tvm-pytorch
-      - ray
-      MLC_MLPERF_DEVICE:
-      - gpu
-
-  ## tensorrt
-  - tags: get,generic-python-lib,_tensorrt
-    names:
-    - ml-engine-tensorrt
-    enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - ray
-
-  ## torch_tensorrt
-  - tags: get,generic-python-lib,_torch_tensorrt
-    names:
-    - ml-engine-torch_tensorrt
-    enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - ray
-
-  ## Ray
-  - tags: get,generic-python-lib,_ray
-    names:
+    - tvm-pytorch
     - ray
-    enable_if_env:
-      MLC_MLPERF_BACKEND:
-        - ray
-
-
-
-  ## Tensorflow
-  - tags: get,generic-python-lib,_tensorflow
-    names:
-    - ml-engine-tensorflow
-    - tensorflow
-    enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - tf
-      - tflite
-
-  # Install MLPerf inference dependencies
-
-
-
-  # Creates user conf for given SUT
-  - tags: generate,user-conf,mlperf,inference,_wg-automotive
-    names:
-    - user-conf-generator
-
-
-  # Install MLPerf loadgen
-  - tags: get,generic-python-lib,_package.mlcommons-loadgen
-    enable_if_env:
-      MLC_MLPERF_LOADGEN_BUILD_FROM_SRC:
-        - "off"
-    names:
-    - loadgen
-    - mlperf-inference-loadgen
-
-  - tags: get,loadgen,_wg-automotive
-    enable_if_any_env:
-      MLC_MLPERF_LOADGEN_BUILD_FROM_SRC:
-        - "on"
-    names:
-    - loadgen
-    - mlperf-inference-loadgen
-    - mlperf-inference-loadgen-from-src
-
-
-#
-#  # Download MLPerf inference source
-#  - tags: get,mlcommons,inference,src
-#    env:
-#      MLC_GET_MLPERF_IMPLEMENTATION_ONLY: 'yes'
-#    names:
-#    - mlperf-implementation
-
-  - tags: get,generic-python-lib,_package.psutil
-
-
-
-
+    MLC_MLPERF_DEVICE:
+    - gpu
+- tags: get,generic-python-lib,_tensorrt
+  names:
+  - ml-engine-tensorrt
+  enable_if_env:
+    MLC_MLPERF_BACKEND:
+    - ray
+- tags: get,generic-python-lib,_torch_tensorrt
+  names:
+  - ml-engine-torch_tensorrt
+  enable_if_env:
+    MLC_MLPERF_BACKEND:
+    - ray
+- tags: get,generic-python-lib,_ray
+  names:
+  - ray
+  enable_if_env:
+    MLC_MLPERF_BACKEND:
+    - ray
+- tags: get,generic-python-lib,_tensorflow
+  names:
+  - ml-engine-tensorflow
+  - tensorflow
+  enable_if_env:
+    MLC_MLPERF_BACKEND:
+    - tf
+    - tflite
+- tags: generate,user-conf,mlperf,inference,_wg-automotive
+  names:
+  - user-conf-generator
+- tags: get,generic-python-lib,_package.mlcommons-loadgen
+  enable_if_env:
+    MLC_MLPERF_LOADGEN_BUILD_FROM_SRC:
+    - 'off'
+  names:
+  - loadgen
+  - mlperf-inference-loadgen
+- tags: get,loadgen,_wg-automotive
+  enable_if_any_env:
+    MLC_MLPERF_LOADGEN_BUILD_FROM_SRC:
+    - 'on'
+  names:
+  - loadgen
+  - mlperf-inference-loadgen
+  - mlperf-inference-loadgen-from-src
+- tags: get,generic-python-lib,_package.psutil
 prehook_deps:
-  - names:
-    - remote-run-cmds
-    tags: remote,run,cmds
-    enable_if_env:
-      MLC_ASSH_RUN_COMMANDS:
-      - "on"
-
-
-
-posthook_deps: 
-  - names:
-    - mlperf-runner
-    tags: benchmark-mlperf
-    skip_if_env:
-      MLC_MLPERF_SKIP_RUN:
-      - "on"
-
-
+- names:
+  - remote-run-cmds
+  tags: remote,run,cmds
+  enable_if_env:
+    MLC_ASSH_RUN_COMMANDS:
+    - 'on'
+posthook_deps:
+- names:
+  - mlperf-runner
+  tags: benchmark-mlperf
+  skip_if_env:
+    MLC_MLPERF_SKIP_RUN:
+    - 'on'
 post_deps:
-  - tags: save,mlperf,inference,state
-    names:
-      - save-mlperf-inference-state
-
-
+- tags: save,mlperf,inference,state
+  names:
+  - save-mlperf-inference-state
 docker:
   real_run: false
-
-# Variations to customize dependencies
 variations:
-  # Implementation
-  python:
-    group: implementation
+  batch_size.#:
+    group: batch-size
+    env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: '#'
+  cpu:
+    group: device
     default: true
     env:
-      MLC_MLPERF_PYTHON: 'yes'
-      MLC_MLPERF_IMPLEMENTATION: reference
-
-
-  # ML engine
+      MLC_MLPERF_DEVICE: cpu
+      CUDA_VISIBLE_DEVICES: ''
+      USE_CUDA: false
+      USE_GPU: false
+  cuda:
+    group: device
+    env:
+      MLC_MLPERF_DEVICE: gpu
+      USE_CUDA: true
+      USE_GPU: true
   onnxruntime:
     group: framework
     env:
@@ -345,17 +260,6 @@ variations:
         tags: _onnx
       ml-model-deeplabv3-plus:
         tags: _onnx
-
-  onnxruntime,cpu:
-    env:
-      MLC_MLPERF_BACKEND_VERSION: <<<MLC_ONNXRUNTIME_VERSION>>>
-
-  onnxruntime,cuda:
-    env:
-      MLC_MLPERF_BACKEND_VERSION: <<<MLC_ONNXRUNTIME_GPU_VERSION>>>
-      ONNXRUNTIME_PREFERRED_EXECUTION_PROVIDER: "CUDAExecutionProvider"
-
-
   pytorch:
     group: framework
     default: true
@@ -375,7 +279,251 @@ variations:
     env:
       MLC_MLPERF_BACKEND: pytorch
       MLC_MLPERF_BACKEND_VERSION: <<<MLC_TORCH_VERSION>>>
-  
+  python:
+    group: implementation
+    default: true
+    env:
+      MLC_MLPERF_PYTHON: 'yes'
+      MLC_MLPERF_IMPLEMENTATION: reference
+  constantstream:
+    group: loadgen-scenario
+    env:
+      MLC_MLPERF_LOADGEN_SCENARIO: ConstantStream
+  singlestream:
+    group: loadgen-scenario
+    env:
+      MLC_MLPERF_LOADGEN_SCENARIO: SingleStream
+    default_variations:
+      batch-size: batch_size.1
+  abtf-demo-model:
+    group: models
+    add_deps_recursive:
+      automotive-src:
+        tags: _sha.ee526dc63d9ca2636000343c5d2d16132145719e
+    deps:
+    - tags: get,generic-python-lib,_opencv-python
+    - tags: get,generic-python-lib,_numpy
+    - tags: get,generic-python-lib,_pycocotools
+    - tags: get,generic-python-lib,_package.torchmetrics
+    - tags: get,generic-python-lib,_package.faster-coco-eval
+      names:
+      - cocoeval
+    - tags: get,dataset,raw,mlcommons-cognata
+      names:
+      - raw-dataset-mlcommons-cognata
+    - tags: get,ml-model,abtf-ssd-pytorch,_abtf-mvp
+      names:
+      - ml-model-abtf
+    env:
+      MLC_MODEL: retinanet
+  abtf-poc-model:
+    group: models
+    default: true
+    add_deps_recursive:
+      automotive-src:
+        tags: _sha.ee526dc63d9ca2636000343c5d2d16132145719e
+    deps:
+    - tags: get,generic-python-lib,_opencv-python
+    - tags: get,generic-python-lib,_numpy
+      version_max: 1.26.4
+      version_max_usable: 1.26.4
+    - tags: get,generic-python-lib,_pycocotools
+    - tags: get,generic-python-lib,_package.torchmetrics
+    - tags: get,generic-python-lib,_package.faster-coco-eval
+      names:
+      - cocoeval
+    - tags: get,dataset,raw,mlcommons-cognata,_abtf-poc
+      skip_if_env:
+        MLC_RUN_STATE_DOCKER:
+        - 'yes'
+      names:
+      - raw-dataset-mlcommons-cognata
+    - tags: get,ml-model,abtf-ssd-pytorch,_abtf-poc
+      names:
+      - ml-model-abtf
+    env:
+      MLC_MODEL: retinanet
+  bevformer:
+    group: models
+    add_deps_recursive:
+      pytorch:
+        version_max: 2.5.1
+        version_max_usable: 2.5.1
+      ml-engine-torchvision:
+        version_max: 0.20.1
+        version_max_usable": 0.20.1
+      torchaudio:
+        version_max: 2.5.1
+        version_max_usable": 2.5.1
+    deps:
+    - tags: get,generic-python-lib,_package.opencv-python
+    - tags: get,generic-python-lib,_package.numpy
+      version_max: 1.26.4
+      version_max_usable: 1.26.4
+    - tags: get,generic-python-lib,_package.onnx
+    - tags: get,generic-python-lib,_package.onnxruntime
+    - tags: get,generic-python-lib,_package.pillow
+    - tags: get,generic-python-lib,_package.pyquaternion
+    - tags: get,generic-python-lib,_package.tqdm
+    - tags: get,generic-python-lib,_package.nuscenes-devkit
+    - tags: get,preprocessed,dataset,nuscenes,_mlc,_validation
+      skip_if_env:
+        MLC_RUN_STATE_DOCKER:
+        - 'yes'
+      names:
+      - preprocessed-dataset-mlcommons-nuscenes
+    - tags: get,ml-model,bevformer,_mlc,_rclone
+      skip_if_env:
+        MLC_RUN_STATE_DOCKER:
+        - 'yes'
+      names:
+      - ml-model-bevformer
+  deeplabv3plus:
+    group: models
+    add_deps_recursive:
+      pytorch:
+        version_max: 2.3.1
+        version_max_usable: 2.3.1
+      ml-engine-torchvision:
+        version_max: 0.18.1
+        version_max_usable": 0.18.1
+      torchaudio:
+        version_max: 2.3.1
+        version_max_usable": 2.3.1
+    deps:
+    - tags: get,generic-python-lib,_package.Cython
+    - tags: get,generic-python-lib,_package.scikit-image
+    - tags: get,generic-python-lib,_package.scikit-learn
+    - tags: get,generic-python-lib,_torchvision
+      names:
+      - ml-engine-torchvision
+    - tags: get,generic-python-lib,_package.torchinfo
+    - tags: get,generic-python-lib,_package.torchmetrics
+    - tags: get,generic-sys-util,_libgl1-mesa-glx
+    - tags: get,generic-python-lib,_package.onnx
+    - tags: get,generic-python-lib,_package.onnxruntime
+    - tags: get,generic-python-lib,_package.tqdm
+    - tags: get,generic-python-lib,_package.ijson
+    - tags: get,preprocessed,dataset,cognata,_mlc,_segmentation,_validation
+      skip_if_env:
+        MLC_RUN_STATE_DOCKER:
+        - 'yes'
+      names:
+      - preprocessed-dataset-mlcommons-cognata-deeplabv3-plus
+    - tags: get,ml-model,deeplabv3-plus,_mlc,_rclone
+      skip_if_env:
+        MLC_RUN_STATE_DOCKER:
+        - 'yes'
+      names:
+      - ml-model-deeplabv3-plus
+  llama3_1-8b:
+    group: models
+    add_deps_recursive:
+      pytorch:
+        version_min: 2.1.0
+    deps:
+    - tags: get,generic-python-lib,_package.accelerate
+    - tags: get,generic-python-lib,_package.transformers
+      version_min: 4.40.0
+    - tags: get,generic-python-lib,_package.protobuf
+    - tags: get,generic-python-lib,_package.sentencepiece
+    - tags: get,generic-python-lib,_package.tokenizers
+    - tags: get-dataset-mmlu
+      skip_if_env:
+        MLC_RUN_STATE_DOCKER:
+        - 'yes'
+      names:
+      - dataset-mmlu
+    - tags: get,ml-model,llama3,_mlc,_8b,_r2-downloader
+      skip_if_env:
+        MLC_RUN_STATE_DOCKER:
+        - 'yes'
+      names:
+      - ml-model-llama3_1-8b
+  ssd:
+    group: models
+    add_deps_recursive:
+      pytorch:
+        version_max: 2.3.1
+        version_max_usable: 2.3.1
+      ml-engine-torchvision:
+        version_max: 0.18.1
+        version_max_usable": 0.18.1
+      torchaudio:
+        version_max: 2.3.1
+        version_max_usable": 2.3.1
+    deps:
+    - tags: get,generic-python-lib,_package.Cython
+    - tags: get,generic-python-lib,_package.scikit-image
+    - tags: get,generic-python-lib,_package.faster-coco-eval
+    - tags: get,generic-python-lib,_torchvision
+      names:
+      - ml-engine-torchvision
+    - tags: get,generic-python-lib,_package.torchinfo
+    - tags: get,generic-python-lib,_package.torchmetrics
+    - tags: get,generic-sys-util,_libgl1-mesa-glx
+    - tags: get,generic-python-lib,_package.onnx
+    - tags: get,generic-python-lib,_package.onnxruntime
+    - tags: get,generic-python-lib,_package.tqdm
+    - tags: get,preprocessed,dataset,cognata,_mlc,_2d_obj_det,_validation
+      skip_if_env:
+        MLC_RUN_STATE_DOCKER:
+        - 'yes'
+      names:
+      - preprocessed-dataset-mlcommons-cognata-ssd
+    - tags: get,ml-model,ssd,resnet50,_mlc,_rclone
+      skip_if_any_env:
+        MLC_RUN_STATE_DOCKER:
+        - 'yes'
+      names:
+      - ml-model-ssd
+  uniad:
+    group: models
+    add_deps_recursive:
+      pytorch:
+        version_max: 1.21.1
+        version_max_usable: 1.21.1
+    deps:
+    - tags: get,generic-python-lib,_package.opencv_python
+      version_min: 4.40.0
+    - tags: get,preprocessed,dataset,nuscenes,_mlc,_validation
+      skip_if_env:
+        MLC_RUN_STATE_DOCKER:
+        - 'yes'
+      names:
+      - preprocessed-dataset-nuscenes
+    - tags: get-ml-model-uniad,_mlc,_r2-downloader
+      skip_if_env:
+        MLC_RUN_STATE_DOCKER:
+        - 'yes'
+      names:
+      - ml-model-uniad
+  bevformer,singlestream:
+    default_env:
+      MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: '99.9'
+      MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT: 6636
+  deeplabv3plus,singlestream:
+    default_env:
+      MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: '99.9'
+      MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT: 6636
+  llama3_1-8b,singlestream:
+    default_env:
+      MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: '90'
+  multistream:
+    env:
+      MLC_MLPERF_LOADGEN_SCENARIO: MultiStream
+  mvp_demo:
+    env: null
+  offline:
+    env:
+      MLC_MLPERF_LOADGEN_SCENARIO: Offline
+  onnxruntime,cpu:
+    env:
+      MLC_MLPERF_BACKEND_VERSION: <<<MLC_ONNXRUNTIME_VERSION>>>
+  onnxruntime,cuda:
+    env:
+      MLC_MLPERF_BACKEND_VERSION: <<<MLC_ONNXRUNTIME_GPU_VERSION>>>
+      ONNXRUNTIME_PREFERRED_EXECUTION_PROVIDER: CUDAExecutionProvider
   pytorch,cpu:
     add_deps_recursive:
       pytorch:
@@ -387,295 +535,10 @@ variations:
       torchaudio:
         env:
           MLC_GENERIC_PYTHON_PIP_EXTRA_INDEX_URL: https://download.pytorch.org/whl/cpu/torch_stable.html
-
-
-
-#  retinanet:
-#    group: models
-#    deps:
-#    - tags: get,generic-python-lib,_opencv-python
-#    - tags: get,generic-python-lib,_numpy
-#    - tags: get,generic-python-lib,_pycocotools
-#
-#    env:
-#      MLC_MODEL: retinanet
-#      MLC_MLPERF_USE_MLCOMMONS_RUN_SCRIPT: 'yes'
-#      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: '1'
-
-
-  abtf-demo-model:
-    group: models
-    add_deps_recursive:
-      automotive-src:
-        tags: _sha.ee526dc63d9ca2636000343c5d2d16132145719e
-    deps:
-      - tags: get,generic-python-lib,_opencv-python
-      - tags: get,generic-python-lib,_numpy
-      - tags: get,generic-python-lib,_pycocotools
-      - tags: get,generic-python-lib,_package.torchmetrics
-      - tags: get,generic-python-lib,_package.faster-coco-eval
-        names:
-        - cocoeval
-      - tags: get,dataset,raw,mlcommons-cognata
-        names:
-        - raw-dataset-mlcommons-cognata
-      - tags: get,ml-model,abtf-ssd-pytorch,_abtf-mvp
-        names:
-        - ml-model-abtf
-    env:
-      MLC_MODEL: retinanet
-
-  abtf-poc-model:
-    group: models
-    default: true
-    add_deps_recursive:
-      automotive-src:
-        tags: _sha.ee526dc63d9ca2636000343c5d2d16132145719e
-    deps:
-      - tags: get,generic-python-lib,_opencv-python
-      - tags: get,generic-python-lib,_numpy
-        version_max: "1.26.4"
-        version_max_usable: "1.26.4"
-      - tags: get,generic-python-lib,_pycocotools
-      - tags: get,generic-python-lib,_package.torchmetrics
-      - tags: get,generic-python-lib,_package.faster-coco-eval
-        names:
-        - cocoeval
-      - tags: get,dataset,raw,mlcommons-cognata,_abtf-poc
-        skip_if_env:
-          MLC_RUN_STATE_DOCKER:
-            - 'yes'
-        names:
-        - raw-dataset-mlcommons-cognata
-      - tags: get,ml-model,abtf-ssd-pytorch,_abtf-poc
-        names:
-        - ml-model-abtf
-    env:
-      MLC_MODEL: retinanet
-
-  bevformer:
-    group: models
-    add_deps_recursive:
-      pytorch:
-        version_max: "2.5.1"
-        version_max_usable: "2.5.1"
-      ml-engine-torchvision:
-        version_max: "0.20.1"
-        version_max_usable": "0.20.1"
-      torchaudio:
-        version_max: "2.5.1"
-        version_max_usable": "2.5.1"
-    deps:
-      - tags: get,generic-python-lib,_package.opencv-python
-      - tags: get,generic-python-lib,_package.numpy
-        version_max: "1.26.4"
-        version_max_usable: "1.26.4"
-      - tags: get,generic-python-lib,_package.onnx
-      - tags: get,generic-python-lib,_package.onnxruntime
-      - tags: get,generic-python-lib,_package.pillow
-      - tags: get,generic-python-lib,_package.pyquaternion
-      - tags: get,generic-python-lib,_package.tqdm
-      - tags: get,generic-python-lib,_package.nuscenes-devkit
-      - tags: get,preprocessed,dataset,nuscenes,_mlc,_validation
-        skip_if_env:
-          MLC_RUN_STATE_DOCKER:
-            - "yes"
-        names:
-          - preprocessed-dataset-mlcommons-nuscenes
-      - tags: get,ml-model,bevformer,_mlc,_rclone
-        skip_if_env:
-          MLC_RUN_STATE_DOCKER:
-            - "yes"
-        names:
-          - ml-model-bevformer
-
-  ssd:
-    group: models
-    add_deps_recursive:
-      pytorch:
-        version_max: "2.3.1"
-        version_max_usable: "2.3.1"
-      ml-engine-torchvision:
-        version_max: "0.18.1"
-        version_max_usable": "0.18.1"
-      torchaudio:
-        version_max: "2.3.1"
-        version_max_usable": "2.3.1"
-    deps:
-      - tags: get,generic-python-lib,_package.Cython
-      - tags: get,generic-python-lib,_package.scikit-image
-      - tags: get,generic-python-lib,_package.faster-coco-eval
-      - tags: get,generic-python-lib,_torchvision
-        names:
-          - ml-engine-torchvision
-      - tags: get,generic-python-lib,_package.torchinfo
-      - tags: get,generic-python-lib,_package.torchmetrics
-      - tags: get,generic-sys-util,_libgl1-mesa-glx
-      - tags: get,generic-python-lib,_package.onnx
-      - tags: get,generic-python-lib,_package.onnxruntime
-      - tags: get,generic-python-lib,_package.tqdm
-      - tags: get,preprocessed,dataset,cognata,_mlc,_2d_obj_det,_validation
-        skip_if_env:
-          MLC_RUN_STATE_DOCKER:
-            - "yes"
-        names:
-          - preprocessed-dataset-mlcommons-cognata-ssd
-      - tags: get,ml-model,ssd,resnet50,_mlc,_rclone
-        skip_if_any_env:
-          MLC_RUN_STATE_DOCKER:
-            - "yes"
-        names:
-          - ml-model-ssd
-
-  deeplabv3plus:
-    group: models
-    add_deps_recursive:
-      pytorch:
-        version_max: "2.3.1"
-        version_max_usable: "2.3.1"
-      ml-engine-torchvision:
-        version_max: "0.18.1"
-        version_max_usable": "0.18.1"
-      torchaudio:
-        version_max: "2.3.1"
-        version_max_usable": "2.3.1"
-    deps:
-      - tags: get,generic-python-lib,_package.Cython
-      - tags: get,generic-python-lib,_package.scikit-image
-      - tags: get,generic-python-lib,_package.scikit-learn
-      - tags: get,generic-python-lib,_torchvision
-        names:
-          - ml-engine-torchvision
-      - tags: get,generic-python-lib,_package.torchinfo
-      - tags: get,generic-python-lib,_package.torchmetrics
-      - tags: get,generic-sys-util,_libgl1-mesa-glx
-      - tags: get,generic-python-lib,_package.onnx
-      - tags: get,generic-python-lib,_package.onnxruntime
-      - tags: get,generic-python-lib,_package.tqdm
-      - tags: get,generic-python-lib,_package.ijson
-      - tags: get,preprocessed,dataset,cognata,_mlc,_segmentation,_validation
-        skip_if_env:
-          MLC_RUN_STATE_DOCKER:
-            - "yes"
-        names:
-          - preprocessed-dataset-mlcommons-cognata-deeplabv3-plus
-      - tags: get,ml-model,deeplabv3-plus,_mlc,_rclone
-        skip_if_env:
-          MLC_RUN_STATE_DOCKER:
-            - "yes"
-        names:
-          - ml-model-deeplabv3-plus
-
-  llama3_1-8b:
-    group: models
-    add_deps_recursive:
-      pytorch:
-        version_min: "2.1.0"
-    deps:
-      - tags: get,generic-python-lib,_package.accelerate
-      - tags: get,generic-python-lib,_package.transformers
-        version_min: 4.40.0
-      - tags: get,generic-python-lib,_package.protobuf
-      - tags: get,generic-python-lib,_package.sentencepiece
-      - tags: get,generic-python-lib,_package.tokenizers
-      - tags: get-dataset-mmlu
-        skip_if_env:
-          MLC_RUN_STATE_DOCKER:
-            - "yes"
-        names:
-          - dataset-mmlu
-      - tags: get,ml-model,llama3,_mlc,_8b,_r2-downloader
-        skip_if_env:
-          MLC_RUN_STATE_DOCKER:
-            - "yes"
-        names:
-          - ml-model-llama3_1-8b
-
-  uniad:
-    group: models
-    add_deps_recursive:
-      pytorch:
-        version_max: "1.21.1"
-        version_max_usable: "1.21.1"
-    deps:
-      - tags: get,generic-python-lib,_package.opencv_python
-        version_min: 4.40.0
-      - tags: get,preprocessed,dataset,nuscenes,_mlc,_validation
-        skip_if_env:
-          MLC_RUN_STATE_DOCKER:
-            - "yes"
-        names:
-          - preprocessed-dataset-nuscenes
-      - tags: get-ml-model-uniad,_mlc,_r2-downloader
-        skip_if_env:
-          MLC_RUN_STATE_DOCKER:
-            - "yes"
-        names:
-          - ml-model-uniad
-
-  # Target devices
-  cpu:
-    group: device
-    default: true
-    env:
-      MLC_MLPERF_DEVICE: cpu
-      CUDA_VISIBLE_DEVICES: ''
-      USE_CUDA: no
-      USE_GPU: no
-
-  cuda:
-    group: device
-    env:
-      MLC_MLPERF_DEVICE: gpu
-      USE_CUDA: yes
-      USE_GPU: yes
-
-
-
-  # Loadgen scenarios
-  offline:
-    env:
-      MLC_MLPERF_LOADGEN_SCENARIO: Offline
-  multistream:
-    env:
-      MLC_MLPERF_LOADGEN_SCENARIO: MultiStream
-  singlestream:
-    group: loadgen-scenario
-    env:
-      MLC_MLPERF_LOADGEN_SCENARIO: SingleStream
-    default_variations:
-      batch-size: batch_size.1
   server:
     env:
       MLC_MLPERF_LOADGEN_SCENARIO: Server
-  constantstream:
-    group: loadgen-scenario
-    env:
-      MLC_MLPERF_LOADGEN_SCENARIO: ConstantStream
-
-  bevformer,singlestream:
-    default_env:
-      MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: "99.9"
-      MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT: 6636
-  
   ssd,singlestream:
     default_env:
-      MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: "99.9"
+      MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: '99.9'
       MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT: 6636
-  
-  deeplabv3plus,singlestream:
-    default_env:
-      MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: "99.9"
-      MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT: 6636
-
-  llama3_1-8b,singlestream:
-    default_env:
-      MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: "90"
-
-  mvp_demo:
-    env:
-
-  batch_size.#:
-    group: batch-size
-    env:
-      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: "#"

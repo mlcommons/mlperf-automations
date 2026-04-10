@@ -29,7 +29,7 @@ prehook_deps:
   reuse_version: true
   inherit_variation_tags: true
   skip_inherit_variation_groups:
-    - install-src
+  - install-src
   tags: install,llvm
 sort: 100
 tags:
@@ -52,15 +52,14 @@ variations:
     ad:
       llvm-install:
         tags: src,_clang
+  branch.#: {}
+  flang: {}
   path.#:
     env:
       MLC_LLVM_DIR_PATH: '#'
       MLC_TMP_LLVM_FORCE_GIVEN_PATH: 'yes'
   release: {}
-  version.#: {}
-  branch.#: {}
   runtimes.#: {}
-  flang: {}
   sha.#: {}
   tag.#: {}
-
+  version.#: {}

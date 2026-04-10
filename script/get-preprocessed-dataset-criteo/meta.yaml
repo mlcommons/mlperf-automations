@@ -78,28 +78,28 @@ tags:
 - preprocessed
 uid: afa59956272a4ba4
 variations:
-  '1':
-    env:
-      MLC_DATASET_SIZE: '1'
-  '50':
-    env:
-      MLC_DATASET_SIZE: '50'
-  fake:
+  r2-downloader:
+    group: download-tool
     add_deps_recursive:
-      original-dataset:
-        tags: _fake
-    env:
-      MLC_CRITEO_FAKE: 'yes'
-  full:
+      dae-criteo-preprocessed:
+        tags: _r2-downloader
+    default: true
+  rclone:
+    group: download-tool
     add_deps_recursive:
-      original-dataset:
-        tags: -_fake
-    env: {}
+      dae-criteo-preprocessed:
+        tags: _rclone
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
   mlc:
     default: true
     env:
       MLC_DATASET_PREPROCESSED_CRITEO_FROM_MLC: 'yes'
       MLC_DATASET_PREPROCESSED_PATH: 'on'
+    group: src
+  preprocess:
     group: src
   multihot:
     default: true
@@ -134,6 +134,29 @@ variations:
     env:
       MLC_DATASET_CRITEO_MULTIHOT: 'yes'
     group: type
+  '1':
+    env:
+      MLC_DATASET_SIZE: '1'
+  '50':
+    env:
+      MLC_DATASET_SIZE: '50'
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  fake:
+    add_deps_recursive:
+      original-dataset:
+        tags: _fake
+    env:
+      MLC_CRITEO_FAKE: 'yes'
+  full:
+    add_deps_recursive:
+      original-dataset:
+        tags: -_fake
+    env: {}
   multihot,mlc:
     deps:
     - env:
@@ -143,44 +166,21 @@ variations:
       extra_cache_tags: criteo,preprocessed,dataset
       force_cache: true
       force_env_keys:
-        - MLC_OUTDIRNAME  
+      - MLC_OUTDIRNAME
       names:
       - dae-criteo-preprocessed
       tags: download-and-extract
       update_tags_from_env_with_prefix:
-          _url.:
-            - MLC_DOWNLOAD_URL
+        _url.:
+        - MLC_DOWNLOAD_URL
+  multihot,mlc,r2-downloader:
+    env:
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/dlrm-v2-preprocessed-dataset.uri
   multihot,mlc,rclone:
     env:
       MLC_DOWNLOAD_CHECKSUM_FILE: <<<MLC_TMP_CURRENT_SCRIPT_PATH>>>/checksums.txt
       MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/dlrm_preprocessed
       MLC_RCLONE_CONFIG_NAME: mlc-inference
-  multihot,mlc,r2-downloader:
-    env:
-      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/dlrm-v2-preprocessed-dataset.uri
-  rclone:
-    group: download-tool
-    add_deps_recursive:
-      dae-criteo-preprocessed:
-        tags: _rclone
-  r2-downloader:
-    group: download-tool
-    add_deps_recursive:
-      dae-criteo-preprocessed:
-        tags: _r2-downloader
-    default: true
-  dry-run:
-    group: run-mode
-    env:
-      MLC_DOWNLOAD_MODE: dry
-  dry-run,rclone:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  dry-run,r2-downloader:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
-  preprocess:
-    group: src
   validation:
     add_deps:
       original-dataset:

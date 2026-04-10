@@ -49,6 +49,15 @@ tags:
 - src-transformers
 uid: 88512c48ea5c4186
 variations:
+  repo.#:
+    env:
+      MLC_GIT_URL: '#'
+    group: repo
+  repo.https://github.com/pytorch/pytorch:
+    default: true
+    env:
+      MLC_GIT_URL: https://github.com/huggingface/transformers
+    group: repo
   branch.#:
     env:
       MLC_GIT_CHECKOUT: '#'
@@ -79,15 +88,6 @@ variations:
       tags: get,generic,conda-package,_package.setuptools,_source.conda-forge
     env:
       MLC_CONDA_ENV: 'yes'
-  repo.#:
-    env:
-      MLC_GIT_URL: '#'
-    group: repo
-  repo.https://github.com/pytorch/pytorch:
-    default: true
-    env:
-      MLC_GIT_URL: https://github.com/huggingface/transformers
-    group: repo
   sha.#:
     env:
       MLC_GIT_CHECKOUT_SHA: '#'

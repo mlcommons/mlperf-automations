@@ -1,90 +1,35 @@
 alias: benchmark-any-mlperf-inference-implementation
 uid: 8d3cd46f54464810
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
-
 cache: false
-
 category: MLPerf Inference
-
 deps:
-  - tags: detect,cpu
-
+- tags: detect,cpu
 default_env:
   DIVISION: open
   CATEGORY: edge
-
 input_mapping:
-  models: MODELS
   backends: BACKENDS
+  category: CATEGORY
   devices: DEVICES
   division: DIVISION
-  category: CATEGORY
+  extra_args: EXTRA_ARGS
+  models: MODELS
   power_server: POWER_SERVER
   power_server_port: POWER_SERVER_PORT
-  extra_args: EXTRA_ARGS
-
 tags:
-  - benchmark
-  - run
-  - natively
-  - all
-  - inference
-  - any
-  - mlperf
-  - mlperf-implementation
-  - implementation
-  - mlperf-models
-
+- benchmark
+- run
+- natively
+- all
+- inference
+- any
+- mlperf
+- mlperf-implementation
+- implementation
+- mlperf-models
 variations:
-
-  mil:
-    group: implementation
-    env:
-      IMPLEMENTATION: mil
-    default_env:
-      MODELS: resnet50,retinanet
-      BACKENDS: onnxruntime
-      DEVICES: cpu,cuda
-
-  reference:
-    group: implementation
-    env:
-      IMPLEMENTATION: reference
-    default_env:
-      MODELS: resnet50,retinanet,bert-99,3d-unet-99,rnnt
-      CATEGORY: edge
-
-  nvidia:
-    group: implementation
-    env:
-      IMPLEMENTATION: nvidia-original
-    default_env:
-      MODELS: resnet50,retinanet,bert-99,bert-99.9,3d-unet-99,rnnt,gptj-99,gptj-99.9,dlrmv2-99,dlrmv2-99.9
-      BACKENDS: tensorrt
-      DEVICES: cuda
-
-  qualcomm:
-    group: implementation
-    env:
-      IMPLEMENTATION: qualcomm
-    default_env:
-      MODELS: resnet50,retinanet,bert-99,bert-99.9
-      DIVISION: closed
-      BACKENDS: glow
-      DEVICES: qaic
-
-  intel:
-    group: implementation
-    env:
-      IMPLEMENTATION: intel
-    default_env:
-      MODELS: resnet50,retinanet,bert-99,3d-unet-99,rnnt
-      DIVISION: closed
-      BACKENDS: pytorch
-      DEVICES: cpu
-
   deepsparse:
     group: implementation
     env:
@@ -94,7 +39,47 @@ variations:
       MODELS: bert-99
       BACKENDS: deepsparse
       DEVICES: cpu
-
+  intel:
+    group: implementation
+    env:
+      IMPLEMENTATION: intel
+    default_env:
+      MODELS: resnet50,retinanet,bert-99,3d-unet-99,rnnt
+      DIVISION: closed
+      BACKENDS: pytorch
+      DEVICES: cpu
+  mil:
+    group: implementation
+    env:
+      IMPLEMENTATION: mil
+    default_env:
+      MODELS: resnet50,retinanet
+      BACKENDS: onnxruntime
+      DEVICES: cpu,cuda
+  nvidia:
+    group: implementation
+    env:
+      IMPLEMENTATION: nvidia-original
+    default_env:
+      MODELS: resnet50,retinanet,bert-99,bert-99.9,3d-unet-99,rnnt,gptj-99,gptj-99.9,dlrmv2-99,dlrmv2-99.9
+      BACKENDS: tensorrt
+      DEVICES: cuda
+  qualcomm:
+    group: implementation
+    env:
+      IMPLEMENTATION: qualcomm
+    default_env:
+      MODELS: resnet50,retinanet,bert-99,bert-99.9
+      DIVISION: closed
+      BACKENDS: glow
+      DEVICES: qaic
+  reference:
+    group: implementation
+    env:
+      IMPLEMENTATION: reference
+    default_env:
+      MODELS: resnet50,retinanet,bert-99,3d-unet-99,rnnt
+      CATEGORY: edge
   tflite-cpp:
     group: implementation
     env:
@@ -105,42 +90,38 @@ variations:
       DIVISION: open
       BACKENDS: tflite
       DEVICES: cpu
-
   performance-only:
     group: power
     default: true
-
   power:
     group: power
     env:
-      POWER: yes
+      POWER: true
     default_env:
       POWER_SERVER: 192.168.1.166
       POWER_SERVER_PORT: 4950
-
-  phoenix,power:
+  aws-dl2q.24xlarge:
+    group: sut
     default_env:
-      POWER_SERVER: 192.168.1.79
-  rb6,power:
-    default_env:
-      POWER_SERVER: 192.168.1.166
-  orin,power:
-    default_env:
-      POWER_SERVER: 192.168.1.166
-  rpi4,power:
-    default_env:
-      POWER_SERVER: 192.168.1.166
-  mini,power:
-    default_env:
-      POWER_SERVER: 192.168.1.166
-  rb6:
+      EXTRA_ARGS: '  --adr.mlperf-inference-implementation.tags=_dl2q.24xlarge'
+      CATEGORY: datacenter
+      DIVISION: closed
+    default_variations:
+      implementation: qualcomm
+  macbookpro-m1:
+    group: sut
+    env:
+      CATEGORY: edge
+      DIVISION: closed
+  mini:
     group: sut
   orin:
     group: sut
-  rpi4:
+  orin.32g:
     group: sut
-  mini:
-    group: sut
+    env:
+      CATEGORY: edge
+      DIVISION: closed
   phoenix:
     group: sut
     env:
@@ -151,14 +132,46 @@ variations:
         cpu:
           onnxruntime:
             offline_target_qps: 250
-
-  phoenix,reference:
+  rb6:
+    group: sut
     default_env:
-      DEVICES: cpu,cuda
-
+      CATEGORY: edge
+      DIVISION: closed
+    default_variations:
+      implementation: qualcomm
+  rpi4:
+    group: sut
+  sapphire-rapids.24c:
+    group: sut
+    env:
+      CATEGORY: edge
+      DIVISION: closed
+  aws-dl2q.24xlarge,qualcomm:
+    state:
+      resnet50:
+        qaic:
+          glow:
+            offline_target_qps: 153000
+            server_target_qps: 149000
+      retinanet:
+        qaic:
+          glow:
+            offline_target_qps: 2500
+            server_target_qps: 2200
+      bert-99.9:
+        qaic:
+          glow:
+            offline_target_qps: 350
+            server_target_qps: 300
+  mini,power:
+    default_env:
+      POWER_SERVER: 192.168.1.166
+  orin,power:
+    default_env:
+      POWER_SERVER: 192.168.1.166
   phoenix,nvidia:
     default_env:
-      EXTRA_ARGS: " --gpu_name=rtx_4090"
+      EXTRA_ARGS: ' --gpu_name=rtx_4090'
     state:
       resnet50:
         cuda:
@@ -188,10 +201,37 @@ variations:
         cuda:
           tensorrt:
             offline_target_qps: 4.5
-
+  phoenix,power:
+    default_env:
+      POWER_SERVER: 192.168.1.79
+  phoenix,reference:
+    default_env:
+      DEVICES: cpu,cuda
+  rb6,power:
+    default_env:
+      POWER_SERVER: 192.168.1.166
+  rb6,qualcomm:
+    default_env:
+      EXTRA_ARGS: ' --adr.mlperf-inference-implementation.tags=_rb6 --env.MLC_MLPERF_SHORT_RANGING_RUN=no'
+    state:
+      resnet50:
+        qaic:
+          glow:
+            offline_target_qps: 6800
+      retinanet:
+        qaic:
+          glow:
+            offline_target_qps: 125
+      bert-99:
+        qaic:
+          glow:
+            offline_target_qps: 255
+  rpi4,power:
+    default_env:
+      POWER_SERVER: 192.168.1.166
   sapphire-rapids.24c,nvidia:
     default_env:
-      EXTRA_ARGS: " --gpu_name=rtx_4090 --adr.mlperf-inference-implementation.tags=_num-gpus.2"
+      EXTRA_ARGS: ' --gpu_name=rtx_4090 --adr.mlperf-inference-implementation.tags=_num-gpus.2'
     state:
       resnet50:
         cuda:
@@ -217,11 +257,6 @@ variations:
           tensorrt:
             offline_target_qps: 8
             singlestream_target_latency: 400
-      3d-unet-99.9:
-        cuda:
-          tensorrt:
-            offline_target_qps: 8
-            singlestream_target_latency: 400
       rnnt:
         cuda:
           tensorrt:
@@ -240,79 +275,8 @@ variations:
       dlrm-v2-99:
         cuda:
           tensorrt:
-            offline_target_qps: 1500
             offline_target_qps: 1200
       dlrm-v2-99.9:
         cuda:
           tensorrt:
-            offline_target_qps: 1500
             offline_target_qps: 1200
-
-  orin.32g:
-    group: sut
-    env:
-      CATEGORY: edge
-      DIVISION: closed
-
-  sapphire-rapids.24c:
-    group: sut
-    env:
-      CATEGORY: edge
-      DIVISION: closed
-
-  macbookpro-m1:
-    group: sut
-    env:
-      CATEGORY: edge
-      DIVISION: closed
-
-  aws-dl2q.24xlarge:
-    group: sut
-    default_env:
-      EXTRA_ARGS: "  --adr.mlperf-inference-implementation.tags=_dl2q.24xlarge"
-      CATEGORY: datacenter
-      DIVISION: closed
-    default_variations:
-      implementation: qualcomm
-
-  aws-dl2q.24xlarge,qualcomm:
-    state:
-      resnet50:
-        qaic:
-          glow:
-            offline_target_qps: 153000
-            server_target_qps: 149000
-      retinanet:
-        qaic:
-          glow:
-            offline_target_qps: 2500
-            server_target_qps: 2200
-      bert-99.9:
-        qaic:
-          glow:
-            offline_target_qps: 350
-            server_target_qps: 300
-  rb6:
-    group: sut
-    default_env:
-      CATEGORY: edge
-      DIVISION: closed
-    default_variations:
-      implementation: qualcomm
-
-  rb6,qualcomm:
-    default_env:
-      EXTRA_ARGS: " --adr.mlperf-inference-implementation.tags=_rb6 --env.MLC_MLPERF_SHORT_RANGING_RUN=no"
-    state:
-      resnet50:
-        qaic:
-          glow:
-            offline_target_qps: 6800
-      retinanet:
-        qaic:
-          glow:
-            offline_target_qps: 125
-      bert-99:
-        qaic:
-          glow:
-            offline_target_qps: 255

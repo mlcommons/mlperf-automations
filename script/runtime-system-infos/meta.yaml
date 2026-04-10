@@ -1,51 +1,31 @@
-# Identification of this MLC script
 alias: runtime-system-infos
 uid: 755cf27627784001
 cache: false
 automation_alias: script
 automation_uid: 5b4e0237da074764
-
 category: MLPerf Inference
 docker:
-  real_run: False
-
-# User-friendly tags to find this MLC script
+  real_run: false
 tags:
-  - runtime
-  - system
-  - utilisation
-  - infos
-
+- runtime
+- system
+- utilisation
+- infos
 input_mapping:
-  log_dir: MLC_LOGS_DIR
   interval: MLC_SYSTEM_INFO_MEASUREMENT_INTERVAL
-
-
-# Dependencies on other MLC scripts
-
+  log_dir: MLC_LOGS_DIR
 deps:
-
-  # Detect host OS features
-  - tags: detect,os
-
-  # Detect host CPU features
-  - tags: detect,cpu
-
-  # Install system dependencies on a given host
-  - tags: get,sys-utils-mlc
-
-  # Detect python3
-  - tags: get,python3
-    names:
-    - python
-    - python3
-
+- tags: detect,os
+- tags: detect,cpu
+- tags: get,sys-utils-mlc
+- tags: get,python3
+  names:
+  - python
+  - python3
 variations:
-  all:    # TODO: get both cpu and gpu measurements
+  all:
     group: devices
-
-  cpu:    # TODO: get the cpu measurements
+  cpu:
     group: devices
-
-  cuda:    # TODO: get the gpu(cuda) measurements
+  cuda:
     group: devices

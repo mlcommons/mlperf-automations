@@ -48,6 +48,15 @@ tags:
 - src-pytorch
 uid: 64eaf3e81de94f41
 variations:
+  repo.#:
+    env:
+      MLC_GIT_URL: '#'
+    group: repo
+  repo.https://github.com/pytorch/pytorch:
+    default: true
+    env:
+      MLC_GIT_URL: https://github.com/pytorch/pytorch
+    group: repo
   branch.#:
     env:
       MLC_GIT_CHECKOUT: '#'
@@ -267,15 +276,6 @@ variations:
       pytorch-src-repo:
         tags: _pr-to-apply.#
     env: {}
-  repo.#:
-    env:
-      MLC_GIT_URL: '#'
-    group: repo
-  repo.https://github.com/pytorch/pytorch:
-    default: true
-    env:
-      MLC_GIT_URL: https://github.com/pytorch/pytorch
-    group: repo
   sha.#:
     env:
       MLC_GIT_CHECKOUT_SHA: '#'

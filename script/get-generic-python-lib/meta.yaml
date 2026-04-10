@@ -156,6 +156,9 @@ variations:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: fiftyone
     new_env_keys:
     - MLC_FIFTYONE_VERSION
+  find_links_url.#:
+    env:
+      MLC_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: '#'
   google-api-python-client:
     env:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: google_api_python_client
@@ -166,16 +169,16 @@ variations:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: google_auth_oauthlib
     new_env_keys:
     - MLC_GOOGLE_AUTH_OAUTHLIB_VERSION
-  google-generativeai:
-    env:
-      MLC_GENERIC_PYTHON_PACKAGE_NAME: google-generativeai
-    new_env_keys:
-    - MLC_GOOGLE_GENERATIVEAI_VERSION
   google-genai:
     env:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: google-genai
     new_env_keys:
     - MLC_GOOGLE_GENAI_VERSION
+  google-generativeai:
+    env:
+      MLC_GENERIC_PYTHON_PACKAGE_NAME: google-generativeai
+    new_env_keys:
+    - MLC_GOOGLE_GENERATIVEAI_VERSION
   groq:
     env:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: groq
@@ -363,9 +366,6 @@ variations:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: '#'
       MLC_GENERIC_PYTHON_PIP_UNINSTALL_DEPS: ''
       MLC_GENERIC_PYTHON_PIP_URL: ''
-  find_links_url.#:
-    env:
-      MLC_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: '#'
   package.torch,cxx11-abi:
     env:
       MLC_GENERIC_PYTHON_PIP_INDEX_URL: https://download.pytorch.org/whl/nightly/cpu-cxx11-abi
@@ -377,6 +377,11 @@ variations:
   path.#:
     env:
       MLC_GENERIC_PYTHON_PIP_URL: '#'
+  pdfplumber:
+    env:
+      MLC_GENERIC_PYTHON_PACKAGE_NAME: pdfplumber
+    new_env_keys:
+    - MLC_PDFPLUMBER_VERSION
   pillow:
     env:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: Pillow
@@ -396,11 +401,6 @@ variations:
       MLC_GENERIC_PYTHON_PIP_EXTRA_INDEX_URL: https://pypi.ngc.nvidia.com
     new_env_keys:
     - MLC_POLYGRAPHY_VERSION
-  pdfplumber:
-    env:
-      MLC_GENERIC_PYTHON_PACKAGE_NAME: pdfplumber
-    new_env_keys:
-    - MLC_PDFPLUMBER_VERSION  
   pre:
     env:
       MLC_GENERIC_PYTHON_DEV_VERSION: 'yes'
@@ -414,11 +414,6 @@ variations:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: psutil
     new_env_keys:
     - MLC_PSUTIL_VERSION
-  python-dotenv:
-    env:
-      MLC_GENERIC_PYTHON_PACKAGE_NAME: python-dotenv
-    new_env_keys:
-    - MLC_PYTHON_DOTENV_VERSION
   pycocotools:
     env:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: pycocotools
@@ -433,6 +428,11 @@ variations:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: pycuda
     new_env_keys:
     - MLC_PYCUDA_VERSION
+  python-dotenv:
+    env:
+      MLC_GENERIC_PYTHON_PACKAGE_NAME: python-dotenv
+    new_env_keys:
+    - MLC_PYTHON_DOTENV_VERSION
   quark-amd:
     deps:
     - env:

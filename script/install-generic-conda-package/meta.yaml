@@ -30,6 +30,14 @@ tags:
 - generic-conda-package
 uid: d9275487f5314195
 variations:
+  source.#:
+    env:
+      MLC_CONDA_PKG_SRC: '#'
+    group: package-source
+  source.intel:
+    env:
+      MLC_CONDA_PKG_SRC: https://software.repos.intel.com/python/conda/
+    group: package-source
   name.#:
     ad:
       conda:
@@ -42,11 +50,3 @@ variations:
       MLC_CONDA_PKG_NAME: python
     new_env_keys:
     - MLC_PYTHON_BIN_WITH_PATH
-  source.#:
-    env:
-      MLC_CONDA_PKG_SRC: '#'
-    group: package-source
-  source.intel:
-    env:
-      MLC_CONDA_PKG_SRC: https://software.repos.intel.com/python/conda/
-    group: package-source

@@ -21,7 +21,7 @@ deps:
     - ubuntu
 - tags: get,generic-sys-util,_libssl-dev
   enable_if_env:
-    MLC_ENABLE_SSL: 
+    MLC_ENABLE_SSL:
     - 'yes'
 - enable_if_env:
     MLC_HOST_OS_FLAVOR:
@@ -65,10 +65,15 @@ tags:
 uid: 12d3a608afe14a1e
 tests:
   run_inputs:
-  # Test 1: Install default Python version from source with SSL
   - variations_list:
-      - with-ssl
+    - with-ssl
 variations:
+  with-ssl:
+    env:
+      MLC_ENABLE_SSL: 'yes'
+      MLC_PYTHON_INSTALL_CACHE_TAGS: with-ssl
+    group: ssl
+    default: true
   lto:
     env:
       MLC_PYTHON_INSTALL_CACHE_TAGS: with-lto
@@ -87,9 +92,3 @@ variations:
     env:
       MLC_CUSTOM_SSL: 'yes'
       MLC_PYTHON_INSTALL_CACHE_TAGS: with-custom-ssl
-  with-ssl:
-    env:
-      MLC_ENABLE_SSL: 'yes'
-      MLC_PYTHON_INSTALL_CACHE_TAGS: with-ssl
-    group: ssl
-    default: true
