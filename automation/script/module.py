@@ -4655,8 +4655,16 @@ def enable_or_skip_script(meta, env):
     (AND function)
     """
 
+    if not isinstance(meta, dict):
+        logging.warning(f"enable_or_skip_script: expected dict but got {type(meta).__name__}: {meta}")
+        return True
+
     for key in meta:
-        meta_key = [str(v).lower() for v in meta[key]]
+        value_spec = meta[key]
+        if isinstance(value_spec, list):
+            meta_key = [str(v).lower() for v in value_spec]
+        else:
+            meta_key = [str(value_spec).lower()]
         if key in env:
             value = str(env[key]).lower().strip()
             if set(meta_key) & set(["yes", "on", "true", "1"]):
@@ -4688,12 +4696,20 @@ def any_enable_or_skip_script(meta, env):
     Internal: enable a dependency based on enable_if_env and skip_if_env meta information
     (OR function)
     """
+    if not isinstance(meta, dict):
+        logging.warning(f"any_enable_or_skip_script: expected dict but got {type(meta).__name__}: {meta}")
+        return False
+
     for key in meta:
         found = False
         if key in env:
             value = str(env[key]).lower().strip()
 
-            meta_key = [str(v).lower() for v in meta[key]]
+            value_spec = meta[key]
+            if isinstance(value_spec, list):
+                meta_key = [str(v).lower() for v in value_spec]
+            else:
+                meta_key = [str(value_spec).lower()]
 
             if set(meta_key) & set(["yes", "on", "true", "1"]):
                 if not is_false(value) and value != '' and not re.findall(

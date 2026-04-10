@@ -301,6 +301,18 @@ def validate_meta(data, file_path=""):
                     errors.append(
                         f"{prefix}{dep_list_key}[{i}].{dk} has type '{actual}', expected {allowed}")
 
+            # Validate enable_if_env/skip_if_env values are single strings/lists, not nested dicts
+            for ck in ["enable_if_env", "skip_if_env", "skip_if_any_env", "enable_if_any_env"]:
+                cv = dep.get(ck)
+                if isinstance(cv, dict):
+                    for ek, ev in cv.items():
+                        if isinstance(ev, (dict, list)) and not isinstance(ev, str):
+                            if isinstance(ev, list):
+                                for item in ev:
+                                    if not isinstance(item, (str, int, float, bool)):
+                                        errors.append(
+                                            f"{prefix}{dep_list_key}[{i}].{ck}.{ek} list contains non-scalar: {type(item).__name__}")
+
     # Validate variations
     variations = data.get("variations")
     if isinstance(variations, dict):
