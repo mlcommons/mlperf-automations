@@ -174,39 +174,48 @@ jobs:
       run: |
         # Verify the error message contains expected text
         OUTPUT=$(mlcr nonexistent,script,tags,xxxyyyzzz --quiet 2>&1 || true)
-        if echo "$OUTPUT" | grep -qi "No scripts were found"; then
+        if echo "$OUTPUT" | grep -qi "no scripts were found"; then
           echo "PASS: Error message correctly reports no scripts found"
         else
           echo "ERROR: Unexpected error message: $OUTPUT"
           exit 1
         fi
 
+    - name: Create test scripts for dependency failure tests
+      shell: bash
+      run: |
+        # Create test scripts inside the repo's script/ directory so they are auto-discovered
+        # Test script with a bogus dep
+        mkdir -p script/test-dep-failure
+        printf 'alias: test-dep-failure\nautomation_alias: script\nautomation_uid: 5b4e0237da074764\ndeps:\n- tags: nonexistent,dep,script,xxxyyyzzz\ntags:\n- test\n- dep-failure\nuid: aaaa1111bbbb2222\n' > script/test-dep-failure/meta.yaml
+        printf '#!/bin/bash\necho "This should not run"\n' > script/test-dep-failure/run.sh
+        chmod +x script/test-dep-failure/run.sh
+        printf '@echo off\necho This should not run\n' > script/test-dep-failure/run.bat
+
+        # Test script with a bogus post_dep
+        mkdir -p script/test-postdep-failure
+        printf 'alias: test-postdep-failure\nautomation_alias: script\nautomation_uid: 5b4e0237da074764\npost_deps:\n- tags: nonexistent,postdep,script,xxxyyyzzz\ntags:\n- test\n- postdep-failure\nuid: aaaa2222bbbb3333\n' > script/test-postdep-failure/meta.yaml
+        printf '#!/bin/bash\necho "Main script runs"\n' > script/test-postdep-failure/run.sh
+        chmod +x script/test-postdep-failure/run.sh
+        printf '@echo off\necho Main script runs\n' > script/test-postdep-failure/run.bat
+
+        # Test script with a bogus prehook_dep
+        mkdir -p script/test-prehookdep-failure
+        printf 'alias: test-prehookdep-failure\nautomation_alias: script\nautomation_uid: 5b4e0237da074764\nprehook_deps:\n- tags: nonexistent,prehookdep,script,xxxyyyzzz\ntags:\n- test\n- prehookdep-failure\nuid: aaaa3333bbbb4444\n' > script/test-prehookdep-failure/meta.yaml
+        printf '#!/bin/bash\necho "Main script runs"\n' > script/test-prehookdep-failure/run.sh
+        chmod +x script/test-prehookdep-failure/run.sh
+        printf '@echo off\necho Main script runs\n' > script/test-prehookdep-failure/run.bat
+
+        # Test script with a bogus posthook_dep
+        mkdir -p script/test-posthookdep-failure
+        printf 'alias: test-posthookdep-failure\nautomation_alias: script\nautomation_uid: 5b4e0237da074764\nposthook_deps:\n- tags: nonexistent,posthookdep,script,xxxyyyzzz\ntags:\n- test\n- posthookdep-failure\nuid: aaaa4444bbbb5555\n' > script/test-posthookdep-failure/meta.yaml
+        printf '#!/bin/bash\necho "Main script runs"\n' > script/test-posthookdep-failure/run.sh
+        chmod +x script/test-posthookdep-failure/run.sh
+        printf '@echo off\necho Main script runs\n' > script/test-posthookdep-failure/run.bat
+
     - name: Test dep script search failure
       shell: bash
       run: |
-        # Create a temporary script with a dependency on a non-existent script
-        SCRIPT_DIR="$HOME/mlc-test-dep-failure"
-        mkdir -p "$SCRIPT_DIR"
-        cat > "$SCRIPT_DIR/meta.yaml" << 'EOF'
-        alias: test-dep-failure
-        automation_alias: script
-        automation_uid: 5b4e0237da074764
-        deps:
-        - tags: nonexistent,dep,script,xxxyyyzzz
-        tags:
-        - test
-        - dep-failure
-        uid: aaaa1111bbbb2222
-        EOF
-        cat > "$SCRIPT_DIR/run.sh" << 'EOF'
-        #!/bin/bash
-        echo "This should not run"
-        EOF
-        chmod +x "$SCRIPT_DIR/run.sh"
-        cat > "$SCRIPT_DIR/run.bat" << 'EOF'
-        echo This should not run
-        EOF
-        mlc add script "$SCRIPT_DIR"
         if mlcr test,dep-failure --quiet 2>&1; then
           echo "ERROR: Expected dep failure but script succeeded"
           exit 1
@@ -217,29 +226,6 @@ jobs:
     - name: Test post_dep script search failure
       shell: bash
       run: |
-        # Create a temporary script with a post_dep on a non-existent script
-        SCRIPT_DIR="$HOME/mlc-test-postdep-failure"
-        mkdir -p "$SCRIPT_DIR"
-        cat > "$SCRIPT_DIR/meta.yaml" << 'EOF'
-        alias: test-postdep-failure
-        automation_alias: script
-        automation_uid: 5b4e0237da074764
-        post_deps:
-        - tags: nonexistent,postdep,script,xxxyyyzzz
-        tags:
-        - test
-        - postdep-failure
-        uid: aaaa2222bbbb3333
-        EOF
-        cat > "$SCRIPT_DIR/run.sh" << 'EOF'
-        #!/bin/bash
-        echo "Main script runs"
-        EOF
-        chmod +x "$SCRIPT_DIR/run.sh"
-        cat > "$SCRIPT_DIR/run.bat" << 'EOF'
-        echo Main script runs
-        EOF
-        mlc add script "$SCRIPT_DIR"
         if mlcr test,postdep-failure --quiet 2>&1; then
           echo "ERROR: Expected post_dep failure but script succeeded"
           exit 1
@@ -250,28 +236,6 @@ jobs:
     - name: Test prehook_dep script search failure
       shell: bash
       run: |
-        SCRIPT_DIR="$HOME/mlc-test-prehookdep-failure"
-        mkdir -p "$SCRIPT_DIR"
-        cat > "$SCRIPT_DIR/meta.yaml" << 'EOF'
-        alias: test-prehookdep-failure
-        automation_alias: script
-        automation_uid: 5b4e0237da074764
-        prehook_deps:
-        - tags: nonexistent,prehookdep,script,xxxyyyzzz
-        tags:
-        - test
-        - prehookdep-failure
-        uid: aaaa3333bbbb4444
-        EOF
-        cat > "$SCRIPT_DIR/run.sh" << 'EOF'
-        #!/bin/bash
-        echo "Main script runs"
-        EOF
-        chmod +x "$SCRIPT_DIR/run.sh"
-        cat > "$SCRIPT_DIR/run.bat" << 'EOF'
-        echo Main script runs
-        EOF
-        mlc add script "$SCRIPT_DIR"
         if mlcr test,prehookdep-failure --quiet 2>&1; then
           echo "ERROR: Expected prehook_dep failure but script succeeded"
           exit 1
@@ -282,28 +246,6 @@ jobs:
     - name: Test posthook_dep script search failure
       shell: bash
       run: |
-        SCRIPT_DIR="$HOME/mlc-test-posthookdep-failure"
-        mkdir -p "$SCRIPT_DIR"
-        cat > "$SCRIPT_DIR/meta.yaml" << 'EOF'
-        alias: test-posthookdep-failure
-        automation_alias: script
-        automation_uid: 5b4e0237da074764
-        posthook_deps:
-        - tags: nonexistent,posthookdep,script,xxxyyyzzz
-        tags:
-        - test
-        - posthookdep-failure
-        uid: aaaa4444bbbb5555
-        EOF
-        cat > "$SCRIPT_DIR/run.sh" << 'EOF'
-        #!/bin/bash
-        echo "Main script runs"
-        EOF
-        chmod +x "$SCRIPT_DIR/run.sh"
-        cat > "$SCRIPT_DIR/run.bat" << 'EOF'
-        echo Main script runs
-        EOF
-        mlc add script "$SCRIPT_DIR"
         if mlcr test,posthookdep-failure --quiet 2>&1; then
           echo "ERROR: Expected posthook_dep failure but script succeeded"
           exit 1
@@ -346,7 +288,7 @@ jobs:
         if echo "$OUTPUT" | grep -qi "detect.*os\|mlcr"; then
           echo "PASS: print_deps correctly listed dependency commands"
         else
-          echo "WARNING: print_deps output may be empty if no deps resolved yet"
+          echo "WARNING: print_deps output may be empty if deps resolved from cache"
         fi
         # Ensure the command itself succeeds
         mlcr detect,cpu --print_deps --quiet
@@ -354,21 +296,25 @@ jobs:
     - name: Test silent option
       shell: bash
       run: |
-        # Run with --silent and verify reduced output
-        OUTPUT_SILENT=$(mlcr detect,os --silent 2>&1)
-        OUTPUT_NORMAL=$(mlcr detect,os 2>&1)
-        # Silent output should be shorter or equal to normal output
+        # --silent suppresses output (sets MLC_TMP_SILENT=yes)
+        # Compare silent+quiet vs just quiet to verify silent produces no extra output
+        OUTPUT_SILENT=$(mlcr detect,os --silent --quiet 2>&1)
+        OUTPUT_QUIET=$(mlcr detect,os --quiet 2>&1)
         SILENT_LEN=${#OUTPUT_SILENT}
-        NORMAL_LEN=${#OUTPUT_NORMAL}
-        echo "Silent output length: $SILENT_LEN"
-        echo "Normal output length: $NORMAL_LEN"
-        if [ "$SILENT_LEN" -le "$NORMAL_LEN" ]; then
+        QUIET_LEN=${#OUTPUT_QUIET}
+        echo "Silent+quiet output length: $SILENT_LEN"
+        echo "Quiet-only output length: $QUIET_LEN"
+        if [ "$SILENT_LEN" -le "$QUIET_LEN" ]; then
           echo "PASS: Silent mode produced less or equal output"
         else
           echo "WARNING: Silent mode output was unexpectedly longer"
         fi
-        # Also test with --s shorthand
+
+    - name: Test s shorthand for silent
+      shell: bash
+      run: |
         mlcr detect,os --s=true --quiet
+        echo "PASS: --s shorthand for silent works"
 
     - name: Test fake_run option
       shell: bash
@@ -471,7 +417,9 @@ jobs:
     - name: Test renew cache entry option
       shell: bash
       run: |
-        # First create a cache entry, then renew it
+        # Clean any stale cache entries first to avoid picking one without mlc-cached-state.json
+        mlc rm cache --tags=detect,os -f --quiet 2>/dev/null || true
+        # Create a fresh cache entry
         mlcr detect,os --quiet
         # --renew overwrites the existing cache entry with fresh output
         mlcr detect,os --renew --quiet
@@ -565,17 +513,18 @@ jobs:
     - name: Test verbose option
       shell: bash
       run: |
-        # --verbose should produce more detailed output than default
-        OUTPUT_VERBOSE=$(mlcr detect,os --verbose 2>&1)
+        # --verbose should produce more detailed output than quiet mode
+        # Use --quiet alongside to avoid interactive prompts with multiple cache entries
+        OUTPUT_VERBOSE=$(mlcr detect,os --verbose --quiet 2>&1)
         OUTPUT_QUIET=$(mlcr detect,os --quiet 2>&1)
-        VERBOSE_LEN=${#OUTPUT_VERBOSE}
-        QUIET_LEN=${#OUTPUT_QUIET}
-        echo "Verbose output length: $VERBOSE_LEN"
-        echo "Quiet output length: $QUIET_LEN"
-        if [ "$VERBOSE_LEN" -ge "$QUIET_LEN" ]; then
+        VERBOSE_LINES=$(echo "$OUTPUT_VERBOSE" | wc -l)
+        QUIET_LINES=$(echo "$OUTPUT_QUIET" | wc -l)
+        echo "Verbose+quiet output lines: $VERBOSE_LINES"
+        echo "Quiet-only output lines: $QUIET_LINES"
+        if [ "$VERBOSE_LINES" -ge "$QUIET_LINES" ]; then
           echo "PASS: Verbose mode produced more or equal output than quiet mode"
         else
-          echo "WARNING: Verbose output was shorter than quiet output"
+          echo "WARNING: Verbose output had fewer lines than quiet output"
         fi
 
     - name: Test v shorthand for verbose
@@ -589,7 +538,7 @@ jobs:
       run: |
         # --json should produce JSON-formatted output
         OUTPUT=$(mlcr detect,os --json --quiet 2>&1)
-        # Check if output contains JSON-like structure
+        # Check if output contains JSON-like structure (curly braces)
         if echo "$OUTPUT" | grep -q '{'; then
           echo "PASS: --json produced JSON-formatted output"
         else
@@ -606,24 +555,26 @@ jobs:
       shell: bash
       run: |
         # --time should show execution time information
-        OUTPUT=$(mlcr detect,os --time 2>&1)
+        OUTPUT=$(mlcr detect,os --time --quiet 2>&1)
         echo "$OUTPUT"
-        echo "PASS: --time option completed successfully"
+        if echo "$OUTPUT" | grep -qi "time\|sec"; then
+          echo "PASS: --time showed timing information"
+        else
+          echo "PASS: --time option completed successfully"
+        fi
 
     - name: Test space option
       shell: bash
       run: |
         # --space should report disk space usage
-        OUTPUT=$(mlcr detect,os --space 2>&1)
-        echo "$OUTPUT"
+        mlcr detect,os --space --quiet 2>&1
         echo "PASS: --space option completed successfully"
 
     - name: Test print_env option
       shell: bash
       run: |
         # --print_env prints aggregated env before each native script run
-        OUTPUT=$(mlcr detect,os --print_env 2>&1)
-        echo "$OUTPUT"
+        mlcr detect,os --print_env --quiet 2>&1
         echo "PASS: --print_env completed successfully"
 
     - name: Test help option
@@ -631,8 +582,13 @@ jobs:
       run: |
         # --help should display script help and return without running
         OUTPUT=$(mlcr detect,os --help 2>&1 || true)
-        echo "$OUTPUT"
-        echo "PASS: --help displayed script information"
+        if echo "$OUTPUT" | grep -qi "detect-os\|Script Name\|Run Commands"; then
+          echo "PASS: --help displayed script information"
+        else
+          echo "ERROR: --help did not produce expected output"
+          echo "$OUTPUT"
+          exit 1
+        fi
 
   test_execution_control:
     runs-on: ${{ matrix.os }}
@@ -672,29 +628,13 @@ jobs:
     - name: Test ignore_script_error option
       shell: bash
       run: |
-        # Create a script that deliberately fails, then ignore the error
-        SCRIPT_DIR="$HOME/mlc-test-ignore-error"
-        mkdir -p "$SCRIPT_DIR"
-        cat > "$SCRIPT_DIR/meta.yaml" << 'EOF'
-        alias: test-ignore-error
-        automation_alias: script
-        automation_uid: 5b4e0237da074764
-        tags:
-        - test
-        - ignore-error
-        uid: bbbb1111cccc2222
-        EOF
-        cat > "$SCRIPT_DIR/run.sh" << 'EOF'
-        #!/bin/bash
-        echo "This script fails on purpose"
-        exit 1
-        EOF
-        chmod +x "$SCRIPT_DIR/run.sh"
-        cat > "$SCRIPT_DIR/run.bat" << 'EOF'
-        echo This script fails on purpose
-        exit /b 1
-        EOF
-        mlc add script "$SCRIPT_DIR"
+        # Create a script that deliberately fails inside the repo's script/ directory
+        mkdir -p script/test-ignore-error
+        printf 'alias: test-ignore-error\nautomation_alias: script\nautomation_uid: 5b4e0237da074764\ntags:\n- test\n- ignore-error\nuid: bbbb1111cccc2222\n' > script/test-ignore-error/meta.yaml
+        printf '#!/bin/bash\necho "This script fails on purpose"\nexit 1\n' > script/test-ignore-error/run.sh
+        chmod +x script/test-ignore-error/run.sh
+        printf '@echo off\necho This script fails on purpose\nexit /b 1\n' > script/test-ignore-error/run.bat
+
         # Without ignore_script_error, it should fail
         if mlcr test,ignore-error --quiet 2>&1; then
           echo "ERROR: Script should have failed"
@@ -702,7 +642,7 @@ jobs:
         else
           echo "PASS: Script correctly failed without ignore_script_error"
         fi
-        # With ignore_script_error, it should succeed
+        # With ignore_script_error, it should succeed despite the exit 1
         if mlcr test,ignore-error --ignore_script_error --quiet 2>&1; then
           echo "PASS: ignore_script_error correctly suppressed the error"
         else
