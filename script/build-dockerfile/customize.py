@@ -191,7 +191,7 @@ def preprocess(i):
         arg_value = config['ARGS_DEFAULT'][arg]
         f.write('ARG ' + f"{arg}={arg_value}" + EOL)
 
-    for arg in config['ARGS']:
+    for arg in config.get('ARGS', []):
         f.write('ARG ' + arg + EOL)
 
     for build_arg in build_args:
@@ -343,11 +343,6 @@ def preprocess(i):
     f.write(EOL + '# Download MLC repo for scripts' + EOL)
     pat = env.get('MLC_GH_TOKEN', '')
 
-    if pat != '':
-        token_string = f" --pat={pat}"
-    else:
-        token_string = ""
-
     if use_copy_repo:
         repo_name = os.path.basename(relative_repo_path)
         docker_repo_dest = f"$HOME/MLC/repos/{repo_name}"
@@ -370,13 +365,24 @@ def preprocess(i):
         if x != '':
             x = ' ' + x
 
-        f.write(
-            'RUN mlc pull repo ' +
-            mlc_mlops_repo +
-            mlc_mlops_repo_branch_string +
-            token_string +
-            x +
-            EOL)
+        if pat != '':
+            # Mount the GH token as a secret and read it at build time
+            f.write(
+                'RUN --mount=type=secret,id=gh_token ' +
+                'MLC_GH_TOKEN=$(cat /run/secrets/gh_token) && ' +
+                'mlc pull repo ' +
+                mlc_mlops_repo +
+                mlc_mlops_repo_branch_string +
+                ' --pat=$MLC_GH_TOKEN' +
+                x +
+                EOL)
+        else:
+            f.write(
+                'RUN mlc pull repo ' +
+                mlc_mlops_repo +
+                mlc_mlops_repo_branch_string +
+                x +
+                EOL)
 
     # Check extra repositories
     x = env.get('MLC_DOCKER_EXTRA_MLC_REPOS', '')
@@ -395,8 +401,10 @@ def preprocess(i):
     run_cmd_extra = " " + \
         env.get('MLC_DOCKER_RUN_CMD_EXTRA', '').replace(":", "=")
     gh_token = get_value(env, config, "GH_TOKEN", "MLC_GH_TOKEN")
+    _run_secret_prefix = ''
     if gh_token:
-        run_cmd_extra = " --env.MLC_GH_TOKEN=$MLC_GH_TOKEN"
+        _run_secret_prefix = '--mount=type=secret,id=gh_token '
+        run_cmd_extra = " --env.MLC_GH_TOKEN=$(cat /run/secrets/gh_token)"
 
     f.write(EOL + '# Run commands' + EOL)
     for comment in env.get('MLC_DOCKER_RUN_COMMENTS', []):
@@ -424,7 +432,7 @@ def preprocess(i):
     fake_run = fake_run + \
         " --fake_deps" if env.get('MLC_DOCKER_FAKE_DEPS') else fake_run
 
-    x = 'RUN ' + env['MLC_DOCKER_RUN_CMD']
+    x = 'RUN ' + _run_secret_prefix + env['MLC_DOCKER_RUN_CMD']
 
     if not skip_extra:
         x += fake_run
