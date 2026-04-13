@@ -184,34 +184,37 @@ jobs:
     - name: Create test scripts for dependency failure tests
       shell: bash
       run: |
-        # Create test scripts inside the repo's script/ directory so they are auto-discovered
+        # Determine the MLC repo path (mlc pull repo clones to ~/MLC/repos/<owner>@<repo>)
+        REPO_SCRIPT_DIR=$(mlc find script --tags=detect,os --quiet 2>&1 | grep 'Item path' | head -1 | sed 's|.*Item path: ||' | xargs dirname)
+        echo "MLC repo script dir: $REPO_SCRIPT_DIR"
+
         # Test script with a bogus dep
-        mkdir -p script/test-dep-failure
-        printf 'alias: test-dep-failure\nautomation_alias: script\nautomation_uid: 5b4e0237da074764\ndeps:\n- tags: nonexistent,dep,script,xxxyyyzzz\ntags:\n- test\n- dep-failure\nuid: aaaa1111bbbb2222\n' > script/test-dep-failure/meta.yaml
-        printf '#!/bin/bash\necho "This should not run"\n' > script/test-dep-failure/run.sh
-        chmod +x script/test-dep-failure/run.sh
-        printf '@echo off\necho This should not run\n' > script/test-dep-failure/run.bat
+        mkdir -p "$REPO_SCRIPT_DIR/test-dep-failure"
+        printf 'alias: test-dep-failure\nautomation_alias: script\nautomation_uid: 5b4e0237da074764\ndeps:\n- tags: nonexistent,dep,script,xxxyyyzzz\ntags:\n- test\n- dep-failure\nuid: aaaa1111bbbb2222\n' > "$REPO_SCRIPT_DIR/test-dep-failure/meta.yaml"
+        printf '#!/bin/bash\necho "This should not run"\n' > "$REPO_SCRIPT_DIR/test-dep-failure/run.sh"
+        chmod +x "$REPO_SCRIPT_DIR/test-dep-failure/run.sh"
+        printf '@echo off\necho This should not run\n' > "$REPO_SCRIPT_DIR/test-dep-failure/run.bat"
 
         # Test script with a bogus post_dep
-        mkdir -p script/test-postdep-failure
-        printf 'alias: test-postdep-failure\nautomation_alias: script\nautomation_uid: 5b4e0237da074764\npost_deps:\n- tags: nonexistent,postdep,script,xxxyyyzzz\ntags:\n- test\n- postdep-failure\nuid: aaaa2222bbbb3333\n' > script/test-postdep-failure/meta.yaml
-        printf '#!/bin/bash\necho "Main script runs"\n' > script/test-postdep-failure/run.sh
-        chmod +x script/test-postdep-failure/run.sh
-        printf '@echo off\necho Main script runs\n' > script/test-postdep-failure/run.bat
+        mkdir -p "$REPO_SCRIPT_DIR/test-postdep-failure"
+        printf 'alias: test-postdep-failure\nautomation_alias: script\nautomation_uid: 5b4e0237da074764\npost_deps:\n- tags: nonexistent,postdep,script,xxxyyyzzz\ntags:\n- test\n- postdep-failure\nuid: aaaa2222bbbb3333\n' > "$REPO_SCRIPT_DIR/test-postdep-failure/meta.yaml"
+        printf '#!/bin/bash\necho "Main script runs"\n' > "$REPO_SCRIPT_DIR/test-postdep-failure/run.sh"
+        chmod +x "$REPO_SCRIPT_DIR/test-postdep-failure/run.sh"
+        printf '@echo off\necho Main script runs\n' > "$REPO_SCRIPT_DIR/test-postdep-failure/run.bat"
 
         # Test script with a bogus prehook_dep
-        mkdir -p script/test-prehookdep-failure
-        printf 'alias: test-prehookdep-failure\nautomation_alias: script\nautomation_uid: 5b4e0237da074764\nprehook_deps:\n- tags: nonexistent,prehookdep,script,xxxyyyzzz\ntags:\n- test\n- prehookdep-failure\nuid: aaaa3333bbbb4444\n' > script/test-prehookdep-failure/meta.yaml
-        printf '#!/bin/bash\necho "Main script runs"\n' > script/test-prehookdep-failure/run.sh
-        chmod +x script/test-prehookdep-failure/run.sh
-        printf '@echo off\necho Main script runs\n' > script/test-prehookdep-failure/run.bat
+        mkdir -p "$REPO_SCRIPT_DIR/test-prehookdep-failure"
+        printf 'alias: test-prehookdep-failure\nautomation_alias: script\nautomation_uid: 5b4e0237da074764\nprehook_deps:\n- tags: nonexistent,prehookdep,script,xxxyyyzzz\ntags:\n- test\n- prehookdep-failure\nuid: aaaa3333bbbb4444\n' > "$REPO_SCRIPT_DIR/test-prehookdep-failure/meta.yaml"
+        printf '#!/bin/bash\necho "Main script runs"\n' > "$REPO_SCRIPT_DIR/test-prehookdep-failure/run.sh"
+        chmod +x "$REPO_SCRIPT_DIR/test-prehookdep-failure/run.sh"
+        printf '@echo off\necho Main script runs\n' > "$REPO_SCRIPT_DIR/test-prehookdep-failure/run.bat"
 
         # Test script with a bogus posthook_dep
-        mkdir -p script/test-posthookdep-failure
-        printf 'alias: test-posthookdep-failure\nautomation_alias: script\nautomation_uid: 5b4e0237da074764\nposthook_deps:\n- tags: nonexistent,posthookdep,script,xxxyyyzzz\ntags:\n- test\n- posthookdep-failure\nuid: aaaa4444bbbb5555\n' > script/test-posthookdep-failure/meta.yaml
-        printf '#!/bin/bash\necho "Main script runs"\n' > script/test-posthookdep-failure/run.sh
-        chmod +x script/test-posthookdep-failure/run.sh
-        printf '@echo off\necho Main script runs\n' > script/test-posthookdep-failure/run.bat
+        mkdir -p "$REPO_SCRIPT_DIR/test-posthookdep-failure"
+        printf 'alias: test-posthookdep-failure\nautomation_alias: script\nautomation_uid: 5b4e0237da074764\nposthook_deps:\n- tags: nonexistent,posthookdep,script,xxxyyyzzz\ntags:\n- test\n- posthookdep-failure\nuid: aaaa4444bbbb5555\n' > "$REPO_SCRIPT_DIR/test-posthookdep-failure/meta.yaml"
+        printf '#!/bin/bash\necho "Main script runs"\n' > "$REPO_SCRIPT_DIR/test-posthookdep-failure/run.sh"
+        chmod +x "$REPO_SCRIPT_DIR/test-posthookdep-failure/run.sh"
+        printf '@echo off\necho Main script runs\n' > "$REPO_SCRIPT_DIR/test-posthookdep-failure/run.bat"
 
     - name: Test dep script search failure
       shell: bash
@@ -628,12 +631,13 @@ jobs:
     - name: Test ignore_script_error option
       shell: bash
       run: |
-        # Create a script that deliberately fails inside the repo's script/ directory
-        mkdir -p script/test-ignore-error
-        printf 'alias: test-ignore-error\nautomation_alias: script\nautomation_uid: 5b4e0237da074764\ntags:\n- test\n- ignore-error\nuid: bbbb1111cccc2222\n' > script/test-ignore-error/meta.yaml
-        printf '#!/bin/bash\necho "This script fails on purpose"\nexit 1\n' > script/test-ignore-error/run.sh
-        chmod +x script/test-ignore-error/run.sh
-        printf '@echo off\necho This script fails on purpose\nexit /b 1\n' > script/test-ignore-error/run.bat
+        # Create a script that deliberately fails inside the MLC repo's script/ directory
+        REPO_SCRIPT_DIR=$(mlc find script --tags=detect,os --quiet 2>&1 | grep 'Item path' | head -1 | sed 's|.*Item path: ||' | xargs dirname)
+        mkdir -p "$REPO_SCRIPT_DIR/test-ignore-error"
+        printf 'alias: test-ignore-error\nautomation_alias: script\nautomation_uid: 5b4e0237da074764\ntags:\n- test\n- ignore-error\nuid: bbbb1111cccc2222\n' > "$REPO_SCRIPT_DIR/test-ignore-error/meta.yaml"
+        printf '#!/bin/bash\necho "This script fails on purpose"\nexit 1\n' > "$REPO_SCRIPT_DIR/test-ignore-error/run.sh"
+        chmod +x "$REPO_SCRIPT_DIR/test-ignore-error/run.sh"
+        printf '@echo off\necho This script fails on purpose\nexit /b 1\n' > "$REPO_SCRIPT_DIR/test-ignore-error/run.bat"
 
         # Without ignore_script_error, it should fail
         if mlcr test,ignore-error --quiet 2>&1; then
