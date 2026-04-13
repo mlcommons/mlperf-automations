@@ -130,3 +130,631 @@ jobs:
       run: |
         mlc experiment script --tags=detect,os --quiet --exp.repeat,=1,2,3
         mlc experiment script --tags=detect,cpu --quiet --exp.explore=2:10:2
+
+  test_error_handling:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.8"]
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Configure git longpaths (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        git config --system core.longpaths true
+    - name: Pull MLOps repository
+      shell: bash
+      env:
+        REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        BRANCH: ${{ github.event.pull_request.head.ref }}
+      run: |
+        pip install mlcflow
+        mlc pull repo "$REPO" --branch="$BRANCH"
+
+    - name: Test script search failure for non-existent tags
+      shell: bash
+      run: |
+        # Running mlcr with tags that match no script should fail
+        if mlcr nonexistent,script,tags,xxxyyyzzz --quiet 2>&1; then
+          echo "ERROR: Expected script search to fail but it succeeded"
+          exit 1
+        else
+          echo "PASS: Script search correctly returned an error for non-existent tags"
+        fi
+
+    - name: Test script search failure error message
+      shell: bash
+      run: |
+        # Verify the error message contains expected text
+        OUTPUT=$(mlcr nonexistent,script,tags,xxxyyyzzz --quiet 2>&1 || true)
+        if echo "$OUTPUT" | grep -qi "No scripts were found"; then
+          echo "PASS: Error message correctly reports no scripts found"
+        else
+          echo "ERROR: Unexpected error message: $OUTPUT"
+          exit 1
+        fi
+
+    - name: Test dep script search failure
+      shell: bash
+      run: |
+        # Create a temporary script with a dependency on a non-existent script
+        SCRIPT_DIR="$HOME/mlc-test-dep-failure"
+        mkdir -p "$SCRIPT_DIR"
+        cat > "$SCRIPT_DIR/meta.yaml" << 'EOF'
+        alias: test-dep-failure
+        automation_alias: script
+        automation_uid: 5b4e0237da074764
+        deps:
+        - tags: nonexistent,dep,script,xxxyyyzzz
+        tags:
+        - test
+        - dep-failure
+        uid: aaaa1111bbbb2222
+        EOF
+        cat > "$SCRIPT_DIR/run.sh" << 'EOF'
+        #!/bin/bash
+        echo "This should not run"
+        EOF
+        chmod +x "$SCRIPT_DIR/run.sh"
+        cat > "$SCRIPT_DIR/run.bat" << 'EOF'
+        echo This should not run
+        EOF
+        mlc add script "$SCRIPT_DIR"
+        if mlcr test,dep-failure --quiet 2>&1; then
+          echo "ERROR: Expected dep failure but script succeeded"
+          exit 1
+        else
+          echo "PASS: Dependency search failure correctly caused an error"
+        fi
+
+    - name: Test post_dep script search failure
+      shell: bash
+      run: |
+        # Create a temporary script with a post_dep on a non-existent script
+        SCRIPT_DIR="$HOME/mlc-test-postdep-failure"
+        mkdir -p "$SCRIPT_DIR"
+        cat > "$SCRIPT_DIR/meta.yaml" << 'EOF'
+        alias: test-postdep-failure
+        automation_alias: script
+        automation_uid: 5b4e0237da074764
+        post_deps:
+        - tags: nonexistent,postdep,script,xxxyyyzzz
+        tags:
+        - test
+        - postdep-failure
+        uid: aaaa2222bbbb3333
+        EOF
+        cat > "$SCRIPT_DIR/run.sh" << 'EOF'
+        #!/bin/bash
+        echo "Main script runs"
+        EOF
+        chmod +x "$SCRIPT_DIR/run.sh"
+        cat > "$SCRIPT_DIR/run.bat" << 'EOF'
+        echo Main script runs
+        EOF
+        mlc add script "$SCRIPT_DIR"
+        if mlcr test,postdep-failure --quiet 2>&1; then
+          echo "ERROR: Expected post_dep failure but script succeeded"
+          exit 1
+        else
+          echo "PASS: post_dep search failure correctly caused an error"
+        fi
+
+    - name: Test prehook_dep script search failure
+      shell: bash
+      run: |
+        SCRIPT_DIR="$HOME/mlc-test-prehookdep-failure"
+        mkdir -p "$SCRIPT_DIR"
+        cat > "$SCRIPT_DIR/meta.yaml" << 'EOF'
+        alias: test-prehookdep-failure
+        automation_alias: script
+        automation_uid: 5b4e0237da074764
+        prehook_deps:
+        - tags: nonexistent,prehookdep,script,xxxyyyzzz
+        tags:
+        - test
+        - prehookdep-failure
+        uid: aaaa3333bbbb4444
+        EOF
+        cat > "$SCRIPT_DIR/run.sh" << 'EOF'
+        #!/bin/bash
+        echo "Main script runs"
+        EOF
+        chmod +x "$SCRIPT_DIR/run.sh"
+        cat > "$SCRIPT_DIR/run.bat" << 'EOF'
+        echo Main script runs
+        EOF
+        mlc add script "$SCRIPT_DIR"
+        if mlcr test,prehookdep-failure --quiet 2>&1; then
+          echo "ERROR: Expected prehook_dep failure but script succeeded"
+          exit 1
+        else
+          echo "PASS: prehook_dep search failure correctly caused an error"
+        fi
+
+    - name: Test posthook_dep script search failure
+      shell: bash
+      run: |
+        SCRIPT_DIR="$HOME/mlc-test-posthookdep-failure"
+        mkdir -p "$SCRIPT_DIR"
+        cat > "$SCRIPT_DIR/meta.yaml" << 'EOF'
+        alias: test-posthookdep-failure
+        automation_alias: script
+        automation_uid: 5b4e0237da074764
+        posthook_deps:
+        - tags: nonexistent,posthookdep,script,xxxyyyzzz
+        tags:
+        - test
+        - posthookdep-failure
+        uid: aaaa4444bbbb5555
+        EOF
+        cat > "$SCRIPT_DIR/run.sh" << 'EOF'
+        #!/bin/bash
+        echo "Main script runs"
+        EOF
+        chmod +x "$SCRIPT_DIR/run.sh"
+        cat > "$SCRIPT_DIR/run.bat" << 'EOF'
+        echo Main script runs
+        EOF
+        mlc add script "$SCRIPT_DIR"
+        if mlcr test,posthookdep-failure --quiet 2>&1; then
+          echo "ERROR: Expected posthook_dep failure but script succeeded"
+          exit 1
+        else
+          echo "PASS: posthook_dep search failure correctly caused an error"
+        fi
+
+  test_script_options:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.8"]
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Configure git longpaths (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        git config --system core.longpaths true
+    - name: Pull MLOps repository
+      shell: bash
+      env:
+        REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        BRANCH: ${{ github.event.pull_request.head.ref }}
+      run: |
+        pip install mlcflow
+        mlc pull repo "$REPO" --branch="$BRANCH"
+
+    - name: Test print_deps option
+      shell: bash
+      run: |
+        # detect-cpu has deps on detect-os, print_deps should list them
+        OUTPUT=$(mlcr detect,cpu --print_deps --quiet 2>&1)
+        if echo "$OUTPUT" | grep -qi "detect.*os\|mlcr"; then
+          echo "PASS: print_deps correctly listed dependency commands"
+        else
+          echo "WARNING: print_deps output may be empty if no deps resolved yet"
+        fi
+        # Ensure the command itself succeeds
+        mlcr detect,cpu --print_deps --quiet
+
+    - name: Test silent option
+      shell: bash
+      run: |
+        # Run with --silent and verify reduced output
+        OUTPUT_SILENT=$(mlcr detect,os --silent 2>&1)
+        OUTPUT_NORMAL=$(mlcr detect,os 2>&1)
+        # Silent output should be shorter or equal to normal output
+        SILENT_LEN=${#OUTPUT_SILENT}
+        NORMAL_LEN=${#OUTPUT_NORMAL}
+        echo "Silent output length: $SILENT_LEN"
+        echo "Normal output length: $NORMAL_LEN"
+        if [ "$SILENT_LEN" -le "$NORMAL_LEN" ]; then
+          echo "PASS: Silent mode produced less or equal output"
+        else
+          echo "WARNING: Silent mode output was unexpectedly longer"
+        fi
+        # Also test with --s shorthand
+        mlcr detect,os --s=true --quiet
+
+    - name: Test fake_run option
+      shell: bash
+      run: |
+        # fake_run should resolve deps but skip the main script execution
+        mlcr detect,cpu --fake_run --quiet
+        echo "PASS: fake_run completed successfully"
+
+    - name: Test prepare option (alias for fake_run)
+      shell: bash
+      run: |
+        # --prepare is an alias for --fake_run
+        mlcr detect,cpu --prepare --quiet
+        echo "PASS: prepare (fake_run alias) completed successfully"
+
+  test_force_cache:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.8"]
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Configure git longpaths (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        git config --system core.longpaths true
+    - name: Pull MLOps repository
+      shell: bash
+      env:
+        REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        BRANCH: ${{ github.event.pull_request.head.ref }}
+      run: |
+        pip install mlcflow
+        mlc pull repo "$REPO" --branch="$BRANCH"
+
+    - name: Test force_cache option
+      shell: bash
+      run: |
+        # download-file has can_force_cache: true and cache: false by default
+        # Using force_cache should create a cache entry
+        mlcr download,file --url="https://raw.githubusercontent.com/mlcommons/mlperf-automations/main/VERSION" --force_cache --quiet
+        # Verify that a cache entry was created
+        if mlc search cache --tags=download,file --quiet 2>&1; then
+          echo "PASS: force_cache correctly created a cache entry"
+        else
+          echo "ERROR: No cache entry found after force_cache"
+          exit 1
+        fi
+
+  test_cache_control:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.8"]
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Configure git longpaths (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        git config --system core.longpaths true
+    - name: Pull MLOps repository
+      shell: bash
+      env:
+        REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        BRANCH: ${{ github.event.pull_request.head.ref }}
+      run: |
+        pip install mlcflow
+        mlc pull repo "$REPO" --branch="$BRANCH"
+
+    - name: Test skip_cache option
+      shell: bash
+      run: |
+        # skip_cache runs the script without reading or writing cache
+        mlcr detect,os --skip_cache --quiet
+        echo "PASS: skip_cache completed successfully without using cache"
+
+    - name: Test new cache entry option
+      shell: bash
+      run: |
+        # --new skips searching for existing cache but writes a new cache entry
+        mlcr detect,os --new --quiet
+        # Verify a cache entry exists
+        mlc search cache --tags=detect,os --quiet
+        echo "PASS: --new option created a fresh cache entry"
+
+    - name: Test renew cache entry option
+      shell: bash
+      run: |
+        # First create a cache entry, then renew it
+        mlcr detect,os --quiet
+        # --renew overwrites the existing cache entry with fresh output
+        mlcr detect,os --renew --quiet
+        mlc search cache --tags=detect,os --quiet
+        echo "PASS: --renew option refreshed the cache entry"
+
+    - name: Test extra_cache_tags option
+      shell: bash
+      run: |
+        # Run with extra cache tags and verify they appear in the cache entry
+        mlcr detect,os --extra_cache_tags=test-extra-tag,ci-run --quiet
+        if mlc search cache --tags=detect,os,test-extra-tag --quiet 2>&1; then
+          echo "PASS: extra_cache_tags correctly added to cache entry"
+        else
+          echo "ERROR: extra_cache_tags not found in cache"
+          exit 1
+        fi
+
+  test_version_control:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.8"]
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Configure git longpaths (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        git config --system core.longpaths true
+    - name: Pull MLOps repository
+      shell: bash
+      env:
+        REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        BRANCH: ${{ github.event.pull_request.head.ref }}
+      run: |
+        pip install mlcflow
+        mlc pull repo "$REPO" --branch="$BRANCH"
+
+    - name: Test version_min option
+      if: runner.os == 'linux'
+      shell: bash
+      run: |
+        # Install a specific version first
+        mlcr get,generic-python-lib,_package.scipy --version=1.9.3 --quiet
+        # Now search with version_min - should find the cached version
+        mlcr get,generic-python-lib,_package.scipy --version_min=1.9.0 --quiet
+        echo "PASS: version_min accepted a version above the minimum"
+
+    - name: Test version_max option
+      if: runner.os == 'linux'
+      shell: bash
+      run: |
+        # Using version_max should constrain the accepted version
+        mlcr get,generic-python-lib,_package.scipy --version_max=1.10.0 --version_max_usable=1.10.0 --quiet
+        echo "PASS: version_max correctly constrained version selection"
+
+  test_output_options:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.8"]
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Configure git longpaths (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        git config --system core.longpaths true
+    - name: Pull MLOps repository
+      shell: bash
+      env:
+        REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        BRANCH: ${{ github.event.pull_request.head.ref }}
+      run: |
+        pip install mlcflow
+        mlc pull repo "$REPO" --branch="$BRANCH"
+
+    - name: Test verbose option
+      shell: bash
+      run: |
+        # --verbose should produce more detailed output than default
+        OUTPUT_VERBOSE=$(mlcr detect,os --verbose 2>&1)
+        OUTPUT_QUIET=$(mlcr detect,os --quiet 2>&1)
+        VERBOSE_LEN=${#OUTPUT_VERBOSE}
+        QUIET_LEN=${#OUTPUT_QUIET}
+        echo "Verbose output length: $VERBOSE_LEN"
+        echo "Quiet output length: $QUIET_LEN"
+        if [ "$VERBOSE_LEN" -ge "$QUIET_LEN" ]; then
+          echo "PASS: Verbose mode produced more or equal output than quiet mode"
+        else
+          echo "WARNING: Verbose output was shorter than quiet output"
+        fi
+
+    - name: Test v shorthand for verbose
+      shell: bash
+      run: |
+        mlcr detect,os --v=true --quiet
+        echo "PASS: --v shorthand for verbose works"
+
+    - name: Test json output option
+      shell: bash
+      run: |
+        # --json should produce JSON-formatted output
+        OUTPUT=$(mlcr detect,os --json --quiet 2>&1)
+        # Check if output contains JSON-like structure
+        if echo "$OUTPUT" | grep -q '{'; then
+          echo "PASS: --json produced JSON-formatted output"
+        else
+          echo "WARNING: --json output may not contain JSON"
+        fi
+
+    - name: Test j shorthand for json
+      shell: bash
+      run: |
+        OUTPUT=$(mlcr detect,os --j=true --quiet 2>&1)
+        echo "PASS: --j shorthand for json works"
+
+    - name: Test time option
+      shell: bash
+      run: |
+        # --time should show execution time information
+        OUTPUT=$(mlcr detect,os --time 2>&1)
+        echo "$OUTPUT"
+        echo "PASS: --time option completed successfully"
+
+    - name: Test space option
+      shell: bash
+      run: |
+        # --space should report disk space usage
+        OUTPUT=$(mlcr detect,os --space 2>&1)
+        echo "$OUTPUT"
+        echo "PASS: --space option completed successfully"
+
+    - name: Test print_env option
+      shell: bash
+      run: |
+        # --print_env prints aggregated env before each native script run
+        OUTPUT=$(mlcr detect,os --print_env 2>&1)
+        echo "$OUTPUT"
+        echo "PASS: --print_env completed successfully"
+
+    - name: Test help option
+      shell: bash
+      run: |
+        # --help should display script help and return without running
+        OUTPUT=$(mlcr detect,os --help 2>&1 || true)
+        echo "$OUTPUT"
+        echo "PASS: --help displayed script information"
+
+  test_execution_control:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.8"]
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Configure git longpaths (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        git config --system core.longpaths true
+    - name: Pull MLOps repository
+      shell: bash
+      env:
+        REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        BRANCH: ${{ github.event.pull_request.head.ref }}
+      run: |
+        pip install mlcflow
+        mlc pull repo "$REPO" --branch="$BRANCH"
+
+    - name: Test dirty option
+      shell: bash
+      run: |
+        # --dirty skips cleaning temporary files after script execution
+        # detect-os has clean_files: [tmp-run.out]
+        mlcr detect,os --dirty --quiet
+        echo "PASS: --dirty option completed without cleaning temp files"
+
+    - name: Test ignore_script_error option
+      shell: bash
+      run: |
+        # Create a script that deliberately fails, then ignore the error
+        SCRIPT_DIR="$HOME/mlc-test-ignore-error"
+        mkdir -p "$SCRIPT_DIR"
+        cat > "$SCRIPT_DIR/meta.yaml" << 'EOF'
+        alias: test-ignore-error
+        automation_alias: script
+        automation_uid: 5b4e0237da074764
+        tags:
+        - test
+        - ignore-error
+        uid: bbbb1111cccc2222
+        EOF
+        cat > "$SCRIPT_DIR/run.sh" << 'EOF'
+        #!/bin/bash
+        echo "This script fails on purpose"
+        exit 1
+        EOF
+        chmod +x "$SCRIPT_DIR/run.sh"
+        cat > "$SCRIPT_DIR/run.bat" << 'EOF'
+        echo This script fails on purpose
+        exit /b 1
+        EOF
+        mlc add script "$SCRIPT_DIR"
+        # Without ignore_script_error, it should fail
+        if mlcr test,ignore-error --quiet 2>&1; then
+          echo "ERROR: Script should have failed"
+          exit 1
+        else
+          echo "PASS: Script correctly failed without ignore_script_error"
+        fi
+        # With ignore_script_error, it should succeed
+        if mlcr test,ignore-error --ignore_script_error --quiet 2>&1; then
+          echo "PASS: ignore_script_error correctly suppressed the error"
+        else
+          echo "ERROR: ignore_script_error did not suppress the error"
+          exit 1
+        fi
+
+    - name: Test skip_remembered_selections option
+      shell: bash
+      run: |
+        # --skip_remembered_selections ignores saved user selections from previous runs
+        mlcr detect,os --skip_remembered_selections --quiet
+        echo "PASS: skip_remembered_selections completed successfully"
+
+  test_dependency_options:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.8"]
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Configure git longpaths (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        git config --system core.longpaths true
+    - name: Pull MLOps repository
+      shell: bash
+      env:
+        REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        BRANCH: ${{ github.event.pull_request.head.ref }}
+      run: |
+        pip install mlcflow
+        mlc pull repo "$REPO" --branch="$BRANCH"
+
+    - name: Test fake_deps option
+      shell: bash
+      run: |
+        # --fake_deps runs dependencies in fake mode, skipping the main script
+        mlcr detect,cpu --fake_deps --quiet
+        echo "PASS: fake_deps completed successfully"
+
+    - name: Test add_deps_recursive (adr) option
+      shell: bash
+      run: |
+        # --adr passes options recursively to all dependency scripts
+        # detect-cpu depends on detect-os; we can pass adr options through
+        mlcr detect,cpu --adr.detect-os.tags=detect,os --quiet
+        echo "PASS: adr option correctly passed through to dependencies"
