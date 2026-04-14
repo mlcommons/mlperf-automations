@@ -6,9 +6,6 @@
     "giturlparse",
     "tabulate"
   ],
-  "ARGS": [
-    "MLC_GH_TOKEN"
-  ],
   "ARGS_DEFAULT": {
     "UID": "1000",
     "GID": "1000"

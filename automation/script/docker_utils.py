@@ -71,7 +71,7 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd, run_state):
         host_placeholders = re.findall(r'\${{ (.*?) }}', host_mount)
         if host_placeholders:
             for placeholder in host_placeholders:
-                if placeholder in env:
+                if placeholder in env and isinstance(env[placeholder], str):
                     host_env_key = placeholder
                     # if the env variable is in the file_path_env_keys, then we
                     # need to get the parent folder path(set
@@ -89,7 +89,7 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd, run_state):
         container_placeholders = re.findall(r'\${{ (.*?) }}', container_mount)
         if container_placeholders:
             for placeholder in container_placeholders:
-                if placeholder in env:
+                if placeholder in env and isinstance(env[placeholder], str):
                     # if the env variable is in the folder_path_env_keys, then
                     # we need to get the parent folder path(set
                     # extract_parent_folder to True)
@@ -441,6 +441,7 @@ def get_docker_default(key):
 
 
 def get_host_path(value, extract_parent_folder=False):
+        
     # convert relative path to absolute path
     value = convert_to_abs_path(value)
 

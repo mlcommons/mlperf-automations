@@ -1567,6 +1567,7 @@ class ScriptAutomation(Automation):
                 run_script_input['state'] = state
                 run_script_input['run_state'] = run_state
                 run_script_input['recursion'] = recursion
+                run_script_input['recursion_spaces'] = self.recursion_spaces
 
                 r = prepare_and_run_script_with_postprocessing(
                     run_script_input)
@@ -3950,7 +3951,6 @@ pip install mlcflow
         rx = prepare_and_run_script_with_postprocessing(
             run_script_input, postprocess="detect_version")
 
-        run_script_input['recursion_spaces'] = self.recursion_spaces
 
         if rx['return'] == 0:
             # Version was detected
@@ -4655,8 +4655,16 @@ def enable_or_skip_script(meta, env):
     (AND function)
     """
 
+    if not isinstance(meta, dict):
+        logging.warning(f"enable_or_skip_script: expected dict but got {type(meta).__name__}: {meta}")
+        return True
+
     for key in meta:
-        meta_key = [str(v).lower() for v in meta[key]]
+        value_spec = meta[key]
+        if isinstance(value_spec, list):
+            meta_key = [str(v).lower() for v in value_spec]
+        else:
+            meta_key = [str(value_spec).lower()]
         if key in env:
             value = str(env[key]).lower().strip()
             if set(meta_key) & set(["yes", "on", "true", "1"]):
@@ -4688,12 +4696,20 @@ def any_enable_or_skip_script(meta, env):
     Internal: enable a dependency based on enable_if_env and skip_if_env meta information
     (OR function)
     """
+    if not isinstance(meta, dict):
+        logging.warning(f"any_enable_or_skip_script: expected dict but got {type(meta).__name__}: {meta}")
+        return False
+
     for key in meta:
         found = False
         if key in env:
             value = str(env[key]).lower().strip()
 
-            meta_key = [str(v).lower() for v in meta[key]]
+            value_spec = meta[key]
+            if isinstance(value_spec, list):
+                meta_key = [str(v).lower() for v in value_spec]
+            else:
+                meta_key = [str(value_spec).lower()]
 
             if set(meta_key) & set(["yes", "on", "true", "1"]):
                 if not is_false(value) and value != '' and not re.findall(
@@ -4893,7 +4909,6 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
     local_env_keys_from_meta = i.get('local_env_keys_from_meta', [])
     posthook_deps = i.get('posthook_deps', [])
     add_deps_recursive = i.get('add_deps_recursive', {})
-    recursion_spaces = i['recursion_spaces']
     remembered_selections = i.get('remembered_selections', [])
     variation_tags_string = i.get('variation_tags_string', '')
     found_cached = i.get('found_cached', False)
@@ -4969,8 +4984,8 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
                 run_script,
                 cur_dir))
 
-        logger.info(recursion_spaces + '       ! cd {}'.format(cur_dir))
-        logger.info(
+        logger.debug(recursion_spaces + '       ! cd {}'.format(cur_dir))
+        logger.debug(
             recursion_spaces +
             '       ! call {} from {}'.format(
                 path_to_run_script,
@@ -5066,11 +5081,7 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
                 if repo_to_report == '':
                     repo_to_report = 'https://github.com/mlcommons/mlperf-automations/issues'
 
-                note = '''
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Please file an issue at {} along with the full MLC command being run and the relevant
-or full console log.
-'''.format(repo_to_report)
+                note = '' 
 
                 rr = {
                     'return': 2,
@@ -5114,7 +5125,7 @@ or full console log.
 
     if postprocess != '' and customize_code is not None and postprocess in dir(
             customize_code):
-        logger.info(
+        logger.debug(
             recursion_spaces +
             '       ! call "{}" from {}'.format(
                 postprocess,
@@ -5169,6 +5180,7 @@ def run_detect_version(customize_code, customize_common_input,
         ii['env'] = env
         ii['state'] = state
         ii['meta'] = meta
+        ii['recursion_spaces'] = recursion_spaces
         ii['automation'] = customize_common_input['automation']
 
         r = customize_code.detect_version(ii)
@@ -5199,6 +5211,7 @@ def run_postprocess(customize_code, customize_common_input, recursion_spaces,
         ii['env'] = env
         ii['state'] = state
         ii['meta'] = meta
+        ii['recursion_spaces'] = recursion_spaces
         ii['automation'] = customize_common_input['automation']
 
         if run_script_input is not None:
