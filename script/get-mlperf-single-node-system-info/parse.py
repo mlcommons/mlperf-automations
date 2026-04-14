@@ -48,27 +48,27 @@ EXTRACT_RULES = {
     # ---------------- Accelerator ----------------
     "accelerator_model_name": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_NAME", "MLC_ROMLC_DEVICE_PROP_GPU_NAME"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_NAME", "MLC_ROCM_DEVICE_PROP_GPU_NAME"],
     },
     "accelerators_per_node": {
         "source": "env",
-        "candidates": ["MLC_CUDA_NUM_DEVICES", "MLC_ROMLC_NUM_DEVICES"],
+        "candidates": ["MLC_CUDA_NUM_DEVICES", "MLC_ROCM_NUM_DEVICES"],
     },
     "accelerator_memory_capacity": {
         "source": "env",
         # Get the value as decimal gigabytes
-        "candidates": ["MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "MLC_ROMLC_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "MLC_ROCM_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB"],
     },
     "accelerator_memory_type": {
         "source": "env",
         "candidates": ["MLC_CUDA_DEVICE_PROP_MEMORY_TYPE"],
     },
     "accelerator_interconnect": {
-        "candidates": ["nvidia_smi_topo", "MLC_ROMLC_DEVICE_PROP_GPU_INTERCONNECT_TYPE"],
+        "candidates": ["nvidia_smi_topo", "MLC_ROCM_DEVICE_PROP_GPU_INTERCONNECT_TYPE"],
         "regex": r".*"
     },
     "accelerator_host_interconnect": {
-        "candidates": ["MLC_ROMLC_DEVICE_PROP_HOST_INTERCONNECT_TYPE", ""],
+        "candidates": ["MLC_ROCM_DEVICE_PROP_HOST_INTERCONNECT_TYPE", ""],
         "regex": r".*"
     },
 

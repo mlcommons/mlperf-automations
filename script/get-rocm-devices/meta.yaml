@@ -11,7 +11,7 @@ tags:
 cache: false
 
 new_env_keys:
-- MLC_ROMLC_*
+- MLC_ROCM_*
 
 can_force_cache: true
 
