@@ -197,7 +197,8 @@ def main():
                 ensemble_type = "software_ensemble"
                 if ensemble_type not in parsed:
                     parsed[ensemble_type] = {}
-                parsed[ensemble_type][target_key] = extract_value(rule, target_key)
+                parsed[ensemble_type][target_key] = extract_value(
+                    rule, target_key)
         except Exception as e:
             parsed[target_key] = ""
             print(

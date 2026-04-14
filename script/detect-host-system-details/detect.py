@@ -35,7 +35,8 @@ def detect_memory_configuration(system_info):
     for dump_key, dump in system_info.items():
         if "dmidecode_full" in dump_key:
             val = dump.get("output", "")
-            if val and "sudo not available" not in val and not val.startswith("FAILED"):
+            if val and "sudo not available" not in val and not val.startswith(
+                    "FAILED"):
                 dmidecode_output = val
             break
 
@@ -43,7 +44,8 @@ def detect_memory_configuration(system_info):
         sudo = os.environ.get('MLC_SUDO', '').strip()
         cmd = ['sudo', 'dmidecode'] if sudo == 'sudo' else ['dmidecode']
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=10)
             if result.returncode == 0:
                 dmidecode_output = result.stdout
         except Exception:
@@ -52,7 +54,10 @@ def detect_memory_configuration(system_info):
     if not dmidecode_output:
         return ""
 
-    dimm_blocks = re.split(r"Memory Device", dmidecode_output, flags=re.IGNORECASE)
+    dimm_blocks = re.split(
+        r"Memory Device",
+        dmidecode_output,
+        flags=re.IGNORECASE)
 
     sizes = []
     types = []
@@ -127,7 +132,8 @@ def detect_storage_type(system_info):
         else:
             model_start = 3
             model_end = len(parts) - 2
-            model = " ".join(parts[model_start:model_end]) if model_end > model_start else ""
+            model = " ".join(parts[model_start:model_end]
+                             ) if model_end > model_start else ""
             if "SSD" in model.upper():
                 types_found.add("SSD")
             elif "HDD" in model.upper() or any(
@@ -199,7 +205,9 @@ def main():
 
     input_path = Path(args.input)
     if not input_path.exists():
-        print(f"[WARN] Platform details file not found: {input_path}", file=sys.stderr)
+        print(
+            f"[WARN] Platform details file not found: {input_path}",
+            file=sys.stderr)
         system_info = {}
     else:
         with open(input_path) as f:
