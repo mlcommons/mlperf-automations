@@ -28,6 +28,7 @@ deps:
 - tags: get,platform-details
   names:
   - platform-details
+- tags: detect,host,system,details
 input_mapping:
   out_dir_path: MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH
   out_file_name: MLC_SINGLE_NODE_SYSTEM_INFO_FILE_NAME

@@ -1,15 +1,11 @@
 import json
-import re
 import argparse
 from pathlib import Path
 import sys
 import os
 
 # -------------------------------------------------------------------
-# Extraction rules:
-#   target_key:
-#     - candidates: possible dump keys in system-info.json
-#     - regex: regex applied on command output
+# Extraction rules: all data comes from environment variables.
 # -------------------------------------------------------------------
 
 EXTRACT_RULES = {
@@ -37,12 +33,8 @@ EXTRACT_RULES = {
         "candidates": ["MLC_HOST_MEMORY_CAPACITY"],
     },
     "host_memory_configuration": {
-        "candidates": ["dmidecode_full"],
-        "regex": [
-            r"Size:\s+(\d+)\s+GB",
-            r"Type:\s+(DDR\d+)",
-            r"Speed:\s+(\d+)\s+MT/s"
-        ]
+        "source": "env",
+        "candidates": ["MLC_HOST_MEMORY_CONFIGURATION"],
     },
 
     # ---------------- Accelerator ----------------
@@ -64,22 +56,22 @@ EXTRACT_RULES = {
         "candidates": ["MLC_CUDA_DEVICE_PROP_MEMORY_TYPE"],
     },
     "accelerator_interconnect": {
-        "candidates": ["nvidia_smi_topo", "MLC_ROCM_DEVICE_PROP_GPU_INTERCONNECT_TYPE"],
-        "regex": r".*"
+        "source": "env",
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_INTERCONNECT_TYPE", "MLC_ROCM_DEVICE_PROP_GPU_INTERCONNECT_TYPE"],
     },
     "accelerator_host_interconnect": {
-        "candidates": ["MLC_ROCM_DEVICE_PROP_HOST_INTERCONNECT_TYPE", ""],
-        "regex": r".*"
+        "source": "env",
+        "candidates": ["MLC_CUDA_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_ROCM_DEVICE_PROP_HOST_INTERCONNECT_TYPE"],
     },
 
     # ---------------- Networking ----------------
     "host_network_card_count": {
-        "candidates": [""],
-        "regex": r".*"
+        "source": "env",
+        "candidates": ["MLC_HOST_NETWORK_CARD_COUNT"],
     },
     "host_networking": {
-        "candidates": [""],
-        "regex": r".*"
+        "source": "env",
+        "candidates": ["MLC_HOST_NETWORKING"],
     },
 
     # ---------------- Storage ----------------
@@ -88,15 +80,14 @@ EXTRACT_RULES = {
         "candidates": ["MLC_HOST_DISK_CAPACITY"],
     },
     "host_storage_type": {
-        "candidates": ["disk_layout"],
-        "regex": r".*"
+        "source": "env",
+        "candidates": ["MLC_HOST_STORAGE_TYPE"],
     },
 
     # ---------------- Software Ensemble ----------------
     "framework": {
         "source": "env",
         "candidates": ["MLC_CUDA_DEVICE_PROP_CUDA_DRIVER_VERSION", "MLC_CUDA_DEVICE_PROP_CUDA_RUNTIME_VERSION"],
-        "regex": r".*"
     },
     "operating_system": {
         "source": "env",
@@ -107,12 +98,12 @@ EXTRACT_RULES = {
         "candidates": ["MLC_HOST_FILESYSTEMS"],
     },
     "other_software_stack": {
+        "source": "env",
         "candidates": [],
-        "regex": r".*"
     },
     "sw_notes": {
+        "source": "env",
         "candidates": [],
-        "regex": r".*"
     }
 }
 
@@ -121,288 +112,48 @@ EXTRACT_RULES = {
 
 def parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument("--input", required=True)
     p.add_argument("--output", required=True)
     return p.parse_args()
 
 # -------------------------------------------------------------------
 
 
-def extract_value(system_info, rule, field_key):
-    def get_link_layer(device_name: str) -> str | None:
-        """Returns 'InfiniBand' or 'Ethernet' (RoCE) for a given RDMA device"""
-        path = f"/sys/class/infiniband/{device_name}/ports/1/link_layer"
-        if not os.path.isfile(path):
-            return None
-        with open(path, "r") as f:
-            return f.read().strip()
+def extract_value(rule, field_key):
+    value = ""
 
-    collected = []
-
-    if rule.get("source", "") == "env":
-        value = ""
-
-        if field_key == "framework":
-            value = ""
-            for candidate in rule["candidates"]:
-                env_output = os.environ.get(candidate, "")
-                if env_output:
-                    if "cuda_runtime" in candidate.lower():
-                        value += f"Cuda runtime version {env_output} ; "
-                    elif "cuda_driver" in candidate.lower():
-                        value += f"Cuda driver version {env_output} ; "
-            return value
-
+    if field_key == "framework":
         for candidate in rule["candidates"]:
-            value += f" {os.environ.get(candidate, '')}"
+            env_output = os.environ.get(candidate, "")
+            if env_output:
+                if "cuda_runtime" in candidate.lower():
+                    value += f"Cuda runtime version {env_output} ; "
+                elif "cuda_driver" in candidate.lower():
+                    value += f"Cuda driver version {env_output} ; "
+        return value
 
-        if field_key == "accelerators_per_node":
-            value = sum(int(elem) for elem in value.split())
-            value = str(value)
+    for candidate in rule["candidates"]:
+        value += f" {os.environ.get(candidate, '')}"
 
-        if field_key == "accelerator_memory_capacity":
-            value = value.strip()
-            if len(value.split()) == 2:
-                value = value.split()[0]
-            value_bytes = float(value)
-            if value_bytes == 0:
-                return ""
-            else:
-                # get as decimal gigabytes as marketed by the vendors
-                if value_bytes >= 1000**3:
-                    return f"{int(value_bytes/(1000**3))}GB"
-                else:
-                    return f"{int(value_bytes)}GB"
-        return value.strip()
-    else:
-        for candidate in rule["candidates"]:
-            for dump_key, dump in system_info.items():
-                if candidate in dump_key:
-                    output = dump.get("output", "")
-                    if not output:
-                        continue
+    if field_key == "accelerators_per_node":
+        value = sum(int(elem) for elem in value.split() if elem.isdigit())
+        return str(value)
 
-                    # Handle list of regex (for derived fields)
-                    regex_list = rule["regex"] if isinstance(
-                        rule["regex"], list) else [rule["regex"]]
-
-                    for regex in regex_list:
-                        matches = re.findall(regex, output, re.IGNORECASE)
-
-                        if matches:
-                            for m in matches:
-                                if isinstance(m, tuple):
-                                    collected.append(m[0].strip())
-                                else:
-                                    collected.append(m.strip())
-
-        if not collected and field_key not in [
-                "host_memory_configuration", "accelerator_interconnect", "host_network_card_count", "host_networking", "host_storage_type"]:
+    if field_key == "accelerator_memory_capacity":
+        value = value.strip()
+        if len(value.split()) == 2:
+            value = value.split()[0]
+        if not value:
             return ""
+        value_bytes = float(value)
+        if value_bytes == 0:
+            return ""
+        # get as decimal gigabytes as marketed by the vendors
+        if value_bytes >= 1000**3:
+            return f"{int(value_bytes/(1000**3))}GB"
+        else:
+            return f"{int(value_bytes)}GB"
 
-        if field_key == "host_storage_type":
-            output = ""
-            for candidate in rule["candidates"]:
-                for dump_key, dump in system_info.items():
-                    if candidate in dump_key.lower():  # case-insensitive match
-                        output = dump.get("output", "").strip()
-                        break
-                if output:
-                    break
-
-            if not output:
-                return "No disk layout data found"
-
-            types_found = set()
-
-            for line in output.splitlines():
-                line = line.strip()
-                if not line:
-                    continue
-
-                # Split on whitespace — columns are space-separated
-                parts = re.split(r'\s+', line)
-
-                if len(parts) < 5:
-                    continue  # too short → skip garbage
-
-                name = parts[0]
-                dev_type = parts[1]
-                size = parts[2]
-                # model may contain spaces → join until we reach the last two columns
-                # last two are TRAN and ROTA (VENDOR may be missing or
-                # multi-word)
-                tran = parts[-2] if len(parts) >= 6 else "unknown"
-                rota = parts[-1] if len(parts) >= 6 else "unknown"
-
-                if dev_type != "disk":
-                    continue
-
-                # Core classification
-                if name.startswith("nvme") or tran == "nvme":
-                    types_found.add("NVMe SSD")
-                elif rota == "0":
-                    types_found.add("SSD")           # usually SATA SSD
-                elif rota == "1":
-                    types_found.add("HDD")
-                else:
-                    # rare fallback — look at model if available
-                    model_start = 3
-                    model_end = len(parts) - 2
-                    model = " ".join(
-                        parts[model_start:model_end]) if model_end > model_start else ""
-                    if "SSD" in model.upper():
-                        types_found.add("SSD")
-                    elif "HDD" in model.upper() or any(x in model for x in ["ST", "WD", "HGST", "Toshiba", "Seagate"]):
-                        types_found.add("HDD")
-                    else:
-                        types_found.add("Other")
-
-            if not types_found:
-                return "No physical disks detected"
-
-            # Order them nicely
-            ordered = []
-            for t in ["NVMe SSD", "SSD", "HDD", "Other"]:
-                if t in types_found:
-                    ordered.append(t)
-
-            return " + ".join(ordered)
-
-        if field_key == "host_networking":
-            if not os.path.isdir("/sys/class/infiniband"):
-                return "Ethernet"
-            devices = os.listdir("/sys/class/infiniband")
-            results = []
-            for dev in devices:
-                ll = get_link_layer(dev)
-                if ll == "InfiniBand":
-                    results.append(f"{dev}: native InfiniBand")
-                elif ll == "Ethernet":
-                    results.append(f"{dev}: RoCE (RDMA over Ethernet)")
-                else:
-                    results.append(f"{dev}: unknown mode")
-            if not results:
-                return "RDMA devices found but no link layer info"
-            return "; ".join(results)
-
-        if field_key == "host_network_card_count":
-            count = 0
-            for ifname in os.listdir("/sys/class/net"):
-                if ifname == 'lo':
-                    continue
-                device_link = f"/sys/class/net/{ifname}/device"
-                if os.path.islink(device_link):
-                    target = os.readlink(device_link)
-                    if '/virtual/' not in target:
-                        count += 1
-            return str(count)
-
-        if field_key == "accelerator_interconnect":
-            topo_output = ""
-            for candidate in rule["candidates"]:
-                topo_output_rocm = os.environ.get(candidate, "")
-                for dump_key, dump in system_info.items():
-                    if candidate in dump_key:
-                        topo_output = dump.get("output", "")
-                        break
-
-            if not topo_output:
-                return topo_output_rocm if topo_output_rocm != "N/A" else ""
-
-            if re.search(r"\bNV\d+\b", topo_output):
-                return "NVLink"
-
-            return "PCIe"
-
-        if field_key == "accelerator_host_interconnect":
-            for candidate in rule["candidates"]:
-                rocm_output = os.environ.get(candidate, "")
-                if rocm_output and rocm_output != "N/A":
-                    return "PCIe " + rocm_output
-            smi_output = ""
-            for dump_key, dump in system_info.items():
-                if "nvidia_smi_full" in dump_key:
-                    smi_output = dump.get("output", "")
-                    break
-
-            if not smi_output:
-                return ""
-
-            gen_match = re.search(
-                r"PCIe Generation\s*\n\s*Max\s*:\s*\d+\s*\n\s*Current\s*:\s*(\d+)",
-                smi_output)
-            width_match = re.search(
-                r"Link Width\s*\n\s*Max\s*:\s*\d+x\s*\n\s*Current\s*:\s*(\d+)x",
-                smi_output)
-
-            if gen_match and width_match:
-                return f"PCIe Gen{gen_match.group(1)} x{width_match.group(1)}"
-
-            return "PCIe"
-
-        if field_key == "host_memory_configuration":
-            try:
-                # Find full dmidecode output
-                dmidecode_output = ""
-                for candidate in rule["candidates"]:
-                    for dump_key, dump in system_info.items():
-                        if candidate in dump_key:
-                            dmidecode_output = dump.get("output", "")
-                            break
-
-                if not dmidecode_output:
-                    return ""
-
-                dimm_blocks = re.split(
-                    r"Memory Device",
-                    dmidecode_output,
-                    flags=re.IGNORECASE)
-
-                sizes = []
-                types = []
-                speeds = []
-
-                for block in dimm_blocks:
-                    if "No Module Installed" in block:
-                        continue
-
-                    size_match = re.search(
-                        r"Size:\s+(\d+)\s+GB", block, re.IGNORECASE)
-                    type_match = re.search(
-                        r"Type:\s+(DDR\d+)", block, re.IGNORECASE)
-                    speed_match = re.search(
-                        r"(Configured Clock Speed|Speed):\s+(\d+)\s+MT/s", block, re.IGNORECASE)
-
-                    if size_match:
-                        sizes.append(size_match.group(1))
-
-                        if type_match:
-                            types.append(type_match.group(1))
-
-                        if speed_match:
-                            speeds.append(speed_match.group(2))
-
-                if not sizes:
-                    return ""
-
-                dimm_count = len(sizes)
-                dimm_size = sizes[0]
-                dimm_type = types[0] if types else ""
-                dimm_speed = speeds[0] if speeds else ""
-
-                return f"{dimm_count} x {dimm_size}GB {dimm_type}-{dimm_speed}".rstrip(
-                    "-")
-
-            except Exception:
-                return ""
-
-        # Special handling: counts
-        if rule["regex"] == r"(Ethernet controller:|Network controller:|Infiniband controller:)":
-            return len(collected)
-
-        # Deduplicate and join
-        return ", ".join(sorted(set(collected)))
+    return value.strip()
 
 # -------------------------------------------------------------------
 
@@ -410,17 +161,7 @@ def extract_value(system_info, rule, field_key):
 def main():
     args = parse_args()
 
-    input_path = Path(args.input)
     output_path = Path(args.output)
-
-    if not input_path.exists():
-        print(f"[WARN] Input file not found: {input_path}", file=sys.stderr)
-        json.dump({}, open(output_path, "w"), indent=2)
-        return
-
-    with open(input_path) as f:
-        system_info = json.load(f)
-        print(system_info.keys())
 
     parsed = {}
 
@@ -451,13 +192,12 @@ def main():
                 if ensemble_type_subpart not in parsed[ensemble_type]:
                     parsed[ensemble_type][ensemble_type_subpart] = {}
                 parsed[ensemble_type][ensemble_type_subpart][target_key] = extract_value(
-                    system_info, rule, target_key)
+                    rule, target_key)
             elif target_key in ["framework", "operating_system", "filesystem", "other_software_stack", "sw_notes"]:
                 ensemble_type = "software_ensemble"
                 if ensemble_type not in parsed:
                     parsed[ensemble_type] = {}
-                parsed[ensemble_type][target_key] = extract_value(
-                    system_info, rule, target_key)
+                parsed[ensemble_type][target_key] = extract_value(rule, target_key)
         except Exception as e:
             parsed[target_key] = ""
             print(

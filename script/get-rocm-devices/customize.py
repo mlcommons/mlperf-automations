@@ -53,6 +53,13 @@ def postprocess(i):
             p[key] = val
 
             key_env = 'MLC_ROCM_DEVICE_PROP_' + key.upper().replace(' ', '_')
+
+            if key_env == 'MLC_ROCM_DEVICE_PROP_GPU_INTERCONNECT_TYPE':
+                val = '' if val == 'N/A' else val
+            elif key_env == 'MLC_ROCM_DEVICE_PROP_HOST_INTERCONNECT_TYPE':
+                if val and not val.startswith('PCIe'):
+                    val = 'PCIe ' + val
+
             env[key_env] = val
 
     state['mlc_rocm_num_devices'] = gpu_id + 1
