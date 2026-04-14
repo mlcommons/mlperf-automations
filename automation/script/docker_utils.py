@@ -71,7 +71,7 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd, run_state):
         host_placeholders = re.findall(r'\${{ (.*?) }}', host_mount)
         if host_placeholders:
             for placeholder in host_placeholders:
-                if placeholder in env and isinstance(env[placeholder], str) and Path(env[placeholder]).exists():
+                if placeholder in env and isinstance(env[placeholder], str):
                     host_env_key = placeholder
                     # if the env variable is in the file_path_env_keys, then we
                     # need to get the parent folder path(set
