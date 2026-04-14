@@ -185,7 +185,7 @@ jobs:
       shell: bash
       run: |
         # Determine the MLC repo path (mlc pull repo clones to ~/MLC/repos/<owner>@<repo>)
-        REPO_SCRIPT_DIR=$(mlc find script --tags=detect,os --quiet 2>&1 | grep 'Item path' | head -1 | sed 's|.*Item path: ||' | xargs dirname)
+        REPO_SCRIPT_DIR=$(python3 -c "import subprocess, re, os; out = subprocess.run(['mlc', 'find', 'script', '--tags=detect,os', '--quiet'], capture_output=True, text=True); combined = out.stdout + out.stderr; match = re.search(r'Item path:\s*(.+)', combined); print(os.path.dirname(match.group(1).strip())) if match else exit(1)")
         echo "MLC repo script dir: $REPO_SCRIPT_DIR"
 
         # Test script with a bogus dep
@@ -440,7 +440,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.14", "3.12"]
+        python-version: ["3.13", "3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -621,7 +621,7 @@ jobs:
       shell: bash
       run: |
         # Create a script that deliberately fails inside the MLC repo's script/ directory
-        REPO_SCRIPT_DIR=$(mlc find script --tags=detect,os --quiet 2>&1 | grep 'Item path' | head -1 | sed 's|.*Item path: ||' | xargs dirname)
+        REPO_SCRIPT_DIR=$(python3 -c "import subprocess, re, os; out = subprocess.run(['mlc', 'find', 'script', '--tags=detect,os', '--quiet'], capture_output=True, text=True); combined = out.stdout + out.stderr; match = re.search(r'Item path:\s*(.+)', combined); print(os.path.dirname(match.group(1).strip())) if match else exit(1)")
         mkdir -p "$REPO_SCRIPT_DIR/test-ignore-error"
         printf 'alias: test-ignore-error\nautomation_alias: script\nautomation_uid: 5b4e0237da074764\ntags:\n- test\n- ignore-error\nuid: bbbb1111cccc2222\n' > "$REPO_SCRIPT_DIR/test-ignore-error/meta.yaml"
         printf '#!/bin/bash\necho "This script fails on purpose"\nexit 1\n' > "$REPO_SCRIPT_DIR/test-ignore-error/run.sh"
