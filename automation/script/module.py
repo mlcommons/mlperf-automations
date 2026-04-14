@@ -3951,7 +3951,6 @@ pip install mlcflow
         rx = prepare_and_run_script_with_postprocessing(
             run_script_input, postprocess="detect_version")
 
-
         if rx['return'] == 0:
             # Version was detected
             detected_version = rx.get('version', '')
@@ -4656,7 +4655,8 @@ def enable_or_skip_script(meta, env):
     """
 
     if not isinstance(meta, dict):
-        logging.warning(f"enable_or_skip_script: expected dict but got {type(meta).__name__}: {meta}")
+        logging.warning(
+            f"enable_or_skip_script: expected dict but got {type(meta).__name__}: {meta}")
         return True
 
     for key in meta:
@@ -4697,7 +4697,8 @@ def any_enable_or_skip_script(meta, env):
     (OR function)
     """
     if not isinstance(meta, dict):
-        logging.warning(f"any_enable_or_skip_script: expected dict but got {type(meta).__name__}: {meta}")
+        logging.warning(
+            f"any_enable_or_skip_script: expected dict but got {type(meta).__name__}: {meta}")
         return False
 
     for key in meta:
@@ -5081,7 +5082,7 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
                 if repo_to_report == '':
                     repo_to_report = 'https://github.com/mlcommons/mlperf-automations/issues'
 
-                note = '' 
+                note = ''
 
                 rr = {
                     'return': 2,

@@ -441,7 +441,7 @@ def get_docker_default(key):
 
 
 def get_host_path(value, extract_parent_folder=False):
-        
+
     # convert relative path to absolute path
     value = convert_to_abs_path(value)
 

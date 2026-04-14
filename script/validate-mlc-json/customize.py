@@ -9,7 +9,8 @@ def preprocess(i):
 
     json_file = env.get('MLC_VALIDATE_JSON_FILE', '')
     if not json_file:
-        return {'return': 1, 'error': 'json_file is required (--json_file=<path>)'}
+        return {'return': 1,
+                'error': 'json_file is required (--json_file=<path>)'}
 
     if not os.path.isfile(json_file):
         return {'return': 1, 'error': f'JSON file not found: {json_file}'}
@@ -52,7 +53,8 @@ def preprocess(i):
         for key in not_env_keys.split(','):
             key = key.strip()
             if key and key in result_env:
-                errors.append(f'Env key "{key}" should not be present but was found')
+                errors.append(
+                    f'Env key "{key}" should not be present but was found')
 
     # Check env key=value pairs (format: KEY=VALUE;KEY2=VALUE2)
     env_key_values = env.get('MLC_VALIDATE_ENV_KEY_VALUES', '')
@@ -77,10 +79,12 @@ def preprocess(i):
         for tag_set in dep_tags.split(';'):
             tag_set = tag_set.strip()
             if tag_set and not any(tag_set in t for t in all_dep_tags):
-                errors.append(f'Expected dep tags "{tag_set}" not found in deps: {all_dep_tags}')
+                errors.append(
+                    f'Expected dep tags "{tag_set}" not found in deps: {all_dep_tags}')
 
     if errors:
-        error_msg = 'JSON validation failed:\n' + '\n'.join(f'  - {e}' for e in errors)
+        error_msg = 'JSON validation failed:\n' + \
+            '\n'.join(f'  - {e}' for e in errors)
         return {'return': 1, 'error': error_msg}
 
     print('JSON validation PASSED')
