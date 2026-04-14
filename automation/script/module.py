@@ -750,8 +750,7 @@ class ScriptAutomation(Automation):
         variations = script_item.meta.get('variations', {})
         if version and f"version.{version}" not in variation_tags and (
                 f"version.{version}" in variations or "version.#" in variations):
-            logger.debug(
-                f"version.{version} added as a variation tag from input version")
+            logger.debug(self.recursion_spaces + f"version.{version} added as a variation tag from input version")
             variation_tags.append(f"version.{version}")
 
         run_state['docker'] = meta.get('docker', {})
