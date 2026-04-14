@@ -467,9 +467,9 @@ jobs:
       shell: bash
       run: |
         # Install a specific version first
-        mlcr get,generic-python-lib,_package.scipy --version=1.9.3 --quiet
+        mlcr get,generic-python-lib,_package.scipy --version=1.15.3 --quiet
         # Now search with version_min - should find the cached version
-        mlcr get,generic-python-lib,_package.scipy --version_min=1.9.0 --quiet
+        mlcr get,generic-python-lib,_package.scipy --version_min=1.15.0 --quiet
         echo "PASS: version_min accepted a version above the minimum"
 
     - name: Test version_max option
@@ -477,7 +477,7 @@ jobs:
       shell: bash
       run: |
         # Using version_max should constrain the accepted version
-        mlcr get,generic-python-lib,_package.scipy --version_max=1.10.0 --version_max_usable=1.10.0 --quiet
+        mlcr get,generic-python-lib,_package.scipy --version_max=1.14.1 --version_max_usable=1.14.1 --quiet
         echo "PASS: version_max correctly constrained version selection"
 
   test_output_options:
