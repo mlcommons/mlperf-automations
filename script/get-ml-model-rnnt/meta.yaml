@@ -23,6 +23,14 @@ uid: 8858f18b89774d28
 variations:
   amazon-s3:
     group: download-src
+  zenodo:
+    default: true
+    group: download-src
+  pytorch:
+    default: true
+    env:
+      MLC_ML_MODEL_FRAMEWORK: pytorch
+    group: framework
   fp32:
     default: true
     env:
@@ -30,11 +38,6 @@ variations:
       MLC_ML_MODEL_PRECISION: fp32
       MLC_ML_MODEL_WEIGHT_DATA_TYPES: fp32
     group: precision
-  pytorch:
-    default: true
-    env:
-      MLC_ML_MODEL_FRAMEWORK: pytorch
-    group: framework
   pytorch,fp32:
     env:
       MLC_ML_MODEL_ACCURACY: '0.07452253714852645'
@@ -47,6 +50,3 @@ variations:
   weights:
     env:
       MLC_MODEL_WEIGHTS_FILE: 'yes'
-  zenodo:
-    default: true
-    group: download-src

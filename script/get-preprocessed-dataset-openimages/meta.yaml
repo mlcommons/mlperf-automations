@@ -48,6 +48,17 @@ tags:
 - preprocessed
 uid: 9842f1be8cba4c7b
 variations:
+  custom-annotations:
+    ad:
+      original-dataset:
+        tags: _custom-annotations
+    group: annotations
+  default-annotations:
+    ad:
+      original-dataset:
+        tags: _default-annotations
+    default: true
+    group: annotations
   '50':
     ad:
       original-dataset:
@@ -62,6 +73,16 @@ variations:
     env:
       MLC_DATASET_SIZE: '500'
     group: dataset-count
+  full:
+    group: dataset-count
+    default: true
+  size.#:
+    ad:
+      original-dataset:
+        tags: _size.#
+    env:
+      MLC_DATASET_SIZE: '#'
+    group: dataset-count
   NCHW:
     default: true
     env:
@@ -71,6 +92,34 @@ variations:
     env:
       MLC_DATASET_DATA_LAYOUT: NHWC
     group: dataset-layout
+  fp32:
+    default: true
+    default_variations:
+      extension: raw
+    env:
+      MLC_DATASET_CONVERT_TO_UNSIGNED: '0'
+      MLC_DATASET_DTYPE: fp32
+      MLC_DATASET_INPUT_DTYPE: fp32
+      MLC_DATASET_QUANTIZE: '0'
+    group: dataset-precision
+  int8:
+    default_variations:
+      extension: rgb8
+    env:
+      MLC_DATASET_CONVERT_TO_UNSIGNED: '0'
+      MLC_DATASET_DTYPE: int8
+      MLC_DATASET_INPUT_DTYPE: fp32
+      MLC_DATASET_QUANTIZE: '1'
+    group: dataset-precision
+  uint8:
+    default_variations:
+      extension: rgb8
+    env:
+      MLC_DATASET_CONVERT_TO_UNSIGNED: '1'
+      MLC_DATASET_DTYPE: uint8
+      MLC_DATASET_INPUT_DTYPE: fp32
+      MLC_DATASET_QUANTIZE: '1'
+    group: dataset-precision
   calibration:
     ad:
       original-dataset:
@@ -82,17 +131,62 @@ variations:
       MLC_DATASET_PATH: <<<MLC_CALIBRATION_DATASET_PATH>>>
       MLC_DATASET_TYPE: calibration
     group: dataset-type
-  custom-annotations:
+  validation:
     ad:
       original-dataset:
-        tags: _custom-annotations
-    group: annotations
-  default-annotations:
-    ad:
-      original-dataset:
-        tags: _default-annotations
+        tags: _validation
     default: true
-    group: annotations
+    env:
+      MLC_DATASET_TYPE: validation
+    group: dataset-type
+  npy:
+    env:
+      MLC_DATASET_PREPROCESSED_EXTENSION: npy
+    group: extension
+  raw:
+    env:
+      MLC_DATASET_PREPROCESSED_EXTENSION: raw
+    group: extension
+  rgb32:
+    env:
+      MLC_DATASET_PREPROCESSED_EXTENSION: rgb32
+    group: extension
+  rgb8:
+    env:
+      MLC_DATASET_PREPROCESSED_EXTENSION: rgb8
+    group: extension
+  filter-size.#:
+    ad:
+      original-dataset:
+        tags: _filter-size.#
+    group: filter-size
+  inter.area:
+    env:
+      MLC_DATASET_INTERPOLATION_METHOD: INTER_AREA
+    group: interpolation-method
+  inter.linear:
+    env:
+      MLC_DATASET_INTERPOLATION_METHOD: INTER_LINEAR
+    group: interpolation-method
+  generic-preprocessor:
+    deps:
+    - names:
+      - torch
+      - pytorch
+      tags: get,generic-python-lib,_torch
+    - names:
+      - torchvision
+      tags: get,generic-python-lib,_torchvision
+    env:
+      MLC_DATASET_REFERENCE_PREPROCESSOR: '0'
+    group: preprocessing-source
+    prehook_deps:
+    - tags: get,generic,image-preprocessor
+  mlcommons-reference-preprocessor:
+    default: true
+    env:
+      MLC_DATASET_REFERENCE_PREPROCESSOR: '1'
+    group: preprocessing-source
   filter:
     ad:
       original-dataset:
@@ -100,11 +194,6 @@ variations:
   filter,calibration:
     env:
       MLC_DATASET_CALIBRATION_FILTER: 'yes'
-  filter-size.#:
-    ad:
-      original-dataset:
-        tags: _filter-size.#
-    group: filter-size
   for.retinanet.onnx:
     default_variations:
       dataset-layout: NCHW
@@ -126,65 +215,12 @@ variations:
     env:
       MLC_DATASET_QUANT_OFFSET: '114'
       MLC_DATASET_QUANT_SCALE: '0.0186584499'
-  fp32:
-    default: true
-    default_variations:
-      extension: raw
-    env:
-      MLC_DATASET_CONVERT_TO_UNSIGNED: '0'
-      MLC_DATASET_DTYPE: fp32
-      MLC_DATASET_INPUT_DTYPE: fp32
-      MLC_DATASET_QUANTIZE: '0'
-    group: dataset-precision
-  full:
-    group: dataset-count
-    default: true
   full,validation:
     ad:
       original-dataset:
         tags: _full
     env:
       MLC_DATASET_SIZE: '24781'
-  generic-preprocessor:
-    deps:
-    - names:
-      - torch
-      - pytorch
-      tags: get,generic-python-lib,_torch
-    - names:
-      - torchvision
-      tags: get,generic-python-lib,_torchvision
-    env:
-      MLC_DATASET_REFERENCE_PREPROCESSOR: '0'
-    group: preprocessing-source
-    prehook_deps:
-    - tags: get,generic,image-preprocessor
-  int8:
-    default_variations:
-      extension: rgb8
-    env:
-      MLC_DATASET_CONVERT_TO_UNSIGNED: '0'
-      MLC_DATASET_DTYPE: int8
-      MLC_DATASET_INPUT_DTYPE: fp32
-      MLC_DATASET_QUANTIZE: '1'
-    group: dataset-precision
-  inter.area:
-    env:
-      MLC_DATASET_INTERPOLATION_METHOD: INTER_AREA
-    group: interpolation-method
-  inter.linear:
-    env:
-      MLC_DATASET_INTERPOLATION_METHOD: INTER_LINEAR
-    group: interpolation-method
-  mlcommons-reference-preprocessor:
-    default: true
-    env:
-      MLC_DATASET_REFERENCE_PREPROCESSOR: '1'
-    group: preprocessing-source
-  npy:
-    env:
-      MLC_DATASET_PREPROCESSED_EXTENSION: npy
-    group: extension
   nvidia:
     env:
       MLC_PREPROCESSING_BY_NVIDIA: 'yes'
@@ -194,39 +230,3 @@ variations:
   quant-scale.#:
     const:
       MLC_DATASET_QUANT_SCALE: '#'
-  raw:
-    env:
-      MLC_DATASET_PREPROCESSED_EXTENSION: raw
-    group: extension
-  rgb32:
-    env:
-      MLC_DATASET_PREPROCESSED_EXTENSION: rgb32
-    group: extension
-  rgb8:
-    env:
-      MLC_DATASET_PREPROCESSED_EXTENSION: rgb8
-    group: extension
-  size.#:
-    ad:
-      original-dataset:
-        tags: _size.#
-    env:
-      MLC_DATASET_SIZE: '#'
-    group: dataset-count
-  uint8:
-    default_variations:
-      extension: rgb8
-    env:
-      MLC_DATASET_CONVERT_TO_UNSIGNED: '1'
-      MLC_DATASET_DTYPE: uint8
-      MLC_DATASET_INPUT_DTYPE: fp32
-      MLC_DATASET_QUANTIZE: '1'
-    group: dataset-precision
-  validation:
-    ad:
-      original-dataset:
-        tags: _validation
-    default: true
-    env:
-      MLC_DATASET_TYPE: validation
-    group: dataset-type

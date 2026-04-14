@@ -7,9 +7,9 @@ clean_files: []
 default_env:
   MLC_MLPERF_SHORT_RUN: 'no'
 file_path_env_keys:
-  - MLPERF_INFERENCE_SUBMISSION_TAR_FILE
+- MLPERF_INFERENCE_SUBMISSION_TAR_FILE
 folder_path_env_keys:
-  - MLC_MLPERF_INFERENCE_SUBMISSION_DIR
+- MLC_MLPERF_INFERENCE_SUBMISSION_DIR
 default_version: master
 deps:
 - names:
@@ -37,7 +37,7 @@ deps:
     MLC_TMP_MLPERF_INFERENCE_PREPROCESS_SUBMISSION:
     - 'on'
   names:
-    - preprocess-mlperf-submission
+  - preprocess-mlperf-submission
   tags: preprocess,mlperf,inference,submission
 docker:
   mlc_repo: mlcommons@mlperf-automations
@@ -46,21 +46,21 @@ docker:
   os: ubuntu
   os_version: '22.04'
   pre_run_cmds:
-    - mlc pull repo
+  - mlc pull repo
   real_run: false
   use_host_group_id: true
   use_host_user_id: true
   deps:
-    - names:
-      - get-mlperf-submission-dir
-      skip_if_env:
-        MLC_MLPERF_INFERENCE_SUBMISSION_DIR:
-        - 'on'
-      tags: get,mlperf,submission,dir
-    - enable_if_env:
-        MLC_TMP_MLPERF_INFERENCE_PREPROCESS_SUBMISSION:
-        - 'on'
-      tags: preprocess,mlperf,inference,submission
+  - names:
+    - get-mlperf-submission-dir
+    skip_if_env:
+      MLC_MLPERF_INFERENCE_SUBMISSION_DIR:
+      - 'on'
+    tags: get,mlperf,submission,dir
+  - enable_if_env:
+      MLC_TMP_MLPERF_INFERENCE_PREPROCESS_SUBMISSION:
+      - 'on'
+    tags: preprocess,mlperf,inference,submission
   input_mapping:
     submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
     submission_tar_file: MLPERF_INFERENCE_SUBMISSION_TAR_FILE
@@ -75,20 +75,20 @@ input_mapping:
   power: MLC_MLPERF_POWER
   preprocess: MLC_TMP_MLPERF_INFERENCE_PREPROCESS_SUBMISSION
   preprocess_submission: MLC_TMP_MLPERF_INFERENCE_PREPROCESS_SUBMISSION
-  push_to_github: MLC_MLPERF_RESULT_PUSH_TO_GITHUB
   pull_changes: MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES
   pull_inference_changes: MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES
+  push_to_github: MLC_MLPERF_RESULT_PUSH_TO_GITHUB
   repo_branch: MLC_MLPERF_RESULTS_GIT_REPO_BRANCH
   repo_name: MLC_MLPERF_RESULTS_GIT_REPO_NAME
   repo_owner: MLC_MLPERF_RESULTS_GIT_REPO_OWNER
+  skip_calibration_check: MLC_MLPERF_SKIP_CALIBRATION_CHECK
   skip_compliance: MLC_MLPERF_SKIP_COMPLIANCE
   skip_power_check: MLC_MLPERF_SKIP_POWER_CHECK
-  skip_calibration_check: MLC_MLPERF_SKIP_CALIBRATION_CHECK
   src_version: MLC_MLPERF_SUBMISSION_CHECKER_VERSION
   submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
+  submission_tar_file: MLPERF_INFERENCE_SUBMISSION_TAR_FILE
   submitter: MLC_MLPERF_SUBMITTER
   submitter_id: MLC_MLPERF_SUBMITTER_ID
-  submission_tar_file: MLPERF_INFERENCE_SUBMISSION_TAR_FILE
   tar: MLC_TAR_SUBMISSION_DIR
 post_deps:
 - enable_if_env:
@@ -132,9 +132,26 @@ tags:
 - mlc-submission-checker
 uid: 15d03ec2c1af4297
 variations:
-  short-run:
-    env:
-      MLC_MLPERF_SHORT_RUN: 'yes'
+  wg-automotive:
+    group: benchmark_wg
+    add_deps_recursive:
+      preprocess-mlperf-submission:
+        tags: _wg-automotive
+      submit-results:
+        tags: _wg-automotive
+      get-mlperf-submission-dir:
+        tags: _wg-automotive
+    deps:
+    - names:
+      - automotive-src
+      - submission-checker-src
+      tags: mlcommons,automotive,src
+    - tags: pull,git,repo
+      env:
+        MLC_GIT_CHECKOUT_PATH: <<<MLC_MLPERF_INFERENCE_SOURCE>>>
+      enable_if_env:
+        MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES:
+        - 'yes'
   wg-inference:
     default: true
     group: benchmark_wg
@@ -146,47 +163,29 @@ variations:
       get-mlperf-submission-dir:
         tags: _wg-inference
     deps:
-      - names:
-        - inference-src
-        - submission-checker-src
-        tags: mlcommons,inference,src
-      - tags: pull,git,repo
-        env:
-          MLC_GIT_CHECKOUT_PATH: '<<<MLC_MLPERF_INFERENCE_SOURCE>>>'
-        enable_if_env:
-          MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES:
-          - 'yes'
-  wg-automotive:
-    group: benchmark_wg
-    add_deps_recursive:
-      preprocess-mlperf-submission:
-        tags: _wg-automotive
-      submit-results:
-        tags: _wg-automotive
-      get-mlperf-submission-dir:
-        tags: _wg-automotive
-    deps:
-      - names:
-        - automotive-src
-        - submission-checker-src
-        tags: mlcommons,automotive,src
-      - tags: pull,git,repo
-        env:
-          MLC_GIT_CHECKOUT_PATH: '<<<MLC_MLPERF_INFERENCE_SOURCE>>>'
-        enable_if_env:
-          MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES:
-          - 'yes'
+    - names:
+      - inference-src
+      - submission-checker-src
+      tags: mlcommons,inference,src
+    - tags: pull,git,repo
+      env:
+        MLC_GIT_CHECKOUT_PATH: <<<MLC_MLPERF_INFERENCE_SOURCE>>>
+      enable_if_env:
+        MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES:
+        - 'yes'
   version.master:
     group: version
-  version.master,wg-inference:
-    adr:
-      submission-checker-src:
-        version: master
+  short-run:
+    env:
+      MLC_MLPERF_SHORT_RUN: 'yes'
   version.master,wg-automotive:
     adr:
       submission-checker-src:
         version: master
-
+  version.master,wg-inference:
+    adr:
+      submission-checker-src:
+        version: master
 versions:
   master:
     adr:
@@ -220,4 +219,3 @@ versions:
     adr:
       submission-checker-src:
         version: master
-

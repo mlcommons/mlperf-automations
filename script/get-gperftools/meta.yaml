@@ -43,12 +43,6 @@ tests:
   run_inputs: []
 uid: 4e91b103c5a04204
 variations:
-  branch.#:
-    env:
-      MLC_GIT_CHECKOUT: '#'
-  sha.#:
-    env:
-      MLC_GIT_SHA: '#'
   url.#:
     env:
       MLC_GIT_URL: '#'
@@ -58,6 +52,12 @@ variations:
     env:
       MLC_GIT_URL: https://github.com/gperftools/gperftools.git
     group: version
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+  sha.#:
+    env:
+      MLC_GIT_SHA: '#'
   version.official:
     base:
     - url.official

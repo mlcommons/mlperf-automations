@@ -11,12 +11,10 @@ deps:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_DATASET_OPENORCA_PATH
   extra_cache_tags: openorca,repo,src
   force_env_keys:
-  - MLC_GIT_*
+  - MLC_OUTDIRNAME
   names:
   - openorca-src
   tags: get,git,repo,_lfs,_repo.https://huggingface.co/datasets/Open-Orca/OpenOrca
-  force_env_keys:
-    - MLC_OUTDIRNAME  
 env:
   MLC_DATASET: OPENORCA
 new_env_keys:
@@ -29,6 +27,15 @@ tags:
 - original
 uid: 9252c4d90d5940b7
 variations:
+  calibration:
+    env:
+      MLC_DATASET_CALIBRATION: 'yes'
+    group: dataset-type
+  validation:
+    default: true
+    env:
+      MLC_DATASET_CALIBRATION: 'no'
+    group: dataset-type
   '500':
     env:
       MLC_DATASET_SIZE: '500'
@@ -37,10 +44,6 @@ variations:
     env:
       MLC_DATASET_SIZE: '60'
     group: size
-  calibration:
-    env:
-      MLC_DATASET_CALIBRATION: 'yes'
-    group: dataset-type
   full:
     default: true
     env:
@@ -50,8 +53,3 @@ variations:
     env:
       MLC_DATASET_SIZE: '#'
     group: size
-  validation:
-    default: true
-    env:
-      MLC_DATASET_CALIBRATION: 'no'
-    group: dataset-type

@@ -39,13 +39,13 @@ docker:
   port_maps:
   - 4950:4950
 input_mapping:
+  conf_file: MLC_MLPERF_POWER_SERVER_CONF_FILE
   device_port: MLC_MLPERF_POWER_DEVICE_PORT
   device_type: MLC_MLPERF_POWER_DEVICE_TYPE
   interface_flag: MLC_MLPERF_POWER_INTERFACE_FLAG
   ntp_server: MLC_MLPERF_POWER_NTP_SERVER
-  conf_file: MLC_MLPERF_POWER_SERVER_CONF_FILE
-  screen: MLC_MLPERF_POWER_SERVER_USE_SCREEN
   num_analyzers: MLC_MLPERF_POWER_NUM_ANALYZERS
+  screen: MLC_MLPERF_POWER_SERVER_USE_SCREEN
 tags:
 - run
 - mlc

@@ -1,4 +1,5 @@
 import os
+import json
 from mlc import utils
 from utils import *
 from pathlib import PureWindowsPath, PurePosixPath, Path
@@ -70,7 +71,7 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd, run_state):
         host_placeholders = re.findall(r'\${{ (.*?) }}', host_mount)
         if host_placeholders:
             for placeholder in host_placeholders:
-                if placeholder in env:
+                if placeholder in env and isinstance(env[placeholder], str):
                     host_env_key = placeholder
                     # if the env variable is in the file_path_env_keys, then we
                     # need to get the parent folder path(set
@@ -88,7 +89,7 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd, run_state):
         container_placeholders = re.findall(r'\${{ (.*?) }}', container_mount)
         if container_placeholders:
             for placeholder in container_placeholders:
-                if placeholder in env:
+                if placeholder in env and isinstance(env[placeholder], str):
                     # if the env variable is in the folder_path_env_keys, then
                     # we need to get the parent folder path(set
                     # extract_parent_folder to True)
@@ -167,6 +168,26 @@ def prepare_docker_inputs(input_params, docker_settings,
     for key in ["dt", "it"]:
         if docker_inputs.get(key):
             del (docker_inputs[key])
+
+    # Resolve default os_version from dockerinfo.json if not specified
+    if not docker_inputs.get('os_version', ''):
+        try:
+            build_dockerfile_scripts = mlc.access(
+                {'action': 'search', 'target': 'script', 'tags': 'build,dockerfile'})
+            if build_dockerfile_scripts.get('list'):
+                dockerinfo_path = os.path.join(
+                    build_dockerfile_scripts['list'][0].path, 'dockerinfo.json')
+                with open(dockerinfo_path) as _f:
+                    dockerinfo = json.load(_f)
+                distro_config = dockerinfo.get(
+                    'distros', {}).get(
+                    docker_inputs.get(
+                        'os', ''), {})
+                docker_inputs['os_version'] = distro_config.get(
+                    'default_version',
+                    list(distro_config['versions'].keys())[-1] if distro_config.get('versions') else '')
+        except Exception:
+            pass
 
     # Determine Dockerfile suffix and path
     docker_base_image = docker_inputs.get('base_image')
@@ -401,7 +422,7 @@ def get_docker_default(key):
         "mlc_repo": "mlcommons@mlperf-automations",
         "mlc_repo_branch": "dev",
         "os": "ubuntu",
-        "os_version": "24.04",
+        "os_version": "",
         "fake_run_deps": False,
         "run_final_cmds": [],
         "skip_run_cmd": False,
@@ -420,6 +441,7 @@ def get_docker_default(key):
 
 
 def get_host_path(value, extract_parent_folder=False):
+
     # convert relative path to absolute path
     value = convert_to_abs_path(value)
 

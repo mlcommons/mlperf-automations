@@ -85,7 +85,7 @@ def select_script_and_cache(
                 mlc_script_info += ","
             mlc_script_info += ",".join("_" + v for v in variation_tags)
 
-    logger.info(recursion_spaces + "* " + mlc_script_info)
+    # logger.debug(recursion_spaces + "* " + mlc_script_info)
 
     # ---------------------------------------------------------
     # STEP 3: Error handling

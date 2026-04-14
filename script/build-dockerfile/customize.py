@@ -11,16 +11,21 @@ def preprocess(i):
 
     os_info = i['os_info']
     env = i['env']
+    state = i['state']
     logger = i['automation'].logger
-
-    if env["MLC_DOCKER_OS"] not in ["ubuntu", "rhel", "arch"]:
-        return {
-            'return': 1, 'error': f"Specified docker OS: {env['MLC_DOCKER_OS']}. Currently only ubuntu, rhel and arch are supported in MLC docker"}
 
     path = i['run_script_input']['path']
 
     with open(os.path.join(path, "dockerinfo.json")) as f:
         config = json.load(f)
+
+    supported_distros = list(config.get('distros', {}).keys())
+    if env["MLC_DOCKER_OS"] not in supported_distros:
+        return {
+            'return': 1, 'error': f"Specified docker OS: {env['MLC_DOCKER_OS']}. Supported: {', '.join(supported_distros)}"}
+
+    if env['MLC_CONTAINER_TOOL'] == "podman":
+        config['USER'] = "root"
 
     build_args = []
     build_args_default = {}
@@ -56,8 +61,10 @@ def preprocess(i):
                 # build_args.append(arg)
                 # input_args.append("--"+input_+"="+"$"+env_)
 
-    if "MLC_DOCKER_OS_VERSION" not in env:
-        env["MLC_DOCKER_OS_VERSION"] = "20.04"
+    if not env.get("MLC_DOCKER_OS_VERSION", ""):
+        distro_config = config['distros'].get(env['MLC_DOCKER_OS'], {})
+        env["MLC_DOCKER_OS_VERSION"] = distro_config.get('default_version', list(
+            distro_config.get('versions', {}).keys())[-1] if distro_config.get('versions') else '24.04')
 
     docker_image_base = get_value(env, config, 'FROM', 'MLC_DOCKER_IMAGE_BASE')
     if not docker_image_base:
@@ -184,7 +191,7 @@ def preprocess(i):
         arg_value = config['ARGS_DEFAULT'][arg]
         f.write('ARG ' + f"{arg}={arg_value}" + EOL)
 
-    for arg in config['ARGS']:
+    for arg in config.get('ARGS', []):
         f.write('ARG ' + arg + EOL)
 
     for build_arg in build_args:
@@ -249,7 +256,7 @@ def preprocess(i):
     for key, value in config['ENV'].items():
         f.write('ENV ' + key + "=\"" + value + "\"" + EOL)
 
-    dockerfile_build_env = env.get('MLC_DOCKERFILE_BUILD_ENV', {})
+    dockerfile_build_env = state.get('dockerfile_build_env', {})
     for key in dockerfile_build_env:
         value = dockerfile_build_env[key]
         f.write('ENV ' + key + "=\"" + value + "\"" + EOL)
@@ -291,7 +298,7 @@ def preprocess(i):
     else:
         f.write('ENV HOME=/root' + EOL)
 
-    dockerfile_env = env.get('MLC_DOCKERFILE_ENV', {})
+    dockerfile_env = state.get('dockerfile_env', {})
     dockerfile_env_input_string = ""
     for docker_env_key in dockerfile_env:
         dockerfile_env_input_string = dockerfile_env_input_string + " --env." + \
@@ -318,6 +325,10 @@ def preprocess(i):
     f.write('ENV PATH="$PATH:$HOME/.local/bin"' + EOL)
 
     f.write(
+        'RUN {} -m pip install --upgrade pip setuptools'.format(python) +
+        ' ' + pip_extra_flags + ' ' + EOL)
+
+    f.write(
         'RUN {} -m pip install '.format(python) +
         " ".join(
             get_value(
@@ -331,11 +342,6 @@ def preprocess(i):
 
     f.write(EOL + '# Download MLC repo for scripts' + EOL)
     pat = env.get('MLC_GH_TOKEN', '')
-
-    if pat != '':
-        token_string = f" --pat={pat}"
-    else:
-        token_string = ""
 
     if use_copy_repo:
         repo_name = os.path.basename(relative_repo_path)
@@ -359,13 +365,24 @@ def preprocess(i):
         if x != '':
             x = ' ' + x
 
-        f.write(
-            'RUN mlc pull repo ' +
-            mlc_mlops_repo +
-            mlc_mlops_repo_branch_string +
-            token_string +
-            x +
-            EOL)
+        if pat != '':
+            # Mount the GH token as a secret and read it at build time
+            f.write(
+                'RUN --mount=type=secret,id=gh_token ' +
+                'MLC_GH_TOKEN=$(cat /run/secrets/gh_token) && ' +
+                'mlc pull repo ' +
+                mlc_mlops_repo +
+                mlc_mlops_repo_branch_string +
+                ' --pat=$MLC_GH_TOKEN' +
+                x +
+                EOL)
+        else:
+            f.write(
+                'RUN mlc pull repo ' +
+                mlc_mlops_repo +
+                mlc_mlops_repo_branch_string +
+                x +
+                EOL)
 
     # Check extra repositories
     x = env.get('MLC_DOCKER_EXTRA_MLC_REPOS', '')
@@ -384,8 +401,10 @@ def preprocess(i):
     run_cmd_extra = " " + \
         env.get('MLC_DOCKER_RUN_CMD_EXTRA', '').replace(":", "=")
     gh_token = get_value(env, config, "GH_TOKEN", "MLC_GH_TOKEN")
+    _run_secret_prefix = ''
     if gh_token:
-        run_cmd_extra = " --env.MLC_GH_TOKEN=$MLC_GH_TOKEN"
+        _run_secret_prefix = '--mount=type=secret,id=gh_token '
+        run_cmd_extra = " --env.MLC_GH_TOKEN=$(cat /run/secrets/gh_token)"
 
     f.write(EOL + '# Run commands' + EOL)
     for comment in env.get('MLC_DOCKER_RUN_COMMENTS', []):
@@ -413,7 +432,7 @@ def preprocess(i):
     fake_run = fake_run + \
         " --fake_deps" if env.get('MLC_DOCKER_FAKE_DEPS') else fake_run
 
-    x = 'RUN ' + env['MLC_DOCKER_RUN_CMD']
+    x = 'RUN ' + _run_secret_prefix + env['MLC_DOCKER_RUN_CMD']
 
     if not skip_extra:
         x += fake_run

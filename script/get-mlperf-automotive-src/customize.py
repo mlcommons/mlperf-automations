@@ -52,7 +52,7 @@ def preprocess(i):
             env["MLC_GIT_URL"] = "https://github.com/mlcommons/mlperf_automotive"
 
     if env.get("MLC_MLPERF_LAST_RELEASE", '') == '':
-        env["MLC_MLPERF_LAST_RELEASE"] = "v0.5"
+        env["MLC_MLPERF_LAST_RELEASE"] = "v1.0"
 
     if 'MLC_GIT_DEPTH' not in env:
         env['MLC_GIT_DEPTH'] = ''
@@ -96,8 +96,10 @@ def postprocess(i):
         automotive_root, 'automotive', '2d-object-detection')
     env['MLC_MLPERF_INFERENCE_DEEPLABV3PLUS_PATH'] = os.path.join(
         automotive_root, 'automotive', 'semantic-segmentation')
-    env['MLC_MLPERF_INFERENCE_LLAMA3_2_3B_PATH'] = os.path.join(
+    env['MLC_MLPERF_INFERENCE_LLAMA3_1_8B_PATH'] = os.path.join(
         automotive_root, 'automotive', 'llm')
+    env['MLC_MLPERF_INFERENCE_UNIAD_PATH'] = os.path.join(
+        automotive_root, 'automotive', 'end-to-end')
 
     env['MLC_GET_DEPENDENT_CACHED_PATH'] = automotive_root
 

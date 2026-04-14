@@ -16,19 +16,19 @@ deps:
     - 'on'
   tags: get,mlperf,submission,dir
 variations:
+  wg-automotive:
+    group: benchmark_wg
+    deps:
+    - names:
+      - automotive-src
+      tags: mlcommons,automotive,src
   wg-inference:
     group: benchmark_wg
     default: true
     deps:
-      - names:
-        - inference-src
-        tags: mlcommons,inference,src
-  wg-automotive:
-    group: benchmark_wg
-    deps:
-      - names:
-        - automotive-src
-        tags: mlcommons,automotive,src
+    - names:
+      - inference-src
+      tags: mlcommons,inference,src
 input_mapping:
   input: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
   submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR

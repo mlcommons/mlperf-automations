@@ -59,20 +59,26 @@ No script specific inputs
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
-### Ungrouped
+### Config
 
-- `branch.#` _(# can be substituted dynamically)_
-- `config.#` _(# can be substituted dynamically)_
-- `enable-prof`
-- `enable-stats`
-- `lg-hugepage.#` _(# can be substituted dynamically)_
-- `lg-page.#` _(# can be substituted dynamically)_
-- `lg-quantum.#` _(# can be substituted dynamically)_
-- `sha.#` _(# can be substituted dynamically)_
-- `version.official` (base: url.official)
+- `custom-config`
+- `default-config` (default)
 
-### Version
+### Repo
 
 - `url.#` _(# can be substituted dynamically)_
 - `url.facebook` (default)
 - `url.official`
+
+### Ungrouped
+
+- `branch.#` _(# can be substituted dynamically)_
+- `config.#` _(# can be substituted dynamically)_ (base: custom-config)
+- `enable-prof` (base: custom-config)
+- `enable-stats` (base: custom-config)
+- `lg-hugepage.#` _(# can be substituted dynamically)_ (base: custom-config)
+- `lg-page.#` _(# can be substituted dynamically)_ (base: custom-config)
+- `lg-quantum.#` _(# can be substituted dynamically)_ (base: custom-config)
+- `sha.#` _(# can be substituted dynamically)_
+- `version.#` _(# can be substituted dynamically)_
+- `version.official` (base: url.official)

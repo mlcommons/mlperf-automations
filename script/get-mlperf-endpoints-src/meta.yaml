@@ -43,29 +43,16 @@ tags:
 - get-mlperf-endpoints-src
 uid: 82c6b66389b24322
 variations:
-  mlcommons:
-    default: true
+  branch.#:
     env:
-      MLC_GIT_URL: https://github.com/mlcommons/endpoints
-    group: repo
+      MLC_GIT_CHECKOUT: '#'
+      MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE_VERSION: custom
+    group: checkout
   main:
     default: true
     env:
       MLC_GIT_CHECKOUT: main
     group: checkout
-  branch.#:
-    env:
-      MLC_GIT_CHECKOUT: '#'
-      MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE_VERSION: 'custom'
-    group: checkout
-  repo.#:
-    env:
-      MLC_GIT_URL: '#'
-      MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE_VERSION: 'custom'
-    group: repo
-  submodules.#:
-    env:
-      MLC_GIT_SUBMODULES: '#'
   sha.#:
     env:
       MLC_GIT_SHA: '#'
@@ -74,6 +61,21 @@ variations:
     env:
       MLC_GIT_DEPTH: ''
     group: git-history
+  short-history:
+    default: true
+    env:
+      MLC_GIT_DEPTH: --depth 10
+    group: git-history
+  mlcommons:
+    default: true
+    env:
+      MLC_GIT_URL: https://github.com/mlcommons/endpoints
+    group: repo
+  repo.#:
+    env:
+      MLC_GIT_URL: '#'
+      MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE_VERSION: custom
+    group: repo
   no-recurse-submodules:
     env:
       MLC_GIT_RECURSE_SUBMODULES: ''
@@ -86,9 +88,6 @@ variations:
   recurse-submodules:
     env:
       MLC_GIT_RECURSE_SUBMODULES: ' --recurse-submodules'
-  short-history:
-    default: true
+  submodules.#:
     env:
-      MLC_GIT_DEPTH: --depth 10
-    group: git-history
-  
+      MLC_GIT_SUBMODULES: '#'

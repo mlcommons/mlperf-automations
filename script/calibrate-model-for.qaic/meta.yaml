@@ -42,26 +42,6 @@ tags:
 - qaic-calibrate
 uid: 817bad70df2f4e45
 variations:
-  bert-99:
-    base:
-    - bert_
-    env:
-      MLC_CALIBRATE_SQUAD: 'yes'
-      MLC_QAIC_COMPILER_ARGS: ''
-      MLC_QAIC_COMPILER_PARAMS: -onnx-define-symbol=batch_size,1 -onnx-define-symbol=seg_length,<<<MLC_DATASET_SQUAD_TOKENIZED_MAX_SEQ_LENGTH>>>
-        -input-list-file=<<<MLC_DATASET_SQUAD_TOKENIZED_PACKED_FILENAMES_FILE>>> -num-histogram-bins=512
-        -profiling-threads=<<<MLC_HOST_CPU_PHYSICAL_CORES_PER_SOCKET>>>
-      MLC_QAIC_MODEL_TO_CONVERT: calibrate_bert_mlperf
-    group: model
-  bert_:
-    adr:
-      model-src:
-        tags: bert-large,_onnx,_packed
-    default-variations:
-      seq-length: seq.384
-    env:
-      MLC_CREATE_INPUT_BATCH: 'no'
-      MLC_QAIC_MODEL_NAME: bert-large
   bs.#:
     env:
       MLC_CREATE_INPUT_BATCH: 'yes'
@@ -77,10 +57,6 @@ variations:
       preprocessed-dataset:
         tags: _filter-size.#,_filter,_size.#
     group: calib-dataset-filter-size
-  first.#:
-    adr:
-      preprocessed-dataset:
-        tags: first.#
   mlperf.option1:
     adr:
       preprocessed-dataset:
@@ -91,6 +67,15 @@ variations:
       preprocessed-dataset:
         tags: _mlperf.option2
     group: calibration-option
+  bert-99:
+    base:
+    - bert_
+    env:
+      MLC_CALIBRATE_SQUAD: 'yes'
+      MLC_QAIC_COMPILER_ARGS: ''
+      MLC_QAIC_COMPILER_PARAMS: -onnx-define-symbol=batch_size,1 -onnx-define-symbol=seg_length,<<<MLC_DATASET_SQUAD_TOKENIZED_MAX_SEQ_LENGTH>>> -input-list-file=<<<MLC_DATASET_SQUAD_TOKENIZED_PACKED_FILENAMES_FILE>>> -num-histogram-bins=512 -profiling-threads=<<<MLC_HOST_CPU_PHYSICAL_CORES_PER_SOCKET>>>
+      MLC_QAIC_MODEL_TO_CONVERT: calibrate_bert_mlperf
+    group: model
   resnet50:
     adr:
       model-src:
@@ -106,14 +91,6 @@ variations:
       MLC_QAIC_MODEL_TO_CONVERT: calibrate_resnet50_tf
       MLC_QAIC_OUTPUT_NODE_NAME: -output-node-name=ArgMax
     group: model
-  resnet50,tf:
-    adr:
-      model-src:
-        tags: _fix-input-shape
-      preprocessed-dataset:
-        tags: _NHWC
-    env:
-      MLC_QAIC_MODEL_TO_CONVERT: calibrate_resnet50_tf
   retinanet:
     adr:
       model-src:
@@ -121,13 +98,14 @@ variations:
     env:
       MLC_CALIBRATE_OPENIMAGES: 'yes'
       MLC_QAIC_COMPILER_ARGS: ''
-      MLC_QAIC_COMPILER_PARAMS: -enable-channelwise -profiling-threads=<<<MLC_HOST_CPU_PHYSICAL_CORES_PER_SOCKET>>>
-        -onnx-define-symbol=batch_size,<<<MLC_QAIC_MODEL_BATCH_SIZE>>> -node-precision-info=<<<MLC_ML_MODEL_RETINANET_QAIC_NODE_PRECISION_INFO_FILE_PATH>>>
+      MLC_QAIC_COMPILER_PARAMS: -enable-channelwise -profiling-threads=<<<MLC_HOST_CPU_PHYSICAL_CORES_PER_SOCKET>>> -onnx-define-symbol=batch_size,<<<MLC_QAIC_MODEL_BATCH_SIZE>>> -node-precision-info=<<<MLC_ML_MODEL_RETINANET_QAIC_NODE_PRECISION_INFO_FILE_PATH>>>
       MLC_QAIC_MODEL_NAME: retinanet
       MLC_QAIC_MODEL_TO_CONVERT: calibrate_retinanet_no_nms_mlperf
     group: model
     new_env_keys:
     - MLC_QAIC_MODEL_RETINANET_*
+  tf:
+    group: model-framework
   seq.#:
     ad:
       squad-preprocessed:
@@ -142,5 +120,24 @@ variations:
     env:
       MLC_DATASET_SQUAD_TOKENIZED_MAX_SEQ_LENGTH: '#'
     group: seq-length
-  tf:
-    group: model-framework
+  bert_:
+    adr:
+      model-src:
+        tags: bert-large,_onnx,_packed
+    default-variations:
+      seq-length: seq.384
+    env:
+      MLC_CREATE_INPUT_BATCH: 'no'
+      MLC_QAIC_MODEL_NAME: bert-large
+  first.#:
+    adr:
+      preprocessed-dataset:
+        tags: first.#
+  resnet50,tf:
+    adr:
+      model-src:
+        tags: _fix-input-shape
+      preprocessed-dataset:
+        tags: _NHWC
+    env:
+      MLC_QAIC_MODEL_TO_CONVERT: calibrate_resnet50_tf

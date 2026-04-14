@@ -43,25 +43,6 @@ variations:
     env:
       MLC_ML_MODEL_MAX_BATCH_SIZE: '#'
     group: batchsize
-  fp32:
-    add_deps_recursive:
-      original-model:
-        tags: _fp32
-    default: true
-    group: precision
-  graph-executor:
-    env:
-      MLC_TVM_USE_VM: 'no'
-    group: runtime
-  int8:
-    add_deps_recursive:
-      original-model:
-        tags: _int8
-    group: precision
-  model.#:
-    env:
-      MLC_ML_MODEL: '#'
-    group: model
   onnx:
     default: true
     deps:
@@ -89,8 +70,6 @@ variations:
     env:
       MLC_TVM_FRONTEND_FRAMEWORK: tensorflow
     group: frontend
-  tf:
-    alias: tensorflow
   tflite:
     deps:
     - names:
@@ -99,6 +78,37 @@ variations:
     env:
       MLC_TVM_FRONTEND_FRAMEWORK: tflite
     group: frontend
+  model.#:
+    env:
+      MLC_ML_MODEL: '#'
+    group: model
+  fp32:
+    add_deps_recursive:
+      original-model:
+        tags: _fp32
+    default: true
+    group: precision
+  int8:
+    add_deps_recursive:
+      original-model:
+        tags: _int8
+    group: precision
+  uint8:
+    add_deps_recursive:
+      original-model:
+        tags: _uint8
+    group: precision
+  graph-executor:
+    env:
+      MLC_TVM_USE_VM: 'no'
+    group: runtime
+  virtual_machine:
+    default: true
+    env:
+      MLC_TVM_USE_VM: 'yes'
+    group: runtime
+  tf:
+    alias: tensorflow
   torch:
     alias: pytorch
   tune-model:
@@ -108,13 +118,3 @@ variations:
     - tags: get,generic-python-lib,_tornado
     env:
       MLC_TUNE_TVM_MODEL: 'yes'
-  uint8:
-    add_deps_recursive:
-      original-model:
-        tags: _uint8
-    group: precision
-  virtual_machine:
-    default: true
-    env:
-      MLC_TVM_USE_VM: 'yes'
-    group: runtime

@@ -18,13 +18,6 @@ tests:
     - r2-downloader,mlc,dry-run
 uid: 2bcb61611b1f4af3
 variations:
-  dry-run:
-    env:
-      MLC_DOWNLOAD_MODE: dry
-    group: run-mode
-  dry-run,r2-downloader:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   mlc:
     default: true
     env:
@@ -53,6 +46,13 @@ variations:
       dae-deepseek-r1:
         tags: _r2-downloader
     group: download-tool
+  dry-run:
+    env:
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   r2-downloader,mlc:
     env:
       MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/deepseek-r1-0528.uri

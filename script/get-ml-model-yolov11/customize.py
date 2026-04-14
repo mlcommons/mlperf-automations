@@ -23,8 +23,9 @@ def postprocess(i):
     env = i['env']
 
     if env.get('MLC_DOWNLOAD_MODE', '') != 'dry':
-        env['MLC_ML_MODEL_YOLOV11_PATH'] = os.path.join(
-            env['MLC_ML_MODEL_YOLOV11_PATH'], 'yolo11l.pt')
+        if env.get('MLC_TMP_REQUIRE_DOWNLOAD') == "yes":
+            env['MLC_ML_MODEL_YOLOV11_PATH'] = os.path.join(
+                env['MLC_ML_MODEL_YOLOV11_PATH'], 'yolo11l.pt')
         env['MLC_ML_MODEL_FILE_WITH_PATH'] = env['MLC_ML_MODEL_YOLOV11_PATH']
 
     return {'return': 0}

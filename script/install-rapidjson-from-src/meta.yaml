@@ -37,9 +37,6 @@ tags:
 - src-rapidjson
 uid: 5171e69b4bb94989
 variations:
-  branch.#:
-    env:
-      MLC_GIT_CHECKOUT: '#'
   repo.#:
     env:
       MLC_GIT_URL: '#'
@@ -49,6 +46,9 @@ variations:
     env:
       MLC_GIT_URL: https://github.com/Tencent/rapidjson
     group: repo
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
   sha.#:
     env:
       MLC_GIT_CHECKOUT_SHA: '#'

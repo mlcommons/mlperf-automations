@@ -127,6 +127,20 @@ class ScriptAutomation(Automation):
         self.main_script_force_new_cache = run_args.get(
             'new', False)  # only set for the initial script being called
 
+        if self.env.get('MLC_USER_RUN_DIR', '') == '':
+            current_path = os.path.abspath(os.getcwd())
+            r = _update_env(self.env, 'MLC_USER_RUN_DIR', current_path)
+            if r['return'] > 0:
+                return r
+
+        if self.const.get('MLC_USER_RUN_DIR', '') == '':
+            r = _update_env(
+                self.const,
+                'MLC_USER_RUN_DIR',
+                self.env['MLC_USER_RUN_DIR'])
+            if r['return'] > 0:
+                return r
+
     def init_run_state(self, run_state):
 
         run_state = run_state or {}
@@ -354,6 +368,7 @@ class ScriptAutomation(Automation):
                 'add_deps_recursive', {}), 'append_lists': True, 'append_unique': True})
 
         env = self.env
+
         state = self.state
         const = self.const
         const_state = self.const_state
@@ -675,6 +690,7 @@ class ScriptAutomation(Automation):
         #           IT HAS THE PRIORITY OVER meta['default_env'] and meta['env'] but not over the meta from versions/variations
         #           (env OVERWRITE - user enforces it from CLI)
         #           (it becomes const)
+
         if input_mapping:
             update_env_from_input_mapping(
                 env, i, input_mapping, input_description)
@@ -754,6 +770,7 @@ class ScriptAutomation(Automation):
         if len(r.get('warnings', [])) > 0:
             warnings += r['warnings']
 
+        variation_tags = r['variation_tags']
         variation_tags_string = r['variation_tags_string']
         explicit_variation_tags = r['explicit_variation_tags']
 
@@ -988,17 +1005,18 @@ class ScriptAutomation(Automation):
                         if r['return'] > 0:
                             return r
 
-                    # Check chain of prehook dependencies on other MLC scripts.
-                    # (No execution of customize.py for cached scripts)
-                    logger.debug(
-                        self.recursion_spaces +
-                        '    - Checking prehook dependencies on other MLC scripts:')
+                    if len(prehook_deps):
+                        # Check chain of prehook dependencies on other MLC scripts.
+                        # (No execution of customize.py for cached scripts)
+                        logger.debug(
+                            self.recursion_spaces +
+                            '    - Checking prehook dependencies on other MLC scripts:')
 
-                    r = self._call_run_deps(prehook_deps, self.local_env_keys, local_env_keys_from_meta,
-                                            self.recursion_spaces + extra_recursion_spaces,
-                                            variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
-                    if r['return'] > 0:
-                        return r
+                        r = self._call_run_deps(prehook_deps, self.local_env_keys, local_env_keys_from_meta,
+                                                self.recursion_spaces + extra_recursion_spaces,
+                                                variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
+                        if r['return'] > 0:
+                            return r
 
                     # Continue with the selected cached script
                     cached_script = found_cached_scripts[selection]
@@ -1038,38 +1056,42 @@ class ScriptAutomation(Automation):
                                        'append_unique': True})
 
                     utils.merge_dicts(
-                        {'dict1': new_env, 'dict2': const, 'append_lists': True, 'append_unique': True})
-                    utils.merge_dicts({'dict1': new_state,
+                        {'dict1': env, 'dict2': const, 'append_lists': True, 'append_unique': True})
+                    utils.merge_dicts({'dict1': state,
                                        'dict2': const_state,
                                        'append_lists': True,
                                        'append_unique': True})
 
                     if not fake_run:
-                        # Check chain of posthook dependencies on other MLC scripts. We consider them same as postdeps when
-                        # script is in cache
-                        logger.debug(
-                            self.recursion_spaces +
-                            '    - Checking posthook dependencies on other MLC scripts:')
 
                         clean_env_keys_post_deps = meta.get(
                             'clean_env_keys_post_deps', [])
 
-                        r = self._call_run_deps(posthook_deps, self.local_env_keys, clean_env_keys_post_deps,
-                                                self.recursion_spaces + extra_recursion_spaces,
-                                                variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
-                        if r['return'] > 0:
-                            return r
+                        # Check chain of posthook dependencies on other MLC scripts. We consider them same as postdeps when
+                        # script is in cache
+                        if len(posthook_deps):
+                            logger.debug(
+                                self.recursion_spaces +
+                                '    - Checking posthook dependencies on other MLC scripts:')
 
-                        logger.debug(
-                            self.recursion_spaces +
-                            '    - Checking post dependencies on other MLC scripts:')
+                            r = self._call_run_deps(posthook_deps, self.local_env_keys, clean_env_keys_post_deps,
+                                                    self.recursion_spaces + extra_recursion_spaces,
+                                                    variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
+                            if r['return'] > 0:
+                                return r
 
-                        # Check chain of post dependencies on other MLC scripts
-                        r = self._call_run_deps(post_deps, self.local_env_keys, clean_env_keys_post_deps,
-                                                self.recursion_spaces + extra_recursion_spaces,
-                                                variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
-                        if r['return'] > 0:
-                            return r
+                        if len(post_deps):
+                            logger.debug(
+                                self.recursion_spaces +
+                                '    - Checking post dependencies on other MLC scripts:')
+
+                            # Check chain of post dependencies on other MLC
+                            # scripts
+                            r = self._call_run_deps(post_deps, self.local_env_keys, clean_env_keys_post_deps,
+                                                    self.recursion_spaces + extra_recursion_spaces,
+                                                    variation_tags_string, True, debug_script_tags, show_time, extra_recursion_spaces, run_state)
+                            if r['return'] > 0:
+                                return r
 
             if renew or (not found_cached and num_found_cached_scripts == 0):
                 # Add more tags to cached tags
@@ -1545,6 +1567,7 @@ class ScriptAutomation(Automation):
                 run_script_input['state'] = state
                 run_script_input['run_state'] = run_state
                 run_script_input['recursion'] = recursion
+                run_script_input['recursion_spaces'] = self.recursion_spaces
 
                 r = prepare_and_run_script_with_postprocessing(
                     run_script_input)
@@ -1874,19 +1897,6 @@ class ScriptAutomation(Automation):
             import json
             logger.info(json.dumps(rr, indent=2))
 
-        if show_time:
-            logger.info(
-                self.recursion_spaces +
-                '  - running time of script "{}": {:.2f} sec.'.format(
-                    ','.join(found_script_tags),
-                    elapsed_time))
-        else:
-            logger.debug(
-                self.recursion_spaces +
-                '  - running time of script "{}": {:.2f} sec.'.format(
-                    ','.join(found_script_tags),
-                    elapsed_time))
-
         if not recursion and show_space:
             stop_disk_stats = shutil.disk_usage("/")
 
@@ -1908,11 +1918,25 @@ class ScriptAutomation(Automation):
 
                 v = new_env.get(p, None)
 
-                logger.info('{}: {}'.format(t, str(v)))
+                logger.info(self.recursion_spaces +
+                            '  * {}: {}'.format(t, str(v)))
 
         # Check if print nice versions
         if print_versions:
             self._print_versions(run_state)
+
+        if show_time:
+            logger.info(
+                self.recursion_spaces +
+                '  - running time of script "{}": {:.2f} sec.'.format(
+                    ','.join(found_script_tags),
+                    elapsed_time))
+        else:
+            logger.debug(
+                self.recursion_spaces +
+                '  - running time of script "{}": {:.2f} sec.'.format(
+                    ','.join(found_script_tags),
+                    elapsed_time))
 
         # Check if pause (useful if running a given script in a new terminal
         # that may close automatically)
@@ -3927,8 +3951,6 @@ pip install mlcflow
         rx = prepare_and_run_script_with_postprocessing(
             run_script_input, postprocess="detect_version")
 
-        run_script_input['recursion_spaces'] = self.recursion_spaces
-
         if rx['return'] == 0:
             # Version was detected
             detected_version = rx.get('version', '')
@@ -3996,6 +4018,8 @@ pip install mlcflow
         logger = self.action_object.logger
         run_script_input = i.get('run_script_input', {})
         extra_paths = i.get('extra_paths', {})
+        force_given_path = False
+        i.get('force_given_path', False)
 
         # Create and work on a copy to avoid contamination
         env_copy = copy.deepcopy(env)
@@ -4021,6 +4045,9 @@ pip install mlcflow
                     return {'return': 1,
                             'error': 'path {} doesn\'t exist'.format(path_tmp)}
 
+        if path != '':
+            force_given_path = i.get('force_given_path', False)
+
         # Check if forced path and file name from --input (MLC_INPUT - local env
         # - will not be visible for higher-level script)
         forced_file = env.get('MLC_INPUT', '').strip()
@@ -4032,7 +4059,8 @@ pip install mlcflow
             file_name = os.path.basename(forced_file)
             path = os.path.dirname(forced_file)
 
-        default_path_list = self.get_default_path_list(i)
+        default_path_list = self.get_default_path_list(
+            i) if not force_given_path else []
         # [] if default_path_env_key == '' else \
         #   os.environ.get(default_path_env_key,'').split(os_info['env_separator'])
 
@@ -4041,7 +4069,8 @@ pip install mlcflow
         priority_folder = env.get('MLC_SEARCH_FOLDER_PATH', '').strip()
         priority_folder_paths = []
 
-        if priority_folder and os.path.isdir(priority_folder):
+        if priority_folder and os.path.isdir(
+                priority_folder) and not force_given_path:
             logger.info(
                 self.recursion_spaces +
                 '    # Prioritizing search in folder: {}'.format(priority_folder))
@@ -4428,6 +4457,12 @@ pip install mlcflow
 
     ############################################################
 
+    def validate(self, i):
+        from script.validate import validate_scripts
+        return validate_scripts(self, i)
+
+    ############################################################
+
     def dockerfile(self, i):
         from script.docker import dockerfile
         return dockerfile(self, i)
@@ -4619,8 +4654,17 @@ def enable_or_skip_script(meta, env):
     (AND function)
     """
 
+    if not isinstance(meta, dict):
+        logging.warning(
+            f"enable_or_skip_script: expected dict but got {type(meta).__name__}: {meta}")
+        return True
+
     for key in meta:
-        meta_key = [str(v).lower() for v in meta[key]]
+        value_spec = meta[key]
+        if isinstance(value_spec, list):
+            meta_key = [str(v).lower() for v in value_spec]
+        else:
+            meta_key = [str(value_spec).lower()]
         if key in env:
             value = str(env[key]).lower().strip()
             if set(meta_key) & set(["yes", "on", "true", "1"]):
@@ -4652,12 +4696,21 @@ def any_enable_or_skip_script(meta, env):
     Internal: enable a dependency based on enable_if_env and skip_if_env meta information
     (OR function)
     """
+    if not isinstance(meta, dict):
+        logging.warning(
+            f"any_enable_or_skip_script: expected dict but got {type(meta).__name__}: {meta}")
+        return False
+
     for key in meta:
         found = False
         if key in env:
             value = str(env[key]).lower().strip()
 
-            meta_key = [str(v).lower() for v in meta[key]]
+            value_spec = meta[key]
+            if isinstance(value_spec, list):
+                meta_key = [str(v).lower() for v in value_spec]
+            else:
+                meta_key = [str(value_spec).lower()]
 
             if set(meta_key) & set(["yes", "on", "true", "1"]):
                 if not is_false(value) and value != '' and not re.findall(
@@ -4857,7 +4910,6 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
     local_env_keys_from_meta = i.get('local_env_keys_from_meta', [])
     posthook_deps = i.get('posthook_deps', [])
     add_deps_recursive = i.get('add_deps_recursive', {})
-    recursion_spaces = i['recursion_spaces']
     remembered_selections = i.get('remembered_selections', [])
     variation_tags_string = i.get('variation_tags_string', '')
     found_cached = i.get('found_cached', False)
@@ -4933,8 +4985,8 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
                 run_script,
                 cur_dir))
 
-        logger.info(recursion_spaces + '       ! cd {}'.format(cur_dir))
-        logger.info(
+        logger.debug(recursion_spaces + '       ! cd {}'.format(cur_dir))
+        logger.debug(
             recursion_spaces +
             '       ! call {} from {}'.format(
                 path_to_run_script,
@@ -5030,11 +5082,7 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
                 if repo_to_report == '':
                     repo_to_report = 'https://github.com/mlcommons/mlperf-automations/issues'
 
-                note = '''
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Please file an issue at {} along with the full MLC command being run and the relevant
-or full console log.
-'''.format(repo_to_report)
+                note = ''
 
                 rr = {
                     'return': 2,
@@ -5078,7 +5126,7 @@ or full console log.
 
     if postprocess != '' and customize_code is not None and postprocess in dir(
             customize_code):
-        logger.info(
+        logger.debug(
             recursion_spaces +
             '       ! call "{}" from {}'.format(
                 postprocess,
@@ -5133,6 +5181,7 @@ def run_detect_version(customize_code, customize_common_input,
         ii['env'] = env
         ii['state'] = state
         ii['meta'] = meta
+        ii['recursion_spaces'] = recursion_spaces
         ii['automation'] = customize_common_input['automation']
 
         r = customize_code.detect_version(ii)
@@ -5163,6 +5212,7 @@ def run_postprocess(customize_code, customize_common_input, recursion_spaces,
         ii['env'] = env
         ii['state'] = state
         ii['meta'] = meta
+        ii['recursion_spaces'] = recursion_spaces
         ii['automation'] = customize_common_input['automation']
 
         if run_script_input is not None:
@@ -5568,11 +5618,25 @@ def update_env_from_input_mapping(
     """
     Internal: update env from input and input_mapping
     """
+
     for key in input_mapping:
         if key in inp:
             if key in input_description and str(input_description[key].get(
                     'is_path', '')).lower() in ['1', 'yes', 'on', 'true']:
-                env[input_mapping[key]] = os.path.expanduser(inp[key])
+
+                # 1. Expand the '~' if it exists
+                path_val = os.path.expanduser(inp[key])
+
+                # 2. Check if the path is NOT already absolute
+                if not os.path.isabs(path_val) and env.get(
+                        'MLC_USER_RUN_DIR', '') != '':
+                    base_dir = env["MLC_USER_RUN_DIR"]
+
+                    # Join the base dir with the relative path and normalize it
+                    path_val = os.path.abspath(
+                        os.path.join(base_dir, path_val))
+
+                env[input_mapping[key]] = path_val
             else:
                 env[input_mapping[key]] = inp[key]
 

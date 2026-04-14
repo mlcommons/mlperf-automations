@@ -72,11 +72,6 @@ tags:
 - coco
 uid: c198e1f60ac6445c
 variations:
-  '2017':
-    default: true
-    env:
-      MLC_DATASET_COCO_VERSION: '2017'
-    group: version
   complete:
     default: true
     env:
@@ -95,3 +90,8 @@ variations:
     env:
       MLC_DATASET_COCO_TYPE: val
     group: type
+  '2017':
+    default: true
+    env:
+      MLC_DATASET_COCO_VERSION: '2017'
+    group: version

@@ -1,19 +1,13 @@
 alias: run-mlperf-automotive-app
 uid: 2a7315d2dff74898
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
-
 category: MLPerf Automotive
-
-developers: "[Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Grigori Fursin](https://cKnowledge.org/gfursin)"
-
-
+developers: '[Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Grigori Fursin](https://cKnowledge.org/gfursin), [Anandhu S](https://www.linkedin.com/in/anandhu-s-2337661b7/)'
 clean_output_files:
 - open.tar.gz
 - summary.csv
 - summary.json
-
 tags:
 - run
 - run-abtf
@@ -21,18 +15,18 @@ tags:
 - mlcommons
 - inference
 - reference
-
-tags_help: "run-abtf,inference"
-
+tags_help: run-abtf,inference
 default_env:
   MLC_MLPERF_IMPLEMENTATION: reference
   MLC_MLPERF_MODEL: retinanet
   MLC_MLPERF_RUN_STYLE: test
-
 input_mapping:
   backend: MLC_MLPERF_BACKEND
+  batch_size: MLC_MLPERF_LOADGEN_MAX_BATCHSIZE
+  category: MLC_MLPERF_SUBMISSION_SYSTEM_TYPE
   clean: MLC_MLPERF_CLEAN_ALL
   compliance: MLC_MLPERF_LOADGEN_COMPLIANCE
+  constantstream_target_qps: MLC_MLPERF_LOADGEN_CONSTANTSTREAM_TARGET_QPS
   dashboard_wb_project: MLC_MLPERF_DASHBOARD_WANDB_PROJECT
   dashboard_wb_user: MLC_MLPERF_DASHBOARD_WANDB_USER
   debug: MLC_DEBUG_SCRIPT_BENCHMARK_PROGRAM
@@ -40,7 +34,6 @@ input_mapping:
   division: MLC_MLPERF_SUBMISSION_DIVISION
   docker: MLC_MLPERF_USE_DOCKER
   dump_version_info: MLC_DUMP_VERSION_INFO
-  save_console_log: MLC_SAVE_CONSOLE_LOG
   execution_mode: MLC_MLPERF_RUN_STYLE
   find_performance: MLC_MLPERF_FIND_PERFORMANCE_MODE
   framework: MLC_MLPERF_BACKEND
@@ -51,6 +44,8 @@ input_mapping:
   imagenet_path: IMAGENET_PATH
   implementation: MLC_MLPERF_IMPLEMENTATION
   lang: MLC_MLPERF_IMPLEMENTATION
+  max_query_count: MLC_MLPERF_INFERENCE_MAX_QUERY_COUNT
+  min_query_count: MLC_MLPERF_INFERENCE_MIN_QUERY_COUNT
   mode: MLC_MLPERF_LOADGEN_MODE
   model: MLC_MLPERF_MODEL
   multistream_target_latency: MLC_MLPERF_LOADGEN_MULTISTREAM_TARGET_LATENCY
@@ -71,129 +66,74 @@ input_mapping:
   results_git_url: MLC_MLPERF_RESULTS_GIT_REPO_URL
   run_checker: MLC_RUN_SUBMISSION_CHECKER
   run_style: MLC_MLPERF_RUN_STYLE
+  save_console_log: MLC_SAVE_CONSOLE_LOG
   scenario: MLC_MLPERF_LOADGEN_SCENARIO
   server_target_qps: MLC_MLPERF_LOADGEN_SERVER_TARGET_QPS
-  constantstream_target_qps: MLC_MLPERF_LOADGEN_CONSTANTSTREAM_TARGET_QPS
   singlestream_target_latency: MLC_MLPERF_LOADGEN_SINGLESTREAM_TARGET_LATENCY
   skip_submission_generation: MLC_MLPERF_SKIP_SUBMISSION_GENERATION
   skip_truncation: MLC_SKIP_TRUNCATE_ACCURACY
+  status: MLC_MLPERF_SUBMISSION_SYSTEM_STATUS
   submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
   submitter: MLC_MLPERF_SUBMITTER
+  sut: MLC_MLPERF_INFERENCE_SUT_VARIATION
   sut_servers: MLC_NETWORK_LOADGEN_SUT_SERVERS
   sw_notes_extra: MLC_MLPERF_SUT_SW_NOTES_EXTRA
   system_type: MLC_MLPERF_SUBMISSION_SYSTEM_TYPE
   target_latency: MLC_MLPERF_LOADGEN_TARGET_LATENCY
   target_qps: MLC_MLPERF_LOADGEN_TARGET_QPS
   test_query_count: MLC_TEST_QUERY_COUNT
-  min_query_count: MLC_MLPERF_INFERENCE_MIN_QUERY_COUNT
-  max_query_count: MLC_MLPERF_INFERENCE_MAX_QUERY_COUNT
   threads: MLC_NUM_THREADS
-  batch_size: MLC_MLPERF_LOADGEN_MAX_BATCHSIZE
-  sut: MLC_MLPERF_INFERENCE_SUT_VARIATION
-
 new_state_keys:
 - app_mlperf_inference_*
 - mlc-mlperf-inference-results*
-
 deps:
 - tags: detect,os
   skip_if_env:
-    MLC_MLPERF_USE_DOCKER: [ on ]
+    MLC_MLPERF_USE_DOCKER:
+    - true
 - tags: detect,cpu
   skip_if_env:
-    MLC_MLPERF_USE_DOCKER: [ on ]
+    MLC_MLPERF_USE_DOCKER:
+    - true
 - names:
   - python
   - python3
   tags: get,python3
   skip_if_env:
-    MLC_MLPERF_USE_DOCKER: [ on ]
+    MLC_MLPERF_USE_DOCKER:
+    - true
 - names:
   - automotive-src
   tags: get,mlcommons,automotive,src
   skip_if_env:
-    MLC_MLPERF_USE_DOCKER: [ on ]
+    MLC_MLPERF_USE_DOCKER:
+    - true
 - tags: get,sut,description
   skip_if_env:
-    MLC_MLPERF_USE_DOCKER: [ on ]
-
+    MLC_MLPERF_USE_DOCKER:
+    - true
 - tags: get,mlperf,inference,results,dir
   names:
-    - get-mlperf-inference-results-dir
+  - get-mlperf-inference-results-dir
   enable_if_env:
-    MLC_MLPERF_USE_DOCKER: [ off ]
+    MLC_MLPERF_USE_DOCKER:
+    - false
   skip_if_env:
-    OUTPUT_BASE_DIR: [ on ]
+    OUTPUT_BASE_DIR:
+    - true
 - tags: install,pip-package,for-mlc-python,_package.tabulate
 - tags: get,mlperf,automotive,utils
   skip_if_env:
-    MLC_MLPERF_USE_DOCKER: [ on ]
-
+    MLC_MLPERF_USE_DOCKER:
+    - true
 variations:
-  accuracy-only:
-    default_variations:
-      submission-generation-style: full
-    env:
-      MLC_MLPERF_LOADGEN_MODE: accuracy
-      MLC_MLPERF_SUBMISSION_RUN: 'yes'
-      MLC_RUN_MLPERF_ACCURACY: 'on'
-      MLC_RUN_SUBMISSION_CHECKER: 'no'
-    group: submission-generation
-
-  all-modes:
-    env:
-      MLC_MLPERF_LOADGEN_ALL_MODES: 'yes'
-    group: mode
-
-  all-scenarios:
-    env:
-      MLC_MLPERF_LOADGEN_ALL_SCENARIOS: 'yes'
-
-  compliance:
-    env:
-      MLC_MLPERF_LOADGEN_COMPLIANCE: 'yes'
-
-  dashboard:
-    default_gui: false
-    env:
-      MLC_MLPERF_DASHBOARD: 'on'
-
-  find-performance:
-    env:
-      MLC_MLPERF_FIND_PERFORMANCE_MODE: 'yes'
-      MLC_MLPERF_LOADGEN_ALL_MODES: 'no'
-      MLC_MLPERF_LOADGEN_MODE: performance
-      MLC_MLPERF_RESULT_PUSH_TO_GITHUB: false
-    group: submission-generation
-
-  full:
-    add_deps_recursive:
-      coco2014-original:
-        tags: _full
-      coco2014-preprocessed:
-        tags: _full
-    env:
-      MLC_MLPERF_SUBMISSION_GENERATION_STYLE: full
-      MLC_MLPERF_SKIP_SUBMISSION_GENERATION: 'yes'
-    group: submission-generation-style
-
-  performance-only:
-    default_variations:
-      submission-generation-style: full
-    env:
-      MLC_MLPERF_LOADGEN_MODE: performance
-      MLC_MLPERF_SUBMISSION_RUN: 'yes'
-      MLC_RUN_SUBMISSION_CHECKER: 'no'
-    group: submission-generation
-
   mvp-demo:
     default_env:
       MLC_MLPERF_DEVICE: cpu
-
     env:
       MLC_MLPERF_INFERENCE_VERSION: mvp-demo
       MLC_MLPERF_MODEL: abtf-demo-model
-      MLC_MLPERF_BACKEND: pytorch 
+      MLC_MLPERF_BACKEND: pytorch
       MLC_MLPERF_IMPLEMENTATION: mlcommons-python
       MLC_MLPERF_LOADGEN_SCENARIO: SingleStream
       MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: mvp-demo
@@ -201,12 +141,10 @@ variations:
       compiler:
         tags: gcc
     group: benchmark-version
-
   poc-demo:
     default_env:
       MLC_MLPERF_DEVICE: cpu
-      MLC_TEST_QUERY_COUNT: "20"
-
+      MLC_TEST_QUERY_COUNT: '20'
     env:
       MLC_MLPERF_INFERENCE_VERSION: poc-demo
       MLC_MLPERF_MODEL: abtf-poc-model
@@ -218,12 +156,42 @@ variations:
       compiler:
         tags: gcc
     group: benchmark-version
-  
   v0.5:
     group: benchmark-version
     env:
       MLC_MLPERF_INFERENCE_VERSION: v0.5
-
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v0.5
+    adr:
+      automotive-src:
+        version: v0.5
+  v1.0:
+    group: benchmark-version
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: v1.0
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v1.0
+    adr:
+      automotive-src:
+        version: v1.0
+  all-modes:
+    env:
+      MLC_MLPERF_LOADGEN_ALL_MODES: 'yes'
+    group: mode
+  accuracy-only:
+    default_variations:
+      submission-generation-style: full
+    env:
+      MLC_MLPERF_LOADGEN_MODE: accuracy
+      MLC_MLPERF_SUBMISSION_RUN: 'yes'
+      MLC_RUN_MLPERF_ACCURACY: 'on'
+      MLC_RUN_SUBMISSION_CHECKER: 'no'
+    group: submission-generation
+  find-performance:
+    env:
+      MLC_MLPERF_FIND_PERFORMANCE_MODE: 'yes'
+      MLC_MLPERF_LOADGEN_ALL_MODES: 'no'
+      MLC_MLPERF_LOADGEN_MODE: performance
+      MLC_MLPERF_RESULT_PUSH_TO_GITHUB: false
+    group: submission-generation
   performance-and-accuracy:
     default: true
     base:
@@ -231,7 +199,14 @@ variations:
     default_variations:
       submission-generation-style: full
     group: submission-generation
-
+  performance-only:
+    default_variations:
+      submission-generation-style: full
+    env:
+      MLC_MLPERF_LOADGEN_MODE: performance
+      MLC_MLPERF_SUBMISSION_RUN: 'yes'
+      MLC_RUN_SUBMISSION_CHECKER: 'no'
+    group: submission-generation
   submission:
     base:
     - all-modes
@@ -248,10 +223,26 @@ variations:
     post_deps:
     - names:
       - submission-generator
-      enable_if_env:
+      skip_if_env:
         MLC_MLPERF_SKIP_SUBMISSION_GENERATION:
-        - 'no'
-        - 'false'
-        - 'False'
-        - '0'
-      tags: generate,mlperf,inference,submission,_automotive
+        - 'yes'
+      tags: generate,mlperf,inference,submission,_wg-automotive
+  full:
+    add_deps_recursive:
+      coco2014-original:
+        tags: _full
+      coco2014-preprocessed:
+        tags: _full
+    env:
+      MLC_MLPERF_SUBMISSION_GENERATION_STYLE: full
+    group: submission-generation-style
+  all-scenarios:
+    env:
+      MLC_MLPERF_LOADGEN_ALL_SCENARIOS: 'yes'
+  compliance:
+    env:
+      MLC_MLPERF_LOADGEN_COMPLIANCE: 'yes'
+  dashboard:
+    default_gui: false
+    env:
+      MLC_MLPERF_DASHBOARD: 'on'

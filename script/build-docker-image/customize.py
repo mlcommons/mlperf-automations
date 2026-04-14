@@ -28,9 +28,6 @@ def preprocess(i):
                     ) and os.name != 'nt' and "GID=\" $(id -g $USER) \"" not in MLC_DOCKER_BUILD_ARGS:
         MLC_DOCKER_BUILD_ARGS.append(f"GID=\" $(id -g $USER) \"")
 
-    if env.get('MLC_GH_TOKEN', '') != '':
-        MLC_DOCKER_BUILD_ARGS.append("MLC_GH_TOKEN=" + env['MLC_GH_TOKEN'])
-
     if MLC_DOCKER_BUILD_ARGS:
         build_args = "--build-arg " + \
             " --build-arg ".join(MLC_DOCKER_BUILD_ARGS)
@@ -72,10 +69,16 @@ def preprocess(i):
     with open('.dockerignore', 'w') as f:
         f.write('.git\n')
 
+    # Pass GH token as a Docker secret (not as a build arg)
+    secret_args = ''
+    if env.get('MLC_GH_TOKEN', '') != '':
+        secret_args = ' --secret id=gh_token,env=MLC_GH_TOKEN'
+
     # Prepare CMD to build image
     XCMD = [
         f'{env["MLC_CONTAINER_TOOL"]} build ' +
         env.get('MLC_DOCKER_CACHE_ARG', ''),
+        secret_args,
         ' ' + build_args,
         ' -f "' + dockerfile_path + '"',
         ' -t "' + image_name,

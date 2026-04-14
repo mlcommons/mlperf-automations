@@ -1,70 +1,47 @@
-# Identification of this MLC script
 alias: reproduce-mlperf-training-nvidia
 uid: f183628f292341e2
 cache: false
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
-
 category: MLPerf Training
-
-
-# User-friendly tags to find this MLC script
 tags:
-  - reproduce
-  - mlcommons
-  - mlperf
-  - train
-  - training
-  - nvidia-training
-  - nvidia
-
-
-# Map script inputs to environment variables
+- reproduce
+- mlcommons
+- mlperf
+- train
+- training
+- nvidia-training
+- nvidia
 input_mapping:
-  system_conf_name: MLC_MLPERF_NVIDIA_TRAINING_SYSTEM_CONF_NAME
   results_dir: MLC_MLPERF_RESULTS_DIR
-
+  system_conf_name: MLC_MLPERF_NVIDIA_TRAINING_SYSTEM_CONF_NAME
 new_state_keys:
-  - mlperf-training-implementation
-  - MLC_SUT_*
-
-# Dependencies on other MLC scripts
-
+- mlperf-training-implementation
+- MLC_SUT_*
 deps:
-
-  # Detect host OS features
-  - tags: detect,os
-
-  # Detect host CPU features
-  - tags: detect,cpu
-
-  # Install system dependencies on a given host
-  - tags: get,nvidia-docker
-    skip_if_env:
-      MLC_SKIP_GET_NVIDIA_DOCKER:
-        - yes
-
-  # Detect CUDA
-  - names:
-    - cuda
-    tags: get,cuda
-    version: 11.7.0
-
+- tags: detect,os
+- tags: detect,cpu
+- tags: get,nvidia-docker
+  skip_if_env:
+    MLC_SKIP_GET_NVIDIA_DOCKER:
+    - true
+- names:
+  - cuda
+  tags: get,cuda
+  version: 11.7.0
 variations:
   resnet:
     group: benchmark
     env:
       MLC_MLPERF_TRAINING_BENCHMARK: resnet
     deps:
-      - tags: prepare,mlperf,training,resnet,_nvidia
-        names:
-        - prepare-training-data
-        - nvidia-training-data
-      - tags: get,nvidia,training,code
-        names:
-        - nvidia-training-code
-
+    - tags: prepare,mlperf,training,resnet,_nvidia
+      names:
+      - prepare-training-data
+      - nvidia-training-data
+    - tags: get,nvidia,training,code
+      names:
+      - nvidia-training-code
 versions:
   r2.1:
     adr:

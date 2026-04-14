@@ -41,9 +41,6 @@ tags:
 - qaic-software-kit
 uid: 3344655922694bbb
 variations:
-  branch.#:
-    env:
-      MLC_GIT_CHECKOUT: '#'
   repo.#:
     env:
       MLC_GIT_URL: '#'
@@ -53,4 +50,7 @@ variations:
     env:
       MLC_GIT_URL: https://github.com/quic/software-kit-for-qualcomm-cloud-ai-100
     group: repo-source
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
 versions: {}

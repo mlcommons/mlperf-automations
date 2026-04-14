@@ -37,9 +37,6 @@ tags:
 - src-gflags
 uid: f311366ff15e4cdf
 variations:
-  branch.#:
-    env:
-      MLC_GIT_CHECKOUT: '#'
   repo.#:
     env:
       MLC_GIT_URL: '#'
@@ -49,6 +46,9 @@ variations:
     env:
       MLC_GIT_URL: https://github.com/gflags/gflags
     group: repo
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
   sha.#:
     env:
       MLC_GIT_CHECKOUT_SHA: '#'

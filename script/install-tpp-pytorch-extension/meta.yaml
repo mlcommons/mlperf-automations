@@ -49,6 +49,15 @@ tags:
 - src-tpp-pex
 uid: 1701d2f5f4e84d42
 variations:
+  repo.#:
+    env:
+      MLC_GIT_URL: '#'
+    group: repo
+  repo.https://github.com/libxsmm/tpp-pytorch-extension:
+    default: true
+    env:
+      MLC_GIT_URL: https://github.com/libxsmm/tpp-pytorch-extension
+    group: repo
   branch.#:
     env:
       MLC_GIT_CHECKOUT: '#'
@@ -81,15 +90,6 @@ variations:
     - tags: install,llvm,src,_for-intel-mlperf-inference-v3.1-gptj
     env:
       MLC_CONDA_ENV: 'yes'
-  repo.#:
-    env:
-      MLC_GIT_URL: '#'
-    group: repo
-  repo.https://github.com/libxsmm/tpp-pytorch-extension:
-    default: true
-    env:
-      MLC_GIT_URL: https://github.com/libxsmm/tpp-pytorch-extension
-    group: repo
   sha.#:
     env:
       MLC_GIT_CHECKOUT_SHA: '#'

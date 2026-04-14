@@ -15,13 +15,6 @@ tests:
     - r2-downloader,mlc,dry-run,235b-a22b
 uid: d52b9d6ab4f640e0
 variations:
-  dry-run:
-    env:
-      MLC_DOWNLOAD_MODE: dry
-    group: run-mode
-  dry-run,r2-downloader:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   mlc:
     default: true
     env:
@@ -54,6 +47,13 @@ variations:
   235b-a22b:
     group: parameters
     default: true
+  dry-run:
+    env:
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   mlc,235b-a22b,r2-downloader:
     adr:
       qwen3-vlm-model-dae:
