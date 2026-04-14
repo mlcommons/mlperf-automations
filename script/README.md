@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-04-10 22:41:27*
+*Last updated: 2026-04-14 21:28:16*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -33,6 +33,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [ROCm automation](#rocm-automation)
 - [Remote automation](#remote-automation)
 - [Reproducibility and artifact evaluation](#reproducibility-and-artifact-evaluation)
+- [Testing](#testing)
 - [Tests](#tests)
 - [TinyML automation](#tinyml-automation)
 - [Uncategorized](#uncategorized)
@@ -937,6 +938,12 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - get-ipol-src
   - Tags: `get`, `ipol`, `journal`, `src`, `ipol-src`
 
+## Testing
+
+- **[validate-mlc-json](validate-mlc-json/)**
+  - validate-mlc-json
+  - Tags: `validate`, `mlc-json`
+
 ## Tests
 
 - **[run-python](run-python/)**
@@ -1109,8 +1116,8 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 324
-- **Categories**: 31
+- **Total Scripts**: 325
+- **Categories**: 32
 
 ## Usage
 

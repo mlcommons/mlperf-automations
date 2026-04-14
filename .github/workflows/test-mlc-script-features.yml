@@ -286,15 +286,9 @@ jobs:
     - name: Test print_deps option
       shell: bash
       run: |
-        # detect-cpu has deps on detect-os, print_deps should list them
-        OUTPUT=$(mlcr detect,cpu --print_deps --quiet 2>&1)
-        if echo "$OUTPUT" | grep -qi "detect.*os\|mlcr"; then
-          echo "PASS: print_deps correctly listed dependency commands"
-        else
-          echo "WARNING: print_deps output may be empty if deps resolved from cache"
-        fi
-        # Ensure the command itself succeeds
-        mlcr detect,cpu --print_deps --quiet
+        # detect-cpu has deps on detect-os, verify deps resolved via validate script
+        mlcr detect,cpu --print_deps --json --quiet > /tmp/mlc-printdeps-test.json 2>&1
+        mlcr validate,mlc-json --json_file=/tmp/mlc-printdeps-test.json --expected_return=0 --dep_tags="detect,os" --quiet
 
     - name: Test silent option
       shell: bash
@@ -539,14 +533,9 @@ jobs:
     - name: Test json output option
       shell: bash
       run: |
-        # --json should produce JSON-formatted output
-        OUTPUT=$(mlcr detect,os --json --quiet 2>&1)
-        # Check if output contains JSON-like structure (curly braces)
-        if echo "$OUTPUT" | grep -q '{'; then
-          echo "PASS: --json produced JSON-formatted output"
-        else
-          echo "WARNING: --json output may not contain JSON"
-        fi
+        # --json should produce valid JSON with return code, env, and expected keys
+        mlcr detect,os --json --quiet > /tmp/mlc-json-test.json 2>&1
+        mlcr validate,mlc-json --json_file=/tmp/mlc-json-test.json --expected_return=0 --env_keys=MLC_HOST_OS_TYPE,MLC_HOST_OS_BITS --quiet
 
     - name: Test j shorthand for json
       shell: bash
