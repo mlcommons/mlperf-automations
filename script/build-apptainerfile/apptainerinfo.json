@@ -19,7 +19,8 @@
         "wget",
         "python3-venv",
         "unzip",
-        "ca-certificates"
+        "ca-certificates",
+        "binutils"
       ],
       "versions": {
         "20.04": {
@@ -46,7 +47,8 @@
         "python-pip",
         "git",
         "wget",
-        "sudo"
+        "sudo",
+        "binutils"
       ],
       "versions": {
         "8": {
@@ -56,7 +58,8 @@
             "python39-pip",
             "git",
             "wget",
-            "sudo"
+            "sudo",
+            "binutils"
           ],
           "PYTHON": "python3.9"
         },
@@ -73,7 +76,8 @@
         "python3-pip",
         "git",
         "wget",
-        "sudo"
+        "sudo",
+        "binutils"
       ],
       "versions": {
         "8": {
@@ -83,7 +87,8 @@
             "python39-pip",
             "git",
             "wget",
-            "sudo"
+            "sudo",
+            "binutils"
           ],
           "PYTHON": "python3.9"
         },
@@ -105,7 +110,8 @@
         "wget",
         "python3-venv",
         "unzip",
-        "ca-certificates"
+        "ca-certificates",
+        "binutils"
       ],
       "versions": {
         "11": {
@@ -131,7 +137,8 @@
         "ca-certificates",
         "gzip",
         "tar",
-        "gawk"
+        "gawk",
+        "binutils"
       ],
       "versions": {
         "15.4": {
@@ -146,7 +153,8 @@
             "ca-certificates",
             "gzip",
             "tar",
-            "gawk"
+            "gawk",
+            "binutils"
           ],
           "PYTHON": "python3.10"
         },
@@ -169,7 +177,8 @@
         "python-pip",
         "git",
         "wget",
-        "sudo"
+        "sudo",
+        "binutils"
       ],
       "versions": {
         "latest": {}
@@ -188,7 +197,8 @@
         "sudo",
         "tar",
         "gzip",
-        "unzip"
+        "unzip",
+        "binutils"
       ],
       "versions": {
         "2023": {
