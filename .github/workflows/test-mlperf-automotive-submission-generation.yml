@@ -58,9 +58,12 @@ jobs:
         pip install mlcflow
         pip install tabulate
     - name: Pull MLOps repository
+      env:
+        PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
       run: |
         if [ -z "${{ inputs.repo-url }}" ]; then
-          mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
+          mlc pull repo "$PR_HEAD_REPO" --branch="$PR_HEAD_REF"
         else
           mlc pull repo mlcommons@mlperf-automations --branch=dev
         fi
@@ -72,6 +75,9 @@ jobs:
         echo "Cloning examples from: $examples_repo_url (branch: $examples_repo_branch)"
         git clone -b $examples_repo_branch $examples_repo_url submission_generation_examples    
     - name: Run Submission Generation - round-${{ matrix.round }}${{ matrix.case }} ${{ matrix.action }} ${{ matrix.category }} ${{ matrix.division }} 
+      env:
+        PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
       run: |
         if [ "${{ matrix.case }}" == "closed" ]; then
           description="Test submission - contains closed edge"
@@ -83,7 +89,7 @@ jobs:
 
         docker_tags=""
         if [ "${{ matrix.action }}" == "docker" ] && [ -z "${{ inputs.repo-url }}" ]; then
-          docker_tags="--docker_mlc_repo=${{ github.event.pull_request.head.repo.html_url }} --docker_mlc_repo_branch=${{ github.event.pull_request.head.ref }}"
+          docker_tags="--docker_mlc_repo=$PR_HEAD_REPO --docker_mlc_repo_branch=$PR_HEAD_REF"
         fi
 
         if [ -n "${{ inputs.repo-url }}" ]; then
