@@ -12,6 +12,9 @@ default_version: master
 deps:
 - tags: detect,os
 - names:
+  - loguru
+  tags: get,generic-python-lib,_package.loguru
+- names:
   - python
   - python3
   tags: get,python3
