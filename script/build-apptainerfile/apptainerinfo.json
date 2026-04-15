@@ -40,7 +40,7 @@
     },
     "rhel": {
       "FROM": "docker://registry.access.redhat.com/ubi9",
-      "package-manager-update-cmd": "dnf update -y --allowerasing",
+      "package-manager-update-cmd": "dnf -y distro-sync",
       "package-manager-get-cmd": "dnf install -y",
       "packages": [
         "python3",
@@ -69,7 +69,7 @@
     },
     "rocky": {
       "FROM": "docker://rockylinux:9",
-      "package-manager-update-cmd": "dnf update -y --allowerasing",
+      "package-manager-update-cmd": "dnf -y distro-sync",
       "package-manager-get-cmd": "dnf install -y",
       "packages": [
         "python3",
@@ -187,7 +187,7 @@
     },
     "amazonlinux": {
       "FROM": "docker://amazonlinux:2023",
-      "package-manager-update-cmd": "dnf update -y --allowerasing",
+      "package-manager-update-cmd": "dnf -y distro-sync",
       "package-manager-get-cmd": "dnf install -y",
       "packages": [
         "python3",
