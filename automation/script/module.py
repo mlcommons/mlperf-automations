@@ -694,8 +694,8 @@ class ScriptAutomation(Automation):
         if input_mapping:
             update_env_from_input_mapping(
                 env, i, input_mapping, input_description)
-            update_env_from_input_mapping(
-                const, i, input_mapping, input_description)
+            #update_env_from_input_mapping(
+            #    const, i, input_mapping, input_description)
 
         # This mapping is done in docker script
         # if docker_input_mapping:
@@ -1565,7 +1565,9 @@ class ScriptAutomation(Automation):
 
                 run_script_input['meta'] = meta
                 run_script_input['env'] = env
+                run_script_input['const'] = const
                 run_script_input['state'] = state
+                run_script_input['const_state'] = const_state
                 run_script_input['run_state'] = run_state
                 run_script_input['recursion'] = recursion
                 run_script_input['recursion_spaces'] = self.recursion_spaces
@@ -5215,6 +5217,8 @@ def run_postprocess(customize_code, customize_common_input, recursion_spaces,
         ii = copy.deepcopy(customize_common_input)
         ii['env'] = env
         ii['state'] = state
+        ii['const'] = const
+        ii['const_state'] = const_state
         ii['meta'] = meta
         ii['recursion_spaces'] = recursion_spaces
         ii['automation'] = customize_common_input['automation']
