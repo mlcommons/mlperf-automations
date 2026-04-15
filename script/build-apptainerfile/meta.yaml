@@ -1,0 +1,52 @@
+alias: build-apptainerfile
+uid: 1ee598bbb59f7ff8
+automation_alias: script
+automation_uid: 5b4e0237da074764
+tags:
+- build
+- apptainerfile
+- apptainer
+- definition
+cache: false
+category: Container automation
+default_env:
+  MLC_APPTAINER_OS: ubuntu
+  MLC_APPTAINER_OS_VERSION: '24.04'
+  MLC_MLOPS_REPO_BRANCH: dev
+input_mapping:
+  base_image: MLC_APPTAINER_IMAGE_BASE
+  build: MLC_BUILD_APPTAINER_IMAGE
+  os: MLC_APPTAINER_OS
+  os_version: MLC_APPTAINER_OS_VERSION
+  docker_os: MLC_APPTAINER_OS
+  docker_os_version: MLC_APPTAINER_OS_VERSION
+  file_path: MLC_APPTAINERFILE_WITH_PATH
+  gh_token: MLC_GH_TOKEN
+  image_repo: MLC_APPTAINER_IMAGE_REPO
+  image_tag: MLC_APPTAINER_IMAGE_TAG
+  mlc_repo: MLC_MLOPS_REPO
+  mlc_repo_branch: MLC_MLOPS_REPO_BRANCH
+  mlc_repo_flags: MLC_APPTAINER_ADD_FLAG_TO_MLC_MLOPS_REPO
+  mlc_repo_path: MLC_REPO_PATH
+  mlc_repos: MLC_APPTAINER_EXTRA_MLC_REPOS
+  extra_sys_deps: MLC_APPTAINER_EXTRA_SYS_DEPS
+  post_run_cmds: MLC_APPTAINER_POST_RUN_COMMANDS
+  pre_run_cmds: MLC_APPTAINER_PRE_RUN_COMMANDS
+  script_tags: MLC_APPTAINER_RUN_SCRIPT_TAGS
+  run_cmd: MLC_APPTAINER_RUN_CMD
+  run_cmd_extra: MLC_APPTAINER_RUN_CMD_EXTRA
+  fakeroot: MLC_APPTAINER_FAKEROOT
+  sandbox: MLC_APPTAINER_BUILD_SANDBOX
+new_env_keys:
+- MLC_APPTAINERFILE_*
+deps:
+- tags: get-apptainer
+  names:
+  - apptainer
+post_deps:
+- enable_if_env:
+    MLC_BUILD_APPTAINER_IMAGE:
+    - 'yes'
+  names:
+  - build-apptainer-image
+  tags: build,apptainer,image
