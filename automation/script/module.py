@@ -3720,6 +3720,8 @@ pip install mlcflow
                             f)]
 
                     for f in file_list:
+                        if os.path.isdir(f):
+                            continue
                         duplicate = False
                         for existing in found_files:
                             if os.path.samefile(existing, f):
@@ -3754,6 +3756,8 @@ pip install mlcflow
                     for suff in file_pattern_suffixes:
                         file_list = glob.glob(path_to_file + suff)
                         for f in file_list:
+                            if os.path.isdir(f):
+                                continue
                             duplicate = False
 
                             for existing in found_files:
