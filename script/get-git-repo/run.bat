@@ -69,6 +69,20 @@ echo MLC_GIT_CHECKOUT=!ACTUAL_CHECKOUT!>>"%ENV_OUT_FILE%"
 echo MLC_GIT_SHA=!CURRENT_SHA!>>"%ENV_OUT_FILE%"
 
 :: ---------------------------------------------------------
+:: Check git user identity (needed for cherry-picks and patches)
+:: ---------------------------------------------------------
+for /f "delims=" %%e in ('git config user.email 2^>nul') do set "GIT_USER_EMAIL=%%e"
+if "!GIT_USER_EMAIL!"=="" (
+    echo Git user email not configured, using dummy value for this repo
+    git config user.email "dummy@mlcommons.org"
+)
+for /f "delims=" %%n in ('git config user.name 2^>nul') do set "GIT_USER_NAME=%%n"
+if "!GIT_USER_NAME!"=="" (
+    echo Git user name not configured, using dummy value for this repo
+    git config user.name "Dummy User"
+)
+
+:: ---------------------------------------------------------
 :: Apply PR, Cherry-picks, and Patches
 :: ---------------------------------------------------------
 if not "%MLC_GIT_PR_TO_APPLY%"=="" (
