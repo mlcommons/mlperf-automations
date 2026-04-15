@@ -81,26 +81,6 @@ if not "%MLC_GIT_PR_TO_APPLY%"=="" (
 )
 
 if not "%MLC_GIT_CHERRYPICKS%"=="" (
-    :: Check git user identity (needed for cherry-pick commits)
-    set "GIT_USER_EMAIL="
-    set "GIT_USER_NAME="
-    for /f "delims=" %%e in ('git config user.email 2^>nul') do set "GIT_USER_EMAIL=%%e"
-    for /f "delims=" %%n in ('git config user.name 2^>nul') do set "GIT_USER_NAME=%%n"
-    if "!GIT_USER_EMAIL!"=="" (set "GIT_IDENTITY_MISSING=1")
-    if "!GIT_USER_NAME!"=="" (set "GIT_IDENTITY_MISSING=1")
-    if defined GIT_IDENTITY_MISSING (
-        if "!MLC_QUIET!"=="yes" (
-            echo Git user identity not configured, using dummy values for this repo
-            git config user.email "dummy@mlcommons.org"
-            git config user.name "Dummy User"
-        ) else (
-            echo ERROR: Git user identity is not configured.
-            echo Please run the following commands to configure it:
-            echo   git config --global user.email "you@example.com"
-            echo   git config --global user.name "Your Name"
-            exit /b 1
-        )
-    )
     :: Log the cherry-picks applied
     echo MLC_GIT_APPLIED_CHERRYPICKS=%MLC_GIT_CHERRYPICKS%>>"%ENV_OUT_FILE%"
     
