@@ -69,18 +69,6 @@ echo "MLC_GIT_CHECKOUT=${ACTUAL_CHECKOUT}" >> "$ENV_OUT_FILE"
 echo "MLC_GIT_SHA=${CURRENT_SHA}" >> "$ENV_OUT_FILE"
 
 # ---------------------------------------------------------
-# Check git user identity (needed for cherry-picks and patches)
-# ---------------------------------------------------------
-if [ -z "$(git config user.email)" ]; then
-  echo "Git user email not configured, using dummy value for this repo"
-  git config user.email "dummy@mlcommons.org"
-fi
-if [ -z "$(git config user.name)" ]; then
-  echo "Git user name not configured, using dummy value for this repo"
-  git config user.name "Dummy User"
-fi
-
-# ---------------------------------------------------------
 # Apply PR, Cherry-picks, and Patches
 # ---------------------------------------------------------
 if [ ! -z ${MLC_GIT_PR_TO_APPLY} ]; then
@@ -93,6 +81,20 @@ if [ ! -z ${MLC_GIT_PR_TO_APPLY} ]; then
 fi
 
 if [ ! -z "${MLC_GIT_CHERRYPICKS}" ]; then
+  # Check git user identity (needed for cherry-pick commits)
+  if [ -z "$(git config user.email)" ] || [ -z "$(git config user.name)" ]; then
+    if [ "${MLC_QUIET}" == "yes" ]; then
+      echo "Git user identity not configured, using dummy values for this repo"
+      git config user.email "dummy@mlcommons.org"
+      git config user.name "Dummy User"
+    else
+      echo "ERROR: Git user identity is not configured."
+      echo "Please run the following commands to configure it:"
+      echo "  git config --global user.email \"you@example.com\""
+      echo "  git config --global user.name \"Your Name\""
+      exit 1
+    fi
+  fi
   # Log the cherry-picks applied
   echo "MLC_GIT_APPLIED_CHERRYPICKS=${MLC_GIT_CHERRYPICKS}" >> "$ENV_OUT_FILE"
   
