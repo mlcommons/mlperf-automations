@@ -751,6 +751,7 @@ class ScriptAutomation(Automation):
         if version and f"version.{version}" not in variation_tags and (
                 f"version.{version}" in variations or "version.#" in variations):
             logger.debug(
+                self.recursion_spaces +
                 f"version.{version} added as a variation tag from input version")
             variation_tags.append(f"version.{version}")
 
