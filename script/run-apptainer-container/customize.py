@@ -19,7 +19,7 @@ def preprocess(i):
 
     if 'MLC_APPTAINER_RUN_SCRIPT_TAGS' not in env:
         env['MLC_APPTAINER_RUN_SCRIPT_TAGS'] = "run,apptainer,container"
-        MLC_RUN_CMD = "mlc --help"
+        MLC_RUN_CMD = "mlcr --help"
     else:
         MLC_RUN_CMD = "mlcr " + \
             env['MLC_APPTAINER_RUN_SCRIPT_TAGS'] + ' --quiet'
