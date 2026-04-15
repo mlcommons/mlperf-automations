@@ -72,6 +72,7 @@ def detect_version(i):
 def postprocess(i):
 
     env = i['env']
+    const = i['const']
     r = detect_version(i)
     if r['return'] > 0:
         return r
@@ -79,6 +80,7 @@ def postprocess(i):
     env['MLC_COMPILER_FAMILY'] = 'GCC'
     version = r['version']
     env['MLC_COMPILER_VERSION'] = env['MLC_GCC_VERSION']
+    const['MLC_GCC_VERSION'] = env['MLC_GCC_VERSION']
     env['MLC_GCC_CACHE_TAGS'] = 'version-' + version
     env['MLC_COMPILER_CACHE_TAGS'] = 'version-' + version + ',family-gcc'
 
