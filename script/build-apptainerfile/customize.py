@@ -185,7 +185,7 @@ def preprocess(i):
         run_cmd_extra = " " + env.get('MLC_APPTAINER_RUN_CMD_EXTRA', '').replace(":", "=")
         if 'MLC_APPTAINER_RUN_CMD' not in env:
             if 'MLC_APPTAINER_RUN_SCRIPT_TAGS' not in env:
-                env['MLC_APPTAINER_RUN_CMD'] = "mlc version"
+                env['MLC_APPTAINER_RUN_CMD'] = "mlc --help"
             else:
                 env['MLC_APPTAINER_RUN_CMD'] = "mlcr " + \
                     env['MLC_APPTAINER_RUN_SCRIPT_TAGS'] + ' --quiet'
