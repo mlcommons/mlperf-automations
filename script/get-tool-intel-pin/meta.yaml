@@ -38,8 +38,16 @@ tests:
   - {}
 uid: a187464b1a794f23
 variations:
-  version.4.0:
+  version.4.2:
     default: true
+    env:
+      MLC_DOWNLOAD_URL: https://software.intel.com/sites/landingpage/pintool/downloads/pin-external-4.2-99776-g21d818fa2-gcc-linux.tar.gz
+    group: version
+  version.4.1:
+    env:
+      MLC_DOWNLOAD_URL: https://software.intel.com/sites/landingpage/pintool/downloads/pin-external-4.1-99687-gd9b8f822c-gcc-linux.tar.gz
+    group: version
+  version.4.0:
     env:
       MLC_DOWNLOAD_URL: https://software.intel.com/sites/landingpage/pintool/downloads/pin-external-4.0-99633-g5ca9893f2-gcc-linux.tar.gz
     group: version
