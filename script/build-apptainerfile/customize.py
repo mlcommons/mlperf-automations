@@ -23,7 +23,9 @@ def preprocess(i):
     with open(os.path.join(path, "apptainerinfo.json")) as f:
         config = json.load(f)
 
-    apptainer_os = env.get('MLC_APPTAINER_OS', env.get('MLC_DOCKER_OS', 'ubuntu'))
+    apptainer_os = env.get(
+        'MLC_APPTAINER_OS', env.get(
+            'MLC_DOCKER_OS', 'ubuntu'))
     env['MLC_APPTAINER_OS'] = apptainer_os
 
     supported_distros = list(config.get('distros', {}).keys())
@@ -136,7 +138,8 @@ def preprocess(i):
         f.write("    # Set timezone\n")
         f.write("    export TZ=US/Pacific\n")
         f.write("    export DEBIAN_FRONTEND=noninteractive\n")
-        f.write("    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone\n")
+        f.write(
+            "    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone\n")
         f.write("\n")
 
         f.write("    # Install system dependencies\n")
@@ -163,7 +166,8 @@ def preprocess(i):
             x = env.get('MLC_APPTAINER_ADD_FLAG_TO_MLC_MLOPS_REPO', '')
             if x != '':
                 x = ' ' + x
-            f.write(f"    mlc pull repo {mlc_mlops_repo}{mlc_mlops_repo_branch_string}{x} --quiet\n")
+            f.write(
+                f"    mlc pull repo {mlc_mlops_repo}{mlc_mlops_repo_branch_string}{x} --quiet\n")
 
         # Extra repos
         extra_repos = env.get('MLC_APPTAINER_EXTRA_MLC_REPOS', '')
@@ -182,7 +186,8 @@ def preprocess(i):
             f.write("\n")
 
         # Main run command
-        run_cmd_extra = " " + env.get('MLC_APPTAINER_RUN_CMD_EXTRA', '').replace(":", "=")
+        run_cmd_extra = " " + \
+            env.get('MLC_APPTAINER_RUN_CMD_EXTRA', '').replace(":", "=")
         if 'MLC_APPTAINER_RUN_CMD' not in env:
             if 'MLC_APPTAINER_RUN_SCRIPT_TAGS' not in env:
                 env['MLC_APPTAINER_RUN_CMD'] = "mlcr --help"
@@ -217,7 +222,8 @@ def preprocess(i):
 
         # Help
         f.write("%help\n")
-        f.write(f"    Apptainer container based on {apptainer_os}:{apptainer_os_version}\n")
+        f.write(
+            f"    Apptainer container based on {apptainer_os}:{apptainer_os_version}\n")
         f.write("    Built with MLC workflow automation framework.\n")
         f.write("    Run with: apptainer run <image.sif> <command>\n")
 
@@ -237,7 +243,9 @@ def get_value(env, config, key, env_key=None):
     apptainer_os_version = env['MLC_APPTAINER_OS_VERSION']
 
     distro_config = config['distros'].get(apptainer_os, {})
-    version_meta = distro_config.get('versions', {}).get(apptainer_os_version, {})
+    version_meta = distro_config.get(
+        'versions', {}).get(
+        apptainer_os_version, {})
     if key in version_meta:
         return version_meta[key]
 

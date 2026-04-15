@@ -41,7 +41,8 @@ def preprocess(i):
     else:
         logger.info('')
         logger.info(f'Apptainer SIF image not found: {sif_path}')
-        logger.info('Will build via build-apptainer-image -> build-apptainerfile')
+        logger.info(
+            'Will build via build-apptainer-image -> build-apptainerfile')
 
     return {'return': 0}
 

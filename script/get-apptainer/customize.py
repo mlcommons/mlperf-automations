@@ -73,7 +73,7 @@ def postprocess(i):
     tool = r['tool']
     found_file_path = env.get('MLC_APPTAINER_BIN_WITH_PATH', '')
     if not found_file_path:
-        found_file_path = shutil.which('apptainer') or ''  
+        found_file_path = shutil.which('apptainer') or ''
         if not found_file_path:
             return {'return': 1, 'error': 'Apptainer binary not found in PATH'}
         env['MLC_APPTAINER_BIN_WITH_PATH'] = found_file_path

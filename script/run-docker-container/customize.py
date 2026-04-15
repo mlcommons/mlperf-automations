@@ -21,7 +21,6 @@ def preprocess(i):
     if is_true(interactive):
         env['MLC_DOCKER_DETACHED_MODE'] = 'no'
 
-    
     if env.get('MLC_DOCKER_RUN_CMD', '') == '':
         if 'MLC_DOCKER_RUN_SCRIPT_TAGS' not in env:
             env['MLC_DOCKER_RUN_SCRIPT_TAGS'] = "run,docker,container"
@@ -29,7 +28,7 @@ def preprocess(i):
         else:
             MLC_RUN_CMD = "mlcr " + \
                 env['MLC_DOCKER_RUN_SCRIPT_TAGS'] + ' --quiet'
-    
+
         env['MLC_DOCKER_RUN_CMD'] = MLC_RUN_CMD
 
     r = mlc.access({'action': 'search',
@@ -43,7 +42,6 @@ def preprocess(i):
 
     PATH = r['list'][0].path
     os.chdir(PATH)
-
 
     # Updating Docker info
     update_docker_info(env)

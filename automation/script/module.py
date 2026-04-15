@@ -694,7 +694,7 @@ class ScriptAutomation(Automation):
         if input_mapping:
             update_env_from_input_mapping(
                 env, i, input_mapping, input_description)
-            #update_env_from_input_mapping(
+            # update_env_from_input_mapping(
             #    const, i, input_mapping, input_description)
 
         # This mapping is done in docker script
