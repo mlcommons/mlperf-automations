@@ -752,7 +752,7 @@ class ScriptAutomation(Automation):
                 f"version.{version}" in variations or "version.#" in variations):
             logger.debug(
                 self.recursion_spaces +
-                f"version.{version} added as a variation tag from input version")
+                f"  - version.{version} added as a variation tag from input version")
             variation_tags.append(f"version.{version}")
 
         run_state['docker'] = meta.get('docker', {})
@@ -3720,6 +3720,8 @@ pip install mlcflow
                             f)]
 
                     for f in file_list:
+                        if os.path.isdir(f):
+                            continue
                         duplicate = False
                         for existing in found_files:
                             if os.path.samefile(existing, f):
@@ -3754,6 +3756,8 @@ pip install mlcflow
                     for suff in file_pattern_suffixes:
                         file_list = glob.glob(path_to_file + suff)
                         for f in file_list:
+                            if os.path.isdir(f):
+                                continue
                             duplicate = False
 
                             for existing in found_files:
@@ -4020,7 +4024,6 @@ pip install mlcflow
         run_script_input = i.get('run_script_input', {})
         extra_paths = i.get('extra_paths', {})
         force_given_path = False
-        i.get('force_given_path', False)
 
         # Create and work on a copy to avoid contamination
         env_copy = copy.deepcopy(env)
@@ -4078,7 +4081,7 @@ pip install mlcflow
             # Add the folder and its subdirectories to priority paths (max
             # depth to avoid NFS issues)
             priority_folder_paths.append(priority_folder)
-            max_depth = int(env.get('MLC_TMP_FOLDER_MAX_DEPTH', '5'))
+            max_depth = int(env.get('MLC_TMP_FOLDER_MAX_DEPTH', '4'))
             for root, dirs, files_in_dir in os.walk(priority_folder):
                 # Calculate current depth relative to priority_folder
                 depth = root[len(priority_folder):].count(os.sep)

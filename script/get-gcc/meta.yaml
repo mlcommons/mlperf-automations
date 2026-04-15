@@ -36,3 +36,4 @@ variations:
   path.#:
     env:
       MLC_GCC_DIR_PATH: '#'
+      MLC_TMP_GCC_FORCE_GIVEN_PATH: 'yes'
