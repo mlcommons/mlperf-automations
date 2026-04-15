@@ -61,3 +61,66 @@ prehook_deps:
     MLC_APPTAINER_SKIP_BUILD:
     - 'yes'
   tags: build,apptainer,image
+
+tests:
+  run_inputs:
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '20.04'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '22.04'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '24.04'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '25.04'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: rhel
+      MLC_APPTAINER_OS_VERSION: '8'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: rhel
+      MLC_APPTAINER_OS_VERSION: '9'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: arch
+      MLC_APPTAINER_OS_VERSION: latest
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: sles
+      MLC_APPTAINER_OS_VERSION: '15.4'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: sles
+      MLC_APPTAINER_OS_VERSION: '15.5'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: sles
+      MLC_APPTAINER_OS_VERSION: '15.6'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: debian
+      MLC_APPTAINER_OS_VERSION: '11'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: debian
+      MLC_APPTAINER_OS_VERSION: '12'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: rocky
+      MLC_APPTAINER_OS_VERSION: '8'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: rocky
+      MLC_APPTAINER_OS_VERSION: '9'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: amazonlinux
+      MLC_APPTAINER_OS_VERSION: '2023'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os

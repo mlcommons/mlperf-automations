@@ -35,3 +35,51 @@ prehook_deps:
     MLC_BUILD_APPTAINERFILE:
     - 'yes'
   tags: build,apptainerfile
+
+tests:
+  run_inputs:
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '20.04'
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '22.04'
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '24.04'
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '25.04'
+  - env:
+      MLC_APPTAINER_OS: rhel
+      MLC_APPTAINER_OS_VERSION: '8'
+  - env:
+      MLC_APPTAINER_OS: rhel
+      MLC_APPTAINER_OS_VERSION: '9'
+  - env:
+      MLC_APPTAINER_OS: arch
+      MLC_APPTAINER_OS_VERSION: latest
+  - env:
+      MLC_APPTAINER_OS: sles
+      MLC_APPTAINER_OS_VERSION: '15.4'
+  - env:
+      MLC_APPTAINER_OS: sles
+      MLC_APPTAINER_OS_VERSION: '15.5'
+  - env:
+      MLC_APPTAINER_OS: sles
+      MLC_APPTAINER_OS_VERSION: '15.6'
+  - env:
+      MLC_APPTAINER_OS: debian
+      MLC_APPTAINER_OS_VERSION: '11'
+  - env:
+      MLC_APPTAINER_OS: debian
+      MLC_APPTAINER_OS_VERSION: '12'
+  - env:
+      MLC_APPTAINER_OS: rocky
+      MLC_APPTAINER_OS_VERSION: '8'
+  - env:
+      MLC_APPTAINER_OS: rocky
+      MLC_APPTAINER_OS_VERSION: '9'
+  - env:
+      MLC_APPTAINER_OS: amazonlinux
+      MLC_APPTAINER_OS_VERSION: '2023'
