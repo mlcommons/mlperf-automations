@@ -1,32 +1,22 @@
 alias: copy-to-clipboard
 uid: 8b3aaa97ce58474d
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
-
 cache: false
-
 category: DevOps automation
-
 tags:
 - copy
 - to
 - clipboard
 - copy-to-clipboard
-
 deps:
-
-  # Get Python
-  - tags: get,python3
-    names:
-      - python
-      - python3
-
-  # Extra package
-  - tags: get,generic-python-lib,_package.pyperclip
-
+- tags: get,python3
+  names:
+  - python
+  - python3
+- tags: get,generic-python-lib,_package.pyperclip
 input_mapping:
-  text: MLC_COPY_TO_CLIPBOARD_TEXT
-  t: MLC_COPY_TO_CLIPBOARD_TEXT
   add_quotes: MLC_COPY_TO_CLIPBOARD_TEXT_ADD_QUOTES
   q: MLC_COPY_TO_CLIPBOARD_TEXT_ADD_QUOTES
+  t: MLC_COPY_TO_CLIPBOARD_TEXT
+  text: MLC_COPY_TO_CLIPBOARD_TEXT

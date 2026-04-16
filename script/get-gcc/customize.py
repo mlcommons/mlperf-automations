@@ -31,6 +31,7 @@ def preprocess(i):
                                            'os_info': os_info,
                                            'default_path_env_key': 'PATH',
                                            'detect_version': True,
+                                           'force_given_path': env.get('MLC_TMP_GCC_FORCE_GIVEN_PATH', False),
                                            'env_path_key': 'MLC_GCC_BIN_WITH_PATH',
                                            'run_script_input': i['run_script_input'],
                                            'recursion_spaces': recursion_spaces})
@@ -71,6 +72,7 @@ def detect_version(i):
 def postprocess(i):
 
     env = i['env']
+    const = i['const']
     r = detect_version(i)
     if r['return'] > 0:
         return r
@@ -78,6 +80,7 @@ def postprocess(i):
     env['MLC_COMPILER_FAMILY'] = 'GCC'
     version = r['version']
     env['MLC_COMPILER_VERSION'] = env['MLC_GCC_VERSION']
+    const['MLC_GCC_VERSION'] = env['MLC_GCC_VERSION']
     env['MLC_GCC_CACHE_TAGS'] = 'version-' + version
     env['MLC_COMPILER_CACHE_TAGS'] = 'version-' + version + ',family-gcc'
 

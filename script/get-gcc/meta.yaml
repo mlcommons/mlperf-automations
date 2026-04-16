@@ -31,9 +31,9 @@ tags:
 - get-gcc
 uid: dbf4ab5cbed74372
 variations:
+  version.#:
+    group: version
   path.#:
     env:
       MLC_GCC_DIR_PATH: '#'
-  version.#:
-    group: version
-
+      MLC_TMP_GCC_FORCE_GIVEN_PATH: 'yes'

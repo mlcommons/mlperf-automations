@@ -44,6 +44,15 @@ tags:
 - src-onednn
 uid: fe3a652e315f4c8f
 variations:
+  repo.#:
+    env:
+      MLC_GIT_URL: '#'
+    group: repo
+  repo.https://github.com/oneapi-src/oneDNN:
+    default: true
+    env:
+      MLC_GIT_URL: https://github.com/oneapi-src/oneDNN
+    group: repo
   branch.#:
     env:
       MLC_GIT_CHECKOUT: '#'
@@ -58,15 +67,6 @@ variations:
     env:
       MLC_CONDA_ENV: 'yes'
       MLC_FOR_INTEL_MLPERF_INFERENCE_BERT: 'yes'
-  repo.#:
-    env:
-      MLC_GIT_URL: '#'
-    group: repo
-  repo.https://github.com/oneapi-src/oneDNN:
-    default: true
-    env:
-      MLC_GIT_URL: https://github.com/oneapi-src/oneDNN
-    group: repo
   sha.#:
     env:
       MLC_GIT_CHECKOUT_SHA: '#'

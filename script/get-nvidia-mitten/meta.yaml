@@ -12,7 +12,7 @@ deps:
   tags: get,python3
 - tags: get,generic-python-lib,_pycuda
   names:
-    - pycuda
+  - pycuda
 - env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_NVIDIA_MITTEN_SRC
   extra_cache_tags: nvidia,mitten,src
@@ -34,13 +34,13 @@ tags:
 - nvidia-mitten
 uid: 1c045f2902374de9
 variations:
+  default:
+    group: numpy-patch
   patched:
     group: numpy-patch
     default: true
     adr:
       nvidia-mitten-git-src:
         tags: _patch
-    env: 
+    env:
       MLC_GIT_PATCH_FILEPATHS: <<<MLC_TMP_CURRENT_SCRIPT_PATH>>>/patch/numpy-mitten-v5.0.patch
-  default:
-    group: numpy-patch

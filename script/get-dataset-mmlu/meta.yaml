@@ -12,7 +12,7 @@ deps:
   - automotive-src
   tags: mlperf,automotive,source
   skip_if_env:
-    MLC_DATASET_DOWNLOAD_SRC: mlcommons # skip if download happens from mlc infrastructure
+    MLC_DATASET_DOWNLOAD_SRC: mlcommons
 - tags: get,generic-python-lib,_package.tqdm
   skip_if_env:
     MLC_DATASET_DOWNLOAD_SRC: mlcommons
@@ -29,12 +29,9 @@ uid: 137c805565214b95
 print_env_at_the_end:
   MLC_DATASET_MMLU_PATH: MMLU Dataset path
 variations:
-  # calibration:
-  #   env:
-  #     MLC_IGBH_CALIBRATION_FLAG: --calibration
-  no-of-samples.#:
-    env:
-      MLC_DATASET_MMLU_COUNT: '#'
   mlc:
     env:
       MLC_DATASET_DOWNLOAD_SRC: mlcommons
+  no-of-samples.#:
+    env:
+      MLC_DATASET_MMLU_COUNT: '#'

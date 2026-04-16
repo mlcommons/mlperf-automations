@@ -50,6 +50,15 @@ tags:
 - src-ipex
 uid: 09364fff2bf04516
 variations:
+  repo.#:
+    env:
+      MLC_GIT_URL: '#'
+    group: repo
+  repo.https://github.com/intel/intel-extension-for-pytorch:
+    default: true
+    env:
+      MLC_GIT_URL: https://github.com/intel/intel-extension-for-pytorch
+    group: repo
   branch.#:
     env:
       MLC_GIT_CHECKOUT: '#'
@@ -325,15 +334,6 @@ variations:
     env:
       MLC_CONDA_ENV: 'yes'
       MLC_IPEX_SKIP_PYTORCH: 'yes'
-  repo.#:
-    env:
-      MLC_GIT_URL: '#'
-    group: repo
-  repo.https://github.com/intel/intel-extension-for-pytorch:
-    default: true
-    env:
-      MLC_GIT_URL: https://github.com/intel/intel-extension-for-pytorch
-    group: repo
   sha.#:
     env:
       MLC_GIT_CHECKOUT_SHA: '#'

@@ -46,9 +46,6 @@ tags:
 - resnet
 uid: d42a8a8ca2704f9f
 variations:
-  mxnet.#:
-    env:
-      MLC_MXNET_VERSION: '#'
   nvidia:
     default: true
     deps:
@@ -75,4 +72,7 @@ variations:
     env:
       MLC_TMP_VARIATION: reference
     group: implementation
+  mxnet.#:
+    env:
+      MLC_MXNET_VERSION: '#'
 versions: {}

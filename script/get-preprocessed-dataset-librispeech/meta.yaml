@@ -62,18 +62,6 @@ variations:
     env:
       MLC_DATASET_SIZE: '500'
     group: dataset-count
-  calibration:
-    add_deps:
-      original-dataset:
-        tags: _calibration
-    env:
-      MLC_DATASET_PATH: <<<MLC_CALIBRATION_DATASET_PATH>>>
-    group: dataset-type
-  fp32:
-    default: true
-    env:
-      MLC_DATASET_DTYPE: fp32
-    group: dataset-precision
   full:
     adr:
       original-dataset:
@@ -81,10 +69,22 @@ variations:
     env:
       MLC_DATASET_SIZE: ''
     group: dataset-count
+  fp32:
+    default: true
+    env:
+      MLC_DATASET_DTYPE: fp32
+    group: dataset-precision
   int8:
     env:
       MLC_DATASET_DTYPE: int8
     group: dataset-precision
+  calibration:
+    add_deps:
+      original-dataset:
+        tags: _calibration
+    env:
+      MLC_DATASET_PATH: <<<MLC_CALIBRATION_DATASET_PATH>>>
+    group: dataset-type
   validation:
     add_deps:
       original-dataset:

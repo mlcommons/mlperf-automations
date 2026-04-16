@@ -15,13 +15,6 @@ tests:
     - r2-downloader,mlc,dry-run,wan2_2_t2v_a14b
 uid: d69adb00b3504163
 variations:
-  dry-run:
-    env:
-      MLC_DOWNLOAD_MODE: dry
-    group: run-mode
-  dry-run,r2-downloader:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   mlc:
     default: true
     env:
@@ -54,6 +47,13 @@ variations:
   wan2_2_t2v_a14b:
     group: model-variant
     default: true
+  dry-run:
+    env:
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   mlc,r2-downloader,wan2_2_t2v_a14b:
     adr:
       wan2-model-dae:

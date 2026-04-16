@@ -1,0 +1,211 @@
+{
+  "python-packages": [
+    "wheel",
+    "mlcflow",
+    "requests",
+    "giturlparse",
+    "tabulate"
+  ],
+  "PYTHON": "python3",
+  "distros": {
+    "ubuntu": {
+      "package-manager-update-cmd": "apt-get update -y",
+      "package-manager-get-cmd": "apt-get install -y",
+      "packages": [
+        "python3",
+        "python3-pip",
+        "git",
+        "sudo",
+        "wget",
+        "python3-venv",
+        "unzip",
+        "ca-certificates",
+        "binutils"
+      ],
+      "versions": {
+        "20.04": {
+          "FROM": "docker://ubuntu:20.04"
+        },
+        "22.04": {
+          "FROM": "docker://ubuntu:22.04"
+        },
+        "24.04": {
+          "FROM": "docker://ubuntu:24.04"
+        },
+        "25.04": {
+          "FROM": "docker://ubuntu:25.04"
+        }
+      },
+      "default_version": "24.04"
+    },
+    "rhel": {
+      "FROM": "docker://registry.access.redhat.com/ubi9",
+      "package-manager-update-cmd": "dnf -y distro-sync",
+      "package-manager-get-cmd": "dnf install -y",
+      "packages": [
+        "python3",
+        "python-pip",
+        "git",
+        "wget",
+        "sudo",
+        "binutils"
+      ],
+      "versions": {
+        "8": {
+          "FROM": "docker://registry.access.redhat.com/ubi8",
+          "packages": [
+            "python39",
+            "python39-pip",
+            "git",
+            "wget",
+            "sudo",
+            "binutils"
+          ],
+          "PYTHON": "python3.9"
+        },
+        "9": {}
+      },
+      "default_version": "9"
+    },
+    "rocky": {
+      "FROM": "docker://rockylinux:9",
+      "package-manager-update-cmd": "dnf -y distro-sync",
+      "package-manager-get-cmd": "dnf install -y",
+      "packages": [
+        "python3",
+        "python3-pip",
+        "git",
+        "wget",
+        "sudo",
+        "binutils"
+      ],
+      "versions": {
+        "8": {
+          "FROM": "docker://rockylinux:8",
+          "packages": [
+            "python39",
+            "python39-pip",
+            "git",
+            "wget",
+            "sudo",
+            "binutils"
+          ],
+          "PYTHON": "python3.9"
+        },
+        "9": {
+          "FROM": "docker://rockylinux:9"
+        }
+      },
+      "default_version": "9"
+    },
+    "debian": {
+      "FROM": "docker://debian:12",
+      "package-manager-update-cmd": "apt-get update -y",
+      "package-manager-get-cmd": "apt-get install -y",
+      "packages": [
+        "python3",
+        "python3-pip",
+        "git",
+        "sudo",
+        "wget",
+        "python3-venv",
+        "unzip",
+        "ca-certificates",
+        "binutils"
+      ],
+      "versions": {
+        "11": {
+          "FROM": "docker://debian:11"
+        },
+        "12": {
+          "FROM": "docker://debian:12"
+        }
+      },
+      "default_version": "12"
+    },
+    "sles": {
+      "FROM": "docker://registry.suse.com/bci/bci-base:15.6",
+      "package-manager-update-cmd": "zypper refresh",
+      "package-manager-get-cmd": "zypper install -y",
+      "packages": [
+        "python311",
+        "python311-pip",
+        "git",
+        "wget",
+        "sudo",
+        "unzip",
+        "ca-certificates",
+        "gzip",
+        "tar",
+        "gawk",
+        "binutils"
+      ],
+      "versions": {
+        "15.4": {
+          "FROM": "docker://registry.suse.com/bci/bci-base:15.4",
+          "packages": [
+            "python310",
+            "python310-pip",
+            "git",
+            "wget",
+            "sudo",
+            "unzip",
+            "ca-certificates",
+            "gzip",
+            "tar",
+            "gawk",
+            "binutils"
+          ],
+          "PYTHON": "python3.10"
+        },
+        "15.5": {
+          "FROM": "docker://registry.suse.com/bci/bci-base:15.5"
+        },
+        "15.6": {
+          "FROM": "docker://registry.suse.com/bci/bci-base:15.6"
+        }
+      },
+      "default_version": "15.6",
+      "PYTHON": "python3.11"
+    },
+    "arch": {
+      "FROM": "docker://archlinux",
+      "package-manager-update-cmd": "pacman -Syu --noconfirm",
+      "package-manager-get-cmd": "pacman -Sy --noconfirm",
+      "packages": [
+        "python",
+        "python-pip",
+        "git",
+        "wget",
+        "sudo",
+        "binutils"
+      ],
+      "versions": {
+        "latest": {}
+      },
+      "default_version": "latest"
+    },
+    "amazonlinux": {
+      "FROM": "docker://amazonlinux:2023",
+      "package-manager-update-cmd": "dnf -y distro-sync",
+      "package-manager-get-cmd": "dnf install -y",
+      "packages": [
+        "python3",
+        "python3-pip",
+        "git",
+        "wget",
+        "sudo",
+        "tar",
+        "gzip",
+        "unzip",
+        "binutils"
+      ],
+      "versions": {
+        "2023": {
+          "FROM": "docker://amazonlinux:2023"
+        }
+      },
+      "default_version": "2023"
+    }
+  }
+}

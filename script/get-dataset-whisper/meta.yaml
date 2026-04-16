@@ -11,6 +11,7 @@ tags:
 - whisper
 uid: 2cc955c795d44978
 tests:
+  needs_pat: true
   run_inputs:
   - variations_list:
     - rclone,preprocessed,mlc,dry-run
@@ -26,10 +27,10 @@ variations:
     deps:
     - tags: get,mlperf,inference,src
       names:
-        - inference-src
+      - inference-src
     - tags: get,python
       names:
-        - python
+      - python
     - tags: get,generic-python-lib,_package.pandas
     - tags: get,generic-python-lib,_package.requests
     - tags: get,generic-python-lib,_package.tqdm
@@ -38,45 +39,32 @@ variations:
     - tags: get,generic-sys-util,_sox
     env:
       MLC_TMP_DATASET_TYPE: unprocessed
-  dry-run:
-    env:
-      MLC_DOWNLOAD_MODE: dry
-    group: run-mode
-  dry-run,rclone:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  dry-run,r2-downloader:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   mlc:
     default: true
     env:
       MLC_DOWNLOAD_SRC: mlcommons
     group: download-src
+  r2-downloader:
+    add_deps_recursive:
+      dae:
+        tags: _r2-downloader
+    group: download-tool
   rclone:
     add_deps_recursive:
       dae:
         tags: _rclone
     default: true
     group: download-tool
-  r2-downloader:
-    add_deps_recursive:
-      dae:
-        tags: _r2-downloader
-    group: download-tool
-  rclone,preprocessed:
+  dry-run:
     env:
-      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/Whisper/dataset/
-    prehook_deps:
-    - enable_if_env:
-        MLC_TMP_REQUIRE_DOWNLOAD:
-        - true
-      tags: get,rclone
-    - enable_if_env:
-        MLC_TMP_REQUIRE_DOWNLOAD:
-        - true
-      force_cache: true
-      tags: get,rclone-config,_mlc-inference
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
   mlc,preprocessed:
     prehook_deps:
     - enable_if_env:
@@ -98,3 +86,16 @@ variations:
   r2-downloader,preprocessed:
     env:
       MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/whisper-dataset.uri
+  rclone,preprocessed:
+    env:
+      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/Whisper/dataset/
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+      tags: get,rclone
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+      force_cache: true
+      tags: get,rclone-config,_mlc-inference

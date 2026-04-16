@@ -9,6 +9,9 @@ deps:
 input_description: {}
 input_mapping: {}
 new_env_keys:
+- MLC_APPTAINER_BIN_WITH_PATH
+- MLC_APPTAINER_INSTALLED_PATH
+- +PATH
 - MLC_APPTAINER_VERSION
 - MLC_CONTAINER_TOOL
 new_state_keys: []

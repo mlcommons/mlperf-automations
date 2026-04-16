@@ -45,19 +45,52 @@ tags:
 - repo
 - repository
 - clone
+tests:
+  run_inputs:
+  - variations_list:
+    - repo.https://github.com/octocat/Hello-World,no-recurse-submodules
+  - variations_list:
+    - repo.https://github.com/octocat/Hello-World,branch.test,no-recurse-submodules
+  - variations_list:
+    - repo.https://github.com/octocat/Hello-World,sha.7fd1a60b01f91b314f59955a4e4d4e80d8edf11d,no-recurse-submodules
+  - variations_list:
+    - repo.https://github.com/octocat/Hello-World,full-history,no-recurse-submodules
+  - variations_list:
+    - repo.https://github.com/pallets/click,tag.8.3.2,short-history,no-recurse-submodules
 uid: ed603e7292974f10
 variations:
   branch.#:
     env:
       MLC_GIT_BRANCH: '#'
     group: checkout
-  cherrypicks.#:
+  tag.#:
+    cache_expiration: 500d
     env:
-      MLC_GIT_CHERRYPICKS: '#'
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: checkout
   full-history:
     env:
       MLC_GIT_DEPTH: ''
     group: git-history
+  short-history:
+    default: true
+    env:
+      MLC_GIT_DEPTH: --depth 5
+    group: git-history
+  sha.#:
+    cache_expiration: 500d
+    default_variations:
+      git-history: full-history
+    env:
+      MLC_GIT_SHA: '#'
+    group: post-checkout
+  repo.#:
+    env:
+      MLC_GIT_URL: '#'
+    group: repo
+  cherrypicks.#:
+    env:
+      MLC_GIT_CHERRYPICKS: '#'
   lfs:
     deps:
     - tags: get,generic,sys-util,_git-lfs
@@ -77,27 +110,6 @@ variations:
   pr-to-apply.#:
     env:
       MLC_GIT_PR_TO_APPLY: '#'
-  repo.#:
-    env:
-      MLC_GIT_URL: '#'
-    group: repo
-  sha.#:
-    cache_expiration: 500d
-    default_variations:
-      git-history: full-history
-    env:
-      MLC_GIT_SHA: '#'
-    group: post-checkout
-  short-history:
-    default: true
-    env:
-      MLC_GIT_DEPTH: --depth 5
-    group: git-history
   submodules.#:
     env:
       MLC_GIT_SUBMODULES: '#'
-  tag.#:
-    cache_expiration: 500d
-    env:
-      MLC_GIT_CHECKOUT_TAG: '#'
-    group: checkout

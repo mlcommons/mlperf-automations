@@ -31,11 +31,6 @@ tags:
 - get-tvm
 uid: 93c89140e6224f4b
 variations:
-  cuda:
-    deps:
-    - tags: get,cuda
-    env:
-      MLC_TVM_USE_CUDA: 'yes'
   llvm:
     deps:
     - names:
@@ -45,9 +40,6 @@ variations:
     env:
       MLC_TVM_USE_LLVM: 'yes'
     group: installation-type
-  openmp:
-    env:
-      MLC_TVM_USE_OPENMP: 'yes'
   pip-install:
     default: true
     deps:
@@ -55,6 +47,14 @@ variations:
     env:
       MLC_TVM_PIP_INSTALL: 'yes'
     group: installation-type
+  cuda:
+    deps:
+    - tags: get,cuda
+    env:
+      MLC_TVM_USE_CUDA: 'yes'
+  openmp:
+    env:
+      MLC_TVM_USE_OPENMP: 'yes'
 versions:
   main:
     env:

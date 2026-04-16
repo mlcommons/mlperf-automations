@@ -14,23 +14,25 @@ deps:
 - tags: get,sys-utils-mlc
 docker:
   deps:
-    - tags: get,mlperf,inference,results,dir,local
-      names:
-      - get-mlperf-inference-results-dir
-      skip_if_env:
-        OUTPUT_BASE_DIR: [ on ]
-    - tags: get,mlperf,inference,submission,dir,local
-      names:
-      - get-mlperf-inference-submission-dir
-      skip_if_env:
-        MLC_MLPERF_INFERENCE_SUBMISSION_DIR: [ on ]
-    - tags: get,dataset,imagenet,validation,original,_full
-      enable_if_env:
-        MLC_USE_DATASET_FROM_HOST:
-        - 'yes'
-      names:
-        - imagenet-original
-        - dataset-original
+  - tags: get,mlperf,inference,results,dir,local
+    names:
+    - get-mlperf-inference-results-dir
+    skip_if_env:
+      OUTPUT_BASE_DIR:
+      - true
+  - tags: get,mlperf,inference,submission,dir,local
+    names:
+    - get-mlperf-inference-submission-dir
+    skip_if_env:
+      MLC_MLPERF_INFERENCE_SUBMISSION_DIR:
+      - true
+  - tags: get,dataset,imagenet,validation,original,_full
+    enable_if_env:
+      MLC_USE_DATASET_FROM_HOST:
+      - 'yes'
+    names:
+    - imagenet-original
+    - dataset-original
   input_mapping:
     imagenet_path: MLC_DATASET_IMAGENET_PATH
     results_dir: MLC_MLPERF_INFERENCE_RESULTS_DIR
@@ -38,18 +40,18 @@ docker:
     minimize_disk_usage: MLC_MINIMIZE_DISK_USAGE
   fake_run_deps: false
   pre_run_cmds:
-    - mlc pull repo
+  - mlc pull repo
   mounts:
-   - "${{ MLC_DATASET_IMAGENET_PATH }}:${{ MLC_DATASET_IMAGENET_PATH }}"
-   - "${{ MLC_MLPERF_INFERENCE_RESULTS_DIR }}:${{ MLC_MLPERF_INFERENCE_RESULTS_DIR }}"
-   - "${{ OUTPUT_BASE_DIR }}:${{ OUTPUT_BASE_DIR }}"
-   - "${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}:${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}"
+  - ${{ MLC_DATASET_IMAGENET_PATH }}:${{ MLC_DATASET_IMAGENET_PATH }}
+  - ${{ MLC_MLPERF_INFERENCE_RESULTS_DIR }}:${{ MLC_MLPERF_INFERENCE_RESULTS_DIR }}
+  - ${{ OUTPUT_BASE_DIR }}:${{ OUTPUT_BASE_DIR }}
+  - ${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}:${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}
   run: true
   interactive: true
   user: mlcuser
   mlc_repo: mlcommons@mlperf-automations
   mlc_repo_branch: dev
-  real_run: False
+  real_run: false
   os_version: '22.04'
 input_mapping:
   find-performance: MLC_MLPERF_FIND_PERFORMANCE_MODE
@@ -69,30 +71,19 @@ tags:
 - inference
 uid: f21cc993a8b14a58
 variations:
-  accuracy-only:
-    env:
-      MLC_MLPERF_ACCURACY_MODE: 'yes'
-      MLC_MLPERF_FIND_PERFORMANCE_MODE: 'no'
-      MLC_MLPERF_SUBMISSION_MODE: 'no'
-    group: run-mode
+  tflite:
+    default: true
+    group: base-framework
   all-models:
     default: true
     env:
       MLC_MLPERF_RUN_EFFICIENTNETS: 'yes'
       MLC_MLPERF_RUN_MOBILENETS: 'yes'
     group: model-selection
-  armnn:
-    env:
-      MLC_MLPERF_USE_ARMNN_LIBRARY: 'yes'
   efficientnet:
     env:
       MLC_MLPERF_RUN_EFFICIENTNETS: 'yes'
     group: model-selection
-  find-performance:
-    env:
-      MLC_MLPERF_FIND_PERFORMANCE_MODE: 'yes'
-      MLC_MLPERF_SUBMISSION_MODE: 'no'
-    group: run-mode
   mobilenet:
     env:
       MLC_MLPERF_RUN_MOBILENETS: 'yes'
@@ -109,18 +100,22 @@ variations:
     env:
       MLC_MLPERF_RUN_MOBILENET_V3: 'yes'
     group: model-selection
-  neon:
+  tflite-default:
+    default: true
     env:
-      MLC_MLPERF_USE_NEON: 'yes'
-  only-fp32:
+      MLC_MLPERF_TFLITE_DEFAULT_MODE: 'yes'
+    group: optimization
+  accuracy-only:
     env:
-      MLC_MLPERF_RUN_INT8: 'no'
-  only-int8:
+      MLC_MLPERF_ACCURACY_MODE: 'yes'
+      MLC_MLPERF_FIND_PERFORMANCE_MODE: 'no'
+      MLC_MLPERF_SUBMISSION_MODE: 'no'
+    group: run-mode
+  find-performance:
     env:
-      MLC_MLPERF_RUN_FP32: 'no'
-  opencl:
-    env:
-      MLC_MLPERF_USE_OPENCL: 'yes'
+      MLC_MLPERF_FIND_PERFORMANCE_MODE: 'yes'
+      MLC_MLPERF_SUBMISSION_MODE: 'no'
+    group: run-mode
   performance-and-accuracy:
     default: 'true'
     env:
@@ -140,9 +135,21 @@ variations:
       MLC_MLPERF_FIND_PERFORMANCE_MODE: 'no'
       MLC_MLPERF_SUBMISSION_MODE: 'yes'
     group: run-mode
-  tflite:
-    default: true
-    group: base-framework
+  armnn:
+    env:
+      MLC_MLPERF_USE_ARMNN_LIBRARY: 'yes'
+  neon:
+    env:
+      MLC_MLPERF_USE_NEON: 'yes'
+  only-fp32:
+    env:
+      MLC_MLPERF_RUN_INT8: 'no'
+  only-int8:
+    env:
+      MLC_MLPERF_RUN_FP32: 'no'
+  opencl:
+    env:
+      MLC_MLPERF_USE_OPENCL: 'yes'
   tflite,armnn:
     env:
       MLC_MLPERF_TFLITE_ARMNN: 'yes'
@@ -152,20 +159,14 @@ variations:
   tflite,armnn,opencl:
     env:
       MLC_MLPERF_TFLITE_ARMNN_OPENCL: 'yes'
-  tflite-default:
-    default: true
-    env:
-      MLC_MLPERF_TFLITE_DEFAULT_MODE: 'yes'
-    group: optimization
   use-neon:
     alias: neon
-
 tests:
   run_inputs:
   - env:
       MLC_TEST_ONE_RUN: 'yes'
     variations_list:
-      - tflite,find-performance
+    - tflite,find-performance
     adr:
       compiler:
         tags: gcc

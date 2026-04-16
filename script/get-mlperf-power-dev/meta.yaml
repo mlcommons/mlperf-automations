@@ -42,6 +42,14 @@ variations:
     env:
       MLC_GIT_CHECKOUT: '#'
     group: checkout
+  sha.#:
+    env:
+      MLC_GIT_SHA: '#'
+    group: checkout
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: checkout
   mlcommons:
     default: true
     env:
@@ -55,11 +63,3 @@ variations:
     env:
       MLC_GIT_URL: '#'
     group: repo
-  sha.#:
-    env:
-      MLC_GIT_SHA: '#'
-    group: checkout
-  tag.#:
-    env:
-      MLC_GIT_CHECKOUT_TAG: '#'
-    group: checkout

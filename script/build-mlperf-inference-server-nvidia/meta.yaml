@@ -1,371 +1,299 @@
-# Identification of this MLC script
 alias: build-mlperf-inference-server-nvidia
 uid: f37403af5e9f4541
 cache: true
 automation_alias: script
 automation_uid: 5b4e0237da074764
 default_version: r3.1
-
 category: MLPerf Inference
-
-
-# User-friendly tags to find this MLC script
 tags:
-  - build
-  - mlcommons
-  - mlperf
-  - inference
-  - inference-server
-  - server
-  - nvidia-harness
-  - nvidia
-
-
+- build
+- mlcommons
+- mlperf
+- inference
+- inference-server
+- server
+- nvidia-harness
+- nvidia
 new_env_keys:
-  - MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH
-
+- MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH
 default_env:
   MLC_MAKE_BUILD_COMMAND: build
-  MLC_MAKE_CLEAN: "no"
-  MLC_CUSTOM_SYSTEM_NVIDIA: "yes"
-
+  MLC_MAKE_CLEAN: 'no'
+  MLC_CUSTOM_SYSTEM_NVIDIA: 'yes'
 input_mapping:
-  custom_system: MLC_CUSTOM_SYSTEM_NVIDIA
   clean: MLC_MAKE_CLEAN
-
-# Dependencies on other MLC scripts
-
+  custom_system: MLC_CUSTOM_SYSTEM_NVIDIA
 deps:
-
-  # Detect host OS features
-  - tags: detect,os
-
-  # Detect host CPU features
-  - tags: detect,cpu
-
-  # Install system dependencies on a given host
-  - tags: get,sys-utils-mlc
-
-  # Detect python3
-  - tags: get,python3
-    names:
-    - python
-    - python3
-
-  # Detect CUDA
-  - tags: get,cuda,_cudnn
-    names:
+- tags: detect,os
+- tags: detect,cpu
+- tags: get,sys-utils-mlc
+- tags: get,python3
+  names:
+  - python
+  - python3
+- tags: get,cuda,_cudnn
+  names:
+  - cuda
+  enable_if_env:
+    MLC_MLPERF_DEVICE:
     - cuda
-    enable_if_env:
-      MLC_MLPERF_DEVICE:
-        - cuda
-        - inferentia
-
-  # Detect Tensorrt
-  - tags: get,tensorrt,_dev
-    names:
-      - tensorrt
-    enable_if_env:
-      MLC_MLPERF_DEVICE:
-        - cuda
-        - inferentia
-    skip_if_env:
-      MLC_TENSORRT_SYSTEM_DETECT:
-        - yes
-
-  # Detect gcc
-  - tags: get,gcc
-
-  # Detect MLCake
-  - tags: get,cmake
-    version: "3.27"
-
-  # Detect Google Logger
-  - tags: get,generic,sys-util,_glog-dev
-
-  # Detect GFlags
-  - tags: get,generic,sys-util,_gflags-dev
-
-  # Detect libgmock-dev
-  - tags: get,generic,sys-util,_libgmock-dev
-
-  # Detect libre2-dev
-  - tags: get,generic,sys-util,_libre2-dev
-
-  # Detect libnuma-dev
-  - tags: get,generic,sys-util,_libnuma-dev
-
-  # Detect libboost-all-dev
-  - tags: get,generic,sys-util,_libboost-all-dev
-
-  # Detect rapidjson-dev
-  - tags: get,generic,sys-util,_rapidjson-dev
-
-  - tags: get,generic,sys-util,_ccache
-    enable_if_env:
-      BUILD_TRTLLM: 
-        - 'yes'
-
-  - tags: get,generic,sys-util,_git-lfs
-    enable_if_env:
-      BUILD_TRTLLM: 
-        - 'yes'
-
-
-  # Download Nvidia Submission Code
-  - tags: get,nvidia,mlperf,inference,common-code
-    names:
-    - nvidia-inference-common-code
-
-  - tags: get,generic-python-lib,_package.pybind11
-
-  # Detect pycuda
-  - tags: get,generic-python-lib,_pycuda
-    names:
-    - pycuda
-    version: "2022.2.2"
-    skip_if_env:
-      MLC_RUN_STATE_DOCKER:
-        - 'yes'
-
-  # Detect opencv-python
-  - tags: get,generic-python-lib,_opencv-python
-
-  # Detect nvidia-dali
-  - tags: get,generic-python-lib,_nvidia-dali
-    version_max: 1.48
-    version_max_usable: 1.48
-
-  # Get Nvidia scratch space where data and models get downloaded
-  - tags: get,mlperf,inference,nvidia,scratch,space
-    names:
-    - nvidia-scratch-space
-
-  - tags: get,generic-python-lib,_package.numpy
-    names:
-    - numpy
-
+    - inferentia
+- tags: get,tensorrt,_dev
+  names:
+  - tensorrt
+  enable_if_env:
+    MLC_MLPERF_DEVICE:
+    - cuda
+    - inferentia
+  skip_if_env:
+    MLC_TENSORRT_SYSTEM_DETECT:
+    - true
+- tags: get,gcc
+- tags: get,cmake
+  version: '3.27'
+- tags: get,generic,sys-util,_glog-dev
+- tags: get,generic,sys-util,_gflags-dev
+- tags: get,generic,sys-util,_libgmock-dev
+- tags: get,generic,sys-util,_libre2-dev
+- tags: get,generic,sys-util,_libnuma-dev
+- tags: get,generic,sys-util,_libboost-all-dev
+- tags: get,generic,sys-util,_rapidjson-dev
+- tags: get,generic,sys-util,_ccache
+  enable_if_env:
+    BUILD_TRTLLM:
+    - 'yes'
+- tags: get,generic,sys-util,_git-lfs
+  enable_if_env:
+    BUILD_TRTLLM:
+    - 'yes'
+- tags: get,nvidia,mlperf,inference,common-code
+  names:
+  - nvidia-inference-common-code
+- tags: get,generic-python-lib,_package.pybind11
+- tags: get,generic-python-lib,_pycuda
+  names:
+  - pycuda
+  version: 2022.2.2
+  skip_if_env:
+    MLC_RUN_STATE_DOCKER:
+    - 'yes'
+- tags: get,generic-python-lib,_opencv-python
+- tags: get,generic-python-lib,_nvidia-dali
+  version_max: 1.48
+  version_max_usable: 1.48
+- tags: get,mlperf,inference,nvidia,scratch,space
+  names:
+  - nvidia-scratch-space
+- tags: get,generic-python-lib,_package.numpy
+  names:
+  - numpy
 post_deps:
-  # Detect nvidia system
-  - tags: add,custom,system,nvidia
-    names:
-    - custom-system-nvidia
-    skip_if_env:
-      MLC_CUSTOM_SYSTEM_NVIDIA:
-      - "no"
-
+- tags: add,custom,system,nvidia
+  names:
+  - custom-system-nvidia
+  skip_if_env:
+    MLC_CUSTOM_SYSTEM_NVIDIA:
+    - 'no'
 variations:
-  # Target devices
+  custom:
+    group: code
+    add_deps_recursive:
+      nvidia-inference-common-code:
+        tags: _custom
+  go:
+    group: code
+    add_deps_recursive:
+      nvidia-inference-common-code:
+        tags: _go
+  mlcommons:
+    group: code
+    add_deps_recursive:
+      nvidia-inference-common-code:
+        tags: _mlcommons
+  nvidia-only:
+    group: code
+    add_deps_recursive:
+      nvidia-inference-common-code:
+        tags: _nvidia-only
   cpu:
     group: device
     env:
       MLC_MLPERF_DEVICE: cpu
-  inferentia:
-    group: device
-    env:
-      MLC_MLPERF_DEVICE: inferentia
   cuda:
     group: device
     default: true
     env:
       MLC_MLPERF_DEVICE: cuda
       MLC_MLPERF_DEVICE_LIB_NAMESPEC: cudart
-
-  go:
-    group: code
-    add_deps_recursive:
-      nvidia-inference-common-code:
-        tags: _go
-  nvidia-only:
-    group: code
-    add_deps_recursive:
-      nvidia-inference-common-code:
-        tags: _nvidia-only
-  custom:
-    group: code
-    add_deps_recursive:
-      nvidia-inference-common-code:
-        tags: _custom
-  mlcommons:
-    group: code
-    add_deps_recursive:
-      nvidia-inference-common-code:
-        tags: _mlcommons
-
+  inferentia:
+    group: device
+    env:
+      MLC_MLPERF_DEVICE: inferentia
   r4.0:
     group: version
     add_deps_recursive:
       nvidia-inference-common-code:
         version: r4.0
     deps:
-      - tags: get,generic,sys-util,_git-lfs
-      - tags: install,pytorch,from.src,_for-nvidia-mlperf-inference-v4.0
-        names:
-        - pytorch
-        - torch
-        skip_if_env:
-          MLC_HOST_PLATFORM_FLAVOR: 
-            - x86_64
-          MLC_PYTHON_MINOR_VERSION:
-            - 8
-      - tags: get,generic-python-lib,_whl-url.https://github.com/mlcommons/cm4mlperf-inference/releases/download/mlperf-inference-v4.0/torch-2.1.0a0+git32f93b1-cp38-cp38-linux_x86_64.whl
-        enable_if_env:
-          MLC_HOST_PLATFORM_FLAVOR: 
-            - x86_64
-          MLC_PYTHON_MINOR_VERSION:
-            - 8
-
-      - tags: install,torchvision,from.src,_for-nvidia-mlperf-inference-v4.0
-        names:
-        - pytorchvision
-        - torchvision
-        skip_if_env:
-          MLC_HOST_PLATFORM_FLAVOR: 
-            - x86_64
-          MLC_PYTHON_MINOR_VERSION:
-            - 8
-      - tags: get,generic-python-lib,_whl-url.https://github.com/mlcommons/cm4mlperf-inference/releases/download/mlperf-inference-v4.0/torchvision-0.16.0a0+657027f-cp38-cp38-linux_x86_64.whl
-        enable_if_env:
-          MLC_HOST_PLATFORM_FLAVOR: 
-            - x86_64
-          MLC_PYTHON_MINOR_VERSION:
-            - 8
-    
+    - tags: get,generic,sys-util,_git-lfs
+    - tags: install,pytorch,from.src,_for-nvidia-mlperf-inference-v4.0
+      names:
+      - pytorch
+      - torch
+      skip_if_env:
+        MLC_HOST_PLATFORM_FLAVOR:
+        - x86_64
+        MLC_PYTHON_MINOR_VERSION:
+        - 8
+    - tags: get,generic-python-lib,_whl-url.https://github.com/mlcommons/cm4mlperf-inference/releases/download/mlperf-inference-v4.0/torch-2.1.0a0+git32f93b1-cp38-cp38-linux_x86_64.whl
+      enable_if_env:
+        MLC_HOST_PLATFORM_FLAVOR:
+        - x86_64
+        MLC_PYTHON_MINOR_VERSION:
+        - 8
+    - tags: install,torchvision,from.src,_for-nvidia-mlperf-inference-v4.0
+      names:
+      - pytorchvision
+      - torchvision
+      skip_if_env:
+        MLC_HOST_PLATFORM_FLAVOR:
+        - x86_64
+        MLC_PYTHON_MINOR_VERSION:
+        - 8
+    - tags: get,generic-python-lib,_whl-url.https://github.com/mlcommons/cm4mlperf-inference/releases/download/mlperf-inference-v4.0/torchvision-0.16.0a0+657027f-cp38-cp38-linux_x86_64.whl
+      enable_if_env:
+        MLC_HOST_PLATFORM_FLAVOR:
+        - x86_64
+        MLC_PYTHON_MINOR_VERSION:
+        - 8
   r5.0:
     add_deps_recursive:
       pycuda:
-        version: "2024.1"
+        version: '2024.1'
       numpy:
-        version_max: "1.26.999"
-        version_max_usable: "1.26.4"
-  
+        version_max: 1.26.999
+        version_max_usable: 1.26.4
   r5.1:
     add_deps_recursive:
       pycuda:
-        version: "2024.1"
+        version: '2024.1'
       numpy:
-        version_max: "1.26.999"
-        version_max_usable: "1.26.4"
-
-
+        version_max: 1.26.999
+        version_max_usable: 1.26.4
 versions:
   r2.1: {}
   r3.0: {}
   r3.1:
     deps:
-      - tags: install,pytorch,from.src,_for-nvidia-mlperf-inference-v3.1
-        names:
-        - pytorch
-        - torch
-      - tags: install,torchvision,from.src,_for-nvidia-mlperf-inference-v3.1
-        names:
-        - pytorchvision
-        - torchvision
-      - tags: install,nccl,libs,_cuda
-
+    - tags: install,pytorch,from.src,_for-nvidia-mlperf-inference-v3.1
+      names:
+      - pytorch
+      - torch
+    - tags: install,torchvision,from.src,_for-nvidia-mlperf-inference-v3.1
+      names:
+      - pytorchvision
+      - torchvision
+    - tags: install,nccl,libs,_cuda
   r4.0:
     default_env:
       BUILD_TRTLLM: 1
     deps:
-      - tags: get,generic,sys-util,_nlohmann-json3-dev
-      - tags: get,generic,sys-util,_git-lfs
-      - tags: install,pytorch,from.src,_for-nvidia-mlperf-inference-v4.0
-        names:
-        - pytorch
-        - torch
-        skip_if_env:
-          MLC_HOST_PLATFORM_FLAVOR: 
-            - x86_64
-          MLC_PYTHON_MINOR_VERSION:
-            - 8
-      - tags: get,generic-python-lib,_package.torch,_whl-url.https://github.com/mlcommons/cm4mlperf-inference/releases/download/mlperf-inference-v4.0/torch-2.1.0a0+git32f93b1-cp38-cp38-linux_x86_64.whl
-        enable_if_env:
-          MLC_HOST_PLATFORM_FLAVOR: 
-            - x86_64
-          MLC_PYTHON_MINOR_VERSION:
-            - 8
-      - tags: install,torchvision,from.src,_for-nvidia-mlperf-inference-v4.0
-        names:
-        - pytorchvision
-        - torchvision
-        skip_if_env:
-          MLC_HOST_PLATFORM_FLAVOR: 
-            - x86_64
-          MLC_PYTHON_MINOR_VERSION:
-            - 8
-      - tags: get,generic-python-lib,_package.torchvision,_whl-url.https://github.com/mlcommons/cm4mlperf-inference/releases/download/mlperf-inference-v4.0/torchvision-0.16.0a0+657027f-cp38-cp38-linux_x86_64.whl
-        enable_if_env:
-          MLC_HOST_PLATFORM_FLAVOR: 
-            - x86_64
-          MLC_PYTHON_MINOR_VERSION:
-            - 8
-      - tags: get,generic-python-lib,_package.cuda-python
-        names:
-        - cuda-python
-        version_max: '12.6'
-        version_max_usable: '12.3.0'
-      - tags: get,generic-python-lib,_package.networkx
-        version_max: '2.9.99'
-        version_max_usable: '2.8.8'
-
+    - tags: get,generic,sys-util,_nlohmann-json3-dev
+    - tags: get,generic,sys-util,_git-lfs
+    - tags: install,pytorch,from.src,_for-nvidia-mlperf-inference-v4.0
+      names:
+      - pytorch
+      - torch
+      skip_if_env:
+        MLC_HOST_PLATFORM_FLAVOR:
+        - x86_64
+        MLC_PYTHON_MINOR_VERSION:
+        - 8
+    - tags: get,generic-python-lib,_package.torch,_whl-url.https://github.com/mlcommons/cm4mlperf-inference/releases/download/mlperf-inference-v4.0/torch-2.1.0a0+git32f93b1-cp38-cp38-linux_x86_64.whl
+      enable_if_env:
+        MLC_HOST_PLATFORM_FLAVOR:
+        - x86_64
+        MLC_PYTHON_MINOR_VERSION:
+        - 8
+    - tags: install,torchvision,from.src,_for-nvidia-mlperf-inference-v4.0
+      names:
+      - pytorchvision
+      - torchvision
+      skip_if_env:
+        MLC_HOST_PLATFORM_FLAVOR:
+        - x86_64
+        MLC_PYTHON_MINOR_VERSION:
+        - 8
+    - tags: get,generic-python-lib,_package.torchvision,_whl-url.https://github.com/mlcommons/cm4mlperf-inference/releases/download/mlperf-inference-v4.0/torchvision-0.16.0a0+657027f-cp38-cp38-linux_x86_64.whl
+      enable_if_env:
+        MLC_HOST_PLATFORM_FLAVOR:
+        - x86_64
+        MLC_PYTHON_MINOR_VERSION:
+        - 8
+    - tags: get,generic-python-lib,_package.cuda-python
+      names:
+      - cuda-python
+      version_max: '12.6'
+      version_max_usable: 12.3.0
+    - tags: get,generic-python-lib,_package.networkx
+      version_max: 2.9.99
+      version_max_usable: 2.8.8
   r4.1-dev:
     default_env:
       BUILD_TRTLLM: 1
     deps:
-      - tags: get,generic,sys-util,_nlohmann-json3-dev
-      - tags: get,generic,sys-util,_git-lfs
-      - tags: get,generic-python-lib,_package.cuda-python
-        names:
-        - cuda-python
-        version_max: '12.6'
-        version_max_usable: '12.3.0'
-      - tags: get,generic-python-lib,_package.networkx
-        version_max: '2.9.99'
-        version_max_usable: '2.8.8'
-      - tags: install,pytorch,from.src,_for-nvidia-mlperf-inference-v4.0
-        names:
-        - pytorch
-        - torch
-        skip_if_env:
-          MLC_HOST_PLATFORM_FLAVOR: 
-            - x86_64
-          MLC_PYTHON_MINOR_VERSION:
-            - 8
-      - tags: get,generic-python-lib,_package.torch,_whl-url.https://github.com/mlcommons/cm4mlperf-inference/releases/download/mlperf-inference-v4.0/torch-2.1.0a0+git32f93b1-cp38-cp38-linux_x86_64.whl
-        enable_if_env:
-          MLC_HOST_PLATFORM_FLAVOR: 
-            - x86_64
-          MLC_PYTHON_MINOR_VERSION:
-            - 8
-      - tags: install,torchvision,from.src,_for-nvidia-mlperf-inference-v4.0
-        names:
-        - pytorchvision
-        - torchvision
-        skip_if_env:
-          MLC_HOST_PLATFORM_FLAVOR: 
-            - x86_64
-          MLC_PYTHON_MINOR_VERSION:
-            - 8
-      - tags: get,generic-python-lib,_package.torchvision,_whl-url.https://github.com/mlcommons/cm4mlperf-inference/releases/download/mlperf-inference-v4.0/torchvision-0.16.0a0+657027f-cp38-cp38-linux_x86_64.whl
-        enable_if_env:
-          MLC_HOST_PLATFORM_FLAVOR: 
-            - x86_64
-          MLC_PYTHON_MINOR_VERSION:
-            - 8
-  
+    - tags: get,generic,sys-util,_nlohmann-json3-dev
+    - tags: get,generic,sys-util,_git-lfs
+    - tags: get,generic-python-lib,_package.cuda-python
+      names:
+      - cuda-python
+      version_max: '12.6'
+      version_max_usable: 12.3.0
+    - tags: get,generic-python-lib,_package.networkx
+      version_max: 2.9.99
+      version_max_usable: 2.8.8
+    - tags: install,pytorch,from.src,_for-nvidia-mlperf-inference-v4.0
+      names:
+      - pytorch
+      - torch
+      skip_if_env:
+        MLC_HOST_PLATFORM_FLAVOR:
+        - x86_64
+        MLC_PYTHON_MINOR_VERSION:
+        - 8
+    - tags: get,generic-python-lib,_package.torch,_whl-url.https://github.com/mlcommons/cm4mlperf-inference/releases/download/mlperf-inference-v4.0/torch-2.1.0a0+git32f93b1-cp38-cp38-linux_x86_64.whl
+      enable_if_env:
+        MLC_HOST_PLATFORM_FLAVOR:
+        - x86_64
+        MLC_PYTHON_MINOR_VERSION:
+        - 8
+    - tags: install,torchvision,from.src,_for-nvidia-mlperf-inference-v4.0
+      names:
+      - pytorchvision
+      - torchvision
+      skip_if_env:
+        MLC_HOST_PLATFORM_FLAVOR:
+        - x86_64
+        MLC_PYTHON_MINOR_VERSION:
+        - 8
+    - tags: get,generic-python-lib,_package.torchvision,_whl-url.https://github.com/mlcommons/cm4mlperf-inference/releases/download/mlperf-inference-v4.0/torchvision-0.16.0a0+657027f-cp38-cp38-linux_x86_64.whl
+      enable_if_env:
+        MLC_HOST_PLATFORM_FLAVOR:
+        - x86_64
+        MLC_PYTHON_MINOR_VERSION:
+        - 8
   r4.1:
     default_env:
       BUILD_TRTLLM: 1
-  
 docker:
   skip_run_cmd: 'no'
   all_gpus: 'yes'
-  shm_size: '32gb'
+  shm_size: 32gb
   extra_run_args: ' --ulimit memlock=-1 --cap-add SYS_ADMIN --cap-add SYS_TIME --security-opt apparmor=unconfined --security-opt seccomp=unconfined'
   os: ubuntu
   mlc_repo_flags1: ' --branch=mlperf-inference'
-  real_run: False
-  interactive: True
+  real_run: false
+  interactive: true
   os_version: '20.04'
   base_image: nvcr.io/nvidia/mlperf/mlperf-inference:mlpinf-v3.1-cuda12.2-cudnn8.9-x86_64-ubuntu20.04-l4-public
   input_mapping:
@@ -380,27 +308,26 @@ docker:
     dlrm_data_path: DLRM_DATA_PATH
     scratch_path: MLPERF_SCRATCH_PATH
   deps:
-    - tags: get,mlperf,inference,nvidia,scratch,space
-      names:
-        - nvidia-scratch-space
-    - tags: get,mlperf,inference,results,dir,local
-    - tags: get,mlperf,inference,submission,dir,local
-    - tags: get,nvidia-docker
-      skip_if_env:
-        MLC_SKIP_GET_NVIDIA_DOCKER:
-          - yes
-
+  - tags: get,mlperf,inference,nvidia,scratch,space
+    names:
+    - nvidia-scratch-space
+  - tags: get,mlperf,inference,results,dir,local
+  - tags: get,mlperf,inference,submission,dir,local
+  - tags: get,nvidia-docker
+    skip_if_env:
+      MLC_SKIP_GET_NVIDIA_DOCKER:
+      - true
   pre_run_cmds:
-    - mlc pull repo
+  - mlc pull repo
   run_cmd_prefix: sudo apt remove -y cmake
   mounts:
-   - "${{ IMAGENET_PATH }}:/data/imagenet-val"
-   - "${{ MLC_MLPERF_INFERENCE_RESULTS_DIR }}:${{ MLC_MLPERF_INFERENCE_RESULTS_DIR }}"
-   - "${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}:${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}"
-   - "${{ RESULTS_DIR }}:/home/cmuser/results_dir"
-   - "${{ SUBMISSION_DIR }}:/home/cmuser/submission_dir"
-   - "${{ MLC_CUDNN_TAR_FILE_PATH }}:${{ MLC_CUDNN_TAR_FILE_PATH }}"
-   - "${{ MLC_TENSORRT_TAR_FILE_PATH }}:${{ MLC_TENSORRT_TAR_FILE_PATH }}"
-   - "${{ CUDA_RUN_FILE_LOCAL_PATH }}:${{ CUDA_RUN_FILE_LOCAL_PATH }}"
-   - "${{ MLPERF_SCRATCH_PATH }}:${{ MLPERF_SCRATCH_PATH }}"
-   - "${{ DLRM_DATA_PATH }}:/home/mlperf_inf_dlrmv2"
+  - ${{ IMAGENET_PATH }}:/data/imagenet-val
+  - ${{ MLC_MLPERF_INFERENCE_RESULTS_DIR }}:${{ MLC_MLPERF_INFERENCE_RESULTS_DIR }}
+  - ${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}:${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}
+  - ${{ RESULTS_DIR }}:/home/cmuser/results_dir
+  - ${{ SUBMISSION_DIR }}:/home/cmuser/submission_dir
+  - ${{ MLC_CUDNN_TAR_FILE_PATH }}:${{ MLC_CUDNN_TAR_FILE_PATH }}
+  - ${{ MLC_TENSORRT_TAR_FILE_PATH }}:${{ MLC_TENSORRT_TAR_FILE_PATH }}
+  - ${{ CUDA_RUN_FILE_LOCAL_PATH }}:${{ CUDA_RUN_FILE_LOCAL_PATH }}
+  - ${{ MLPERF_SCRATCH_PATH }}:${{ MLPERF_SCRATCH_PATH }}
+  - ${{ DLRM_DATA_PATH }}:/home/mlperf_inf_dlrmv2

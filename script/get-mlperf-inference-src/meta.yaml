@@ -12,6 +12,9 @@ default_version: master
 deps:
 - tags: detect,os
 - names:
+  - loguru
+  tags: get,generic-python-lib,_package.loguru
+- names:
   - python
   - python3
   tags: get,python3
@@ -66,14 +69,27 @@ tags:
 - mlcommons
 uid: 4b57186581024797
 variations:
-  3d-unet:
-    env:
-      MLC_SUBMODULE_3D_UNET: 'yes'
   branch.#:
     default_version: custom
     env:
       MLC_GIT_CHECKOUT: '#'
     group: checkout
+  sha.#:
+    env:
+      MLC_GIT_SHA: '#'
+    group: checkout
+  full-history:
+    env:
+      MLC_GIT_DEPTH: ''
+    group: git-history
+  short-history:
+    default: true
+    env:
+      MLC_GIT_DEPTH: --depth 10
+    group: git-history
+  3d-unet:
+    env:
+      MLC_SUBMODULE_3D_UNET: 'yes'
   deeplearningexamples:
     env:
       MLC_SUBMODULE_DEEPLEARNINGEXAMPLES: 'yes'
@@ -81,10 +97,6 @@ variations:
     base:
     - _branch.deepsparse
     - _repo.https://github.com/gateoverflow/nm-inference
-  full-history:
-    env:
-      MLC_GIT_DEPTH: ''
-    group: git-history
   gn:
     env:
       MLC_SUBMODULE_GN: 'yes'
@@ -122,15 +134,6 @@ variations:
   repo.#:
     env:
       MLC_GIT_URL: '#'
-  sha.#:
-    env:
-      MLC_GIT_SHA: '#'
-    group: checkout
-  short-history:
-    default: true
-    env:
-      MLC_GIT_DEPTH: --depth 10
-    group: git-history
   submodules.#:
     env:
       MLC_GIT_SUBMODULES: '#'
@@ -168,21 +171,21 @@ versions:
         tags: _tag.v3.1
     env:
       MLC_MLPERF_LAST_RELEASE: v3.1
-      MLC_GIT_CHECKOUT_TAG: 'v3.1'
+      MLC_GIT_CHECKOUT_TAG: v3.1
   r4.0:
     ad:
       inference-git-repo:
         tags: _tag.v4.0
     env:
       MLC_MLPERF_LAST_RELEASE: v4.0
-      MLC_GIT_CHECKOUT_TAG: 'v4.0'
+      MLC_GIT_CHECKOUT_TAG: v4.0
   r4.1:
     ad:
       inference-git-repo:
         tags: _tag.v4.1
     env:
       MLC_MLPERF_LAST_RELEASE: v4.1
-      MLC_GIT_CHECKOUT_TAG: 'v4.1'
+      MLC_GIT_CHECKOUT_TAG: v4.1
   r5.0:
     env:
       MLC_MLPERF_LAST_RELEASE: v5.0

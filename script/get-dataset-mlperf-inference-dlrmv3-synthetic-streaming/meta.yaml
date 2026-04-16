@@ -15,21 +15,12 @@ tags:
 - dlrmv3
 - synthetic-streaming
 - get-dataset-mlperf-inference-dlrmv3-synthetic-streaming
-
 tests:
   run_inputs:
   - variations_list:
     - r2-downloader,mlc,dry-run
-    
 uid: d73c9e063f5e44f2
 variations:
-  dry-run:
-    env:
-      MLC_DOWNLOAD_MODE: dry
-    group: run-mode
-  dry-run,r2-downloader:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   mlc:
     default: true
     env:
@@ -53,6 +44,13 @@ variations:
       update_tags_from_env_with_prefix:
         _url.:
         - MLC_DOWNLOAD_URL
+  dry-run:
+    env:
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   r2-downloader:
     adr:
       dlrm-v3-synthetic-streaming-dataset:

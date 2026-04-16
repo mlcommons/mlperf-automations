@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-03-26 23:12:50*
+*Last updated: 2026-04-16 03:44:28*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -14,6 +14,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [CUDA automation](#cuda-automation)
 - [Cloud automation](#cloud-automation)
 - [Compiler automation](#compiler-automation)
+- [Container automation](#container-automation)
 - [Dashboard automation](#dashboard-automation)
 - [Detection or installation of tools and artifacts](#detection-or-installation-of-tools-and-artifacts)
 - [DevOps automation](#devops-automation)
@@ -33,6 +34,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [ROCm automation](#rocm-automation)
 - [Remote automation](#remote-automation)
 - [Reproducibility and artifact evaluation](#reproducibility-and-artifact-evaluation)
+- [Testing](#testing)
 - [Tests](#tests)
 - [TinyML automation](#tinyml-automation)
 - [Uncategorized](#uncategorized)
@@ -402,6 +404,18 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[install-vllm-from-src](install-vllm-from-src/)**
   - Build vllm from sources
   - Tags: `install-vllm-from-src`
+
+## Container automation
+
+- **[build-apptainer-image](build-apptainer-image/)**
+  - build-apptainer-image
+  - Tags: `build`, `apptainer`, `image`, `apptainer-image`
+- **[build-apptainerfile](build-apptainerfile/)**
+  - build-apptainerfile
+  - Tags: `build`, `apptainerfile`, `apptainer`, `definition`
+- **[run-apptainer-container](run-apptainer-container/)**
+  - run-apptainer-container
+  - Tags: `run`, `apptainer`, `container`
 
 ## Dashboard automation
 
@@ -937,6 +951,12 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - get-ipol-src
   - Tags: `get`, `ipol`, `journal`, `src`, `ipol-src`
 
+## Testing
+
+- **[validate-mlc-json](validate-mlc-json/)**
+  - validate-mlc-json
+  - Tags: `validate`, `mlc-json`
+
 ## Tests
 
 - **[run-python](run-python/)**
@@ -1109,8 +1129,8 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 324
-- **Categories**: 31
+- **Total Scripts**: 328
+- **Categories**: 33
 
 ## Usage
 

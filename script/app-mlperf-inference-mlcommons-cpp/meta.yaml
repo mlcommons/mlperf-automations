@@ -1,33 +1,20 @@
-# Identification of this MLC script
 alias: app-mlperf-inference-mlcommons-cpp
 uid: bf62405e6c7a44bf
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
-
 category: MLPerf Inference
-
-developers: "[Thomas Zhu](https://www.linkedin.com/in/hanwen-zhu-483614189), [Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Grigori Fursin](https://cKnowledge.org/gfursin)"
-
-# User-friendly tags to find this MLC script
+developers: '[Thomas Zhu](https://www.linkedin.com/in/hanwen-zhu-483614189), [Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Grigori Fursin](https://cKnowledge.org/gfursin)'
 tags:
-  - app
-  - mlcommons
-  - mlperf
-  - inference
-  - cpp
-
-
-
-# Default environment
+- app
+- mlcommons
+- mlperf
+- inference
+- cpp
 default_env:
   MLC_BATCH_COUNT: '1'
   MLC_BATCH_SIZE: '1'
-  MLC_FAST_COMPILATION: "yes"
+  MLC_FAST_COMPILATION: 'yes'
   MLC_MLPERF_SUT_NAME_IMPLEMENTATION_PREFIX: cpp
-
-
-# Map script inputs to environment variables
 input_mapping:
   count: MLC_MLPERF_LOADGEN_QUERY_COUNT
   max_batchsize: MLC_MLPERF_LOADGEN_MAX_BATCHSIZE
@@ -37,127 +24,84 @@ input_mapping:
   performance_sample_count: MLC_MLPERF_LOADGEN_PERFORMANCE_SAMPLE_COUNT
   scenario: MLC_MLPERF_LOADGEN_SCENARIO
   user_conf: MLC_MLPERF_USER_CONF
-
 new_env_keys:
-  - MLC_MLPERF_*
-  - MLC_DATASET_*
-  - MLC_ML_MODEL_*
-  - MLC_HW_NAME
-
+- MLC_MLPERF_*
+- MLC_DATASET_*
+- MLC_ML_MODEL_*
+- MLC_HW_NAME
 new_state_keys:
-  - mlperf-inference-implementation
-  - MLC_SUT_*
-
-# Dependencies on other MLC scripts
-
+- mlperf-inference-implementation
+- MLC_SUT_*
 deps:
-
-  # Detect host OS features
-  - tags: detect,os
-
-  # Detect host CPU features
-  - tags: detect,cpu
-
-  # Install system dependencies on a given host
-  - tags: get,sys-utils-mlc
-
-  # Detect CUDA if required
-  - tags: get,cuda,_cudnn
-    enable_if_env:
-      MLC_MLPERF_DEVICE:
-      - gpu
-
-  ########################################################################
-  # Install MLPerf inference dependencies
-  
-  # Install MLPerf loadgen
-  - tags: get,loadgen,_wg-inference
-    names:
-    - loadgen
-    
-  # Download MLPerf inference source
-  - tags: get,mlcommons,inference,src
-    names:
-    - inference-src
-
-  ########################################################################
-  # Install ML engines via MLC
-  - enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - onnxruntime
-      MLC_MLPERF_DEVICE:
-      - cpu
-    tags: get,lib,onnxruntime,lang-cpp,_cpu
-
-  - enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - onnxruntime
-      MLC_MLPERF_DEVICE:
-      - gpu
-    tags: get,lib,onnxruntime,lang-cpp,_cuda
-
-
-  ########################################################################
-  # Install ResNet50 model (ONNX) and ImageNet
-
-  - enable_if_env:
-      MLC_MODEL:
-      - resnet50
-    names:
-      - imagenet-preprocessed
-    tags: get,dataset,preprocessed,imagenet,_NCHW
-
-  - enable_if_env:
-      MLC_MODEL:
-      - resnet50
-    tags: get,ml-model,raw,resnet50,_onnx
-
-
-  ########################################################################
-  # Install RetinaNet model (ONNX) and OpenImages
-
-  - enable_if_env:
-      MLC_MODEL:
-      - retinanet
-    names:
-      - openimages-preprocessed
-    tags: get,dataset,preprocessed,openimages,_validation,_NCHW
-
-  - enable_if_env:
-      MLC_MODEL:
-      - retinanet
-    tags: get,ml-model,retinanet,_onnx,_fp32
-
-  # Creates user conf for given SUT
-  - tags: generate,user-conf,mlperf,inference,_wg-inference
-    names:
-    - user-conf-generator
-  
-
-# Post dependencies to compile and run this app
+- tags: detect,os
+- tags: detect,cpu
+- tags: get,sys-utils-mlc
+- tags: get,cuda,_cudnn
+  enable_if_env:
+    MLC_MLPERF_DEVICE:
+    - gpu
+- tags: get,loadgen,_wg-inference
+  names:
+  - loadgen
+- tags: get,mlcommons,inference,src
+  names:
+  - inference-src
+- enable_if_env:
+    MLC_MLPERF_BACKEND:
+    - onnxruntime
+    MLC_MLPERF_DEVICE:
+    - cpu
+  tags: get,lib,onnxruntime,lang-cpp,_cpu
+- enable_if_env:
+    MLC_MLPERF_BACKEND:
+    - onnxruntime
+    MLC_MLPERF_DEVICE:
+    - gpu
+  tags: get,lib,onnxruntime,lang-cpp,_cuda
+- enable_if_env:
+    MLC_MODEL:
+    - resnet50
+  names:
+  - imagenet-preprocessed
+  tags: get,dataset,preprocessed,imagenet,_NCHW
+- enable_if_env:
+    MLC_MODEL:
+    - resnet50
+  tags: get,ml-model,raw,resnet50,_onnx
+- enable_if_env:
+    MLC_MODEL:
+    - retinanet
+  names:
+  - openimages-preprocessed
+  tags: get,dataset,preprocessed,openimages,_validation,_NCHW
+- enable_if_env:
+    MLC_MODEL:
+    - retinanet
+  tags: get,ml-model,retinanet,_onnx,_fp32
+- tags: generate,user-conf,mlperf,inference,_wg-inference
+  names:
+  - user-conf-generator
 post_deps:
-
-  - names:
-    - compile-program
-    tags: compile,cpp-program
-    skip_if_env:
-      MLC_MLPERF_SKIP_RUN:
-        - "yes"
-
-  - names:
-    - mlperf-runner
-    tags: benchmark-mlperf
-    skip_if_env:
-      MLC_MLPERF_SKIP_RUN:
-        - "yes"
-
-  - tags: save,mlperf,inference,state
-    names:
-      - save-mlperf-inference-state
-
-# Variations to customize dependencies
+- names:
+  - compile-program
+  tags: compile,cpp-program
+  skip_if_env:
+    MLC_MLPERF_SKIP_RUN:
+    - 'yes'
+- names:
+  - mlperf-runner
+  tags: benchmark-mlperf
+  skip_if_env:
+    MLC_MLPERF_SKIP_RUN:
+    - 'yes'
+- tags: save,mlperf,inference,state
+  names:
+  - save-mlperf-inference-state
 variations:
-  # Target devices
+  batch-size.#:
+    group: batch-size
+    env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: '#'
   cpu:
     group: device
     default: true
@@ -168,93 +112,72 @@ variations:
     env:
       MLC_MLPERF_DEVICE: gpu
       MLC_MLPERF_DEVICE_LIB_NAMESPEC: cudart
-
-  # ML engine
   onnxruntime:
     group: framework
     default: true
     env:
       MLC_MLPERF_BACKEND: onnxruntime
       MLC_MLPERF_BACKEND_LIB_NAMESPEC: onnxruntime
-
   pytorch:
     group: framework
     env:
       MLC_MLPERF_BACKEND: pytorch
-
   tf:
     group: framework
     env:
       MLC_MLPERF_BACKEND: tf
-
   tflite:
     group: framework
     env:
       MLC_MLPERF_BACKEND: tflite
-
   tvm-onnx:
     group: framework
     env:
       MLC_MLPERF_BACKEND: tvm-onnx
-
-  # Reference MLPerf models
+  multistream:
+    group: loadgen-scenario
+    env:
+      MLC_MLPERF_LOADGEN_SCENARIO: MultiStream
+  offline:
+    group: loadgen-scenario
+    default: true
+    env:
+      MLC_MLPERF_LOADGEN_SCENARIO: Offline
+  server:
+    group: loadgen-scenario
+    env:
+      MLC_MLPERF_LOADGEN_SCENARIO: Server
+  singlestream:
+    group: loadgen-scenario
+    env:
+      MLC_MLPERF_LOADGEN_SCENARIO: SingleStream
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 1
   resnet50:
     group: model
     default: true
     env:
       MLC_MODEL: resnet50
-
   retinanet:
     group: model
     default_env:
       MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 1
     env:
       MLC_MODEL: retinanet
-
-  resnet50,offline:
-    default_env:
-      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 32
-
-  resnet50,server:
-    default_env:
-      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 32
-
-  resnet50,multistream:
-    default_env:
-      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 8
-
-  batch-size.#:
-    group: batch-size
-    env:
-      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: "#"
-
-  offline:
-    group: loadgen-scenario
-    default: true
-    env:
-      MLC_MLPERF_LOADGEN_SCENARIO: Offline
-  multistream:
-    group: loadgen-scenario
-    env:
-      MLC_MLPERF_LOADGEN_SCENARIO: MultiStream
-  singlestream:
-    group: loadgen-scenario
-    env:
-      MLC_MLPERF_LOADGEN_SCENARIO: SingleStream
-      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 1
-  server:
-    group: loadgen-scenario
-    env:
-      MLC_MLPERF_LOADGEN_SCENARIO: Server
-
   multistream,resnet50:
     default_variations:
       batch-size: batch-size.8
-
-  offline,resnet50:
-    default_variations:
-      batch-size: batch-size.32
-
   multistream,retinanet:
     default_variations:
       batch-size: batch-size.1
+  offline,resnet50:
+    default_variations:
+      batch-size: batch-size.32
+  resnet50,multistream:
+    default_env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 8
+  resnet50,offline:
+    default_env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 32
+  resnet50,server:
+    default_env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 32

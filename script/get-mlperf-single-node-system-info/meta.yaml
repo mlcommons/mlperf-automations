@@ -19,9 +19,9 @@ deps:
   names:
   - platform-details
 input_mapping:
+  node_id: MLC_SINGLE_NODE_SYSTEM_ID
   out_dir_path: MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH
   out_file_name: MLC_SINGLE_NODE_SYSTEM_INFO_FILE_NAME
-  node_id: MLC_SINGLE_NODE_SYSTEM_ID
 tags:
 - get
 - mlperf

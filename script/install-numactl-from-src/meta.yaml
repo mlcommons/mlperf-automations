@@ -36,9 +36,6 @@ tags:
 - src-numactl
 uid: 4f355ae8ca1948b2
 variations:
-  branch.#:
-    env:
-      MLC_GIT_CHECKOUT: '#'
   repo.#:
     env:
       MLC_GIT_URL: '#'
@@ -48,6 +45,9 @@ variations:
     env:
       MLC_GIT_URL: https://github.com/numactl/numactl
     group: repo
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
   sha.#:
     env:
       MLC_GIT_CHECKOUT_SHA: '#'

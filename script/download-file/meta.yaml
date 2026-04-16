@@ -6,7 +6,7 @@ can_force_cache: true
 category: DevOps automation
 default_env:
   MLC_RCLONE_COPY_USING: sync
-  MLC_EXTRACT_REMOVE_EXTRACTED: no
+  MLC_EXTRACT_REMOVE_EXTRACTED: false
   MLC_DOWNLOAD_RETRY_COUNT: 2
 deps:
 - tags: detect,os
@@ -39,13 +39,6 @@ tags:
 tags_help: download file
 uid: 9cdc8dc41aae437e
 variations:
-  cmutil:
-    alias: mlcutil
-  mlcutil:
-    default: true
-    env:
-      MLC_DOWNLOAD_TOOL: mlcutil
-    group: download-tool
   curl:
     default_env:
       MLC_DOWNLOAD_CURL_EMULATE_BROWSER: 'no'
@@ -57,6 +50,15 @@ variations:
     - tags: get,generic-python-lib,_package.gdown
     env:
       MLC_DOWNLOAD_TOOL: gdown
+    group: download-tool
+  mlcutil:
+    default: true
+    env:
+      MLC_DOWNLOAD_TOOL: mlcutil
+    group: download-tool
+  r2-downloader:
+    env:
+      MLC_DOWNLOAD_TOOL: r2-downloader
     group: download-tool
   rclone:
     deps:
@@ -71,16 +73,27 @@ variations:
     env:
       MLC_DOWNLOAD_TOOL: rclone
     group: download-tool
-  url.#:
-    env:
-      MLC_DOWNLOAD_URL: '#'
   wget:
     env:
       MLC_DOWNLOAD_TOOL: wget
     group: download-tool
-  r2-downloader:
+  cmutil:
+    alias: mlcutil
+  url.#:
     env:
-      MLC_DOWNLOAD_TOOL: r2-downloader
-    group: download-tool
-    
+      MLC_DOWNLOAD_URL: '#'
+tests:
+  run_inputs:
+  - variations_list:
+    - url.https://raw.githubusercontent.com/octocat/Hello-World/refs/heads/master/README
+    env:
+      MLC_DOWNLOAD_FILENAME: test-readme.md
+  - variations_list:
+    - wget,url.https://raw.githubusercontent.com/octocat/Hello-World/refs/heads/master/README
+    env:
+      MLC_DOWNLOAD_FILENAME: test-readme-wget.md
+  - variations_list:
+    - curl,url.https://raw.githubusercontent.com/octocat/Hello-World/refs/heads/master/README
+    env:
+      MLC_DOWNLOAD_FILENAME: test-readme-curl.md
 versions: {}

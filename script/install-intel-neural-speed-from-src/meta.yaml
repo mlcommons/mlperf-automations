@@ -35,6 +35,15 @@ tags:
 - intel-neural-speed
 uid: b5477fdc929744ce
 variations:
+  repo.#:
+    env:
+      MLC_GIT_URL: '#'
+    group: repo
+  repo.https://github.com/intel/neural-speed:
+    default: true
+    env:
+      MLC_GIT_URL: https://github.com/intel/neural-speed
+    group: repo
   branch.#:
     env:
       MLC_GIT_CHECKOUT: '#'
@@ -55,15 +64,6 @@ variations:
       - conda-package
       - wheel
       tags: get,generic,conda-package,_package.wheel,_source.conda-forge
-  repo.#:
-    env:
-      MLC_GIT_URL: '#'
-    group: repo
-  repo.https://github.com/intel/neural-speed:
-    default: true
-    env:
-      MLC_GIT_URL: https://github.com/intel/neural-speed
-    group: repo
   sha.#:
     env:
       MLC_GIT_CHECKOUT_SHA: '#'

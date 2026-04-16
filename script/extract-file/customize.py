@@ -1,6 +1,8 @@
 from mlc import utils
 import os
 import hashlib
+import tarfile
+import zipfile
 from utils import *
 
 
@@ -142,8 +144,19 @@ def preprocess(i):
             ('-k ' if not remove_extracted else '')
 
     else:
-        return {'return': 1,
-                'error': 'Neither MLC_EXTRACT_UNZIP nor MLC_EXTRACT_UNTAR is yes'}
+        # Fallback: detect file type using Python modules
+        try:
+            if tarfile.is_tarfile(filename):
+                env['MLC_EXTRACT_TOOL_OPTIONS'] = ' -xvf'
+                env['MLC_EXTRACT_TOOL'] = 'tar '
+            elif zipfile.is_zipfile(filename):
+                env['MLC_EXTRACT_TOOL'] = 'unzip'
+            else:
+                return {'return': 1,
+                        'error': f'Cannot determine archive type for: {filename}'}
+        except (OSError, IOError):
+            return {'return': 1,
+                    'error': f'Cannot determine archive type for: {filename}'}
 
     env['MLC_EXTRACT_PRE_CMD'] = ''
 

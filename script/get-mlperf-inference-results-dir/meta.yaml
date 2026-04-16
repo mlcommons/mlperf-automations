@@ -26,8 +26,6 @@ tags:
 - directory
 uid: 84f3c5aad5e1444b
 variations:
-  path.#:
-    MLC_MLPERF_INFERENCE_RESULTS_DIR: '#'
   version.#:
     env:
       MLC_MLPERF_INFERENCE_RESULTS_VERSION: '#'
@@ -41,4 +39,6 @@ variations:
     env:
       MLC_MLPERF_INFERENCE_RESULTS_VERSION: 4_1-dev
     group: version
+  path.#:
+    MLC_MLPERF_INFERENCE_RESULTS_DIR: '#'
 versions: {}

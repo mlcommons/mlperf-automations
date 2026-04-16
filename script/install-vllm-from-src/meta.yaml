@@ -50,6 +50,26 @@ tags:
 - install-vllm-from-src
 uid: 7b3ad76e24d742c7
 variations:
+  branch.main:
+    default: true
+    group: branch
+  cpu:
+    group: device
+    default: true
+    env:
+      MLC_TMP_DEVICE: cpu
+    deps:
+    - tags: get,generic-python-lib,_package.setuptools_scm
+    - tags: get,generic-sys-util,_libnuma-dev
+  repo.#:
+    env:
+      MLC_GIT_URL: '#'
+    group: repo
+  repo.https://github.com/vllm-project/vllm:
+    default: true
+    env:
+      MLC_GIT_URL: https://github.com/vllm-project/vllm
+    group: repo
   branch.#:
     env:
       MLC_GIT_CHECKOUT: '#'
@@ -58,14 +78,6 @@ variations:
       pytorch-src-repo:
         tags: _cherrypicks.#
     env: {}
-  cpu:
-    group: device
-    default: true
-    env:
-      MLC_TMP_DEVICE: cpu
-    deps:
-      - tags: get,generic-python-lib,_package.setuptools_scm
-      - tags: get,generic-sys-util,_libnuma-dev
   cuda:
     deps:
     - names:
@@ -85,18 +97,6 @@ variations:
       pytorch-src-repo:
         tags: _pr-to-apply.#
     env: {}
-  repo.#:
-    env:
-      MLC_GIT_URL: '#'
-    group: repo
-  repo.https://github.com/vllm-project/vllm:
-    default: true
-    env:
-      MLC_GIT_URL: https://github.com/vllm-project/vllm
-    group: repo
-  branch.main:
-    default: true
-    group: branch
   sha.#:
     env:
       MLC_GIT_CHECKOUT_SHA: '#'

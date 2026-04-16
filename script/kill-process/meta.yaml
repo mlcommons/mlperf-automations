@@ -15,9 +15,7 @@ tests:
   run_inputs: []
 uid: 27b5651692454cb6
 input_mapping:
+  busy_group: MLC_KILL_BUSIEST_PROCESS_GROUP
   group: MLC_KILL_PROCESS_GROUP
   pid: MLC_KILL_PROCESS_ID
   pname: MLC_KILL_PROCESS_NAME
-  busy_group: MLC_KILL_BUSIEST_PROCESS_GROUP
-  
-

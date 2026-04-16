@@ -1,13 +1,8 @@
 alias: app-mlperf-automotive
 uid: f7488ce376484fd2
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
-
 category: MLPerf Automotive
-
-
-# User-friendly tags to find this MLC script
 tags:
 - app
 - app-mlperf-inference
@@ -15,172 +10,146 @@ tags:
 - mlperf-inference
 - mlperf-inference-automotive
 - abtf-inference
-
-predeps: no
-
-# Default environment
+predeps: false
 default_env:
   MLC_MLPERF_LOADGEN_MODE: accuracy
   MLC_MLPERF_LOADGEN_SCENARIO: Offline
   MLC_OUTPUT_FOLDER_NAME: test_results
   MLC_MLPERF_RUN_STYLE: test
   MLC_TEST_QUERY_COUNT: '10'
-  MLC_MLPERF_QUANTIZATION: off
+  MLC_MLPERF_QUANTIZATION: false
   MLC_MLPERF_SUT_NAME_IMPLEMENTATION_PREFIX: reference
   MLC_MLPERF_SUT_NAME_RUN_CONFIG_SUFFIX: ''
-
-
-# Map script inputs to environment variables
 input_mapping:
-  device: MLC_MLPERF_DEVICE
+  clean: MLC_MLPERF_CLEAN_SUBMISSION_DIR
+  constantstream_target_qps: MLC_MLPERF_LOADGEN_CONSTANTSTREAM_TARGET_QPS
   count: MLC_MLPERF_LOADGEN_QUERY_COUNT
+  dataset: MLC_MLPERF_VISION_DATASET_OPTION
+  dataset_args: MLC_MLPERF_EXTRA_DATASET_ARGS
+  device: MLC_MLPERF_DEVICE
   docker: MLC_RUN_DOCKER_CONTAINER
   hw_name: MLC_HW_NAME
   imagenet_path: IMAGENET_PATH
+  max_amps: MLC_MLPERF_POWER_MAX_AMPS
   max_batchsize: MLC_MLPERF_LOADGEN_MAX_BATCHSIZE
+  max_volts: MLC_MLPERF_POWER_MAX_VOLTS
   mode: MLC_MLPERF_LOADGEN_MODE
-  num_threads: MLC_NUM_THREADS
-  threads: MLC_NUM_THREADS
-  dataset: MLC_MLPERF_VISION_DATASET_OPTION
   model: MLC_MLPERF_CUSTOM_MODEL_PATH
+  multistream_target_latency: MLC_MLPERF_LOADGEN_MULTISTREAM_TARGET_LATENCY
+  ntp_server: MLC_MLPERF_POWER_NTP_SERVER
+  num_threads: MLC_NUM_THREADS
+  offline_target_qps: MLC_MLPERF_LOADGEN_OFFLINE_TARGET_QPS
+  output: MLC_MLPERF_OUTPUT_DIR
   output_dir: OUTPUT_BASE_DIR
   power: MLC_MLPERF_POWER
   power_server: MLC_MLPERF_POWER_SERVER_ADDRESS
-  ntp_server: MLC_MLPERF_POWER_NTP_SERVER
-  max_amps: MLC_MLPERF_POWER_MAX_AMPS
-  max_volts: MLC_MLPERF_POWER_MAX_VOLTS
   regenerate_files: MLC_REGENERATE_MEASURE_FILES
   rerun: MLC_RERUN
   scenario: MLC_MLPERF_LOADGEN_SCENARIO
-  test_query_count: MLC_TEST_QUERY_COUNT
-  clean: MLC_MLPERF_CLEAN_SUBMISSION_DIR
-  dataset_args: MLC_MLPERF_EXTRA_DATASET_ARGS
-  target_qps: MLC_MLPERF_LOADGEN_TARGET_QPS
-  target_latency: MLC_MLPERF_LOADGEN_TARGET_LATENCY
-  offline_target_qps: MLC_MLPERF_LOADGEN_OFFLINE_TARGET_QPS
   server_target_qps: MLC_MLPERF_LOADGEN_SERVER_TARGET_QPS
-  constantstream_target_qps: MLC_MLPERF_LOADGEN_CONSTANTSTREAM_TARGET_QPS
   singlestream_target_latency: MLC_MLPERF_LOADGEN_SINGLESTREAM_TARGET_LATENCY
-  multistream_target_latency: MLC_MLPERF_LOADGEN_MULTISTREAM_TARGET_LATENCY
-  output: MLC_MLPERF_OUTPUT_DIR
-
-# Env keys which are exposed to higher level scripts
+  target_latency: MLC_MLPERF_LOADGEN_TARGET_LATENCY
+  target_qps: MLC_MLPERF_LOADGEN_TARGET_QPS
+  test_query_count: MLC_TEST_QUERY_COUNT
+  threads: MLC_NUM_THREADS
 new_env_keys:
-  - MLC_MLPERF_*
-  - MLC_OUTPUT_PREDICTIONS_PATH
-
+- MLC_MLPERF_*
+- MLC_OUTPUT_PREDICTIONS_PATH
 new_state_keys:
-  - mlc-mlperf-inference-results*
-
-# Dependencies on other MLC scripts
+- mlc-mlperf-inference-results*
 deps:
-
-  # Detect host OS features
-  - tags: detect,os
-
-  # Detect host CPU features
-  - tags: detect,cpu
-
-  # Install system dependencies on a given host
-  - tags: get,sys-utils-mlc
-
-  # Detect/install python
-  - tags: get,python
-    names:
-    - python
-    - python3
-
-  # Use mlc inside scripts
-  #- tags: get,generic-python-lib,_package.mlcflow
-
-  - tags: get,mlperf,automotive,utils
-
+- tags: detect,os
+- tags: detect,cpu
+- tags: get,sys-utils-mlc
+- tags: get,python
+  names:
+  - python
+  - python3
+- tags: get,mlperf,automotive,utils
 posthook_deps:
-  - tags: get,mlperf,sut,description #populate system meta information like framework
-  - tags: get,platform,details
-    enable_if_env:
-      MLC_GET_PLATFORM_DETAILS:
-        - yes
-    skip_if_env:
-      MLC_MLPERF_LOADGEN_MODE:
-      - accuracy
-    env: 
-      MLC_PLATFORM_DETAILS_FILE_PATH: '<<<MLC_MLPERF_OUTPUT_DIR>>>/system_info.txt'
-
+- tags: get,mlperf,sut,description
+- tags: get,platform,details
+  enable_if_env:
+    MLC_GET_PLATFORM_DETAILS:
+    - true
+  skip_if_env:
+    MLC_MLPERF_LOADGEN_MODE:
+    - accuracy
+  env:
+    MLC_PLATFORM_DETAILS_FILE_PATH: <<<MLC_MLPERF_OUTPUT_DIR>>>/system_info.txt
 post_deps:
-  - tags: draw,graph,from-json
-    enable_if_env:
-      MLC_MLPERF_RUN_JSON_VERSION_INFO_FILE:
-        - on
-    env:
-      MLC_JSON_INPUT_FILE: <<<MLC_MLPERF_RUN_JSON_VERSION_INFO_FILE>>>
-      MLC_OUTPUT_IMAGE_PATH: <<<MLC_MLPERF_RUN_DEPS_GRAPH>>>
-      MLC_OUTPUT_MERMAID_PATH: <<<MLC_MLPERF_RUN_DEPS_MERMAID>>>
-
-
+- tags: draw,graph,from-json
+  enable_if_env:
+    MLC_MLPERF_RUN_JSON_VERSION_INFO_FILE:
+    - true
+  env:
+    MLC_JSON_INPUT_FILE: <<<MLC_MLPERF_RUN_JSON_VERSION_INFO_FILE>>>
+    MLC_OUTPUT_IMAGE_PATH: <<<MLC_MLPERF_RUN_DEPS_GRAPH>>>
+    MLC_OUTPUT_MERMAID_PATH: <<<MLC_MLPERF_RUN_DEPS_MERMAID>>>
 docker:
   mlc_repo: mlcommons@mlperf-automations
   mlc_repo_branch: dev
-  use_host_group_id: True
-  use_host_user_id: True
+  use_host_group_id: true
+  use_host_user_id: true
   real_run: false
   user: mlcuser
-  interactive: True
+  interactive: true
   pre_run_cmds:
-    - mlc pull repo
+  - mlc pull repo
   deps:
-    - tags: get,abtf,scratch,space
+  - tags: get,abtf,scratch,space
   mounts:
-    - "${{ MLC_ABTF_SCRATCH_PATH_DATASETS }}:${{ MLC_ABTF_SCRATCH_PATH_DATASETS }}"
-    - "${{ MLC_ML_MODEL_FILE_WITH_PATH }}:${{ MLC_ML_MODEL_FILE_WITH_PATH }}"
-
-
-# Variations to customize dependencies
+  - ${{ MLC_ABTF_SCRATCH_PATH_DATASETS }}:${{ MLC_ABTF_SCRATCH_PATH_DATASETS }}
+  - ${{ MLC_ML_MODEL_FILE_WITH_PATH }}:${{ MLC_ML_MODEL_FILE_WITH_PATH }}
 variations:
-
-  reference:
-    alias: mlcommons-python
-
-  # Implementation
-  mlcommons-python:
-    group: implementation
+  batch_size.#:
+    group: batch_size
+    env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: '#'
+    add_deps_recursive:
+      abtf-inference-implementation:
+        tags: _batch_size.#
+  cpu:
+    group: device
     default: true
     env:
-      MLC_MLPERF_PYTHON: 'yes'
-      MLC_MLPERF_IMPLEMENTATION: reference
-    prehook_deps:
-      - names:
-         - python-reference-abtf-inference
-         - abtf-inference-implementation
-        tags: run-mlperf-inference,abtf-model
-        skip_if_env:
-          MLC_SKIP_RUN:
-            - yes
-
-
-  # Execution modes
+      MLC_MLPERF_DEVICE: cpu
+      CUDA_VISIBLE_DEVICES: ''
+      USE_CUDA: false
+      USE_GPU: false
+    add_deps_recursive:
+      abtf-inference-implementation:
+        tags: _cpu
+  cuda:
+    group: device
+    env:
+      MLC_MLPERF_DEVICE: gpu
+      USE_CUDA: true
+      USE_GPU: true
+    add_deps_recursive:
+      abtf-inference-implementation:
+        tags: _cuda
+    docker:
+      all_gpus: 'yes'
+      base_image: nvcr.io/nvidia/pytorch:24.08-py3
+      os_version: 22.04
   fast:
     group: execution-mode
     env:
       MLC_FAST_FACTOR: '5'
       MLC_OUTPUT_FOLDER_NAME: fast_results
       MLC_MLPERF_RUN_STYLE: fast
-
   test:
     group: execution-mode
     default: true
     env:
       MLC_OUTPUT_FOLDER_NAME: test_results
       MLC_MLPERF_RUN_STYLE: test
-
   valid:
     group: execution-mode
     env:
       MLC_OUTPUT_FOLDER_NAME: valid_results
       MLC_MLPERF_RUN_STYLE: valid
-
-
-  # ML engine
   onnxruntime:
     group: framework
     env:
@@ -194,24 +163,6 @@ variations:
         tags: _onnx
       ml-model-deeplabv3plus:
         tags: _onnx
-
-  onnx_dynamic:
-    base:
-      - onnxruntime
-    add_deps_recursive:
-      ml-model-deeplabv3plus:
-        tags: _onnx_dynamic
-
-  onnxruntime,cpu:
-    env:
-      MLC_MLPERF_BACKEND_VERSION: <<<MLC_ONNXRUNTIME_VERSION>>>
-
-  onnxruntime,cuda:
-    env:
-      MLC_MLPERF_BACKEND_VERSION: <<<MLC_ONNXRUNTIME_GPU_VERSION>>>
-      ONNXRUNTIME_PREFERRED_EXECUTION_PROVIDER: "CUDAExecutionProvider"
-
-
   pytorch:
     group: framework
     default: true
@@ -227,8 +178,35 @@ variations:
         tags: _pytorch
       ml-model-deeplabv3plus:
         tags: _pytorch
-
-
+  mlcommons-python:
+    group: implementation
+    default: true
+    env:
+      MLC_MLPERF_PYTHON: 'yes'
+      MLC_MLPERF_IMPLEMENTATION: reference
+    prehook_deps:
+    - names:
+      - python-reference-abtf-inference
+      - abtf-inference-implementation
+      tags: run-mlperf-inference,abtf-model
+      skip_if_env:
+        MLC_SKIP_RUN:
+        - true
+  constantstream:
+    group: loadgen-scenario
+    env:
+      MLC_MLPERF_LOADGEN_SCENARIO: ConstantStream
+    add_deps_recursive:
+      abtf-inference-implementation:
+        tags: _constantstream
+  singlestream:
+    group: loadgen-scenario
+    default: true
+    env:
+      MLC_MLPERF_LOADGEN_SCENARIO: SingleStream
+    add_deps_recursive:
+      abtf-inference-implementation:
+        tags: _singlestream
   abtf-demo-model:
     env:
       MLC_MODEL: retinanet
@@ -236,7 +214,6 @@ variations:
     add_deps_recursive:
       abtf-inference-implementation:
         tags: _abtf-demo-model
-
   abtf-poc-model:
     env:
       MLC_MODEL: retinanet
@@ -247,38 +224,36 @@ variations:
         tags: _abtf-poc-model
     docker:
       deps:
-        - tags: get,dataset,raw,mlcommons-cognata,_abtf-poc
-          names:
-          - raw-dataset-mlcommons-cognata
-          enable_if_env:
-            MLC_DATASET_MLCOMMONS_COGNATA_DOWNLOAD_IN_HOST:
-              - yes
+      - tags: get,dataset,raw,mlcommons-cognata,_abtf-poc
+        names:
+        - raw-dataset-mlcommons-cognata
+        enable_if_env:
+          MLC_DATASET_MLCOMMONS_COGNATA_DOWNLOAD_IN_HOST:
+          - true
       mounts:
-        - "${{ MLC_DATASET_MLCOMMONS_COGNATA_PATH }}:${{ MLC_DATASET_MLCOMMONS_COGNATA_PATH }}"
-  
+      - ${{ MLC_DATASET_MLCOMMONS_COGNATA_PATH }}:${{ MLC_DATASET_MLCOMMONS_COGNATA_PATH }}
   bevformer:
-    group:
-      models
+    group: models
     default_env:
-      MLC_USE_DATASET_FROM_HOST: yes
+      MLC_USE_DATASET_FROM_HOST: true
     env:
       MLC_MODEL: bevformer
     docker:
       deps:
-        - tags: get,preprocessed,dataset,nuscenes,_mlc,_validation
-          enable_if_env:
-            MLC_USE_DATASET_FROM_HOST:
-              - "yes"
-        - tags: get,ml-model,bevformer,_mlc,_rclone
-          enable_if_env:
-            MLC_USE_MODEL_FROM_HOST:
-              - "yes"
-          names:
-            - ml-model-bevformer
+      - tags: get,preprocessed,dataset,nuscenes,_mlc,_validation
+        enable_if_env:
+          MLC_USE_DATASET_FROM_HOST:
+          - 'yes'
+      - tags: get,ml-model,bevformer,_mlc,_rclone
+        enable_if_env:
+          MLC_USE_MODEL_FROM_HOST:
+          - 'yes'
+        names:
+        - ml-model-bevformer
       mounts:
-        - "${{ MLC_PREPROCESSED_DATASET_NUSCENES_PATH }}:${{ MLC_PREPROCESSED_DATASET_NUSCENES_PATH }}"
-        - "${{ MLC_ML_MODEL_BEVFORMER_PATH }}:${{ MLC_ML_MODEL_BEVFORMER_PATH }}"
-        - "${{ MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH }}:${{ MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH }}"
+      - ${{ MLC_PREPROCESSED_DATASET_NUSCENES_PATH }}:${{ MLC_PREPROCESSED_DATASET_NUSCENES_PATH }}
+      - ${{ MLC_ML_MODEL_BEVFORMER_PATH }}:${{ MLC_ML_MODEL_BEVFORMER_PATH }}
+      - ${{ MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH }}:${{ MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH }}
     add_deps_recursive:
       abtf-inference-implementation:
         tags: _bevformer
@@ -293,66 +268,27 @@ variations:
       - mlperf-accuracy-script
       - nuscenes-accuracy-script
       tags: run,accuracy,mlperf,_nuscenes
-  
-  ssd:
-    group:
-      models
-    default_env:
-      MLC_USE_DATASET_FROM_HOST: yes
-    env:
-      MLC_MODEL: ssd
-    docker:
-      deps:
-        - tags: get,preprocessed,dataset,cognata,_mlc,_2d_obj_det,_validation
-          enable_if_env:
-            MLC_USE_DATASET_FROM_HOST:
-              - "yes"
-        - tags: get,ml-model,ssd,resnet50,_mlc,_rclone
-          enable_if_env:
-            MLC_USE_MODEL_FROM_HOST:
-              - "yes"
-          names:
-            - ml-model-ssd
-      mounts:
-        - "${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}:${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}"
-        - "${{ MLC_ML_MODEL_SSD_PATH }}:${{ MLC_ML_MODEL_SSD_PATH }}"
-    add_deps_recursive:
-      abtf-inference-implementation:
-        tags: _ssd
-    posthook_deps:
-    - enable_if_env:
-        MLC_MLPERF_LOADGEN_MODE:
-        - accuracy
-        - all
-        MLC_MLPERF_ACCURACY_RESULTS_DIR:
-        - 'on'
-      names:
-      - mlperf-accuracy-script
-      - cognata-ssd-accuracy-script
-      tags: run,accuracy,mlperf,_cognata_ssd
-  
   deeplabv3plus:
-    group:
-      models
+    group: models
     default_env:
-      MLC_USE_DATASET_FROM_HOST: yes
+      MLC_USE_DATASET_FROM_HOST: true
     env:
       MLC_MODEL: deeplabv3plus
     docker:
       deps:
-        - tags: get,preprocessed,dataset,cognata,_mlc,_segmentation,_validation
-          enable_if_env:
-            MLC_USE_DATASET_FROM_HOST:
-              - "yes"
-        - tags:  get,ml-model,deeplabv3-plus,_mlc,_rclone
-          enable_if_env:
-            MLC_USE_MODEL_FROM_HOST:
-              - "yes"
-          names:
-            - ml-model-deeplabv3plus
+      - tags: get,preprocessed,dataset,cognata,_mlc,_segmentation,_validation
+        enable_if_env:
+          MLC_USE_DATASET_FROM_HOST:
+          - 'yes'
+      - tags: get,ml-model,deeplabv3-plus,_mlc,_rclone
+        enable_if_env:
+          MLC_USE_MODEL_FROM_HOST:
+          - 'yes'
+        names:
+        - ml-model-deeplabv3plus
       mounts:
-        - "${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}:${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}"
-        - "${{ MLC_ML_MODEL_DEEPLABV3_PLUS_PATH }}:${{ MLC_ML_MODEL_DEEPLABV3_PLUS_PATH }}"
+      - ${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}:${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}
+      - ${{ MLC_ML_MODEL_DEEPLABV3_PLUS_PATH }}:${{ MLC_ML_MODEL_DEEPLABV3_PLUS_PATH }}
     add_deps_recursive:
       abtf-inference-implementation:
         tags: _deeplabv3plus
@@ -367,31 +303,29 @@ variations:
       - mlperf-accuracy-script
       - cognata-deeplab-accuracy-script
       tags: run,accuracy,mlperf,_cognata_deeplab
-  
   llama3_1-8b:
-    group:
-      models
+    group: models
     default_env:
-      MLC_USE_DATASET_FROM_HOST: yes
+      MLC_USE_DATASET_FROM_HOST: true
     env:
       MLC_MODEL: llama3_1-8b
     docker:
       deps:
-        - tags: get-dataset-mmlu
-          names:
-            - dataset-mmlu
-          enable_if_env:
-            MLC_USE_DATASET_FROM_HOST:
-              - "yes"
-        - tags:  get,ml-model,llama3,_mlc,_8b,_r2-downloader
-          enable_if_env:
-            MLC_USE_MODEL_FROM_HOST:
-              - "yes"
-          names:
-            - ml-model-llama3_1-8b
+      - tags: get-dataset-mmlu
+        names:
+        - dataset-mmlu
+        enable_if_env:
+          MLC_USE_DATASET_FROM_HOST:
+          - 'yes'
+      - tags: get,ml-model,llama3,_mlc,_8b,_r2-downloader
+        enable_if_env:
+          MLC_USE_MODEL_FROM_HOST:
+          - 'yes'
+        names:
+        - ml-model-llama3_1-8b
       mounts:
-        - "${{ MLC_DATASET_MMLU_PATH }}:${{ MLC_DATASET_MMLU_PATH }}"
-        - "${{ LLAMA3_CHECKPOINT_PATH }}:${{ LLAMA3_CHECKPOINT_PATH }}"
+      - ${{ MLC_DATASET_MMLU_PATH }}:${{ MLC_DATASET_MMLU_PATH }}
+      - ${{ LLAMA3_CHECKPOINT_PATH }}:${{ LLAMA3_CHECKPOINT_PATH }}
     add_deps_recursive:
       abtf-inference-implementation:
         tags: _llama3_1-8b
@@ -406,97 +340,52 @@ variations:
       - mlperf-accuracy-script
       - cognata-deeplab-accuracy-script
       tags: run,accuracy,mlperf,_mmlu
-
-  # Target devices
-  cpu:
-    group: device
-    default: true
+  ssd:
+    group: models
+    default_env:
+      MLC_USE_DATASET_FROM_HOST: true
     env:
-      MLC_MLPERF_DEVICE: cpu
-      CUDA_VISIBLE_DEVICES: ''
-      USE_CUDA: no
-      USE_GPU: no
+      MLC_MODEL: ssd
+    docker:
+      deps:
+      - tags: get,preprocessed,dataset,cognata,_mlc,_2d_obj_det,_validation
+        enable_if_env:
+          MLC_USE_DATASET_FROM_HOST:
+          - 'yes'
+      - tags: get,ml-model,ssd,resnet50,_mlc,_rclone
+        enable_if_env:
+          MLC_USE_MODEL_FROM_HOST:
+          - 'yes'
+        names:
+        - ml-model-ssd
+      mounts:
+      - ${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}:${{ MLC_PREPROCESSED_DATASET_COGNATA_PATH }}
+      - ${{ MLC_ML_MODEL_SSD_PATH }}:${{ MLC_ML_MODEL_SSD_PATH }}
     add_deps_recursive:
       abtf-inference-implementation:
-        tags: _cpu
-
+        tags: _ssd
+    posthook_deps:
+    - enable_if_env:
+        MLC_MLPERF_LOADGEN_MODE:
+        - accuracy
+        - all
+        MLC_MLPERF_ACCURACY_RESULTS_DIR:
+        - 'on'
+      names:
+      - mlperf-accuracy-script
+      - cognata-ssd-accuracy-script
+      tags: run,accuracy,mlperf,_cognata_ssd
   gpu:
     alias: cuda
-
-  cuda:
-    group: device
-    env:
-      MLC_MLPERF_DEVICE: gpu
-      USE_CUDA: yes
-      USE_GPU: yes
-    add_deps_recursive:
-      abtf-inference-implementation:
-        tags: _cuda
-    docker:
-      all_gpus: 'yes'
-      base_image: nvcr.io/nvidia/pytorch:24.08-py3
-      os_version: 22.04
-
-  v0.5: {}
-
-  v1.0: {}
-
-  mvp-demo: {}
-
-  poc-demo: {}
-
-  v0.5,mlcommons-python,cpu:
-    docker:
-      base_image: ubuntu:22.04
-      os_version: 22.04
-
-  v1.0,mlcommons-python,cpu:
-    docker:
-      base_image: ubuntu:22.04
-      os_version: 22.04
-
-  # Loadgen scenarios
-  offline:
-    env:
-      MLC_MLPERF_LOADGEN_SCENARIO: Offline
-    add_deps_recursive:
-      abtf-inference-implementation:
-        tags: _offline
-
   multistream:
     env:
       MLC_MLPERF_LOADGEN_SCENARIO: MultiStream
     add_deps_recursive:
       abtf-inference-implementation:
         tags: _multistream
-
-  singlestream:
-    group: loadgen-scenario
-    default: true
-    env:
-      MLC_MLPERF_LOADGEN_SCENARIO: SingleStream
-    add_deps_recursive:
-      abtf-inference-implementation:
-        tags: _singlestream
-
-  constantstream:
-    group: loadgen-scenario
-    env:
-      MLC_MLPERF_LOADGEN_SCENARIO: ConstantStream
-    add_deps_recursive:
-      abtf-inference-implementation:
-        tags: _constantstream
-
-  server:
-    env:
-      MLC_MLPERF_LOADGEN_SCENARIO: Server
-    add_deps_recursive:
-      abtf-inference-implementation:
-        tags: _server
-
   mvp-demo:
     env:
-      MLC_ABTF_MVP_DEMO: yes
+      MLC_ABTF_MVP_DEMO: true
       MLC_MLPERF_VISION_DATASET_OPTION: cognata-8mp-pt
       MLC_ABTF_ML_MODEL_CONFIG: baseline_8MP_ss_scales_all
       MLC_ABTF_NUM_CLASSES: 15
@@ -504,10 +393,28 @@ variations:
       MLC_DATASET_MLCOMMONS_COGNATA_GROUP_NAMES: Cognata_Camera_01_8M
       MLC_ABTF_ML_MODEL_TRAINING_FORCE_COGNATA_LABELS: 'yes'
       MLC_ABTF_ML_MODEL_SKIP_WARMUP: 'yes'
-
+  offline:
+    env:
+      MLC_MLPERF_LOADGEN_SCENARIO: Offline
+    add_deps_recursive:
+      abtf-inference-implementation:
+        tags: _offline
+  onnx_dynamic:
+    base:
+    - onnxruntime
+    add_deps_recursive:
+      ml-model-deeplabv3plus:
+        tags: _onnx_dynamic
+  onnxruntime,cpu:
+    env:
+      MLC_MLPERF_BACKEND_VERSION: <<<MLC_ONNXRUNTIME_VERSION>>>
+  onnxruntime,cuda:
+    env:
+      MLC_MLPERF_BACKEND_VERSION: <<<MLC_ONNXRUNTIME_GPU_VERSION>>>
+      ONNXRUNTIME_PREFERRED_EXECUTION_PROVIDER: CUDAExecutionProvider
   poc-demo:
     env:
-      MLC_ABTF_POC_DEMO: yes
+      MLC_ABTF_POC_DEMO: true
       MLC_MLPERF_VISION_DATASET_OPTION: cognata-8mp-pt
       MLC_ABTF_ML_MODEL_CONFIG: baseline_8MP_ss_scales_fm1_5x5_all
       MLC_ABTF_NUM_CLASSES: 15
@@ -515,11 +422,21 @@ variations:
       MLC_DATASET_MLCOMMONS_COGNATA_GROUP_NAMES: Cognata_Camera_01_8M
       MLC_ABTF_ML_MODEL_TRAINING_FORCE_COGNATA_LABELS: 'yes'
       MLC_ABTF_ML_MODEL_SKIP_WARMUP: 'yes'
-
-  batch_size.#:
-    group: batch_size
+  reference:
+    alias: mlcommons-python
+  server:
     env:
-      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: '#'
+      MLC_MLPERF_LOADGEN_SCENARIO: Server
     add_deps_recursive:
       abtf-inference-implementation:
-        tags: _batch_size.#
+        tags: _server
+  v0.5: {}
+  v0.5,mlcommons-python,cpu:
+    docker:
+      base_image: ubuntu:22.04
+      os_version: 22.04
+  v1.0: {}
+  v1.0,mlcommons-python,cpu:
+    docker:
+      base_image: ubuntu:22.04
+      os_version: 22.04

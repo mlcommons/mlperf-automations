@@ -4,7 +4,6 @@ automation_uid: 5b4e0237da074764
 category: MLPerf Inference
 default_env:
   MLC_MLPERF_SUBMISSION_URL: https://submissions-ui.mlcommons.org
-
 input_mapping:
   input: MLC_MLPERF_SUBMISSION_FILE
   submitter_id: MLC_MLPERF_SUBMITTER_ID
@@ -17,9 +16,9 @@ tags:
 - submission
 uid: cc01f0a82bef4216
 variations:
-  wg-inference:
-    env:
-      MLC_MLPERF_BENCHMARK: Inference
   wg-automotive:
     env:
       MLC_MLPERF_BENCHMARK: Automotive
+  wg-inference:
+    env:
+      MLC_MLPERF_BENCHMARK: Inference

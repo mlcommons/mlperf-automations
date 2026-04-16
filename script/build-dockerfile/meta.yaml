@@ -1,39 +1,28 @@
 alias: build-dockerfile
 uid: e66a7483230d4641
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
-
 tags:
 - build
 - dockerfile
-
 cache: false
-
 category: Docker automation
-
 default_env:
   MLC_DOCKER_BUILD_SLIM: 'no'
   MLC_DOCKER_IMAGE_EOL: '
 
     '
   MLC_DOCKER_OS: ubuntu
-  MLC_DOCKER_NOT_PULL_UPDATE: False
+  MLC_DOCKER_NOT_PULL_UPDATE: false
   MLC_MLOPS_REPO_BRANCH: dev
-
 input_mapping:
+  base_image: MLC_DOCKER_IMAGE_BASE
   build: MLC_BUILD_DOCKER_IMAGE
   cache: MLC_DOCKER_CACHE
-  mlc_repo: MLC_MLOPS_REPO
-  mlc_repo_flags: MLC_DOCKER_ADD_FLAG_TO_MLC_MLOPS_REPO
-  mlc_repos: MLC_DOCKER_EXTRA_MLC_REPOS
-  mlc_repo_branch: MLC_MLOPS_REPO_BRANCH
   comments: MLC_DOCKER_RUN_COMMENTS
   copy_files: MLC_DOCKER_COPY_FILES
-  base_image: MLC_DOCKER_IMAGE_BASE
-  os: MLC_DOCKER_OS
-  os_version: MLC_DOCKER_OS_VERSION
   docker_base_image: MLC_DOCKER_IMAGE_BASE
+  docker_not_pull_update: MLC_DOCKER_NOT_PULL_UPDATE
   docker_os: MLC_DOCKER_OS
   docker_os_version: MLC_DOCKER_OS_VERSION
   extra_sys_deps: MLC_DOCKER_EXTRA_SYS_DEPS
@@ -43,29 +32,31 @@ input_mapping:
   gh_token: MLC_GH_TOKEN
   image_repo: MLC_DOCKER_IMAGE_REPO
   image_tag: MLC_DOCKER_IMAGE_TAG
+  mlc_repo: MLC_MLOPS_REPO
+  mlc_repo_branch: MLC_MLOPS_REPO_BRANCH
+  mlc_repo_flags: MLC_DOCKER_ADD_FLAG_TO_MLC_MLOPS_REPO
   mlc_repo_path: MLC_REPO_PATH
+  mlc_repos: MLC_DOCKER_EXTRA_MLC_REPOS
+  os: MLC_DOCKER_OS
+  os_version: MLC_DOCKER_OS_VERSION
   package_manager_update_cmd: MLC_PACKAGE_MANAGER_UPDATE_CMD
   pip_extra_flags: MLC_DOCKER_PIP_INSTALL_EXTRA_FLAGS
   post_file: DOCKER_IMAGE_POST_FILE
   post_run_cmds: MLC_DOCKER_POST_RUN_COMMANDS
   pre_run_cmds: MLC_DOCKER_PRE_RUN_COMMANDS
+  push_image: MLC_DOCKER_PUSH_IMAGE
   real_run: MLC_REAL_RUN
   run_cmd: MLC_DOCKER_RUN_CMD
   run_cmd_extra: MLC_DOCKER_RUN_CMD_EXTRA
   script_tags: MLC_DOCKER_RUN_SCRIPT_TAGS
   skip_mlc_sys_upgrade: MLC_DOCKER_SKIP_MLC_SYS_UPGRADE
-  push_image: MLC_DOCKER_PUSH_IMAGE
-  docker_not_pull_update: MLC_DOCKER_NOT_PULL_UPDATE
   user: MLC_DOCKER_USER
-
 new_env_keys:
 - MLC_DOCKERFILE_*
-
 deps:
-  - tags: get,docker
-    names:
-    - docker
-
+- tags: get,docker
+  names:
+  - docker
 post_deps:
 - enable_if_env:
     MLC_BUILD_DOCKER_IMAGE:
@@ -73,7 +64,56 @@ post_deps:
   names:
   - build-docker-image
   tags: build,docker,image
-
+tests:
+  run_inputs:
+  - env:
+      MLC_DOCKER_OS: ubuntu
+      MLC_DOCKER_OS_VERSION: '20.04'
+  - env:
+      MLC_DOCKER_OS: ubuntu
+      MLC_DOCKER_OS_VERSION: '22.04'
+  - env:
+      MLC_DOCKER_OS: ubuntu
+      MLC_DOCKER_OS_VERSION: '24.04'
+  - env:
+      MLC_DOCKER_OS: ubuntu
+      MLC_DOCKER_OS_VERSION: '25.04'
+  - env:
+      MLC_DOCKER_OS: ubuntu
+      MLC_DOCKER_OS_VERSION: '25.10'
+  - env:
+      MLC_DOCKER_OS: rhel
+      MLC_DOCKER_OS_VERSION: '8'
+  - env:
+      MLC_DOCKER_OS: rhel
+      MLC_DOCKER_OS_VERSION: '9'
+  - env:
+      MLC_DOCKER_OS: arch
+      MLC_DOCKER_OS_VERSION: latest
+  - env:
+      MLC_DOCKER_OS: sles
+      MLC_DOCKER_OS_VERSION: '15.4'
+  - env:
+      MLC_DOCKER_OS: sles
+      MLC_DOCKER_OS_VERSION: '15.5'
+  - env:
+      MLC_DOCKER_OS: sles
+      MLC_DOCKER_OS_VERSION: '15.6'
+  - env:
+      MLC_DOCKER_OS: debian
+      MLC_DOCKER_OS_VERSION: '11'
+  - env:
+      MLC_DOCKER_OS: debian
+      MLC_DOCKER_OS_VERSION: '12'
+  - env:
+      MLC_DOCKER_OS: rocky
+      MLC_DOCKER_OS_VERSION: '8'
+  - env:
+      MLC_DOCKER_OS: rocky
+      MLC_DOCKER_OS_VERSION: '9'
+  - env:
+      MLC_DOCKER_OS: amazonlinux
+      MLC_DOCKER_OS_VERSION: '2023'
 variations:
   slim:
     env:

@@ -16,13 +16,6 @@ tests:
     - r2-downloader,mlc,dry-run
 uid: b83c7b589d274002
 variations:
-  dry-run:
-    env:
-      MLC_DOWNLOAD_MODE: dry
-    group: run-mode
-  dry-run,r2-downloader:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   mlc:
     default: true
     env:
@@ -46,6 +39,13 @@ variations:
       update_tags_from_env_with_prefix:
         _url.:
         - MLC_DOWNLOAD_URL
+  dry-run:
+    env:
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
   r2-downloader:
     adr:
       yolov11-model-dae:

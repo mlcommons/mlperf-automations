@@ -11,30 +11,46 @@ tags:
 - mlperf-deepseek-r1
 uid: 4f95da01a8244833
 new_env_keys:
-  - MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH
-  - MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_VALIDATION_PATH
-  - MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_CALIBRATION_PATH
+- MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH
+- MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_VALIDATION_PATH
+- MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_CALIBRATION_PATH
 input_mapping:
   deepseek_path: MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH
 print_env_at_the_end:
   MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_VALIDATION_PATH: DeepSeek-R1 validation dataset path
   MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_CALIBRATION_PATH: DeepSeek-R1 calibration dataset path
 variations:
+  calibration:
+    group: dataset-type
+    env:
+      MLC_PREPROCESSED_DATASET_TYPE: calibration
   validation:
     default: true
     group: dataset-type
     env:
       MLC_PREPROCESSED_DATASET_TYPE: validation
-  validation,rclone:
+  mlc:
+    group: download-src
+    default: true
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      env:
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH
+      extra_cache_tags: deepseek-r1,dataset
+      force_cache: true
+      names:
+      - dae
+      tags: download-and-extract
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
     env:
-      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/deepseek_r1/mlperf_deepseek_r1_dataset_4388_fp8_eval.pkl
-  validation,r2-downloader:
-    env:
-      MLC_DOWNLOAD_URL:  https://inference.mlcommons-storage.org/metadata/deepseek-r1-dataset-4388-fp8-eval.uri
-  calibration:
-    group: dataset-type
-    env:
-      MLC_PREPROCESSED_DATASET_TYPE: calibration
+      MLC_DOWNLOAD_SRC: mlcommons
   r2-downloader:
     group: download-tool
     add_deps_recursive:
@@ -46,56 +62,37 @@ variations:
       dae:
         tags: _rclone
     prehook_deps:
-      - tags: get,rclone
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-      - tags: get,rclone-config,_mlc-inference
-        force_cache: true
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
+    - tags: get,rclone
+      enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+    - tags: get,rclone-config,_mlc-inference
+      force_cache: true
+      enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
     default: true
   dry-run:
     group: run-mode
     env:
       MLC_DOWNLOAD_MODE: dry
-  dry-run,rclone:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  calibration,rclone:
-    env:
-      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/deepseek_r1/mlperf_deepseek_r1_calibration_dataset_500_fp8_eval.pkl
   calibration,r2-downloader:
     env:
       MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/deepseek-r1-calibration-dataset-500-fp8-eval.uri
-  mlc:
-    group: download-src
-    default: true
-    prehook_deps:
-      - enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - 'yes'
-        env:
-          MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH
-          MLC_EXTRACT_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH
-        extra_cache_tags: deepseek-r1,dataset
-        force_cache: true
-        names:
-          - dae
-        tags: download-and-extract
-        force_env_keys:
-          - MLC_OUTDIRNAME  
-        update_tags_from_env_with_prefix:
-          _url.:
-            - MLC_DOWNLOAD_URL
+  calibration,rclone:
     env:
-      MLC_DOWNLOAD_SRC: mlcommons
+      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/deepseek_r1/mlperf_deepseek_r1_calibration_dataset_500_fp8_eval.pkl
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  validation,r2-downloader:
+    env:
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/deepseek-r1-dataset-4388-fp8-eval.uri
+  validation,rclone:
+    env:
+      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/deepseek_r1/mlperf_deepseek_r1_dataset_4388_fp8_eval.pkl
 tests:
   run_inputs:
   - variations_list:
-      - calibration,r2-downloader,mlc,dry-run
-      - validation,r2-downloader,mlc,dry-run
-      # - validation,rclone,mlc,dry-run
-      # - calibration,rclone,mlc,dry-run
-      
+    - calibration,r2-downloader,mlc,dry-run
+    - validation,r2-downloader,mlc,dry-run
