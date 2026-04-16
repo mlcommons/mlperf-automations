@@ -54,6 +54,9 @@ jobs:
         pip install mlcflow
         pip install tabulate
     - name: Pull MLOps repository
+      env:
+        PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
       run: |
         if [ -n "${{ inputs.inf-repo-url }}" ]; then
           if [ -n "${{ inputs.automation-repo }}" ]; then
@@ -66,12 +69,15 @@ jobs:
             mlc pull repo mlcommons@mlperf-automations --branch=dev
           fi
         else
-          mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
+          mlc pull repo "$PR_HEAD_REPO" --branch="$PR_HEAD_REF"
         fi
     - name: Pull repo where test cases are uploaded
       run: |
         git clone -b submission-generation-examples https://github.com/mlcommons/inference.git submission_generation_examples
     - name: Run Submission Generation - round-${{ matrix.round }}${{ matrix.folder_name }} ${{ matrix.action }} ${{ matrix.category }} ${{ matrix.division }} 
+      env:
+        PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
       run: |
         if [ "${{ matrix.folder_name }}" == "closed" ]; then
           description="Test submission - contains closed edge and datacenter"
@@ -84,7 +90,7 @@ jobs:
         docker_tags=""
         # we use inf-repo-url to identify whether the workflow is triggered from inference or automations repo
         if [ "${{ matrix.action }}" == "docker" ] && [ -z "${{ inputs.inf-repo-url }}" ]; then
-          docker_tags="--docker_mlc_repo=${{ github.event.pull_request.head.repo.html_url }} --docker_mlc_repo_branch=${{ github.event.pull_request.head.ref }}"
+          docker_tags="--docker_mlc_repo=$PR_HEAD_REPO --docker_mlc_repo_branch=$PR_HEAD_REF"
         fi
         if [ "${{ matrix.action }}" == "docker" ] && [ -n "${{ inputs.inf-repo-url }}" ]; then
           if [ -n "${{ inputs.automation-repo }}" ]; then
