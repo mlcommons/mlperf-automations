@@ -10,7 +10,7 @@ env:
 
 jobs:
   format-code:
-    if: github.actor != 'mlc-automations'
+    if: github.actor != 'mlc-automations' && github.repository_owner == 'mlcommons'
     runs-on: ubuntu-latest
     permissions:
       contents: write
