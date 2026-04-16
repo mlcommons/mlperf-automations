@@ -1,19 +1,21 @@
 alias: get-dataset-mlperf-inference-shopify-catalogue
+uid: ca5cbb485e044ac4
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
+tags:
+- get-dataset-mlperf-inference-shopify-catalogue
+
+# Cache
 cache: true
+
+# Environment
 new_env_keys:
 - MLC_ML_DATASET_MLPERF_INFERENCE_SHOPIFY_CATALOGUE_DATASET_PATH
 - MLC_ML_DATASET_FILE_WITH_PATH
-print_env_at_the_end:
-  MLC_ML_DATASET_MLPERF_INFERENCE_SHOPIFY_CATALOGUE_DATASET_PATH: Shopify catalogue dataset path
-tags:
-- get-dataset-mlperf-inference-shopify-catalogue
-tests:
-  run_inputs:
-  - variations_list:
-    - r2-downloader,mlc,dry-run
-uid: ca5cbb485e044ac4
+
+# Variations
 variations:
   mlc:
     default: true
@@ -53,3 +55,13 @@ variations:
   dry-run,r2-downloader:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_DATASET_MLPERF_INFERENCE_SHOPIFY_CATALOGUE_DATASET_PATH: Shopify catalogue dataset path
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - r2-downloader,mlc,dry-run

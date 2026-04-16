@@ -1,15 +1,31 @@
 alias: get-ml-model-llama3
+uid: 2f8cef2acc334e80
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
-docker:
-  real_run: false
-input_mapping:
-  outdirname: MLC_OUTDIRNAME
+tags:
+- get
+- raw
+- ml-model
+- language-processing
+- llama3
+- llama3-405b
+
+# Cache
+cache: true
+
+# Environment
 new_env_keys:
 - MLC_ML_MODEL_*
 - LLAMA3_CHECKPOINT_PATH
+
+# Input mapping
+input_mapping:
+  outdirname: MLC_OUTDIRNAME
+
+# Dependencies
 prehook_deps:
 - enable_if_env:
     MLC_TMP_REQUIRE_DOWNLOAD:
@@ -23,23 +39,8 @@ prehook_deps:
   names:
   - hf-zoo
   tags: get,ml-model,huggingface,zoo,_clone-repo
-print_env_at_the_end:
-  LLAMA3_CHECKPOINT_PATH: LLAMA3 checkpoint path
-tags:
-- get
-- raw
-- ml-model
-- language-processing
-- llama3
-- llama3-405b
-uid: 2f8cef2acc334e80
-tests:
-  needs_pat: true
-  run_inputs:
-  - variations_list:
-    - rclone,405b,mlc,dry-run
-    - r2-downloader,405b,mlc,dry-run
-    - r2-downloader,8b,mlc,dry-run
+
+# Variations
 variations:
   hf:
     group: download-src
@@ -182,3 +183,20 @@ variations:
     adr:
       llama3-model-download:
         extra_cache_tags: llama3,dataset,rclone
+
+# Docker / container
+docker:
+  real_run: false
+
+# Output / debugging
+print_env_at_the_end:
+  LLAMA3_CHECKPOINT_PATH: LLAMA3 checkpoint path
+
+# Tests
+tests:
+  needs_pat: true
+  run_inputs:
+  - variations_list:
+    - rclone,405b,mlc,dry-run
+    - r2-downloader,405b,mlc,dry-run
+    - r2-downloader,8b,mlc,dry-run

@@ -1,21 +1,26 @@
 alias: get-preprocessed-dataset-nuscenes
+uid: 0e403a2861984a4e
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
-default_env:
-  MLC_DATASET: nuscenes
-new_env_keys:
-- MLC_PREPROCESSED_DATASET_*
 tags:
 - get
 - dataset
 - nuscenes
 - preprocessed
-uid: 0e403a2861984a4e
-print_env_at_the_end:
-  MLC_PREPROCESSED_DATASET_NUSCENES_PATH: Preprocessed Nuscenes dataset path
-  MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH: Path containing minimum files for accuracy checker
+
+# Cache
+cache: true
+
+# Environment
+default_env:
+  MLC_DATASET: nuscenes
+new_env_keys:
+- MLC_PREPROCESSED_DATASET_*
+
+# Variations
 variations:
   prebuilt:
     default: true
@@ -158,6 +163,13 @@ variations:
         - MLC_DOWNLOAD_NUSCENES_SCENE_LENGTHS_URL
     env:
       MLC_DOWNLOAD_URL: mlc-nuscenes:nuscenes_dataset/preprocessed/<<<MLC_DATASET_NUSCENES_TAR_FILENAME>>>
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_PREPROCESSED_DATASET_NUSCENES_PATH: Preprocessed Nuscenes dataset path
+  MLC_PREPROCESSED_DATASET_NUSCENES_ACC_CHECKER_MIN_FILES_PATH: Path containing minimum files for accuracy checker
+
+# Tests
 tests:
   needs_pat: true
   run_inputs:

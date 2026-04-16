@@ -2,22 +2,9 @@ alias: benchmark-any-mlperf-inference-implementation
 uid: 8d3cd46f54464810
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: MLPerf Inference
-deps:
-- tags: detect,cpu
-default_env:
-  DIVISION: open
-  CATEGORY: edge
-input_mapping:
-  backends: BACKENDS
-  category: CATEGORY
-  devices: DEVICES
-  division: DIVISION
-  extra_args: EXTRA_ARGS
-  models: MODELS
-  power_server: POWER_SERVER
-  power_server_port: POWER_SERVER_PORT
 tags:
 - benchmark
 - run
@@ -29,6 +16,31 @@ tags:
 - mlperf-implementation
 - implementation
 - mlperf-models
+
+# Cache
+cache: false
+
+# Environment
+default_env:
+  DIVISION: open
+  CATEGORY: edge
+
+# Input mapping
+input_mapping:
+  backends: BACKENDS
+  category: CATEGORY
+  devices: DEVICES
+  division: DIVISION
+  extra_args: EXTRA_ARGS
+  models: MODELS
+  power_server: POWER_SERVER
+  power_server_port: POWER_SERVER_PORT
+
+# Dependencies
+deps:
+- tags: detect,cpu
+
+# Variations
 variations:
   deepsparse:
     group: implementation

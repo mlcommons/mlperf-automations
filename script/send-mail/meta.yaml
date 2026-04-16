@@ -1,7 +1,29 @@
 alias: send-mail
+uid: 5f9b9654ecbe4662
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: Utils
+tags:
+- send
+- mail
+- email
+
+# Environment
+new_env_keys: []
+new_state_keys: []
+
+# Input mapping
+input_mapping:
+  attachment: MLC_EMAIL_ATTACHMENTS
+  attachments: MLC_EMAIL_ATTACHMENTS
+  subject: MLC_EMAIL_SUBJECT
+  to_address: MLC_EMAIL_TO_ADDRESSES
+  to_addresses: MLC_EMAIL_TO_ADDRESSES
+  use_attachment_basenames: MLC_EMAIL_USE_ATTACHMENT_BASENAMES
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: get,python
@@ -12,20 +34,6 @@ deps:
   enable_if_env:
     MLC_HOST_OS_FLAVOR:
     - ubuntu
-new_env_keys: []
-new_state_keys: []
-post_deps: []
-posthook_deps: []
 prehook_deps: []
-input_mapping:
-  attachment: MLC_EMAIL_ATTACHMENTS
-  attachments: MLC_EMAIL_ATTACHMENTS
-  subject: MLC_EMAIL_SUBJECT
-  to_address: MLC_EMAIL_TO_ADDRESSES
-  to_addresses: MLC_EMAIL_TO_ADDRESSES
-  use_attachment_basenames: MLC_EMAIL_USE_ATTACHMENT_BASENAMES
-tags:
-- send
-- mail
-- email
-uid: 5f9b9654ecbe4662
+posthook_deps: []
+post_deps: []

@@ -1,8 +1,22 @@
 alias: get-preprocessed-dataset-openimages
+uid: 9842f1be8cba4c7b
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
+tags:
+- get
+- dataset
+- openimages
+- open-images
+- object-detection
+- preprocessed
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_DATASET: OPENIMAGES
   MLC_DATASET_CROP_FACTOR: '100.0'
@@ -11,6 +25,15 @@ default_env:
   MLC_DATASET_QUANTIZE: '0'
   MLC_DATASET_QUANT_OFFSET: '0'
   MLC_DATASET_QUANT_SCALE: '1'
+new_env_keys:
+- MLC_DATASET_*
+
+# Input mapping
+input_mapping:
+  dir: MLC_DATASET_PREPROCESSED_PATH
+  threads: MLC_NUM_PREPROCESS_THREADS
+
+# Dependencies
 deps:
 - names:
   - python3
@@ -34,19 +57,8 @@ deps:
 - names:
   - numpy
   tags: get,generic-python-lib,_numpy
-input_mapping:
-  dir: MLC_DATASET_PREPROCESSED_PATH
-  threads: MLC_NUM_PREPROCESS_THREADS
-new_env_keys:
-- MLC_DATASET_*
-tags:
-- get
-- dataset
-- openimages
-- open-images
-- object-detection
-- preprocessed
-uid: 9842f1be8cba4c7b
+
+# Variations
 variations:
   custom-annotations:
     ad:

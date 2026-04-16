@@ -2,20 +2,39 @@ alias: get-dataset-coco2014
 uid: 3f7ad9d42f4040f8
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
 category_sort: 8500
-input_mapping:
-  num_workers: MLC_DATASET_COCO2014_NUM_WORKERS
 tags:
 - get
 - dataset
 - coco2014
 - object-detection
 - original
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_DATASET_CALIBRATION: 'no'
   MLC_DATASET_COCO2014_NUM_WORKERS: 1
+env:
+  MLC_DATASET: COCO2014
+new_env_keys:
+- MLC_DATASET_PATH
+- MLC_DATASET_PATH_ROOT
+- MLC_DATASET_ANNOTATIONS_DIR_PATH
+- MLC_DATASET_ANNOTATIONS_FILE_PATH
+- MLC_CALIBRATION_DATASET_PATH
+- MLC_COCO2014_SAMPLE_ID_PATH
+
+# Input mapping
+input_mapping:
+  num_workers: MLC_DATASET_COCO2014_NUM_WORKERS
+
+# Dependencies
 deps:
 - names:
   - python
@@ -29,20 +48,13 @@ deps:
   - inference-src
   tags: mlperf,inference,source
   version: master
-env:
-  MLC_DATASET: COCO2014
-new_env_keys:
-- MLC_DATASET_PATH
-- MLC_DATASET_PATH_ROOT
-- MLC_DATASET_ANNOTATIONS_DIR_PATH
-- MLC_DATASET_ANNOTATIONS_FILE_PATH
-- MLC_CALIBRATION_DATASET_PATH
-- MLC_COCO2014_SAMPLE_ID_PATH
 posthook_deps:
 - enable_if_env:
     MLC_DATASET_COCO2014_CUSTOM_ANNOTATIONS:
     - 'yes'
   tags: get,coco2014,annotations
+
+# Variations
 variations:
   custom-annotations:
     env:

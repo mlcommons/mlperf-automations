@@ -1,7 +1,24 @@
 alias: get-dataset-mmlu
+uid: 137c805565214b95
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
+tags:
+- get-dataset-mmlu
+
+# Cache
 cache: true
+
+# Environment
+new_env_keys:
+- MLC_DATASET_MMLU_PATH
+
+# Input mapping
+input_mapping:
+  out_path: MLC_DATASET_MMLU_OUT_PATH
+
+# Dependencies
 deps:
 - names:
   - python
@@ -19,15 +36,8 @@ deps:
 - tags: get,generic-python-lib,_package.datasets
   skip_if_env:
     MLC_DATASET_DOWNLOAD_SRC: mlcommons
-input_mapping:
-  out_path: MLC_DATASET_MMLU_OUT_PATH
-new_env_keys:
-- MLC_DATASET_MMLU_PATH
-tags:
-- get-dataset-mmlu
-uid: 137c805565214b95
-print_env_at_the_end:
-  MLC_DATASET_MMLU_PATH: MMLU Dataset path
+
+# Variations
 variations:
   mlc:
     env:
@@ -35,3 +45,7 @@ variations:
   no-of-samples.#:
     env:
       MLC_DATASET_MMLU_COUNT: '#'
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_DATASET_MMLU_PATH: MMLU Dataset path

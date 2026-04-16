@@ -694,8 +694,8 @@ class ScriptAutomation(Automation):
         if input_mapping:
             update_env_from_input_mapping(
                 env, i, input_mapping, input_description)
-            update_env_from_input_mapping(
-                const, i, input_mapping, input_description)
+            # update_env_from_input_mapping(
+            #    const, i, input_mapping, input_description)
 
         # This mapping is done in docker script
         # if docker_input_mapping:
@@ -752,7 +752,7 @@ class ScriptAutomation(Automation):
                 f"version.{version}" in variations or "version.#" in variations):
             logger.debug(
                 self.recursion_spaces +
-                f"version.{version} added as a variation tag from input version")
+                f"  - version.{version} added as a variation tag from input version")
             variation_tags.append(f"version.{version}")
 
         run_state['docker'] = meta.get('docker', {})
@@ -1565,7 +1565,9 @@ class ScriptAutomation(Automation):
 
                 run_script_input['meta'] = meta
                 run_script_input['env'] = env
+                run_script_input['const'] = const
                 run_script_input['state'] = state
+                run_script_input['const_state'] = const_state
                 run_script_input['run_state'] = run_state
                 run_script_input['recursion'] = recursion
                 run_script_input['recursion_spaces'] = self.recursion_spaces
@@ -2656,6 +2658,11 @@ class ScriptAutomation(Automation):
 
         script_tags = i.get('script_tags', [])
         variation_tags = i.get('variation_tags', [])
+        
+        if not script_tags and tags_string:
+            r = get_variation_and_script_tags(tags_string.strip())
+            script_tags = r['script_tags']
+            variation_tags = r['variation_tags']
 
         excluded_tags = [v[1:] for v in script_tags if v.startswith("-")]
         common = set(script_tags).intersection(set(excluded_tags))
@@ -3720,6 +3727,8 @@ pip install mlcflow
                             f)]
 
                     for f in file_list:
+                        if os.path.isdir(f):
+                            continue
                         duplicate = False
                         for existing in found_files:
                             if os.path.samefile(existing, f):
@@ -3754,6 +3763,8 @@ pip install mlcflow
                     for suff in file_pattern_suffixes:
                         file_list = glob.glob(path_to_file + suff)
                         for f in file_list:
+                            if os.path.isdir(f):
+                                continue
                             duplicate = False
 
                             for existing in found_files:
@@ -4020,7 +4031,6 @@ pip install mlcflow
         run_script_input = i.get('run_script_input', {})
         extra_paths = i.get('extra_paths', {})
         force_given_path = False
-        i.get('force_given_path', False)
 
         # Create and work on a copy to avoid contamination
         env_copy = copy.deepcopy(env)
@@ -4078,7 +4088,7 @@ pip install mlcflow
             # Add the folder and its subdirectories to priority paths (max
             # depth to avoid NFS issues)
             priority_folder_paths.append(priority_folder)
-            max_depth = int(env.get('MLC_TMP_FOLDER_MAX_DEPTH', '5'))
+            max_depth = int(env.get('MLC_TMP_FOLDER_MAX_DEPTH', '4'))
             for root, dirs, files_in_dir in os.walk(priority_folder):
                 # Calculate current depth relative to priority_folder
                 depth = root[len(priority_folder):].count(os.sep)
@@ -4473,6 +4483,16 @@ pip install mlcflow
         from script.docker import docker_run
         return docker_run(self, i)
 
+
+    ############################################################
+    def apptainerfile(self, i):
+        from script.apptainer import apptainerfile
+        return apptainerfile(self, i)
+
+    ############################################################
+    def apptainer(self, i):
+        from script.apptainer import apptainer_run
+        return apptainer_run(self, i)
     ############################################################
     def experiment(self, i):
         from script.experiment import experiment_run
@@ -5212,6 +5232,8 @@ def run_postprocess(customize_code, customize_common_input, recursion_spaces,
         ii = copy.deepcopy(customize_common_input)
         ii['env'] = env
         ii['state'] = state
+        ii['const'] = const
+        ii['const_state'] = const_state
         ii['meta'] = meta
         ii['recursion_spaces'] = recursion_spaces
         ii['automation'] = customize_common_input['automation']

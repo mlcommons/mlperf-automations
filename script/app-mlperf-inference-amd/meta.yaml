@@ -1,8 +1,9 @@
 alias: app-mlperf-inference-amd
 uid: 467cdb20aabc4394
-cache: false
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: MLPerf Inference
 tags:
 - reproduce
@@ -12,6 +13,11 @@ tags:
 - harness
 - amd-harness
 - amd
+
+# Cache
+cache: false
+
+# Environment
 default_env:
   MLC_MLPERF_LOADGEN_SCENARIO: Offline
   MLC_MLPERF_LOADGEN_MODE: performance
@@ -21,6 +27,19 @@ default_env:
   MLC_MLPERF_SKIP_RUN: 'no'
 env:
   MLC_CALL_MLPERF_RUNNER: 'no'
+new_env_keys:
+- MLC_MLPERF_*
+- MLC_DATASET_*
+- MLC_HW_NAME
+- MLC_ML_MODEL_*
+- MLC_MAX_EXAMPLES
+- MLC_IMAGENET_ACCURACY_DTYPE
+- MLC_SQUAD_ACCURACY_DTYPE
+new_state_keys:
+- mlperf-inference-implementation
+- MLC_SUT_*
+
+# Input mapping
 input_mapping:
   count: MLC_MLPERF_LOADGEN_QUERY_COUNT
   max_batchsize: MLC_MLPERF_LOADGEN_MAX_BATCHSIZE
@@ -40,17 +59,8 @@ input_mapping:
   target_latency: MLC_MLPERF_LOADGEN_TARGET_LATENCY
   target_qps: MLC_MLPERF_LOADGEN_TARGET_QPS
   user_conf: MLC_MLPERF_USER_CONF
-new_state_keys:
-- mlperf-inference-implementation
-- MLC_SUT_*
-new_env_keys:
-- MLC_MLPERF_*
-- MLC_DATASET_*
-- MLC_HW_NAME
-- MLC_ML_MODEL_*
-- MLC_MAX_EXAMPLES
-- MLC_IMAGENET_ACCURACY_DTYPE
-- MLC_SQUAD_ACCURACY_DTYPE
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -89,6 +99,8 @@ post_deps:
 - tags: save,mlperf,inference,state
   names:
   - save-mlperf-inference-state
+
+# Variations
 variations:
   openshift:
     group: backend
@@ -243,5 +255,7 @@ variations:
   singlestream,retinanet:
     default_variations:
       batch-size: bs.1
+
+# Docker / container
 docker:
   real_run: false

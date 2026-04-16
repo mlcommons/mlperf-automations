@@ -1,18 +1,34 @@
 alias: get-ml-model-mixtral
+uid: 0c14127677f34ea2
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
+tags:
+- get
+- raw
+- ml-model
+- language-processing
+- mixtral
+- mixtral-8x7b
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_ML_MODEL_DATASET: ''
   MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'no'
-docker:
-  real_run: false
-input_mapping:
-  checkpoint: MIXTRAL_CHECKPOINT_PATH
 new_env_keys:
 - MLC_ML_MODEL_*
 - MIXTRAL_CHECKPOINT_PATH
+
+# Input mapping
+input_mapping:
+  checkpoint: MIXTRAL_CHECKPOINT_PATH
+
+# Dependencies
 prehook_deps:
 - enable_if_env:
     MLC_TMP_REQUIRE_DOWNLOAD:
@@ -27,16 +43,8 @@ prehook_deps:
   names:
   - hf-zoo
   tags: get,ml-model,huggingface,zoo,_clone-repo
-print_env_at_the_end:
-  MIXTRAL_CHECKPOINT_PATH: MIXTRAL checkpoint path
-tags:
-- get
-- raw
-- ml-model
-- language-processing
-- mixtral
-- mixtral-8x7b
-uid: 0c14127677f34ea2
+
+# Variations
 variations:
   r2-downloader:
     adr:
@@ -106,6 +114,16 @@ variations:
     env:
       MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/mixtral-8x7b-model-checkpoint.uri
       MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: ''
+
+# Docker / container
+docker:
+  real_run: false
+
+# Output / debugging
+print_env_at_the_end:
+  MIXTRAL_CHECKPOINT_PATH: MIXTRAL checkpoint path
+
+# Tests
 tests:
   run_inputs:
   - variations_list:

@@ -1,9 +1,42 @@
 alias: get-aocc
+uid: 1ceb0656e99a44ec
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
+name: Detect or install AOCC compiler
 category: Compiler automation
+tags:
+- compiler
+- get
+- aocc
+
+# Cache
+cache: true
 clean_files: []
+
+# Environment
+new_env_keys:
+- MLC_AOCC_*
+- MLC_C_COMPILER_*
+- MLC_CXX_COMPILER_*
+- MLC_FORTRAN_COMPILER_*
+- MLC_COMPILER_*
+- MLC_LINKER_*
+- + CFLAGS
+- + CXXFLAGS
+- + FFLAGS
+- + LDFLAGS
+- +MLC_HOST_OS_DEFAULT_INCLUDE_PATH
+- +PATH
+
+# Input mapping
+input_mapping:
+  accept_eula: MLC_AOCC_ACCEPT_EULA
+  aocc_dir: MLC_AOCC_DIR_PATH
+  tar_file_path: MLC_AOCC_TAR_FILE_PATH
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: download,file,_mlcutil
@@ -31,39 +64,8 @@ deps:
   enable_if_env:
     MLC_AOCC_NEEDS_TAR:
     - true
-input_mapping:
-  accept_eula: MLC_AOCC_ACCEPT_EULA
-  aocc_dir: MLC_AOCC_DIR_PATH
-  tar_file_path: MLC_AOCC_TAR_FILE_PATH
-name: Detect or install AOCC compiler
-new_env_keys:
-- MLC_AOCC_*
-- MLC_C_COMPILER_*
-- MLC_CXX_COMPILER_*
-- MLC_FORTRAN_COMPILER_*
-- MLC_COMPILER_*
-- MLC_LINKER_*
-- + CFLAGS
-- + CXXFLAGS
-- + FFLAGS
-- + LDFLAGS
-- +MLC_HOST_OS_DEFAULT_INCLUDE_PATH
-- +PATH
-post_deps_off:
-- tags: get,compiler-flags
-sort: 500
-tags:
-- compiler
-- get
-- aocc
-uid: 1ceb0656e99a44ec
-versions:
-  5.0.0:
-    env:
-      MLC_AOCC_URL: https://download.amd.com/developer/eula/aocc/aocc-5-0/aocc-compiler-5.0.0.tar
-      MLC_DOWNLOAD_CHECKSUM: c01ee764a8370a2ed546c1a38e41bb42
-      MLC_AOCC_NEEDS_TAR: true
-      MLC_VERSION: 5.0.0-Build#1377
+
+# Variations
 variations:
   download-and-install:
     group: install-type
@@ -80,6 +82,20 @@ variations:
       install-type: local-install
     env:
       MLC_AOCC_DIR_PATH: '#'
+
+# Versions
+versions:
+  5.0.0:
+    env:
+      MLC_AOCC_URL: https://download.amd.com/developer/eula/aocc/aocc-5-0/aocc-compiler-5.0.0.tar
+      MLC_DOWNLOAD_CHECKSUM: c01ee764a8370a2ed546c1a38e41bb42
+      MLC_AOCC_NEEDS_TAR: true
+      MLC_VERSION: 5.0.0-Build#1377
+
+# Output / debugging
+sort: 500
+
+# Tests
 tests:
   run_inputs:
   - accept_eula: true

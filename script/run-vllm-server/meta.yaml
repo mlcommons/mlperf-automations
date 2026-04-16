@@ -1,14 +1,20 @@
-uid: c3eff27c791048aa
 alias: run-vllm-server
+uid: c3eff27c791048aa
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: DevOps automation
 tags:
 - run
 - server
 - vllm
 - vllm-server
+
+# Cache
+cache: false
+
+# Input mapping
 input_mapping:
   allow_credentials: MLC_VLLM_SERVER_ALLOW_CREDENTIALS
   allowed_headers: MLC_VLLM_SERVER_ALLOWED_HEADERS
@@ -106,6 +112,8 @@ input_mapping:
   use_v2_block_manager: MLC_VLLM_SERVER_USE_V2_BLOCK_MANAGER
   uvicorn_log_level: MLC_VLLM_SERVER_UVICORN_LOG_LEVEL
   worker_use_ray: MLC_VLLM_SERVER_WORKER_USE_RAY
+
+# Dependencies
 deps:
 - tags: get,python3,get-python3
   version_max: 3.11.999
@@ -124,6 +132,8 @@ deps:
     MLC_VLLM_SKIP_DOCKER_MODEL_DOWNLOAD:
     - true
 - tags: get,generic-python-lib,_package.vllm
+
+# Docker / container
 docker:
   port_maps:
   - 8000:8000

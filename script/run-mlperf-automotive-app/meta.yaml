@@ -2,12 +2,10 @@ alias: run-mlperf-automotive-app
 uid: 2a7315d2dff74898
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: MLPerf Automotive
 developers: '[Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Grigori Fursin](https://cKnowledge.org/gfursin), [Anandhu S](https://www.linkedin.com/in/anandhu-s-2337661b7/)'
-clean_output_files:
-- open.tar.gz
-- summary.csv
-- summary.json
 tags:
 - run
 - run-abtf
@@ -16,10 +14,23 @@ tags:
 - inference
 - reference
 tags_help: run-abtf,inference
+
+# Cache
+clean_output_files:
+- open.tar.gz
+- summary.csv
+- summary.json
+
+# Environment
 default_env:
   MLC_MLPERF_IMPLEMENTATION: reference
   MLC_MLPERF_MODEL: retinanet
   MLC_MLPERF_RUN_STYLE: test
+new_state_keys:
+- app_mlperf_inference_*
+- mlc-mlperf-inference-results*
+
+# Input mapping
 input_mapping:
   backend: MLC_MLPERF_BACKEND
   batch_size: MLC_MLPERF_LOADGEN_MAX_BATCHSIZE
@@ -83,9 +94,8 @@ input_mapping:
   target_qps: MLC_MLPERF_LOADGEN_TARGET_QPS
   test_query_count: MLC_TEST_QUERY_COUNT
   threads: MLC_NUM_THREADS
-new_state_keys:
-- app_mlperf_inference_*
-- mlc-mlperf-inference-results*
+
+# Dependencies
 deps:
 - tags: detect,os
   skip_if_env:
@@ -126,6 +136,8 @@ deps:
   skip_if_env:
     MLC_MLPERF_USE_DOCKER:
     - true
+
+# Variations
 variations:
   mvp-demo:
     default_env:
@@ -210,7 +222,6 @@ variations:
   submission:
     base:
     - all-modes
-    default_gui: true
     default_variations:
       submission-generation-style: full
     env:
@@ -243,6 +254,5 @@ variations:
     env:
       MLC_MLPERF_LOADGEN_COMPLIANCE: 'yes'
   dashboard:
-    default_gui: false
     env:
       MLC_MLPERF_DASHBOARD: 'on'

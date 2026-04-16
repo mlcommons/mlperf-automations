@@ -1,0 +1,96 @@
+alias: build-apptainer-image
+uid: ec9e72fb6df8c7a6
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: Container automation
+tags:
+- build
+- apptainer
+- image
+- apptainer-image
+
+# Cache
+cache: false
+
+# Environment
+default_env:
+  MLC_APPTAINER_IMAGE_REPO: local
+  MLC_APPTAINER_IMAGE_TAG: latest
+new_env_keys:
+- MLC_APPTAINER_*
+
+# Input mapping
+input_mapping:
+  def_file: MLC_APPTAINERFILE_WITH_PATH
+  docker_os: MLC_APPTAINER_OS
+  docker_os_version: MLC_APPTAINER_OS_VERSION
+  fakeroot: MLC_APPTAINER_FAKEROOT
+  force: MLC_APPTAINER_BUILD_FORCE
+  image_name: MLC_APPTAINER_IMAGE_NAME
+  image_repo: MLC_APPTAINER_IMAGE_REPO
+  image_tag: MLC_APPTAINER_IMAGE_TAG
+  notest: MLC_APPTAINER_BUILD_NOTEST
+  os: MLC_APPTAINER_OS
+  os_version: MLC_APPTAINER_OS_VERSION
+  sandbox: MLC_APPTAINER_BUILD_SANDBOX
+  script_tags: MLC_APPTAINER_RUN_SCRIPT_TAGS
+
+# Dependencies
+deps:
+- tags: get-apptainer
+prehook_deps:
+- enable_if_env:
+    MLC_BUILD_APPTAINERFILE:
+    - 'yes'
+  tags: build,apptainerfile
+
+# Tests
+tests:
+  run_inputs:
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '20.04'
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '22.04'
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '24.04'
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '25.04'
+  - env:
+      MLC_APPTAINER_OS: rhel
+      MLC_APPTAINER_OS_VERSION: '8'
+  - env:
+      MLC_APPTAINER_OS: rhel
+      MLC_APPTAINER_OS_VERSION: '9'
+  - env:
+      MLC_APPTAINER_OS: arch
+      MLC_APPTAINER_OS_VERSION: latest
+  - env:
+      MLC_APPTAINER_OS: sles
+      MLC_APPTAINER_OS_VERSION: '15.4'
+  - env:
+      MLC_APPTAINER_OS: sles
+      MLC_APPTAINER_OS_VERSION: '15.5'
+  - env:
+      MLC_APPTAINER_OS: sles
+      MLC_APPTAINER_OS_VERSION: '15.6'
+  - env:
+      MLC_APPTAINER_OS: debian
+      MLC_APPTAINER_OS_VERSION: '11'
+  - env:
+      MLC_APPTAINER_OS: debian
+      MLC_APPTAINER_OS_VERSION: '12'
+  - env:
+      MLC_APPTAINER_OS: rocky
+      MLC_APPTAINER_OS_VERSION: '8'
+  - env:
+      MLC_APPTAINER_OS: rocky
+      MLC_APPTAINER_OS_VERSION: '9'
+  - env:
+      MLC_APPTAINER_OS: amazonlinux
+      MLC_APPTAINER_OS_VERSION: '2023'

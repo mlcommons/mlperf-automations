@@ -1,11 +1,28 @@
 alias: get-preprocessed-dataset-openorca
+uid: 5614c39cb1564d72
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
 category_sort: 8500
+tags:
+- get
+- dataset
+- openorca
+- language-processing
+- preprocessed
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_DATASET_CALIBRATION: 'no'
+env:
+  MLC_DATASET: OPENORCA
+
+# Dependencies
 deps:
 - tags: get,sys-utils-mlc
   skip_if_env:
@@ -71,17 +88,8 @@ deps:
     - 'on'
     - 'yes'
   tags: get,ml-model,llama2
-docker:
-  real_run: false
-env:
-  MLC_DATASET: OPENORCA
-tags:
-- get
-- dataset
-- openorca
-- language-processing
-- preprocessed
-uid: 5614c39cb1564d72
+
+# Variations
 variations:
   calibration:
     base:
@@ -177,6 +185,12 @@ variations:
     env:
       MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/open_orca
       MLC_RCLONE_CONFIG_NAME: mlc-inference
+
+# Docker / container
+docker:
+  real_run: false
+
+# Tests
 tests:
   needs_pat: true
   run_inputs:

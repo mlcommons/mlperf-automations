@@ -1,12 +1,24 @@
 alias: get-gcc
+uid: dbf4ab5cbed74372
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
-category: Compiler automation
-clean_files: []
-deps:
-- tags: detect,os
+
+# Metadata
 name: Detect or install GCC compiler
+category: Compiler automation
+tags:
+- get
+- gcc
+- compiler
+- c-compiler
+- cpp-compiler
+- get-gcc
+
+# Cache
+cache: true
+clean_files: []
+
+# Environment
 new_env_keys:
 - MLC_GCC_*
 - MLC_C_COMPILER_*
@@ -19,20 +31,21 @@ new_env_keys:
 - + LDFLAGS
 - +MLC_HOST_OS_DEFAULT_INCLUDE_PATH
 - +PATH
+
+# Dependencies
+deps:
+- tags: detect,os
 post_deps:
 - tags: get,compiler-flags
-sort: 500
-tags:
-- get
-- gcc
-- compiler
-- c-compiler
-- cpp-compiler
-- get-gcc
-uid: dbf4ab5cbed74372
+
+# Variations
 variations:
   version.#:
     group: version
   path.#:
     env:
       MLC_GCC_DIR_PATH: '#'
+      MLC_TMP_GCC_FORCE_GIVEN_PATH: 'yes'
+
+# Output / debugging
+sort: 500

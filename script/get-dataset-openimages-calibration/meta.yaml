@@ -1,9 +1,24 @@
-uid: 27228976bb084dd0
 alias: get-dataset-openimages-calibration
+uid: 27228976bb084dd0
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
+tags:
+- get
+- dataset
+- openimages
+- calibration
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_MLPERF_OPENIMAGES_CALIBRATION_LIST_FILE_WITH_PATH
+
+# Dependencies
 deps:
 - tags: download,file
   force_env_keys:
@@ -14,13 +29,8 @@ deps:
   - calibration-file-downloader
   env:
     MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_MLPERF_OPENIMAGES_CALIBRATION_LIST_FILE_WITH_PATH
-new_env_keys:
-- MLC_MLPERF_OPENIMAGES_CALIBRATION_LIST_FILE_WITH_PATH
-tags:
-- get
-- dataset
-- openimages
-- calibration
+
+# Variations
 variations:
   mlperf.option1:
     group: calibration-option

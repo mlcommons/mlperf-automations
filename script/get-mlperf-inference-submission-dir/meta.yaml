@@ -1,21 +1,10 @@
 alias: get-mlperf-inference-submission-dir
+uid: ddf36a41d6934a7e
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLPerf Inference
-deps: []
-docker:
-  run: false
-input_description: {}
-input_mapping:
-  submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
-new_env_keys:
-- MLC_MLPERF_INFERENCE_SUBMISSION_DIR
-- MLC_MLPERF_INFERENCE_SUBMISSION_VERSION
-new_state_keys: []
-post_deps: []
-posthook_deps: []
-prehook_deps: []
 tags:
 - get
 - mlperf
@@ -24,7 +13,28 @@ tags:
 - local
 - dir
 - directory
-uid: ddf36a41d6934a7e
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_MLPERF_INFERENCE_SUBMISSION_DIR
+- MLC_MLPERF_INFERENCE_SUBMISSION_VERSION
+new_state_keys: []
+
+# Input mapping
+input_mapping:
+  submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
+input_description: {}
+
+# Dependencies
+deps: []
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations:
   version.#:
     env:
@@ -44,4 +54,10 @@ variations:
     default: true
     env:
       MLC_MLPERF_WORKING_GROUP: inference
+
+# Versions
 versions: {}
+
+# Docker / container
+docker:
+  run: false

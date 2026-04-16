@@ -1,8 +1,22 @@
 alias: get-ml-model-mobilenet
+uid: ce46675a3ab249e4
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
+tags:
+- get
+- ml-model
+- mobilenet
+- raw
+- ml-model-mobilenet
+- image-classification
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_ML_MODEL: mobilenet
   MLC_ML_MODEL_DATASET: imagenet2012-val
@@ -14,16 +28,8 @@ default_env:
 new_env_keys:
 - MLC_ML_MODEL_*
 - MLC_DATASET_PREPROCESSED_IMAGENET_DEP_TAGS
-print_env_at_the_end:
-  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
-tags:
-- get
-- ml-model
-- mobilenet
-- raw
-- ml-model-mobilenet
-- image-classification
-uid: ce46675a3ab249e4
+
+# Variations
 variations:
   onnx:
     env:
@@ -278,3 +284,7 @@ variations:
   tflite:
     base:
     - tf
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model

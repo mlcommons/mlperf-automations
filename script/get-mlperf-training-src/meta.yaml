@@ -1,19 +1,36 @@
 alias: get-mlperf-training-src
+uid: dc440bd88e794a28
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLPerf Training
+tags:
+- get
+- src
+- source
+- training
+- training-src
+- training-source
+- mlperf
+- mlcommons
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_GIT_CHECKOUT: master
   MLC_GIT_CHECKOUT_FOLDER: training
   MLC_GIT_DEPTH: --depth 4
   MLC_GIT_PATCH: 'no'
   MLC_GIT_RECURSE_SUBMODULES: ' --recurse-submodules'
-default_version: master
 new_env_keys:
 - MLC_MLPERF_TRAINING_*
 - MLC_MLPERF_TRAINING_LAST_RELEASE
 - +PYTHONPATH
+
+# Dependencies
 prehook_deps:
 - env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_MLPERF_TRAINING_SOURCE
@@ -32,16 +49,8 @@ prehook_deps:
     - MLC_GIT_SHA
     _tag.:
     - MLC_GIT_CHECKOUT_TAG
-tags:
-- get
-- src
-- source
-- training
-- training-src
-- training-source
-- mlperf
-- mlcommons
-uid: dc440bd88e794a28
+
+# Variations
 variations:
   branch.#:
     env:
@@ -88,6 +97,9 @@ variations:
   patch:
     env:
       MLC_GIT_PATCH: 'yes'
+
+# Versions
+default_version: master
 versions:
   custom:
     env:

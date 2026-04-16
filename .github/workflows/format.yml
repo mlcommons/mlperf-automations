@@ -10,7 +10,7 @@ env:
 
 jobs:
   format-code:
-    if: github.actor != 'mlc-automations'
+    if: github.actor != 'mlc-automations' && github.repository_owner == 'mlcommons'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -32,6 +32,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.python_version }}
+
+      - name: Lint MLC metas
+        run: |
+          pip install mlcflow
+          mlc lint script --all
+          git add -- '*/meta.yaml' '*/meta.yml' 2>/dev/null || true
 
       - name: Format modified Python files
         env:

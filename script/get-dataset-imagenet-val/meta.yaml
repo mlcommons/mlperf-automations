@@ -2,23 +2,40 @@ alias: get-dataset-imagenet-val
 uid: 7afd58d287fe4f11
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
-deps:
-- tags: detect,os
-docker:
-  run: false
+tags:
+- get
+- val
+- validation
+- dataset
+- imagenet
+- ILSVRC
+- image-classification
+- original
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_DATASET: IMAGENET
-input_mapping:
-  imagenet_path: IMAGENET_PATH
-  torrent: MLC_DATASET_IMAGENET_VAL_TORRENT_PATH
 new_env_keys:
 - MLC_DATASET_PATH
 - MLC_DATASET_IMAGENET_PATH
 - MLC_DATASET_IMAGENET_VAL_PATH
 - MLC_DATASET_SIZE
 - MLC_DATASET_VER
+
+# Input mapping
+input_mapping:
+  imagenet_path: IMAGENET_PATH
+  torrent: MLC_DATASET_IMAGENET_VAL_TORRENT_PATH
+
+# Dependencies
+deps:
+- tags: detect,os
 prehook_deps:
 - enable_if_env:
     MLC_DATASET_IMAGENET_VAL_REQUIRE_DAE:
@@ -44,15 +61,8 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _path.:
     - MLC_EXTRACT_PATH
-tags:
-- get
-- val
-- validation
-- dataset
-- imagenet
-- ILSVRC
-- image-classification
-- original
+
+# Variations
 variations:
   full:
     env:
@@ -91,3 +101,7 @@ variations:
   run-during-docker-build:
     docker:
       run: true
+
+# Docker / container
+docker:
+  run: false

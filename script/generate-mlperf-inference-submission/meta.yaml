@@ -1,64 +1,33 @@
 alias: generate-mlperf-inference-submission
+uid: 5f8ab2d0b5874d53
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: MLPerf Inference
-new_env_keys:
-- MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER
+tags:
+- generate
+- submission
+- mlperf
+- mlperf-inference
+- inference
+- mlcommons
+- inference-submission
+- mlperf-inference-submission
+- mlcommons-inference-submission
+
+# Cache
+cache: false
+
+# Environment
 default_env:
   MLC_MLPERF_RUN_STYLE: valid
   MLC_MLPERF_SUBMISSION_DIR_SHARED: 'yes'
   MLC_RUN_MLPERF_ACCURACY: 'on'
-predeps: false
-deps:
-- names:
-  - python
-  - python3
-  tags: get,python3
-- tags: get,sut,system-description
-- tags: install,pip-package,for-mlc-python,_package.tabulate
-- names:
-  - get-mlperf-results-dir
-  skip_if_env:
-    MLC_MLPERF_INFERENCE_RESULTS_DIR_:
-    - 'on'
-  tags: get,mlperf,results,dir,local
-- names:
-  - get-mlperf-submission-dir
-  skip_if_any_env:
-    MLC_MLPERF_INFERENCE_SUBMISSION_DIR:
-    - 'on'
-    MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR:
-    - 'on'
-  tags: get,mlperf,submission,dir
-docker:
-  mlc_repo: mlcommons@mlperf-automations
-  mlc_repo_branch: dev
-  deps:
-  - names: get-mlperf-inference-results-dir
-    skip_if_env:
-      MLC_MLPERF_INFERENCE_RESULTS_DIR_:
-      - 'on'
-    tags: get,mlperf,inference,results,dir,local
-  - names: get-mlperf-inference-submission-dir
-    skip_if_any_env:
-      MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR:
-      - 'on'
-    tags: get,mlperf,inference,submission,dir,local
-  input_mapping:
-    results_dir: MLC_MLPERF_INFERENCE_RESULTS_DIR_
-    submission_base_dir: MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR
-  extra_run_args: ' --cap-add SYS_ADMIN'
-  mounts:
-  - ${{ MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR }}:${{ MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR }}
-  - ${{ MLC_MLPERF_INFERENCE_RESULTS_DIR_ }}:${{ MLC_MLPERF_INFERENCE_RESULTS_DIR_ }}
-  os: ubuntu
-  os_version: '22.04'
-  pre_run_cmds:
-  - mlc pull repo
-  real_run: false
-  use_host_group_id: true
-  use_host_user_id: true
+new_env_keys:
+- MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER
+
+# Input mapping
 input_mapping:
   analyzer_settings_file: MLC_MLPERF_POWER_ANALYZER_SETTINGS_FILE_PATH
   category: MLC_MLPERF_SUBMISSION_CATEGORY
@@ -89,6 +58,30 @@ input_mapping:
   sw_notes_extra: MLC_MLPERF_SUT_SW_NOTES_EXTRA
   tar: MLC_TAR_SUBMISSION_DIR
   version: MLC_MLPERF_SUBMISSION_CHECKER_VERSION
+
+# Dependencies
+predeps: false
+deps:
+- names:
+  - python
+  - python3
+  tags: get,python3
+- tags: get,sut,system-description
+- tags: install,pip-package,for-mlc-python,_package.tabulate
+- names:
+  - get-mlperf-results-dir
+  skip_if_env:
+    MLC_MLPERF_INFERENCE_RESULTS_DIR_:
+    - 'on'
+  tags: get,mlperf,results,dir,local
+- names:
+  - get-mlperf-submission-dir
+  skip_if_any_env:
+    MLC_MLPERF_INFERENCE_SUBMISSION_DIR:
+    - 'on'
+    MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR:
+    - 'on'
+  tags: get,mlperf,submission,dir
 post_deps:
 - enable_if_env:
     MLC_RUN_MLPERF_ACCURACY:
@@ -113,6 +106,8 @@ post_deps:
   - mlperf-submission-checker
   - submission-checker
   tags: submission,inference,checker,mlc
+
+# Variations
 variations:
   wg-automotive:
     group: benchmark_wg
@@ -151,14 +146,33 @@ variations:
       - inference-src
       tags: mlcommons,inference,src
     - tags: get,mlperf,inference,utils
-tags:
-- generate
-- submission
-- mlperf
-- mlperf-inference
-- inference
-- mlcommons
-- inference-submission
-- mlperf-inference-submission
-- mlcommons-inference-submission
-uid: 5f8ab2d0b5874d53
+
+# Docker / container
+docker:
+  mlc_repo: mlcommons@mlperf-automations
+  mlc_repo_branch: dev
+  deps:
+  - names: get-mlperf-inference-results-dir
+    skip_if_env:
+      MLC_MLPERF_INFERENCE_RESULTS_DIR_:
+      - 'on'
+    tags: get,mlperf,inference,results,dir,local
+  - names: get-mlperf-inference-submission-dir
+    skip_if_any_env:
+      MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR:
+      - 'on'
+    tags: get,mlperf,inference,submission,dir,local
+  input_mapping:
+    results_dir: MLC_MLPERF_INFERENCE_RESULTS_DIR_
+    submission_base_dir: MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR
+  extra_run_args: ' --cap-add SYS_ADMIN'
+  mounts:
+  - ${{ MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR }}:${{ MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR }}
+  - ${{ MLC_MLPERF_INFERENCE_RESULTS_DIR_ }}:${{ MLC_MLPERF_INFERENCE_RESULTS_DIR_ }}
+  os: ubuntu
+  os_version: '22.04'
+  pre_run_cmds:
+  - mlc pull repo
+  real_run: false
+  use_host_group_id: true
+  use_host_user_id: true

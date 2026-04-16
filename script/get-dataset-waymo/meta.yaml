@@ -1,16 +1,26 @@
 alias: get-dataset-waymo
+uid: 21b269c753b64437
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 tags:
 - get
 - dataset
 - waymo
-uid: 21b269c753b64437
+
+# Cache
+cache: true
+
+# Environment
 new_env_keys:
 - MLC_DATASET_WAYMO_PATH
+
+# Input mapping
 input_mapping:
   waymo_path: MLC_DATASET_WAYMO_PATH
+
+# Variations
 variations:
   kitti_format:
     default: true
@@ -77,6 +87,8 @@ variations:
   rclone,mlc:
     env:
       MLC_DOWNLOAD_URL: mlc_waymo:waymo_preprocessed_dataset/kitti_format
+
+# Tests
 tests:
   needs_pat: true
   run_inputs:

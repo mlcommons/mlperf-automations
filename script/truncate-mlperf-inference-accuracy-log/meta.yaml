@@ -1,38 +1,10 @@
 alias: truncate-mlperf-inference-accuracy-log
+uid: 9d5ec20434084d14
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: MLPerf Inference
-clean_files: []
-deps:
-- names:
-  - python
-  - python3
-  tags: get,python3
-- names:
-  - get-mlperf-submission-dir
-  skip_if_env:
-    MLC_MLPERF_INFERENCE_SUBMISSION_DIR:
-    - 'on'
-  tags: get,mlperf,submission,dir
-variations:
-  wg-automotive:
-    group: benchmark_wg
-    deps:
-    - names:
-      - automotive-src
-      tags: mlcommons,automotive,src
-  wg-inference:
-    group: benchmark_wg
-    default: true
-    deps:
-    - names:
-      - inference-src
-      tags: mlcommons,inference,src
-input_mapping:
-  input: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
-  submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
-  submitter: MLC_MLPERF_SUBMITTER
 tags:
 - run
 - mlc
@@ -49,4 +21,42 @@ tags:
 - accuracy-log-truncator
 - mlc-accuracy-log-trancation
 - mlc-accuracy-log-truncator
-uid: 9d5ec20434084d14
+
+# Cache
+cache: false
+clean_files: []
+
+# Input mapping
+input_mapping:
+  input: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
+  submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
+  submitter: MLC_MLPERF_SUBMITTER
+
+# Dependencies
+deps:
+- names:
+  - python
+  - python3
+  tags: get,python3
+- names:
+  - get-mlperf-submission-dir
+  skip_if_env:
+    MLC_MLPERF_INFERENCE_SUBMISSION_DIR:
+    - 'on'
+  tags: get,mlperf,submission,dir
+
+# Variations
+variations:
+  wg-automotive:
+    group: benchmark_wg
+    deps:
+    - names:
+      - automotive-src
+      tags: mlcommons,automotive,src
+  wg-inference:
+    group: benchmark_wg
+    default: true
+    deps:
+    - names:
+      - inference-src
+      tags: mlcommons,inference,src

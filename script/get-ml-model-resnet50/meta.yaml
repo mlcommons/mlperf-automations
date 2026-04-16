@@ -1,8 +1,22 @@
 alias: get-ml-model-resnet50
+uid: 56203e4e998b4bc0
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
+tags:
+- get
+- raw
+- ml-model
+- resnet50
+- ml-model-resnet50
+- image-classification
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_FILE_WITH_PATH
   MLC_ML_MODEL: RESNET50
@@ -15,6 +29,8 @@ env:
   MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'no'
 new_env_keys:
 - MLC_ML_MODEL_*
+
+# Dependencies
 prehook_deps:
 - env:
     MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_FILE_WITH_PATH
@@ -30,16 +46,8 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_PACKAGE_URL
-print_env_at_the_end:
-  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
-tags:
-- get
-- raw
-- ml-model
-- resnet50
-- ml-model-resnet50
-- image-classification
-uid: 56203e4e998b4bc0
+
+# Variations
 variations:
   ncnn:
     env:
@@ -241,3 +249,7 @@ variations:
       MLC_ML_MODEL_FILE: resnet50_v1.no-argmax.tflite
       MLC_ML_MODEL_INPUT_SHAPES: '\"input_tensor 2\": (BATCH_SIZE, 224, 224, 3)'
       MLC_PACKAGE_URL: https://www.dropbox.com/s/vhuqo0wc39lky0a/resnet50_v1.no-argmax.tflite?dl=1
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model

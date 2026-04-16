@@ -1,8 +1,22 @@
 alias: install-python-src
+uid: 12d3a608afe14a1e
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Python automation
+tags:
+- install
+- src
+- python
+- python3
+- src-python3
+- src-python
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_CUSTOM_SSL: 'no'
   MLC_ENABLE_SSL: 'no'
@@ -10,7 +24,14 @@ default_env:
   MLC_PYTHON_OPTIMIZATION_FLAG: ''
   MLC_SHARED_BUILD: 'no'
   MLC_WGET_URL: https://www.python.org/ftp/python/[PYTHON_VERSION]/Python-[PYTHON_VERSION].tgz
-default_version: 3.10.13
+new_env_keys:
+- MLC_PYTHON_INSTALL_PATH
+- MLC_PYTHON_BIN_WITH_PATH
+- +PATH
+- +LD_LIBRARY_PATH
+- +C_INCLUDE_PATH
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -39,12 +60,6 @@ deps:
     MLC_HOST_OS_FLAVOR:
     - ubuntu
   tags: get,generic-sys-util,_libsqlite3-dev
-new_env_keys:
-- MLC_PYTHON_INSTALL_PATH
-- MLC_PYTHON_BIN_WITH_PATH
-- +PATH
-- +LD_LIBRARY_PATH
-- +C_INCLUDE_PATH
 post_deps:
 - inherit_variation_tags: 'True'
   names:
@@ -55,18 +70,8 @@ post_deps:
     MLC_REQUIRE_INSTALL:
     - 'yes'
   tags: get,python3
-tags:
-- install
-- src
-- python
-- python3
-- src-python3
-- src-python
-uid: 12d3a608afe14a1e
-tests:
-  run_inputs:
-  - variations_list:
-    - with-ssl
+
+# Variations
 variations:
   with-ssl:
     env:
@@ -92,3 +97,12 @@ variations:
     env:
       MLC_CUSTOM_SSL: 'yes'
       MLC_PYTHON_INSTALL_CACHE_TAGS: with-custom-ssl
+
+# Versions
+default_version: 3.10.13
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - with-ssl

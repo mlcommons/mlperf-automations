@@ -1,9 +1,9 @@
 alias: build-mlperf-inference-server-nvidia
 uid: f37403af5e9f4541
-cache: true
 automation_alias: script
 automation_uid: 5b4e0237da074764
-default_version: r3.1
+
+# Metadata
 category: MLPerf Inference
 tags:
 - build
@@ -14,15 +14,24 @@ tags:
 - server
 - nvidia-harness
 - nvidia
-new_env_keys:
-- MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_MAKE_BUILD_COMMAND: build
   MLC_MAKE_CLEAN: 'no'
   MLC_CUSTOM_SYSTEM_NVIDIA: 'yes'
+new_env_keys:
+- MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH
+
+# Input mapping
 input_mapping:
   clean: MLC_MAKE_CLEAN
   custom_system: MLC_CUSTOM_SYSTEM_NVIDIA
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -94,6 +103,8 @@ post_deps:
   skip_if_env:
     MLC_CUSTOM_SYSTEM_NVIDIA:
     - 'no'
+
+# Variations
 variations:
   custom:
     group: code
@@ -180,6 +191,9 @@ variations:
       numpy:
         version_max: 1.26.999
         version_max_usable: 1.26.4
+
+# Versions
+default_version: r3.1
 versions:
   r2.1: {}
   r3.0: {}
@@ -285,13 +299,14 @@ versions:
   r4.1:
     default_env:
       BUILD_TRTLLM: 1
+
+# Docker / container
 docker:
   skip_run_cmd: 'no'
   all_gpus: 'yes'
   shm_size: 32gb
   extra_run_args: ' --ulimit memlock=-1 --cap-add SYS_ADMIN --cap-add SYS_TIME --security-opt apparmor=unconfined --security-opt seccomp=unconfined'
   os: ubuntu
-  mlc_repo_flags1: ' --branch=mlperf-inference'
   real_run: false
   interactive: true
   os_version: '20.04'

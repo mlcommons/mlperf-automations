@@ -1,37 +1,36 @@
 alias: get-aria2
 uid: d83419a90a0c40d0
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
-cache: true
-
+# Metadata
 category: Detection or installation of tools and artifacts
-
-input_mapping:
-  install: MLC_FORCE_INSTALL
-  src: MLC_ARIA2_BUILD_FROM_SRC
-
-deps:
-  - tags: detect,cpu
-  - tags: detect,os
-
-#called after preprocess from customize.py
-#prehook_deps:
-#  - tags: print,native,hello-world
-
-env:
-  MLC_REQUIRE_INSTALL: no
-  MLC_ARIA2_DEFAULT_INSTALL_VERSION: "1.37.0"
-
-new_env_keys:
-  - MLC_ARIA2_*
-  - +PATH
-
-print_env_at_the_end:
-  MLC_ARIA2_INSTALLED_PATH: Path to the tool
-
 tags:
 - get
 - aria2
 - get-aria2
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_REQUIRE_INSTALL: false
+  MLC_ARIA2_DEFAULT_INSTALL_VERSION: 1.37.0
+new_env_keys:
+- MLC_ARIA2_*
+- +PATH
+
+# Input mapping
+input_mapping:
+  install: MLC_FORCE_INSTALL
+  src: MLC_ARIA2_BUILD_FROM_SRC
+
+# Dependencies
+deps:
+- tags: detect,cpu
+- tags: detect,os
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ARIA2_INSTALLED_PATH: Path to the tool

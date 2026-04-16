@@ -1,8 +1,25 @@
 alias: calibrate-model-for.qaic
+uid: 817bad70df2f4e45
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML optimization
+tags:
+- qaic
+- calibrate
+- profile
+- qaic-profile
+- qaic-calibrate
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_QAIC_MODEL_PROFILE_*
+
+# Dependencies
 deps:
 - tags: detect,cpu
 - names:
@@ -32,15 +49,8 @@ deps:
 - names:
   - model-src
   tags: get,ml-model
-new_env_keys:
-- MLC_QAIC_MODEL_PROFILE_*
-tags:
-- qaic
-- calibrate
-- profile
-- qaic-profile
-- qaic-calibrate
-uid: 817bad70df2f4e45
+
+# Variations
 variations:
   bs.#:
     env:
@@ -124,7 +134,7 @@ variations:
     adr:
       model-src:
         tags: bert-large,_onnx,_packed
-    default-variations:
+    default_variations:
       seq-length: seq.384
     env:
       MLC_CREATE_INPUT_BATCH: 'no'

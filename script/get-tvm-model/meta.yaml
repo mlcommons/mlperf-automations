@@ -1,13 +1,30 @@
 alias: get-tvm-model
+uid: c1b7b656b6224307
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
+tags:
+- get
+- ml-model-tvm
+- tvm-model
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_ML_MODEL_MAX_BATCH_SIZE: '1'
   MLC_TUNE_TVM_MODEL: 'no'
   MLC_TVM_FRONTEND_FRAMEWORK: onnx
   MLC_TVM_USE_VM: 'yes'
+new_env_keys:
+- MLC_ML_MODEL_*
+- MLC_TUNE_TVM_*
+- MLC_TVM_*
+
+# Dependencies
 deps:
 - names:
   - python
@@ -20,10 +37,6 @@ deps:
 - tags: get,generic-python-lib,_psutil
 - tags: get,generic-python-lib,_scipy
 - tags: get,generic-python-lib,_attrs
-new_env_keys:
-- MLC_ML_MODEL_*
-- MLC_TUNE_TVM_*
-- MLC_TVM_*
 prehook_deps:
 - names:
   - original-model
@@ -33,11 +46,8 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _:
     - MLC_TVM_FRONTEND_FRAMEWORK
-tags:
-- get
-- ml-model-tvm
-- tvm-model
-uid: c1b7b656b6224307
+
+# Variations
 variations:
   batch_size.#:
     env:

@@ -1,17 +1,10 @@
 alias: get-ml-model-rnnt
+uid: 8858f18b89774d28
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
-env:
-  MLC_ML_MODEL: rnnt
-  MLC_ML_MODEL_DATASET: librispeech
-  MLC_ML_MODEL_RETRAINING: 'no'
-  MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'no'
-new_env_keys:
-- MLC_ML_MODEL_*
-print_env_at_the_end:
-  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
 tags:
 - get
 - ml-model
@@ -19,7 +12,20 @@ tags:
 - raw
 - librispeech
 - speech-recognition
-uid: 8858f18b89774d28
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_ML_MODEL: rnnt
+  MLC_ML_MODEL_DATASET: librispeech
+  MLC_ML_MODEL_RETRAINING: 'no'
+  MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'no'
+new_env_keys:
+- MLC_ML_MODEL_*
+
+# Variations
 variations:
   amazon-s3:
     group: download-src
@@ -50,3 +56,7 @@ variations:
   weights:
     env:
       MLC_MODEL_WEIGHTS_FILE: 'yes'
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model

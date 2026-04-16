@@ -1,14 +1,29 @@
 alias: run-terraform
+uid: ec344bd44af144d7
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Cloud automation
+tags:
+- run
+- terraform
+
+# Cache
+cache: true
 clean_files: []
+
+# Environment
 default_env:
   TF_VAR_CPU_COUNT: '1'
   TF_VAR_SECURITY_GROUP_ID: sg-0783752c97d2e011d
-deps:
-- tags: get,terraform
+new_env_keys:
+- MLC_TERRAFORM_RUN_DIR
+- MLC_TERRAFORM_CONFIG_DIR
+new_state_keys:
+- MLC_TF_NEW_INSTANCES_STATE
+
+# Input mapping
 input_mapping:
   cminit: MLC_TERRAFORM_MLC_INIT
   destroy: MLC_DESTROY_TERRAFORM
@@ -16,11 +31,10 @@ input_mapping:
   key_file: MLC_SSH_KEY_FILE
   run_cmds: MLC_TERRAFORM_RUN_COMMANDS
   ssh_key_file: MLC_SSH_KEY_FILE
-new_env_keys:
-- MLC_TERRAFORM_RUN_DIR
-- MLC_TERRAFORM_CONFIG_DIR
-new_state_keys:
-- MLC_TF_NEW_INSTANCES_STATE
+
+# Dependencies
+deps:
+- tags: get,terraform
 post_deps:
 - dynamic: true
   enable_if_env:
@@ -29,10 +43,8 @@ post_deps:
   names:
   - destroy-cmd
   tags: destroy,terraform
-tags:
-- run
-- terraform
-uid: ec344bd44af144d7
+
+# Variations
 variations:
   amazon-linux-2-kernel.510,arm64,us-west-2:
     env:

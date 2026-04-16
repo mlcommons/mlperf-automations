@@ -1,10 +1,24 @@
 alias: benchmark-program
+uid: 19f369ef47084895
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: DevOps automation
+tags:
+- program
+- benchmark
+- benchmark-program
+tags_help: benchmark program
+
+# Environment
 default_env:
   MLC_ENABLE_NUMACTL: '0'
   MLC_ENABLE_PROFILING: '0'
+new_env_keys:
+- MLC_RUN_CMD
+
+# Dependencies
 deps:
 - tags: detect,cpu
 - enable_if_env:
@@ -14,14 +28,8 @@ deps:
     - 'True'
     - true
   tags: set,performance,mode,_performance
-new_env_keys:
-- MLC_RUN_CMD
-tags:
-- program
-- benchmark
-- benchmark-program
-tags_help: benchmark program
-uid: 19f369ef47084895
+
+# Variations
 variations:
   numactl:
     default_env:

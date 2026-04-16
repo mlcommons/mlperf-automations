@@ -1,8 +1,22 @@
 alias: get-ml-model-retinanet
+uid: 427bc5665e4541c2
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
+tags:
+- get
+- ml-model
+- raw
+- resnext50
+- retinanet
+- object-detection
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_ML_MODEL: retinanet
   MLC_ML_MODEL_DATASET: open-images
@@ -15,6 +29,8 @@ env:
 new_env_keys:
 - MLC_ML_MODEL_*
 - <<<MLC_ENV_NAME_ML_MODEL_FILE>>>
+
+# Dependencies
 prehook_deps:
 - env:
     MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_FILE_WITH_PATH
@@ -33,17 +49,8 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_PACKAGE_URL
-print_env_at_the_end:
-  MLC_ML_MODEL_ACCURACY: Model accuracy
-  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
-tags:
-- get
-- ml-model
-- raw
-- resnext50
-- retinanet
-- object-detection
-uid: 427bc5665e4541c2
+
+# Variations
 variations:
   onnx:
     default: true
@@ -128,3 +135,8 @@ variations:
   weights:
     env:
       MLC_MODEL_WEIGHTS_FILE: 'yes'
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_ACCURACY: Model accuracy
+  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model

@@ -1,23 +1,29 @@
 alias: get-mlperf-inference-src
+uid: 4b57186581024797
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLPerf Inference
+tags:
+- get
+- src
+- source
+- inference
+- inference-src
+- inference-source
+- mlperf
+- mlcommons
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_GIT_CHECKOUT_FOLDER: inference
   MLC_GIT_DEPTH: --depth 4
   MLC_GIT_PATCH: 'no'
   MLC_GIT_RECURSE_SUBMODULES: ''
-default_version: master
-deps:
-- tags: detect,os
-- names:
-  - python
-  - python3
-  tags: get,python3
-- names:
-  - loguru
-  tags: get,generic-python-lib,_package.loguru
 new_env_keys:
 - MLC_MLPERF_INFERENCE_3DUNET_PATH
 - MLC_MLPERF_INFERENCE_BERT_PATH
@@ -35,6 +41,20 @@ new_env_keys:
 - MLC_MLPERF_INFERENCE_POINTPAINTING_PATH
 - MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER
 - +PYTHONPATH
+
+# Dependencies
+deps:
+- tags: detect,os
+- names:
+  - loguru
+  tags: get,generic-python-lib,_package.loguru
+- names:
+  - python
+  - python3
+  tags: get,python3
+- names:
+  - loguru
+  tags: get,generic-python-lib,_package.loguru
 prehook_deps:
 - env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_MLPERF_INFERENCE_SOURCE
@@ -53,18 +73,8 @@ prehook_deps:
     - MLC_GIT_SHA
     _submodules.:
     - MLC_GIT_SUBMODULES
-print_env_at_the_end_disabled:
-  MLC_MLPERF_INFERENCE_SOURCE: Path to MLPerf inference benchmark sources
-tags:
-- get
-- src
-- source
-- inference
-- inference-src
-- inference-source
-- mlperf
-- mlcommons
-uid: 4b57186581024797
+
+# Variations
 variations:
   branch.#:
     default_version: custom
@@ -134,6 +144,9 @@ variations:
   submodules.#:
     env:
       MLC_GIT_SUBMODULES: '#'
+
+# Versions
+default_version: master
 versions:
   custom:
     env:

@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-04-14 21:28:16*
+*Last updated: 2026-04-16 18:55:55*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -14,6 +14,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [CUDA automation](#cuda-automation)
 - [Cloud automation](#cloud-automation)
 - [Compiler automation](#compiler-automation)
+- [Container automation](#container-automation)
 - [Dashboard automation](#dashboard-automation)
 - [Detection or installation of tools and artifacts](#detection-or-installation-of-tools-and-artifacts)
 - [DevOps automation](#devops-automation)
@@ -403,6 +404,18 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[install-vllm-from-src](install-vllm-from-src/)**
   - Build vllm from sources
   - Tags: `install-vllm-from-src`
+
+## Container automation
+
+- **[build-apptainer-image](build-apptainer-image/)**
+  - build-apptainer-image
+  - Tags: `build`, `apptainer`, `image`, `apptainer-image`
+- **[build-apptainerfile](build-apptainerfile/)**
+  - build-apptainerfile
+  - Tags: `build`, `apptainerfile`, `apptainer`, `definition`
+- **[run-apptainer-container](run-apptainer-container/)**
+  - run-apptainer-container
+  - Tags: `run`, `apptainer`, `container`
 
 ## Dashboard automation
 
@@ -1116,8 +1129,8 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 325
-- **Categories**: 32
+- **Total Scripts**: 328
+- **Categories**: 33
 
 ## Usage
 

@@ -1,18 +1,32 @@
 alias: get-ml-model-rgat
+uid: b409fd66c5ad4ed5
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
-docker:
-  fake_run_deps: true
+tags:
+- get
+- raw
+- ml-model
+- rgat
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_ML_MODEL: RGAT
-input_mapping:
-  checkpoint: RGAT_CHECKPOINT_PATH
 new_env_keys:
 - MLC_ML_MODEL_*
 - MLC_ML_MODEL_RGAT_CHECKPOINT_PATH
 - RGAT_CHECKPOINT_PATH
+
+# Input mapping
+input_mapping:
+  checkpoint: RGAT_CHECKPOINT_PATH
+
+# Dependencies
 prehook_deps:
 - enable_if_env:
     MLC_TMP_REQUIRE_DOWNLOAD:
@@ -29,14 +43,8 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_DOWNLOAD_URL
-print_env_at_the_end:
-  RGAT_CHECKPOINT_PATH: R-GAT checkpoint path
-tags:
-- get
-- raw
-- ml-model
-- rgat
-uid: b409fd66c5ad4ed5
+
+# Variations
 variations:
   mlcommons:
     default: true
@@ -87,6 +95,16 @@ variations:
       MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: https://github.com/mlcommons/inference/tree/master/graph/R-GAT#download-model-using-rclone
       MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/R-GAT/RGAT.pt
       MLC_DOWNLOAD_FILENAME: RGAT
+
+# Docker / container
+docker:
+  fake_run_deps: true
+
+# Output / debugging
+print_env_at_the_end:
+  RGAT_CHECKPOINT_PATH: R-GAT checkpoint path
+
+# Tests
 tests:
   needs_pat: true
   run_inputs:

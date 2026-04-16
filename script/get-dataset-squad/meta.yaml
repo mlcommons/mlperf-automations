@@ -1,28 +1,10 @@
 alias: get-dataset-squad
+uid: 6651c119c3ae49b3
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
-default_version: '1.1'
-deps:
-- tags: get,sys-utils-mlc
-env:
-  MLC_DATASET: SQUAD
-new_env_keys:
-- MLC_DATASET_*
-prehook_deps:
-- env:
-    MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_SQUAD_VAL_PATH
-  extra_cache_tags: bert,get,dataset-squad
-  force_cache: true
-  tags: download-and-extract,_wget
-  force_env_keys:
-    - MLC_OUTDIRNAME  
-  update_tags_from_env_with_prefix:
-    _url.:
-    - MLC_PACKAGE_URL
-print_env_at_the_end:
-  MLC_DATASET_SQUAD_VAL_PATH: Path to SQUAD dataset
 tags:
 - get
 - dataset
@@ -30,7 +12,33 @@ tags:
 - language-processing
 - validation
 - original
-uid: 6651c119c3ae49b3
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_DATASET: SQUAD
+new_env_keys:
+- MLC_DATASET_*
+
+# Dependencies
+deps:
+- tags: get,sys-utils-mlc
+prehook_deps:
+- env:
+    MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_SQUAD_VAL_PATH
+  extra_cache_tags: bert,get,dataset-squad
+  force_cache: true
+  tags: download-and-extract,_wget
+  force_env_keys:
+  - MLC_OUTDIRNAME
+  update_tags_from_env_with_prefix:
+    _url.:
+    - MLC_PACKAGE_URL
+
+# Versions
+default_version: '1.1'
 versions:
   '1.1':
     env:
@@ -46,3 +54,7 @@ versions:
       MLC_PACKAGE_URL: https://raw.githubusercontent.com/rajpurkar/SQuAD-explorer/master/dataset/dev-v2.0.json
       MLC_TRAIN_FILENAME: train-v2.0.json
       MLC_VAL_FILENAME: dev-v2.0.json
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_DATASET_SQUAD_VAL_PATH: Path to SQUAD dataset

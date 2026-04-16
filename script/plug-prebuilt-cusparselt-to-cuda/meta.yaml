@@ -2,29 +2,36 @@ alias: plug-prebuilt-cusparselt-to-cuda
 uid: d87ae2182d364483
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
+category: CUDA automation
 tags:
 - plug
 - prebuilt-cusparselt
 - to-cuda
+
+# Cache
 cache: true
-category: CUDA automation
+
+# Environment
 default_env:
   MLC_SUDO: sudo
-default_version: 0.6.2.3
+new_env_keys:
+- MLC_CUSPARSELT_*
+
+# Input mapping
+input_mapping:
+  skip_sudo: CUDA_SKIP_SUDO
+  tar_file: MLC_CUSPARSELT_TAR_FILE_PATH
+input_description:
+  tar_file:
+    desc: Full path to the cuSPARSELt Tar file downloaded from Nvidia website (https://developer.nvidia.com/cusparselt-downloads)
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
 - tags: get,cuda
-docker:
-  run: true
-input_description:
-  tar_file:
-    desc: Full path to the cuSPARSELt Tar file downloaded from Nvidia website (https://developer.nvidia.com/cusparselt-downloads)
-input_mapping:
-  skip_sudo: CUDA_SKIP_SUDO
-  tar_file: MLC_CUSPARSELT_TAR_FILE_PATH
-new_env_keys:
-- MLC_CUSPARSELT_*
 prehook_deps:
 - tags: download,file
   env:
@@ -39,8 +46,15 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _url.:
     - WGET_URL
+
+# Versions
+default_version: 0.6.2.3
 versions:
   0.6.2.3:
     env:
       MLC_CUSPARSELT_TAR_FILE_NAME_TEMPLATE: libcusparse_lt-linux-x86_64-0.6.2.3-archive.tar.xz
       MLC_CUSPARSELT_TAR_MD5SUM: 2fa73268de8bbdab5560f4aa1a5a73ab
+
+# Docker / container
+docker:
+  run: true

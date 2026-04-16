@@ -1,18 +1,10 @@
 alias: get-dataset-librispeech
+uid: 09f29df607e0415d
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
-default_version: dev-clean
-deps:
-- names:
-  - sys-utils
-  tags: get,sys-utils-mlc
-env:
-  MLC_DATASET: LIBRISPEECH
-  MLC_WGET_URL: http://www.openslr.org/resources/12/<<<MLC_DATASET_ARCHIVE>>>
-new_env_keys:
-- MLC_DATASET_*
 tags:
 - get
 - dataset
@@ -23,7 +15,25 @@ tags:
 - audio
 - training
 - original
-uid: 09f29df607e0415d
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_DATASET: LIBRISPEECH
+  MLC_WGET_URL: http://www.openslr.org/resources/12/<<<MLC_DATASET_ARCHIVE>>>
+new_env_keys:
+- MLC_DATASET_*
+
+# Dependencies
+deps:
+- names:
+  - sys-utils
+  tags: get,sys-utils-mlc
+
+# Versions
+default_version: dev-clean
 versions:
   dev-clean:
     env:

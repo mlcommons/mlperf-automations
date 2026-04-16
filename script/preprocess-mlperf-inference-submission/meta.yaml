@@ -1,9 +1,40 @@
 alias: preprocess-mlperf-inference-submission
+uid: c23068394a314266
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: MLPerf Inference
+tags:
+- run
+- mlc
+- mlcommons
+- mlperf
+- inference
+- submission
+- mlperf-inference
+- processor
+- preprocessor
+- preprocess
+
+# Cache
+cache: false
 clean_files: []
+
+# Environment
+default_env:
+  MLC_MLPERF_NOINFER_LOW_ACCURACY_RESULTS: false
+  MLC_MLPERF_NOINFER_SCENARIO_RESULTS: false
+
+# Input mapping
+input_mapping:
+  input: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
+  submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
+  submission_preprocessor_args: MLC_MLPERF_PREPROCESS_SUBMISSION_EXTRA_ARGS
+  submitter: MLC_MLPERF_SUBMITTER
+  version: MLC_MLPERF_SUBMISSION_CHECKER_VERSION
+
+# Dependencies
 deps:
 - names:
   - python
@@ -15,6 +46,8 @@ deps:
     MLC_MLPERF_INFERENCE_SUBMISSION_DIR:
     - 'on'
   tags: get,mlperf,submission,dir
+
+# Variations
 variations:
   wg-automotive:
     group: benchmark_wg
@@ -31,24 +64,3 @@ variations:
       - submission-checker-src
       tags: mlcommons,inference,src
       version: custom
-input_mapping:
-  input: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
-  submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
-  submission_preprocessor_args: MLC_MLPERF_PREPROCESS_SUBMISSION_EXTRA_ARGS
-  submitter: MLC_MLPERF_SUBMITTER
-  version: MLC_MLPERF_SUBMISSION_CHECKER_VERSION
-default_env:
-  MLC_MLPERF_NOINFER_LOW_ACCURACY_RESULTS: false
-  MLC_MLPERF_NOINFER_SCENARIO_RESULTS: false
-tags:
-- run
-- mlc
-- mlcommons
-- mlperf
-- inference
-- submission
-- mlperf-inference
-- processor
-- preprocessor
-- preprocess
-uid: c23068394a314266

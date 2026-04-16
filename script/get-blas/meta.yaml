@@ -1,18 +1,19 @@
 alias: get-blas
+uid: 1a6e1cf75242456c
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Detection or installation of tools and artifacts
-default_version: master
-deps:
-- force_env_keys:
-  - MLC_GIT_CHECKOUT
-  names:
-  - blas-source-repo
-  tags: get,git
-- tags: detect,cpu
-input_description: {}
-input_mapping: {}
+tags:
+- get
+- lib
+- blas
+
+# Cache
+cache: true
+
+# Environment
 new_env_keys:
 - MLC_BLAS_SRC_PATH
 - +LD_LIBRARY_PATH
@@ -20,14 +21,24 @@ new_env_keys:
 - MLC_BLAS_INC
 - MLC_BLAS_LIB
 new_state_keys: []
-post_deps: []
-posthook_deps: []
+
+# Input mapping
+input_mapping: {}
+input_description: {}
+
+# Dependencies
+deps:
+- force_env_keys:
+  - MLC_GIT_CHECKOUT
+  names:
+  - blas-source-repo
+  tags: get,git
+- tags: detect,cpu
 prehook_deps: []
-tags:
-- get
-- lib
-- blas
-uid: 1a6e1cf75242456c
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations:
   openblas:
     add_deps_recursive:
@@ -35,6 +46,9 @@ variations:
         tags: _repo.https://github.com/xianyi/OpenBLAS.git
     default: true
     group: source
+
+# Versions
+default_version: master
 versions:
   0.3.21:
     env:

@@ -1,8 +1,26 @@
 alias: get-ml-model-tiny-resnet
+uid: dd5ec11c3f6e49eb
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
+tags:
+- get
+- raw
+- ml-model
+- resnet
+- pretrained
+- tiny
+- model
+- ic
+- ml-model-tiny-resnet
+- image-classification
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_FILE_WITH_PATH
   MLC_ML_MODEL: RESNET
@@ -15,6 +33,8 @@ env:
   MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'no'
 new_env_keys:
 - MLC_ML_MODEL_*
+
+# Dependencies
 prehook_deps:
 - enable_if_env:
     MLC_PACKAGE_URL:
@@ -27,20 +47,8 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_PACKAGE_URL
-print_env_at_the_end:
-  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
-tags:
-- get
-- raw
-- ml-model
-- resnet
-- pretrained
-- tiny
-- model
-- ic
-- ml-model-tiny-resnet
-- image-classification
-uid: dd5ec11c3f6e49eb
+
+# Variations
 variations:
   onnx:
     deps:
@@ -108,3 +116,7 @@ variations:
     env:
       MLC_DOWNLOAD_CHECKSUM: 2d6dd48722471313e4c4528249205ae3
       MLC_PACKAGE_URL: https://github.com/mlcommons/tiny/raw/master/benchmark/training/image_classification/trained_models/pretrainedResnet_quant.tflite
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model

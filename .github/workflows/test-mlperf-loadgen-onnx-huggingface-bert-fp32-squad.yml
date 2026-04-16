@@ -28,8 +28,11 @@ jobs:
         pip install mlcflow
         pip install tabulate
     - name: Pull MLOps repository
+      env:
+        PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
       run: |
-        mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
+        mlc pull repo "$PR_HEAD_REPO" --branch="$PR_HEAD_REF"
     - name: Test MLPerf loadgen with HuggingFace bert onnx fp32 squad model
       run: |
         mlcr python,app,loadgen-generic,_onnxruntime,_custom,_huggingface,_model-stub.ctuning/mlperf-inference-bert-onnx-fp32-squad-v1.1 --quiet

@@ -1,11 +1,23 @@
 alias: detect-os
+uid: 863735b7db8c44fc
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: Platform information
+tags:
+- detect-os
+- detect
+- os
+- info
+
+# Cache
 cache: true
 cache_expiration: 1h
 clean_files:
 - tmp-run.out
+
+# Environment
 new_env_keys:
 - MLC_HOST_OS_*
 - +MLC_HOST_OS_*
@@ -17,6 +29,8 @@ new_env_keys:
 - +PATH
 new_state_keys:
 - os_uname_*
+
+# Dependencies
 post_deps:
 - enable_if_env:
     MLC_HOST_OS_TYPE:
@@ -25,9 +39,3 @@ post_deps:
     MLC_WINDOWS_SYS_UTILS_MIN_INSTALL:
     - 'yes'
   tags: get,sys-utils-min
-tags:
-- detect-os
-- detect
-- os
-- info
-uid: 863735b7db8c44fc

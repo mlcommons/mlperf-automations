@@ -2,6 +2,8 @@ alias: app-mlperf-training-reference
 uid: 0c4b11bdcf494b4f
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: MLPerf Training
 tags:
 - app
@@ -12,17 +14,11 @@ tags:
 - training
 - reference
 - ref
+
+# Environment
 default_env:
   MLC_MLPERF_SUT_NAME_IMPLEMENTATION_PREFIX: reference
   MLC_MLPERF_SUT_NAME_RUN_CONFIG_SUFFIX: ''
-input_mapping:
-  clean: MLC_MLPERF_CLEAN_SUBMISSION_DIR
-  docker: MLC_RUN_DOCKER_CONTAINER
-  hw_name: MLC_HW_NAME
-  model: MLC_MLPERF_CUSTOM_MODEL_PATH
-  num_threads: MLC_NUM_THREADS
-  output_dir: OUTPUT_BASE_DIR
-  rerun: MLC_RERUN
 new_env_keys:
 - MLC_MLPERF_*
 - MLC_DATASET_*
@@ -31,6 +27,18 @@ new_env_keys:
 new_state_keys:
 - mlperf-inference-implementation
 - MLC_SUT_*
+
+# Input mapping
+input_mapping:
+  clean: MLC_MLPERF_CLEAN_SUBMISSION_DIR
+  docker: MLC_RUN_DOCKER_CONTAINER
+  hw_name: MLC_HW_NAME
+  model: MLC_MLPERF_CUSTOM_MODEL_PATH
+  num_threads: MLC_NUM_THREADS
+  output_dir: OUTPUT_BASE_DIR
+  rerun: MLC_RERUN
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -62,6 +70,8 @@ deps:
   enable_if_env:
     MLC_MLPERF_MODEL:
     - bert
+
+# Variations
 variations:
   cuda:
     group: device

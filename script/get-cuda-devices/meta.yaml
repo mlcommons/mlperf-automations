@@ -1,65 +1,66 @@
 alias: get-cuda-devices
 uid: 7a3ede4d3558427a
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
+# Metadata
+category: CUDA automation
 tags:
 - get
 - cuda-devices
 
+# Cache
 cache: true
-cache_expiration: 1d
-
 can_force_cache: true
-
-category: CUDA automation
-
+cache_expiration: 1d
 clean_files:
 - tmp-run.out
 
-deps:
-- names:
-  - cuda
-  tags: get,cuda,_toolkit
-
-docker:
-  run: false
-  all_gpus: 'yes'
-  skip_run_cmd: 'no'
-  skip_mlc_sys_upgrade: 'yes'
-  mlc_repo_flags: '--checkout=dev'
-  use_host_group_id: 'yes'
-  image_tag_extra: '-mlc-dev'
-
+# Environment
 env:
   MLC_DETECT_USING_PYCUDA: 'no'
-
 new_env_keys:
 - MLC_CUDA_DEVICE_*
 - MLC_CUDA_NUM_DEVICES
 - MLC_CUDA_VERSION
-
 new_state_keys:
 - mlc_cuda_device_prop
 - mlc_cuda_devices_prop
 - mlc_cuda_num_devices
 
-print_files_if_script_error:
-- tmp-run.out
+# Dependencies
+deps:
+- names:
+  - cuda
+  tags: get,cuda,_toolkit
 
+# Variations
 variations:
   with-pycuda:
     env:
       MLC_DETECT_USING_PYCUDA: 'yes'
     deps:
-      - tags: get,python3
-        names:
-          - python
-          - python3
-      - tags: get,generic-python-lib,_package.pycuda
-        names:
-          - pycuda
-      - tags: get,generic-python-lib,_package.numpy
-        names:
-          - numpy
+    - tags: get,python3
+      names:
+      - python
+      - python3
+    - tags: get,generic-python-lib,_package.pycuda
+      names:
+      - pycuda
+    - tags: get,generic-python-lib,_package.numpy
+      names:
+      - numpy
+
+# Docker / container
+docker:
+  run: false
+  all_gpus: 'yes'
+  skip_run_cmd: 'no'
+  skip_mlc_sys_upgrade: 'yes'
+  mlc_repo_flags: --checkout=dev
+  use_host_group_id: 'yes'
+  image_tag_extra: -mlc-dev
+
+# Output / debugging
+print_files_if_script_error:
+- tmp-run.out

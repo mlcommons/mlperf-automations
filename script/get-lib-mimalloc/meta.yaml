@@ -1,8 +1,28 @@
 alias: get-lib-mimalloc
+uid: 81d0dc1269fe41cc
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Detection or installation of tools and artifacts
+tags:
+- get-lib-mimalloc
+- get
+- lib
+- mimalloc
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_MIMALLOC_PATH
+- MLC_MIMALLOC_LIB_PATH
+- MLC_MIMALLOC_VERSION
+- +LD_LIBRARY_PATH
+new_state_keys: []
+
+# Dependencies
 deps:
 - env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_MIMALLOC_SRC_PATH
@@ -26,25 +46,11 @@ deps:
 - env:
     MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
   tags: get,generic-sys-util,_build-essential
-new_env_keys:
-- MLC_MIMALLOC_PATH
-- MLC_MIMALLOC_LIB_PATH
-- MLC_MIMALLOC_VERSION
-- +LD_LIBRARY_PATH
-new_state_keys: []
-post_deps: []
-posthook_deps: []
 prehook_deps: []
-tags:
-- get-lib-mimalloc
-- get
-- lib
-- mimalloc
-tests:
-  run_inputs:
-  - variations_list:
-    - branch.main
-uid: 81d0dc1269fe41cc
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations:
   url.#:
     env:
@@ -67,3 +73,9 @@ variations:
   version.official:
     base:
     - url.official
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - branch.main

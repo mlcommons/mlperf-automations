@@ -1,26 +1,36 @@
 alias: set-cpu-frequency
+uid: 1fe0500d7a2e4c6a
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: MLC Sys Utils
-deps:
-  - tags: detect,os
-  - tags: detect,sudo
-new_env_keys: []
-new_state_keys: []
-post_deps: []
-posthook_deps: []
-prehook_deps: []
-input_mapping:
-  freq: MLC_TARGET_FREQ
-  frequency: MLC_TARGET_FREQ
 tags:
 - set
 - cpu
 - target
 - freq
 - frequency
+
+# Environment
+new_env_keys: []
+new_state_keys: []
+
+# Input mapping
+input_mapping:
+  freq: MLC_TARGET_FREQ
+  frequency: MLC_TARGET_FREQ
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: detect,sudo
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Tests
 tests:
   run_inputs:
-    - freq: 1GHz
-    - freq: ''
-uid: 1fe0500d7a2e4c6a
+  - freq: 1GHz
+  - freq: ''

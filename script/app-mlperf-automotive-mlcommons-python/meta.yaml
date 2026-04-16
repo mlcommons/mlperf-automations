@@ -2,6 +2,8 @@ alias: app-mlperf-automotive-mlcommons-python
 uid: 621240c5d30a437c
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: MLPerf Automotive
 tags:
 - automotive
@@ -11,6 +13,8 @@ tags:
 - object-detection
 - abtf-model
 - demo
+
+# Environment
 default_env:
   MLC_MLPERF_LOADGEN_MODE: accuracy
   MLC_MLPERF_LOADGEN_SCENARIO: Offline
@@ -21,6 +25,25 @@ default_env:
   MLC_MLPERF_QUANTIZATION: false
   MLC_MLPERF_SUT_NAME_IMPLEMENTATION_PREFIX: reference
   MLC_MLPERF_SUT_NAME_RUN_CONFIG_SUFFIX: ''
+new_env_keys:
+- MLC_MLPERF_*
+- MLC_DATASET_*
+- MLC_PREPROCESSED_DATASET_*
+- MLC_HW_NAME
+- MLC_COGNATA_ACCURACY_DUMP_FILE
+- MLC_OUTPUT_PREDICTIONS_PATH
+- MLC_ML_MODEL_*
+- MLC_MAX_EXAMPLES
+new_state_keys:
+- mlperf-inference-implementation
+- MLC_SUT_*
+env_key_mappings:
+  MLC_HOST_: HOST_
+  MLC_ML_: ML_
+  MLC_MLPERF_TVM: MLPERF_TVM
+  MLC_MLPERF_DELETE: MLPERF_DELETE
+
+# Input mapping
 input_mapping:
   clean: MLC_MLPERF_CLEAN_SUBMISSION_DIR
   constantstream_target_qps: MLC_MLPERF_LOADGEN_CONSTANTSTREAM_TARGET_QPS
@@ -53,23 +76,8 @@ input_mapping:
   target_qps: MLC_MLPERF_LOADGEN_TARGET_QPS
   test_query_count: MLC_TEST_QUERY_COUNT
   threads: MLC_NUM_THREADS
-env_key_mappings:
-  MLC_HOST_: HOST_
-  MLC_ML_: ML_
-  MLC_MLPERF_TVM: MLPERF_TVM
-  MLC_MLPERF_DELETE: MLPERF_DELETE
-new_env_keys:
-- MLC_MLPERF_*
-- MLC_DATASET_*
-- MLC_PREPROCESSED_DATASET_*
-- MLC_HW_NAME
-- MLC_COGNATA_ACCURACY_DUMP_FILE
-- MLC_OUTPUT_PREDICTIONS_PATH
-- MLC_ML_MODEL_*
-- MLC_MAX_EXAMPLES
-new_state_keys:
-- mlperf-inference-implementation
-- MLC_SUT_*
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -228,8 +236,8 @@ post_deps:
 - tags: save,mlperf,inference,state
   names:
   - save-mlperf-inference-state
-docker:
-  real_run: false
+
+# Variations
 variations:
   batch_size.#:
     group: batch-size
@@ -542,3 +550,7 @@ variations:
     default_env:
       MLC_MLPERF_SINGLESTREAM_TARGET_LATENCY_PERCENTILE: '99.9'
       MLC_MLPERF_DEFAULT_MAX_QUERY_COUNT: 6636
+
+# Docker / container
+docker:
+  real_run: false
