@@ -1,9 +1,33 @@
 alias: reproduce-mlperf-octoml-tinyml-results
+uid: a63803a707d04332
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: TinyML automation
-default_version: r1.0
+tags:
+- reproduce
+- tiny
+- results
+- mlperf
+- octoml
+- mlcommons
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_TINY_*
+local_env_keys:
+- MLC_*
+
+# Input mapping
+input_mapping:
+  flash: MLC_FLASH_BOARD
+  recreate_binary: MLC_RECREATE_BINARY
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -29,26 +53,13 @@ deps:
   tags: get,cmake
   version_min: 3.20.0
 - tags: get,gcc
-input_mapping:
-  flash: MLC_FLASH_BOARD
-  recreate_binary: MLC_RECREATE_BINARY
-local_env_keys:
-- MLC_*
-new_env_keys:
-- MLC_TINY_*
 post_deps:
 - enable_if_env:
     MLC_FLASH_BOARD:
     - 'True'
   tags: flash,tiny,mlperf
-tags:
-- reproduce
-- tiny
-- results
-- mlperf
-- octoml
-- mlcommons
-uid: a63803a707d04332
+
+# Variations
 variations:
   NRF:
     env:
@@ -74,6 +85,9 @@ variations:
   vww:
     env:
       MLC_TINY_MODEL: vww
+
+# Versions
+default_version: r1.0
 versions:
   r1.0:
     add_deps_recursive:

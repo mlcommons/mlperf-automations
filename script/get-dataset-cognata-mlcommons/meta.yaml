@@ -2,6 +2,10 @@ alias: get-dataset-cognata-mlcommons
 uid: 464ce21f2dce464e
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
+category: AI/ML datasets
+category_sort: 8500
 developers: Grigori Fursin, Radoyeh Shojaei
 tags:
 - get
@@ -11,11 +15,20 @@ tags:
 - mlcommons-cognata
 - ml-task--object-detection
 - ml-task--image-segmentation
-min_mlc_version: 2.2.0
 private: true
+min_mlc_version: 2.2.0
+
+# Cache
 cache: false
-category: AI/ML datasets
-category_sort: 8500
+
+# Environment
+env:
+  MLC_DATASET: MLCOMMONS_COGNATA
+  MLC_DATASET_MLCOMMONS_COGNATA_KEY1: Dataset 1.0
+new_env_keys:
+- MLC_DATASET_MLCOMMONS_COGNATA*
+
+# Input mapping
 input_mapping:
   file_names: MLC_DATASET_MLCOMMONS_COGNATA_FILE_NAMES
   group_names: MLC_DATASET_MLCOMMONS_COGNATA_GROUP_NAMES
@@ -23,9 +36,8 @@ input_mapping:
   private_url: MLC_DATASET_MLCOMMONS_COGNATA_PRIVATE_URL
   serial_numbers: MLC_DATASET_MLCOMMONS_COGNATA_SERIAL_NUMBERS
   update: MLC_DATASET_MLCOMMONS_COGNATA_UPDATE
-env:
-  MLC_DATASET: MLCOMMONS_COGNATA
-  MLC_DATASET_MLCOMMONS_COGNATA_KEY1: Dataset 1.0
+
+# Dependencies
 deps:
 - names:
   - custom-cache-entry-mlcommons-cognata-dataset
@@ -111,6 +123,8 @@ prehook_deps:
   enable_if_env:
     MLC_DATASET_MLCOMMONS_COGNATA_FILE_NAMES:
     - 'on'
+
+# Variations
 variations:
   abtf-demo:
     group: dataset-type
@@ -184,7 +198,7 @@ variations:
         tags: _rclone
     env:
       MLC_RCLONE_COPY_USING: sync
-new_env_keys:
-- MLC_DATASET_MLCOMMONS_COGNATA*
+
+# Output / debugging
 print_env_at_the_end:
   MLC_DATASET_MLCOMMONS_COGNATA_PATH: Path to Cognata dataset

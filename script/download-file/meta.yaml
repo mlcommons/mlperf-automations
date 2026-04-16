@@ -1,22 +1,32 @@
 alias: download-file
+uid: 9cdc8dc41aae437e
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
+category: DevOps automation
+tags:
+- download
+- file
+- download-file
+tags_help: download file
+
+# Cache
 cache: false
 can_force_cache: true
-category: DevOps automation
+
+# Environment
 default_env:
   MLC_RCLONE_COPY_USING: sync
   MLC_EXTRACT_REMOVE_EXTRACTED: false
   MLC_DOWNLOAD_RETRY_COUNT: 2
-deps:
-- tags: detect,os
-- enable_if_env:
-    MLC_DOWNLOAD_CHECKSUM:
-    - 'on'
-    MLC_HOST_OS_FLAVOR:
-    - macos
-  tags: get,generic-sys-util,_md5sha1sum
-input_description: {}
+new_env_keys:
+- MLC_DOWNLOAD_DOWNLOADED_PATH
+- <<<MLC_DOWNLOAD_FINAL_ENV_NAME>>>
+- MLC_GET_DEPENDENT_CACHED_PATH
+new_state_keys: []
+
+# Input mapping
 input_mapping:
   download_path: MLC_DOWNLOAD_PATH
   from: MLC_DOWNLOAD_LOCAL_FILE_PATH
@@ -25,19 +35,21 @@ input_mapping:
   output_file: MLC_DOWNLOAD_FILENAME
   store: MLC_DOWNLOAD_PATH
   url: MLC_DOWNLOAD_URL
-new_env_keys:
-- MLC_DOWNLOAD_DOWNLOADED_PATH
-- <<<MLC_DOWNLOAD_FINAL_ENV_NAME>>>
-- MLC_GET_DEPENDENT_CACHED_PATH
-new_state_keys: []
-post_deps: []
+input_description: {}
+
+# Dependencies
+deps:
+- tags: detect,os
+- enable_if_env:
+    MLC_DOWNLOAD_CHECKSUM:
+    - 'on'
+    MLC_HOST_OS_FLAVOR:
+    - macos
+  tags: get,generic-sys-util,_md5sha1sum
 prehook_deps: []
-tags:
-- download
-- file
-- download-file
-tags_help: download file
-uid: 9cdc8dc41aae437e
+post_deps: []
+
+# Variations
 variations:
   curl:
     default_env:
@@ -82,6 +94,11 @@ variations:
   url.#:
     env:
       MLC_DOWNLOAD_URL: '#'
+
+# Versions
+versions: {}
+
+# Tests
 tests:
   run_inputs:
   - variations_list:
@@ -96,4 +113,3 @@ tests:
     - curl,url.https://raw.githubusercontent.com/octocat/Hello-World/refs/heads/master/README
     env:
       MLC_DOWNLOAD_FILENAME: test-readme-curl.md
-versions: {}

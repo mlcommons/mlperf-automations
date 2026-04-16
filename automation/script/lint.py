@@ -80,9 +80,162 @@ def lint_meta(self_module, input_params):
     return {'return': 0}
 
 
+# Canonical key order for top-level meta.yaml keys.
+# Keys are grouped logically so readers can quickly find what they need.
+# Keys not in this list are placed at the end in their original order.
+TOP_LEVEL_KEY_ORDER = [
+    # Identity
+    "alias",
+    "uid",
+    "automation_alias",
+    "automation_uid",
+
+    # Metadata
+    "name",
+    "category",
+    "category_sort",
+    "developers",
+    "tags",
+    "tags_help",
+    "private",
+    "min_mlc_version",
+
+    # Cache
+    "cache",
+    "can_force_cache",
+    "cache_expiration",
+    "extra_cache_tags_from_env",
+    "clean_files",
+    "clean_output_files",
+
+    # Environment
+    "default_env",
+    "env",
+    "new_env_keys",
+    "new_state_keys",
+    "local_env_keys",
+    "file_path_env_keys",
+    "folder_path_env_keys",
+    "env_key_mappings",
+
+    # Input
+    "input_mapping",
+    "input_description",
+
+    # Dependencies
+    "predeps",
+    "deps",
+    "prehook_deps",
+    "posthook_deps",
+    "post_deps",
+
+    # Variations
+    "default_variation",
+    "default_variations",
+    "variation_groups_order",
+    "invalid_variation_combinations",
+    "valid_variation_combinations",
+    "variations",
+
+    # Versions
+    "default_version",
+    "versions",
+
+    # Conditional
+    "update_meta_if_env",
+
+    # Docker / container
+    "docker",
+
+    # Output / debugging
+    "print_env_at_the_end",
+    "print_files_if_script_error",
+    "warnings",
+    "sudo_install",
+    "sort",
+    "remote_run",
+
+    # Tests
+    "tests",
+]
+
+
+# Section groups: each entry is (header_comment, [keys_in_this_group]).
+# A comment is inserted before the first key from each group that appears in the file.
+SECTION_GROUPS = [
+    # Identity keys (alias, uid, etc.) get no header - they're always first
+    ("# Metadata",                ["name", "category", "category_sort", "developers", "tags", "tags_help", "private", "min_mlc_version"]),
+    ("# Cache",                   ["cache", "can_force_cache", "cache_expiration", "extra_cache_tags_from_env", "clean_files", "clean_output_files"]),
+    ("# Environment",             ["default_env", "env", "new_env_keys", "new_state_keys", "local_env_keys", "file_path_env_keys", "folder_path_env_keys", "env_key_mappings"]),
+    ("# Input mapping",           ["input_mapping", "input_description"]),
+    ("# Dependencies",            ["predeps", "deps", "prehook_deps", "posthook_deps", "post_deps"]),
+    ("# Variations",              ["default_variation", "default_variations", "variation_groups_order", "invalid_variation_combinations", "valid_variation_combinations", "variations"]),
+    ("# Versions",                ["default_version", "versions"]),
+    ("# Conditional meta updates",["update_meta_if_env"]),
+    ("# Docker / container",      ["docker"]),
+    ("# Output / debugging",      ["print_env_at_the_end", "print_files_if_script_error", "warnings", "sudo_install", "sort", "remote_run"]),
+    ("# Tests",                   ["tests"]),
+]
+
+
+def _build_key_to_header(data_keys):
+    """Build a mapping from key -> header, only for the *first* key in each
+    section group that actually appears in data_keys."""
+    data_key_set = set(data_keys)
+    key_to_header = {}
+    for header, group_keys in SECTION_GROUPS:
+        for k in group_keys:
+            if k in data_key_set:
+                key_to_header[k] = header
+                break  # only tag the first present key per group
+    return key_to_header
+
+
+def insert_section_comments(yaml_string, data_keys):
+    """Insert section header comments before the first key of each group.
+    Only inserts a header once per section even if multiple keys from that
+    section are present."""
+    key_to_header = _build_key_to_header(data_keys)
+    lines = yaml_string.split('\n')
+    result = []
+
+    for line in lines:
+        # Check if this line is a top-level key (not indented, has a colon)
+        if line and not line[0].isspace() and ':' in line:
+            key = line.split(':')[0].strip()
+            header = key_to_header.get(key)
+            if header:
+                # Add blank line before section (unless at the very start)
+                if result and result[-1] != '':
+                    result.append('')
+                result.append(header)
+        result.append(line)
+
+    return '\n'.join(result)
+
+
+def reorder_top_level_keys(data):
+    """Reorder top-level keys in data dict according to TOP_LEVEL_KEY_ORDER.
+    Keys not in the canonical list are appended at the end in original order."""
+    ordered = {}
+    for key in TOP_LEVEL_KEY_ORDER:
+        if key in data:
+            ordered[key] = data[key]
+    # Append any remaining keys not in the canonical order
+    for key in data:
+        if key not in ordered:
+            ordered[key] = data[key]
+    return ordered
+
+
 def sort_meta_yaml_file(script_directory, quiet=False):
     """
-    Sort specific keys in the meta.yaml file and save it back to disk.
+    Sort and reorder keys in the meta.yaml file and save it back to disk.
+
+    Applies three transformations:
+    1. Reorders top-level keys into a canonical, grouped order.
+    2. Sorts input_mapping keys alphabetically.
+    3. Sorts variations: grouped by group name first, then ungrouped alphabetically.
 
     Args:
         script_directory: Path to the script directory
@@ -114,14 +267,19 @@ def sort_meta_yaml_file(script_directory, quiet=False):
             return {
                 'return': 1, 'error': 'YAML does not contain a dictionary', 'modified': False}
 
-        # Store original for comparison
+        # Store original raw text for comparison
+        with open(meta_yaml_path, 'r', encoding='utf-8') as file:
+            original_raw = file.read()
         original_data = copy.deepcopy(data)
 
-        # Sort input_mapping alphabetically
+        # 1. Reorder top-level keys
+        data = reorder_top_level_keys(data)
+
+        # 2. Sort input_mapping alphabetically
         if 'input_mapping' in data and isinstance(data['input_mapping'], dict):
             data['input_mapping'] = dict(sorted(data['input_mapping'].items()))
 
-        # Sort variations: grouped consecutively by group name, then ungrouped
+        # 3. Sort variations: grouped consecutively by group name, then ungrouped
         if 'variations' in data and isinstance(data['variations'], dict):
             variations = data['variations']
 
@@ -152,20 +310,20 @@ def sort_meta_yaml_file(script_directory, quiet=False):
 
             data['variations'] = sorted_variations
 
-        # Check if anything changed (including order)
-        original_yaml = yaml.dump(
-            original_data,
-            default_flow_style=False,
-            sort_keys=False)
-        new_yaml = yaml.dump(data, default_flow_style=False, sort_keys=False)
+        # Generate new output and check if anything changed
+        new_yaml = yaml.dump(data, default_flow_style=False, sort_keys=False,
+                             allow_unicode=True, width=1000, indent=2)
+        new_yaml = insert_section_comments(new_yaml, list(data.keys()))
 
-        if original_yaml == new_yaml:
+        if original_raw.rstrip() == new_yaml.rstrip():
             return {'return': 0, 'modified': False}
 
-        # Write the sorted YAML back to file
+        # Write the sorted YAML back to file with section comments
+        yaml_output = yaml.dump(data, default_flow_style=False, sort_keys=False,
+                                allow_unicode=True, width=1000, indent=2)
+        yaml_output = insert_section_comments(yaml_output, list(data.keys()))
         with open(meta_yaml_path, 'w', encoding='utf-8') as file:
-            yaml.dump(data, file, default_flow_style=False, sort_keys=False,
-                      allow_unicode=True, width=1000, indent=2)
+            file.write(yaml_output)
 
         if not quiet:
             print(f"Sorted YAML keys in {meta_yaml_path}")

@@ -2,6 +2,9 @@ alias: get-cuda
 uid: 46d133d9ef92422d
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
+category: CUDA automation
 tags:
 - get
 - cuda
@@ -13,26 +16,14 @@ tags:
 - get-nvcc
 - get-cuda
 - 46d133d9ef92422d
+
+# Cache
 cache: true
-category: CUDA automation
+
+# Environment
 default_env:
   MLC_CUDA_PATH_LIB_CUDNN_EXISTS: 'no'
   MLC_REQUIRE_INSTALL: 'no'
-deps:
-- tags: detect,os
-- enable_if_env:
-    MLC_CUDA_FULL_TOOLKIT_INSTALL:
-    - 'yes'
-    MLC_HOST_OS_TYPE:
-    - windows
-  names:
-  - compiler
-  tags: get,cl
-input_mapping:
-  cudnn_tar_file: MLC_CUDNN_TAR_FILE_PATH
-  cudnn_tar_path: MLC_CUDNN_TAR_FILE_PATH
-  skip_cudnn_install: MLC_CUDA_SKIP_CUDNN_INSTALL
-  skip_sudo: CUDA_SKIP_SUDO
 new_env_keys:
 - CUDA_HOME
 - CUDA_PATH
@@ -45,6 +36,25 @@ new_env_keys:
 - +LD_LIBRARY_PATH
 - +DYLD_FALLBACK_LIBRARY_PATH
 - + LDFLAGS
+
+# Input mapping
+input_mapping:
+  cudnn_tar_file: MLC_CUDNN_TAR_FILE_PATH
+  cudnn_tar_path: MLC_CUDNN_TAR_FILE_PATH
+  skip_cudnn_install: MLC_CUDA_SKIP_CUDNN_INSTALL
+  skip_sudo: CUDA_SKIP_SUDO
+
+# Dependencies
+deps:
+- tags: detect,os
+- enable_if_env:
+    MLC_CUDA_FULL_TOOLKIT_INSTALL:
+    - 'yes'
+    MLC_HOST_OS_TYPE:
+    - windows
+  names:
+  - compiler
+  tags: get,cl
 prehook_deps:
 - enable_if_env:
     MLC_REQUIRE_INSTALL:
@@ -57,14 +67,8 @@ prehook_deps:
     MLC_CUDA_PACKAGE_MANAGER_INSTALL:
     - 'yes'
   tags: get,generic-sys-util,_nvidia-cuda-toolkit
-print_env_at_the_end:
-  MLC_CUDA_PATH_LIB_CUDNN_EXISTS: ''
-  MLC_CUDA_VERSION: ''
-  MLC_CUDA_VERSION_STRING: ''
-  MLC_NVCC_BIN_WITH_PATH: ''
-  CUDA_HOME: ''
-print_files_if_script_error:
-- tmp-ver.out
+
+# Variations
 variations:
   lib-only:
     env:
@@ -95,3 +99,13 @@ variations:
   prebuilt:
     env:
       MLC_REQUIRE_INSTALL: 'yes'
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_CUDA_PATH_LIB_CUDNN_EXISTS: ''
+  MLC_CUDA_VERSION: ''
+  MLC_CUDA_VERSION_STRING: ''
+  MLC_NVCC_BIN_WITH_PATH: ''
+  CUDA_HOME: ''
+print_files_if_script_error:
+- tmp-ver.out

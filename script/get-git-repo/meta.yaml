@@ -1,17 +1,35 @@
 alias: get-git-repo
+uid: ed603e7292974f10
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
+category: DevOps automation
+tags:
+- get
+- git
+- repo
+- repository
+- clone
+
+# Cache
 cache: true
 cache_expiration: 5d
-category: DevOps automation
+
+# Environment
 default_env:
   MLC_GIT_CHECKOUT_FOLDER: repo
   MLC_GIT_DEPTH: --depth 4
   MLC_GIT_PATCH: 'no'
   MLC_GIT_RECURSE_SUBMODULES: ' --recurse-submodules'
   MLC_GIT_URL: https://github.com/mlcommons/mlperf-automations
-deps:
-- tags: detect,os
+new_env_keys:
+- MLC_GIT_CHECKOUT_PATH
+- MLC_GIT_REPO_*
+- <<<MLC_GIT_CHECKOUT_PATH_ENV_NAME>>>
+- <<<MLC_GIT_REPO_VERSION_ENV_NAME>>>
+
+# Input mapping
 input_mapping:
   branch: MLC_GIT_CHECKOUT
   depth: MLC_GIT_DEPTH
@@ -21,11 +39,10 @@ input_mapping:
   pull: MLC_GIT_REPO_PULL
   submodules: MLC_GIT_RECURSE_SUBMODULES
   update: MLC_GIT_REPO_PULL
-new_env_keys:
-- MLC_GIT_CHECKOUT_PATH
-- MLC_GIT_REPO_*
-- <<<MLC_GIT_CHECKOUT_PATH_ENV_NAME>>>
-- <<<MLC_GIT_REPO_VERSION_ENV_NAME>>>
+
+# Dependencies
+deps:
+- tags: detect,os
 post_deps:
 - dynamic: true
   enable_if_env:
@@ -37,27 +54,8 @@ post_deps:
   names:
   - pull-git-repo
   tags: pull,git,repo
-print_env_at_the_end:
-  MLC_GIT_CHECKOUT_PATH: MLC cache path to the Git repo
-tags:
-- get
-- git
-- repo
-- repository
-- clone
-tests:
-  run_inputs:
-  - variations_list:
-    - repo.https://github.com/octocat/Hello-World,no-recurse-submodules
-  - variations_list:
-    - repo.https://github.com/octocat/Hello-World,branch.test,no-recurse-submodules
-  - variations_list:
-    - repo.https://github.com/octocat/Hello-World,sha.7fd1a60b01f91b314f59955a4e4d4e80d8edf11d,no-recurse-submodules
-  - variations_list:
-    - repo.https://github.com/octocat/Hello-World,full-history,no-recurse-submodules
-  - variations_list:
-    - repo.https://github.com/pallets/click,tag.8.3.2,short-history,no-recurse-submodules
-uid: ed603e7292974f10
+
+# Variations
 variations:
   branch.#:
     env:
@@ -113,3 +111,21 @@ variations:
   submodules.#:
     env:
       MLC_GIT_SUBMODULES: '#'
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_GIT_CHECKOUT_PATH: MLC cache path to the Git repo
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - repo.https://github.com/octocat/Hello-World,no-recurse-submodules
+  - variations_list:
+    - repo.https://github.com/octocat/Hello-World,branch.test,no-recurse-submodules
+  - variations_list:
+    - repo.https://github.com/octocat/Hello-World,sha.7fd1a60b01f91b314f59955a4e4d4e80d8edf11d,no-recurse-submodules
+  - variations_list:
+    - repo.https://github.com/octocat/Hello-World,full-history,no-recurse-submodules
+  - variations_list:
+    - repo.https://github.com/pallets/click,tag.8.3.2,short-history,no-recurse-submodules

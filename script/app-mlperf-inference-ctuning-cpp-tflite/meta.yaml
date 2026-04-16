@@ -1,7 +1,19 @@
 alias: app-mlperf-inference-ctuning-cpp-tflite
+uid: 415904407cca404a
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: MLPerf Inference
+tags:
+- app
+- mlcommons
+- mlperf
+- inference
+- tflite-cpp
+tags_help: app mlperf inference tflite-cpp
+
+# Environment
 default_env:
   MLC_DATASET_COMPRESSED: 'off'
   MLC_DATASET_INPUT_SQUARE_SIDE: '224'
@@ -18,6 +30,26 @@ default_env:
   MLC_ML_MODEL_NORMALIZE_DATA: '0'
   MLC_ML_MODEL_SUBTRACT_MEANS: '1'
   MLC_VERBOSE: '0'
+new_env_keys:
+- MLC_MLPERF_*
+- MLC_ML_MODEL_*
+- MLC_HW_NAME
+new_state_keys:
+- MLC_SUT_*
+
+# Input mapping
+input_mapping:
+  compressed_dataset: MLC_DATASET_COMPRESSED
+  count: MLC_MLPERF_LOADGEN_QUERY_COUNT
+  mlperf_conf: MLC_MLPERF_CONF
+  mode: MLC_MLPERF_LOADGEN_MODE
+  output_dir: MLC_MLPERF_OUTPUT_DIR
+  performance_sample_count: MLC_MLPERF_LOADGEN_PERFORMANCE_SAMPLE_COUNT
+  scenario: MLC_MLPERF_LOADGEN_SCENARIO
+  user_conf: MLC_MLPERF_USER_CONF
+  verbose: MLC_VERBOSE
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -86,38 +118,6 @@ deps:
   - armnn
   - lib-armnn
   tags: get,lib,armnn
-input_mapping:
-  compressed_dataset: MLC_DATASET_COMPRESSED
-  count: MLC_MLPERF_LOADGEN_QUERY_COUNT
-  mlperf_conf: MLC_MLPERF_CONF
-  mode: MLC_MLPERF_LOADGEN_MODE
-  output_dir: MLC_MLPERF_OUTPUT_DIR
-  performance_sample_count: MLC_MLPERF_LOADGEN_PERFORMANCE_SAMPLE_COUNT
-  scenario: MLC_MLPERF_LOADGEN_SCENARIO
-  user_conf: MLC_MLPERF_USER_CONF
-  verbose: MLC_VERBOSE
-new_env_keys:
-- MLC_MLPERF_*
-- MLC_ML_MODEL_*
-- MLC_HW_NAME
-new_state_keys:
-- MLC_SUT_*
-post_deps:
-- names:
-  - compiler-program
-  skip_if_env:
-    MLC_MLPERF_SKIP_RUN:
-    - 'yes'
-  tags: compile,program
-- names:
-  - mlperf-runner
-  skip_if_env:
-    MLC_MLPERF_SKIP_RUN:
-    - 'yes'
-  tags: benchmark-mlperf
-- names:
-  - save-mlperf-inference-state
-  tags: save,mlperf,inference,state
 prehook_deps:
 - names:
   - user-conf-generator
@@ -178,14 +178,24 @@ prehook_deps:
   tags: get,dataset,preprocessed,imagenet,_for.resnet50,_rgb8,_NHWC
   update_tags_from_env:
   - MLC_DATASET_PREPROCESSED_IMAGENET_DEP_TAGS
-tags:
-- app
-- mlcommons
-- mlperf
-- inference
-- tflite-cpp
-tags_help: app mlperf inference tflite-cpp
-uid: 415904407cca404a
+post_deps:
+- names:
+  - compiler-program
+  skip_if_env:
+    MLC_MLPERF_SKIP_RUN:
+    - 'yes'
+  tags: compile,program
+- names:
+  - mlperf-runner
+  skip_if_env:
+    MLC_MLPERF_SKIP_RUN:
+    - 'yes'
+  tags: benchmark-mlperf
+- names:
+  - save-mlperf-inference-state
+  tags: save,mlperf,inference,state
+
+# Variations
 variations:
   tf:
     env:

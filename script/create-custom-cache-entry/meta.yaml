@@ -1,27 +1,30 @@
 alias: create-custom-cache-entry
 uid: 485741440fbe4236
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
+# Metadata
+category: MLC automation
 tags:
 - create
 - custom
 - cache
 - entry
 
-category: MLC automation
-
+# Cache
 cache: true
 
+# Environment
+new_env_keys:
+- MLC_CUSTOM_CACHE_ENTRY*
+
+# Input mapping
 input_mapping:
   env_key: MLC_CUSTOM_CACHE_ENTRY_ENV_KEY
   env_key2: MLC_CUSTOM_CACHE_ENTRY_ENV_KEY2
   path: MLC_CUSTOM_CACHE_ENTRY_PATH
   to: MLC_CUSTOM_CACHE_ENTRY_PATH
 
-new_env_keys:
-- MLC_CUSTOM_CACHE_ENTRY*
-
+# Output / debugging
 print_env_at_the_end:
-  MLC_CUSTOM_CACHE_ENTRY_PATH: "Path to custom cache entry"
+  MLC_CUSTOM_CACHE_ENTRY_PATH: Path to custom cache entry

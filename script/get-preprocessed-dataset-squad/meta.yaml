@@ -1,9 +1,27 @@
-uid: 7cd1d9b7e8af4788
 alias: get-preprocessed-dataset-squad
+uid: 7cd1d9b7e8af4788
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
+tags:
+- get
+- dataset
+- preprocessed
+- tokenized
+- squad
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_DATASET_MAX_QUERY_LENGTH: 64
+new_env_keys:
+- MLC_DATASET_SQUAD_TOKENIZED_*
+
+# Dependencies
 deps:
 - tags: get,python3
   names:
@@ -21,16 +39,8 @@ deps:
 - tags: get,generic-python-lib,_package.tokenization
 - tags: get,generic-python-lib,_package.transformers
 - tags: get,generic-python-lib,_package.tensorflow
-env:
-  MLC_DATASET_MAX_QUERY_LENGTH: 64
-new_env_keys:
-- MLC_DATASET_SQUAD_TOKENIZED_*
-tags:
-- get
-- dataset
-- preprocessed
-- tokenized
-- squad
+
+# Variations
 variations:
   calib1:
     group: calibration-set

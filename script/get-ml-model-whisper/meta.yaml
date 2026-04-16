@@ -1,31 +1,33 @@
 alias: get-ml-model-whisper
+uid: 3bea2356e97f47b1
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
-env:
-  MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'no'
-  MLC_ML_MODEL_DATASET: whisper
-input_mapping:
-  checkpoint: MLC_ML_MODEL_WHISPER_PATH
-new_env_keys:
-- MLC_ML_MODEL_WHISPER_PATH
-- MLC_ML_MODEL_FILE_WITH_PATH
-print_env_at_the_end:
-  MLC_ML_MODEL_WHISPER_PATH: Whisper checkpoint path
 tags:
 - get-ml-model-whisper
 - get
 - ml-model
 - whisper
 - speech-recognition
-tests:
-  needs_pat: true
-  run_inputs:
-  - variations_list:
-    - rclone,mlc,dry-run
-    - r2-downloader,mlc,dry-run
-uid: 3bea2356e97f47b1
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'no'
+  MLC_ML_MODEL_DATASET: whisper
+new_env_keys:
+- MLC_ML_MODEL_WHISPER_PATH
+- MLC_ML_MODEL_FILE_WITH_PATH
+
+# Input mapping
+input_mapping:
+  checkpoint: MLC_ML_MODEL_WHISPER_PATH
+
+# Dependencies
 prehook_deps:
 - enable_if_env:
     MLC_TMP_REQUIRE_DOWNLOAD:
@@ -39,6 +41,8 @@ prehook_deps:
   names:
   - hf-zoo
   tags: get,ml-model,huggingface,zoo,_clone-repo
+
+# Variations
 variations:
   huggingface:
     group: download-src
@@ -126,3 +130,15 @@ variations:
   dry-run,rclone:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_WHISPER_PATH: Whisper checkpoint path
+
+# Tests
+tests:
+  needs_pat: true
+  run_inputs:
+  - variations_list:
+    - rclone,mlc,dry-run
+    - r2-downloader,mlc,dry-run

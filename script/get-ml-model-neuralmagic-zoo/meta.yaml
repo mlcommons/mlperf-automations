@@ -1,24 +1,10 @@
 alias: get-ml-model-neuralmagic-zoo
+uid: adbb3f2525a14f97
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
-deps:
-- names:
-  - python3
-  - python
-  tags: get,python3
-- tags: get,generic-python-lib,_package.protobuf
-  version_max: 3.20.1
-- tags: get,generic-python-lib,_sparsezoo
-env: {}
-new_env_keys:
-- MLC_ML_MODEL*
-- MLC_MODEL_ZOO_STUB
-- MLC_MLPERF_CUSTOM_MODEL_PATH
-- MLC_GET_DEPENDENT_CACHED_PATH
-print_env_at_the_end:
-  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
 tags:
 - get
 - ml-model
@@ -29,7 +15,29 @@ tags:
 - sparse-zoo
 - neuralmagic
 - neural-magic
-uid: adbb3f2525a14f97
+
+# Cache
+cache: true
+
+# Environment
+env: {}
+new_env_keys:
+- MLC_ML_MODEL*
+- MLC_MODEL_ZOO_STUB
+- MLC_MLPERF_CUSTOM_MODEL_PATH
+- MLC_GET_DEPENDENT_CACHED_PATH
+
+# Dependencies
+deps:
+- names:
+  - python3
+  - python
+  tags: get,python3
+- tags: get,generic-python-lib,_package.protobuf
+  version_max: 3.20.1
+- tags: get,generic-python-lib,_sparsezoo
+
+# Variations
 variations:
   bert-base-pruned90-none:
     env:
@@ -221,3 +229,7 @@ variations:
       MLC_ML_MODEL_WEIGHTS_DATA_TYPE: int8
       MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: quantization, unstructured pruning
       MLC_MODEL_ZOO_STUB: zoo:nlp/question_answering/roberta-base/pytorch/huggingface/squad/pruned85_quant-none
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model

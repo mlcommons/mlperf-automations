@@ -2,6 +2,8 @@ alias: app-mlperf-automotive
 uid: f7488ce376484fd2
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: MLPerf Automotive
 tags:
 - app
@@ -10,7 +12,8 @@ tags:
 - mlperf-inference
 - mlperf-inference-automotive
 - abtf-inference
-predeps: false
+
+# Environment
 default_env:
   MLC_MLPERF_LOADGEN_MODE: accuracy
   MLC_MLPERF_LOADGEN_SCENARIO: Offline
@@ -20,6 +23,13 @@ default_env:
   MLC_MLPERF_QUANTIZATION: false
   MLC_MLPERF_SUT_NAME_IMPLEMENTATION_PREFIX: reference
   MLC_MLPERF_SUT_NAME_RUN_CONFIG_SUFFIX: ''
+new_env_keys:
+- MLC_MLPERF_*
+- MLC_OUTPUT_PREDICTIONS_PATH
+new_state_keys:
+- mlc-mlperf-inference-results*
+
+# Input mapping
 input_mapping:
   clean: MLC_MLPERF_CLEAN_SUBMISSION_DIR
   constantstream_target_qps: MLC_MLPERF_LOADGEN_CONSTANTSTREAM_TARGET_QPS
@@ -52,11 +62,9 @@ input_mapping:
   target_qps: MLC_MLPERF_LOADGEN_TARGET_QPS
   test_query_count: MLC_TEST_QUERY_COUNT
   threads: MLC_NUM_THREADS
-new_env_keys:
-- MLC_MLPERF_*
-- MLC_OUTPUT_PREDICTIONS_PATH
-new_state_keys:
-- mlc-mlperf-inference-results*
+
+# Dependencies
+predeps: false
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -86,21 +94,8 @@ post_deps:
     MLC_JSON_INPUT_FILE: <<<MLC_MLPERF_RUN_JSON_VERSION_INFO_FILE>>>
     MLC_OUTPUT_IMAGE_PATH: <<<MLC_MLPERF_RUN_DEPS_GRAPH>>>
     MLC_OUTPUT_MERMAID_PATH: <<<MLC_MLPERF_RUN_DEPS_MERMAID>>>
-docker:
-  mlc_repo: mlcommons@mlperf-automations
-  mlc_repo_branch: dev
-  use_host_group_id: true
-  use_host_user_id: true
-  real_run: false
-  user: mlcuser
-  interactive: true
-  pre_run_cmds:
-  - mlc pull repo
-  deps:
-  - tags: get,abtf,scratch,space
-  mounts:
-  - ${{ MLC_ABTF_SCRATCH_PATH_DATASETS }}:${{ MLC_ABTF_SCRATCH_PATH_DATASETS }}
-  - ${{ MLC_ML_MODEL_FILE_WITH_PATH }}:${{ MLC_ML_MODEL_FILE_WITH_PATH }}
+
+# Variations
 variations:
   batch_size.#:
     group: batch_size
@@ -440,3 +435,20 @@ variations:
     docker:
       base_image: ubuntu:22.04
       os_version: 22.04
+
+# Docker / container
+docker:
+  mlc_repo: mlcommons@mlperf-automations
+  mlc_repo_branch: dev
+  use_host_group_id: true
+  use_host_user_id: true
+  real_run: false
+  user: mlcuser
+  interactive: true
+  pre_run_cmds:
+  - mlc pull repo
+  deps:
+  - tags: get,abtf,scratch,space
+  mounts:
+  - ${{ MLC_ABTF_SCRATCH_PATH_DATASETS }}:${{ MLC_ABTF_SCRATCH_PATH_DATASETS }}
+  - ${{ MLC_ML_MODEL_FILE_WITH_PATH }}:${{ MLC_ML_MODEL_FILE_WITH_PATH }}

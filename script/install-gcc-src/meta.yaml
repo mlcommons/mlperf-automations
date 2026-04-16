@@ -1,8 +1,32 @@
 alias: install-gcc-src
+uid: faae0ebd6e1242db
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Compiler automation
+tags:
+- install
+- src
+- gcc
+- src-gcc
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_GCC_*
+
+# Input mapping
+input_mapping:
+  build: MLC_GCC_BUILD
+  extra: MLC_GCC_EXTRA_CONFIGURE_STRING
+  host: MLC_GCC_HOST
+  pull_changes: MLC_GCC_REPO_PULL_CHANGES
+  targets: MLC_GCC_TARGET
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -30,20 +54,6 @@ deps:
   enable_if_env:
     MLC_GCC_REPO_PULL_CHANGES:
     - 'yes'
-input_mapping:
-  build: MLC_GCC_BUILD
-  extra: MLC_GCC_EXTRA_CONFIGURE_STRING
-  host: MLC_GCC_HOST
-  pull_changes: MLC_GCC_REPO_PULL_CHANGES
-  targets: MLC_GCC_TARGET
-update_meta_if_env:
-- default_variations:
-    repo: darwin
-  enable_if_env:
-    MLC_HOST_OS_TYPE:
-    - darwin
-new_env_keys:
-- MLC_GCC_*
 post_deps:
 - skip_if_env:
     MLC_REQUIRE_INSTALL:
@@ -52,19 +62,8 @@ post_deps:
   update_tags_from_env_with_prefix:
     _path.:
     - MLC_GCC_INSTALLED_PATH
-tags:
-- install
-- src
-- gcc
-- src-gcc
-uid: faae0ebd6e1242db
-docker:
-  skip_run_cmd: true
-  pre_run_cmds:
-  - mlc pull repo
-tests:
-  run_inputs:
-  - {}
+
+# Variations
 variations:
   darwin:
     group: repo
@@ -103,3 +102,22 @@ variations:
     env:
       +MLC_GCC_ENABLED_LANGUAGES:
       - '#'
+
+# Conditional meta updates
+update_meta_if_env:
+- default_variations:
+    repo: darwin
+  enable_if_env:
+    MLC_HOST_OS_TYPE:
+    - darwin
+
+# Docker / container
+docker:
+  skip_run_cmd: true
+  pre_run_cmds:
+  - mlc pull repo
+
+# Tests
+tests:
+  run_inputs:
+  - {}

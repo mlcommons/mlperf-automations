@@ -1,9 +1,27 @@
 alias: get-nvidia-mitten
+uid: 1c045f2902374de9
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLPerf Inference
-default_version: main
+tags:
+- get
+- nvidia
+- mitten
+- nvidia-mitten
+
+# Cache
+cache: true
+extra_cache_tags_from_env:
+- env: MLC_PYTHON_CACHE_TAGS
+  prefix: python-
+
+# Environment
+new_env_keys:
+- MLC_NVIDIA_MITTEN*
+
+# Dependencies
 deps:
 - tags: detect,os
 - names:
@@ -22,17 +40,8 @@ deps:
   names:
   - nvidia-mitten-git-src
   tags: get,git,_repo.https://github.com/NVIDIA/mitten
-extra_cache_tags_from_env:
-- env: MLC_PYTHON_CACHE_TAGS
-  prefix: python-
-new_env_keys:
-- MLC_NVIDIA_MITTEN*
-tags:
-- get
-- nvidia
-- mitten
-- nvidia-mitten
-uid: 1c045f2902374de9
+
+# Variations
 variations:
   default:
     group: numpy-patch
@@ -44,3 +53,6 @@ variations:
         tags: _patch
     env:
       MLC_GIT_PATCH_FILEPATHS: <<<MLC_TMP_CURRENT_SCRIPT_PATH>>>/patch/numpy-mitten-v5.0.patch
+
+# Versions
+default_version: main

@@ -2,6 +2,8 @@ alias: generate-mlperf-inference-user-conf
 uid: 3af4475745964b93
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: MLPerf Inference
 developers: '[Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Thomas Zhu](https://www.linkedin.com/in/hanwen-zhu-483614189), [Grigori Fursin](https://cKnowledge.org/gfursin)'
 tags:
@@ -10,6 +12,8 @@ tags:
 - inference
 - user-conf
 - inference-user-conf
+
+# Environment
 default_env:
   MLC_MLPERF_LOADGEN_MODE: accuracy
   MLC_MLPERF_LOADGEN_SCENARIO: Offline
@@ -19,8 +23,16 @@ default_env:
   MLC_FAST_FACTOR: '5'
   MLC_MLPERF_QUANTIZATION: false
   MLC_MLPERF_RESULTS_DIR_SHARED: true
-docker:
-  real_run: false
+new_env_keys:
+- MLC_MLPERF_*
+- MLC_LOGS_DIR
+- MLC_HW_*
+- MLC_SUT_*
+- MLC_MAX_EXAMPLES
+new_state_keys:
+- MLC_SUT_*
+
+# Input mapping
 input_mapping:
   constantstream_target_qps: MLC_MLPERF_LOADGEN_CONSTANTSTREAM_TARGET_QPS
   count: MLC_MLPERF_LOADGEN_QUERY_COUNT
@@ -40,14 +52,8 @@ input_mapping:
   target_latency: MLC_MLPERF_LOADGEN_TARGET_LATENCY
   target_qps: MLC_MLPERF_LOADGEN_TARGET_QPS
   test_query_count: MLC_TEST_QUERY_COUNT
-new_env_keys:
-- MLC_MLPERF_*
-- MLC_LOGS_DIR
-- MLC_HW_*
-- MLC_SUT_*
-- MLC_MAX_EXAMPLES
-new_state_keys:
-- MLC_SUT_*
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -62,6 +68,8 @@ deps:
     OUTPUT_BASE_DIR:
     - 'on'
 - tags: get,sut,configs
+
+# Variations
 variations:
   wg-automotive:
     group: benchmark_wg
@@ -80,3 +88,7 @@ variations:
     - tags: get,mlcommons,inference,src
       names:
       - inference-src
+
+# Docker / container
+docker:
+  real_run: false

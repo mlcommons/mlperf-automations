@@ -1,27 +1,10 @@
 alias: get-ml-model-huggingface-zoo
+uid: 53cf8252a443446a
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
-deps:
-- names:
-  - python3
-  - python
-  tags: get,python3
-- tags: get,generic-python-lib,_huggingface_hub
-env: {}
-input_mapping:
-  download_path: MLC_DOWNLOAD_PATH
-  env_key: MLC_MODEL_ZOO_ENV_KEY
-  full_subfolder: MLC_HF_FULL_SUBFOLDER
-  model_filename: MLC_MODEL_ZOO_FILENAME
-  revision: MLC_HF_REVISION
-  subfolder: MLC_HF_SUBFOLDER
-new_env_keys:
-- MLC_ML_MODEL*
-- MLC_MODEL_ZOO_STUB
-print_env_at_the_end:
-  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
 tags:
 - get
 - ml-model
@@ -31,19 +14,46 @@ tags:
 - model-zoo
 - huggingface
 tags_help: get ml-model huggingface zoo
-uid: 53cf8252a443446a
+
+# Cache
+cache: true
+
+# Environment
+env: {}
+new_env_keys:
+- MLC_ML_MODEL*
+- MLC_MODEL_ZOO_STUB
+
+# Input mapping
+input_mapping:
+  download_path: MLC_DOWNLOAD_PATH
+  env_key: MLC_MODEL_ZOO_ENV_KEY
+  full_subfolder: MLC_HF_FULL_SUBFOLDER
+  model_filename: MLC_MODEL_ZOO_FILENAME
+  revision: MLC_HF_REVISION
+  subfolder: MLC_HF_SUBFOLDER
+
+# Dependencies
+deps:
+- names:
+  - python3
+  - python
+  tags: get,python3
+- tags: get,generic-python-lib,_huggingface_hub
+
+# Variations
 variations:
   clone-repo:
     deps:
     - tags: get,hf-cli,_with-login
       enable_if_env:
         MLC_HF_TOKEN:
-          - on
+        - true
     - env:
         MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_ML_MODEL_PATH
       tags: get,git,repo,_lfs
       force_env_keys:
-      - MLC_OUTDIRNAME    
+      - MLC_OUTDIRNAME
       update_tags_from_env_with_prefix:
         _repo.https://huggingface.co/:
         - MLC_MODEL_ZOO_STUB
@@ -62,3 +72,7 @@ variations:
   prune:
     env:
       MLC_MODEL_TASK: prune
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model

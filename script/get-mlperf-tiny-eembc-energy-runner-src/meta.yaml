@@ -1,16 +1,10 @@
 alias: get-mlperf-tiny-eembc-energy-runner-src
+uid: c7da8d1ce4164a4b
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: TinyML automation
-default_env:
-  MLC_GIT_CHECKOUT: main
-  MLC_GIT_PATCH: 'no'
-  MLC_GIT_RECURSE_SUBMODULES: ''
-  MLC_GIT_URL: https://github.com/eembc/energyrunner
-new_env_keys:
-- MLC_EEMBC_ENERGY_RUNNER_*
-- +PYTHONPATH
 tags:
 - get
 - src
@@ -20,4 +14,16 @@ tags:
 - energy-runner
 - eembc-energy-runner
 - tinymlperf-energy-runner
-uid: c7da8d1ce4164a4b
+
+# Cache
+cache: true
+
+# Environment
+default_env:
+  MLC_GIT_CHECKOUT: main
+  MLC_GIT_PATCH: 'no'
+  MLC_GIT_RECURSE_SUBMODULES: ''
+  MLC_GIT_URL: https://github.com/eembc/energyrunner
+new_env_keys:
+- MLC_EEMBC_ENERGY_RUNNER_*
+- +PYTHONPATH

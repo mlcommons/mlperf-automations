@@ -1,20 +1,26 @@
 alias: get-preprocessed-dataset-cognata
+uid: 29b3a984ff444de9
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
-default_env:
-  MLC_DATASET: cognata
-new_env_keys:
-- MLC_PREPROCESSED_DATASET_*
 tags:
 - get
 - dataset
 - cognata
 - preprocessed
-uid: 29b3a984ff444de9
-print_env_at_the_end:
-  MLC_PREPROCESSED_DATASET_COGNATA_PATH: Preprocessed Cognata dataset path
+
+# Cache
+cache: true
+
+# Environment
+default_env:
+  MLC_DATASET: cognata
+new_env_keys:
+- MLC_PREPROCESSED_DATASET_*
+
+# Variations
 variations:
   prebuilt:
     default: true
@@ -137,6 +143,12 @@ variations:
   validation,segmentation,rclone:
     env:
       MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/preprocessed_seg/<<<MLC_DATASET_COGNATA_TAR_FILENAME>>>
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_PREPROCESSED_DATASET_COGNATA_PATH: Preprocessed Cognata dataset path
+
+# Tests
 tests:
   needs_pat: true
   run_inputs:

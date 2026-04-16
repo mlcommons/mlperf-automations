@@ -2,6 +2,8 @@ alias: app-mlperf-inference
 uid: d775cac873ee4231
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: MLPerf Inference
 developers: '[Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Thomas Zhu](https://www.linkedin.com/in/hanwen-zhu-483614189), [Grigori Fursin](https://cKnowledge.org/gfursin)'
 tags:
@@ -12,6 +14,8 @@ tags:
 - mlperf
 - inference
 - generic
+
+# Environment
 default_env:
   MLC_MLPERF_LOADGEN_MODE: accuracy
   MLC_MLPERF_LOADGEN_SCENARIO: Offline
@@ -25,6 +29,17 @@ default_env:
 env:
   MLC_MLPERF_PRINT_SUMMARY: 'no'
   MLC_MLPERF_MODEL_EQUAL_ISSUE_MODE: 'no'
+new_env_keys:
+- MLC_MLPERF_*
+new_state_keys:
+- app_mlperf_inference_*
+- mlc-mlperf-inference-results*
+env_key_mappings:
+  MLC_HOST_: HOST_
+  MLC_ML_: ML_
+  MLC_MLPERF_TVM: MLPERF_TVM
+
+# Input mapping
 input_mapping:
   clean: MLC_MLPERF_CLEAN_SUBMISSION_DIR
   count: MLC_MLPERF_LOADGEN_QUERY_COUNT
@@ -56,16 +71,68 @@ input_mapping:
   test_query_count: MLC_TEST_QUERY_COUNT
   tp_size: MLC_NVIDIA_TP_SIZE
   use_dataset_from_host: MLC_USE_DATASET_FROM_HOST
+input_description:
+  scenario:
+    desc: MLPerf inference scenario
+    choices:
+    - Offline
+    - Server
+    - SingleStream
+    - MultiStream
+    default: Offline
+  mode:
+    desc: MLPerf inference mode
+    choices:
+    - performance
+    - accuracy
+    default: accuracy
+  test_query_count:
+    desc: Specifies the number of samples to be processed during a test run
+  target_qps:
+    desc: Target QPS
+  target_latency:
+    desc: Target Latency
+  max_batchsize:
+    desc: Maximum batchsize to be used
+  num_threads:
+    desc: Number of CPU threads to launch the application with
+  hw_name:
+    desc: Hardware part of the SUT name
+  output_dir:
+    desc: Location where the outputs are produced
+  rerun:
+    desc: Redo the run even if previous run files exist
+    boolean: true
+    default: true
+  regenerate_files:
+    desc: Regenerates measurement files including accuracy.txt files even if a previous run exists. This option is redundant if `--rerun` is used
+    boolean: true
+  adr.python.name:
+    desc: Python virtual environment name (optional)
+    default: mlperf
+  adr.python.version_min:
+    desc: Minimal Python version
+    default: '3.8'
+  adr.python.version:
+    desc: Force Python version (must have all system deps)
+  adr.compiler.tags:
+    desc: Compiler for loadgen
+    default: gcc
+  adr.inference-src-loadgen.env.MLC_GIT_URL:
+    desc: Git URL for MLPerf inference sources to build LoadGen (to enable non-reference implementations)
+  adr.inference-src.env.MLC_GIT_URL:
+    desc: Git URL for MLPerf inference sources to run benchmarks (to enable non-reference implementations)
+  quiet:
+    desc: Quiet run (select default values for all questions)
+    boolean: true
+    default: false
+  readme:
+    desc: Generate README with the reproducibility report
+  debug:
+    desc: Debug MLPerf script
+
+# Dependencies
 predeps: false
-env_key_mappings:
-  MLC_HOST_: HOST_
-  MLC_ML_: ML_
-  MLC_MLPERF_TVM: MLPERF_TVM
-new_env_keys:
-- MLC_MLPERF_*
-new_state_keys:
-- app_mlperf_inference_*
-- mlc-mlperf-inference-results*
 deps:
 - tags: detect,os
 - tags: get,sys-utils-mlc
@@ -107,6 +174,8 @@ post_deps:
     MLC_JSON_INPUT_FILE: <<<MLC_MLPERF_RUN_JSON_VERSION_INFO_FILE>>>
     MLC_OUTPUT_IMAGE_PATH: <<<MLC_MLPERF_RUN_DEPS_GRAPH>>>
     MLC_OUTPUT_MERMAID_PATH: <<<MLC_MLPERF_RUN_DEPS_MERMAID>>>
+
+# Variations
 variation_groups_order:
 - implementation
 - backend
@@ -115,6 +184,25 @@ variation_groups_order:
 - precision
 - execution-mode
 - reproducibility
+invalid_variation_combinations:
+- - retinanet
+  - tf
+- - nvidia-original
+  - tf
+- - nvidia-original
+  - onnxruntime
+- - nvidia-original
+  - pytorch
+- - nvidia
+  - tf
+- - nvidia
+  - onnxruntime
+- - nvidia
+  - pytorch
+- - gptj
+  - tf
+- - gptj
+  - r5.1_default
 variations:
   deepsparse:
     group: backend
@@ -2132,84 +2220,8 @@ variations:
       - yolo-accuracy-script
       - mlperf-accuracy-script
       tags: run,accuracy,mlperf,_yolo-coco2017-filtered
-invalid_variation_combinations:
-- - retinanet
-  - tf
-- - nvidia-original
-  - tf
-- - nvidia-original
-  - onnxruntime
-- - nvidia-original
-  - pytorch
-- - nvidia
-  - tf
-- - nvidia
-  - onnxruntime
-- - nvidia
-  - pytorch
-- - gptj
-  - tf
-- - gptj
-  - r5.1_default
-input_description:
-  scenario:
-    desc: MLPerf inference scenario
-    choices:
-    - Offline
-    - Server
-    - SingleStream
-    - MultiStream
-    default: Offline
-  mode:
-    desc: MLPerf inference mode
-    choices:
-    - performance
-    - accuracy
-    default: accuracy
-  test_query_count:
-    desc: Specifies the number of samples to be processed during a test run
-  target_qps:
-    desc: Target QPS
-  target_latency:
-    desc: Target Latency
-  max_batchsize:
-    desc: Maximum batchsize to be used
-  num_threads:
-    desc: Number of CPU threads to launch the application with
-  hw_name:
-    desc: Hardware part of the SUT name
-  output_dir:
-    desc: Location where the outputs are produced
-  rerun:
-    desc: Redo the run even if previous run files exist
-    boolean: true
-    default: true
-  regenerate_files:
-    desc: Regenerates measurement files including accuracy.txt files even if a previous run exists. This option is redundant if `--rerun` is used
-    boolean: true
-  adr.python.name:
-    desc: Python virtual environment name (optional)
-    default: mlperf
-  adr.python.version_min:
-    desc: Minimal Python version
-    default: '3.8'
-  adr.python.version:
-    desc: Force Python version (must have all system deps)
-  adr.compiler.tags:
-    desc: Compiler for loadgen
-    default: gcc
-  adr.inference-src-loadgen.env.MLC_GIT_URL:
-    desc: Git URL for MLPerf inference sources to build LoadGen (to enable non-reference implementations)
-  adr.inference-src.env.MLC_GIT_URL:
-    desc: Git URL for MLPerf inference sources to run benchmarks (to enable non-reference implementations)
-  quiet:
-    desc: Quiet run (select default values for all questions)
-    boolean: true
-    default: false
-  readme:
-    desc: Generate README with the reproducibility report
-  debug:
-    desc: Debug MLPerf script
+
+# Conditional meta updates
 update_meta_if_env:
 - enable_if_env:
     MLC_CONTAINER_TOOL:
@@ -2233,6 +2245,8 @@ update_meta_if_env:
     adr:
       compiler:
         tags: gcc
+
+# Docker / container
 docker:
   deps:
   - tags: get,mlperf,inference,results,dir,local

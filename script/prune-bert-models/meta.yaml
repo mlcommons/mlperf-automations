@@ -1,12 +1,29 @@
 alias: prune-bert-models
+uid: 76182d4896414216
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: AI/ML optimization
+tags:
+- prune
+- bert-models
+- bert-prune
+- prune-bert-models
+
+# Environment
 default_env:
   MLC_BERT_PRUNE_CONSTRAINT: '0.5'
   MLC_BERT_PRUNE_MODEL_NAME: bert-large-uncased
   MLC_BERT_PRUNE_TASK: squad
   MLC_MODEL_ZOO_STUB: bert-large-uncased
+
+# Input mapping
+input_mapping:
+  constraint: MLC_BERT_PRUNE_CONSTRAINT
+  output_dir: MLC_BERT_PRUNE_OUTPUT_DIR
+
+# Dependencies
 deps:
 - tags: get,python3
 - tags: get,generic-python-lib,_numpy
@@ -23,15 +40,8 @@ deps:
 - names:
   - get-model
   tags: get,ml-model,model,zoo,model-zoo,huggingface,_prune
-input_mapping:
-  constraint: MLC_BERT_PRUNE_CONSTRAINT
-  output_dir: MLC_BERT_PRUNE_OUTPUT_DIR
-tags:
-- prune
-- bert-models
-- bert-prune
-- prune-bert-models
-uid: 76182d4896414216
+
+# Variations
 variations:
   model.#:
     adr:

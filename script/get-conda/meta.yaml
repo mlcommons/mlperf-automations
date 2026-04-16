@@ -1,11 +1,20 @@
 alias: get-conda
+uid: 6600115f41324c7b
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: DevOps automation
+tags:
+- get
+- conda
+- get-conda
+
+# Cache
+cache: true
 clean_files: []
-deps:
-- tags: detect,os
+
+# Environment
 new_env_keys:
 - +PATH
 - +LD_LIBRARY_PATH
@@ -15,11 +24,12 @@ new_env_keys:
 - MLC_CONDA_BIN_PATH
 - MLC_CONDA_BIN_WITH_PATH
 - MLC_CONDA_LIB_PATH
-tags:
-- get
-- conda
-- get-conda
-uid: 6600115f41324c7b
+
+# Dependencies
+deps:
+- tags: detect,os
+
+# Variations
 variations:
   python-3.#:
     env:

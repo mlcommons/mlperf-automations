@@ -1,9 +1,35 @@
 alias: get-profiler-uprof
+uid: 1530bfcddc3f4fa1
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
+name: Detect or install AMD uprof
 category: Compiler automation
+tags:
+- get-uprof
+- get
+- uprof
+- profiler
+- uprof-profiler
+
+# Cache
+cache: true
 clean_files: []
+
+# Environment
+new_env_keys:
+- +PATH
+- MLC_UPROF_INSTALLED_PATH
+- MLC_UPROF_BIN_WITH_PATH
+
+# Input mapping
+input_mapping:
+  accept_eula: MLC_UPROF_ACCEPT_EULA
+  tar_file_path: MLC_UPROF_TAR_FILE_PATH
+  uprof_dir: MLC_UPROF_DIR_PATH
+
+# Dependencies
 deps:
 - tags: detect,os
 - enable_if_env:
@@ -32,25 +58,8 @@ deps:
   update_tags_from_env_with_prefix:
     _path.:
     - MLC_UPROF_TAR_FILE_PATH
-input_mapping:
-  accept_eula: MLC_UPROF_ACCEPT_EULA
-  tar_file_path: MLC_UPROF_TAR_FILE_PATH
-  uprof_dir: MLC_UPROF_DIR_PATH
-name: Detect or install AMD uprof
-new_env_keys:
-- +PATH
-- MLC_UPROF_INSTALLED_PATH
-- MLC_UPROF_BIN_WITH_PATH
-post_deps_off:
-- tags: get,compiler-flags
-sort: 500
-tags:
-- get-uprof
-- get
-- uprof
-- profiler
-- uprof-profiler
-uid: 1530bfcddc3f4fa1
+
+# Variations
 variations:
   download-and-install:
     default_version: 5.2
@@ -67,6 +76,8 @@ variations:
       install-type: local-install
     env:
       MLC_UPROF_DIR_PATH: '#'
+
+# Versions
 versions:
   5.2:
     env:
@@ -79,3 +90,6 @@ versions:
       MLC_UPROF_URL: https://download.amd.com/developer/eula/uprof/uprof-5-1/AMDuProf_Linux_x64_5.1.701.tar.bz2
       MLC_DOWNLOAD_CHECKSUM: a297f370e633505e4c432da4f94c680a
       MLC_VERSION: 5.1.701
+
+# Output / debugging
+sort: 500

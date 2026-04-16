@@ -1,19 +1,37 @@
 alias: get-ml-model-stable-diffusion
+uid: 22c6516b2d4d4c23
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
+tags:
+- get
+- raw
+- ml-model
+- stable-diffusion
+- sdxl
+- text-to-image
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_ML_MODEL: SDXL
   MLC_ML_MODEL_DATASET: openorca
   MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'no'
+new_env_keys:
+- MLC_ML_MODEL_*
+- SDXL_CHECKPOINT_PATH
+
+# Input mapping
 input_mapping:
   checkpoint: SDXL_CHECKPOINT_PATH
   download_path: MLC_DOWNLOAD_PATH
   to: MLC_DOWNLOAD_PATH
-new_env_keys:
-- MLC_ML_MODEL_*
-- SDXL_CHECKPOINT_PATH
+
+# Dependencies
 prehook_deps:
 - enable_if_env:
     MLC_DOWNLOAD_TOOL:
@@ -43,16 +61,8 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_DOWNLOAD_URL
-print_env_at_the_end:
-  SDXL_CHECKPOINT_PATH: Stable diffusion checkpoint path
-tags:
-- get
-- raw
-- ml-model
-- stable-diffusion
-- sdxl
-- text-to-image
-uid: 22c6516b2d4d4c23
+
+# Variations
 variations:
   huggingface:
     default_variations:
@@ -154,7 +164,13 @@ variations:
   rclone,fp32:
     env:
       MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/stable_diffusion_fp32
-test:
+
+# Output / debugging
+print_env_at_the_end:
+  SDXL_CHECKPOINT_PATH: Stable diffusion checkpoint path
+
+# Tests
+tests:
   run_inputs:
   - variations_list:
     - fp32,r2-downloader,dry-run

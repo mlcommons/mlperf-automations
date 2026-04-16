@@ -1,18 +1,10 @@
 alias: get-nvidia-docker
+uid: 465ae240998e4779
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Detection or installation of tools and artifacts
-deps:
-- tags: detect,os
-- tags: get,docker
-input_description: {}
-input_mapping: {}
-new_env_keys: []
-new_state_keys: []
-post_deps: []
-posthook_deps: []
-prehook_deps: []
 tags:
 - get
 - install
@@ -20,6 +12,28 @@ tags:
 - nvidia-container-toolkit
 - nvidia-docker
 - engine
-uid: 465ae240998e4779
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys: []
+new_state_keys: []
+
+# Input mapping
+input_mapping: {}
+input_description: {}
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: get,docker
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations: {}
+
+# Versions
 versions: {}

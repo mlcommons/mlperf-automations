@@ -1,33 +1,34 @@
 alias: get-sys-utils-min
 uid: a9af7714d3d94779
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
-cache: true
-
+# Metadata
 category: Detection or installation of tools and artifacts
-
-deps:
-  - tags: detect,os
-  - tags: get,generic,sys-util,_xz
-    enable_if_env:
-      MLC_HOST_OS_TYPE:
-        - windows
-  - tags: get,generic,sys-util,_zlib
-    enable_if_env:
-      MLC_HOST_OS_TYPE:
-        - windows
-
-env:
-  MLC_CLEAN_DIRS: bin
-  MLC_WINDOWS_SYS_UTILS_MIN_INSTALL: yes
-  MLC_PACKAGE_WIN_URL: https://github.com/mlcommons/mlperf-automations/releases/download/mlperf-automations-v1.0.0/cm-artifact-os-windows-32.zip
-  MLC_SUDO: sudo
-
-new_env_keys:
-- +PATH
-
 tags:
 - get
 - sys-utils-min
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_CLEAN_DIRS: bin
+  MLC_WINDOWS_SYS_UTILS_MIN_INSTALL: true
+  MLC_PACKAGE_WIN_URL: https://github.com/mlcommons/mlperf-automations/releases/download/mlperf-automations-v1.0.0/cm-artifact-os-windows-32.zip
+  MLC_SUDO: sudo
+new_env_keys:
+- +PATH
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: get,generic,sys-util,_xz
+  enable_if_env:
+    MLC_HOST_OS_TYPE:
+    - windows
+- tags: get,generic,sys-util,_zlib
+  enable_if_env:
+    MLC_HOST_OS_TYPE:
+    - windows

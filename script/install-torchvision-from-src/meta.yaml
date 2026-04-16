@@ -1,8 +1,30 @@
 alias: install-torchvision-from-src
+uid: 68b855780d474546
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
+name: Build pytorchvision from sources
 category: Compiler automation
+tags:
+- install
+- get
+- src
+- from.src
+- pytorchvision
+- torchvision
+- src-pytorchvision
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_GIT_URL: https://github.com/pytorch/vision
+new_env_keys:
+- MLC_PYTORCHVISION_*
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -36,22 +58,9 @@ deps:
     - MLC_GIT_CHECKOUT_SHA
     _tag.:
     - MLC_GIT_CHECKOUT_TAG
-env:
-  MLC_GIT_URL: https://github.com/pytorch/vision
-name: Build pytorchvision from sources
-new_env_keys:
-- MLC_PYTORCHVISION_*
 prehook_deps: []
-sort: 1000
-tags:
-- install
-- get
-- src
-- from.src
-- pytorchvision
-- torchvision
-- src-pytorchvision
-uid: 68b855780d474546
+
+# Variations
 variations:
   repo.#:
     env:
@@ -105,4 +114,9 @@ variations:
         tags: _no-recurse-submodules,_full-history
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
+
+# Versions
 versions: {}
+
+# Output / debugging
+sort: 1000

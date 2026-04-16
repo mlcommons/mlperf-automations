@@ -2658,6 +2658,11 @@ class ScriptAutomation(Automation):
 
         script_tags = i.get('script_tags', [])
         variation_tags = i.get('variation_tags', [])
+        
+        if not script_tags and tags_string:
+            r = get_variation_and_script_tags(tags_string.strip())
+            script_tags = r['script_tags']
+            variation_tags = r['variation_tags']
 
         excluded_tags = [v[1:] for v in script_tags if v.startswith("-")]
         common = set(script_tags).intersection(set(excluded_tags))

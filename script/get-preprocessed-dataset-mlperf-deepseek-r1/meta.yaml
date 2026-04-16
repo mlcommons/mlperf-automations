@@ -1,7 +1,9 @@
 alias: get-preprocessed-dataset-mlperf-deepseek-r1
+uid: 4f95da01a8244833
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 tags:
 - get
 - preprocessed
@@ -9,16 +11,21 @@ tags:
 - mlperf
 - deepseek-r1
 - mlperf-deepseek-r1
-uid: 4f95da01a8244833
+
+# Cache
+cache: true
+
+# Environment
 new_env_keys:
 - MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH
 - MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_VALIDATION_PATH
 - MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_CALIBRATION_PATH
+
+# Input mapping
 input_mapping:
   deepseek_path: MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_PATH
-print_env_at_the_end:
-  MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_VALIDATION_PATH: DeepSeek-R1 validation dataset path
-  MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_CALIBRATION_PATH: DeepSeek-R1 calibration dataset path
+
+# Variations
 variations:
   calibration:
     group: dataset-type
@@ -91,6 +98,13 @@ variations:
   validation,rclone:
     env:
       MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/deepseek_r1/mlperf_deepseek_r1_dataset_4388_fp8_eval.pkl
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_VALIDATION_PATH: DeepSeek-R1 validation dataset path
+  MLC_PREPROCESSED_DATASET_DEEPSEEK_R1_CALIBRATION_PATH: DeepSeek-R1 calibration dataset path
+
+# Tests
 tests:
   run_inputs:
   - variations_list:

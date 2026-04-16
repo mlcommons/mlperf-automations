@@ -2,12 +2,10 @@ alias: run-mlperf-inference-app
 uid: 4a5d5b13fd7e4ac8
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: MLPerf Inference
 developers: '[Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Grigori Fursin](https://cKnowledge.org/gfursin)'
-clean_output_files:
-- open.tar.gz
-- summary.csv
-- summary.json
 tags:
 - run
 - common
@@ -20,7 +18,14 @@ tags:
 - inference
 - reference
 tags_help: run-mlperf,inference
-predeps: false
+
+# Cache
+clean_output_files:
+- open.tar.gz
+- summary.csv
+- summary.json
+
+# Environment
 default_env:
   MLC_MLPERF_IMPLEMENTATION: reference
   MLC_MLPERF_MODEL: resnet50
@@ -30,6 +35,11 @@ default_env:
   MLC_DOCKER_PRIVILEGED_MODE: true
   MLC_MLPERF_SUBMISSION_DIVISION: open
   MLC_MLPERF_INFERENCE_TP_SIZE: 1
+new_state_keys:
+- app_mlperf_inference_*
+- mlc-mlperf-inference-results*
+
+# Input mapping
 input_mapping:
   all_models: MLC_MLPERF_ALL_MODELS
   api_server: MLC_MLPERF_INFERENCE_API_SERVER
@@ -124,9 +134,210 @@ input_mapping:
   vllm_model_name: MLC_VLLM_SERVER_MODEL_NAME
   vllm_tp_size: MLC_MLPERF_INFERENCE_TP_SIZE
   waymo_path: MLC_DATASET_WAYMO_PATH
-new_state_keys:
-- app_mlperf_inference_*
-- mlc-mlperf-inference-results*
+input_description:
+  division:
+    choices:
+    - open
+    - closed
+    desc: MLPerf division
+    sort: 50
+  category:
+    choices:
+    - edge
+    - datacenter
+    - network
+    default: edge
+    desc: MLPerf category
+    sort: 60
+  device:
+    choices:
+    - cpu
+    - cuda
+    - rocm
+    - qaic
+    desc: MLPerf device
+    sort: 100
+  model:
+    choices:
+    - resnet50
+    - retinanet
+    - bert-99
+    - bert-99.9
+    - 3d-unet-99
+    - 3d-unet-99.9
+    - rnnt
+    - dlrm-v2-99
+    - dlrm-v2-99.9
+    - gptj-99
+    - gptj-99.9
+    - sdxl
+    - llama2-70b-99
+    - llama2-70b-99.9
+    - mixtral-8x7b
+    - mobilenet
+    - efficientnet
+    - rgat
+    - llama3_1-405b
+    - pointpainting
+    - yolo-95
+    - yolo-99
+    - wan-2.2-t2v-a14b
+    desc: MLPerf model
+    sort: 200
+  precision:
+    choices:
+    - float32
+    - float16
+    - bfloat16
+    - int8
+    - uint8
+    desc: MLPerf model precision
+    sort: 250
+  implementation:
+    choices:
+    - mlcommons-python
+    - mlcommons-cpp
+    - nvidia
+    - intel
+    - qualcomm
+    - ctuning-cpp-tflite
+    desc: MLPerf implementation
+    sort: 300
+  backend:
+    choices:
+    - onnxruntime
+    - tf
+    - pytorch
+    - deepsparse
+    - tensorrt
+    - glow
+    - tvm-onnx
+    desc: MLPerf framework (backend)
+    sort: 400
+  scenario:
+    choices:
+    - Offline
+    - Server
+    - SingleStream
+    - MultiStream
+    desc: MLPerf scenario
+    sort: 500
+  mode:
+    choices:
+    - ''
+    - accuracy
+    - performance
+    desc: MLPerf benchmark mode
+    sort: 600
+  execution_mode:
+    choices:
+    - test
+    - fast
+    - valid
+    desc: MLPerf execution mode
+    sort: 700
+  sut:
+    desc: SUT configuration (if known)
+    sort: 750
+  submitter:
+    default: MLCommons
+    desc: Submitter name (without space)
+    sort: 800
+  results_dir:
+    desc: Folder path to store results (defaults to the current working directory)
+    sort: 900
+  submission_dir:
+    desc: Folder path to store MLPerf submission tree
+    sort: 1000
+  use_dataset_from_host:
+    desc: Run the dataset download script on the host machine and mount the dataset into the Docker container to avoid repeated downloads.
+    choices:
+    - true
+    - false
+    default: 'no'
+  use_model_from_host:
+    desc: Run the model download script on the host machine and mount the model files into the Docker container to avoid repeated downloads.
+    choices:
+    - true
+    - false
+    default: 'no'
+  adr.compiler.tags:
+    desc: Compiler for loadgen and any C/C++ part of implementation
+  adr.inference-src-loadgen.env.MLC_GIT_URL:
+    default: ''
+    desc: Git URL for MLPerf inference sources to build LoadGen (to enable non-reference implementations)
+  adr.inference-src.env.MLC_GIT_URL:
+    default: ''
+    desc: Git URL for MLPerf inference sources to run benchmarks (to enable non-reference implementations)
+  adr.mlperf-inference-implementation.max_batchsize:
+    desc: Maximum batchsize to be used
+  adr.mlperf-inference-implementation.num_threads:
+    desc: Number of threads (reference & C++ implementation only)
+  adr.python.name:
+    desc: Python virtual environment name (optional)
+  adr.python.version:
+    desc: Force Python version (must have all system deps)
+  adr.python.version_min:
+    default: '3.8'
+    desc: Minimal Python version
+  power:
+    choices:
+    - 'yes'
+    - 'no'
+    default: 'no'
+    desc: Measure power
+    sort: 5000
+  adr.mlperf-power-client.power_server:
+    default: 192.168.0.15
+    desc: MLPerf Power server IP address
+    sort: 5005
+  adr.mlperf-power-client.port:
+    default: 4950
+    desc: MLPerf Power server port
+    sort: 5010
+  clean:
+    boolean: true
+    default: false
+    desc: Clean run
+  compliance:
+    choices:
+    - 'yes'
+    - 'no'
+    default: 'no'
+    desc: Whether to run compliance tests (applicable only for closed division)
+  hw_name:
+    desc: MLPerf hardware name (for example "gcp.c3_standard_8", "nvidia_orin", "lenovo_p14s_gen_4_windows_11", "macbook_pro_m1_2", "thundercomm_rb6" ...)
+  multistream_target_latency:
+    desc: Set MultiStream target latency
+  offline_target_qps:
+    desc: Set LoadGen Offline target QPS
+  quiet:
+    boolean: true
+    default: true
+    desc: Quiet run (select default values for all questions)
+  server_target_qps:
+    desc: Set Server target QPS
+  singlestream_target_latency:
+    desc: Set SingleStream target latency
+  target_latency:
+    desc: Set Target latency
+  target_qps:
+    desc: Set LoadGen target QPS
+  repro:
+    desc: Record input/output/state/info files to make it easier to reproduce results
+    boolean: true
+    default: false
+  time:
+    desc: Print script execution time at the end of the run
+    boolean: true
+    default: true
+  debug:
+    desc: Debug this script
+    boolean: true
+    default: false
+
+# Dependencies
+predeps: false
 deps:
 - tags: detect,os
   skip_if_env:
@@ -164,8 +375,8 @@ deps:
     - true
 - tags: install,pip-package,for-mlc-python,_package.tabulate
 - tags: get,mlperf,inference,utils
-docker:
-  pass_docker_to_script: true
+
+# Variations
 variations:
   r2.1:
     env:
@@ -431,207 +642,12 @@ variations:
     deps:
     - tags: clean,nvidia,scratch,_sdxl,_downloaded-data
       extra_cache_rm_tags: scc24-base
+
+# Versions
 versions:
   master: {}
   r2.1: {}
-input_description:
-  division:
-    choices:
-    - open
-    - closed
-    desc: MLPerf division
-    sort: 50
-  category:
-    choices:
-    - edge
-    - datacenter
-    - network
-    default: edge
-    desc: MLPerf category
-    sort: 60
-  device:
-    choices:
-    - cpu
-    - cuda
-    - rocm
-    - qaic
-    desc: MLPerf device
-    sort: 100
-  model:
-    choices:
-    - resnet50
-    - retinanet
-    - bert-99
-    - bert-99.9
-    - 3d-unet-99
-    - 3d-unet-99.9
-    - rnnt
-    - dlrm-v2-99
-    - dlrm-v2-99.9
-    - gptj-99
-    - gptj-99.9
-    - sdxl
-    - llama2-70b-99
-    - llama2-70b-99.9
-    - mixtral-8x7b
-    - mobilenet
-    - efficientnet
-    - rgat
-    - llama3_1-405b
-    - pointpainting
-    - yolo-95
-    - yolo-99
-    - wan-2.2-t2v-a14b
-    desc: MLPerf model
-    sort: 200
-  precision:
-    choices:
-    - float32
-    - float16
-    - bfloat16
-    - int8
-    - uint8
-    desc: MLPerf model precision
-    sort: 250
-  implementation:
-    choices:
-    - mlcommons-python
-    - mlcommons-cpp
-    - nvidia
-    - intel
-    - qualcomm
-    - ctuning-cpp-tflite
-    desc: MLPerf implementation
-    sort: 300
-  backend:
-    choices:
-    - onnxruntime
-    - tf
-    - pytorch
-    - deepsparse
-    - tensorrt
-    - glow
-    - tvm-onnx
-    desc: MLPerf framework (backend)
-    sort: 400
-  scenario:
-    choices:
-    - Offline
-    - Server
-    - SingleStream
-    - MultiStream
-    desc: MLPerf scenario
-    sort: 500
-  mode:
-    choices:
-    - ''
-    - accuracy
-    - performance
-    desc: MLPerf benchmark mode
-    sort: 600
-  execution_mode:
-    choices:
-    - test
-    - fast
-    - valid
-    desc: MLPerf execution mode
-    sort: 700
-  sut:
-    desc: SUT configuration (if known)
-    sort: 750
-  submitter:
-    default: MLCommons
-    desc: Submitter name (without space)
-    sort: 800
-  results_dir:
-    desc: Folder path to store results (defaults to the current working directory)
-    sort: 900
-  submission_dir:
-    desc: Folder path to store MLPerf submission tree
-    sort: 1000
-  use_dataset_from_host:
-    desc: Run the dataset download script on the host machine and mount the dataset into the Docker container to avoid repeated downloads.
-    choices:
-    - true
-    - false
-    default: 'no'
-  use_model_from_host:
-    desc: Run the model download script on the host machine and mount the model files into the Docker container to avoid repeated downloads.
-    choices:
-    - true
-    - false
-    default: 'no'
-  adr.compiler.tags:
-    desc: Compiler for loadgen and any C/C++ part of implementation
-  adr.inference-src-loadgen.env.MLC_GIT_URL:
-    default: ''
-    desc: Git URL for MLPerf inference sources to build LoadGen (to enable non-reference implementations)
-  adr.inference-src.env.MLC_GIT_URL:
-    default: ''
-    desc: Git URL for MLPerf inference sources to run benchmarks (to enable non-reference implementations)
-  adr.mlperf-inference-implementation.max_batchsize:
-    desc: Maximum batchsize to be used
-  adr.mlperf-inference-implementation.num_threads:
-    desc: Number of threads (reference & C++ implementation only)
-  adr.python.name:
-    desc: Python virtual environment name (optional)
-  adr.python.version:
-    desc: Force Python version (must have all system deps)
-  adr.python.version_min:
-    default: '3.8'
-    desc: Minimal Python version
-  power:
-    choices:
-    - 'yes'
-    - 'no'
-    default: 'no'
-    desc: Measure power
-    sort: 5000
-  adr.mlperf-power-client.power_server:
-    default: 192.168.0.15
-    desc: MLPerf Power server IP address
-    sort: 5005
-  adr.mlperf-power-client.port:
-    default: 4950
-    desc: MLPerf Power server port
-    sort: 5010
-  clean:
-    boolean: true
-    default: false
-    desc: Clean run
-  compliance:
-    choices:
-    - 'yes'
-    - 'no'
-    default: 'no'
-    desc: Whether to run compliance tests (applicable only for closed division)
-  hw_name:
-    desc: MLPerf hardware name (for example "gcp.c3_standard_8", "nvidia_orin", "lenovo_p14s_gen_4_windows_11", "macbook_pro_m1_2", "thundercomm_rb6" ...)
-  multistream_target_latency:
-    desc: Set MultiStream target latency
-  offline_target_qps:
-    desc: Set LoadGen Offline target QPS
-  quiet:
-    boolean: true
-    default: true
-    desc: Quiet run (select default values for all questions)
-  server_target_qps:
-    desc: Set Server target QPS
-  singlestream_target_latency:
-    desc: Set SingleStream target latency
-  target_latency:
-    desc: Set Target latency
-  target_qps:
-    desc: Set LoadGen target QPS
-  repro:
-    desc: Record input/output/state/info files to make it easier to reproduce results
-    boolean: true
-    default: false
-  time:
-    desc: Print script execution time at the end of the run
-    boolean: true
-    default: true
-  debug:
-    desc: Debug this script
-    boolean: true
-    default: false
+
+# Docker / container
+docker:
+  pass_docker_to_script: true

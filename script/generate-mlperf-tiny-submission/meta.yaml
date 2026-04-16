@@ -1,18 +1,10 @@
 alias: generate-mlperf-tiny-submission
+uid: 04289b9fc07b42b6
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: TinyML automation
-deps:
-- names:
-  - python
-  - python3
-  tags: get,python3
-- tags: get,sut,system-description
-post_deps:
-- enable_if_env:
-    MLC_MLPERF_RUN_STYLE:
-    - valid
 tags:
 - generate
 - submission
@@ -23,4 +15,18 @@ tags:
 - tiny-submission
 - mlperf-tiny-submission
 - mlcommons-tiny-submission
-uid: 04289b9fc07b42b6
+
+# Cache
+cache: false
+
+# Dependencies
+deps:
+- names:
+  - python
+  - python3
+  tags: get,python3
+- tags: get,sut,system-description
+post_deps:
+- enable_if_env:
+    MLC_MLPERF_RUN_STYLE:
+    - valid

@@ -1,9 +1,26 @@
 alias: get-mlperf-logging
+uid: c9830dc6f87b4dc6
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLPerf Inference
+tags:
+- get
+- mlperf
+- logging
+- mlperf-logging
+
+# Cache
+cache: true
+
+# Environment
 default_env: {}
+new_env_keys:
+- MLC_MLPERF_LOGGING_*
+- +PYTHONPATH
+
+# Dependencies
 deps:
 - tags: detect,os
 - names:
@@ -13,12 +30,3 @@ deps:
 - env:
     MLC_GIT_CHECKOUT: master
   tags: get,git,repo,_repo.https://github.com/mlcommons/logging
-new_env_keys:
-- MLC_MLPERF_LOGGING_*
-- +PYTHONPATH
-tags:
-- get
-- mlperf
-- logging
-- mlperf-logging
-uid: c9830dc6f87b4dc6

@@ -1,23 +1,30 @@
 alias: benchmark-program-geekbench
+uid: eec4b864cb654974
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: Benchmarking
+tags:
+- benchmark
+- geekbench
+- benchmark-geekbench
+- benchmark-program-geekbench
+
+# Cache
 cache: false
+
+# Environment
 default_env:
   MLC_GEEKBENCH_WORKLOAD: ''
   MLC_GEEKBENCH_NUM_RUNS: '1'
   MLC_GEEKBENCH_CORE_PINNING: 'no'
   MLC_GEEKBENCH_PINNED_CORE: '0'
   MLC_GEEKBENCH_EXTRA_ARGS: ''
-deps:
-- tags: detect,os
-- tags: detect,cpu
-- names:
-  - get-geekbench
-  tags: get,geekbench
-- names:
-  - get-platform-details
-  tags: get,platform,details
+new_env_keys:
+- MLC_GEEKBENCH_*
+
+# Input mapping
 input_mapping:
   core_pinning: MLC_GEEKBENCH_CORE_PINNING
   cpu_workers: MLC_GEEKBENCH_CPU_WORKERS
@@ -41,18 +48,19 @@ input_mapping:
   workload: MLC_GEEKBENCH_WORKLOAD
   workload_gap: MLC_GEEKBENCH_WORKLOAD_GAP
   workload_ids: MLC_GEEKBENCH_WORKLOAD_IDS
-new_env_keys:
-- MLC_GEEKBENCH_*
-tags:
-- benchmark
-- geekbench
-- benchmark-geekbench
-- benchmark-program-geekbench
-uid: eec4b864cb654974
-tests:
-  run_inputs:
-  - variations_list:
-    - upload
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: detect,cpu
+- names:
+  - get-geekbench
+  tags: get,geekbench
+- names:
+  - get-platform-details
+  tags: get,platform,details
+
+# Variations
 variations:
   all-cores:
     default: true
@@ -133,6 +141,8 @@ variations:
   workload-list:
     env:
       MLC_GEEKBENCH_WORKLOAD_LIST: 'yes'
+
+# Versions
 versions:
   5.5.1:
     adr:
@@ -150,3 +160,9 @@ versions:
     adr:
       get-geekbench:
         tags: _version.6.6.0
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - upload

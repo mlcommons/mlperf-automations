@@ -2,16 +2,26 @@ alias: run-docker-container
 uid: 1e0c884107514b46
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
+category: Docker automation
 tags:
 - run
 - docker
 - container
+
+# Cache
 cache: false
-category: Docker automation
+
+# Environment
 default_env:
   MLC_DOCKER_REUSE_EXISTING_CONTAINER: 'no'
   MLC_DOCKER_PRIVILEGED_MODE: 'no'
   MLC_PODMAN_MAP_USER_ID: 'no'
+new_env_keys:
+- MLC_DOCKER_CONTAINER_ID
+
+# Input mapping
 input_mapping:
   all_gpus: MLC_DOCKER_ADD_ALL_GPUS
   base: MLC_DOCKER_IMAGE_BASE
@@ -57,8 +67,8 @@ input_mapping:
   use_google_dns: MLC_DOCKER_USE_GOOGLE_DNS
   use_host_group_id: MLC_DOCKER_USE_HOST_GROUP_ID
   use_host_user_id: MLC_DOCKER_USE_HOST_USER_ID
-new_env_keys:
-- MLC_DOCKER_CONTAINER_ID
+
+# Dependencies
 deps:
 - tags: get,docker
 prehook_deps:

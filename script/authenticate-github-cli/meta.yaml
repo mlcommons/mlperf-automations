@@ -1,16 +1,24 @@
 alias: authenticate-github-cli
+uid: 7b57673ac14a4337
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
-input_mapping:
-  with-token: MLC_GH_AUTH_TOKEN
-  with_token: MLC_GH_AUTH_TOKEN
+
+# Metadata
 tags:
 - auth
 - authenticate
 - github
 - gh
 - cli
-uid: 7b57673ac14a4337
+
+# Cache
+cache: true
+
+# Input mapping
+input_mapping:
+  with-token: MLC_GH_AUTH_TOKEN
+  with_token: MLC_GH_AUTH_TOKEN
+
+# Dependencies
 deps:
 - tags: get,gh,cli

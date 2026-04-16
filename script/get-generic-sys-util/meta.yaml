@@ -1,57 +1,40 @@
 alias: get-generic-sys-util
+uid: bb0393afa8404a11
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Detection or installation of tools and artifacts
-default_env:
-  MLC_CLEAN_DIRS: bin
-  MLC_SUDO: sudo
-deps:
-- tags: detect,os
-- tags: detect,sudo
-env:
-  MLC_GENERIC_SYS_UTIL_INSTALL_NEEDED: 'no'
-  MLC_SYS_UTIL_VERSION_CMD: ''
-input_mapping:
-  fail_safe: MLC_TMP_FAIL_SAFE
-  ignore_missing: MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE
-new_env_keys:
-- +PATH
 tags:
 - get
 - sys-util
 - generic
 - generic-sys-util
-tests:
-  run_inputs:
-  - docker: 'yes'
-    docker_os: rhel
-    docker_os_version: '9'
-    env:
-      MLC_TMP_FAIL_SAFE: 'yes'
-    ignore_missing: 'yes'
-    test-all-variations: 'yes'
-  - docker: 'yes'
-    docker_os: ubuntu
-    docker_os_version: '20.04'
-    fail_safe: 'yes'
-    ignore_missing: 'yes'
-    test-all-variations: 'yes'
-  - docker: 'yes'
-    docker_os: ubuntu
-    docker_os_version: '22.04'
-    fail_safe: 'yes'
-    ignore_missing: 'yes'
-    test-all-variations: 'yes'
-    docker_prune: 'yes'
-  - docker: 'yes'
-    docker_os: ubuntu
-    docker_os_version: '24.04'
-    fail_safe: 'yes'
-    ignore_missing: 'yes'
-    test-all-variations: 'yes'
-    docker_prune: 'yes'
-uid: bb0393afa8404a11
+
+# Cache
+cache: true
+
+# Environment
+default_env:
+  MLC_CLEAN_DIRS: bin
+  MLC_SUDO: sudo
+env:
+  MLC_GENERIC_SYS_UTIL_INSTALL_NEEDED: 'no'
+  MLC_SYS_UTIL_VERSION_CMD: ''
+new_env_keys:
+- +PATH
+
+# Input mapping
+input_mapping:
+  fail_safe: MLC_TMP_FAIL_SAFE
+  ignore_missing: MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: detect,sudo
+
+# Variations
 variations:
   detect:
     default: true
@@ -973,3 +956,34 @@ variations:
         dnf: zlib-devel
         yum: zlib-devel
         zypper: zlib-devel
+
+# Tests
+tests:
+  run_inputs:
+  - docker: 'yes'
+    docker_os: rhel
+    docker_os_version: '9'
+    env:
+      MLC_TMP_FAIL_SAFE: 'yes'
+    ignore_missing: 'yes'
+    test-all-variations: 'yes'
+  - docker: 'yes'
+    docker_os: ubuntu
+    docker_os_version: '20.04'
+    fail_safe: 'yes'
+    ignore_missing: 'yes'
+    test-all-variations: 'yes'
+  - docker: 'yes'
+    docker_os: ubuntu
+    docker_os_version: '22.04'
+    fail_safe: 'yes'
+    ignore_missing: 'yes'
+    test-all-variations: 'yes'
+    docker_prune: 'yes'
+  - docker: 'yes'
+    docker_os: ubuntu
+    docker_os_version: '24.04'
+    fail_safe: 'yes'
+    ignore_missing: 'yes'
+    test-all-variations: 'yes'
+    docker_prune: 'yes'

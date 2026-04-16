@@ -1,8 +1,29 @@
 alias: install-numactl-from-src
+uid: 4f355ae8ca1948b2
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
+name: Build numactl from sources
 category: Detection or installation of tools and artifacts
+tags:
+- install
+- src
+- from.src
+- numactl
+- src-numactl
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_GIT_URL: https://github.com/numactl/numactl
+new_env_keys:
+- MLC_NUMACTL_*
+- +PATH
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -21,20 +42,8 @@ deps:
     - MLC_GIT_CHECKOUT_SHA
     _tag.:
     - MLC_GIT_CHECKOUT_TAG
-env:
-  MLC_GIT_URL: https://github.com/numactl/numactl
-name: Build numactl from sources
-new_env_keys:
-- MLC_NUMACTL_*
-- +PATH
-sort: 1000
-tags:
-- install
-- src
-- from.src
-- numactl
-- src-numactl
-uid: 4f355ae8ca1948b2
+
+# Variations
 variations:
   repo.#:
     env:
@@ -57,5 +66,8 @@ variations:
         tags: _no-recurse-submodules,_full-history
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
+
+# Output / debugging
 warnings:
 - This MLC script will need sudo to install numactl!
+sort: 1000

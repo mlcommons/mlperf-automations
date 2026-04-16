@@ -1,24 +1,22 @@
 alias: get-mlperf-multi-node-system-info
+uid: 1e4bc0644f554bc2
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: Platform information
-deps:
-- tags: detect,os
-- names:
-  - python
-  - python3
-  tags: get,python
-prehook_deps:
-- tags: get,mlperf,single-node,system-info
-  names:
-  - mlperf-single-node-system-info
-  skip_if_env:
-    MLC_EXCLUDE_CURRENT_NODE:
-    - 'True'
-  env:
-    MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH: <<<MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH>>>
-    MLC_SINGLE_NODE_SYSTEM_INFO_FILE_NAME: mlperf-system-info-single-node-current.json
+tags:
+- get-mlperf-multi-node-system-info
+
+# Cache
+cache: false
+
+# Environment
+new_env_keys:
+- MLC_REMOTE_RUN_SSH_ID_COUNT
+- MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH
+
+# Input mapping
 input_mapping:
   category: MLC_MLPERF_SUBMISSION_SYSTEM_TYPE
   cooling: MLC_MLPERF_COOLING
@@ -52,14 +50,26 @@ input_mapping:
   system_node_ensemble_total: MLC_MLPERF_SYSTEM_NODE_ENSEMBLE_TOTAL
   system_size: MLC_MLPERF_SYSTEM_SIZE
   system_type_detail: MLC_MLPERF_SUBMISSION_SYSTEM_TYPE_DETAIL
-tags:
-- get-mlperf-multi-node-system-info
-new_env_keys:
-- MLC_REMOTE_RUN_SSH_ID_COUNT
-- MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH
-print_env_at_the_end:
-  MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH: Path to the generated multi-node system info file.
-uid: 1e4bc0644f554bc2
+
+# Dependencies
+deps:
+- tags: detect,os
+- names:
+  - python
+  - python3
+  tags: get,python
+prehook_deps:
+- tags: get,mlperf,single-node,system-info
+  names:
+  - mlperf-single-node-system-info
+  skip_if_env:
+    MLC_EXCLUDE_CURRENT_NODE:
+    - 'True'
+  env:
+    MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH: <<<MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH>>>
+    MLC_SINGLE_NODE_SYSTEM_INFO_FILE_NAME: mlperf-system-info-single-node-current.json
+
+# Variations
 variations:
   cuda:
     adr:
@@ -70,3 +80,7 @@ variations:
   exclude_current_node:
     env:
       MLC_EXCLUDE_CURRENT_NODE: 'True'
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH: Path to the generated multi-node system info file.

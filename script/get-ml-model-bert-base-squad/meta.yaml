@@ -1,8 +1,24 @@
 alias: get-ml-model-bert-base-squad
+uid: b3b10b452ce24c5f
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
+tags:
+- get
+- ml-model
+- raw
+- bert
+- bert-base
+- bert-squad
+- language
+- language-processing
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_ML_MODEL: BERT
   MLC_ML_MODEL_DATASET: squad-1.1
@@ -11,8 +27,8 @@ env:
   MLC_TMP_ML_MODEL_REQUIRE_DOWNLOAD: 'no'
 new_env_keys:
 - MLC_ML_MODEL*
-post_deps:
-- tags: get,bert,squad,vocab
+
+# Dependencies
 prehook_deps:
 - enable_if_env:
     MLC_TMP_ML_MODEL_REQUIRE_DOWNLOAD: 'yes'
@@ -24,19 +40,10 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_PACKAGE_URL
-print_env_at_the_end:
-  MLC_ML_MODEL_BERT_VOCAB_FILE_WITH_PATH: Path to the BERT vocab file
-  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
-tags:
-- get
-- ml-model
-- raw
-- bert
-- bert-base
-- bert-squad
-- language
-- language-processing
-uid: b3b10b452ce24c5f
+post_deps:
+- tags: get,bert,squad,vocab
+
+# Variations
 variations:
   deepsparse:
     env:
@@ -66,3 +73,8 @@ variations:
       MLC_ML_MODEL_F1: '87.89'
       MLC_ML_MODEL_FILE: model.onnx
       MLC_PRUNING_PERCENTAGE: '95'
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_BERT_VOCAB_FILE_WITH_PATH: Path to the BERT vocab file
+  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model

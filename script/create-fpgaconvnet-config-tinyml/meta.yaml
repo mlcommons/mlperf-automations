@@ -1,27 +1,39 @@
 alias: create-fpgaconvnet-config-tinyml
+uid: f6cdad166cfa47bc
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: TinyML automation
+tags:
+- create
+- config
+- fpgaconvnet
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_TINY_FPGACONVNET*
+new_state_keys: []
+
+# Input mapping
+input_mapping: {}
+input_description: {}
+
+# Dependencies
 deps:
 - tags: get,python3
 - names:
   - ml-model
   tags: get,ml-model,tiny
 - tags: get,git,repo,_repo.https://github.com/mlcommons/submissions_tiny_v1.1
-input_description: {}
-input_mapping: {}
-new_env_keys:
-- MLC_TINY_FPGACONVNET*
-new_state_keys: []
-post_deps: []
-posthook_deps: []
 prehook_deps: []
-tags:
-- create
-- config
-- fpgaconvnet
-uid: f6cdad166cfa47bc
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations:
   ic:
     add_deps:
@@ -37,4 +49,6 @@ variations:
   zc706,ic:
     env:
       MLC_TINY_NETWORK_NAME: zc706-resnet
+
+# Versions
 versions: {}

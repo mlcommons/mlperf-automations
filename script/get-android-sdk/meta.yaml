@@ -1,8 +1,20 @@
 alias: get-android-sdk
+uid: 8c5b4b83d49c441a
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Detection or installation of tools and artifacts
+tags:
+- get
+- android
+- sdk
+- android-sdk
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_ANDROID_BUILD_TOOLS_VERSION: 29.0.3
   MLC_ANDROID_CMAKE_VERSION: 3.6.4111459
@@ -10,23 +22,21 @@ default_env:
   MLC_ANDROID_CMDLINE_TOOLS_VERSION: '9123335'
   MLC_ANDROID_NDK_VERSION: 21.3.6528147
   MLC_ANDROID_VERSION: '30'
-deps:
-- tags: detect,os
-- tags: get,java
+new_env_keys:
+- MLC_ANDROID_HOME
+- ANDROID_HOME
+- ANDROID_NDK_HOME
+- +PATH
+
+# Input mapping
 input_mapping:
   android_cmake_version: MLC_ANDROID_CMAKE_VERSION
   android_ndk_version: MLC_ANDROID_NDK_VERSION
   android_version: MLC_ANDROID_VERSION
   build_tools_version: MLC_ANDROID_BUILD_TOOLS_VERSION
   cmdline_tools_version: MLC_ANDROID_CMDLINE_TOOLS_VERSION
-new_env_keys:
-- MLC_ANDROID_HOME
-- ANDROID_HOME
-- ANDROID_NDK_HOME
-- +PATH
-tags:
-- get
-- android
-- sdk
-- android-sdk
-uid: 8c5b4b83d49c441a
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: get,java

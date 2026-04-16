@@ -2,32 +2,42 @@ alias: build-apptainer-image
 uid: ec9e72fb6df8c7a6
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: Container automation
 tags:
 - build
 - apptainer
 - image
 - apptainer-image
+
+# Cache
+cache: false
+
+# Environment
 default_env:
   MLC_APPTAINER_IMAGE_REPO: local
   MLC_APPTAINER_IMAGE_TAG: latest
+new_env_keys:
+- MLC_APPTAINER_*
+
+# Input mapping
 input_mapping:
   def_file: MLC_APPTAINERFILE_WITH_PATH
+  docker_os: MLC_APPTAINER_OS
+  docker_os_version: MLC_APPTAINER_OS_VERSION
+  fakeroot: MLC_APPTAINER_FAKEROOT
+  force: MLC_APPTAINER_BUILD_FORCE
   image_name: MLC_APPTAINER_IMAGE_NAME
   image_repo: MLC_APPTAINER_IMAGE_REPO
   image_tag: MLC_APPTAINER_IMAGE_TAG
-  fakeroot: MLC_APPTAINER_FAKEROOT
-  sandbox: MLC_APPTAINER_BUILD_SANDBOX
-  force: MLC_APPTAINER_BUILD_FORCE
+  notest: MLC_APPTAINER_BUILD_NOTEST
   os: MLC_APPTAINER_OS
   os_version: MLC_APPTAINER_OS_VERSION
-  docker_os: MLC_APPTAINER_OS
-  docker_os_version: MLC_APPTAINER_OS_VERSION
+  sandbox: MLC_APPTAINER_BUILD_SANDBOX
   script_tags: MLC_APPTAINER_RUN_SCRIPT_TAGS
-  notest: MLC_APPTAINER_BUILD_NOTEST
-new_env_keys:
-- MLC_APPTAINER_*
+
+# Dependencies
 deps:
 - tags: get-apptainer
 prehook_deps:
@@ -36,6 +46,7 @@ prehook_deps:
     - 'yes'
   tags: build,apptainerfile
 
+# Tests
 tests:
   run_inputs:
   - env:

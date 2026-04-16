@@ -1,18 +1,24 @@
 alias: get-ml-model-bevformer
+uid: 438a053f666443bd
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 tags:
 - get
 - ml-model
 - bevformer
 - get-ml-model-bevformer
-uid: 438a053f666443bd
+
+# Cache
+cache: true
+
+# Environment
 new_env_keys:
 - MLC_ML_MODEL_BEVFORMER_PATH
 - MLC_ML_MODEL_FILE_WITH_PATH
-print_env_at_the_end:
-  MLC_ML_MODEL_BEVFORMER_PATH: BevFormer checkpoint path
+
+# Variations
 variations:
   mlc:
     group: download-src
@@ -75,6 +81,12 @@ variations:
   dry-run,rclone:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_BEVFORMER_PATH: BevFormer checkpoint path
+
+# Tests
 tests:
   needs_pat: true
   run_inputs:
