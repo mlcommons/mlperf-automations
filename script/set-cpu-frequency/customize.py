@@ -13,6 +13,11 @@ def preprocess(i):
     if shutil.which('cpupower') is None:
         return {'return': 1, 'error': "'cpupower' utility not found. Please install it (e.g., 'sudo apt install linux-tools-common linux-tools-generic' on Ubuntu, 'sudo dnf install kernel-tools' on Fedora/RHEL)."}
 
+    # Check that cpufreq is available on this system
+    driver_file = '/sys/devices/system/cpu/cpu0/cpufreq/scaling_driver'
+    if not os.path.exists(driver_file):
+        return {'return': 1, 'error': f"cpufreq not available on this system ({driver_file} does not exist). This can happen in VMs, containers, or if the kernel lacks cpufreq support."}
+
     freq = env.get('MLC_TARGET_FREQ', '').strip()
     if freq != '':
         try:
