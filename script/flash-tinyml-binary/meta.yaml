@@ -1,9 +1,28 @@
 alias: flash-tinyml-binary
+uid: 98913babb43f4fcb
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: TinyML automation
-default_version: r1.0
+tags:
+- flash
+- tiny
+- mlperf
+- mlcommons
+
+# Cache
+cache: false
+
+# Environment
+local_env_keys:
+- MLC_*
+
+# Input mapping
+input_mapping:
+  build_dir: MLC_TINY_BUILD_DIR
+
+# Dependencies
 deps:
 - tags: detect,os
 - names:
@@ -17,16 +36,8 @@ deps:
     MLC_TINY_BUILD_DIR:
     - 'on'
   tags: reproduce,tiny,mlperf
-input_mapping:
-  build_dir: MLC_TINY_BUILD_DIR
-local_env_keys:
-- MLC_*
-tags:
-- flash
-- tiny
-- mlperf
-- mlcommons
-uid: 98913babb43f4fcb
+
+# Variations
 variations:
   NRF: {}
   NUCLEO: {}
@@ -36,3 +47,6 @@ variations:
   kws: {}
   native: {}
   vww: {}
+
+# Versions
+default_version: r1.0

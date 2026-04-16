@@ -1,22 +1,32 @@
 alias: get-dataset-criteo
+uid: 194a47d908714897
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
-default_env:
-  MLC_BACKUP_ZIPS: 'no'
-env:
-  MLC_DATASET: terabyte
-input_mapping:
-  criteo_path: MLC_CRITEO_PATH
-new_env_keys:
-- MLC_DATASET*
 tags:
 - get
 - dataset
 - criteo
 - original
-uid: 194a47d908714897
+
+# Cache
+cache: true
+
+# Environment
+default_env:
+  MLC_BACKUP_ZIPS: 'no'
+env:
+  MLC_DATASET: terabyte
+new_env_keys:
+- MLC_DATASET*
+
+# Input mapping
+input_mapping:
+  criteo_path: MLC_CRITEO_PATH
+
+# Variations
 variations:
   backup:
     env:

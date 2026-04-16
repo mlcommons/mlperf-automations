@@ -2,22 +2,34 @@ alias: get-sys-utils-mlc
 uid: bc90993277e84b8e
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Detection or installation of tools and artifacts
-deps:
-- tags: detect,os
-env:
-  MLC_CLEAN_DIRS: bin
-  MLC_PACKAGE_WIN_URL: https://zenodo.org/records/13868077/files/mlc-artifact-os-windows-32.zip?download=1
-  MLC_SUDO: sudo
-input_mapping:
-  skip: MLC_SKIP_SYS_UTILS
-new_env_keys:
-- +PATH
 tags:
 - get
 - sys-utils-cm
 - sys-utils-mlc
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_CLEAN_DIRS: bin
+  MLC_PACKAGE_WIN_URL: https://zenodo.org/records/13868077/files/mlc-artifact-os-windows-32.zip?download=1
+  MLC_SUDO: sudo
+new_env_keys:
+- +PATH
+
+# Input mapping
+input_mapping:
+  skip: MLC_SKIP_SYS_UTILS
+
+# Dependencies
+deps:
+- tags: detect,os
+
+# Variations
 variations:
   skip_python_deps:
     env:

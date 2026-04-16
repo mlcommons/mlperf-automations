@@ -1,29 +1,41 @@
 alias: get-aocl
+uid: a65d3088f57d413d
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: 'true'
+
+# Metadata
 category: Compiler automation
-default_version: '4.0'
-deps:
-- tags: get,generic,sys-util,_libmpfr-dev
-- tags: get,generic-python-lib,_scons
-- force_env_keys:
-  - MLC_GIT_CHECKOUT
-  tags: get,git,_repo.https://github.com/amd/aocl-libm-ose
-new_env_keys:
-- MLC_AOCL_BUILD_PATH
-- MLC_AOCL_SRC_PATH
-- MLC_AOCL_LIB_PATH
-- +LD_LIBRARY_PATH
-- +LIBRARY_PATH
 tags:
 - get
 - lib
 - aocl
 - amd-optimized
 - amd
-uid: a65d3088f57d413d
+
+# Cache
+cache: 'true'
+
+# Environment
+new_env_keys:
+- MLC_AOCL_BUILD_PATH
+- MLC_AOCL_SRC_PATH
+- MLC_AOCL_LIB_PATH
+- +LD_LIBRARY_PATH
+- +LIBRARY_PATH
+
+# Dependencies
+deps:
+- tags: get,generic,sys-util,_libmpfr-dev
+- tags: get,generic-python-lib,_scons
+- force_env_keys:
+  - MLC_GIT_CHECKOUT
+  tags: get,git,_repo.https://github.com/amd/aocl-libm-ose
+
+# Variations
 variations: {}
+
+# Versions
+default_version: '4.0'
 versions:
   '4.0':
     env:

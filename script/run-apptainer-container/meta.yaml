@@ -2,54 +2,64 @@ alias: run-apptainer-container
 uid: d3bdc61a712c4703
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
+category: Container automation
 tags:
 - run
 - apptainer
 - container
+
+# Cache
 cache: false
-category: Container automation
+
+# Environment
 default_env:
   MLC_APPTAINER_WRITABLE_TMPFS: 'yes'
   MLC_APPTAINER_CLEANENV: 'yes'
   MLC_APPTAINER_OS: ubuntu
   MLC_APPTAINER_OS_VERSION: '24.04'
-input_mapping:
-  image: MLC_APPTAINER_IMAGE
-  image_url: MLC_APPTAINER_IMAGE_URL
-  docker_image: MLC_APPTAINER_FROM_DOCKER
-  sandbox: MLC_APPTAINER_SANDBOX
-  sandbox_path: MLC_APPTAINER_SANDBOX_PATH
-  writable: MLC_APPTAINER_WRITABLE
-  writable_tmpfs: MLC_APPTAINER_WRITABLE_TMPFS
-  cleanenv: MLC_APPTAINER_CLEANENV
-  nv: MLC_APPTAINER_NV
-  rocm: MLC_APPTAINER_ROCM
-  bind: MLC_APPTAINER_BIND_MOUNTS
-  overlay: MLC_APPTAINER_OVERLAY
-  extra_args: MLC_APPTAINER_EXTRA_ARGS
-  pre_run_cmds: MLC_APPTAINER_PRE_RUN_COMMANDS
-  post_run_cmds: MLC_APPTAINER_POST_RUN_COMMANDS
-  run_cmd: MLC_APPTAINER_RUN_CMD
-  run_cmd_extra: MLC_APPTAINER_RUN_CMD_EXTRA
-  script_tags: MLC_APPTAINER_RUN_SCRIPT_TAGS
-  fakeroot: MLC_APPTAINER_FAKEROOT
-  no_home: MLC_APPTAINER_NO_HOME
-  contain: MLC_APPTAINER_CONTAIN
-  containall: MLC_APPTAINER_CONTAINALL
-  home: MLC_APPTAINER_HOME
-  pwd: MLC_APPTAINER_PWD
-  env_vars: MLC_APPTAINER_ENV_VARS
-  save_script: MLC_APPTAINER_SAVE_SCRIPT
-  os: MLC_APPTAINER_OS
-  os_version: MLC_APPTAINER_OS_VERSION
-  docker_os: MLC_APPTAINER_OS
-  docker_os_version: MLC_APPTAINER_OS_VERSION
-  image_name: MLC_APPTAINER_IMAGE_NAME
-  image_tag: MLC_APPTAINER_IMAGE_TAG
-  recreate: MLC_APPTAINER_IMAGE_RECREATE
-  rebuild: MLC_APPTAINER_IMAGE_RECREATE
 new_env_keys:
 - MLC_APPTAINER_*
+
+# Input mapping
+input_mapping:
+  bind: MLC_APPTAINER_BIND_MOUNTS
+  cleanenv: MLC_APPTAINER_CLEANENV
+  contain: MLC_APPTAINER_CONTAIN
+  containall: MLC_APPTAINER_CONTAINALL
+  docker_image: MLC_APPTAINER_FROM_DOCKER
+  docker_os: MLC_APPTAINER_OS
+  docker_os_version: MLC_APPTAINER_OS_VERSION
+  env_vars: MLC_APPTAINER_ENV_VARS
+  extra_args: MLC_APPTAINER_EXTRA_ARGS
+  fakeroot: MLC_APPTAINER_FAKEROOT
+  home: MLC_APPTAINER_HOME
+  image: MLC_APPTAINER_IMAGE
+  image_name: MLC_APPTAINER_IMAGE_NAME
+  image_tag: MLC_APPTAINER_IMAGE_TAG
+  image_url: MLC_APPTAINER_IMAGE_URL
+  no_home: MLC_APPTAINER_NO_HOME
+  nv: MLC_APPTAINER_NV
+  os: MLC_APPTAINER_OS
+  os_version: MLC_APPTAINER_OS_VERSION
+  overlay: MLC_APPTAINER_OVERLAY
+  post_run_cmds: MLC_APPTAINER_POST_RUN_COMMANDS
+  pre_run_cmds: MLC_APPTAINER_PRE_RUN_COMMANDS
+  pwd: MLC_APPTAINER_PWD
+  rebuild: MLC_APPTAINER_IMAGE_RECREATE
+  recreate: MLC_APPTAINER_IMAGE_RECREATE
+  rocm: MLC_APPTAINER_ROCM
+  run_cmd: MLC_APPTAINER_RUN_CMD
+  run_cmd_extra: MLC_APPTAINER_RUN_CMD_EXTRA
+  sandbox: MLC_APPTAINER_SANDBOX
+  sandbox_path: MLC_APPTAINER_SANDBOX_PATH
+  save_script: MLC_APPTAINER_SAVE_SCRIPT
+  script_tags: MLC_APPTAINER_RUN_SCRIPT_TAGS
+  writable: MLC_APPTAINER_WRITABLE
+  writable_tmpfs: MLC_APPTAINER_WRITABLE_TMPFS
+
+# Dependencies
 deps:
 - tags: get-apptainer
 prehook_deps:
@@ -62,6 +72,7 @@ prehook_deps:
     - 'yes'
   tags: build,apptainer,image
 
+# Tests
 tests:
   run_inputs:
   - env:

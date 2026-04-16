@@ -1,30 +1,38 @@
 alias: install-cuda-prebuilt
+uid: 14eadcd42ba340c3
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: CUDA automation
+tags:
+- install
+- prebuilt
+- cuda
+- prebuilt-cuda
+- install-prebuilt-cuda
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_SUDO: sudo
-default_version: 11.8.0
-deps:
-- tags: detect,os
-- tags: detect,sudo
-docker:
-  run: true
+new_env_keys:
+- MLC_CUDA_*
+- MLC_NVCC_*
+
+# Input mapping
 input_mapping:
   install_prefix: MLC_CUDA_INSTALL_PREFIX
   local_run_file_path: CUDA_RUN_FILE_LOCAL_PATH
   override-driver-check: MLC_CUDA_DRIVER_INSTALL_OVERRIDE
   skip_sudo: CUDA_SKIP_SUDO
-sudo_install: True
-new_env_keys:
-- MLC_CUDA_*
-- MLC_NVCC_*
-post_deps:
-- skip_if_env:
-    MLC_REQUIRE_INSTALL:
-    - 'yes'
-  tags: get,cuda
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: detect,sudo
 prehook_deps:
 - env:
     MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_CUDA_RUN_FILE_PATH
@@ -37,13 +45,13 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _url.:
     - WGET_URL
-tags:
-- install
-- prebuilt
-- cuda
-- prebuilt-cuda
-- install-prebuilt-cuda
-uid: 14eadcd42ba340c3
+post_deps:
+- skip_if_env:
+    MLC_REQUIRE_INSTALL:
+    - 'yes'
+  tags: get,cuda
+
+# Variations
 variations:
   driver:
     env:
@@ -54,6 +62,9 @@ variations:
     env:
       MLC_CUDA_INSTALL_DRIVER: 'no'
     group: install-driver
+
+# Versions
+default_version: 11.8.0
 versions:
   11.7.0:
     env:
@@ -100,3 +111,10 @@ versions:
   13.1.1:
     env:
       MLC_CUDA_LINUX_FILENAME: cuda_13.1.1_590.48.01_linux.run
+
+# Docker / container
+docker:
+  run: true
+
+# Output / debugging
+sudo_install: true

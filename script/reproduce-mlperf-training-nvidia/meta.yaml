@@ -1,8 +1,9 @@
 alias: reproduce-mlperf-training-nvidia
 uid: f183628f292341e2
-cache: false
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: MLPerf Training
 tags:
 - reproduce
@@ -12,12 +13,21 @@ tags:
 - training
 - nvidia-training
 - nvidia
-input_mapping:
-  results_dir: MLC_MLPERF_RESULTS_DIR
-  system_conf_name: MLC_MLPERF_NVIDIA_TRAINING_SYSTEM_CONF_NAME
+
+# Cache
+cache: false
+
+# Environment
 new_state_keys:
 - mlperf-training-implementation
 - MLC_SUT_*
+
+# Input mapping
+input_mapping:
+  results_dir: MLC_MLPERF_RESULTS_DIR
+  system_conf_name: MLC_MLPERF_NVIDIA_TRAINING_SYSTEM_CONF_NAME
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -29,6 +39,8 @@ deps:
   - cuda
   tags: get,cuda
   version: 11.7.0
+
+# Variations
 variations:
   resnet:
     group: benchmark
@@ -42,6 +54,8 @@ variations:
     - tags: get,nvidia,training,code
       names:
       - nvidia-training-code
+
+# Versions
 versions:
   r2.1:
     adr:

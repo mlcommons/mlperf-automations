@@ -1,22 +1,24 @@
 alias: get-ml-model-deepseek-r1
+uid: 2bcb61611b1f4af3
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
-new_env_keys:
-- MLC_ML_MODEL_DEEPSEEK_R1_PATH
-- MLC_ML_MODEL_FILE_WITH_PATH
-print_env_at_the_end:
-  MLC_ML_MODEL_DEEPSEEK_R1_PATH: DeepSeek-R1 checkpoint path
+
+# Metadata
 tags:
 - get
 - ml-model
 - deepseek-r1
 - get-ml-model-deepseek-r1
-tests:
-  run_inputs:
-  - variations_list:
-    - r2-downloader,mlc,dry-run
-uid: 2bcb61611b1f4af3
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_ML_MODEL_DEEPSEEK_R1_PATH
+- MLC_ML_MODEL_FILE_WITH_PATH
+
+# Variations
 variations:
   mlc:
     default: true
@@ -56,3 +58,13 @@ variations:
   r2-downloader,mlc:
     env:
       MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/deepseek-r1-0528.uri
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_DEEPSEEK_R1_PATH: DeepSeek-R1 checkpoint path
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - r2-downloader,mlc,dry-run

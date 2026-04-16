@@ -1,12 +1,25 @@
 alias: get-python3
+uid: d0b5dd74373f4a62
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Python automation
-clean_files: []
+tags:
+- get
+- python
+- python3
+- get-python
+- get-python3
+
+# Cache
+cache: true
 extra_cache_tags_from_env:
 - env: MLC_PYTHON_INSTALL_CACHE_TAGS
   prefix: python-
+clean_files: []
+
+# Environment
 new_env_keys:
 - MLC_PYTHON_*
 - +LD_LIBRARY_PATH
@@ -14,6 +27,8 @@ new_env_keys:
 - +PATH
 new_state_keys:
 - script_prefix
+
+# Dependencies
 prehook_deps:
 - enable_if_env:
     MLC_REQUIRE_INSTALL:
@@ -21,17 +36,8 @@ prehook_deps:
   inherit_variation_tags: true
   reuse_version: true
   tags: install,python,src
-tags:
-- get
-- python
-- python3
-- get-python
-- get-python3
-uid: d0b5dd74373f4a62
-tests:
-  run_inputs:
-  # Test 1: Detect system python3
-  - variations_list: []
+
+# Variations
 variations:
   conda.#:
     adr:
@@ -53,3 +59,8 @@ variations:
   shared: {}
   with-custom-ssl: {}
   with-ssl: {}
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list: []

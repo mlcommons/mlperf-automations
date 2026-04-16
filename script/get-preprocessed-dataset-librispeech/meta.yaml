@@ -1,11 +1,33 @@
 alias: get-preprocessed-dataset-librispeech
+uid: e9f62fc969d5483a
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
+tags:
+- get
+- dataset
+- speech-recognition
+- librispeech
+- preprocessed
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_DATASET: kits19
   MLC_DATASET_DTYPE: fp32
+new_env_keys:
+- MLC_DATASET_*
+
+# Input mapping
+input_mapping:
+  dir: MLC_DATASET_PREPROCESSED_PATH
+  threads: MLC_NUM_PREPROCESS_THREADS
+
+# Dependencies
 deps:
 - names:
   - python3
@@ -21,18 +43,8 @@ deps:
 - tags: get,generic-python-lib,_pandas
 - tags: get,generic-python-lib,_tqdm
 - tags: get,sys-util,generic,_sox
-input_mapping:
-  dir: MLC_DATASET_PREPROCESSED_PATH
-  threads: MLC_NUM_PREPROCESS_THREADS
-new_env_keys:
-- MLC_DATASET_*
-tags:
-- get
-- dataset
-- speech-recognition
-- librispeech
-- preprocessed
-uid: e9f62fc969d5483a
+
+# Variations
 variations:
   '1':
     adr:

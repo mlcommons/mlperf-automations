@@ -1,10 +1,25 @@
 alias: get-dataset-imagenet-aux
+uid: bb2c6dd8c8c64217
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
+tags:
+- get
+- aux
+- dataset-aux
+- image-classification
+- imagenet-aux
+
+# Cache
+cache: true
+
+# Environment
 new_env_keys:
 - MLC_DATASET_AUX_*
+
+# Dependencies
 prehook_deps:
 - env:
     MLC_DOWNLOAD_URL: <<<MLC_PACKAGE_URL>>>
@@ -19,13 +34,8 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_PACKAGE_URL
-tags:
-- get
-- aux
-- dataset-aux
-- image-classification
-- imagenet-aux
-uid: bb2c6dd8c8c64217
+
+# Variations
 variations:
   from.berkeleyvision:
     base:

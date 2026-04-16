@@ -1,14 +1,25 @@
 alias: get-ml-model-gpt-oss
+uid: 562047f9667c4c09
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
+tags:
+- get-ml-model-gpt-oss
+
+# Cache
 cache: true
+
+# Environment
 new_env_keys:
 - MLC_ML_MODEL_GPT_OSS_PATH
 - MLC_ML_MODEL_FILE_WITH_PATH
-print_env_at_the_end:
-  MLC_ML_MODEL_GPT_OSS_PATH: GPT OSS model path
+
+# Input mapping
 input_mapping:
   checkpoint: MLC_ML_MODEL_GPT_OSS_PATH
+
+# Dependencies
 prehook_deps:
 - enable_if_env:
     MLC_TMP_REQUIRE_DOWNLOAD:
@@ -23,13 +34,8 @@ prehook_deps:
   names:
   - hf-zoo
   tags: get,ml-model,huggingface,zoo,_clone-repo
-tags:
-- get-ml-model-gpt-oss
-tests:
-  run_inputs:
-  - variations_list:
-    - r2-downloader,mlc,dry-run
-uid: 562047f9667c4c09
+
+# Variations
 variations:
   hf:
     group: download-src
@@ -102,3 +108,13 @@ variations:
       gpt-oss-model-dae:
         env:
           MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/gpt-oss-model.uri
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_GPT_OSS_PATH: GPT OSS model path
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - r2-downloader,mlc,dry-run

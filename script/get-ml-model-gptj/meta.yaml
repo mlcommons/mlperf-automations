@@ -1,21 +1,37 @@
 alias: get-ml-model-gptj
+uid: a41166210f294fbf
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
-docker:
-  run: false
+tags:
+- get
+- raw
+- ml-model
+- gptj
+- gpt-j
+- large-language-model
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_ML_MODEL: GPTJ
   MLC_ML_MODEL_DATASET: cnndm
   MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'no'
+new_env_keys:
+- MLC_ML_MODEL_*
+- GPTJ_CHECKPOINT_PATH
+
+# Input mapping
 input_mapping:
   checkpoint: GPTJ_CHECKPOINT_PATH
   download_path: MLC_DOWNLOAD_PATH
   to: MLC_DOWNLOAD_PATH
-new_env_keys:
-- MLC_ML_MODEL_*
-- GPTJ_CHECKPOINT_PATH
+
+# Dependencies
 prehook_deps:
 - enable_if_env:
     MLC_TMP_REQUIRE_DOWNLOAD:
@@ -34,22 +50,8 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_DOWNLOAD_URL
-tests:
-  needs_pat: true
-  run_inputs:
-  - variations_list:
-    - fp32,pytorch,r2-downloader,dry-run
-    - fp32,pytorch,rclone,dry-run
-print_env_at_the_end:
-  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
-tags:
-- get
-- raw
-- ml-model
-- gptj
-- gpt-j
-- large-language-model
-uid: a41166210f294fbf
+
+# Variations
 variations:
   r2-downloader:
     group: download-tool
@@ -260,3 +262,19 @@ variations:
       tags: get,git,repo,_repo.https://github.com/google/saxml
     env:
       MLC_TMP_MODEL_SAXML: int8
+
+# Docker / container
+docker:
+  run: false
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
+
+# Tests
+tests:
+  needs_pat: true
+  run_inputs:
+  - variations_list:
+    - fp32,pytorch,r2-downloader,dry-run
+    - fp32,pytorch,rclone,dry-run

@@ -1,7 +1,9 @@
 alias: get-dataset-igbh
+uid: 824e61316c074253
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 tags:
 - get
 - dataset
@@ -9,14 +11,22 @@ tags:
 - rgat
 - igbh
 - inference
-uid: 824e61316c074253
+
+# Cache
+cache: true
+
+# Environment
+env:
+  SKIP_USER_PROMPT: true
 new_env_keys:
 - MLC_DATASET_IGBH_PATH
 - MLC_DATASET_IGBH_SIZE
+
+# Input mapping
 input_mapping:
   out_path: MLC_DATASET_IGBH_OUT_PATH
-env:
-  SKIP_USER_PROMPT: true
+
+# Dependencies
 deps:
 - tags: mlperf,inference,source
   names:
@@ -409,6 +419,8 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_PACKAGE_URL
+
+# Variations
 variations:
   csc:
     group: compressed-layout

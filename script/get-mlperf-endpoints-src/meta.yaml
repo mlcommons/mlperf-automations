@@ -1,24 +1,35 @@
 alias: get-mlperf-endpoints-src
+uid: 82c6b66389b24322
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLPerf Inference
+tags:
+- get-mlperf-endpoints-src
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_GIT_CHECKOUT_FOLDER: endpoints
   MLC_GIT_DEPTH: --depth 4
   MLC_GIT_PATCH: 'no'
   MLC_GIT_RECURSE_SUBMODULES: ''
+new_env_keys:
+- MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE
+- MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE_VERSION
+- MLC_MLPERF_LAST_RELEASE
+- +PYTHONPATH
+
+# Dependencies
 deps:
 - tags: detect,os
 - names:
   - python
   - python3
   tags: get,python3
-new_env_keys:
-- MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE
-- MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE_VERSION
-- MLC_MLPERF_LAST_RELEASE
-- +PYTHONPATH
 prehook_deps:
 - env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE
@@ -37,11 +48,8 @@ prehook_deps:
     - MLC_GIT_SHA
     _submodules.:
     - MLC_GIT_SUBMODULES
-print_env_at_the_end_disabled:
-  MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE: Path to MLPerf endpoints benchmark sources
-tags:
-- get-mlperf-endpoints-src
-uid: 82c6b66389b24322
+
+# Variations
 variations:
   branch.#:
     env:

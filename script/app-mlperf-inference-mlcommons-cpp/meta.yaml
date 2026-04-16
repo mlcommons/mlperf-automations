@@ -2,6 +2,8 @@ alias: app-mlperf-inference-mlcommons-cpp
 uid: bf62405e6c7a44bf
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: MLPerf Inference
 developers: '[Thomas Zhu](https://www.linkedin.com/in/hanwen-zhu-483614189), [Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Grigori Fursin](https://cKnowledge.org/gfursin)'
 tags:
@@ -10,11 +12,23 @@ tags:
 - mlperf
 - inference
 - cpp
+
+# Environment
 default_env:
   MLC_BATCH_COUNT: '1'
   MLC_BATCH_SIZE: '1'
   MLC_FAST_COMPILATION: 'yes'
   MLC_MLPERF_SUT_NAME_IMPLEMENTATION_PREFIX: cpp
+new_env_keys:
+- MLC_MLPERF_*
+- MLC_DATASET_*
+- MLC_ML_MODEL_*
+- MLC_HW_NAME
+new_state_keys:
+- mlperf-inference-implementation
+- MLC_SUT_*
+
+# Input mapping
 input_mapping:
   count: MLC_MLPERF_LOADGEN_QUERY_COUNT
   max_batchsize: MLC_MLPERF_LOADGEN_MAX_BATCHSIZE
@@ -24,14 +38,8 @@ input_mapping:
   performance_sample_count: MLC_MLPERF_LOADGEN_PERFORMANCE_SAMPLE_COUNT
   scenario: MLC_MLPERF_LOADGEN_SCENARIO
   user_conf: MLC_MLPERF_USER_CONF
-new_env_keys:
-- MLC_MLPERF_*
-- MLC_DATASET_*
-- MLC_ML_MODEL_*
-- MLC_HW_NAME
-new_state_keys:
-- mlperf-inference-implementation
-- MLC_SUT_*
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -97,6 +105,8 @@ post_deps:
 - tags: save,mlperf,inference,state
   names:
   - save-mlperf-inference-state
+
+# Variations
 variations:
   batch-size.#:
     group: batch-size

@@ -1,8 +1,24 @@
 alias: get-ml-model-bert-large-squad
+uid: 5e865dbdc65949d2
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
+tags:
+- get
+- ml-model
+- raw
+- bert
+- bert-large
+- bert-squad
+- language
+- language-processing
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_ML_MODEL: BERT
   MLC_ML_MODEL_DATASET: squad-1.1
@@ -11,10 +27,8 @@ env:
   MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: <<<MLC_PACKAGE_URL>>>
 new_env_keys:
 - MLC_ML_MODEL*
-post_deps:
-- tags: get,dataset-aux,squad-vocab
-  force_env_keys:
-  - MLC_OUTDIRNAME
+
+# Dependencies
 prehook_deps:
 - env:
     MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_FILE_WITH_PATH
@@ -32,18 +46,12 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_PACKAGE_URL
-print_env_at_the_end:
-  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
-tags:
-- get
-- ml-model
-- raw
-- bert
-- bert-large
-- bert-squad
-- language
-- language-processing
-uid: 5e865dbdc65949d2
+post_deps:
+- tags: get,dataset-aux,squad-vocab
+  force_env_keys:
+  - MLC_OUTDIRNAME
+
+# Variations
 variations:
   amazon-s3:
     group: download-source
@@ -268,3 +276,7 @@ variations:
   tf,fp32,zenodo:
     env:
       MLC_PACKAGE_URL: https://zenodo.org/record/3939747/files/model.pb
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model

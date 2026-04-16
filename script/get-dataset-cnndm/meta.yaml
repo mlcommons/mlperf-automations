@@ -1,10 +1,28 @@
 alias: get-dataset-cnndm
+uid: aed298c156e24257
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
+tags:
+- get
+- dataset
+- gpt-j
+- cnndm
+- cnn-dailymail
+- original
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_DATASET_CALIBRATION: 'no'
+env:
+  MLC_DATASET: CNNDM
+
+# Dependencies
 deps:
 - tags: get,sys-utils-mlc
 - names:
@@ -72,16 +90,8 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_DOWNLOAD_URL
-env:
-  MLC_DATASET: CNNDM
-tags:
-- get
-- dataset
-- gpt-j
-- cnndm
-- cnn-dailymail
-- original
-uid: aed298c156e24257
+
+# Variations
 variations:
   datacenter:
     group: category
@@ -208,9 +218,11 @@ variations:
       MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
       MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
   validation,llama3:
-    default-variations:
+    default_variations:
       download-tool: r2-downloader
       download-src: mlc
+
+# Tests
 tests:
   run_inputs:
   - variations_list:

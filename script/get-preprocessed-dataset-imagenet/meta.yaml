@@ -1,8 +1,22 @@
 alias: get-preprocessed-dataset-imagenet
+uid: f259d490bbaf45f5
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
+tags:
+- get
+- dataset
+- imagenet
+- ILSVRC
+- image-classification
+- preprocessed
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_DATASET_CONVERT_TO_UNSIGNED: '0'
   MLC_DATASET_CROP_FACTOR: '87.5'
@@ -15,6 +29,19 @@ default_env:
   MLC_DATASET_REFERENCE_PREPROCESSOR: '1'
   MLC_MODEL: resnet50
   MLC_PREPROCESS_VGG: 'yes'
+env:
+  MLC_DATASET: imagenet
+new_env_keys:
+- MLC_DATASET_*
+
+# Input mapping
+input_mapping:
+  dir: MLC_DATASET_PREPROCESSED_PATH
+  imagenet_path: MLC_IMAGENET_PATH
+  imagenet_preprocessed_path: MLC_IMAGENET_PREPROCESSED_PATH
+  threads: MLC_NUM_PREPROCESS_THREADS
+
+# Dependencies
 deps:
 - names:
   - python3
@@ -52,25 +79,8 @@ deps:
     - 'on'
   tags: mlperf,mlcommons,inference,source,src
 - tags: get,generic-sys-util,_libgl
-docker:
-  run: false
-env:
-  MLC_DATASET: imagenet
-input_mapping:
-  dir: MLC_DATASET_PREPROCESSED_PATH
-  imagenet_path: MLC_IMAGENET_PATH
-  imagenet_preprocessed_path: MLC_IMAGENET_PREPROCESSED_PATH
-  threads: MLC_NUM_PREPROCESS_THREADS
-new_env_keys:
-- MLC_DATASET_*
-tags:
-- get
-- dataset
-- imagenet
-- ILSVRC
-- image-classification
-- preprocessed
-uid: f259d490bbaf45f5
+
+# Variations
 variations:
   mlperf.option1:
     env:
@@ -271,3 +281,7 @@ variations:
     env:
       MLC_MODEL: resnet50
       MLC_PREPROCESS_TFLITE_TPU: 'yes'
+
+# Docker / container
+docker:
+  run: false

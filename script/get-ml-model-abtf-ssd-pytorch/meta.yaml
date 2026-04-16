@@ -2,9 +2,9 @@ alias: get-ml-model-abtf-ssd-pytorch
 uid: b3750a4b222a485d
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
-private: true
 tags:
 - get
 - ml-model
@@ -12,12 +12,24 @@ tags:
 - ssd
 - resnet50
 - cmc
-input_mapping:
-  model_code_git_branch: MLC_ABTF_MODEL_CODE_GIT_BRANCH
-  model_code_git_url: MLC_ABTF_MODEL_CODE_GIT_URL
+private: true
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_ABTF_MODEL_CODE_GIT_URL: https://github.com/mlcommons/abtf-ssd-pytorch
   MLC_ABTF_MODEL_CODE_GIT_BRANCH: cognata
+new_env_keys:
+- MLC_ML_MODEL_*
+
+# Input mapping
+input_mapping:
+  model_code_git_branch: MLC_ABTF_MODEL_CODE_GIT_BRANCH
+  model_code_git_url: MLC_ABTF_MODEL_CODE_GIT_URL
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: get,git,repo
@@ -56,12 +68,8 @@ deps:
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_ML_MODEL_URL
-new_env_keys:
-- MLC_ML_MODEL_*
-print_env_at_the_end:
-  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model weights
-  MLC_ML_MODEL_CODE_WITH_PATH: Path to the ML model code
-  MLC_ML_MODEL_SSD_PATH: Path to ssd resnet50 model
+
+# Variations
 variations:
   mlc:
     group: download-src
@@ -235,6 +243,14 @@ variations:
   skip_code:
     env:
       MLC_SKIP_MODEL_CODE_DOWNLOAD: 'yes'
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model weights
+  MLC_ML_MODEL_CODE_WITH_PATH: Path to the ML model code
+  MLC_ML_MODEL_SSD_PATH: Path to ssd resnet50 model
+
+# Tests
 tests:
   needs_pat: true
   run_inputs:

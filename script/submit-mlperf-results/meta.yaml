@@ -1,12 +1,10 @@
 alias: submit-mlperf-results
+uid: cc01f0a82bef4216
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: MLPerf Inference
-default_env:
-  MLC_MLPERF_SUBMISSION_URL: https://submissions-ui.mlcommons.org
-input_mapping:
-  input: MLC_MLPERF_SUBMISSION_FILE
-  submitter_id: MLC_MLPERF_SUBMITTER_ID
 tags:
 - submit
 - mlperf
@@ -14,7 +12,17 @@ tags:
 - mlperf-results
 - publish-results
 - submission
-uid: cc01f0a82bef4216
+
+# Environment
+default_env:
+  MLC_MLPERF_SUBMISSION_URL: https://submissions-ui.mlcommons.org
+
+# Input mapping
+input_mapping:
+  input: MLC_MLPERF_SUBMISSION_FILE
+  submitter_id: MLC_MLPERF_SUBMITTER_ID
+
+# Variations
 variations:
   wg-automotive:
     env:

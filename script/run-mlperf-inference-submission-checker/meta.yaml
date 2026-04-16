@@ -1,16 +1,60 @@
 alias: run-mlperf-inference-submission-checker
+uid: 15d03ec2c1af4297
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: MLPerf Inference
+tags:
+- run
+- mlc
+- mlcommons
+- mlperf
+- inference
+- mlperf-inference
+- submission
+- checker
+- submission-checker
+- mlc-submission-checker
+
+# Cache
+cache: false
 clean_files: []
+
+# Environment
 default_env:
   MLC_MLPERF_SHORT_RUN: 'no'
 file_path_env_keys:
 - MLPERF_INFERENCE_SUBMISSION_TAR_FILE
 folder_path_env_keys:
 - MLC_MLPERF_INFERENCE_SUBMISSION_DIR
-default_version: master
+
+# Input mapping
+input_mapping:
+  extra_args: MLC_MLPERF_SUBMISSION_CHECKER_EXTRA_ARGS
+  extra_checker_args: MLC_MLPERF_SUBMISSION_CHECKER_EXTRA_ARGS
+  extra_model_benchmark_map: MLC_MLPERF_EXTRA_MODEL_MAPPING
+  input: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
+  power: MLC_MLPERF_POWER
+  preprocess: MLC_TMP_MLPERF_INFERENCE_PREPROCESS_SUBMISSION
+  preprocess_submission: MLC_TMP_MLPERF_INFERENCE_PREPROCESS_SUBMISSION
+  pull_changes: MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES
+  pull_inference_changes: MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES
+  push_to_github: MLC_MLPERF_RESULT_PUSH_TO_GITHUB
+  repo_branch: MLC_MLPERF_RESULTS_GIT_REPO_BRANCH
+  repo_name: MLC_MLPERF_RESULTS_GIT_REPO_NAME
+  repo_owner: MLC_MLPERF_RESULTS_GIT_REPO_OWNER
+  skip_calibration_check: MLC_MLPERF_SKIP_CALIBRATION_CHECK
+  skip_compliance: MLC_MLPERF_SKIP_COMPLIANCE
+  skip_power_check: MLC_MLPERF_SKIP_POWER_CHECK
+  src_version: MLC_MLPERF_SUBMISSION_CHECKER_VERSION
+  submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
+  submission_tar_file: MLPERF_INFERENCE_SUBMISSION_TAR_FILE
+  submitter: MLC_MLPERF_SUBMITTER
+  submitter_id: MLC_MLPERF_SUBMITTER_ID
+  tar: MLC_TAR_SUBMISSION_DIR
+
+# Dependencies
 deps:
 - names:
   - python
@@ -39,57 +83,6 @@ deps:
   names:
   - preprocess-mlperf-submission
   tags: preprocess,mlperf,inference,submission
-docker:
-  mlc_repo: mlcommons@mlperf-automations
-  mlc_repo_branch: dev
-  extra_run_args: ' --cap-add SYS_ADMIN'
-  os: ubuntu
-  os_version: '22.04'
-  pre_run_cmds:
-  - mlc pull repo
-  real_run: false
-  use_host_group_id: true
-  use_host_user_id: true
-  deps:
-  - names:
-    - get-mlperf-submission-dir
-    skip_if_env:
-      MLC_MLPERF_INFERENCE_SUBMISSION_DIR:
-      - 'on'
-    tags: get,mlperf,submission,dir
-  - enable_if_env:
-      MLC_TMP_MLPERF_INFERENCE_PREPROCESS_SUBMISSION:
-      - 'on'
-    tags: preprocess,mlperf,inference,submission
-  input_mapping:
-    submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
-    submission_tar_file: MLPERF_INFERENCE_SUBMISSION_TAR_FILE
-  mounts:
-  - ${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}:${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}
-  - ${{ MLPERF_INFERENCE_SUBMISSION_TAR_FILE }}:${{ MLPERF_INFERENCE_SUBMISSION_TAR_FILE }}
-input_mapping:
-  extra_args: MLC_MLPERF_SUBMISSION_CHECKER_EXTRA_ARGS
-  extra_checker_args: MLC_MLPERF_SUBMISSION_CHECKER_EXTRA_ARGS
-  extra_model_benchmark_map: MLC_MLPERF_EXTRA_MODEL_MAPPING
-  input: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
-  power: MLC_MLPERF_POWER
-  preprocess: MLC_TMP_MLPERF_INFERENCE_PREPROCESS_SUBMISSION
-  preprocess_submission: MLC_TMP_MLPERF_INFERENCE_PREPROCESS_SUBMISSION
-  pull_changes: MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES
-  pull_inference_changes: MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES
-  push_to_github: MLC_MLPERF_RESULT_PUSH_TO_GITHUB
-  repo_branch: MLC_MLPERF_RESULTS_GIT_REPO_BRANCH
-  repo_name: MLC_MLPERF_RESULTS_GIT_REPO_NAME
-  repo_owner: MLC_MLPERF_RESULTS_GIT_REPO_OWNER
-  skip_calibration_check: MLC_MLPERF_SKIP_CALIBRATION_CHECK
-  skip_compliance: MLC_MLPERF_SKIP_COMPLIANCE
-  skip_power_check: MLC_MLPERF_SKIP_POWER_CHECK
-  src_version: MLC_MLPERF_SUBMISSION_CHECKER_VERSION
-  submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
-  submission_tar_file: MLPERF_INFERENCE_SUBMISSION_TAR_FILE
-  submitter: MLC_MLPERF_SUBMITTER
-  submitter_id: MLC_MLPERF_SUBMITTER_ID
-  tar: MLC_TAR_SUBMISSION_DIR
 post_deps:
 - enable_if_env:
     MLC_MLPERF_DASHBOARD:
@@ -119,18 +112,8 @@ post_deps:
   tags: submit,mlperf,results
   env:
     MLC_MLPERF_SUBMISSION_FILE: <<<MLC_TAR_OUTFILE>>>
-tags:
-- run
-- mlc
-- mlcommons
-- mlperf
-- inference
-- mlperf-inference
-- submission
-- checker
-- submission-checker
-- mlc-submission-checker
-uid: 15d03ec2c1af4297
+
+# Variations
 variations:
   wg-automotive:
     group: benchmark_wg
@@ -186,6 +169,9 @@ variations:
     adr:
       submission-checker-src:
         version: master
+
+# Versions
+default_version: master
 versions:
   master:
     adr:
@@ -219,3 +205,33 @@ versions:
     adr:
       submission-checker-src:
         version: master
+
+# Docker / container
+docker:
+  mlc_repo: mlcommons@mlperf-automations
+  mlc_repo_branch: dev
+  extra_run_args: ' --cap-add SYS_ADMIN'
+  os: ubuntu
+  os_version: '22.04'
+  pre_run_cmds:
+  - mlc pull repo
+  real_run: false
+  use_host_group_id: true
+  use_host_user_id: true
+  deps:
+  - names:
+    - get-mlperf-submission-dir
+    skip_if_env:
+      MLC_MLPERF_INFERENCE_SUBMISSION_DIR:
+      - 'on'
+    tags: get,mlperf,submission,dir
+  - enable_if_env:
+      MLC_TMP_MLPERF_INFERENCE_PREPROCESS_SUBMISSION:
+      - 'on'
+    tags: preprocess,mlperf,inference,submission
+  input_mapping:
+    submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
+    submission_tar_file: MLPERF_INFERENCE_SUBMISSION_TAR_FILE
+  mounts:
+  - ${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}:${{ MLC_MLPERF_INFERENCE_SUBMISSION_DIR }}
+  - ${{ MLPERF_INFERENCE_SUBMISSION_TAR_FILE }}:${{ MLPERF_INFERENCE_SUBMISSION_TAR_FILE }}

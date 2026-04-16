@@ -1,20 +1,28 @@
 alias: get-rocm
+uid: 23a69f9477cb4dab
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML frameworks
+tags:
+- get
+- rocm
+- get-rocm
+
+# Cache
+cache: true
 clean_files: []
+
+# Environment
 new_env_keys:
 - MLC_ROMLC_*
 - +PATH
+
+# Dependencies
 prehook_deps:
 - enable_if_env:
     MLC_REQUIRE_INSTALL:
     - 'yes'
   reuse_version: true
   tags: install,rocm
-tags:
-- get
-- rocm
-- get-rocm
-uid: 23a69f9477cb4dab

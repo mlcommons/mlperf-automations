@@ -1,9 +1,37 @@
 alias: extract-file
+uid: 3f0b76219d004817
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
+category: DevOps automation
+tags:
+- extract
+- file
+- extract-file
+tags_help: extract file
+
+# Cache
 cache: false
 can_force_cache: true
-category: DevOps automation
+
+# Environment
+new_env_keys:
+- MLC_EXTRACT_EXTRACTED_PATH
+- MLC_EXTRACT_EXTRACTED_SUBDIR_PATH
+- <<<MLC_EXTRACT_FINAL_ENV_NAME>>>
+- MLC_GET_DEPENDENT_CACHED_PATH
+new_state_keys: []
+
+# Input mapping
+input_mapping:
+  extra_folder: MLC_EXTRACT_TO_FOLDER
+  extract_path: MLC_EXTRACT_PATH
+  input: MLC_EXTRACT_FILEPATH
+  to: MLC_EXTRACT_PATH
+input_description: {}
+
+# Dependencies
 deps:
 - tags: detect,os
 - enable_if_env:
@@ -15,27 +43,11 @@ deps:
     MLC_EXTRACT_EXTRACTED_CHECKSUM_FILE:
     - 'off'
   tags: get,generic-sys-util,_md5sha1sum
-input_description: {}
-input_mapping:
-  extra_folder: MLC_EXTRACT_TO_FOLDER
-  extract_path: MLC_EXTRACT_PATH
-  input: MLC_EXTRACT_FILEPATH
-  to: MLC_EXTRACT_PATH
-new_env_keys:
-- MLC_EXTRACT_EXTRACTED_PATH
-- MLC_EXTRACT_EXTRACTED_SUBDIR_PATH
-- <<<MLC_EXTRACT_FINAL_ENV_NAME>>>
-- MLC_GET_DEPENDENT_CACHED_PATH
-new_state_keys: []
-post_deps: []
-posthook_deps: []
 prehook_deps: []
-tags:
-- extract
-- file
-- extract-file
-tags_help: extract file
-uid: 3f0b76219d004817
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations:
   keep:
     group: keep
@@ -49,6 +61,10 @@ variations:
   path.#:
     env:
       MLC_EXTRACT_FILEPATH: '#'
+
+# Versions
+versions: {}
+
+# Tests
 tests:
   run_inputs: []
-versions: {}

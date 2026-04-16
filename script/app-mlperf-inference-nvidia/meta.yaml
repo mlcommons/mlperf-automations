@@ -1,9 +1,9 @@
 alias: app-mlperf-inference-nvidia
 uid: bc3b17fb430f4732
-cache: false
-can_force_cache: true
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: MLPerf Inference
 tags:
 - reproduce
@@ -13,8 +13,12 @@ tags:
 - harness
 - nvidia-harness
 - nvidia
-new_env_keys:
-- +LD_LIBRARY_PATH
+
+# Cache
+cache: false
+can_force_cache: true
+
+# Environment
 default_env:
   MLC_BATCH_COUNT: '1'
   MLC_BATCH_SIZE: '1'
@@ -27,6 +31,10 @@ default_env:
   MLC_MLPERF_SKIP_RUN: 'no'
 env:
   MLC_CALL_MLPERF_RUNNER: 'no'
+new_env_keys:
+- +LD_LIBRARY_PATH
+
+# Input mapping
 input_mapping:
   audio_buffer_num_lines: MLC_MLPERF_NVIDIA_HARNESS_AUDIO_BUFFER_NUM_LINES
   count: MLC_MLPERF_LOADGEN_QUERY_COUNT
@@ -79,6 +87,8 @@ input_mapping:
   use_triton: MLC_MLPERF_NVIDIA_HARNESS_USE_TRITON
   user_conf: MLC_MLPERF_USER_CONF
   workspace_size: MLC_MLPERF_NVIDIA_HARNESS_WORKSPACE_SIZE
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -271,6 +281,8 @@ post_deps:
 - tags: save,mlperf,inference,state
   names:
   - save-mlperf-inference-state
+
+# Variations
 variations:
   tensorrt:
     group: backend
@@ -1907,5 +1919,7 @@ variations:
     adr:
       pytorch:
         tags: _for-nvidia-mlperf-inference-v3.1
+
+# Docker / container
 docker:
   real_run: false

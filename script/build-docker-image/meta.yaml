@@ -2,7 +2,8 @@ alias: build-docker-image
 uid: 2c3c4ba2413442e7
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: Docker automation
 tags:
 - build
@@ -10,9 +11,18 @@ tags:
 - image
 - docker-image
 - dockerimage
+
+# Cache
+cache: false
+
+# Environment
 default_env:
   MLC_DOCKER_IMAGE_REPO: local
   MLC_DOCKER_IMAGE_TAG: latest
+new_env_keys:
+- MLC_DOCKER_*
+
+# Input mapping
 input_mapping:
   cache: MLC_DOCKER_CACHE
   docker_os: MLC_DOCKER_OS
@@ -28,8 +38,8 @@ input_mapping:
   push_image: MLC_DOCKER_PUSH_IMAGE
   real_run: MLC_REAL_RUN
   script_tags: MLC_DOCKER_RUN_SCRIPT_TAGS
-new_env_keys:
-- MLC_DOCKER_*
+
+# Dependencies
 deps:
 - tags: get,docker
 prehook_deps:

@@ -2,11 +2,17 @@ alias: build-dockerfile
 uid: e66a7483230d4641
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
+category: Docker automation
 tags:
 - build
 - dockerfile
+
+# Cache
 cache: false
-category: Docker automation
+
+# Environment
 default_env:
   MLC_DOCKER_BUILD_SLIM: 'no'
   MLC_DOCKER_IMAGE_EOL: '
@@ -15,6 +21,10 @@ default_env:
   MLC_DOCKER_OS: ubuntu
   MLC_DOCKER_NOT_PULL_UPDATE: false
   MLC_MLOPS_REPO_BRANCH: dev
+new_env_keys:
+- MLC_DOCKERFILE_*
+
+# Input mapping
 input_mapping:
   base_image: MLC_DOCKER_IMAGE_BASE
   build: MLC_BUILD_DOCKER_IMAGE
@@ -51,8 +61,8 @@ input_mapping:
   script_tags: MLC_DOCKER_RUN_SCRIPT_TAGS
   skip_mlc_sys_upgrade: MLC_DOCKER_SKIP_MLC_SYS_UPGRADE
   user: MLC_DOCKER_USER
-new_env_keys:
-- MLC_DOCKERFILE_*
+
+# Dependencies
 deps:
 - tags: get,docker
   names:
@@ -64,6 +74,14 @@ post_deps:
   names:
   - build-docker-image
   tags: build,docker,image
+
+# Variations
+variations:
+  slim:
+    env:
+      MLC_DOCKER_BUILD_SLIM: 'yes'
+
+# Tests
 tests:
   run_inputs:
   - env:
@@ -114,7 +132,3 @@ tests:
   - env:
       MLC_DOCKER_OS: amazonlinux
       MLC_DOCKER_OS_VERSION: '2023'
-variations:
-  slim:
-    env:
-      MLC_DOCKER_BUILD_SLIM: 'yes'

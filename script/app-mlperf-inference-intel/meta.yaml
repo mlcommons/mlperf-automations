@@ -1,9 +1,9 @@
 alias: app-mlperf-inference-intel
 uid: c05a90433bb04cc1
-cache: false
-can_force_cache: true
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: MLPerf Inference
 tags:
 - reproduce
@@ -15,6 +15,12 @@ tags:
 - intel
 - intel-harness
 - intel
+
+# Cache
+cache: false
+can_force_cache: true
+
+# Environment
 default_env:
   MLC_BATCH_COUNT: '1'
   MLC_BATCH_SIZE: '1'
@@ -31,6 +37,11 @@ env:
   MLC_CALL_MLPERF_RUNNER: 'no'
   CUDA_VISIBLE_DEVICES: ''
   USE_CUDA: '0'
+new_state_keys:
+- mlperf-inference-implementation
+- MLC_SUT_*
+
+# Input mapping
 input_mapping:
   count: MLC_MLPERF_LOADGEN_QUERY_COUNT
   max_batchsize: MLC_MLPERF_LOADGEN_MAX_BATCHSIZE
@@ -49,9 +60,8 @@ input_mapping:
   target_latency: MLC_MLPERF_LOADGEN_TARGET_LATENCY
   target_qps: MLC_MLPERF_LOADGEN_TARGET_QPS
   user_conf: MLC_MLPERF_USER_CONF
-new_state_keys:
-- mlperf-inference-implementation
-- MLC_SUT_*
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -102,6 +112,8 @@ post_deps:
 - tags: save,mlperf,inference,state
   names:
   - save-mlperf-inference-state
+
+# Variations
 variations:
   cpu:
     group: device
@@ -1056,5 +1068,7 @@ variations:
     adr:
       pytorch:
         tags: _for-intel-mlperf-inference-v4.0
+
+# Docker / container
 docker:
   real_run: false

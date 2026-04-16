@@ -1,10 +1,23 @@
 alias: get-dataset-mlperf-inference-mixtral
+uid: 89e7c91444804775
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
+tags:
+- get
+- dataset-mixtral
+- openorca-mbxp-gsm8k-combined
+
+# Cache
+cache: true
+
+# Environment
 new_env_keys:
 - MLC_DATASET_*
+
+# Dependencies
 prehook_deps:
 - env:
     MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_PREPROCESSED_PATH
@@ -18,11 +31,8 @@ prehook_deps:
     - MLC_PACKAGE_URL
   names:
   - download-file-mixtral-dataset
-tags:
-- get
-- dataset-mixtral
-- openorca-mbxp-gsm8k-combined
-uid: 89e7c91444804775
+
+# Variations
 variations:
   calibration:
     group: dataset-type
@@ -101,6 +111,8 @@ variations:
   validation,rclone:
     env:
       MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/mixtral_8x7b/09292024_mixtral_15k_mintoken2_v1.pkl
+
+# Tests
 tests:
   needs_pat: true
   run_inputs:

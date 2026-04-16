@@ -1,18 +1,28 @@
 alias: get-dataset-mlperf-inference-llama3
+uid: c3bc69599cbc4db7
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 tags:
 - get
 - dataset
 - mlperf
 - llama3
 - inference
-uid: c3bc69599cbc4db7
+
+# Cache
+cache: true
+
+# Environment
 new_env_keys:
 - MLC_DATASET_LLAMA3_PATH
+
+# Input mapping
 input_mapping:
   outdirname: MLC_OUTDIRNAME
+
+# Dependencies
 prehook_deps:
 - env:
     MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_LLAMA3_PATH
@@ -28,6 +38,8 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_DOWNLOAD_URL
+
+# Variations
 variations:
   calibration:
     group: dataset-type
@@ -73,5 +85,7 @@ variations:
     env:
       MLC_RCLONE_URL: mlc-inference:mlcommons-inference-wg-public/llama3.1_405b/mlperf_llama3.1_405b_dataset_8313_processed_fp16_eval.pkl
       MLC_DATASET_FILE_NAME: mlperf_llama3.1_405b_dataset_8313_processed_fp16_eval.pkl
+
+# Output / debugging
 print_env_at_the_end:
   MLC_DATASET_LLAMA3_PATH: Path to the dataset

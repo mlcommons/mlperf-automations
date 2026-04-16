@@ -1,15 +1,23 @@
-uid: 0659dc1f75664c65
 alias: create-patch
-category: DevOps automation
+uid: 0659dc1f75664c65
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
+category: DevOps automation
+tags:
+- create
+- patch
+
+# Cache
 cache: false
-deps:
-- tags: detect,os
+
+# Input mapping
 input_mapping:
   exclude: MLC_CREATE_PATCH_EXCLUDE
   new: MLC_CREATE_PATCH_NEW
   old: MLC_CREATE_PATCH_OLD
-tags:
-- create
-- patch
+
+# Dependencies
+deps:
+- tags: detect,os

@@ -1,18 +1,28 @@
 alias: tar-my-folder
+uid: 3784212e986c456b
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: DevOps automation
+tags:
+- run
+- tar
+
+# Cache
+cache: false
 clean_files: []
-deps: []
+
+# Environment
+new_env_keys:
+- MLC_TAR_OUTFILE
+
+# Input mapping
 input_mapping:
   input_dir: MLC_TAR_INPUT_DIR
   outfile: MLC_TAR_OUTFILE
   output_dir: MLC_TAR_OUTPUT_DIR
   sub_folders_to_include: MLC_TAR_SUB_FOLDERS_TO_INCLUDE
-new_env_keys:
-  - MLC_TAR_OUTFILE
-tags:
-- run
-- tar
-uid: 3784212e986c456b
+
+# Dependencies
+deps: []

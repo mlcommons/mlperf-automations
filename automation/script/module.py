@@ -2658,6 +2658,11 @@ class ScriptAutomation(Automation):
 
         script_tags = i.get('script_tags', [])
         variation_tags = i.get('variation_tags', [])
+        
+        if not script_tags and tags_string:
+            r = get_variation_and_script_tags(tags_string.strip())
+            script_tags = r['script_tags']
+            variation_tags = r['variation_tags']
 
         excluded_tags = [v[1:] for v in script_tags if v.startswith("-")]
         common = set(script_tags).intersection(set(excluded_tags))
@@ -4478,6 +4483,16 @@ pip install mlcflow
         from script.docker import docker_run
         return docker_run(self, i)
 
+
+    ############################################################
+    def apptainerfile(self, i):
+        from script.apptainer import apptainerfile
+        return apptainerfile(self, i)
+
+    ############################################################
+    def apptainer(self, i):
+        from script.apptainer import apptainer_run
+        return apptainer_run(self, i)
     ############################################################
     def experiment(self, i):
         from script.experiment import experiment_run

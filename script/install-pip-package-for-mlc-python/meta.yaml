@@ -1,7 +1,9 @@
 alias: install-pip-package-for-mlc-python
+uid: b16ed087abab459c
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 tags:
 - install
 - pip
@@ -9,9 +11,12 @@ tags:
 - pip-package
 - for-mlc-python
 - for.mlc-python
-uid: b16ed087abab459c
 
+# Cache
+cache: true
+
+# Variations
 variations:
   package.#:
     env:
-      MLC_PIP_PACKAGE_NAME: "#"
+      MLC_PIP_PACKAGE_NAME: '#'

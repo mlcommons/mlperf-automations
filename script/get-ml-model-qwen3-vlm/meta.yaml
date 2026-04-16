@@ -1,19 +1,21 @@
 alias: get-ml-model-qwen3-vlm
+uid: d52b9d6ab4f640e0
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
+tags:
+- get-ml-model-qwen3-vl
+
+# Cache
 cache: true
+
+# Environment
 new_env_keys:
 - MLC_ML_MODEL_QWEN3_VLM_PATH
 - MLC_ML_MODEL_FILE_WITH_PATH
-print_env_at_the_end:
-  MLC_ML_MODEL_QWEN3_VLM_PATH: Qwen3 VLM checkpoint path
-tags:
-- get-ml-model-qwen3-vl
-tests:
-  run_inputs:
-  - variations_list:
-    - r2-downloader,mlc,dry-run,235b-a22b
-uid: d52b9d6ab4f640e0
+
+# Variations
 variations:
   mlc:
     default: true
@@ -59,3 +61,13 @@ variations:
       qwen3-vlm-model-dae:
         env:
           MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/VLM-model.uri
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_QWEN3_VLM_PATH: Qwen3 VLM checkpoint path
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - r2-downloader,mlc,dry-run,235b-a22b

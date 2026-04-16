@@ -2,6 +2,8 @@ alias: app-mlperf-inference-mlcommons-python
 uid: ff149e9781fc4b65
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: MLPerf Inference
 developers: '[Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Thomas Zhu](https://www.linkedin.com/in/hanwen-zhu-483614189), [Grigori Fursin](https://cKnowledge.org/gfursin)'
 tags:
@@ -13,6 +15,8 @@ tags:
 - inference
 - reference
 - ref
+
+# Environment
 default_env:
   MLC_MLPERF_LOADGEN_MODE: accuracy
   MLC_MLPERF_LOADGEN_SCENARIO: Offline
@@ -22,8 +26,23 @@ default_env:
   MLC_MLPERF_QUANTIZATION: false
   MLC_MLPERF_SUT_NAME_IMPLEMENTATION_PREFIX: reference
   MLC_MLPERF_SUT_NAME_RUN_CONFIG_SUFFIX: ''
-docker:
-  real_run: false
+new_env_keys:
+- MLC_MLPERF_*
+- MLC_DATASET_*
+- MLC_HW_NAME
+- MLC_ML_MODEL_*
+- MLC_MAX_EXAMPLES
+- MLC_VLLM_*
+new_state_keys:
+- mlperf-inference-implementation
+- MLC_SUT_*
+env_key_mappings:
+  MLC_HOST_: HOST_
+  MLC_ML_: ML_
+  MLC_MLPERF_TVM: MLPERF_TVM
+  MLC_MLPERF_DELETE: MLPERF_DELETE
+
+# Input mapping
 input_mapping:
   clean: MLC_MLPERF_CLEAN_SUBMISSION_DIR
   count: MLC_MLPERF_LOADGEN_QUERY_COUNT
@@ -58,21 +77,8 @@ input_mapping:
   test_query_count: MLC_TEST_QUERY_COUNT
   threads: MLC_NUM_THREADS
   waymo_path: MLC_DATASET_WAYMO_PATH
-env_key_mappings:
-  MLC_HOST_: HOST_
-  MLC_ML_: ML_
-  MLC_MLPERF_TVM: MLPERF_TVM
-  MLC_MLPERF_DELETE: MLPERF_DELETE
-new_env_keys:
-- MLC_MLPERF_*
-- MLC_DATASET_*
-- MLC_HW_NAME
-- MLC_ML_MODEL_*
-- MLC_MAX_EXAMPLES
-- MLC_VLLM_*
-new_state_keys:
-- mlperf-inference-implementation
-- MLC_SUT_*
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -622,6 +628,8 @@ post_deps:
 - tags: save,mlperf,inference,state
   names:
   - save-mlperf-inference-state
+
+# Variations
 variations:
   batch_size.#:
     group: batch-size
@@ -1535,3 +1543,7 @@ variations:
     env:
       MLC_MLPERF_MODEL_SKIP_BATCHING: true
       MLC_ML_MODEL_DATASET_TYPE: multihot-criteo
+
+# Docker / container
+docker:
+  real_run: false
