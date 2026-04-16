@@ -4478,6 +4478,16 @@ pip install mlcflow
         from script.docker import docker_run
         return docker_run(self, i)
 
+
+    ############################################################
+    def apptainerfile(self, i):
+        from script.apptainer import apptainerfile
+        return apptainerfile(self, i)
+
+    ############################################################
+    def apptainer(self, i):
+        from script.apptainer import apptainer_run
+        return apptainer_run(self, i)
     ############################################################
     def experiment(self, i):
         from script.experiment import experiment_run
