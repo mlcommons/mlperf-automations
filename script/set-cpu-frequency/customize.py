@@ -1,5 +1,6 @@
 from mlc import utils
 import os
+import shutil
 import subprocess
 import re
 
@@ -8,12 +9,16 @@ def preprocess(i):
     env = i['env']
     state = i['state']
 
+    # Check that cpupower is available
+    if shutil.which('cpupower') is None:
+        return {'return': 1, 'error': "'cpupower' utility not found. Please install it (e.g., 'sudo apt install linux-tools-common linux-tools-generic' on Ubuntu, 'sudo dnf install kernel-tools' on Fedora/RHEL)."}
+
     freq = env.get('MLC_TARGET_FREQ', '').strip()
     if freq != '':
         try:
             freq = parse_target_freq(freq)
         except ValueError as e:
-            return {'return': 1, 'error': sys.stderr}
+            return {'return': 1, 'error': str(e)}
 
     os_info = i['os_info']
 
