@@ -41,6 +41,15 @@ case "$DRIVER_KEY" in
     echo "If you need a precise kHz, switch back to acpi-cpufreq in your kernel cmdline."
     ;;
 
+  intel_cpufreq)
+    echo "→ intel_cpufreq (passive mode): setting performance governor"
+    ${MLC_SUDO} cpupower frequency-set -g performance
+    if [[ -n "$TARGET_FREQ" ]]; then
+      echo "   Setting max freq to ${TARGET_FREQ} kHz"
+      ${MLC_SUDO} cpupower frequency-set --max "${TARGET_FREQ}"
+    fi
+    ;;
+
   acpi-cpufreq)
     echo "→ acpi-cpufreq: switching to userspace governor + fixed freq"
     if [[ -z "$TARGET_FREQ" ]]; then
