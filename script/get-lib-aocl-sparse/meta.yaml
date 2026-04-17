@@ -2,7 +2,6 @@ alias: get-lib-aocl-sparse
 uid: 1871ea1352614038
 automation_alias: script
 automation_uid: 5b4e0237da074764
-
 category: Detection or installation of tools and artifacts
 tags:
 - get
@@ -10,9 +9,7 @@ tags:
 - lib-aocl-sparse
 - aocl-sparse
 - aocl
-
 cache: true
-
 new_env_keys:
 - MLC_AOCL_SPARSE_SRC_PATH
 - MLC_AOCL_SPARSE_BUILD_PATH
@@ -22,14 +19,27 @@ new_env_keys:
 - +LIBRARY_PATH
 - +C_INCLUDE_PATH
 - +CPLUS_INCLUDE_PATH
+- MLC_AOCL_BINARY_INSTALL_PATH
+- MLC_AOCL_SPARSE_BINARY_PATH
 new_state_keys: []
-
 deps:
 - tags: get,cmake
+  skip_if_env:
+    MLC_AOCL_BINARY_DOWNLOAD:
+    - 'yes'
 - tags: detect,cpu
 - tags: get,utils,aocl-utils
+  skip_if_env:
+    MLC_AOCL_BINARY_DOWNLOAD:
+    - 'yes'
 - tags: get,lib,aocl-blis
+  skip_if_env:
+    MLC_AOCL_BINARY_DOWNLOAD:
+    - 'yes'
 - tags: get,lib,aocl-libflame
+  skip_if_env:
+    MLC_AOCL_BINARY_DOWNLOAD:
+    - 'yes'
 - tags: get,git,repo
   names:
   - aocl-sparse-repo
@@ -45,7 +55,9 @@ deps:
     - MLC_GIT_REPO_URL
     _tag.:
     - MLC_GIT_CHECKOUT_TAG
-
+  skip_if_env:
+    MLC_AOCL_BINARY_DOWNLOAD:
+    - 'yes'
 variations:
   branch.#:
     env:
@@ -63,17 +75,58 @@ variations:
     env:
       MLC_GIT_REPO_URL: https://github.com/amd/aocl-sparse.git
     group: repo
-
-default_version: '5.2.2'
-versions:
-  '5.2.2':
+  _binary:
     env:
-      MLC_GIT_CHECKOUT: '5.2.2'
+      MLC_AOCL_BINARY_DOWNLOAD: 'yes'
+      MLC_AOCL_BINARY_LIB_NAME: sparse
+      MLC_AOCL_BINARY_COMPILER: aocc
+      MLC_AOCL_BINARY_VERSION: 5.2.0
+      MLC_AOCL_BINARY_VERSION_PATH: 5-2
+    prehook_deps:
+    - tags: download-and-extract
+      names:
+      - aocl-sparse-binary
+      extra_cache_tags: aocl,sparse,binary
+      force_cache: true
+      env:
+        MLC_DAE_URL: https://download.amd.com/developer/eula/<<<MLC_AOCL_BINARY_LIB_NAME>>>/<<<MLC_AOCL_BINARY_LIB_NAME>>>-<<<MLC_AOCL_BINARY_VERSION_PATH>>>/aocl-<<<MLC_AOCL_BINARY_LIB_NAME>>>-linux-<<<MLC_AOCL_BINARY_COMPILER>>>-<<<MLC_AOCL_BINARY_VERSION>>>.tar.gz
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_AOCL_SPARSE_BINARY_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: MLC_AOCL_SPARSE_BINARY_PATH
+        MLC_DAE_EXTRACT_DOWNLOADED: 'yes'
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DAE_URL
+      force_env_keys:
+      - MLC_OUTDIRNAME
+  _binary.aocc:
+    env:
+      MLC_AOCL_BINARY_COMPILER: aocc
+    group: binary-compiler
+    default: true
+  _binary.gcc:
+    env:
+      MLC_AOCL_BINARY_COMPILER: gcc
+    group: binary-compiler
+default_version: 5.2.2
+versions:
+  5.2.2:
+    env:
+      MLC_GIT_CHECKOUT: 5.2.2
   master:
     env:
       MLC_GIT_CHECKOUT: master
-
 tests:
   run_inputs:
   - variations_list:
     - repo.amd
+  - variations_list:
+    - _binary
+    env:
+      MLC_AOCL_ACCEPT_EULA: 'yes'
+default_env:
+  MLC_AOCL_ACCEPT_EULA: 'no'
+input_mapping:
+  accept_eula: MLC_AOCL_ACCEPT_EULA
+input_description:
+  accept_eula:
+    desc: Accept the AMD EULA for binary downloads (yes/no)
