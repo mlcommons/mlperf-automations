@@ -95,10 +95,11 @@ variations:
   gdown:
     group: download-tool
     env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: ' --fuzzy'
+      MLC_DOWNLOAD_EXTRA_OPTIONS: ' '
     adr:
       abtf-ml-model-weights-download:
         tags: _gdown
+  
   r2-downloader:
     group: download-tool
   rclone:
@@ -159,7 +160,7 @@ variations:
     group: model-weights
   abtf-poc:
     default_variations:
-      download-tool: rclone
+      download-tool: gdown
     env:
       MLC_ML_MODEL: abtf-ssd-pytorch
       MLC_ML_MODEL_CHECKSUM: 26845c3b9573ce115ef29dca4ae5be14
@@ -202,7 +203,7 @@ variations:
     group: run-mode
     env:
       MLC_DOWNLOAD_MODE: dry
-  abtf-poc,gdrive:
+  abtf-poc,gdown:
     env:
       MLC_ML_MODEL_URL: https://drive.google.com/file/d/1kfJR_bs54KONprVd51kZu0PYmmh1wZZa/view
   abtf-poc,rclone:
