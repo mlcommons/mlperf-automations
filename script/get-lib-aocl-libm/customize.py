@@ -1,4 +1,5 @@
 from mlc import utils
+from utils import is_true
 import os
 
 
@@ -10,8 +11,8 @@ def preprocess(i):
 
     env = i['env']
 
-    if env.get('MLC_AOCL_BINARY_DOWNLOAD') == 'yes':
-        if env.get('MLC_AOCL_ACCEPT_EULA') != 'yes':
+    if is_true(env.get('MLC_AOCL_BINARY_DOWNLOAD', '')):
+        if not is_true(env.get('MLC_AOCL_ACCEPT_EULA', '')):
             return {'return': 1, 'error': 'You must accept the AMD EULA to download binary packages. Use --accept_eula=yes to accept.'}
 
     return {'return': 0}
@@ -21,7 +22,7 @@ def postprocess(i):
 
     env = i['env']
 
-    if env.get('MLC_AOCL_BINARY_DOWNLOAD') == 'yes':
+    if is_true(env.get('MLC_AOCL_BINARY_DOWNLOAD', '')):
         install_path = env.get('MLC_AOCL_LIBM_BINARY_PATH', '')
         if not install_path:
             return {'return': 1, 'error': 'Binary download path not set'}
@@ -41,7 +42,7 @@ def postprocess(i):
     env['MLC_AOCL_BINARY_INSTALL_PATH'] = install_path
 
     aocl_lib_path = install_path
-    if env.get('MLC_AOCL_BINARY_DOWNLOAD') == 'yes':
+    if is_true(env.get('MLC_AOCL_BINARY_DOWNLOAD', '')):
         lib_path = os.path.join(install_path, 'lib')
         if not os.path.isdir(lib_path):
             lib_path = os.path.join(install_path, 'lib64')
@@ -51,7 +52,7 @@ def postprocess(i):
     env['+LIBRARY_PATH'] = [aocl_lib_path]
     env['+LD_LIBRARY_PATH'] = [aocl_lib_path]
 
-    if env.get('MLC_AOCL_BINARY_DOWNLOAD') == 'yes':
+    if is_true(env.get('MLC_AOCL_BINARY_DOWNLOAD', '')):
         env['+C_INCLUDE_PATH'] = [os.path.join(install_path, 'include')]
         env['+CPLUS_INCLUDE_PATH'] = [os.path.join(install_path, 'include')]
 

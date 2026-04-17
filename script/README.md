@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-04-17 23:52:57*
+*Last updated: 2026-04-18 03:58:25*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -484,7 +484,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - Tags: `get`, `lib`, `lib-aocl-crypto`, `aocl-crypto`, `aocl`
 - **[get-lib-aocl-data-analytics](get-lib-aocl-data-analytics/)**
   - get-lib-aocl-data-analytics
-  - Tags: `get`, `lib`, `lib-aocl-data-analytics`, `aocl-data-analytics`, `aocl`
+  - Tags: `get`, `lib`, `lib-aocl-data-analytics`, `aocl-data-analytics`, `aocl`, `aocl-da`
 - **[get-lib-aocl-dlp](get-lib-aocl-dlp/)**
   - get-lib-aocl-dlp
   - Tags: `get`, `lib`, `lib-aocl-dlp`, `aocl-dlp`, `aocl`

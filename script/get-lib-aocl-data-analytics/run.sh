@@ -63,6 +63,7 @@ cmake .. \
     -DBUILD_TESTS=OFF \
     -DBUILD_EXAMPLES=OFF \
     -DBUILD_DOC=OFF \
+    -DCMAKE_POLICY_DEFAULT_CMP0167=OLD \
     ${MLC_CMAKE_EXTRA_FLAGS}
 test $? -eq 0 || exit $?
 

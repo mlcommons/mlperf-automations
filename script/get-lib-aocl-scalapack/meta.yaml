@@ -40,6 +40,10 @@ deps:
   skip_if_env:
     MLC_AOCL_BINARY_DOWNLOAD:
     - 'yes'
+- tags: get,generic,sys-util,_libopenmpi-dev
+  skip_if_env:
+    MLC_AOCL_BINARY_DOWNLOAD:
+    - 'yes'
 - tags: get,git,repo
   names:
   - aocl-scalapack-repo
