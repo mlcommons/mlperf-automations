@@ -9,6 +9,7 @@ cd ${MLC_AOCL_BLIS_SRC_PATH}
 ./configure \
     --prefix=${MLC_AOCL_BLIS_SRC_PATH}/install \
     --enable-threading=openmp \
+    --enable-cblas \
     auto
 test $? -eq 0 || exit $?
 

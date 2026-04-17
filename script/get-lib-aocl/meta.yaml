@@ -17,6 +17,7 @@ deps:
 - tags: get,utils,aocl-utils
 - tags: get,lib,aocl-libm
 - tags: get,lib,aocl-blis
+- tags: get,lib,aocl-libflame
 - tags: get,lib,aocl-sparse
 - tags: get,lib,aocl-compression
 - tags: get,lib,aocl-crypto

@@ -29,6 +29,8 @@ deps:
 - tags: detect,cpu
 - tags: get,utils,aocl-utils
 - tags: get,lib,aocl-blis
+- tags: get,lib,aocl-libflame
+- tags: get,lib,aocl-sparse
 - tags: get,git,repo
   names:
   - aocl-da-repo

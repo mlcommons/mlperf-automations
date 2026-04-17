@@ -28,6 +28,8 @@ deps:
 - tags: get,cmake
 - tags: detect,cpu
 - tags: get,utils,aocl-utils
+- tags: get,lib,aocl-blis
+- tags: get,lib,aocl-libflame
 - tags: get,git,repo
   names:
   - aocl-sparse-repo

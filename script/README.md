@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-04-17 21:57:24*
+*Last updated: 2026-04-17 22:38:27*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -491,6 +491,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-lib-aocl-fftz](get-lib-aocl-fftz/)**
   - get-lib-aocl-fftz
   - Tags: `get`, `lib`, `lib-aocl-fftz`, `aocl-fftz`, `aocl`
+- **[get-lib-aocl-libflame](get-lib-aocl-libflame/)**
+  - get-lib-aocl-libflame
+  - Tags: `get`, `lib`, `lib-aocl-libflame`, `aocl-libflame`, `aocl`
 - **[get-lib-aocl-libm](get-lib-aocl-libm/)**
   - get-lib-aocl-libm
   - Tags: `get`, `lib`, `lib-aocl-libm`, `aocl-libm`, `aocl`
@@ -1159,7 +1162,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 338
+- **Total Scripts**: 339
 - **Categories**: 33
 
 ## Usage
