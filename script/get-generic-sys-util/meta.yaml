@@ -252,6 +252,15 @@ variations:
         brew: gflags
         dnf: gflags-devel
         yum: gflags-devel
+  gfortran:
+    env:
+      MLC_SYS_UTIL_NAME: gfortran
+    state:
+      gfortran:
+        apt: gfortran
+        brew: gcc
+        dnf: gcc-gfortran
+        yum: gcc-gfortran
   gfortran-12-aarch64-linux-gnu:
     env:
       MLC_SYS_UTIL_NAME: gfortran-12-aarch64

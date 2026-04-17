@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-04-18 04:15:08*
+*Last updated: 2026-04-18 04:19:17*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -671,6 +671,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[app-cp2k](app-cp2k/)**
   - app-cp2k
   - Tags: `app`, `cp2k`
+- **[app-nwchem](app-nwchem/)**
+  - app-nwchem
+  - Tags: `app`, `nwchem`, `hpc`
 
 ## MLCommons automation
 
@@ -1162,7 +1165,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 339
+- **Total Scripts**: 340
 - **Categories**: 33
 
 ## Usage
