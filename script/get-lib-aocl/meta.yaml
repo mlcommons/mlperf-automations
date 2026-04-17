@@ -1,0 +1,30 @@
+alias: get-lib-aocl
+uid: b2a16ffc30a0467c
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+category: Detection or installation of tools and artifacts
+tags:
+- get
+- lib
+- lib-aocl
+- aocl
+- aocl-all
+
+cache: false
+
+deps:
+- tags: get,utils,aocl-utils
+- tags: get,lib,aocl-libm
+- tags: get,lib,aocl-blis
+- tags: get,lib,aocl-sparse
+- tags: get,lib,aocl-compression
+- tags: get,lib,aocl-crypto
+- tags: get,lib,aocl-data-analytics
+- tags: get,lib,aocl-dlp
+- tags: get,lib,aocl-fftz
+- tags: get,lib,aocl-scalapack
+
+tests:
+  run_inputs:
+  - variations_list: []

@@ -1,0 +1,74 @@
+alias: get-lib-aocl-compression
+uid: a3200df6015e4b0a
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+category: Detection or installation of tools and artifacts
+tags:
+- get
+- lib
+- lib-aocl-compression
+- aocl-compression
+- aocl
+
+cache: true
+
+new_env_keys:
+- MLC_AOCL_COMPRESSION_SRC_PATH
+- MLC_AOCL_COMPRESSION_BUILD_PATH
+- MLC_AOCL_COMPRESSION_INSTALL_PATH
+- MLC_AOCL_COMPRESSION_LIB_PATH
+- +LD_LIBRARY_PATH
+- +LIBRARY_PATH
+- +C_INCLUDE_PATH
+- +CPLUS_INCLUDE_PATH
+new_state_keys: []
+
+deps:
+- tags: get,cmake
+- tags: detect,cpu
+- tags: get,utils,aocl-utils
+- tags: get,git,repo
+  names:
+  - aocl-compression-repo
+  extra_cache_tags: aocl-compression,repo,aocl-compression-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_AOCL_COMPRESSION_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+
+variations:
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  repo.#:
+    env:
+      MLC_GIT_REPO_URL: '#'
+    group: repo
+  repo.amd:
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://github.com/amd/aocl-compression.git
+    group: repo
+
+default_version: main
+versions:
+  main:
+    env:
+      MLC_GIT_CHECKOUT: main
+
+tests:
+  run_inputs:
+  - variations_list:
+    - repo.amd
