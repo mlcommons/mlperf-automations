@@ -25,6 +25,18 @@ def postprocess(i):
         install_path = env.get('MLC_AOCL_SCALAPACK_BINARY_PATH', '')
         if not install_path:
             return {'return': 1, 'error': 'Binary download path not set'}
+        # Find the library subdirectory inside the extracted archive
+        for entry in os.listdir(install_path):
+            entry_path = os.path.join(install_path, entry)
+            if os.path.isdir(entry_path) and (os.path.isdir(os.path.join(entry_path, 'lib')) or os.path.isdir(os.path.join(entry_path, 'lib64'))):
+                install_path = entry_path
+                break
+        # Find the library subdirectory inside the extracted archive
+        for entry in os.listdir(install_path):
+            entry_path = os.path.join(install_path, entry)
+            if os.path.isdir(entry_path) and (os.path.isdir(os.path.join(entry_path, 'lib')) or os.path.isdir(os.path.join(entry_path, 'lib64'))):
+                install_path = entry_path
+                break
     else:
         src_path = env.get('MLC_AOCL_SCALAPACK_SRC_PATH', env.get('MLC_GIT_REPO_CHECKOUT_PATH', ''))
         env['MLC_AOCL_SCALAPACK_SRC_PATH'] = src_path
