@@ -26,6 +26,8 @@ cmake .. \
     -DCMAKE_INSTALL_PREFIX=${MLC_AOCL_SCALAPACK_SRC_PATH}/install \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_AOCL_ROOT=${AOCL_ROOT} \
+    -DLAPACKE=OFF \
+    -DCBLAS=OFF \
     ${MLC_CMAKE_EXTRA_FLAGS}
 test $? -eq 0 || exit $?
 

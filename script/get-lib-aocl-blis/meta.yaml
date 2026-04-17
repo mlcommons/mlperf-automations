@@ -85,7 +85,7 @@ variations:
         - MLC_DAE_URL
       force_env_keys:
       - MLC_OUTDIRNAME
-    default-variations:
+    default_variations:
       version: version.5.1.0
   binary.aocc:
     env:
