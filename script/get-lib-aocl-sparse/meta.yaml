@@ -62,11 +62,14 @@ variations:
       MLC_GIT_REPO_URL: https://github.com/amd/aocl-sparse.git
     group: repo
 
-default_version: main
+default_version: '5.2.2'
 versions:
-  main:
+  '5.2.2':
     env:
-      MLC_GIT_CHECKOUT: main
+      MLC_GIT_CHECKOUT: '5.2.2'
+  master:
+    env:
+      MLC_GIT_CHECKOUT: master
 
 tests:
   run_inputs:
