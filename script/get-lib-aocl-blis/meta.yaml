@@ -85,6 +85,8 @@ variations:
         - MLC_DAE_URL
       force_env_keys:
       - MLC_OUTDIRNAME
+    default-variations:
+      version: version.5.1.0
   binary.aocc:
     env:
       MLC_AOCL_BINARY_COMPILER: aocc
@@ -94,9 +96,9 @@ variations:
     env:
       MLC_AOCL_BINARY_COMPILER: gcc
     group: binary-compiler
-default_version: 5.1.0
-versions:
-  5.1.0:
+  version.5.1.0:
+    default: true
+    group: version
     env:
       MLC_GIT_CHECKOUT: 5.1.0
       MLC_AOCL_BINARY_VERSION: 5.1.0

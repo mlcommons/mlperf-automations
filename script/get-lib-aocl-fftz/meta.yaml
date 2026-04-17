@@ -72,8 +72,6 @@ variations:
       MLC_AOCL_BINARY_DOWNLOAD: 'yes'
       MLC_AOCL_BINARY_LIB_NAME: fftz
       MLC_AOCL_BINARY_COMPILER: aocc
-      MLC_AOCL_BINARY_VERSION: 5.2.0
-      MLC_AOCL_BINARY_VERSION_PATH: 5-2
     prehook_deps:
     - tags: download-and-extract
       names:
@@ -90,6 +88,8 @@ variations:
         - MLC_DAE_URL
       force_env_keys:
       - MLC_OUTDIRNAME
+    default-variations:
+      version: version.5.2.0
   binary.aocc:
     env:
       MLC_AOCL_BINARY_COMPILER: aocc
@@ -99,11 +99,19 @@ variations:
     env:
       MLC_AOCL_BINARY_COMPILER: gcc
     group: binary-compiler
-default_version: '5.2'
-versions:
-  '5.2':
+  version.5.2:
+    default: true
+    group: version
     env:
       MLC_GIT_CHECKOUT: '5.2'
+      MLC_AOCL_BINARY_VERSION: 5.2.0
+      MLC_AOCL_BINARY_VERSION_PATH: 5-2
+  version.5.2.0:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT: '5.2'
+      MLC_AOCL_BINARY_VERSION: 5.2.0
+      MLC_AOCL_BINARY_VERSION_PATH: 5-2
   amd-main:
     env:
       MLC_GIT_CHECKOUT: amd-main
