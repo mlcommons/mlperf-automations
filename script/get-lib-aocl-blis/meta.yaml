@@ -96,8 +96,14 @@ variations:
     env:
       MLC_AOCL_BINARY_COMPILER: gcc
     group: binary-compiler
-  version.5.1.0:
+  version.5.2.0:
     default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT: 5.2.0
+      MLC_AOCL_BINARY_VERSION: 5.2.0
+      MLC_AOCL_BINARY_VERSION_PATH: 5-2
+  version.5.1.0:
     group: version
     env:
       MLC_GIT_CHECKOUT: 5.1.0
