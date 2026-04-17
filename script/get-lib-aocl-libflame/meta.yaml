@@ -67,7 +67,7 @@ variations:
     env:
       MLC_GIT_REPO_URL: https://github.com/amd/libflame.git
     group: repo
-  _binary:
+  binary:
     env:
       MLC_AOCL_BINARY_DOWNLOAD: 'yes'
       MLC_AOCL_BINARY_LIB_NAME: libflame
@@ -90,12 +90,12 @@ variations:
         - MLC_DAE_URL
       force_env_keys:
       - MLC_OUTDIRNAME
-  _binary.aocc:
+  binary.aocc:
     env:
       MLC_AOCL_BINARY_COMPILER: aocc
     group: binary-compiler
     default: true
-  _binary.gcc:
+  binary.gcc:
     env:
       MLC_AOCL_BINARY_COMPILER: gcc
     group: binary-compiler
@@ -112,7 +112,7 @@ tests:
   - variations_list:
     - repo.amd
   - variations_list:
-    - _binary
+    - binary
     env:
       MLC_AOCL_ACCEPT_EULA: 'yes'
 default_env:
