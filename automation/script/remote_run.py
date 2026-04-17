@@ -91,7 +91,7 @@ def remote_run(self_module, i):
     }
 
     run_cmds = []
-    remote_mlc_python_venv = i.get('remote_python_venv', '.mlcflow')
+    remote_mlc_python_venv = i.get('remote_python_venv', 'mlcflow')
 
     # Determine if the local system is Windows to adjust command formatting
     is_windows = platform.system() == 'Windows'
