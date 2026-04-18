@@ -23,7 +23,7 @@ jobs:
           path-to-signatures: 'cla-bot/v1/cla.json'
           # branch should not be protected
           branch: 'main'
-          allowlist: user1,mlcommons-bot,mlc-automations,bot*,copilot-swe-agent[bot]
+          allowlist: user1,mlcommons-bot,mlc-automations,bot*,copilot-swe-agent[bot],copilot
           remote-organization-name: mlcommons
           remote-repository-name: systems
           
