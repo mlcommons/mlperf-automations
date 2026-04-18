@@ -1,5 +1,8 @@
 name: Test Docker images
 
+permissions:
+  contents: read
+
 on:
   pull_request:
     branches: [ "main", "dev" ]
@@ -49,6 +52,9 @@ on:
         required: false
         default: 'detect,cpu'
         type: string
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
