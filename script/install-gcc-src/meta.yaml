@@ -1,8 +1,32 @@
 alias: install-gcc-src
+uid: faae0ebd6e1242db
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Compiler automation
+tags:
+- install
+- src
+- gcc
+- src-gcc
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_GCC_*
+
+# Input mapping
+input_mapping:
+  build: MLC_GCC_BUILD
+  extra: MLC_GCC_EXTRA_CONFIGURE_STRING
+  host: MLC_GCC_HOST
+  pull_changes: MLC_GCC_REPO_PULL_CHANGES
+  targets: MLC_GCC_TARGET
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -24,45 +48,28 @@ deps:
     - MLC_GIT_CHECKOUT_SHA
     _tag.:
     - MLC_GIT_CHECKOUT_TAG
-input_mapping:
-  targets: MLC_GCC_TARGET 
-  host: MLC_GCC_HOST
-  build: MLC_GCC_BUILD
-  extra: MLC_GCC_EXTRA_CONFIGURE_STRING
-
-
-new_env_keys:
-  - MLC_GCC_*
+- tags: pull,git,repo
+  env:
+    MLC_GIT_CHECKOUT_PATH: <<<MLC_GCC_SRC_REPO_PATH>>>
+  enable_if_env:
+    MLC_GCC_REPO_PULL_CHANGES:
+    - 'yes'
 post_deps:
 - skip_if_env:
     MLC_REQUIRE_INSTALL:
     - 'yes'
   tags: get,gcc
-tags:
-- install
-- src
-- gcc
-- src-gcc
-uid: faae0ebd6e1242db
-docker:
-  skip_run_cmd: true
-  pre_run_cmds:
-    - mlc pull repo
-tests:
-  run_inputs:
-    - {}
-variations:
-  extra.#:
-    env:
-      MLC_GCC_EXTRA_CONFIGURE_STRING: '#'
-      
-  enable-multilib:
-    deps:
-      - tags: get,multilib
-    env:
-      +MLC_GCC_EXTRA_CONFIGURE_LIST:
-        - "--enable-multilib"
+  update_tags_from_env_with_prefix:
+    _path.:
+    - MLC_GCC_INSTALLED_PATH
 
+# Variations
+variations:
+  darwin:
+    group: repo
+    env:
+      MLC_GIT_URL: https://github.com/iains/gcc-darwin-arm64
+      MLC_GCC_WITH_SYSROOT: '`xcrun --show-sdk-path`'
   mainline:
     group: repo
     default: true
@@ -70,11 +77,10 @@ variations:
       version: master
     env:
       MLC_GIT_URL: git://gcc.gnu.org/git/gcc.git
-  darwin:
-    group: repo
+  branch.#:
+    group: version
     env:
-      MLC_GIT_URL: https://github.com/iains/gcc-darwin-arm64
-      MLC_GCC_WITH_SYSROOT: '`xcrun --show-sdk-path`'
+      MLC_GIT_CHECKOUT: '#'
   master:
     group: version
     env:
@@ -83,11 +89,35 @@ variations:
     group: version
     env:
       MLC_GIT_CHECKOUT: releases/gcc-#
-  branch.#:
-    group: version
+  enable-multilib:
+    deps:
+    - tags: get,multilib
     env:
-      MLC_GIT_CHECKOUT: '#'
+      +MLC_GCC_EXTRA_CONFIGURE_LIST:
+      - --enable-multilib
+  extra.#:
+    env:
+      MLC_GCC_EXTRA_CONFIGURE_STRING: '#'
   lang.#:
     env:
       +MLC_GCC_ENABLED_LANGUAGES:
-        - '#'
+      - '#'
+
+# Conditional meta updates
+update_meta_if_env:
+- default_variations:
+    repo: darwin
+  enable_if_env:
+    MLC_HOST_OS_TYPE:
+    - darwin
+
+# Docker / container
+docker:
+  skip_run_cmd: true
+  pre_run_cmds:
+  - mlc pull repo
+
+# Tests
+tests:
+  run_inputs:
+  - {}

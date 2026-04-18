@@ -1,8 +1,28 @@
 alias: install-intel-neural-speed-from-src
+uid: b5477fdc929744ce
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
+name: Build Intel Neural Speed from sources
 category: Detection or installation of tools and artifacts
+tags:
+- install
+- src
+- from.src
+- neural-speed
+- intel-neural-speed
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_GIT_URL: https://github.com/intel/neural-speed
+new_env_keys:
+- MLC_INTEL_NEURAL_SPEED_*
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -21,20 +41,18 @@ deps:
     - MLC_GIT_CHECKOUT_SHA
     _tag.:
     - MLC_GIT_CHECKOUT_TAG
-env:
-  MLC_GIT_URL: https://github.com/intel/neural-speed
-name: Build Intel Neural Speed from sources
-new_env_keys:
-- MLC_INTEL_NEURAL_SPEED_*
-sort: 1000
-tags:
-- install
-- src
-- from.src
-- neural-speed
-- intel-neural-speed
-uid: b5477fdc929744ce
+
+# Variations
 variations:
+  repo.#:
+    env:
+      MLC_GIT_URL: '#'
+    group: repo
+  repo.https://github.com/intel/neural-speed:
+    default: true
+    env:
+      MLC_GIT_URL: https://github.com/intel/neural-speed
+    group: repo
   branch.#:
     env:
       MLC_GIT_CHECKOUT: '#'
@@ -55,15 +73,6 @@ variations:
       - conda-package
       - wheel
       tags: get,generic,conda-package,_package.wheel,_source.conda-forge
-  repo.#:
-    env:
-      MLC_GIT_URL: '#'
-    group: repo
-  repo.https://github.com/intel/neural-speed:
-    default: true
-    env:
-      MLC_GIT_URL: https://github.com/intel/neural-speed
-    group: repo
   sha.#:
     env:
       MLC_GIT_CHECKOUT_SHA: '#'
@@ -73,4 +82,7 @@ variations:
         tags: _no-recurse-submodules,_full-history
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
+
+# Output / debugging
 warnings: []
+sort: 1000

@@ -1,15 +1,32 @@
 alias: get-mlperf-inference-results
+uid: 36bae5b25dbe41da
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLPerf Inference
+tags:
+- get
+- results
+- inference
+- official
+- inference-results
+- mlcommons
+- mlperf
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_GIT_CHECKOUT: master
   MLC_GIT_DEPTH: --depth 1
   MLC_GIT_PATCH: 'no'
-deps: []
 new_env_keys:
 - MLC_MLPERF_INFERENCE_RESULTS_*
+
+# Dependencies
+deps: []
 prehook_deps:
 - env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_MLPERF_INFERENCE_RESULTS_PATH
@@ -22,15 +39,8 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _repo.:
     - MLC_GIT_URL
-tags:
-- get
-- results
-- inference
-- official
-- inference-results
-- mlcommons
-- mlperf
-uid: 36bae5b25dbe41da
+
+# Variations
 variations:
   code-only:
     adr:
@@ -46,6 +56,11 @@ variations:
     adr:
       inference-results-repo:
         tags: _branch.mlc-code-only-for-v5.1
+    group: repo-branch
+  code-only-for-v6.0:
+    adr:
+      inference-results-repo:
+        tags: _branch.mlc-code-only-for-v6.0
     group: repo-branch
   ctuning:
     env:
@@ -74,25 +89,33 @@ variations:
     env:
       MLC_GIT_URL: https://github.com/<<<GITHUB_REPO_OWNER>>>/inference_results_v4.0.git
       MLC_MLPERF_INFERENCE_RESULTS_VERSION_NAME: v4.0
-      MLC_VERSION: "v4.0"
+      MLC_VERSION: v4.0
   v5.0:
     group: version
     env:
       MLC_GIT_URL: https://github.com/<<<GITHUB_REPO_OWNER>>>/inference_results_v5.0.git
       MLC_MLPERF_INFERENCE_RESULTS_VERSION_NAME: v5.0
-      MLC_VERSION: "v5.0"
-  v5.1-dev:
-    group: version
-    env:
-      MLC_GIT_URL: https://github.com/<<<GITHUB_REPO_OWNER>>>/inference_results_v5.0.git
-      MLC_MLPERF_INFERENCE_RESULTS_VERSION_NAME: v5.1-dev
-      MLC_VERSION: "v5.0"
+      MLC_VERSION: v5.0
   v5.1:
     group: version
     env:
       MLC_GIT_URL: https://github.com/<<<GITHUB_REPO_OWNER>>>/inference_results_v5.1.git
       MLC_MLPERF_INFERENCE_RESULTS_VERSION_NAME: v5.1
-      MLC_VERSION: "v5.1"
+      MLC_VERSION: v5.1
+  v5.1-dev:
+    group: version
+    env:
+      MLC_GIT_URL: https://github.com/<<<GITHUB_REPO_OWNER>>>/inference_results_v5.0.git
+      MLC_MLPERF_INFERENCE_RESULTS_VERSION_NAME: v5.1-dev
+      MLC_VERSION: v5.0
+  v6.0-dev:
+    group: version
+    env:
+      MLC_GIT_URL: https://github.com/<<<GITHUB_REPO_OWNER>>>/inference_results_v5.0.git
+      MLC_MLPERF_INFERENCE_RESULTS_VERSION_NAME: v6.0-dev
+      MLC_VERSION: v5.0
+
+# Versions
 versions:
   v2.1:
     env:
@@ -114,4 +137,3 @@ versions:
     env:
       MLC_GIT_URL: https://github.com/<<<GITHUB_REPO_OWNER>>>/inference_results_v4.1.git
       MLC_MLPERF_INFERENCE_RESULTS_VERSION_NAME: v4.1
-

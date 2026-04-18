@@ -1,8 +1,9 @@
 alias: get-gh-actions-runner
+uid: 5b005c5a76f242a7
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
-can_force_cache: true
+
+# Metadata
 tags:
 - get
 - gh
@@ -12,47 +13,55 @@ tags:
 - runner
 - code
 - gh-actions-runner
-uid: 5b005c5a76f242a7
+
+# Cache
+cache: false
+can_force_cache: true
+
+# Environment
+new_env_keys:
+- MLC_GH_ACTIONS_RUNNER_CODE_PATH
+
+# Input mapping
 input_mapping:
   token: MLC_GH_ACTIONS_RUNNER_TOKEN
   url: MLC_GH_ACTIONS_RUNNER_URL
 
-new_env_keys:
-  - MLC_GH_ACTIONS_RUNNER_CODE_PATH
-
+# Dependencies
 deps:
-  - tags: detect-os
-  - tags: download-and-extract,_extract,_url.https://github.com/actions/runner/releases/download/v2.321.0/actions-runner-linux-x64-2.321.0.tar.gz
-    force_cache: yes
-    extra_cache_tags: gh-actions-runner-code,gh-actions,code
-    env:
-      MLC_DAE_FINAL_ENV_NAME: MLC_GH_ACTIONS_RUNNER_CODE_PATH
+- tags: detect-os
+- tags: download-and-extract,_extract,_url.https://github.com/actions/runner/releases/download/v2.321.0/actions-runner-linux-x64-2.321.0.tar.gz
+  force_cache: true
+  extra_cache_tags: gh-actions-runner-code,gh-actions,code
+  env:
+    MLC_DAE_FINAL_ENV_NAME: MLC_GH_ACTIONS_RUNNER_CODE_PATH
 
+# Variations
 variations:
   config:
     group: command
     env:
       MLC_GH_ACTIONS_RUNNER_COMMAND: config
+  install:
+    group: command
+    deps:
+    - tags: get,gh,actions-runner,_config
+      force_cache: true
+    env:
+      MLC_GH_ACTIONS_RUNNER_COMMAND: install
   remove:
     group: command
     env:
       MLC_GH_ACTIONS_RUNNER_COMMAND: remove
-  install:
-    group: command
-    deps:
-      - tags: get,gh,actions-runner,_config
-        force_cache: yes
-    env:
-      MLC_GH_ACTIONS_RUNNER_COMMAND: install
-  uninstall:
-    group: command
-    env:
-      MLC_GH_ACTIONS_RUNNER_COMMAND: uninstall
   start:
     group: command
     default: true
     deps:
-      - tags: get,gh,actions-runner,_install
-        force_cache: yes
+    - tags: get,gh,actions-runner,_install
+      force_cache: true
     env:
       MLC_GH_ACTIONS_RUNNER_COMMAND: start
+  uninstall:
+    group: command
+    env:
+      MLC_GH_ACTIONS_RUNNER_COMMAND: uninstall

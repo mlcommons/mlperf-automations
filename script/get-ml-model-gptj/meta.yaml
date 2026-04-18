@@ -1,21 +1,37 @@
 alias: get-ml-model-gptj
+uid: a41166210f294fbf
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
-docker:
-  run: false
+tags:
+- get
+- raw
+- ml-model
+- gptj
+- gpt-j
+- large-language-model
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_ML_MODEL: GPTJ
   MLC_ML_MODEL_DATASET: cnndm
   MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'no'
+new_env_keys:
+- MLC_ML_MODEL_*
+- GPTJ_CHECKPOINT_PATH
+
+# Input mapping
 input_mapping:
   checkpoint: GPTJ_CHECKPOINT_PATH
   download_path: MLC_DOWNLOAD_PATH
   to: MLC_DOWNLOAD_PATH
-new_env_keys:
-- MLC_ML_MODEL_*
-- GPTJ_CHECKPOINT_PATH
+
+# Dependencies
 prehook_deps:
 - enable_if_env:
     MLC_TMP_REQUIRE_DOWNLOAD:
@@ -30,31 +46,61 @@ prehook_deps:
   - dae
   tags: download-and-extract
   force_env_keys:
-    - MLC_OUTDIRNAME  
+  - MLC_OUTDIRNAME
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_DOWNLOAD_URL
-tests:
-  run_inputs:
-    - variations_list:
-      - fp32,pytorch,r2-downloader,dry-run
-      - fp32,pytorch,rclone,dry-run
-  
-    
-print_env_at_the_end:
-  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
-tags:
-- get
-- raw
-- ml-model
-- gptj
-- gpt-j
-- large-language-model
-uid: a41166210f294fbf
+
+# Variations
 variations:
-  batch_size.#:
+  r2-downloader:
+    group: download-tool
+    default: true
+    add_deps_recursive:
+      dae:
+        tags: _r2-downloader
     env:
-      MLC_ML_MODEL_BATCH_SIZE: '#'
+      MLC_DOWNLOAD_FILENAME: checkpoint
+  rclone:
+    add_deps_recursive:
+      dae:
+        tags: _rclone
+    env:
+      MLC_DOWNLOAD_FILENAME: checkpoint
+      MLC_DOWNLOAD_URL: <<<MLC_RCLONE_URL>>>
+    group: download-tool
+  wget:
+    add_deps_recursive:
+      dae:
+        tags: _wget
+    env:
+      MLC_DOWNLOAD_FILENAME: checkpoint.zip
+      MLC_DOWNLOAD_URL: <<<MLC_PACKAGE_URL>>>
+    group: download-tool
+  pytorch:
+    default: true
+    env:
+      MLC_ML_MODEL_DATA_LAYOUT: NCHW
+      MLC_ML_MODEL_FRAMEWORK: pytorch
+      MLC_ML_STARTING_WEIGHTS_FILENAME: <<<MLC_PACKAGE_URL>>>
+    group: framework
+  saxml:
+    group: framework
+  intel:
+    default_variations:
+      framework: pytorch
+    group: model-provider
+  mlcommons:
+    default: true
+    default_variations:
+      precision: fp32
+    group: model-provider
+  nvidia:
+    default_variations:
+      framework: pytorch
+    env:
+      MLC_TMP_ML_MODEL_PROVIDER: nvidia
+    group: model-provider
   fp32:
     env:
       MLC_ML_MODEL_INPUT_DATA_TYPES: fp32
@@ -77,41 +123,38 @@ variations:
       MLC_ML_MODEL_PRECISION: int8
       MLC_ML_MODEL_WEIGHT_DATA_TYPES: int8
     group: precision
-  intel:
-    default_variations:
-      framework: pytorch
-    group: model-provider
-  mlcommons:
-    default: true
-    default_variations:
-      precision: fp32
-    group: model-provider
-  nvidia:
-    default_variations:
-      framework: pytorch
+  uint8:
     env:
-      MLC_TMP_ML_MODEL_PROVIDER: nvidia
-    group: model-provider
-  pytorch:
-    default: true
+      MLC_ML_MODEL_INPUT_DATA_TYPES: uint8
+      MLC_ML_MODEL_PRECISION: uint8
+      MLC_ML_MODEL_WEIGHT_DATA_TYPES: uint8
+    group: precision
+  dry-run:
+    group: run-mode
     env:
-      MLC_ML_MODEL_DATA_LAYOUT: NCHW
-      MLC_ML_MODEL_FRAMEWORK: pytorch
-      MLC_ML_STARTING_WEIGHTS_FILENAME: <<<MLC_PACKAGE_URL>>>
-    group: framework
+      MLC_DOWNLOAD_MODE: dry
+  batch_size.#:
+    env:
+      MLC_ML_MODEL_BATCH_SIZE: '#'
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
   pytorch,fp32:
     env:
       MLC_DOWNLOAD_CHECKSUM_NOT_USED: e677e28aaf03da84584bb3073b7ee315
       MLC_PACKAGE_URL: https://cloud.mlcommons.org/index.php/s/QAZ2oM94MkFtbQx/download
       MLC_UNZIP: 'yes'
     required_disk_space: 22700
+  pytorch,fp32,r2-downloader:
+    env:
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/gpt-j-model-checkpoint.uri
   pytorch,fp32,rclone:
     env:
       MLC_RCLONE_URL: mlc-inference:mlcommons-inference-wg-public/gpt-j
       MLC_RCLONE_CONFIG_NAME: mlc-inference
-  pytorch,fp32,r2-downloader:
-    env:
-      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/gpt-j-model-checkpoint.uri
   pytorch,fp32,wget:
     add_deps_recursive:
       dae:
@@ -185,34 +228,6 @@ variations:
       names:
       - torch
       - pytorch
-  rclone:
-    add_deps_recursive:
-      dae:
-        tags: _rclone
-    env:
-      MLC_DOWNLOAD_FILENAME: checkpoint
-      MLC_DOWNLOAD_URL: <<<MLC_RCLONE_URL>>>
-    group: download-tool
-  r2-downloader:
-    group: download-tool
-    default: true
-    add_deps_recursive:
-      dae:
-        tags: _r2-downloader
-    env:
-      MLC_DOWNLOAD_FILENAME: checkpoint
-  dry-run:
-    group: run-mode
-    env:
-      MLC_DOWNLOAD_MODE: dry
-  dry-run,r2-downloader:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
-  dry-run,rclone:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  saxml:
-    group: framework
   saxml,fp32:
     deps:
     - tags: get,ml-model,gptj,_fp32,_pytorch,_r2-downloader
@@ -247,17 +262,19 @@ variations:
       tags: get,git,repo,_repo.https://github.com/google/saxml
     env:
       MLC_TMP_MODEL_SAXML: int8
-  uint8:
-    env:
-      MLC_ML_MODEL_INPUT_DATA_TYPES: uint8
-      MLC_ML_MODEL_PRECISION: uint8
-      MLC_ML_MODEL_WEIGHT_DATA_TYPES: uint8
-    group: precision
-  wget:
-    add_deps_recursive:
-      dae:
-        tags: _wget
-    env:
-      MLC_DOWNLOAD_FILENAME: checkpoint.zip
-      MLC_DOWNLOAD_URL: <<<MLC_PACKAGE_URL>>>
-    group: download-tool
+
+# Docker / container
+docker:
+  run: false
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
+
+# Tests
+tests:
+  needs_pat: true
+  run_inputs:
+  - variations_list:
+    - fp32,pytorch,r2-downloader,dry-run
+    - fp32,pytorch,rclone,dry-run

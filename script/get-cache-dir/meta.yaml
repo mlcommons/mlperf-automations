@@ -1,27 +1,43 @@
 alias: get-cache-dir
+uid: 48f4622e059b45ce
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLC Interface
-deps: []
-docker:
-  run: false
-input_description: {}
-new_env_keys:
-- MLC_CACHE_DIR
-- <<<MLC_CACHE_DIR_ENV_NAME>>>
-new_state_keys: []
-post_deps: []
-posthook_deps: []
-prehook_deps: []
 tags:
 - get
 - cache
 - dir
 - directory
-uid: 48f4622e059b45ce
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_CACHE_DIR
+- <<<MLC_CACHE_DIR_ENV_NAME>>>
+new_state_keys: []
+
+# Input mapping
+input_description: {}
+
+# Dependencies
+deps: []
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations:
   name.#:
     env:
       MLC_CACHE_DIR_NAME: '#'
+
+# Versions
 versions: {}
+
+# Docker / container
+docker:
+  run: false

@@ -1,8 +1,22 @@
 alias: get-preprocessed-dataset-imagenet
+uid: f259d490bbaf45f5
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
+tags:
+- get
+- dataset
+- imagenet
+- ILSVRC
+- image-classification
+- preprocessed
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_DATASET_CONVERT_TO_UNSIGNED: '0'
   MLC_DATASET_CROP_FACTOR: '87.5'
@@ -15,6 +29,19 @@ default_env:
   MLC_DATASET_REFERENCE_PREPROCESSOR: '1'
   MLC_MODEL: resnet50
   MLC_PREPROCESS_VGG: 'yes'
+env:
+  MLC_DATASET: imagenet
+new_env_keys:
+- MLC_DATASET_*
+
+# Input mapping
+input_mapping:
+  dir: MLC_DATASET_PREPROCESSED_PATH
+  imagenet_path: MLC_IMAGENET_PATH
+  imagenet_preprocessed_path: MLC_IMAGENET_PREPROCESSED_PATH
+  threads: MLC_NUM_PREPROCESS_THREADS
+
+# Dependencies
 deps:
 - names:
   - python3
@@ -52,26 +79,112 @@ deps:
     - 'on'
   tags: mlperf,mlcommons,inference,source,src
 - tags: get,generic-sys-util,_libgl
-docker:
-  run: false
-env:
-  MLC_DATASET: imagenet
-input_mapping:
-  dir: MLC_DATASET_PREPROCESSED_PATH
-  imagenet_path: MLC_IMAGENET_PATH
-  imagenet_preprocessed_path: MLC_IMAGENET_PREPROCESSED_PATH
-  threads: MLC_NUM_PREPROCESS_THREADS
-new_env_keys:
-- MLC_DATASET_*
-tags:
-- get
-- dataset
-- imagenet
-- ILSVRC
-- image-classification
-- preprocessed
-uid: f259d490bbaf45f5
+
+# Variations
 variations:
+  mlperf.option1:
+    env:
+      MLC_DATASET_CALIBRATION_OPTION: one
+    group: calibration-option
+  mlperf.option2:
+    env:
+      MLC_DATASET_CALIBRATION_OPTION: two
+    group: calibration-option
+  calibration:
+    add_deps:
+      original-dataset:
+        tags: _full
+    default_variations:
+      calibration-option: mlperf.option1
+      preprocessing-source: generic-preprocessor
+    env:
+      MLC_DATASET_TYPE: calibration
+    group: dataset-type
+  validation:
+    default: 'true'
+    default_variations:
+      size: '500'
+    env:
+      MLC_DATASET_TYPE: validation
+    group: dataset-type
+  rgb32:
+    env:
+      MLC_DATASET_PREPROCESSED_EXTENSION: rgb32
+    group: extension
+  rgb8:
+    env:
+      MLC_DATASET_PREPROCESSED_EXTENSION: rgb8
+    group: extension
+  inter.area:
+    env:
+      MLC_DATASET_INTERPOLATION_METHOD: INTER_AREA
+    group: interpolation-method
+  inter.linear:
+    env:
+      MLC_DATASET_INTERPOLATION_METHOD: INTER_LINEAR
+    group: interpolation-method
+  NCHW:
+    default: true
+    env:
+      MLC_DATASET_DATA_LAYOUT: NCHW
+    group: layout
+  NHWC:
+    env:
+      MLC_DATASET_DATA_LAYOUT: NHWC
+    group: layout
+  for.mobilenet:
+    base:
+    - mobilenet_
+    env: {}
+    group: model
+  for.resnet50:
+    base:
+    - resnet50_
+    env:
+      MLC_DATASET_GIVEN_CHANNEL_MEANS: 123.68 116.78 103.94
+      MLC_DATASET_INTERPOLATION_METHOD: INTER_AREA
+      MLC_DATASET_NORMALIZE_DATA: '0'
+      MLC_DATASET_SUBTRACT_MEANS: '1'
+    group: model
+  float32:
+    env:
+      MLC_DATASET_CONVERT_TO_UNSIGNED: '0'
+      MLC_DATASET_DATA_TYPE: float32
+      MLC_DATASET_QUANTIZE: '0'
+    group: precision
+  int8:
+    env:
+      MLC_DATASET_CONVERT_TO_UNSIGNED: '0'
+      MLC_DATASET_DATA_TYPE: int8
+      MLC_DATASET_QUANTIZE: '1'
+    group: precision
+  uint8:
+    env:
+      MLC_DATASET_CONVERT_TO_UNSIGNED: '1'
+      MLC_DATASET_DATA_TYPE: uint8
+      MLC_DATASET_DATA_TYPE_INPUT: float32
+      MLC_DATASET_QUANTIZE: '1'
+    group: precision
+  generic-preprocessor:
+    env:
+      MLC_DATASET_REFERENCE_PREPROCESSOR: '0'
+    group: preprocessing-source
+    prehook_deps:
+    - tags: get,generic,image-preprocessor
+  mlcommons-reference-preprocessor:
+    default: true
+    env:
+      MLC_DATASET_REFERENCE_PREPROCESSOR: '1'
+    group: preprocessing-source
+  resolution.#:
+    env:
+      MLC_DATASET_INPUT_SQUARE_SIDE: '#'
+    group: resolution
+  resolution.224:
+    default: true
+    env:
+      MLC_DATASET_INPUT_SQUARE_SIDE: '224'
+    group: resolution
   '1':
     add_deps:
       original-dataset:
@@ -86,41 +199,25 @@ variations:
     env:
       MLC_DATASET_SIZE: '500'
     group: size
+  full:
+    add_deps:
+      original-dataset:
+        tags: _full
+    env:
+      MLC_DATASET_SIZE: '50000'
+    group: size
+  size.#:
+    add_deps:
+      original-dataset:
+        tags: _#
+    env:
+      MLC_DATASET_SIZE: '#'
+    group: size
   500,validation:
     add_deps:
       original-dataset:
         tags: _size.500
-  NCHW:
-    default: true
-    env:
-      MLC_DATASET_DATA_LAYOUT: NCHW
-    group: layout
-  NHWC:
-    env:
-      MLC_DATASET_DATA_LAYOUT: NHWC
-    group: layout
-  calibration:
-    add_deps:
-      original-dataset:
-        tags: _full
-    default_variations:
-      calibration-option: mlperf.option1
-      preprocessing-source: generic-preprocessor
-    env:
-      MLC_DATASET_TYPE: calibration
-    group: dataset-type
   default: {}
-  float32:
-    env:
-      MLC_DATASET_CONVERT_TO_UNSIGNED: '0'
-      MLC_DATASET_DATA_TYPE: float32
-      MLC_DATASET_QUANTIZE: '0'
-    group: precision
-  for.mobilenet:
-    base:
-    - mobilenet_
-    env: {}
-    group: model
   for.mobilenet,float32:
     env:
       MLC_DATASET_GIVEN_CHANNEL_MEANS: ''
@@ -134,15 +231,6 @@ variations:
       MLC_DATASET_NORMALIZE_DATA: '0'
       MLC_DATASET_QUANTIZE: '0'
       MLC_DATASET_SUBTRACT_MEANS: '0'
-  for.resnet50:
-    base:
-    - resnet50_
-    env:
-      MLC_DATASET_GIVEN_CHANNEL_MEANS: 123.68 116.78 103.94
-      MLC_DATASET_INTERPOLATION_METHOD: INTER_AREA
-      MLC_DATASET_NORMALIZE_DATA: '0'
-      MLC_DATASET_SUBTRACT_MEANS: '1'
-    group: model
   for.resnet50,float32:
     env: {}
   for.resnet50,rgb8:
@@ -161,46 +249,6 @@ variations:
     env:
       MLC_DATASET_QUANT_OFFSET: '0'
       MLC_DATASET_QUANT_SCALE: '1.18944883'
-  full:
-    add_deps:
-      original-dataset:
-        tags: _full
-    env:
-      MLC_DATASET_SIZE: '50000'
-    group: size
-  generic-preprocessor:
-    env:
-      MLC_DATASET_REFERENCE_PREPROCESSOR: '0'
-    group: preprocessing-source
-    prehook_deps:
-    - tags: get,generic,image-preprocessor
-  int8:
-    env:
-      MLC_DATASET_CONVERT_TO_UNSIGNED: '0'
-      MLC_DATASET_DATA_TYPE: int8
-      MLC_DATASET_QUANTIZE: '1'
-    group: precision
-  inter.area:
-    env:
-      MLC_DATASET_INTERPOLATION_METHOD: INTER_AREA
-    group: interpolation-method
-  inter.linear:
-    env:
-      MLC_DATASET_INTERPOLATION_METHOD: INTER_LINEAR
-    group: interpolation-method
-  mlcommons-reference-preprocessor:
-    default: true
-    env:
-      MLC_DATASET_REFERENCE_PREPROCESSOR: '1'
-    group: preprocessing-source
-  mlperf.option1:
-    env:
-      MLC_DATASET_CALIBRATION_OPTION: one
-    group: calibration-option
-  mlperf.option2:
-    env:
-      MLC_DATASET_CALIBRATION_OPTION: two
-    group: calibration-option
   mobilenet_:
     default_variations:
       extension: rgb32
@@ -227,47 +275,13 @@ variations:
       preprocessing-source: generic-preprocessor
     env:
       MLC_MODEL: resnet50
-  resolution.#:
-    env:
-      MLC_DATASET_INPUT_SQUARE_SIDE: '#'
-    group: resolution
-  resolution.224:
-    default: true
-    env:
-      MLC_DATASET_INPUT_SQUARE_SIDE: '224'
-    group: resolution
-  rgb32:
-    env:
-      MLC_DATASET_PREPROCESSED_EXTENSION: rgb32
-    group: extension
-  rgb8:
-    env:
-      MLC_DATASET_PREPROCESSED_EXTENSION: rgb8
-    group: extension
-  size.#:
-    add_deps:
-      original-dataset:
-        tags: _#
-    env:
-      MLC_DATASET_SIZE: '#'
-    group: size
   tflite_tpu:
     default_variations:
       preprocessing-source: mlcommons-reference-preprocessor
     env:
       MLC_MODEL: resnet50
       MLC_PREPROCESS_TFLITE_TPU: 'yes'
-  uint8:
-    env:
-      MLC_DATASET_CONVERT_TO_UNSIGNED: '1'
-      MLC_DATASET_DATA_TYPE: uint8
-      MLC_DATASET_DATA_TYPE_INPUT: float32
-      MLC_DATASET_QUANTIZE: '1'
-    group: precision
-  validation:
-    default: 'true'
-    default_variations:
-      size: '500'
-    env:
-      MLC_DATASET_TYPE: validation
-    group: dataset-type
+
+# Docker / container
+docker:
+  run: false

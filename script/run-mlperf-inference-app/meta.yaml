@@ -1,18 +1,11 @@
 alias: run-mlperf-inference-app
 uid: 4a5d5b13fd7e4ac8
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
+# Metadata
 category: MLPerf Inference
-
-developers: "[Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Grigori Fursin](https://cKnowledge.org/gfursin)"
-
-clean_output_files:
-- open.tar.gz
-- summary.csv
-- summary.json
-
+developers: '[Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Grigori Fursin](https://cKnowledge.org/gfursin)'
 tags:
 - run
 - common
@@ -24,462 +17,136 @@ tags:
 - mlperf
 - inference
 - reference
+tags_help: run-mlperf,inference
 
-tags_help: "run-mlperf,inference"
-predeps: False
+# Cache
+clean_output_files:
+- open.tar.gz
+- summary.csv
+- summary.json
 
+# Environment
 default_env:
   MLC_MLPERF_IMPLEMENTATION: reference
   MLC_MLPERF_MODEL: resnet50
   MLC_MLPERF_LOADGEN_SCENARIO: Offline
   MLC_MLPERF_RUN_STYLE: test
-  MLC_MLPERF_SKIP_SUBMISSION_GENERATION: no
-  MLC_DOCKER_PRIVILEGED_MODE: yes
+  MLC_MLPERF_SKIP_SUBMISSION_GENERATION: false
+  MLC_DOCKER_PRIVILEGED_MODE: true
   MLC_MLPERF_SUBMISSION_DIVISION: open
   MLC_MLPERF_INFERENCE_TP_SIZE: 1
+new_state_keys:
+- app_mlperf_inference_*
+- mlc-mlperf-inference-results*
 
+# Input mapping
 input_mapping:
+  all_models: MLC_MLPERF_ALL_MODELS
   api_server: MLC_MLPERF_INFERENCE_API_SERVER
   backend: MLC_MLPERF_BACKEND
   batch_size: MLC_MLPERF_LOADGEN_MAX_BATCHSIZE
   beam_size: GPTJ_BEAM_SIZE
   category: MLC_MLPERF_SUBMISSION_SYSTEM_TYPE
   clean: MLC_MLPERF_CLEAN_ALL
+  client_id: CF_ACCESS_CLIENT_ID
+  client_secret: CF_ACCESS_CLIENT_SECRET
   compliance: MLC_MLPERF_LOADGEN_COMPLIANCE
+  criteo_day23_raw_data_path: MLC_CRITEO_DAY23_RAW_DATA_PATH
   custom_system_nvidia: MLC_CUSTOM_SYSTEM_NVIDIA
   dashboard_wb_project: MLC_MLPERF_DASHBOARD_WANDB_PROJECT
   dashboard_wb_user: MLC_MLPERF_DASHBOARD_WANDB_USER
   debug: MLC_DEBUG_SCRIPT_BENCHMARK_PROGRAM
+  deeplab_resnet50_path: MLC_ML_MODEL_DPLAB_RESNET50_PATH
   device: MLC_MLPERF_DEVICE
   division: MLC_MLPERF_SUBMISSION_DIVISION
   dlrm_data_path: DLRM_DATA_PATH
   docker: MLC_MLPERF_USE_DOCKER
+  docker_keep_alive: MLC_DOCKER_CONTAINER_KEEP_ALIVE
   dump_version_info: MLC_DUMP_VERSION_INFO
-  save_console_log: MLC_SAVE_CONSOLE_LOG
   execution_mode: MLC_MLPERF_RUN_STYLE
   find_performance: MLC_MLPERF_FIND_PERFORMANCE_MODE
   framework: MLC_MLPERF_BACKEND
-  status: MLC_MLPERF_SUBMISSION_SYSTEM_STATUS
-  docker_keep_alive: MLC_DOCKER_CONTAINER_KEEP_ALIVE
   get_platform_details: MLC_GET_PLATFORM_DETAILS
   gpu_name: MLC_NVIDIA_GPU_NAME
   hw_name: MLC_HW_NAME
-  pip_loadgen: MLC_MLPERF_INFERENCE_LOADGEN_INSTALL_FROM_PIP
   hw_notes_extra: MLC_MLPERF_SUT_SW_NOTES_EXTRA
   imagenet_path: IMAGENET_PATH
   implementation: MLC_MLPERF_IMPLEMENTATION
   lang: MLC_MLPERF_IMPLEMENTATION
+  max_query_count: MLC_MLPERF_INFERENCE_MAX_QUERY_COUNT
+  max_test_duration: MLC_MLPERF_MAX_DURATION_TEST
   min_duration: MLC_MLPERF_INFERENCE_MIN_DURATION
   min_query_count: MLC_MLPERF_INFERENCE_MIN_QUERY_COUNT
-  max_query_count: MLC_MLPERF_INFERENCE_MAX_QUERY_COUNT
   mode: MLC_MLPERF_LOADGEN_MODE
   model: MLC_MLPERF_MODEL
   multistream_target_latency: MLC_MLPERF_LOADGEN_MULTISTREAM_TARGET_LATENCY
   network: MLC_NETWORK_LOADGEN
+  nm_model_zoo_stub: MLC_MLPERF_NEURALMAGIC_MODEL_ZOO_STUB
+  num_workers: MLC_MLPERF_INFERENCE_NUM_WORKERS
+  number_of_processes_per_gpu_node: MLC_MLPERF_INFERENCE_NUM_PROCESSES_PER_GPU_NODE
+  nvidia_llama2_dataset_file_path: MLC_NVIDIA_LLAMA_DATASET_FILE_PATH
   nvidia_system_name: MLC_NVIDIA_SYSTEM_NAME
   offline_target_qps: MLC_MLPERF_LOADGEN_OFFLINE_TARGET_QPS
   output_dir: OUTPUT_BASE_DIR
   output_summary: MLPERF_INFERENCE_SUBMISSION_SUMMARY
   output_tar: MLPERF_INFERENCE_SUBMISSION_TAR_FILE
   performance_sample_count: MLC_MLPERF_LOADGEN_PERFORMANCE_SAMPLE_COUNT
+  pip_loadgen: MLC_MLPERF_INFERENCE_LOADGEN_INSTALL_FROM_PIP
+  pointpainting_checkpoint_path: MLC_ML_MODEL_POINT_PILLARS_PATH
   power: MLC_SYSTEM_POWER
   precision: MLC_MLPERF_MODEL_PRECISION
   preprocess_submission: MLC_RUN_MLPERF_SUBMISSION_PREPROCESSOR
-  push_to_github: MLC_MLPERF_RESULT_PUSH_TO_GITHUB
   pull_changes: MLC_MLPERF_INFERENCE_PULL_CODE_CHANGES
   pull_inference_changes: MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES
+  push_to_github: MLC_MLPERF_RESULT_PUSH_TO_GITHUB
   readme: MLC_MLPERF_README
   regenerate_accuracy_file: MLC_MLPERF_REGENERATE_ACCURACY_FILE
   regenerate_files: MLC_REGENERATE_MEASURE_FILES
   rerun: MLC_RERUN
   results_dir: OUTPUT_BASE_DIR
   results_git_url: MLC_MLPERF_RESULTS_GIT_REPO_URL
+  rgat_checkpoint_path: RGAT_CHECKPOINT_PATH
   run_checker: MLC_RUN_SUBMISSION_CHECKER
   run_style: MLC_MLPERF_RUN_STYLE
+  save_console_log: MLC_SAVE_CONSOLE_LOG
   scenario: MLC_MLPERF_LOADGEN_SCENARIO
   server_target_qps: MLC_MLPERF_LOADGEN_SERVER_TARGET_QPS
   singlestream_target_latency: MLC_MLPERF_LOADGEN_SINGLESTREAM_TARGET_LATENCY
   skip_submission_generation: MLC_MLPERF_SKIP_SUBMISSION_GENERATION
   skip_truncation: MLC_SKIP_TRUNCATE_ACCURACY
+  status: MLC_MLPERF_SUBMISSION_SYSTEM_STATUS
   submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
   submitter: MLC_MLPERF_SUBMITTER
+  submitter_id: MLC_MLPERF_SUBMITTER_ID
+  sut: MLC_MLPERF_INFERENCE_SUT_VARIATION
   sut_servers: MLC_NETWORK_LOADGEN_SUT_SERVERS
   sw_notes_extra: MLC_MLPERF_SUT_SW_NOTES_EXTRA
   system_type: MLC_MLPERF_SUBMISSION_SYSTEM_TYPE
   target_latency: MLC_MLPERF_LOADGEN_TARGET_LATENCY
   target_qps: MLC_MLPERF_LOADGEN_TARGET_QPS
+  test_qps: MLC_MLPERF_INFERENCE_TEST_QPS
   test_query_count: MLC_TEST_QUERY_COUNT
   threads: MLC_NUM_THREADS
-  sut: MLC_MLPERF_INFERENCE_SUT_VARIATION
-  nvidia_llama2_dataset_file_path: MLC_NVIDIA_LLAMA_DATASET_FILE_PATH
   tp_size: MLC_NVIDIA_TP_SIZE
-  vllm_tp_size: MLC_MLPERF_INFERENCE_TP_SIZE
-  vllm_model_name: MLC_VLLM_SERVER_MODEL_NAME
-  num_workers: MLC_MLPERF_INFERENCE_NUM_WORKERS
-  max_test_duration: MLC_MLPERF_MAX_DURATION_TEST
-  all_models: MLC_MLPERF_ALL_MODELS
-  criteo_day23_raw_data_path: MLC_CRITEO_DAY23_RAW_DATA_PATH
   use_dataset_from_host: MLC_USE_DATASET_FROM_HOST
   use_model_from_host: MLC_USE_MODEL_FROM_HOST
-  rgat_checkpoint_path: RGAT_CHECKPOINT_PATH
-  pointpainting_checkpoint_path: MLC_ML_MODEL_POINT_PILLARS_PATH
-  deeplab_resnet50_path: MLC_ML_MODEL_DPLAB_RESNET50_PATH
-  waymo_path: MLC_DATASET_WAYMO_PATH
-  nm_model_zoo_stub: MLC_MLPERF_NEURALMAGIC_MODEL_ZOO_STUB
   use_service_account: MLC_AUTH_USING_SERVICE_ACCOUNT
-  client_id: CF_ACCESS_CLIENT_ID
-  client_secret: CF_ACCESS_CLIENT_SECRET
-
-new_state_keys:
-- app_mlperf_inference_*
-- mlc-mlperf-inference-results*
-
-deps:
-- tags: detect,os
-  skip_if_env:
-    MLC_MLPERF_USE_DOCKER: [ on ]
-- tags: detect,cpu
-  skip_if_env:
-    MLC_MLPERF_USE_DOCKER: [ on ]
-- names:
-  - python
-  - python3
-  tags: get,python3
-  skip_if_env:
-    MLC_MLPERF_USE_DOCKER: [ on ]
-- names:
-  - inference-src
-  tags: get,mlcommons,inference,src
-- tags: pull,git,repo
-  env:
-    MLC_GIT_CHECKOUT_PATH: '<<<MLC_MLPERF_INFERENCE_SOURCE>>>'
-  enable_if_env:
-    MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES:
-    - 'yes'
-- tags: get,sut,description
-  skip_if_env:
-    MLC_MLPERF_USE_DOCKER: [ on ]
-
-- tags: get,mlperf,inference,results,dir
-  names:
-    - get-mlperf-inference-results-dir
-  skip_if_env:
-    OUTPUT_BASE_DIR: [ on ]
-- tags: install,pip-package,for-mlc-python,_package.tabulate
-- tags: get,mlperf,inference,utils
-
-#We use this script as a command generator to run docker via app-mlperf-inference script
-docker:
-  pass_docker_to_script: True
-
-variations:
-
-  accuracy-only:
-    default_variations:
-      submission-generation-style: full
-    env:
-      MLC_MLPERF_LOADGEN_MODE: accuracy
-      MLC_MLPERF_SUBMISSION_RUN: 'yes'
-      MLC_RUN_MLPERF_ACCURACY: 'on'
-      MLC_RUN_SUBMISSION_CHECKER: 'no'
-    group: submission-generation
-
-  all-modes:
-    env:
-      MLC_MLPERF_LOADGEN_ALL_MODES: 'yes'
-    group: mode
-
-  all-scenarios:
-    env:
-      MLC_MLPERF_LOADGEN_ALL_SCENARIOS: 'yes'
-
-  compliance:
-    env:
-      MLC_MLPERF_LOADGEN_COMPLIANCE: 'yes'
-
-  find-performance:
-    env:
-      MLC_MLPERF_FIND_PERFORMANCE_MODE: 'yes'
-      MLC_MLPERF_LOADGEN_ALL_MODES: 'no'
-      MLC_MLPERF_LOADGEN_MODE: performance
-      MLC_MLPERF_RESULT_PUSH_TO_GITHUB: false
-    group: submission-generation
-
-  full:
-    add_deps_recursive:
-      coco2014-original:
-        tags: _full
-      coco2014-preprocessed:
-        tags: _full
-      imagenet-original:
-        tags: _full
-      imagenet-preprocessed:
-        tags: _full
-      openimages-original:
-        tags: _full
-      openimages-preprocessed:
-        tags: _full
-      openorca-original:
-        tags: _full
-      openorca-preprocessed:
-        tags: _full
-      coco2014-dataset:
-        tags: _full
-      igbh-dataset:
-        tags: _full
-    env:
-      MLC_MLPERF_SUBMISSION_GENERATION_STYLE: full
-    group: submission-generation-style
-
-  performance-only:
-    default_variations:
-      submission-generation-style: full
-    env:
-      MLC_MLPERF_LOADGEN_MODE: performance
-      MLC_MLPERF_SUBMISSION_RUN: 'yes'
-      MLC_RUN_SUBMISSION_CHECKER: 'no'
-    group: submission-generation
-
-  populate-readme:
-    base:
-    - all-modes
-    default_variations:
-      submission-generation-style: full
-    env:
-      MLC_MLPERF_README: 'yes'
-      MLC_MLPERF_SUBMISSION_RUN: 'yes'
-      MLC_RUN_SUBMISSION_CHECKER: 'no'
-    group: submission-generation
-
-  scc24-base:
-    base:
-    - short
-    env:
-      MLC_MLPERF_SUT_NAME_RUN_CONFIG_SUFFIX4: scc24-base
-      MLC_DOCKER_IMAGE_NAME: scc24
-      MLC_MLPERF_INFERENCE_MIN_QUERY_COUNT: 50 
-    adr:
-      coco2014-preprocessed:
-        tags: _size.50,_with-sample-ids
-      coco2014-dataset:
-        tags: _size.50,_with-sample-ids
-      nvidia-preprocess-data:
-        extra_cache_tags: "scc24-base"
-    deps:
-      - tags: clean,nvidia,scratch,_sdxl,_downloaded-data
-        extra_cache_rm_tags: scc24-main
-
-  scc24-main:
-    base:
-    - short
-    adr:
-      coco2014-preprocessed:
-        tags: _size.500,_with-sample-ids
-      coco2014-dataset:
-        tags: _size.500,_with-sample-ids
-      nvidia-preprocess-data:
-        extra_cache_tags: "scc24-main"
-    env:
-      MLC_MLPERF_SUT_NAME_RUN_CONFIG_SUFFIX4: scc24-main
-      MLC_DOCKER_IMAGE_NAME: scc24
-      MLC_MLPERF_INFERENCE_MIN_QUERY_COUNT: 500 
-    deps:
-      - tags: clean,nvidia,scratch,_sdxl,_downloaded-data
-        extra_cache_rm_tags: scc24-base
-
-  r2.1:
-    env:
-      MLC_MLPERF_INFERENCE_VERSION: '2.1'
-      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r2.1_default
-    group: benchmark-version
-
-  r3.0:
-    env:
-      MLC_MLPERF_INFERENCE_VERSION: '3.0'
-      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r3.0_default
-    group: benchmark-version
-
-  r3.1:
-    env:
-      MLC_MLPERF_INFERENCE_VERSION: '3.1'
-      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r3.1_default
-    group: benchmark-version
-
-  r4.0-dev:
-    env:
-      MLC_MLPERF_INFERENCE_VERSION: '4.0-dev'
-      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r4.0-dev_default
-    group: benchmark-version
-
-  r4.0:
-    env:
-      MLC_MLPERF_INFERENCE_VERSION: '4.0'
-      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r4.0_default
-    group: benchmark-version
-    adr:
-      get-mlperf-inference-results-dir:
-        tags: _version.r4_0-dev
-      get-mlperf-inference-submission-dir:
-        tags: _version.r4_0-dev
-      mlperf-inference-nvidia-scratch-space:
-        tags: _version.r4_0-dev
-
-  r4.1-dev:
-    env:
-      MLC_MLPERF_INFERENCE_VERSION: '4.1-dev'
-      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r4.1-dev_default
-    group: benchmark-version
-    adr:
-      get-mlperf-inference-results-dir:
-        tags: _version.r4_1-dev
-      get-mlperf-inference-submission-dir:
-        tags: _version.r4_1-dev
-      mlperf-inference-nvidia-scratch-space:
-        tags: _version.r4_1-dev
-
-  r4.1:
-    env:
-      MLC_MLPERF_INFERENCE_VERSION: '4.1'
-      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r4.1_default
-      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v4.1
-    adr:
-      get-mlperf-inference-results-dir:
-        tags: _version.r4_1
-      get-mlperf-inference-submission-dir:
-        tags: _version.r4_1
-      mlperf-inference-nvidia-scratch-space:
-        tags: _version.r4_1
-    group: benchmark-version
-  
-  r5.0-dev:
-    env:
-      MLC_MLPERF_INFERENCE_VERSION: '5.0-dev'
-      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r5.0-dev_default
-      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v5.0
-    group: benchmark-version
-    adr:
-      get-mlperf-inference-results-dir:
-        tags: _version.r5.0-dev
-      get-mlperf-inference-submission-dir:
-        tags: _version.r5.0-dev
-      mlperf-inference-nvidia-scratch-space:
-        tags: _version.r5.0-dev
-
-  r5.0:
-    env:
-      MLC_MLPERF_INFERENCE_VERSION: '5.0'
-      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r5.0_default
-      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v5.0
-    group: benchmark-version
-    adr:
-      get-mlperf-inference-results-dir:
-        tags: _version.r5.0
-      get-mlperf-inference-submission-dir:
-        tags: _version.r5.0
-      mlperf-inference-nvidia-scratch-space:
-        tags: _version.r5.0
-        
-  r5.1-dev:
-    env:
-      MLC_MLPERF_INFERENCE_VERSION: '5.1-dev'
-      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r5.1-dev_default
-      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v5.1
-    group: benchmark-version
-    adr:
-      get-mlperf-inference-results-dir:
-        tags: _version.r5.1-dev
-      get-mlperf-inference-submission-dir:
-        tags: _version.r5.1-dev
-      mlperf-inference-nvidia-scratch-space:
-        tags: _version.r5.1-dev
-
-  r5.1:
-    env:
-      MLC_MLPERF_INFERENCE_VERSION: '5.1'
-      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r5.1_default
-      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v5.1
-      MLC_CUSTOM_SYSTEM_NVIDIA: no  # prevents build-mlperf-inference-server-nvidia from calling add-custom-system-nvidia
-      SYSTEM_NAME: '<<<MLC_NVIDIA_SYSTEM_NAME>>>'
-    group: benchmark-version
-    adr:
-      get-mlperf-inference-results-dir:
-        tags: _version.r5.1
-      get-mlperf-inference-submission-dir:
-        tags: _version.r5.1
-      mlperf-inference-nvidia-scratch-space:
-        tags: _version.r5.1
-
-  r6.0-dev:
-    default: true
-    env:
-      MLC_MLPERF_INFERENCE_VERSION: '6.0-dev'
-      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r6.0-dev_default
-      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v6.0
-    group: benchmark-version
-    adr:
-      get-mlperf-inference-results-dir:
-        tags: _version.r6.0-dev
-      get-mlperf-inference-submission-dir:
-        tags: _version.r6.0-dev
-
-  short:
-    add_deps_recursive:
-      submission-checker:
-        tags: _short-run
-      openimages-preprocessed:
-        tags: _50
-    default: 'true'
-    env:
-      MLC_MLPERF_SUBMISSION_DIVISION: open
-      MLC_RUN_MLPERF_SUBMISSION_PREPROCESSOR: off
-      MLC_MLPERF_SUBMISSION_GENERATION_STYLE: short
-    group: submission-generation-style
-
-  performance-and-accuracy:
-    default: true
-    base:
-    - all-modes
-    default_variations:
-      submission-generation-style: full
-    group: submission-generation
-
-  submission:
-    base:
-    - all-modes
-    default_variations:
-      submission-generation-style: full
-    env:
-      MLC_MLPERF_LOADGEN_COMPLIANCE: 'yes'
-      MLC_MLPERF_SUBMISSION_RUN: 'yes'
-      MLC_RUN_MLPERF_ACCURACY: 'on'
-      MLC_RUN_SUBMISSION_CHECKER: 'yes'
-      MLC_TAR_SUBMISSION_DIR: 'yes'
-    group: submission-generation
-    post_deps:
-    - names:
-      - submission-generator
-      skip_if_env:
-        MLC_MLPERF_SKIP_SUBMISSION_GENERATION:
-        - 'yes'
-      tags: generate,mlperf,inference,submission,_wg-inference
-
-versions:
-  master: {}
-  r2.1: {}
-
+  vllm_model_name: MLC_VLLM_SERVER_MODEL_NAME
+  vllm_tp_size: MLC_MLPERF_INFERENCE_TP_SIZE
+  waymo_path: MLC_DATASET_WAYMO_PATH
 input_description:
   division:
     choices:
-    - 'open'
-    - 'closed'
+    - open
+    - closed
     desc: MLPerf division
     sort: 50
   category:
     choices:
-    - 'edge'
-    - 'datacenter'
-    - 'network'
-    default: 'edge'
+    - edge
+    - datacenter
+    - network
+    default: edge
     desc: MLPerf category
     sort: 60
   device:
@@ -514,6 +181,7 @@ input_description:
     - pointpainting
     - yolo-95
     - yolo-99
+    - wan-2.2-t2v-a14b
     desc: MLPerf model
     sort: 200
   precision:
@@ -579,31 +247,28 @@ input_description:
     desc: Folder path to store results (defaults to the current working directory)
     sort: 900
   submission_dir:
-    desc: Folder path to store MLPerf submission tree 
+    desc: Folder path to store MLPerf submission tree
     sort: 1000
-  use_dataset_from_host: 
+  use_dataset_from_host:
     desc: Run the dataset download script on the host machine and mount the dataset into the Docker container to avoid repeated downloads.
     choices:
-      - yes
-      - no
+    - true
+    - false
     default: 'no'
-  use_model_from_host: 
+  use_model_from_host:
     desc: Run the model download script on the host machine and mount the model files into the Docker container to avoid repeated downloads.
     choices:
-      - yes
-      - no
+    - true
+    - false
     default: 'no'
-
   adr.compiler.tags:
     desc: Compiler for loadgen and any C/C++ part of implementation
   adr.inference-src-loadgen.env.MLC_GIT_URL:
     default: ''
-    desc: Git URL for MLPerf inference sources to build LoadGen (to enable non-reference
-      implementations)
+    desc: Git URL for MLPerf inference sources to build LoadGen (to enable non-reference implementations)
   adr.inference-src.env.MLC_GIT_URL:
     default: ''
-    desc: Git URL for MLPerf inference sources to run benchmarks (to enable non-reference
-      implementations)
+    desc: Git URL for MLPerf inference sources to run benchmarks (to enable non-reference implementations)
   adr.mlperf-inference-implementation.max_batchsize:
     desc: Maximum batchsize to be used
   adr.mlperf-inference-implementation.num_threads:
@@ -623,10 +288,10 @@ input_description:
     desc: Measure power
     sort: 5000
   adr.mlperf-power-client.power_server:
-    default: '192.168.0.15'
+    default: 192.168.0.15
     desc: MLPerf Power server IP address
     sort: 5005
-  adr.mlperf-power-client.port: 
+  adr.mlperf-power-client.port:
     default: 4950
     desc: MLPerf Power server port
     sort: 5010
@@ -670,5 +335,319 @@ input_description:
     desc: Debug this script
     boolean: true
     default: false
-    
-#repo_to_report_errors: https://github.com/mlcommons/inference/issues
+
+# Dependencies
+predeps: false
+deps:
+- tags: detect,os
+  skip_if_env:
+    MLC_MLPERF_USE_DOCKER:
+    - true
+- tags: detect,cpu
+  skip_if_env:
+    MLC_MLPERF_USE_DOCKER:
+    - true
+- names:
+  - python
+  - python3
+  tags: get,python3
+  skip_if_env:
+    MLC_MLPERF_USE_DOCKER:
+    - true
+- names:
+  - inference-src
+  tags: get,mlcommons,inference,src
+- tags: pull,git,repo
+  env:
+    MLC_GIT_CHECKOUT_PATH: <<<MLC_MLPERF_INFERENCE_SOURCE>>>
+  enable_if_env:
+    MLC_MLPERF_INFERENCE_PULL_SRC_CHANGES:
+    - 'yes'
+- tags: get,sut,description
+  skip_if_env:
+    MLC_MLPERF_USE_DOCKER:
+    - true
+- tags: get,mlperf,inference,results,dir
+  names:
+  - get-mlperf-inference-results-dir
+  skip_if_env:
+    OUTPUT_BASE_DIR:
+    - true
+- tags: install,pip-package,for-mlc-python,_package.tabulate
+- tags: get,mlperf,inference,utils
+
+# Variations
+variations:
+  r2.1:
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: '2.1'
+      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r2.1_default
+    group: benchmark-version
+  r3.0:
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: '3.0'
+      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r3.0_default
+    group: benchmark-version
+  r3.1:
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: '3.1'
+      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r3.1_default
+    group: benchmark-version
+  r4.0:
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: '4.0'
+      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r4.0_default
+    group: benchmark-version
+    adr:
+      get-mlperf-inference-results-dir:
+        tags: _version.r4_0-dev
+      get-mlperf-inference-submission-dir:
+        tags: _version.r4_0-dev
+      mlperf-inference-nvidia-scratch-space:
+        tags: _version.r4_0-dev
+  r4.0-dev:
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: 4.0-dev
+      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r4.0-dev_default
+    group: benchmark-version
+  r4.1:
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: '4.1'
+      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r4.1_default
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v4.1
+    adr:
+      get-mlperf-inference-results-dir:
+        tags: _version.r4_1
+      get-mlperf-inference-submission-dir:
+        tags: _version.r4_1
+      mlperf-inference-nvidia-scratch-space:
+        tags: _version.r4_1
+    group: benchmark-version
+  r4.1-dev:
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: 4.1-dev
+      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r4.1-dev_default
+    group: benchmark-version
+    adr:
+      get-mlperf-inference-results-dir:
+        tags: _version.r4_1-dev
+      get-mlperf-inference-submission-dir:
+        tags: _version.r4_1-dev
+      mlperf-inference-nvidia-scratch-space:
+        tags: _version.r4_1-dev
+  r5.0:
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: '5.0'
+      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r5.0_default
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v5.0
+    group: benchmark-version
+    adr:
+      get-mlperf-inference-results-dir:
+        tags: _version.r5.0
+      get-mlperf-inference-submission-dir:
+        tags: _version.r5.0
+      mlperf-inference-nvidia-scratch-space:
+        tags: _version.r5.0
+  r5.0-dev:
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: 5.0-dev
+      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r5.0-dev_default
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v5.0
+    group: benchmark-version
+    adr:
+      get-mlperf-inference-results-dir:
+        tags: _version.r5.0-dev
+      get-mlperf-inference-submission-dir:
+        tags: _version.r5.0-dev
+      mlperf-inference-nvidia-scratch-space:
+        tags: _version.r5.0-dev
+  r5.1:
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: '5.1'
+      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r5.1_default
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v5.1
+      MLC_CUSTOM_SYSTEM_NVIDIA: false
+      SYSTEM_NAME: <<<MLC_NVIDIA_SYSTEM_NAME>>>
+    group: benchmark-version
+    adr:
+      get-mlperf-inference-results-dir:
+        tags: _version.r5.1
+      get-mlperf-inference-submission-dir:
+        tags: _version.r5.1
+      mlperf-inference-nvidia-scratch-space:
+        tags: _version.r5.1
+  r5.1-dev:
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: 5.1-dev
+      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r5.1-dev_default
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v5.1
+    group: benchmark-version
+    adr:
+      get-mlperf-inference-results-dir:
+        tags: _version.r5.1-dev
+      get-mlperf-inference-submission-dir:
+        tags: _version.r5.1-dev
+      mlperf-inference-nvidia-scratch-space:
+        tags: _version.r5.1-dev
+  r6.0-dev:
+    default: true
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: 6.0-dev
+      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r6.0-dev_default
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v6.0
+    group: benchmark-version
+    adr:
+      get-mlperf-inference-results-dir:
+        tags: _version.r6.0-dev
+      get-mlperf-inference-submission-dir:
+        tags: _version.r6.0-dev
+  all-modes:
+    env:
+      MLC_MLPERF_LOADGEN_ALL_MODES: 'yes'
+    group: mode
+  accuracy-only:
+    default_variations:
+      submission-generation-style: full
+    env:
+      MLC_MLPERF_LOADGEN_MODE: accuracy
+      MLC_MLPERF_SUBMISSION_RUN: 'yes'
+      MLC_RUN_MLPERF_ACCURACY: 'on'
+      MLC_RUN_SUBMISSION_CHECKER: 'no'
+    group: submission-generation
+  find-performance:
+    env:
+      MLC_MLPERF_FIND_PERFORMANCE_MODE: 'yes'
+      MLC_MLPERF_LOADGEN_ALL_MODES: 'no'
+      MLC_MLPERF_LOADGEN_MODE: performance
+      MLC_MLPERF_RESULT_PUSH_TO_GITHUB: false
+    group: submission-generation
+  performance-and-accuracy:
+    default: true
+    base:
+    - all-modes
+    default_variations:
+      submission-generation-style: full
+    group: submission-generation
+  performance-only:
+    default_variations:
+      submission-generation-style: full
+    env:
+      MLC_MLPERF_LOADGEN_MODE: performance
+      MLC_MLPERF_SUBMISSION_RUN: 'yes'
+      MLC_RUN_SUBMISSION_CHECKER: 'no'
+    group: submission-generation
+  populate-readme:
+    base:
+    - all-modes
+    default_variations:
+      submission-generation-style: full
+    env:
+      MLC_MLPERF_README: 'yes'
+      MLC_MLPERF_SUBMISSION_RUN: 'yes'
+      MLC_RUN_SUBMISSION_CHECKER: 'no'
+    group: submission-generation
+  submission:
+    base:
+    - all-modes
+    default_variations:
+      submission-generation-style: full
+    env:
+      MLC_MLPERF_LOADGEN_COMPLIANCE: 'yes'
+      MLC_MLPERF_SUBMISSION_RUN: 'yes'
+      MLC_RUN_MLPERF_ACCURACY: 'on'
+      MLC_RUN_SUBMISSION_CHECKER: 'yes'
+      MLC_TAR_SUBMISSION_DIR: 'yes'
+    group: submission-generation
+    post_deps:
+    - names:
+      - submission-generator
+      skip_if_env:
+        MLC_MLPERF_SKIP_SUBMISSION_GENERATION:
+        - 'yes'
+      tags: generate,mlperf,inference,submission,_wg-inference
+  full:
+    add_deps_recursive:
+      coco2014-original:
+        tags: _full
+      coco2014-preprocessed:
+        tags: _full
+      imagenet-original:
+        tags: _full
+      imagenet-preprocessed:
+        tags: _full
+      openimages-original:
+        tags: _full
+      openimages-preprocessed:
+        tags: _full
+      openorca-original:
+        tags: _full
+      openorca-preprocessed:
+        tags: _full
+      coco2014-dataset:
+        tags: _full
+      igbh-dataset:
+        tags: _full
+    env:
+      MLC_MLPERF_SUBMISSION_GENERATION_STYLE: full
+    group: submission-generation-style
+  short:
+    add_deps_recursive:
+      submission-checker:
+        tags: _short-run
+      openimages-preprocessed:
+        tags: _50
+    default: 'true'
+    env:
+      MLC_MLPERF_SUBMISSION_DIVISION: open
+      MLC_RUN_MLPERF_SUBMISSION_PREPROCESSOR: false
+      MLC_MLPERF_SUBMISSION_GENERATION_STYLE: short
+    group: submission-generation-style
+  all-scenarios:
+    env:
+      MLC_MLPERF_LOADGEN_ALL_SCENARIOS: 'yes'
+  compliance:
+    env:
+      MLC_MLPERF_LOADGEN_COMPLIANCE: 'yes'
+  scc24-base:
+    base:
+    - short
+    env:
+      MLC_MLPERF_SUT_NAME_RUN_CONFIG_SUFFIX4: scc24-base
+      MLC_DOCKER_IMAGE_NAME: scc24
+      MLC_MLPERF_INFERENCE_MIN_QUERY_COUNT: 50
+    adr:
+      coco2014-preprocessed:
+        tags: _size.50,_with-sample-ids
+      coco2014-dataset:
+        tags: _size.50,_with-sample-ids
+      nvidia-preprocess-data:
+        extra_cache_tags: scc24-base
+    deps:
+    - tags: clean,nvidia,scratch,_sdxl,_downloaded-data
+      extra_cache_rm_tags: scc24-main
+  scc24-main:
+    base:
+    - short
+    adr:
+      coco2014-preprocessed:
+        tags: _size.500,_with-sample-ids
+      coco2014-dataset:
+        tags: _size.500,_with-sample-ids
+      nvidia-preprocess-data:
+        extra_cache_tags: scc24-main
+    env:
+      MLC_MLPERF_SUT_NAME_RUN_CONFIG_SUFFIX4: scc24-main
+      MLC_DOCKER_IMAGE_NAME: scc24
+      MLC_MLPERF_INFERENCE_MIN_QUERY_COUNT: 500
+    deps:
+    - tags: clean,nvidia,scratch,_sdxl,_downloaded-data
+      extra_cache_rm_tags: scc24-base
+
+# Versions
+versions:
+  master: {}
+  r2.1: {}
+
+# Docker / container
+docker:
+  pass_docker_to_script: true

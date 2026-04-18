@@ -1,14 +1,29 @@
 alias: run-terraform
+uid: ec344bd44af144d7
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Cloud automation
+tags:
+- run
+- terraform
+
+# Cache
+cache: true
 clean_files: []
+
+# Environment
 default_env:
   TF_VAR_CPU_COUNT: '1'
   TF_VAR_SECURITY_GROUP_ID: sg-0783752c97d2e011d
-deps:
-- tags: get,terraform
+new_env_keys:
+- MLC_TERRAFORM_RUN_DIR
+- MLC_TERRAFORM_CONFIG_DIR
+new_state_keys:
+- MLC_TF_NEW_INSTANCES_STATE
+
+# Input mapping
 input_mapping:
   cminit: MLC_TERRAFORM_MLC_INIT
   destroy: MLC_DESTROY_TERRAFORM
@@ -16,11 +31,10 @@ input_mapping:
   key_file: MLC_SSH_KEY_FILE
   run_cmds: MLC_TERRAFORM_RUN_COMMANDS
   ssh_key_file: MLC_SSH_KEY_FILE
-new_env_keys:
-- MLC_TERRAFORM_RUN_DIR
-- MLC_TERRAFORM_CONFIG_DIR
-new_state_keys:
-- MLC_TF_NEW_INSTANCES_STATE
+
+# Dependencies
+deps:
+- tags: get,terraform
 post_deps:
 - dynamic: true
   enable_if_env:
@@ -29,11 +43,37 @@ post_deps:
   names:
   - destroy-cmd
   tags: destroy,terraform
-tags:
-- run
-- terraform
-uid: ec344bd44af144d7
+
+# Variations
 variations:
+  amazon-linux-2-kernel.510,arm64,us-west-2:
+    env:
+      TF_VAR_INSTANCE_IMAGE: ami-0f1a5f5ada0e7da53
+    group: aws-instance-image
+  aws_instance_image.#:
+    env:
+      TF_VAR_INSTANCE_IMAGE: '#'
+    group: aws-instance-image
+  aws_instance_image.ami-0735c191cf914754d:
+    env:
+      TF_VAR_INSTANCE_IMAGE: ami-0735c191cf914754d
+    group: aws-instance-image
+  aws_instance_image.ami-0a0d8589b597d65b3:
+    env:
+      TF_VAR_INSTANCE_IMAGE: ami-0a0d8589b597d65b3
+    group: aws-instance-image
+  rhel.9,x86,us-west-2:
+    env:
+      TF_VAR_INSTANCE_IMAGE: ami-0dda7e535b65b6469
+    group: aws-instance-image
+  ubuntu.2204,arm64,us-west-2:
+    env:
+      TF_VAR_INSTANCE_IMAGE: ami-079f51a7bcca65b92
+    group: aws-instance-image
+  ubuntu.2204,x86,us-west-2:
+    env:
+      TF_VAR_INSTANCE_IMAGE: ami-0735c191cf914754d
+    group: aws-instance-image
   a1.2xlarge:
     base:
     - aws
@@ -55,37 +95,6 @@ variations:
     env:
       TF_VAR_INSTANCE_TYPE: a1.xlarge
     group: aws-instance-type
-  amazon-linux-2-kernel.#:
-    env:
-      TF_VAR_INSTANCE_IMAGE_OS: amazon-linux-2-kernel.#
-  amazon-linux-2-kernel.510,arm64,us-west-2:
-    env:
-      TF_VAR_INSTANCE_IMAGE: ami-0f1a5f5ada0e7da53
-    group: aws-instance-image
-  arm64:
-    env:
-      MLC_INSTANCE_PLATFORM: arm64
-    group: platform
-  aws:
-    default: true
-    default_variations:
-      aws-instance-type: t2.micro
-      region: us-west-2
-    env:
-      MLC_TERRAFORM_CONFIG_DIR_NAME: aws
-    group: cloud-provider
-  aws_instance_image.#:
-    env:
-      TF_VAR_INSTANCE_IMAGE: '#'
-    group: aws-instance-image
-  aws_instance_image.ami-0735c191cf914754d:
-    env:
-      TF_VAR_INSTANCE_IMAGE: ami-0735c191cf914754d
-    group: aws-instance-image
-  aws_instance_image.ami-0a0d8589b597d65b3:
-    env:
-      TF_VAR_INSTANCE_IMAGE: ami-0a0d8589b597d65b3
-    group: aws-instance-image
   aws_instance_type.#:
     env:
       TF_VAR_INSTANCE_TYPE: '#'
@@ -108,53 +117,12 @@ variations:
     env:
       TF_VAR_INSTANCE_TYPE: c5d.9xlarge
     group: aws-instance-type
-  debian-cloud/debian-11:
-    env:
-      TF_VAR_INSTANCE_IMAGE: debian-cloud/debian-11
-    group: gcp-instance-image
-  f1-micro:
-    base:
-    - gcp
-    env:
-      TF_VAR_INSTANCE_TYPE: f1-micro
-    group: gcp-instance-type
   g4dn.xlarge:
     base:
     - aws
     env:
       TF_VAR_INSTANCE_TYPE: g4dn.xlarge
     group: aws-instance-type
-  gcp:
-    default_env:
-      TF_VAR_SSH_PUB_KEY_FILE: $HOME/.ssh/id_rsa.pub
-      TF_VAR_SSH_USER: asuresh
-    default_variations:
-      gcp-instance-image: ubuntu-2204-jammy-v20230114
-      gcp-instance-type: f1-micro
-      instance-name: instance_name.microubuntu2204
-      region: region.us-west1
-      storage-size: storage_size.120
-      zone: zone.us-west1-a
-    env:
-      MLC_TERRAFORM_CONFIG_DIR_NAME: gcp
-    group: cloud-provider
-  gcp_instance_image.#:
-    env:
-      TF_VAR_INSTANCE_IMAGE: '#'
-    group: gcp-instance-image
-  gcp_instance_type.#:
-    env:
-      TF_VAR_INSTANCE_TYPE: '#'
-    group: gcp-instance-type
-  gcp_project.#:
-    env:
-      TF_VAR_GCP_PROJECT: '#'
-    group: gcp-project
-  graviton:
-    default_variations:
-      platform: arm64
-    env:
-      MLC_TERRAFORM_AWS_GRAVITON_INSTANCE: 'yes'
   inf1.2xlarge:
     base:
     - aws
@@ -183,18 +151,6 @@ variations:
     env:
       TF_VAR_INSTANCE_TYPE: inf2.xlarge
     group: aws-instance-type
-  inferentia:
-    default_variations:
-      platform: arm64
-    env:
-      MLC_TERRAFORM_AWS_INFERENTIA_INSTANCE: 'yes'
-  inferentia,amazon-linux-2-kernel.510:
-    default_variations:
-      aws-instance-image: amazon-linux-2-kernel.510,arm64,us-west-2
-  instance_name.#:
-    env:
-      TF_VAR_INSTANCE_NAME: '#'
-    group: instance-name
   m7g.2xlarge:
     base:
     - aws
@@ -211,37 +167,6 @@ variations:
     env:
       TF_VAR_INSTANCE_TYPE: m7g.xlarge
     group: aws-instance-type
-  n1-highmem.#:
-    base:
-    - gcp
-    env:
-      TF_VAR_INSTANCE_TYPE: n1-highmem-#
-    group: gcp-instance-type
-  n1-standard.#:
-    base:
-    - gcp
-    env:
-      TF_VAR_INSTANCE_TYPE: n1-highmem-#
-    group: gcp-instance-type
-  region.#:
-    env:
-      TF_VAR_INSTANCE_REGION: '#'
-    group: region
-  rhel.#:
-    env:
-      TF_VAR_INSTANCE_IMAGE_OS: rhel.#
-  rhel.9,x86,us-west-2:
-    env:
-      TF_VAR_INSTANCE_IMAGE: ami-0dda7e535b65b6469
-    group: aws-instance-image
-  storage_size.#:
-    env:
-      TF_VAR_DISK_GBS: '#'
-    group: storage-size
-  storage_size.8:
-    env:
-      TF_VAR_DISK_GBS: '8'
-    group: storage-size
   t2.#:
     base:
     - aws
@@ -290,31 +215,118 @@ variations:
     env:
       TF_VAR_INSTANCE_TYPE: t2.xlarge
     group: aws-instance-type
+  aws:
+    default: true
+    default_variations:
+      aws-instance-type: t2.micro
+      region: us-west-2
+    env:
+      MLC_TERRAFORM_CONFIG_DIR_NAME: aws
+    group: cloud-provider
+  gcp:
+    default_env:
+      TF_VAR_SSH_PUB_KEY_FILE: $HOME/.ssh/id_rsa.pub
+      TF_VAR_SSH_USER: asuresh
+    default_variations:
+      gcp-instance-image: ubuntu-2204-jammy-v20230114
+      gcp-instance-type: f1-micro
+      instance-name: instance_name.microubuntu2204
+      region: region.us-west1
+      storage-size: storage_size.120
+      zone: zone.us-west1-a
+    env:
+      MLC_TERRAFORM_CONFIG_DIR_NAME: gcp
+    group: cloud-provider
+  debian-cloud/debian-11:
+    env:
+      TF_VAR_INSTANCE_IMAGE: debian-cloud/debian-11
+    group: gcp-instance-image
+  gcp_instance_image.#:
+    env:
+      TF_VAR_INSTANCE_IMAGE: '#'
+    group: gcp-instance-image
   ubuntu-2204-jammy-v20230114:
     env:
       TF_VAR_INSTANCE_IMAGE: ubuntu-2204-jammy-v20230114
     group: gcp-instance-image
-  ubuntu.#:
+  f1-micro:
+    base:
+    - gcp
     env:
-      TF_VAR_INSTANCE_IMAGE_OS: ubuntu.#
-  ubuntu.2204,arm64,us-west-2:
+      TF_VAR_INSTANCE_TYPE: f1-micro
+    group: gcp-instance-type
+  gcp_instance_type.#:
     env:
-      TF_VAR_INSTANCE_IMAGE: ami-079f51a7bcca65b92
-    group: aws-instance-image
-  ubuntu.2204,x86,us-west-2:
+      TF_VAR_INSTANCE_TYPE: '#'
+    group: gcp-instance-type
+  n1-highmem.#:
+    base:
+    - gcp
     env:
-      TF_VAR_INSTANCE_IMAGE: ami-0735c191cf914754d
-    group: aws-instance-image
-  us-west-2:
+      TF_VAR_INSTANCE_TYPE: n1-highmem-#
+    group: gcp-instance-type
+  n1-standard.#:
+    base:
+    - gcp
     env:
-      TF_VAR_INSTANCE_REGION: us-west-2
-    group: region
+      TF_VAR_INSTANCE_TYPE: n1-highmem-#
+    group: gcp-instance-type
+  gcp_project.#:
+    env:
+      TF_VAR_GCP_PROJECT: '#'
+    group: gcp-project
+  instance_name.#:
+    env:
+      TF_VAR_INSTANCE_NAME: '#'
+    group: instance-name
+  arm64:
+    env:
+      MLC_INSTANCE_PLATFORM: arm64
+    group: platform
   x86:
     default: true
     env:
       MLC_INSTANCE_PLATFORM: x86
     group: platform
+  region.#:
+    env:
+      TF_VAR_INSTANCE_REGION: '#'
+    group: region
+  us-west-2:
+    env:
+      TF_VAR_INSTANCE_REGION: us-west-2
+    group: region
+  storage_size.#:
+    env:
+      TF_VAR_DISK_GBS: '#'
+    group: storage-size
+  storage_size.8:
+    env:
+      TF_VAR_DISK_GBS: '8'
+    group: storage-size
   zone.#:
     env:
       TF_VAR_INSTANCE_ZONE: '#'
     group: zone
+  amazon-linux-2-kernel.#:
+    env:
+      TF_VAR_INSTANCE_IMAGE_OS: amazon-linux-2-kernel.#
+  graviton:
+    default_variations:
+      platform: arm64
+    env:
+      MLC_TERRAFORM_AWS_GRAVITON_INSTANCE: 'yes'
+  inferentia:
+    default_variations:
+      platform: arm64
+    env:
+      MLC_TERRAFORM_AWS_INFERENTIA_INSTANCE: 'yes'
+  inferentia,amazon-linux-2-kernel.510:
+    default_variations:
+      aws-instance-image: amazon-linux-2-kernel.510,arm64,us-west-2
+  rhel.#:
+    env:
+      TF_VAR_INSTANCE_IMAGE_OS: rhel.#
+  ubuntu.#:
+    env:
+      TF_VAR_INSTANCE_IMAGE_OS: ubuntu.#

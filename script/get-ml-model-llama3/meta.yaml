@@ -1,15 +1,31 @@
 alias: get-ml-model-llama3
+uid: 2f8cef2acc334e80
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
-docker:
-  real_run: false
-input_mapping:
-  outdirname: MLC_OUTDIRNAME
+tags:
+- get
+- raw
+- ml-model
+- language-processing
+- llama3
+- llama3-405b
+
+# Cache
+cache: true
+
+# Environment
 new_env_keys:
 - MLC_ML_MODEL_*
 - LLAMA3_CHECKPOINT_PATH
+
+# Input mapping
+input_mapping:
+  outdirname: MLC_OUTDIRNAME
+
+# Dependencies
 prehook_deps:
 - enable_if_env:
     MLC_TMP_REQUIRE_DOWNLOAD:
@@ -23,31 +39,110 @@ prehook_deps:
   names:
   - hf-zoo
   tags: get,ml-model,huggingface,zoo,_clone-repo
-print_env_at_the_end:
-  LLAMA3_CHECKPOINT_PATH: LLAMA3 checkpoint path
-tags:
-- get
-- raw
-- ml-model
-- language-processing
-- llama3
-- llama3-405b
-uid: 2f8cef2acc334e80
-tests:
-  needs_pat: true
-  run_inputs:
-  - variations_list:
-    - rclone,405b,mlc,dry-run
-    - r2-downloader,405b,mlc,dry-run
-    - r2-downloader,8b,mlc,dry-run
+
+# Variations
 variations:
-  fp16:
+  hf:
+    group: download-src
+    default_variations:
+      huggingface-stub: meta-llama/Llama-3.1-405B-Instruct
+    env:
+      MLC_DOWNLOAD_SRC: huggingface
+  mlc:
+    group: download-src
+    default: true
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      env:
+        MLC_DOWNLOAD_FINAL_ENV_NAME: LLAMA3_CHECKPOINT_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: LLAMA3_CHECKPOINT_PATH
+      force_cache: true
+      names:
+      - dae
+      - llama3-model-download
+      tags: download-and-extract
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+  r2-downloader:
+    default: true
+    group: download-tool
+    env:
+      MLC_DOWNLOAD_FILENAME: <<<MLC_ML_MODEL_NAME>>>
+    add_deps_recursive:
+      dae:
+        tags: _r2-downloader
+  rclone:
+    group: download-tool
+    add_deps_recursive:
+      dae:
+        tags: _rclone
+    prehook_deps:
+    - tags: get,rclone
+      enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+    - tags: get,rclone-config,_mlperf-llama3-1
+      force_cache: true
+      enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+  vllm:
     default: true
     env:
-      MLC_ML_MODEL_INPUT_DATA_TYPES: fp16
-      MLC_ML_MODEL_PRECISION: fp16
-      MLC_ML_MODEL_WEIGHT_DATA_TYPES: fp16
-    group: precision
+      MLC_ML_MODEL_FRAMEWORK: vllm
+    group: framework
+  meta-llama/Llama-3.1-405B-Instruct:
+    base:
+    - 405b
+    adr:
+      hf-zoo:
+        tags: _model-stub.meta-llama/Llama-3.1-405B-Instruct
+    env:
+      MLC_ML_MODEL_NAME: Llama-3.1-405B-Instruct
+      MLC_ML_MODEL_R2_HOSTED_NAME: llama3-1-405b-instruct
+      MLC_MODEL_ZOO_ENV_KEY: LLAMA3
+    group: huggingface-stub
+  meta-llama/Llama-3.1-8B-Instruct:
+    base:
+    - 8b
+    adr:
+      hf-zoo:
+        tags: _model-stub.meta-llama/Llama-3.1-8B-Instruct
+    env:
+      MLC_ML_MODEL_NAME: Llama-3.1-8b-Instruct
+      MLC_ML_MODEL_R2_HOSTED_NAME: llama3-1-8b-instruct
+      MLC_MODEL_ZOO_ENV_KEY: LLAMA3
+    group: huggingface-stub
+  meta-llama/Llama-3.2-8B-Instruct:
+    base:
+    - 3b
+    adr:
+      hf-zoo:
+        tags: _model-stub.meta-llama/Llama-3.2-3B-Instruct
+    env:
+      MLC_ML_MODEL_NAME: Llama-3.2-3b-Instruct
+      MLC_ML_MODEL_R2_HOSTED_NAME: ''
+      MLC_MODEL_ZOO_ENV_KEY: LLAMA3
+    group: huggingface-stub
+  stub.#:
+    adr:
+      hf-zoo:
+        tags: _model-stub.#
+    env:
+      MLC_MODEL_ZOO_ENV_KEY: LLAMA3
+    group: huggingface-stub
+  3b:
+    group: model-size
+    env:
+      MLC_ML_MODEL_NAME: Llama-3.2-3b-Instruct
+      MLC_ML_MODEL_R2_HOSTED_NAME: llama3-2-3b-instruct
   405b:
     group: model-size
     default: true
@@ -59,112 +154,49 @@ variations:
     env:
       MLC_ML_MODEL_NAME: Llama-3.1-8b-Instruct
       MLC_ML_MODEL_R2_HOSTED_NAME: llama3-1-8b-instruct
-  rclone:
-    group: download-tool
-    add_deps_recursive:
-      dae:
-        tags: _rclone
-    prehook_deps:
-      - tags: get,rclone
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-      - tags: get,rclone-config,_mlperf-llama3-1
-        force_cache: true
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-  r2-downloader:
+  fp16:
     default: true
-    group: download-tool
-    add_deps_recursive:
-      dae:
-        tags: _r2-downloader
-  mlc:
-    group: download-src
-    default: true
-    prehook_deps:
-      - enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - 'yes'
-        env:
-          MLC_DOWNLOAD_FINAL_ENV_NAME: LLAMA3_CHECKPOINT_PATH
-          MLC_EXTRACT_FINAL_ENV_NAME: LLAMA3_CHECKPOINT_PATH
-        force_cache: true
-        names:
-          - dae
-          - llama3-model-download
-        tags: download-and-extract
-        force_env_keys:
-          - MLC_OUTDIRNAME  
-        update_tags_from_env_with_prefix:
-          _url.:
-            - MLC_DOWNLOAD_URL
     env:
-      MLC_DOWNLOAD_SRC: mlcommons
-  mlc,rclone:
+      MLC_ML_MODEL_INPUT_DATA_TYPES: fp16
+      MLC_ML_MODEL_PRECISION: fp16
+      MLC_ML_MODEL_WEIGHT_DATA_TYPES: fp16
+    group: precision
+  dry-run:
+    group: run-mode
     env:
-      MLC_DOWNLOAD_URL: mlc-llama3-1:inference/<<<MLC_ML_MODEL_NAME>>>
-    adr:
-      llama3-model-download:
-        extra_cache_tags: llama3,dataset,rclone
+      MLC_DOWNLOAD_MODE: dry
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
   mlc,r2-downloader:
     env:
       MLC_DOWNLOAD_URL: https://llama3-1.mlcommons-storage.org/metadata/<<<MLC_ML_MODEL_R2_HOSTED_NAME>>>.uri
     adr:
       llama3-model-download:
         extra_cache_tags: llama3,dataset,rclone
-  dry-run:
-    group: run-mode
+  mlc,rclone:
     env:
-      MLC_DOWNLOAD_MODE: dry
-  dry-run,rclone:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  dry-run,r2-downloader:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
-  hf:
-    group: download-src
-    default_variations:
-      huggingface-stub: meta-llama/Llama-3.1-405B-Instruct
-    env:
-      MLC_DOWNLOAD_SRC: huggingface
-
-  meta-llama/Llama-3.1-405B-Instruct:
-    base:
-      - 405b
+      MLC_DOWNLOAD_URL: mlc-llama3-1:inference/<<<MLC_ML_MODEL_NAME>>>
     adr:
-      hf-zoo:
-        tags: _model-stub.meta-llama/Llama-3.1-405B-Instruct
-    env:
-      MLC_ML_MODEL_NAME: Llama-3.1-405B-Instruct
-      MLC_ML_MODEL_R2_HOSTED_NAME: llama3-1-405b-instruct
-      MLC_MODEL_ZOO_ENV_KEY: LLAMA3
-    group: huggingface-stub
+      llama3-model-download:
+        extra_cache_tags: llama3,dataset,rclone
 
-  meta-llama/Llama-3.1-8B-Instruct:
-    base:
-      - 8b
-    adr:
-      hf-zoo:
-        tags: _model-stub.meta-llama/Llama-3.1-8B-Instruct
-    env:
-      MLC_ML_MODEL_NAME: Llama-3.1-8b-Instruct
-      MLC_ML_MODEL_R2_HOSTED_NAME: llama3-1-8b-instruct
-      MLC_MODEL_ZOO_ENV_KEY: LLAMA3
-    group: huggingface-stub
+# Docker / container
+docker:
+  real_run: false
 
-  vllm:
-    default: true
-    env:
-      MLC_ML_MODEL_FRAMEWORK: vllm
-    group: framework
-    
-  stub.#:
-    adr:
-      hf-zoo:
-        tags: _model-stub.#
-    env:
-      MLC_MODEL_ZOO_ENV_KEY: LLAMA3
-    group: huggingface-stub
+# Output / debugging
+print_env_at_the_end:
+  LLAMA3_CHECKPOINT_PATH: LLAMA3 checkpoint path
+
+# Tests
+tests:
+  needs_pat: true
+  run_inputs:
+  - variations_list:
+    - rclone,405b,mlc,dry-run
+    - r2-downloader,405b,mlc,dry-run
+    - r2-downloader,8b,mlc,dry-run

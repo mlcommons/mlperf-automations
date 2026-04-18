@@ -1,326 +1,242 @@
-# Identification of this MLC script
 alias: app-loadgen-generic-python
 uid: d3d949cc361747a6
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
+# Metadata
 category: MLPerf Inference
-
-developers: "[Gaz Iqbal](https://www.linkedin.com/in/gaziqbal), [Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Grigori Fursin](https://cKnowledge.org/gfursin)"
-
-
-# User-friendly tags to find this MLC script
+developers: '[Gaz Iqbal](https://www.linkedin.com/in/gaziqbal), [Arjun Suresh](https://www.linkedin.com/in/arjunsuresh), [Grigori Fursin](https://cKnowledge.org/gfursin)'
 tags:
-  - app
-  - loadgen
-  - generic
-  - loadgen-generic
-  - python
+- app
+- loadgen
+- generic
+- loadgen-generic
+- python
+tags_help: python app generic loadgen
 
-tags_help: "python app generic loadgen"
-
-
-# Default environment
+# Environment
 default_env:
   MLC_MLPERF_EXECUTION_MODE: parallel
   MLC_MLPERF_BACKEND: onnxruntime
+new_env_keys:
+- MLC_MLPERF_*
 
-# Map script inputs to environment variables
+# Input mapping
 input_mapping:
-  modelpath: MLC_ML_MODEL_FILE_WITH_PATH
-  modelcodepath: MLC_ML_MODEL_CODE_WITH_PATH
-  modelcfgpath: MLC_ML_MODEL_CFG_WITH_PATH
-  modelcfg: MLC_ML_MODEL_CFG
-  modelsamplepath: MLC_ML_MODEL_SAMPLE_WITH_PATH
-  output_dir: MLC_MLPERF_OUTPUT_DIR
-  scenario: MLC_MLPERF_LOADGEN_SCENARIO
-  runner: MLC_MLPERF_RUNNER
   concurrency: MLC_MLPERF_CONCURRENCY
   ep: MLC_MLPERF_EXECUTION_PROVIDER
-  intraop: MLC_MLPERF_INTRAOP
-  interop: MLC_MLPERF_INTEROP
   execmode: MLC_MLPERF_EXEC_MODE
-  samples: MLC_MLPERF_LOADGEN_SAMPLES
-  loadgen_expected_qps: MLC_MLPERF_LOADGEN_EXPECTED_QPS
+  interop: MLC_MLPERF_INTEROP
+  intraop: MLC_MLPERF_INTRAOP
   loadgen_duration_sec: MLC_MLPERF_LOADGEN_DURATION_SEC
+  loadgen_expected_qps: MLC_MLPERF_LOADGEN_EXPECTED_QPS
+  modelcfg: MLC_ML_MODEL_CFG
+  modelcfgpath: MLC_ML_MODEL_CFG_WITH_PATH
+  modelcodepath: MLC_ML_MODEL_CODE_WITH_PATH
+  modelpath: MLC_ML_MODEL_FILE_WITH_PATH
+  modelsamplepath: MLC_ML_MODEL_SAMPLE_WITH_PATH
+  output_dir: MLC_MLPERF_OUTPUT_DIR
+  runner: MLC_MLPERF_RUNNER
+  samples: MLC_MLPERF_LOADGEN_SAMPLES
+  scenario: MLC_MLPERF_LOADGEN_SCENARIO
+input_description:
+  modelpath:
+    desc: Full path to file with model weights
+  modelcodepath:
+    desc: (for PyTorch models) Full path to file with model code and cmc.py
+  modelcfgpath:
+    desc: (for PyTorch models) Full path to JSON file with model cfg
+  modelsamplepath:
+    desc: (for PyTorch models) Full path to file with model sample in pickle format
+  ep:
+    desc: ONNX Execution provider
+  scenario:
+    desc: MLPerf LoadGen scenario
+  samples:
+    desc: Number of samples
+    default: 2
+  runner:
+    desc: MLPerf runner
+  execmode:
+    desc: MLPerf exec mode
+  output_dir:
+    desc: MLPerf output directory
+  concurrency:
+    desc: MLPerf concurrency
+  intraop:
+    desc: MLPerf intra op threads
+  interop:
+    desc: MLPerf inter op threads
 
-# New env keys exported from this script
-new_env_keys:
-  - MLC_MLPERF_*
-
-# Dependencies on other MLC scripts
-
+# Dependencies
 deps:
-
-  # Detect host OS features
-  - tags: detect,os
-
-  # Detect host CPU features
-  - tags: detect,cpu
-
-  # Get Python
-  - tags: get,python3
-    names:
-      - python
-      - python3
-
-  # Extra package
-  - tags: get,generic-python-lib,_psutil
-  - tags: get,generic-python-lib,_package.numpy
-    version_max: "1.99.99"
-
-  # Detect CUDA if required
-  - tags: get,cuda
-    enable_if_env:
-      MLC_MLPERF_DEVICE:
-      - gpu
-
-  # Install loadgen
-  - tags: get,loadgen
-    names:
-    - loadgen
-
-  ########################################################################
-  # Install ML engines via MLC
-  # ONNX
-  - enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - onnxruntime
-      MLC_MLPERF_DEVICE:
-      - cpu
-    tags: get,generic-python-lib,_onnxruntime
-    names:
+- tags: detect,os
+- tags: detect,cpu
+- tags: get,python3
+  names:
+  - python
+  - python3
+- tags: get,generic-python-lib,_psutil
+- tags: get,generic-python-lib,_package.numpy
+  version_max: 1.99.99
+- tags: get,cuda
+  enable_if_env:
+    MLC_MLPERF_DEVICE:
+    - gpu
+- tags: get,loadgen
+  names:
+  - loadgen
+- enable_if_env:
+    MLC_MLPERF_BACKEND:
     - onnxruntime
-
-  - enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - onnxruntime
-      MLC_MLPERF_DEVICE:
-      - gpu
-    tags: get,generic-python-lib,_onnxruntime_gpu
-    names:
+    MLC_MLPERF_DEVICE:
+    - cpu
+  tags: get,generic-python-lib,_onnxruntime
+  names:
+  - onnxruntime
+- enable_if_env:
+    MLC_MLPERF_BACKEND:
     - onnxruntime
+    MLC_MLPERF_DEVICE:
+    - gpu
+  tags: get,generic-python-lib,_onnxruntime_gpu
+  names:
+  - onnxruntime
+- enable_if_env:
+    MLC_MLPERF_BACKEND:
+    - onnxruntime
+  tags: get,generic-python-lib,_onnx
+  names:
+  - onnx
+- enable_if_env:
+    MLC_MLPERF_BACKEND:
+    - pytorch
+    MLC_MLPERF_DEVICE:
+    - cpu
+  tags: get,generic-python-lib,_torch
+  names:
+  - torch
+- enable_if_env:
+    MLC_MLPERF_BACKEND:
+    - pytorch
+    MLC_MLPERF_DEVICE:
+    - cpu
+  tags: get,generic-python-lib,_torchvision
+  names:
+  - torchvision
+- enable_if_env:
+    MLC_MLPERF_BACKEND:
+    - pytorch
+    MLC_MLPERF_DEVICE:
+    - gpu
+  tags: get,generic-python-lib,_torch_cuda
+  names:
+  - torch
+- enable_if_env:
+    MLC_MLPERF_BACKEND:
+    - pytorch
+    MLC_MLPERF_DEVICE:
+    - gpu
+  tags: get,generic-python-lib,_torchvision_cuda
+  names:
+  - torchvision
+- enable_if_env:
+    MLC_MODEL:
+    - resnet50
+  tags: get,ml-model,resnet50,_onnx
+- enable_if_env:
+    MLC_MODEL:
+    - retinanet
+  tags: get,ml-model,retinanet,_onnx,_fp32
+- enable_if_env:
+    MLC_MODEL:
+    - retinanet
+  tags: get,ml-model,retinanet,_onnx,_fp32
 
-  - enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - onnxruntime
-    tags: get,generic-python-lib,_onnx
-    names:
-    - onnx
-
-  ########################################################################
-  # Install ML engines via MLC
-  # PyTorch
-
-  # CPU
-  
-  - enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - pytorch
-      MLC_MLPERF_DEVICE:
-      - cpu
-    tags: get,generic-python-lib,_torch
-    names:
-    - torch
-
-  - enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - pytorch
-      MLC_MLPERF_DEVICE:
-      - cpu
-    tags: get,generic-python-lib,_torchvision
-    names:
-    - torchvision
-
-  # CUDA/GPU
-  
-  - enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - pytorch
-      MLC_MLPERF_DEVICE:
-      - gpu
-    tags: get,generic-python-lib,_torch_cuda
-    names:
-    - torch
-
-  - enable_if_env:
-      MLC_MLPERF_BACKEND:
-      - pytorch
-      MLC_MLPERF_DEVICE:
-      - gpu
-    tags: get,generic-python-lib,_torchvision_cuda
-    names:
-    - torchvision
-
-
-
-  ########################################################################
-  # Install MLPerf models
-  - enable_if_env:
-      MLC_MODEL:
-      - resnet50
-    tags: get,ml-model,resnet50,_onnx
-
-  - enable_if_env:
-      MLC_MODEL:
-      - retinanet
-    tags: get,ml-model,retinanet,_onnx,_fp32
-
-  - enable_if_env:
-      MLC_MODEL:
-      - retinanet
-    tags: get,ml-model,retinanet,_onnx,_fp32
-
-
-
-
-# Customize this MLC script
+# Variations
 variations:
-
-  pytorch:
-    group: backend
-    env:
-      MLC_MLPERF_BACKEND:
-        pytorch
-
   onnxruntime:
     group: backend
     default: true
     env:
-      MLC_MLPERF_BACKEND:
-        onnxruntime
-
-
-
-  cpu:
-    group:
-      device
-    default:
-      true
+      MLC_MLPERF_BACKEND: onnxruntime
+  pytorch:
+    group: backend
     env:
-      MLC_MLPERF_DEVICE:
-        cpu
-      MLC_MLPERF_EXECUTION_PROVIDER:
-        CPUExecutionProvider
-
+      MLC_MLPERF_BACKEND: pytorch
+  cpu:
+    group: device
+    default: true
+    env:
+      MLC_MLPERF_DEVICE: cpu
+      MLC_MLPERF_EXECUTION_PROVIDER: CPUExecutionProvider
   cuda:
     docker:
       all_gpus: 'yes'
       base_image: nvcr.io/nvidia/pytorch:24.03-py3
-    group:
-      device
+    group: device
     env:
-      MLC_MLPERF_DEVICE:
-        gpu
-      MLC_MLPERF_EXECUTION_PROVIDER:
-        CUDAExecutionProvider
-
-
-
-  retinanet:
-    group:
-      models
-    env:
-      MLC_MODEL: retinanet
-
-  resnet50:
-    group:
-      models
-    env:
-      MLC_MODEL: resnet50
-  
+      MLC_MLPERF_DEVICE: gpu
+      MLC_MLPERF_EXECUTION_PROVIDER: CUDAExecutionProvider
   custom:
-    group:
-      models
+    group: models
     env:
       MLC_MODEL: custom
-
-
-
-  huggingface:
+  resnet50:
+    group: models
     env:
-      MLC_CUSTOM_MODEL_SOURCE: huggingface
-
+      MLC_MODEL: resnet50
+  retinanet:
+    group: models
+    env:
+      MLC_MODEL: retinanet
+  cmc:
+    env:
+      MLC_CUSTOM_MODEL_CMC: true
+  custom,cmc:
+    deps:
+    - tags: get,ml-model,cmc
+    names:
+    - cmc-model
   custom,huggingface:
     deps:
     - tags: get,ml-model,huggingface
       names:
       - hf-downloader
       update_tags_from_env_with_prefix:
-        "_model-stub.":
+        _model-stub.:
         - MLC_ML_MODEL_STUB
-
+  huggingface:
+    env:
+      MLC_CUSTOM_MODEL_SOURCE: huggingface
   model-stub.#:
     env:
-      MLC_ML_MODEL_STUB: "#"
+      MLC_ML_MODEL_STUB: '#'
 
-
-  cmc:
-    env:
-      MLC_CUSTOM_MODEL_CMC: yes
-
-
-  custom,cmc:
-    deps:
-    - tags: get,ml-model,cmc
-    names:
-    - cmc-model
-
-
-input_description:
-  modelpath: 
-    desc: Full path to file with model weights
-  modelcodepath: 
-    desc: (for PyTorch models) Full path to file with model code and cmc.py
-  modelcfgpath: 
-    desc: (for PyTorch models) Full path to JSON file with model cfg
-  modelsamplepath: 
-    desc: (for PyTorch models) Full path to file with model sample in pickle format
-  ep: 
-    desc: ONNX Execution provider
-  scenario: 
-    desc: MLPerf LoadGen scenario
-  samples: 
-    desc: Number of samples
-    default: 2
-  runner: 
-    desc: MLPerf runner
-  execmode: 
-    desc: MLPerf exec mode
-  output_dir: 
-    desc: MLPerf output directory
-  concurrency: 
-    desc: MLPerf concurrency
-  intraop: 
-    desc: MLPerf intra op threads
-  interop: 
-    desc: MLPerf inter op threads
-
-
+# Docker / container
 docker:
   skip_run_cmd: 'no'
   input_paths:
-    - modelpath
-    - modelsamplepath
-    - env.MLC_ML_MODEL_FILE_WITH_PATH
-    - env.MLC_ML_MODEL_CODE_WITH_PATH
-    - output_dir
-    - repro_dir
+  - modelpath
+  - modelsamplepath
+  - env.MLC_ML_MODEL_FILE_WITH_PATH
+  - env.MLC_ML_MODEL_CODE_WITH_PATH
+  - output_dir
+  - repro_dir
   skip_input_for_fake_run:
-    - modelpath
-    - modelsamplepath
-    - env.MLC_ML_MODEL_FILE_WITH_PATH
-    - env.MLC_ML_MODEL_CODE_WITH_PATH
-    - output_dir
-    - scenario
-    - runner
-    - repro_dir
-    - concurrency
-    - intraop
-    - interop
-    - execmode
-    - samples
-    - modelcfg.num_classes
-    - modelcfg.config
-    - repro
+  - modelpath
+  - modelsamplepath
+  - env.MLC_ML_MODEL_FILE_WITH_PATH
+  - env.MLC_ML_MODEL_CODE_WITH_PATH
+  - output_dir
+  - scenario
+  - runner
+  - repro_dir
+  - concurrency
+  - intraop
+  - interop
+  - execmode
+  - samples
+  - modelcfg.num_classes
+  - modelcfg.config
+  - repro

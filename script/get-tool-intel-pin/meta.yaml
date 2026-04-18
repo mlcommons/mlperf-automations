@@ -1,8 +1,33 @@
 alias: get-tool-intel-pin
+uid: a187464b1a794f23
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLC Utils
+tags:
+- get-intel-pin-tool
+- get
+- intel
+- pin-tool
+- pin
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_INTEL_PINTOOL_DIR_PATH
+- MLC_INTEL_PINTOOL_BIN_WITH_PATH
+- MLC_INTEL_PINTOOL_VERSION
+- +PATH
+new_state_keys: []
+
+# Input mapping
+input_mapping:
+  pintool_dir: MLC_INTEL_PINTOOL_DIR_PATH
+
+# Dependencies
 deps:
 - tags: detect,os
 - enable_if_env:
@@ -17,25 +42,26 @@ deps:
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_DOWNLOAD_URL
-input_mapping:
-  pintool_dir: MLC_INTEL_PINTOOL_DIR_PATH
-new_env_keys:
-- MLC_INTEL_PINTOOL_DIR_PATH
-- MLC_INTEL_PINTOOL_BIN_WITH_PATH
-- MLC_INTEL_PINTOOL_VERSION
-- +PATH
-new_state_keys: []
-post_deps: []
 posthook_deps: []
-tags:
-- get-intel-pin-tool
-tests:
-  run_inputs:
-  - {}
-uid: a187464b1a794f23
+post_deps: []
+
+# Variations
 variations:
   version.4.0:
-    default: true
     env:
       MLC_DOWNLOAD_URL: https://software.intel.com/sites/landingpage/pintool/downloads/pin-external-4.0-99633-g5ca9893f2-gcc-linux.tar.gz
     group: version
+  version.4.1:
+    env:
+      MLC_DOWNLOAD_URL: https://software.intel.com/sites/landingpage/pintool/downloads/pin-external-4.1-99687-gd9b8f822c-gcc-linux.tar.gz
+    group: version
+  version.4.2:
+    default: true
+    env:
+      MLC_DOWNLOAD_URL: https://software.intel.com/sites/landingpage/pintool/downloads/pin-external-4.2-99776-g21d818fa2-gcc-linux.tar.gz
+    group: version
+
+# Tests
+tests:
+  run_inputs:
+  - {}

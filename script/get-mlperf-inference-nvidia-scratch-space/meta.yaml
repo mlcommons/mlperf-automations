@@ -1,22 +1,10 @@
 alias: get-mlperf-inference-nvidia-scratch-space
+uid: 0b2bec8b29fb4ab7
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLPerf Inference
-deps: []
-docker:
-  run: false
-input_description: {}
-input_mapping:
-  scratch_path: MLC_NVIDIA_MLPERF_SCRATCH_PATH
-new_env_keys:
-- MLC_NVIDIA_MLPERF_SCRATCH_PATH
-- MLPERF_SCRATCH_PATH
-- MLC_NVIDIA_SCRATCH_SPACE_VERSION
-new_state_keys: []
-post_deps: []
-posthook_deps: []
-prehook_deps: []
 tags:
 - get
 - mlperf
@@ -24,7 +12,29 @@ tags:
 - nvidia
 - scratch
 - space
-uid: 0b2bec8b29fb4ab7
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_NVIDIA_MLPERF_SCRATCH_PATH
+- MLPERF_SCRATCH_PATH
+- MLC_NVIDIA_SCRATCH_SPACE_VERSION
+new_state_keys: []
+
+# Input mapping
+input_mapping:
+  scratch_path: MLC_NVIDIA_MLPERF_SCRATCH_PATH
+input_description: {}
+
+# Dependencies
+deps: []
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations:
   version.#:
     env:
@@ -47,4 +57,10 @@ variations:
     env:
       MLC_NVIDIA_SCRATCH_SPACE_VERSION: 5_0-dev
     group: version
+
+# Versions
 versions: {}
+
+# Docker / container
+docker:
+  run: false

@@ -1,33 +1,36 @@
-uid: 27228976bb084dd0
 alias: get-dataset-openimages-calibration
-
+uid: 27228976bb084dd0
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
-cache: true
-
+# Metadata
 category: AI/ML datasets
-
-deps:
-  - tags: download,file
-    force_env_keys:
-      - MLC_OUTDIRNAME
-    force_cache: true
-    extra_cache_tags: openimages-calibration,openimages,calibration
-    names:
-      - calibration-file-downloader
-    env:
-        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_MLPERF_OPENIMAGES_CALIBRATION_LIST_FILE_WITH_PATH
-
-new_env_keys:
-- MLC_MLPERF_OPENIMAGES_CALIBRATION_LIST_FILE_WITH_PATH
-
 tags:
 - get
 - dataset
 - openimages
 - calibration
 
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_MLPERF_OPENIMAGES_CALIBRATION_LIST_FILE_WITH_PATH
+
+# Dependencies
+deps:
+- tags: download,file
+  force_env_keys:
+  - MLC_OUTDIRNAME
+  force_cache: true
+  extra_cache_tags: openimages-calibration,openimages,calibration
+  names:
+  - calibration-file-downloader
+  env:
+    MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_MLPERF_OPENIMAGES_CALIBRATION_LIST_FILE_WITH_PATH
+
+# Variations
 variations:
   mlperf.option1:
     group: calibration-option
@@ -39,26 +42,25 @@ variations:
       calibration-file-downloader:
         tags: _url.https://github.com/mlcommons/inference/raw/master/calibration/openimages/openimages_cal_images_list.txt
         env:
-            MLC_DOWNLOAD_CHECKSUM: 5c3196ddcec4605c6a9fcf004d9615e6
-  filter:
-    default_variations:
-      filter-size: filter_size.400
-    deps:
-      - names:
-        - python
-        - python3
-        tags: get,python3
-      - tags: get,openimages,dataset,original,_calibration
-        env:
-          MLC_CALIBRATE_FILTER: ''
-    env:
-      MLC_CALIBRATE_FILTER: 'yes'
-
+          MLC_DOWNLOAD_CHECKSUM: 5c3196ddcec4605c6a9fcf004d9615e6
   filter-size.#:
     group: filter-size
     env:
-      MLC_CALIBRATION_FILTER_SIZE: "#"
+      MLC_CALIBRATION_FILTER_SIZE: '#'
   filter-size.400:
     group: filter-size
     env:
       MLC_CALIBRATION_FILTER_SIZE: 400
+  filter:
+    default_variations:
+      filter-size: filter_size.400
+    deps:
+    - names:
+      - python
+      - python3
+      tags: get,python3
+    - tags: get,openimages,dataset,original,_calibration
+      env:
+        MLC_CALIBRATE_FILTER: ''
+    env:
+      MLC_CALIBRATE_FILTER: 'yes'

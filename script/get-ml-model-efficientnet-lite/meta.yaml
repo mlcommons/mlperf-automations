@@ -1,8 +1,25 @@
 alias: get-ml-model-efficientnet-lite
+uid: 1041f681977d4b7c
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
+tags:
+- get
+- ml-model
+- efficientnet
+- raw
+- ml-model-efficientnet
+- ml-model-efficientnet-lite
+- lite
+- tflite
+- image-classification
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_ML_MODEL_INPUTS_DATA_TYPE: fp32
   MLC_ML_MODEL_PRECISION: fp32
@@ -30,19 +47,8 @@ env:
 new_env_keys:
 - MLC_ML_MODEL_*
 - MLC_DATASET_PREPROCESSED_IMAGENET_DEP_TAGS
-print_env_at_the_end:
-  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
-tags:
-- get
-- ml-model
-- efficientnet
-- raw
-- ml-model-efficientnet
-- ml-model-efficientnet-lite
-- lite
-- tflite
-- image-classification
-uid: 1041f681977d4b7c
+
+# Variations
 valid_variation_combinations:
 - - lite0
   - resolution-224
@@ -55,16 +61,6 @@ valid_variation_combinations:
 - - lite4
   - resolution-300
 variations:
-  fp32:
-    default: true
-    env:
-      MLC_ML_MODEL_EFFICIENTNET_LITE_PRECISION: fp32
-      MLC_ML_MODEL_INPUTS_DATA_TYPE: fp32
-      MLC_ML_MODEL_PRECISION: fp32
-      MLC_ML_MODEL_WEIGHTS_DATA_TYPE: fp32
-    group: precision
-  int8:
-    alias: uint8
   lite0:
     base:
     - resolution-224
@@ -96,6 +92,21 @@ variations:
     env:
       MLC_ML_MODEL_EFFICIENTNET_LITE_KIND: lite4
     group: kind
+  fp32:
+    default: true
+    env:
+      MLC_ML_MODEL_EFFICIENTNET_LITE_PRECISION: fp32
+      MLC_ML_MODEL_INPUTS_DATA_TYPE: fp32
+      MLC_ML_MODEL_PRECISION: fp32
+      MLC_ML_MODEL_WEIGHTS_DATA_TYPE: fp32
+    group: precision
+  uint8:
+    env:
+      MLC_ML_MODEL_EFFICIENTNET_LITE_PRECISION: int8
+      MLC_ML_MODEL_INPUTS_DATA_TYPE: uint8
+      MLC_ML_MODEL_PRECISION: uint8
+      MLC_ML_MODEL_WEIGHTS_DATA_TYPE: uint8
+    group: precision
   resolution-224:
     default: true
     env:
@@ -132,11 +143,10 @@ variations:
       MLC_ML_MODEL_IMAGE_WIDTH: '300'
       MLC_ML_MODEL_MOBILENET_RESOLUTION: '300'
     group: resolution
+  int8:
+    alias: uint8
   tflite: {}
-  uint8:
-    env:
-      MLC_ML_MODEL_EFFICIENTNET_LITE_PRECISION: int8
-      MLC_ML_MODEL_INPUTS_DATA_TYPE: uint8
-      MLC_ML_MODEL_PRECISION: uint8
-      MLC_ML_MODEL_WEIGHTS_DATA_TYPE: uint8
-    group: precision
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model

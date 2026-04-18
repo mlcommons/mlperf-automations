@@ -1,18 +1,32 @@
 alias: get-ml-model-rgat
+uid: b409fd66c5ad4ed5
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
-docker:
-  fake_run_deps: True
+tags:
+- get
+- raw
+- ml-model
+- rgat
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_ML_MODEL: RGAT
-input_mapping:
-  checkpoint: RGAT_CHECKPOINT_PATH
 new_env_keys:
 - MLC_ML_MODEL_*
 - MLC_ML_MODEL_RGAT_CHECKPOINT_PATH
 - RGAT_CHECKPOINT_PATH
+
+# Input mapping
+input_mapping:
+  checkpoint: RGAT_CHECKPOINT_PATH
+
+# Dependencies
 prehook_deps:
 - enable_if_env:
     MLC_TMP_REQUIRE_DOWNLOAD:
@@ -25,33 +39,25 @@ prehook_deps:
   - download-rgat-model-file
   tags: download,file
   force_env_keys:
-    - MLC_OUTDIRNAME
+  - MLC_OUTDIRNAME
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_DOWNLOAD_URL
-print_env_at_the_end:
-  RGAT_CHECKPOINT_PATH: R-GAT checkpoint path
-tags:
-- get
-- raw
-- ml-model
-- rgat
-uid: b409fd66c5ad4ed5
+
+# Variations
 variations:
-  pytorch:
-    default: true
-  fp32:
-    default: true
-    env:
-      MLC_ML_MODEL_INPUT_DATA_TYPES: fp32
-      MLC_ML_MODEL_PRECISION: fp32
-      MLC_ML_MODEL_WEIGHT_DATA_TYPES: fp32
-    group: precision
   mlcommons:
     default: true
     default_variations:
       download-tool: r2-downloader
     group: download-source
+  r2-downloader:
+    adr:
+      download-rgat-model-file:
+        tags: _r2-downloader
+    env:
+      MLC_DOWNLOAD_TOOL: r2-downloader
+    group: download-tool
   rclone:
     adr:
       download-rgat-model-file:
@@ -60,34 +66,47 @@ variations:
       MLC_DOWNLOAD_TOOL: rclone
       MLC_RCLONE_CONFIG_NAME: mlc-inference
     group: download-tool
-  r2-downloader:
-    adr:
-      download-rgat-model-file:
-        tags: _r2-downloader
+  fp32:
+    default: true
     env:
-      MLC_DOWNLOAD_TOOL: r2-downloader
-    group: download-tool
-  rclone,mlcommons,fp32:
+      MLC_ML_MODEL_INPUT_DATA_TYPES: fp32
+      MLC_ML_MODEL_PRECISION: fp32
+      MLC_ML_MODEL_WEIGHT_DATA_TYPES: fp32
+    group: precision
+  dry-run:
     env:
-      MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: https://github.com/mlcommons/inference/tree/master/graph/R-GAT#download-model-using-rclone
-      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/R-GAT/RGAT.pt
-      MLC_DOWNLOAD_FILENAME: RGAT
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  pytorch:
+    default: true
   r2-downloader,mlcommons,fp32:
     env:
       MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: https://github.com/mlcommons/inference/tree/master/graph/R-GAT#download-model-using-mlc-r2-downloader
       MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/rgat-model.uri
       MLC_DOWNLOAD_FILENAME: RGAT
-  dry-run:
+  rclone,mlcommons,fp32:
     env:
-      MLC_DOWNLOAD_MODE: dry
-    group: run-mode
-  dry-run,rclone:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  dry-run,r2-downloader:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+      MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: https://github.com/mlcommons/inference/tree/master/graph/R-GAT#download-model-using-rclone
+      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/R-GAT/RGAT.pt
+      MLC_DOWNLOAD_FILENAME: RGAT
+
+# Docker / container
+docker:
+  fake_run_deps: true
+
+# Output / debugging
+print_env_at_the_end:
+  RGAT_CHECKPOINT_PATH: R-GAT checkpoint path
+
+# Tests
 tests:
+  needs_pat: true
   run_inputs:
   - variations_list:
     - rclone,mlcommons,fp32,dry-run

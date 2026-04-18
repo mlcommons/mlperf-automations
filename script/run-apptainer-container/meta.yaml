@@ -1,0 +1,137 @@
+alias: run-apptainer-container
+uid: d3bdc61a712c4703
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: Container automation
+tags:
+- run
+- apptainer
+- container
+
+# Cache
+cache: false
+
+# Environment
+default_env:
+  MLC_APPTAINER_WRITABLE_TMPFS: 'yes'
+  MLC_APPTAINER_CLEANENV: 'yes'
+  MLC_APPTAINER_OS: ubuntu
+  MLC_APPTAINER_OS_VERSION: '24.04'
+new_env_keys:
+- MLC_APPTAINER_*
+
+# Input mapping
+input_mapping:
+  bind: MLC_APPTAINER_BIND_MOUNTS
+  cleanenv: MLC_APPTAINER_CLEANENV
+  contain: MLC_APPTAINER_CONTAIN
+  containall: MLC_APPTAINER_CONTAINALL
+  docker_image: MLC_APPTAINER_FROM_DOCKER
+  docker_os: MLC_APPTAINER_OS
+  docker_os_version: MLC_APPTAINER_OS_VERSION
+  env_vars: MLC_APPTAINER_ENV_VARS
+  extra_args: MLC_APPTAINER_EXTRA_ARGS
+  fakeroot: MLC_APPTAINER_FAKEROOT
+  home: MLC_APPTAINER_HOME
+  image: MLC_APPTAINER_IMAGE
+  image_name: MLC_APPTAINER_IMAGE_NAME
+  image_tag: MLC_APPTAINER_IMAGE_TAG
+  image_url: MLC_APPTAINER_IMAGE_URL
+  no_home: MLC_APPTAINER_NO_HOME
+  nv: MLC_APPTAINER_NV
+  os: MLC_APPTAINER_OS
+  os_version: MLC_APPTAINER_OS_VERSION
+  overlay: MLC_APPTAINER_OVERLAY
+  post_run_cmds: MLC_APPTAINER_POST_RUN_COMMANDS
+  pre_run_cmds: MLC_APPTAINER_PRE_RUN_COMMANDS
+  pwd: MLC_APPTAINER_PWD
+  rebuild: MLC_APPTAINER_IMAGE_RECREATE
+  recreate: MLC_APPTAINER_IMAGE_RECREATE
+  rocm: MLC_APPTAINER_ROCM
+  run_cmd: MLC_APPTAINER_RUN_CMD
+  run_cmd_extra: MLC_APPTAINER_RUN_CMD_EXTRA
+  sandbox: MLC_APPTAINER_SANDBOX
+  sandbox_path: MLC_APPTAINER_SANDBOX_PATH
+  save_script: MLC_APPTAINER_SAVE_SCRIPT
+  script_tags: MLC_APPTAINER_RUN_SCRIPT_TAGS
+  writable: MLC_APPTAINER_WRITABLE
+  writable_tmpfs: MLC_APPTAINER_WRITABLE_TMPFS
+
+# Dependencies
+deps:
+- tags: get-apptainer
+prehook_deps:
+- names:
+  - build-apptainer-image
+  skip_if_any_env:
+    MLC_APPTAINER_IMAGE_EXISTS:
+    - 'yes'
+    MLC_APPTAINER_SKIP_BUILD:
+    - 'yes'
+  tags: build,apptainer,image
+
+# Tests
+tests:
+  run_inputs:
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '20.04'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '22.04'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '24.04'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '25.04'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: rhel
+      MLC_APPTAINER_OS_VERSION: '8'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: rhel
+      MLC_APPTAINER_OS_VERSION: '9'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: arch
+      MLC_APPTAINER_OS_VERSION: latest
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: sles
+      MLC_APPTAINER_OS_VERSION: '15.4'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: sles
+      MLC_APPTAINER_OS_VERSION: '15.5'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: sles
+      MLC_APPTAINER_OS_VERSION: '15.6'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: debian
+      MLC_APPTAINER_OS_VERSION: '11'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: debian
+      MLC_APPTAINER_OS_VERSION: '12'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: rocky
+      MLC_APPTAINER_OS_VERSION: '8'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: rocky
+      MLC_APPTAINER_OS_VERSION: '9'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
+  - env:
+      MLC_APPTAINER_OS: amazonlinux
+      MLC_APPTAINER_OS_VERSION: '2023'
+      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os

@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-01-17 00:49:15*
+*Last updated: 2026-04-18 05:31:02*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -10,13 +10,16 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [AI/ML frameworks](#aiml-frameworks)
 - [AI/ML models](#aiml-models)
 - [AI/ML optimization](#aiml-optimization)
+- [Benchmarking](#benchmarking)
 - [CUDA automation](#cuda-automation)
 - [Cloud automation](#cloud-automation)
 - [Compiler automation](#compiler-automation)
+- [Container automation](#container-automation)
 - [Dashboard automation](#dashboard-automation)
 - [Detection or installation of tools and artifacts](#detection-or-installation-of-tools-and-artifacts)
 - [DevOps automation](#devops-automation)
 - [Docker automation](#docker-automation)
+- [HPC Application](#hpc-application)
 - [MLCommons automation](#mlcommons-automation)
 - [MLCommons interface](#mlcommons-interface)
 - [MLCommons script templates](#mlcommons-script-templates)
@@ -31,6 +34,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [ROCm automation](#rocm-automation)
 - [Remote automation](#remote-automation)
 - [Reproducibility and artifact evaluation](#reproducibility-and-artifact-evaluation)
+- [Testing](#testing)
 - [Tests](#tests)
 - [TinyML automation](#tinyml-automation)
 - [Uncategorized](#uncategorized)
@@ -266,6 +270,12 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - prune-bert-models
   - Tags: `prune`, `bert-models`, `bert-prune`, `prune-bert-models`
 
+## Benchmarking
+
+- **[benchmark-program-geekbench](benchmark-program-geekbench/)**
+  - benchmark-program-geekbench
+  - Tags: `benchmark`, `geekbench`, `benchmark-geekbench`, `benchmark-program-geekbench`
+
 ## CUDA automation
 
 - **[get-cuda](get-cuda/)**
@@ -319,9 +329,6 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-aocc](get-aocc/)**
   - Detect or install AOCC compiler
   - Tags: `compiler`, `get`, `aocc`
-- **[get-aocl](get-aocl/)**
-  - get-aocl
-  - Tags: `get`, `lib`, `aocl`, `amd-optimized`, `amd`
 - **[get-cl](get-cl/)**
   - Detect or install Microsoft C compiler
   - Tags: `get`, `cl`, `compiler`, `c-compiler`, `cpp-compiler`, `get-cl`
@@ -345,7 +352,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - Tags: `get`, `oneapi`, `compiler`, `get-oneapi`
 - **[get-profiler-uprof](get-profiler-uprof/)**
   - Detect or install AMD uprof
-  - Tags: `get-uprof`, `get`, `uprof`, `uprof-profiler`
+  - Tags: `get-uprof`, `get`, `uprof`, `profiler`, `uprof-profiler`
 - **[install-diffusers-from-src](install-diffusers-from-src/)**
   - Build diffusers from sources
   - Tags: `install`, `get`, `src`, `from.src`, `diffusers`, `src-diffusers`
@@ -395,6 +402,18 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - Build vllm from sources
   - Tags: `install-vllm-from-src`
 
+## Container automation
+
+- **[build-apptainer-image](build-apptainer-image/)**
+  - build-apptainer-image
+  - Tags: `build`, `apptainer`, `image`, `apptainer-image`
+- **[build-apptainerfile](build-apptainerfile/)**
+  - build-apptainerfile
+  - Tags: `build`, `apptainerfile`, `apptainer`, `definition`
+- **[run-apptainer-container](run-apptainer-container/)**
+  - run-apptainer-container
+  - Tags: `run`, `apptainer`, `container`
+
 ## Dashboard automation
 
 - **[publish-results-to-dashboard](publish-results-to-dashboard/)**
@@ -415,6 +434,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-bazel](get-bazel/)**
   - get-bazel
   - Tags: `get`, `bazel`, `get-bazel`
+- **[get-blas](get-blas/)**
+  - get-blas
+  - Tags: `get`, `lib`, `blas`
 - **[get-blis](get-blis/)**
   - get-blis
   - Tags: `get`, `lib`, `blis`
@@ -430,18 +452,57 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-docker](get-docker/)**
   - get-docker
   - Tags: `get`, `install`, `docker`, `engine`
+- **[get-geekbench](get-geekbench/)**
+  - get-geekbench
+  - Tags: `get`, `geekbench`, `get-geekbench`
 - **[get-generic-sys-util](get-generic-sys-util/)**
   - get-generic-sys-util
   - Tags: `get`, `sys-util`, `generic`, `generic-sys-util`
 - **[get-google-test](get-google-test/)**
   - get-google-test
   - Tags: `get`, `google-test`, `googletest`, `gtest`, `test`, `google`
+- **[get-gperftools](get-gperftools/)**
+  - get-gperftools
+  - Tags: `get-gperftools`, `get`, `gperftools`
 - **[get-java](get-java/)**
   - get-java
   - Tags: `get`, `java`
 - **[get-javac](get-javac/)**
   - get-javac
   - Tags: `get`, `javac`
+- **[get-lib-aocl](get-lib-aocl/)**
+  - get-lib-aocl
+  - Tags: `get`, `lib`, `lib-aocl`, `aocl`, `aocl-all`
+- **[get-lib-aocl-blis](get-lib-aocl-blis/)**
+  - get-lib-aocl-blis
+  - Tags: `get`, `lib`, `lib-aocl-blis`, `aocl-blis`, `aocl`, `blis`
+- **[get-lib-aocl-compression](get-lib-aocl-compression/)**
+  - get-lib-aocl-compression
+  - Tags: `get`, `lib`, `lib-aocl-compression`, `aocl-compression`, `aocl`
+- **[get-lib-aocl-crypto](get-lib-aocl-crypto/)**
+  - get-lib-aocl-crypto
+  - Tags: `get`, `lib`, `lib-aocl-crypto`, `aocl-crypto`, `aocl`
+- **[get-lib-aocl-data-analytics](get-lib-aocl-data-analytics/)**
+  - get-lib-aocl-data-analytics
+  - Tags: `get`, `lib`, `lib-aocl-data-analytics`, `aocl-data-analytics`, `aocl`, `aocl-da`
+- **[get-lib-aocl-dlp](get-lib-aocl-dlp/)**
+  - get-lib-aocl-dlp
+  - Tags: `get`, `lib`, `lib-aocl-dlp`, `aocl-dlp`, `aocl`
+- **[get-lib-aocl-fftz](get-lib-aocl-fftz/)**
+  - get-lib-aocl-fftz
+  - Tags: `get`, `lib`, `lib-aocl-fftz`, `aocl-fftz`, `aocl`
+- **[get-lib-aocl-libflame](get-lib-aocl-libflame/)**
+  - get-lib-aocl-libflame
+  - Tags: `get`, `lib`, `lib-aocl-libflame`, `aocl-libflame`, `aocl`
+- **[get-lib-aocl-libm](get-lib-aocl-libm/)**
+  - get-lib-aocl-libm
+  - Tags: `get`, `lib`, `lib-aocl-libm`, `aocl-libm`, `aocl`
+- **[get-lib-aocl-scalapack](get-lib-aocl-scalapack/)**
+  - get-lib-aocl-scalapack
+  - Tags: `get`, `lib`, `lib-aocl-scalapack`, `aocl-scalapack`, `aocl`
+- **[get-lib-aocl-sparse](get-lib-aocl-sparse/)**
+  - get-lib-aocl-sparse
+  - Tags: `get`, `lib`, `lib-aocl-sparse`, `aocl-sparse`, `aocl`
 - **[get-lib-armnn](get-lib-armnn/)**
   - get-lib-armnn
   - Tags: `get`, `lib-armnn`, `lib`, `armnn`
@@ -454,12 +515,18 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-lib-jemalloc](get-lib-jemalloc/)**
   - get-lib-jemalloc
   - Tags: `get`, `lib`, `lib-jemalloc`, `jemalloc`
+- **[get-lib-mimalloc](get-lib-mimalloc/)**
+  - get-lib-mimalloc
+  - Tags: `get-lib-mimalloc`, `get`, `lib`, `mimalloc`
 - **[get-lib-protobuf](get-lib-protobuf/)**
   - get-lib-protobuf
   - Tags: `get`, `google-protobuf`, `protobuf`, `lib`, `lib-protobuf`, `google`
 - **[get-lib-qaic-api](get-lib-qaic-api/)**
   - get-lib-qaic-api
   - Tags: `get`, `api`, `lib-qaic-api`, `lib`, `qaic`
+- **[get-lib-tcmalloc](get-lib-tcmalloc/)**
+  - get-lib-tcmalloc
+  - Tags: `tcmalloc`, `get`, `lib`
 - **[get-nvidia-docker](get-nvidia-docker/)**
   - get-nvidia-docker
   - Tags: `get`, `install`, `nvidia`, `nvidia-container-toolkit`, `nvidia-docker`, `engine`
@@ -475,6 +542,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-sys-utils-mlc](get-sys-utils-mlc/)**
   - get-sys-utils-mlc
   - Tags: `get`, `sys-utils-cm`, `sys-utils-mlc`
+- **[get-utils-aocl](get-utils-aocl/)**
+  - get-utils-aocl
+  - Tags: `get`, `utils`, `utils-aocl`, `aocl-utils`, `aocl`
 - **[get-xilinx-sdk](get-xilinx-sdk/)**
   - get-xilinx-sdk
   - Tags: `get`, `xilinx`, `sdk`
@@ -596,6 +666,15 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - run-docker-container
   - Tags: `run`, `docker`, `container`
 
+## HPC Application
+
+- **[app-cp2k](app-cp2k/)**
+  - app-cp2k
+  - Tags: `app`, `cp2k`
+- **[app-nwchem](app-nwchem/)**
+  - app-nwchem
+  - Tags: `app`, `nwchem`, `hpc`
+
 ## MLCommons automation
 
 - **[create-custom-cache-entry](create-custom-cache-entry/)**
@@ -636,10 +715,10 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 - **[get-tool-intel-pin](get-tool-intel-pin/)**
   - get-tool-intel-pin
-  - Tags: `get-intel-pin-tool`
+  - Tags: `get-intel-pin-tool`, `get`, `intel`, `pin-tool`, `pin`
 - **[get-tool-intel-sde](get-tool-intel-sde/)**
   - get-tool-intel-sde
-  - Tags: `get-intel-sde-tool`
+  - Tags: `get-intel-sde-tool`, `get`, `intel`, `sde`, `tool`, `sde-tool`
 - **[parse-dmidecode-memory-info](parse-dmidecode-memory-info/)**
   - parse-dmidecode-memory-info
   - Tags: `dmidecode`, `parse`, `memory`, `info`
@@ -856,6 +935,12 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[detect-os](detect-os/)**
   - detect-os
   - Tags: `detect-os`, `detect`, `os`, `info`
+- **[get-mlperf-multi-node-system-info](get-mlperf-multi-node-system-info/)**
+  - get-mlperf-multi-node-system-info
+  - Tags: `get-mlperf-multi-node-system-info`
+- **[get-mlperf-single-node-system-info](get-mlperf-single-node-system-info/)**
+  - get-mlperf-single-node-system-info
+  - Tags: `get`, `mlperf`, `single-node`, `system-info`
 - **[get-platform-details](get-platform-details/)**
   - get-platform-details
   - Tags: `get`, `platform`, `details`, `platform-details`
@@ -901,6 +986,12 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-ipol-src](get-ipol-src/)**
   - get-ipol-src
   - Tags: `get`, `ipol`, `journal`, `src`, `ipol-src`
+
+## Testing
+
+- **[validate-mlc-json](validate-mlc-json/)**
+  - validate-mlc-json
+  - Tags: `validate`, `mlc-json`
 
 ## Tests
 
@@ -970,12 +1061,24 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-dataset-mlperf-inference-dlrmv3-synthetic-streaming](get-dataset-mlperf-inference-dlrmv3-synthetic-streaming/)**
   - get-dataset-mlperf-inference-dlrmv3-synthetic-streaming
   - Tags: `get`, `dataset`, `mlperf`, `inference`, `dlrmv3`, `synthetic-streaming`, `get-dataset-mlperf-inference-dlrmv3-synthetic-streaming`
+- **[get-dataset-mlperf-inference-gpt-oss](get-dataset-mlperf-inference-gpt-oss/)**
+  - get-dataset-mlperf-inference-gpt-oss
+  - Tags: `get-dataset-mlperf-inference-gpt-oss`
 - **[get-dataset-mlperf-inference-llama3](get-dataset-mlperf-inference-llama3/)**
   - get-dataset-mlperf-inference-llama3
   - Tags: `get`, `dataset`, `mlperf`, `llama3`, `inference`
+- **[get-dataset-mlperf-inference-shopify-catalogue](get-dataset-mlperf-inference-shopify-catalogue/)**
+  - get-dataset-mlperf-inference-shopify-catalogue
+  - Tags: `get-dataset-mlperf-inference-shopify-catalogue`
+- **[get-dataset-mlperf-inference-text-to-video](get-dataset-mlperf-inference-text-to-video/)**
+  - get-dataset-mlperf-inference-text-to-video
+  - Tags: `get-dataset-mlperf-inference-text-to-video`
 - **[get-dataset-mlperf-inference-yolo-coco2017-filtered-dataset](get-dataset-mlperf-inference-yolo-coco2017-filtered-dataset/)**
   - get-dataset-mlperf-inference-yolo-coco2017-filtered-dataset
   - Tags: `get`, `dataset`, `mlperf-inference`, `yolo-coco2017-filtered`, `get-dataset-mlperf-inference-yolo-coco2017-filtered-dataset`
+- **[get-dataset-mmlu](get-dataset-mmlu/)**
+  - get-dataset-mmlu
+  - Tags: `get-dataset-mmlu`
 - **[get-dataset-nuscenes](get-dataset-nuscenes/)**
   - get-dataset-nuscenes
   - Tags: `get`, `dataset`, `nuscenes`
@@ -1012,6 +1115,15 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-ml-model-pointpainting](get-ml-model-pointpainting/)** (alias: `get-ml-model-pointpillars`)
   - get-ml-model-pointpainting
   - Tags: `get`, `ml-model`, `ml`, `model`, `pointpainting`
+- **[get-ml-model-qwen3-vlm](get-ml-model-qwen3-vlm/)**
+  - get-ml-model-qwen3-vlm
+  - Tags: `get-ml-model-qwen3-vl`
+- **[get-ml-model-wan2](get-ml-model-wan2/)**
+  - get-ml-model-wan2
+  - Tags: `get-ml-model-wan2`
+- **[get-ml-model-yolov11](get-ml-model-yolov11/)**
+  - get-ml-model-yolov11
+  - Tags: `get-ml-model-yolov11`
 - **[get-mlperf-automotive-utils](get-mlperf-automotive-utils/)**
   - get-mlperf-automotive-utils
   - Tags: `get`, `mlperf`, `automotive`, `util`, `utils`, `functions`
@@ -1053,8 +1165,8 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 308
-- **Categories**: 29
+- **Total Scripts**: 340
+- **Categories**: 33
 
 ## Usage
 

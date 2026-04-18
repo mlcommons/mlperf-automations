@@ -7,9 +7,14 @@ set -e
 cd ${MLC_JEMALLOC_SRC_PATH}
 autoconf
 cd - 
+
 mkdir -p obj
 cd obj
+
 echo "${MLC_JEMALLOC_CONFIGURE_COMMAND}"
 ${MLC_JEMALLOC_CONFIGURE_COMMAND}
-${MLC_JEMALLOC_SRC_PATH}/configure --enable-autogen
+
 make
+make install
+
+rm -rf obj

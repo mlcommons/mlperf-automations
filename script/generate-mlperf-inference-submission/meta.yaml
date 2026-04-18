@@ -1,15 +1,66 @@
 alias: generate-mlperf-inference-submission
+uid: 5f8ab2d0b5874d53
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: MLPerf Inference
-new_env_keys:
-  - MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER
+tags:
+- generate
+- submission
+- mlperf
+- mlperf-inference
+- inference
+- mlcommons
+- inference-submission
+- mlperf-inference-submission
+- mlcommons-inference-submission
+
+# Cache
+cache: false
+
+# Environment
 default_env:
   MLC_MLPERF_RUN_STYLE: valid
   MLC_MLPERF_SUBMISSION_DIR_SHARED: 'yes'
   MLC_RUN_MLPERF_ACCURACY: 'on'
-predeps: False
+new_env_keys:
+- MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER
+
+# Input mapping
+input_mapping:
+  analyzer_settings_file: MLC_MLPERF_POWER_ANALYZER_SETTINGS_FILE_PATH
+  category: MLC_MLPERF_SUBMISSION_CATEGORY
+  clean: MLC_MLPERF_CLEAN_SUBMISSION_DIR
+  dashboard: MLC_MLPERF_DASHBOARD
+  dashboard_wb_project: MLC_MLPERF_DASHBOARD_WANDB_PROJECT
+  device: MLC_MLPERF_DEVICE
+  division: MLC_MLPERF_SUBMISSION_DIVISION
+  extra_checker_args: MLC_MLPERF_SUBMISSION_CHECKER_EXTRA_ARGS
+  get_platform_details: MLC_GET_PLATFORM_DETAILS
+  hw_name: MLC_HW_NAME
+  hw_notes_extra: MLC_MLPERF_SUT_HW_NOTES_EXTRA
+  noinfer_low_accuracy_results: MLC_MLPERF_NOINFER_LOW_ACCURACY_RESULTS
+  noinfer_scenario_results: MLC_MLPERF_NOINFER_SCENARIO_RESULTS
+  power_settings_file: MLC_MLPERF_POWER_SETTINGS_FILE_PATH
+  preprocess: MLC_RUN_MLPERF_SUBMISSION_PREPROCESSOR
+  preprocess_submission: MLC_RUN_MLPERF_SUBMISSION_PREPROCESSOR
+  results_dir: MLC_MLPERF_INFERENCE_RESULTS_DIR_
+  run_checker: MLC_RUN_SUBMISSION_CHECKER
+  run_style: MLC_MLPERF_RUN_STYLE
+  skip_truncation: MLC_SKIP_TRUNCATE_ACCURACY
+  status: MLC_MLPERF_SUBMISSION_SYSTEM_STATUS
+  submission_base_dir: MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR
+  submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
+  submission_preprocessor_args: MLC_MLPERF_PREPROCESS_SUBMISSION_EXTRA_ARGS
+  submitter: MLC_MLPERF_SUBMITTER
+  submitter_id: MLC_MLPERF_SUBMITTER_ID
+  sw_notes_extra: MLC_MLPERF_SUT_SW_NOTES_EXTRA
+  tar: MLC_TAR_SUBMISSION_DIR
+  version: MLC_MLPERF_SUBMISSION_CHECKER_VERSION
+
+# Dependencies
+predeps: false
 deps:
 - names:
   - python
@@ -31,6 +82,72 @@ deps:
     MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR:
     - 'on'
   tags: get,mlperf,submission,dir
+post_deps:
+- enable_if_env:
+    MLC_RUN_MLPERF_ACCURACY:
+    - 'on'
+  skip_if_env:
+    MLC_SKIP_TRUNCATE_ACCURACY:
+    - 'yes'
+  names:
+  - truncate-mlperf-accuracy-log
+  tags: accuracy,truncate,mlc
+- enable_if_env:
+    MLC_RUN_MLPERF_SUBMISSION_PREPROCESSOR:
+    - 'yes'
+  names:
+  - preprocess-mlperf-submission
+  tags: preprocess,mlperf,submission
+- skip_if_env:
+    MLC_RUN_SUBMISSION_CHECKER:
+    - 'no'
+  names:
+  - mlperf-inference-submission-checker
+  - mlperf-submission-checker
+  - submission-checker
+  tags: submission,inference,checker,mlc
+
+# Variations
+variations:
+  wg-automotive:
+    group: benchmark_wg
+    env:
+      MLC_MLPERF_WG: automotive
+    add_deps_recursive:
+      truncate-mlperf-accuracy-log:
+        tags: _wg-automotive
+      preprocess-mlperf-submission:
+        tags: _wg-automotive
+      mlperf-inference-submission-checker:
+        tags: _wg-automotive
+    default_env:
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v0.5
+    deps:
+    - names:
+      - automotive-src
+      tags: mlcommons,automotive,src
+    - tags: get,mlperf,automotive,utils
+  wg-inference:
+    group: benchmark_wg
+    default: true
+    env:
+      MLC_MLPERF_WG: inference
+    add_deps_recursive:
+      truncate-mlperf-accuracy-log:
+        tags: _wg-inference
+      preprocess-mlperf-submission:
+        tags: _wg-inference
+      mlperf-inference-submission-checker:
+        tags: _wg-inference
+    default_env:
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v5.1
+    deps:
+    - names:
+      - inference-src
+      tags: mlcommons,inference,src
+    - tags: get,mlperf,inference,utils
+
+# Docker / container
 docker:
   mlc_repo: mlcommons@mlperf-automations
   mlc_repo_branch: dev
@@ -59,106 +176,3 @@ docker:
   real_run: false
   use_host_group_id: true
   use_host_user_id: true
-input_mapping:
-  analyzer_settings_file: MLC_MLPERF_POWER_ANALYZER_SETTINGS_FILE_PATH
-  status: MLC_MLPERF_SUBMISSION_SYSTEM_STATUS
-  category: MLC_MLPERF_SUBMISSION_CATEGORY
-  clean: MLC_MLPERF_CLEAN_SUBMISSION_DIR
-  dashboard: MLC_MLPERF_DASHBOARD
-  dashboard_wb_project: MLC_MLPERF_DASHBOARD_WANDB_PROJECT
-  device: MLC_MLPERF_DEVICE
-  division: MLC_MLPERF_SUBMISSION_DIVISION
-  extra_checker_args: MLC_MLPERF_SUBMISSION_CHECKER_EXTRA_ARGS
-  hw_name: MLC_HW_NAME
-  hw_notes_extra: MLC_MLPERF_SUT_HW_NOTES_EXTRA
-  noinfer_scenario_results: MLC_MLPERF_NOINFER_SCENARIO_RESULTS
-  noinfer_low_accuracy_results: MLC_MLPERF_NOINFER_LOW_ACCURACY_RESULTS
-  power_settings_file: MLC_MLPERF_POWER_SETTINGS_FILE_PATH
-  preprocess: MLC_RUN_MLPERF_SUBMISSION_PREPROCESSOR
-  preprocess_submission: MLC_RUN_MLPERF_SUBMISSION_PREPROCESSOR
-  results_dir: MLC_MLPERF_INFERENCE_RESULTS_DIR_
-  run_checker: MLC_RUN_SUBMISSION_CHECKER
-  run_style: MLC_MLPERF_RUN_STYLE
-  skip_truncation: MLC_SKIP_TRUNCATE_ACCURACY
-  submission_base_dir: MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR
-  submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
-  submitter: MLC_MLPERF_SUBMITTER
-  submitter_id: MLC_MLPERF_SUBMITTER_ID
-  sw_notes_extra: MLC_MLPERF_SUT_SW_NOTES_EXTRA
-  tar: MLC_TAR_SUBMISSION_DIR
-  get_platform_details: MLC_GET_PLATFORM_DETAILS
-  submission_preprocessor_args: MLC_MLPERF_PREPROCESS_SUBMISSION_EXTRA_ARGS
-  version: MLC_MLPERF_SUBMISSION_CHECKER_VERSION
-post_deps:
-- enable_if_env:
-    MLC_RUN_MLPERF_ACCURACY:
-    - 'on'
-  skip_if_env:
-    MLC_SKIP_TRUNCATE_ACCURACY:
-    - 'yes'
-  names:
-    - truncate-mlperf-accuracy-log
-  tags: accuracy,truncate,mlc
-- enable_if_env:
-    MLC_RUN_MLPERF_SUBMISSION_PREPROCESSOR:
-    - 'yes'
-  names:
-    - preprocess-mlperf-submission
-  tags: preprocess,mlperf,submission
-- skip_if_env:
-    MLC_RUN_SUBMISSION_CHECKER:
-    - 'no'
-  names:
-  - mlperf-inference-submission-checker
-  - mlperf-submission-checker
-  - submission-checker
-  tags: submission,inference,checker,mlc
-variations:
-  wg-inference:
-    group: benchmark_wg
-    default: true
-    env:
-      MLC_MLPERF_WG: inference
-    add_deps_recursive:
-      truncate-mlperf-accuracy-log:
-        tags: _wg-inference
-      preprocess-mlperf-submission:
-        tags: _wg-inference
-      mlperf-inference-submission-checker:
-        tags: _wg-inference
-    default_env:
-      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v5.1
-    deps:
-      - names:
-        - inference-src
-        tags: mlcommons,inference,src
-      - tags: get,mlperf,inference,utils
-  wg-automotive:
-    group: benchmark_wg
-    env:
-      MLC_MLPERF_WG: automotive
-    add_deps_recursive:
-      truncate-mlperf-accuracy-log:
-        tags: _wg-automotive
-      preprocess-mlperf-submission:
-        tags: _wg-automotive
-      mlperf-inference-submission-checker:
-        tags: _wg-automotive
-    default_env:
-      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v0.5
-    deps:
-      - names:
-        - automotive-src
-        tags: mlcommons,automotive,src
-      - tags: get,mlperf,automotive,utils
-tags:
-- generate
-- submission
-- mlperf
-- mlperf-inference
-- inference
-- mlcommons
-- inference-submission
-- mlperf-inference-submission
-- mlcommons-inference-submission
-uid: 5f8ab2d0b5874d53

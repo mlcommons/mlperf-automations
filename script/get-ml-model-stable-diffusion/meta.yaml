@@ -1,19 +1,37 @@
 alias: get-ml-model-stable-diffusion
+uid: 22c6516b2d4d4c23
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
+tags:
+- get
+- raw
+- ml-model
+- stable-diffusion
+- sdxl
+- text-to-image
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_ML_MODEL: SDXL
   MLC_ML_MODEL_DATASET: openorca
   MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'no'
+new_env_keys:
+- MLC_ML_MODEL_*
+- SDXL_CHECKPOINT_PATH
+
+# Input mapping
 input_mapping:
   checkpoint: SDXL_CHECKPOINT_PATH
   download_path: MLC_DOWNLOAD_PATH
   to: MLC_DOWNLOAD_PATH
-new_env_keys:
-- MLC_ML_MODEL_*
-- SDXL_CHECKPOINT_PATH
+
+# Dependencies
 prehook_deps:
 - enable_if_env:
     MLC_DOWNLOAD_TOOL:
@@ -24,12 +42,10 @@ prehook_deps:
     MLC_GIT_CHECKOUT_FOLDER: stable-diffusion-xl-base-1.0
     MLC_MODEL_ZOO_ENV_KEY: SDXL
   force_env_keys:
-  - MLC_GIT_CHECKOUT_FOLDER
+  - MLC_OUTDIRNAME
   names:
   - hf-zoo
   tags: get,ml-model,huggingface,zoo,_clone-repo,_model-stub.stabilityai/stable-diffusion-xl-base-1.0
-  force_env_keys:
-    - MLC_OUTDIRNAME  
 - enable_if_env:
     MLC_DOWNLOAD_SOURCE:
     - mlcommons
@@ -45,20 +61,52 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_DOWNLOAD_URL
-print_env_at_the_end:
-  SDXL_CHECKPOINT_PATH: Stable diffusion checkpoint path
-tags:
-- get
-- raw
-- ml-model
-- stable-diffusion
-- sdxl
-- text-to-image
-uid: 22c6516b2d4d4c23
+
+# Variations
 variations:
-  batch_size.#:
+  huggingface:
+    default_variations:
+      download-tool: git
+    group: download-source
+  mlcommons:
+    default: true
+    default_variations:
+      download-tool: r2-downloader
     env:
-      MLC_ML_MODEL_BATCH_SIZE: '#'
+      MLC_DOWNLOAD_SOURCE: mlcommons
+    group: download-source
+  git:
+    env:
+      MLC_DOWNLOAD_TOOL: git
+    group: download-tool
+  r2-downloader:
+    adr:
+      dae-sdxl-model:
+        tags: _r2-downloader
+    env:
+      MLC_DOWNLOAD_TOOL: r2-downloader
+    group: download-tool
+  rclone:
+    adr:
+      dae-sdxl-model:
+        tags: _rclone
+    env:
+      MLC_DOWNLOAD_TOOL: rclone
+      MLC_RCLONE_CONFIG_NAME: mlc-inference
+    group: download-tool
+  wget:
+    adr:
+      dae-sdxl-model:
+        tags: _wget
+    env:
+      MLC_DOWNLOAD_TOOL: wget
+    group: download-tool
+  pytorch:
+    default: true
+    env:
+      MLC_ML_MODEL_FRAMEWORK: pytorch
+      MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: https://github.com/mlcommons/inference/tree/master/text_to_image#download-model
+    group: framework
   fp16:
     env:
       MLC_ML_MODEL_INPUT_DATA_TYPES: fp16
@@ -72,59 +120,36 @@ variations:
       MLC_ML_MODEL_PRECISION: fp32
       MLC_ML_MODEL_WEIGHT_DATA_TYPES: fp32
     group: precision
-  git:
-    env:
-      MLC_DOWNLOAD_TOOL: git
-    group: download-tool
-  huggingface:
-    default_variations:
-      download-tool: git
-    group: download-source
   int8:
     env:
       MLC_ML_MODEL_INPUT_DATA_TYPES: int8
       MLC_ML_MODEL_PRECISION: int8
       MLC_ML_MODEL_WEIGHT_DATA_TYPES: int8
     group: precision
-  mlcommons:
-    default: true
-    default_variations:
-      download-tool: r2-downloader
+  uint8:
     env:
-      MLC_DOWNLOAD_SOURCE: mlcommons
-    group: download-source
-  pytorch:
-    default: true
+      MLC_ML_MODEL_INPUT_DATA_TYPES: uint8
+      MLC_ML_MODEL_PRECISION: uint8
+      MLC_ML_MODEL_WEIGHT_DATA_TYPES: uint8
+    group: precision
+  dry-run:
+    group: run-mode
     env:
-      MLC_ML_MODEL_FRAMEWORK: pytorch
-      MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: https://github.com/mlcommons/inference/tree/master/text_to_image#download-model
-    group: framework
+      MLC_DOWNLOAD_MODE: dry
+  batch_size.#:
+    env:
+      MLC_ML_MODEL_BATCH_SIZE: '#'
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
   pytorch,fp16:
     required_disk_space: 6500
   pytorch,fp32:
     env: {}
     required_disk_space: 13000
-  rclone:
-    adr:
-      dae-sdxl-model:
-        tags: _rclone
-    env:
-      MLC_DOWNLOAD_TOOL: rclone
-      MLC_RCLONE_CONFIG_NAME: mlc-inference
-    group: download-tool
-  r2-downloader:
-    adr:
-      dae-sdxl-model:
-        tags: _r2-downloader
-    env:
-      MLC_DOWNLOAD_TOOL: r2-downloader
-    group: download-tool
-  rclone,fp16:
-    env:
-      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/stable_diffusion_fp16
-  rclone,fp32:
-    env:
-      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/stable_diffusion_fp32
   r2-downloader,fp16:
     env:
       MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/stable-diffusion-xl-1-0-fp16-checkpoint.uri
@@ -133,31 +158,20 @@ variations:
     env:
       MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/stable-diffusion-xl-1-0-fp32-checkpoint.uri
       MLC_DOWNLOAD_FILENAME: fp32-checkpoint
-  uint8:
+  rclone,fp16:
     env:
-      MLC_ML_MODEL_INPUT_DATA_TYPES: uint8
-      MLC_ML_MODEL_PRECISION: uint8
-      MLC_ML_MODEL_WEIGHT_DATA_TYPES: uint8
-    group: precision
-  wget:
-    adr:
-      dae-sdxl-model:
-        tags: _wget
+      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/stable_diffusion_fp16
+  rclone,fp32:
     env:
-      MLC_DOWNLOAD_TOOL: wget
-    group: download-tool
-  dry-run:
-    group: run-mode
-    env:
-      MLC_DOWNLOAD_MODE: dry
-  dry-run,rclone:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  dry-run,r2-downloader:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
-test:
+      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/stable_diffusion_fp32
+
+# Output / debugging
+print_env_at_the_end:
+  SDXL_CHECKPOINT_PATH: Stable diffusion checkpoint path
+
+# Tests
+tests:
   run_inputs:
-    - variations_list:
-      - fp32,r2-downloader,dry-run
-      - fp16,r2-downloader,dry-run
+  - variations_list:
+    - fp32,r2-downloader,dry-run
+    - fp16,r2-downloader,dry-run

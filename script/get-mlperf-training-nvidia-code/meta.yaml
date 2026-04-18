@@ -1,10 +1,27 @@
 alias: get-mlperf-training-nvidia-code
+uid: fdc630b1d41743c5
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLPerf Training
+tags:
+- get
+- nvidia
+- mlperf
+- training
+- code
+- training-code
+
+# Cache
+cache: true
 clean_files: []
-default_version: r3.0
+
+# Environment
+new_env_keys:
+- MLC_MLPERF_TRAINING_NVIDIA_CODE_PATH
+
+# Dependencies
 deps:
 - env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_MLPERF_TRAINING_RESULTS_PATH
@@ -15,16 +32,8 @@ deps:
   update_tags_from_env_with_prefix:
     _repo.:
     - MLC_NVIDIA_CODE_DOWNLOAD_URL
-new_env_keys:
-- MLC_MLPERF_TRAINING_NVIDIA_CODE_PATH
-tags:
-- get
-- nvidia
-- mlperf
-- training
-- code
-- training-code
-uid: fdc630b1d41743c5
+
+# Variations
 variations:
   ctuning:
     env:
@@ -41,6 +50,9 @@ variations:
     env:
       MLC_TMP_TRAINING_SRC: GATEOverflow
     group: repo-owner
+
+# Versions
+default_version: r3.0
 versions:
   r2.1:
     env:

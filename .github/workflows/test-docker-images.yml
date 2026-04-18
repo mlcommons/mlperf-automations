@@ -1,0 +1,229 @@
+name: Test Docker images
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    branches: [ "main", "dev" ]
+    paths:
+      - 'script/build-dockerfile/**'
+      - 'script/detect-cpu/**'
+      - 'script/detect-os/**'
+      - 'automation/script/docker_utils.py'
+      - '.github/workflows/test-docker-images.yml'
+  workflow_dispatch:
+    inputs:
+      docker_os:
+        description: 'Docker OS (leave empty to test all)'
+        required: false
+        default: ''
+        type: string
+      docker_os_version:
+        description: 'Docker OS version (leave empty for default)'
+        required: false
+        default: ''
+        type: string
+      docker_cache:
+        description: 'Use Docker build cache'
+        required: false
+        default: 'no'
+        type: choice
+        options:
+          - 'yes'
+          - 'no'
+      docker_base_image:
+        description: 'Custom base Docker image (overrides os/version)'
+        required: false
+        default: ''
+        type: string
+      docker_extra_sys_deps:
+        description: 'Extra system packages to install'
+        required: false
+        default: ''
+        type: string
+      docker_mounts:
+        description: 'Docker mount points (comma-separated host:container pairs)'
+        required: false
+        default: ''
+        type: string
+      script_tags:
+        description: 'MLC script tags to test inside Docker'
+        required: false
+        default: 'detect,cpu'
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate matrix from dockerinfo.json
+        id: set-matrix
+        run: |
+          matrix=$(python3 -c "
+          import json, os
+
+          filter_os = '${{ inputs.docker_os }}'
+          filter_ver = '${{ inputs.docker_os_version }}'
+          base_image = '${{ inputs.docker_base_image }}'
+
+          if base_image:
+              includes = [{'docker_os': 'custom', 'docker_os_version': 'custom', 'docker_base_image': base_image}]
+          else:
+              with open('script/build-dockerfile/dockerinfo.json') as f:
+                  config = json.load(f)
+              includes = []
+              for distro, info in config['distros'].items():
+                  if filter_os and distro != filter_os:
+                      continue
+                  for ver in info['versions']:
+                      if filter_ver and str(ver) != filter_ver:
+                          continue
+                      includes.append({'docker_os': distro, 'docker_os_version': str(ver), 'docker_base_image': ''})
+
+          print(json.dumps({'include': includes}))
+          ")
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
+  # Job 1: Basic detect-cpu test across all OS/version combos
+  test-docker:
+    needs: generate-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.generate-matrix.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install mlcflow
+        run: |
+          pip install mlcflow tabulate
+
+      - name: Pull repo
+        run: |
+          mlc pull repo ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }} --branch=${{ github.event.pull_request.head.ref || github.ref_name }}
+
+      - name: Test in Docker (${{ matrix.docker_os }} ${{ matrix.docker_os_version }})
+        run: |
+          SCRIPT_TAGS="${{ inputs.script_tags || 'detect,cpu' }}"
+          CMD="mlcd ${SCRIPT_TAGS} -j"
+
+          if [ -n "${{ matrix.docker_base_image }}" ]; then
+            CMD="$CMD --docker_base_image=${{ matrix.docker_base_image }}"
+          else
+            CMD="$CMD --docker_os=${{ matrix.docker_os }} --docker_os_version=${{ matrix.docker_os_version }}"
+          fi
+
+          CMD="$CMD --docker_cache=${{ inputs.docker_cache || 'no' }}"
+
+          if [ -n "${{ inputs.docker_extra_sys_deps }}" ]; then
+            CMD="$CMD --docker_extra_sys_deps='${{ inputs.docker_extra_sys_deps }}'"
+          fi
+
+          if [ -n "${{ inputs.docker_mounts }}" ]; then
+            CMD="$CMD --docker_mounts='${{ inputs.docker_mounts }}'"
+          fi
+
+          CMD="$CMD --quiet"
+
+          echo "Running: $CMD"
+          eval $CMD
+
+  # Job 2: Test Docker volume mounts (read from host + write to host)
+  test-docker-mounts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install mlcflow
+        run: |
+          pip install mlcflow tabulate
+
+      - name: Pull repo
+        run: |
+          mlc pull repo ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }} --branch=${{ github.event.pull_request.head.ref || github.ref_name }}
+
+      - name: Prepare host test files
+        run: |
+          # Create a host input directory with a test file for the container to read
+          mkdir -p /tmp/docker-test-input
+          echo "HELLO_FROM_HOST=$(date -u +%s)" > /tmp/docker-test-input/host-data.txt
+          cat /tmp/docker-test-input/host-data.txt
+
+          # Create an empty host output directory for the container to write into
+          mkdir -p /tmp/docker-test-output
+
+      - name: Test reading host file from Docker container
+        run: |
+          mlcd detect,os -j \
+            --docker_os=ubuntu --docker_os_version=24.04 \
+            --docker_cache=no \
+            --docker_mounts,="/tmp/docker-test-input:/mnt/host-input" \
+            --docker_pre_run_cmds,="cat /mnt/host-input/host-data.txt" \
+            --quiet
+
+      - name: Test writing to host directory from Docker container
+        run: |
+          mlcd detect,cpu -j \
+            --docker_os=ubuntu --docker_os_version=24.04 \
+            --docker_cache=yes \
+            --docker_mounts,="/tmp/docker-test-output:/mnt/host-output" \
+            --docker_pre_run_cmds,="echo WRITTEN_BY_CONTAINER=true > /mnt/host-output/container-result.txt" \
+            --quiet
+
+      - name: Verify container wrote to host
+        run: |
+          echo "=== Checking host output directory ==="
+          ls -la /tmp/docker-test-output/
+          if [ ! -f /tmp/docker-test-output/container-result.txt ]; then
+            echo "FAIL: container-result.txt not found on host"
+            exit 1
+          fi
+          cat /tmp/docker-test-output/container-result.txt
+          grep -q "WRITTEN_BY_CONTAINER=true" /tmp/docker-test-output/container-result.txt
+          echo "PASS: Container successfully wrote to mounted host directory"
+
+      - name: Test bidirectional mount (read + write same mount)
+        run: |
+          # Place input file
+          mkdir -p /tmp/docker-test-bidir
+          echo "INPUT_VALUE=42" > /tmp/docker-test-bidir/input.txt
+
+          mlcd detect,os -j \
+            --docker_os=ubuntu --docker_os_version=24.04 \
+            --docker_cache=yes \
+            --docker_mounts,="/tmp/docker-test-bidir:/mnt/shared" \
+            --docker_pre_run_cmds,="cat /mnt/shared/input.txt && echo OUTPUT_VALUE=84 > /mnt/shared/output.txt" \
+            --quiet
+
+      - name: Verify bidirectional mount
+        run: |
+          if [ ! -f /tmp/docker-test-bidir/output.txt ]; then
+            echo "FAIL: output.txt not found on host"
+            exit 1
+          fi
+          cat /tmp/docker-test-bidir/output.txt
+          grep -q "OUTPUT_VALUE=84" /tmp/docker-test-bidir/output.txt
+          echo "PASS: Bidirectional mount works correctly"

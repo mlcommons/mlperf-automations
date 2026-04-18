@@ -1,0 +1,89 @@
+alias: get-geekbench
+uid: f0ae6ec4a8f94fd2
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: Detection or installation of tools and artifacts
+tags:
+- get
+- geekbench
+- get-geekbench
+
+# Cache
+cache: true
+
+# Environment
+default_env:
+  MLC_GEEKBENCH_VERSION_MAJOR: '6'
+new_env_keys:
+- MLC_GEEKBENCH_*
+- MLC_GET_DEPENDENT_CACHED_PATH
+- +PATH
+
+# Input mapping
+input_mapping:
+  local_file: MLC_GEEKBENCH_LOCAL_FILE
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: detect,cpu
+prehook_deps:
+- enable_if_env:
+    MLC_GEEKBENCH_NEED_EXTRACT:
+    - 'yes'
+  skip_if_env:
+    MLC_GEEKBENCH_INSTALLED_PATH:
+    - true
+  env:
+    MLC_DAE_EXTRACT_DOWNLOADED: 'yes'
+    MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_GEEKBENCH_DOWNLOAD_PATH
+    MLC_EXTRACT_FINAL_ENV_NAME: MLC_GEEKBENCH_EXTRACTED_PATH
+  extra_cache_tags: geekbench
+  force_cache: true
+  names:
+  - download-geekbench
+  tags: download-and-extract,_extract
+  update_tags_from_env_with_prefix:
+    _url.:
+    - MLC_GEEKBENCH_PACKAGE_URL
+- enable_if_env:
+    MLC_GEEKBENCH_NEED_EXTRACT:
+    - 'no'
+  skip_if_env:
+    MLC_GEEKBENCH_INSTALLED_PATH:
+    - true
+  env:
+    MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_GEEKBENCH_DOWNLOAD_PATH
+  extra_cache_tags: geekbench
+  force_cache: true
+  names:
+  - download-geekbench
+  tags: download-and-extract
+  update_tags_from_env_with_prefix:
+    _url.:
+    - MLC_GEEKBENCH_PACKAGE_URL
+
+# Variations
+variations:
+  path.#:
+    env:
+      MLC_GEEKBENCH_INSTALLED_PATH: '#'
+    default_version: ''
+
+# Versions
+default_version: 6.6.0
+versions:
+  5.5.1:
+    env:
+      MLC_GEEKBENCH_VERSION_MAJOR: '5'
+  6.3.0:
+    env:
+      MLC_GEEKBENCH_VERSION_MAJOR: '6'
+  6.4.0:
+    env:
+      MLC_GEEKBENCH_VERSION_MAJOR: '6'
+  6.6.0:
+    env:
+      MLC_GEEKBENCH_VERSION_MAJOR: '6'

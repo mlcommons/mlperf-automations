@@ -1,79 +1,27 @@
 alias: get-preprocessed-dataset-cognata
+uid: 29b3a984ff444de9
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
-default_env:
-  MLC_DATASET: cognata
-new_env_keys:
-- MLC_PREPROCESSED_DATASET_*
 tags:
 - get
 - dataset
 - cognata
 - preprocessed
-uid: 29b3a984ff444de9
-print_env_at_the_end:
-  MLC_PREPROCESSED_DATASET_COGNATA_PATH: Preprocessed Cognata dataset path
+
+# Cache
+cache: true
+
+# Environment
+default_env:
+  MLC_DATASET: cognata
+new_env_keys:
+- MLC_PREPROCESSED_DATASET_*
+
+# Variations
 variations:
-  validation:
-    default: true
-    group: dataset-type
-    env:
-      MLC_DATASET_COGNATA_TYPE: validation
-  calibration:
-    group: dataset-type
-    env:
-      MLC_DATASET_COGNATA_TYPE: calibration
-  2d_obj_det:
-    default: true
-    group: task
-    env:
-      MLC_DATASET_COGNATA_TASK: 2d_object_detection
-  segmentation:
-    group: task
-    env:
-      MLC_DATASET_COGNATA_TASK: segmentation
-  validation,2d_obj_det:
-    env:
-      MLC_DATASET_COGNATA_EXTRACTED_FOLDER_NAME: val_2d
-      MLC_DATASET_COGNATA_TAR_FILENAME: val_2d.tar.gz
-  validation,2d_obj_det,rclone:
-    env:
-      MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/preprocessed_2d/<<<MLC_DATASET_COGNATA_TAR_FILENAME>>>
-  validation,2d_obj_det,r2-downloader:
-    env:
-      MLC_DOWNLOAD_URL: https://cognata.mlcommons-storage.org/metadata/val_2d.uri
-  calibration,2d_obj_det:
-    env:
-      MLC_DATASET_COGNATA_EXTRACTED_FOLDER_NAME: calib_2d
-      MLC_DATASET_COGNATA_TAR_FILENAME: calib_2d.tar.gz
-  calibration,2d_obj_det,rclone:
-    env:
-      MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/preprocessed_2d/<<<MLC_DATASET_COGNATA_TAR_FILENAME>>>
-  calibration,2d_obj_det,r2-downloader:
-    env:
-      MLC_DOWNLOAD_URL: https://cognata.mlcommons-storage.org/metadata/calib_2d.uri
-  validation,segmentation:
-    env:
-      MLC_DATASET_COGNATA_EXTRACTED_FOLDER_NAME: val_seg
-      MLC_DATASET_COGNATA_TAR_FILENAME: val_seg.tar.gz
-  validation,segmentation,rclone:
-    env:
-      MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/preprocessed_seg/<<<MLC_DATASET_COGNATA_TAR_FILENAME>>>
-  validation,segmentation,r2-downloader:
-    env:
-      MLC_DOWNLOAD_URL: https://cognata.mlcommons-storage.org/metadata/val_seg.uri
-  calibration,segmentation:
-    env:
-      MLC_DATASET_COGNATA_EXTRACTED_FOLDER_NAME: calib_seg
-      MLC_DATASET_COGNATA_TAR_FILENAME: calib_seg.tar.gz
-  calibration,segmentation,rclone:
-    env:
-      MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/preprocessed_seg/<<<MLC_DATASET_COGNATA_TAR_FILENAME>>>
-  calibration,segmentation,r2-downloader:
-    env:
-      MLC_DOWNLOAD_URL: https://cognata.mlcommons-storage.org/metadata/calib_seg.uri
   prebuilt:
     default: true
     group: dataset-src
@@ -81,41 +29,39 @@ variations:
       MLC_NUSCENES_DATASET_TYPE: prebuilt
       MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_COGNATA_PATH
       MLC_EXTRACT_FINAL_ENV_NAME: MLC_PREPROCESSED_DATASET_COGNATA_PATH
-  prebuilt,rclone:
+  calibration:
+    group: dataset-type
     env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: ' --include '
+      MLC_DATASET_COGNATA_TYPE: calibration
+  validation:
+    default: true
+    group: dataset-type
+    env:
+      MLC_DATASET_COGNATA_TYPE: validation
   mlc:
     group: download-src
     default: true
     prehook_deps:
-      - enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - 'yes'
-        extra_cache_tags: cognata,dataset
-        force_cache: true
-        names:
-          - dae
-        tags: download-and-extract
-        force_env_keys:
-          - MLC_OUTDIRNAME  
-        update_tags_from_env_with_prefix:
-          _url.:
-            - MLC_DOWNLOAD_URL
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      extra_cache_tags: cognata,dataset
+      force_cache: true
+      names:
+      - dae
+      tags: download-and-extract
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
     env:
       MLC_DOWNLOAD_SRC: mlcommons
-  mlc,rclone:
-    prehook_deps:
-      - tags: get,rclone
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-      - tags: get,rclone-config,_config-name.mlc-cognata
-        force_cache: true
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-        env:
-          MLC_RCLONE_DRIVE_FOLDER_ID: 1u5FDoeXHVtDrd4zClE47Gmyr7iLFidz1
+  r2-downloader:
+    group: download-tool
+    add_deps_recursive:
+      dae:
+        tags: _r2-downloader
   rclone:
     group: download-tool
     add_deps_recursive:
@@ -126,26 +72,92 @@ variations:
     group: run-mode
     env:
       MLC_DOWNLOAD_MODE: dry
-  dry-run,rclone:
+  2d_obj_det:
+    default: true
+    group: task
     env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  r2-downloader:
-    group: download-tool
-    add_deps_recursive:
-      dae:
-        tags: _r2-downloader
+      MLC_DATASET_COGNATA_TASK: 2d_object_detection
+  segmentation:
+    group: task
+    env:
+      MLC_DATASET_COGNATA_TASK: segmentation
+  calibration,2d_obj_det:
+    env:
+      MLC_DATASET_COGNATA_EXTRACTED_FOLDER_NAME: calib_2d
+      MLC_DATASET_COGNATA_TAR_FILENAME: calib_2d.tar.gz
+  calibration,2d_obj_det,r2-downloader:
+    env:
+      MLC_DOWNLOAD_URL: https://cognata.mlcommons-storage.org/metadata/calib_2d.uri
+  calibration,2d_obj_det,rclone:
+    env:
+      MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/preprocessed_2d/<<<MLC_DATASET_COGNATA_TAR_FILENAME>>>
+  calibration,segmentation:
+    env:
+      MLC_DATASET_COGNATA_EXTRACTED_FOLDER_NAME: calib_seg
+      MLC_DATASET_COGNATA_TAR_FILENAME: calib_seg.tar.gz
+  calibration,segmentation,r2-downloader:
+    env:
+      MLC_DOWNLOAD_URL: https://cognata.mlcommons-storage.org/metadata/calib_seg.uri
+  calibration,segmentation,rclone:
+    env:
+      MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/preprocessed_seg/<<<MLC_DATASET_COGNATA_TAR_FILENAME>>>
   dry-run,r2-downloader:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  mlc,rclone:
+    prehook_deps:
+    - tags: get,rclone
+      enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+    - tags: get,rclone-config,_config-name.mlc-cognata
+      force_cache: true
+      enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+      env:
+        MLC_RCLONE_DRIVE_FOLDER_ID: 1u5FDoeXHVtDrd4zClE47Gmyr7iLFidz1
+  prebuilt,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: ' --include '
+  validation,2d_obj_det:
+    env:
+      MLC_DATASET_COGNATA_EXTRACTED_FOLDER_NAME: val_2d
+      MLC_DATASET_COGNATA_TAR_FILENAME: val_2d.tar.gz
+  validation,2d_obj_det,r2-downloader:
+    env:
+      MLC_DOWNLOAD_URL: https://cognata.mlcommons-storage.org/metadata/val_2d.uri
+  validation,2d_obj_det,rclone:
+    env:
+      MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/preprocessed_2d/<<<MLC_DATASET_COGNATA_TAR_FILENAME>>>
+  validation,segmentation:
+    env:
+      MLC_DATASET_COGNATA_EXTRACTED_FOLDER_NAME: val_seg
+      MLC_DATASET_COGNATA_TAR_FILENAME: val_seg.tar.gz
+  validation,segmentation,r2-downloader:
+    env:
+      MLC_DOWNLOAD_URL: https://cognata.mlcommons-storage.org/metadata/val_seg.uri
+  validation,segmentation,rclone:
+    env:
+      MLC_DOWNLOAD_URL: mlc-cognata:mlc_cognata_dataset/preprocessed_seg/<<<MLC_DATASET_COGNATA_TAR_FILENAME>>>
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_PREPROCESSED_DATASET_COGNATA_PATH: Preprocessed Cognata dataset path
+
+# Tests
 tests:
   needs_pat: true
   run_inputs:
   - variations_list:
-      - validation,prebuilt,2d_obj_det,rclone,mlc,dry-run
-      - calibration,prebuilt,2d_obj_det,rclone,mlc,dry-run
-      - validation,prebuilt,segmentation,rclone,mlc,dry-run
-      - calibration,prebuilt,segmentation,rclone,mlc,dry-run
-      - validation,prebuilt,2d_obj_det,r2-downloader,mlc,dry-run
-      - calibration,prebuilt,2d_obj_det,r2-downloader,mlc,dry-run
-      - validation,prebuilt,segmentation,r2-downloader,mlc,dry-run
-      - calibration,prebuilt,segmentation,r2-downloader,mlc,dry-run
+    - validation,prebuilt,2d_obj_det,rclone,mlc,dry-run
+    - calibration,prebuilt,2d_obj_det,rclone,mlc,dry-run
+    - validation,prebuilt,segmentation,rclone,mlc,dry-run
+    - calibration,prebuilt,segmentation,rclone,mlc,dry-run
+    - validation,prebuilt,2d_obj_det,r2-downloader,mlc,dry-run
+    - calibration,prebuilt,2d_obj_det,r2-downloader,mlc,dry-run
+    - validation,prebuilt,segmentation,r2-downloader,mlc,dry-run
+    - calibration,prebuilt,segmentation,r2-downloader,mlc,dry-run

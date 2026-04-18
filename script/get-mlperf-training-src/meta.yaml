@@ -1,19 +1,36 @@
 alias: get-mlperf-training-src
+uid: dc440bd88e794a28
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLPerf Training
+tags:
+- get
+- src
+- source
+- training
+- training-src
+- training-source
+- mlperf
+- mlcommons
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_GIT_CHECKOUT: master
   MLC_GIT_CHECKOUT_FOLDER: training
   MLC_GIT_DEPTH: --depth 4
   MLC_GIT_PATCH: 'no'
   MLC_GIT_RECURSE_SUBMODULES: ' --recurse-submodules'
-default_version: master
 new_env_keys:
 - MLC_MLPERF_TRAINING_*
 - MLC_MLPERF_TRAINING_LAST_RELEASE
 - +PYTHONPATH
+
+# Dependencies
 prehook_deps:
 - env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_MLPERF_TRAINING_SOURCE
@@ -32,30 +49,39 @@ prehook_deps:
     - MLC_GIT_SHA
     _tag.:
     - MLC_GIT_CHECKOUT_TAG
-tags:
-- get
-- src
-- source
-- training
-- training-src
-- training-source
-- mlperf
-- mlcommons
-uid: dc440bd88e794a28
+
+# Variations
 variations:
   branch.#:
     env:
       MLC_GIT_CHECKOUT: '#'
     group: checkout
+  sha.#:
+    env:
+      MLC_GIT_SHA: '#'
+    group: checkout
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: checkout
+  full-history:
+    env:
+      MLC_GIT_DEPTH: ''
+    group: git-history
+  short-history:
+    default: true
+    env:
+      MLC_GIT_DEPTH: --depth 5
+    group: git-history
+  repo.#:
+    env:
+      MLC_GIT_URL: '#'
+    group: repo
   cknowledge:
     default: true
     env:
       MLC_GIT_URL: https://github.com/cknowledge/training.git
     group: src
-  full-history:
-    env:
-      MLC_GIT_DEPTH: ''
-    group: git-history
   mlcommons:
     env:
       MLC_GIT_URL: https://github.com/mlcommons/training.git
@@ -71,23 +97,9 @@ variations:
   patch:
     env:
       MLC_GIT_PATCH: 'yes'
-  repo.#:
-    env:
-      MLC_GIT_URL: '#'
-    group: repo
-  sha.#:
-    env:
-      MLC_GIT_SHA: '#'
-    group: checkout
-  short-history:
-    default: true
-    env:
-      MLC_GIT_DEPTH: --depth 5
-    group: git-history
-  tag.#:
-    env:
-      MLC_GIT_CHECKOUT_TAG: '#'
-    group: checkout
+
+# Versions
+default_version: master
 versions:
   custom:
     env:

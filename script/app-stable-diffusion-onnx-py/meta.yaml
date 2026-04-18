@@ -1,11 +1,10 @@
 alias: app-stable-diffusion-onnx-py
 uid: 4d33981ac3534b3b
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
+# Metadata
 category: Modular AI/ML application pipeline
-
 tags:
 - app
 - modular
@@ -14,10 +13,19 @@ tags:
 - stable-diffusion
 - onnx
 - python
+tags_help: modular python app stable-diffusion onnx
 
-tags_help: "modular python app stable-diffusion onnx"
+# Input mapping
+input_mapping:
+  output: MLC_APP_STABLE_DIFFUSION_ONNX_PY_OUTPUT
+  text: MLC_APP_STABLE_DIFFUSION_ONNX_PY_TEXT
+input_description:
+  text:
+    desc: Text to generate image
+  output:
+    desc: Output directory
 
-
+# Dependencies
 deps:
 - tags: detect,os
 - tags: get,sys-utils-mlc
@@ -25,86 +33,62 @@ deps:
   - python
   - python3
   tags: get,python3
-
 - tags: get,cuda
   names:
   - cuda
   enable_if_env:
     USE_CUDA:
-    - yes
+    - true
 - tags: get,cudnn
   names:
   - cudnn
   enable_if_env:
     USE_CUDA:
-    - yes
-
-
-
-
-
-
-
+    - true
 - tags: get,generic-python-lib,_package.optimum[onnxruntime]
   names:
   - optimum
   skip_if_env:
     USE_CUDA:
-    - yes
-
+    - true
 - tags: get,generic-python-lib,_package.optimum[onnxruntime-gpu]
   names:
   - optimum
   enable_if_env:
     USE_CUDA:
-    - yes
-
+    - true
 - tags: get,generic-python-lib,_package.diffusers
   names:
   - diffusers
-
-
 - tags: get,ml-model,huggingface,zoo,_model-stub.runwayml/stable-diffusion-v1-5
   revision: onnx
   model_filename: model_index.json
   full_subfolder: .
 
-
+# Variations
 variations:
+  cpu:
+    group: target
+    default: true
+    env:
+      USE_CPU: true
+      MLC_DEVICE: cpu
   cuda:
     docker:
       all_gpus: 'yes'
     group: target
     env:
-      USE_CUDA: yes
+      USE_CUDA: true
       MLC_DEVICE: cuda:0
 
-  cpu:
-    group: target
-    default: yes
-    env:
-      USE_CPU: yes
-      MLC_DEVICE: cpu
-
-input_mapping:
-  text: MLC_APP_STABLE_DIFFUSION_ONNX_PY_TEXT
-  output: MLC_APP_STABLE_DIFFUSION_ONNX_PY_OUTPUT
-
-
-input_description:
-  text: 
-    desc: "Text to generate image"
-  output: 
-    desc: "Output directory"
-
-
+# Docker / container
 docker:
   skip_run_cmd: 'no'
   input_paths:
-    - output
+  - output
   add_quotes_to_keys:
-    - text
+  - text
   skip_input_for_fake_run:
-    - text
-    - output
-    - env.MLC_DOCKER_ADD_FLAG_TO_MLC_MLOPS_REPO
+  - text
+  - output
+  - env.MLC_DOCKER_ADD_FLAG_TO_MLC_MLOPS_REPO

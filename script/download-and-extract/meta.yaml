@@ -1,20 +1,21 @@
 alias: download-and-extract
+uid: c67e81a4ce2649f5
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
+category: DevOps automation
+tags:
+- dae
+- file
+- download-and-extract
+tags_help: download-and-extract file
+
+# Cache
 cache: false
 can_force_cache: true
-category: DevOps automation
-deps: []
-input_description: {}
-input_mapping:
-  download_path: MLC_DOWNLOAD_PATH
-  extra_folder: MLC_EXTRACT_TO_FOLDER
-  extract_path: MLC_EXTRACT_PATH
-  from: MLC_DOWNLOAD_LOCAL_FILE_PATH
-  local_path: MLC_DOWNLOAD_LOCAL_FILE_PATH
-  store: MLC_DOWNLOAD_PATH
-  to: MLC_EXTRACT_PATH
-  url: MLC_DAE_URL
+
+# Environment
 new_env_keys:
 - MLC_DOWNLOAD_DOWNLOADED_PATH*
 - MLC_EXTRACT_EXTRACTED_PATH
@@ -24,24 +25,21 @@ new_env_keys:
 - <<<MLC_DAE_FINAL_ENV_NAME>>>
 - MLC_GET_DEPENDENT_CACHED_PATH
 new_state_keys: []
-post_deps: []
-posthook_deps:
-- enable_if_env:
-    MLC_DAE_EXTRACT_DOWNLOADED:
-    - 'yes'
-    - 'True'
-  skip_if_env:
-    MLC_DOWNLOAD_MODE:
-    - 'dry'
-  names:
-  - extract-script
-  tags: extract,file
-  force_env_keys:
-    - MLC_OUTDIRNAME
-  update_tags_from_env_with_prefix:
-    _path.:
-    - MLC_DOWNLOAD_DOWNLOADED_PATH
-    - MLC_TORRENT_DOWNLOADED_PATH
+
+# Input mapping
+input_mapping:
+  download_path: MLC_DOWNLOAD_PATH
+  extra_folder: MLC_EXTRACT_TO_FOLDER
+  extract_path: MLC_EXTRACT_PATH
+  from: MLC_DOWNLOAD_LOCAL_FILE_PATH
+  local_path: MLC_DOWNLOAD_LOCAL_FILE_PATH
+  store: MLC_DOWNLOAD_PATH
+  to: MLC_EXTRACT_PATH
+  url: MLC_DAE_URL
+input_description: {}
+
+# Dependencies
+deps: []
 prehook_deps:
 - names:
   - download-script
@@ -51,58 +49,52 @@ prehook_deps:
     - 'True'
   tags: download,file
   force_env_keys:
-    - MLC_OUTDIRNAME
+  - MLC_OUTDIRNAME
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_DAE_URL
-tags:
-- dae
-- file
-- download-and-extract
-tags_help: download-and-extract file
-uid: c67e81a4ce2649f5
+posthook_deps:
+- enable_if_env:
+    MLC_DAE_EXTRACT_DOWNLOADED:
+    - 'yes'
+    - 'True'
+  skip_if_env:
+    MLC_DOWNLOAD_MODE:
+    - dry
+  names:
+  - extract-script
+  tags: extract,file
+  force_env_keys:
+  - MLC_OUTDIRNAME
+  update_tags_from_env_with_prefix:
+    _path.:
+    - MLC_DOWNLOAD_DOWNLOADED_PATH
+    - MLC_TORRENT_DOWNLOADED_PATH
+post_deps: []
+
+# Variations
 variations:
+  curl:
+    add_deps:
+      download-script:
+        tags: _wget
+    group: download-tool
+  gdown:
+    add_deps:
+      download-script:
+        tags: _gdown
+    group: download-tool
   mlcutil:
     add_deps:
       download-script:
         tags: _mlcutil
     default: true
     group: download-tool
-  cmutil:
-    alias: mlcutil
-  curl:
+  r2-downloader:
     add_deps:
       download-script:
-        tags: _wget
+        tags: _r2-downloader
     group: download-tool
-  extract:
-    env:
-      MLC_DAE_EXTRACT_DOWNLOADED: 'yes'
-  extract-to-download-dir:
-    env:
-      MLC_DAE_EXTRACT_TO_DOWNLOADED: 'yes'
-  gdown:
-    add_deps:
-      download-script:
-        tags: _gdown
-    group: download-tool
-  keep:
-    default: 'true'
-    env:
-      MLC_EXTRACT_REMOVE_EXTRACTED: 'no'
-    adr:
-      extract-script:
-        tags:
-          _keep
-    group: keep
-  remove-extracted:
-    env:
-      MLC_EXTRACT_REMOVE_EXTRACTED: 'yes'
-    group: keep
-    adr:
-      extract-script:
-        tags:
-          _remove-extracted
   rclone:
     add_deps:
       download-script:
@@ -122,17 +114,45 @@ variations:
       update_tags_from_env_with_prefix:
         _torrent.:
         - MLC_DAE_TORRENT_PATH
-  url.#:
-    env:
-      MLC_DAE_URL: '#'
   wget:
     add_deps:
       download-script:
         tags: _wget
     group: download-tool
-  r2-downloader:
+  keep:
+    default: 'true'
+    env:
+      MLC_EXTRACT_REMOVE_EXTRACTED: 'no'
     add_deps:
-      download-script:
-        tags: _r2-downloader
-    group: download-tool
+      extract-script:
+        tags: _keep
+    group: keep
+  remove-extracted:
+    env:
+      MLC_EXTRACT_REMOVE_EXTRACTED: 'yes'
+    group: keep
+    add_deps:
+      extract-script:
+        tags: _remove-extracted
+  cmutil:
+    alias: mlcutil
+  extract:
+    env:
+      MLC_DAE_EXTRACT_DOWNLOADED: 'yes'
+  extract-to-download-dir:
+    env:
+      MLC_DAE_EXTRACT_TO_DOWNLOADED: 'yes'
+  url.#:
+    env:
+      MLC_DAE_URL: '#'
+
+# Versions
 versions: {}
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - url.https://github.com/octocat/Hello-World/archive/refs/heads/master.tar.gz,extract
+  - variations_list:
+    - url.https://raw.githubusercontent.com/octocat/Hello-World/refs/heads/master/README

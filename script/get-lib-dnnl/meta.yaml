@@ -1,12 +1,20 @@
 alias: get-lib-dnnl
+uid: 1cd35a6a3b0b4530
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Detection or installation of tools and artifacts
-default_version: dev
-deps:
-- tags: detect,cpu
-- tags: cmake,get-cmake
+tags:
+- get
+- lib-dnnl
+- lib
+- dnnl
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_DNNL_CLEAN_BUILD: 'yes'
   MLC_GIT_URL: https://github.com/oneapi-src/oneDNN
@@ -18,12 +26,14 @@ new_env_keys:
 - +C_INCLUDE_PATH
 - +CPLUS_INCLUDE_PATH
 - +LD_LIBRARY_PATH
-tags:
-- get
-- lib-dnnl
-- lib
-- dnnl
-uid: 1cd35a6a3b0b4530
+
+# Dependencies
+deps:
+- tags: detect,cpu
+- tags: cmake,get-cmake
+
+# Versions
+default_version: dev
 versions:
   2.2.4:
     env:

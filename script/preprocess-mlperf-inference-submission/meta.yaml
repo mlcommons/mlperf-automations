@@ -1,45 +1,10 @@
 alias: preprocess-mlperf-inference-submission
+uid: c23068394a314266
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: MLPerf Inference
-clean_files: []
-deps:
-- names:
-  - python
-  - python3
-  tags: get,python3
-- names:
-  - get-mlperf-submission-dir
-  skip_if_env:
-    MLC_MLPERF_INFERENCE_SUBMISSION_DIR:
-    - 'on'
-  tags: get,mlperf,submission,dir
-variations:
-  wg-inference:
-    group: benchmark_wg
-    default: true
-    deps:
-      - names:
-        - inference-src
-        - submission-checker-src
-        tags: mlcommons,inference,src
-        version: custom
-  wg-automotive:
-    group: benchmark_wg
-    deps:
-      - names:
-        - automotive-src
-        tags: mlcommons,automotive,src
-input_mapping:
-  input: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
-  submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
-  version: MLC_MLPERF_SUBMISSION_CHECKER_VERSION
-  submitter: MLC_MLPERF_SUBMITTER
-  submission_preprocessor_args: MLC_MLPERF_PREPROCESS_SUBMISSION_EXTRA_ARGS
-default_env:
-  MLC_MLPERF_NOINFER_LOW_ACCURACY_RESULTS: False
-  MLC_MLPERF_NOINFER_SCENARIO_RESULTS: False
 tags:
 - run
 - mlc
@@ -51,4 +16,51 @@ tags:
 - processor
 - preprocessor
 - preprocess
-uid: c23068394a314266
+
+# Cache
+cache: false
+clean_files: []
+
+# Environment
+default_env:
+  MLC_MLPERF_NOINFER_LOW_ACCURACY_RESULTS: false
+  MLC_MLPERF_NOINFER_SCENARIO_RESULTS: false
+
+# Input mapping
+input_mapping:
+  input: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
+  submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
+  submission_preprocessor_args: MLC_MLPERF_PREPROCESS_SUBMISSION_EXTRA_ARGS
+  submitter: MLC_MLPERF_SUBMITTER
+  version: MLC_MLPERF_SUBMISSION_CHECKER_VERSION
+
+# Dependencies
+deps:
+- names:
+  - python
+  - python3
+  tags: get,python3
+- names:
+  - get-mlperf-submission-dir
+  skip_if_env:
+    MLC_MLPERF_INFERENCE_SUBMISSION_DIR:
+    - 'on'
+  tags: get,mlperf,submission,dir
+
+# Variations
+variations:
+  wg-automotive:
+    group: benchmark_wg
+    deps:
+    - names:
+      - automotive-src
+      tags: mlcommons,automotive,src
+  wg-inference:
+    group: benchmark_wg
+    default: true
+    deps:
+    - names:
+      - inference-src
+      - submission-checker-src
+      tags: mlcommons,inference,src
+      version: custom

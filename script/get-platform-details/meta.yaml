@@ -1,13 +1,36 @@
 alias: get-platform-details
+uid: f0801943c17f4e48
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: Platform information
+tags:
+- get
+- platform
+- details
+- platform-details
+
+# Cache
+cache: false
+
+# Environment
+new_env_keys:
+- MLC_PLATFORM_DETAILS_FILE_PATH
+- MLC_PLATFORM_DETAILS_RAW_FILE_PATH
+
+# Input mapping
+input_mapping:
+  out_dir_path: MLC_PLATFORM_DETAILS_DIR_PATH
+  out_file_name: MLC_PLATFORM_DETAILS_FILE_NAME
+
+# Dependencies
 deps:
 - tags: detect,os
 - skip_if_env:
     MLC_HOST_OS_TYPE:
     - windows
+    - darwin
   tags: detect,sudo
 - skip_if_any_env:
     MLC_HOST_OS_TYPE:
@@ -16,6 +39,11 @@ deps:
     MLC_SUDO_USER:
     - 'no'
   tags: get,sys-util,generic,_psmisc
+- skip_if_any_env:
+    MLC_HOST_OS_TYPE:
+    - windows
+    - darwin
+  tags: get,sys-util,generic,_jq
 - enable_if_env:
     MLC_HOST_OS_TYPE:
     - linux
@@ -30,9 +58,6 @@ deps:
     MLC_SUDO_USER:
     - 'no'
   tags: get,sys-util,generic,_dmidecode
-input_mapping:
-  out_dir_path: MLC_PLATFORM_DETAILS_DIR_PATH
-  out_file_name: MLC_PLATFORM_DETAILS_FILE_NAME
 prehook_deps:
 - enable_if_env:
     MLC_HOST_OS_TYPE:
@@ -54,10 +79,18 @@ prehook_deps:
     MLC_SUDO_USER:
     - 'no'
   tags: get,sys-util,generic,_linux-tools
-  ignore_missing: True
-tags:
-- get
-- platform
-- details
-- platform-details
-uid: f0801943c17f4e48
+  ignore_missing: true
+
+# Variations
+variations:
+  cuda:
+    group: gpu-driver
+    deps:
+    - tags: get,cuda-devices
+    env:
+      MLC_ACCELERATOR_BACKEND: cuda
+
+# Tests
+tests:
+  run_inputs:
+  - quiet: true

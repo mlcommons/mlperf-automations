@@ -1,8 +1,26 @@
 alias: save-machine-state
+uid: 2f62820ed7294659
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: Platform information
+tags:
+- machine-state
+- save
+- machine
+- system
+- system-state
+- state
+
+# Cache
+cache: false
+
+# Input mapping
+input_mapping:
+  outfile: MLC_SYSTEM_STATE_SAVE_FILENAME
+
+# Dependencies
 deps:
 - tags: detect,os
 - skip_if_env:
@@ -35,8 +53,6 @@ deps:
     - 'no'
   tags: get,sys-util,generic,_dmidecode
 - tags: get,generic-python-lib,_package.psutil
-input_mapping:
-  outfile: MLC_SYSTEM_STATE_SAVE_FILENAME
 prehook_deps:
 - enable_if_env:
     MLC_HOST_OS_TYPE:
@@ -59,11 +75,3 @@ prehook_deps:
     MLC_SUDO_USER:
     - 'no'
   tags: get,sys-util,generic,_linux-tools
-tags:
-- machine-state
-- save
-- machine
-- system
-- system-state
-- state
-uid: 2f62820ed7294659

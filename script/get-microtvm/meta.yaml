@@ -1,29 +1,40 @@
 alias: get-microtvm
+uid: a9cad70972a140b9
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: TinyML automation
-default_version: main
-deps:
-- tags: detect,os
-env:
-  MLC_GIT_AUTH: 'yes'
-  MLC_GIT_DEPTH: ''
-  MLC_GIT_PATCH: 'no'
-  MLC_GIT_URL: https://github.com/mlcommons/tiny_results_v1.0
-input_mapping:
-  ssh: MLC_GIT_SSH
-local_env_keys:
-- MLC_GIT_*
-new_env_keys:
-- MLC_MICROTVM_*
 tags:
 - get
 - src
 - source
 - microtvm
 - tiny
-uid: a9cad70972a140b9
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_GIT_AUTH: 'yes'
+  MLC_GIT_DEPTH: ''
+  MLC_GIT_PATCH: 'no'
+  MLC_GIT_URL: https://github.com/mlcommons/tiny_results_v1.0
+new_env_keys:
+- MLC_MICROTVM_*
+local_env_keys:
+- MLC_GIT_*
+
+# Input mapping
+input_mapping:
+  ssh: MLC_GIT_SSH
+
+# Dependencies
+deps:
+- tags: detect,os
+
+# Variations
 variations:
   full-history:
     env:
@@ -31,6 +42,9 @@ variations:
   short-history:
     env:
       MLC_GIT_DEPTH: --depth 10
+
+# Versions
+default_version: main
 versions:
   custom: {}
   main:

@@ -1,14 +1,18 @@
 alias: publish-results-to-dashboard
+uid: 4af3a2d09f14412b
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: Dashboard automation
+tags:
+- publish-results
+- dashboard
+
+# Dependencies
 deps:
 - names:
   - python3
   - python
   tags: get,python3
 - tags: get,generic-python-lib,_wandb
-tags:
-- publish-results
-- dashboard
-uid: 4af3a2d09f14412b

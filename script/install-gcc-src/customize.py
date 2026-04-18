@@ -47,7 +47,10 @@ def preprocess(i):
     if "enable-multilib" not in env['MLC_GCC_EXTRA_CONFIGURE_STRING']:
         env['MLC_GCC_EXTRA_CONFIGURE_STRING'] += " --disable-multilib"
 
-    env['MLC_GCC_INSTALLED_PATH'] = os.path.join(os.getcwd(), 'install', 'bin')
+    env['MLC_GCC_INSTALLED_PATH'] = os.path.join(os.getcwd(), 'install')
+    env['MLC_GCC_BIN_PATH'] = os.path.join(
+        env['MLC_GCC_INSTALLED_PATH'], 'bin')
+    env['MLC_GCC_BIN_WITH_PATH'] = os.path.join(env['MLC_GCC_BIN_PATH'], 'gcc')
 
     return {'return': 0}
 
@@ -57,5 +60,7 @@ def postprocess(i):
     env = i['env']
     if env.get('MLC_GIT_REPO_CURRENT_HASH', '') != '':
         env['MLC_GCC_SRC_REPO_COMMIT'] = env['MLC_GIT_REPO_CURRENT_HASH']
+
+    env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_GCC_BIN_WITH_PATH']
 
     return {'return': 0}

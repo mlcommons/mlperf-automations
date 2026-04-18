@@ -1,10 +1,28 @@
 alias: get-dataset-cnndm
+uid: aed298c156e24257
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
+tags:
+- get
+- dataset
+- gpt-j
+- cnndm
+- cnn-dailymail
+- original
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_DATASET_CALIBRATION: 'no'
+env:
+  MLC_DATASET: CNNDM
+
+# Dependencies
 deps:
 - tags: get,sys-utils-mlc
 - names:
@@ -14,125 +32,71 @@ deps:
   version_max: 3.9.999
   version_max_usable: 3.9.12
   skip_if_env:
-    MLC_TMP_ML_MODEL: 
-      - llama3_1-8b
+    MLC_TMP_ML_MODEL:
+    - llama3_1-8b
 - names:
   - inference-src
   skip_if_env:
     MLC_CNNDM_INTEL_VARIATION:
-      - 'yes'
-    MLC_TMP_ML_MODEL: 
-      - llama3_1-8b
+    - 'yes'
+    MLC_TMP_ML_MODEL:
+    - llama3_1-8b
   tags: mlperf,inference,source
 - tags: get,generic-python-lib,_package.simplejson
   skip_if_env:
-    MLC_TMP_ML_MODEL: 
-      - llama3_1-8b
+    MLC_TMP_ML_MODEL:
+    - llama3_1-8b
 - tags: get,generic-python-lib,_datasets
   skip_if_env:
-    MLC_TMP_ML_MODEL: 
-      - llama3_1-8b
+    MLC_TMP_ML_MODEL:
+    - llama3_1-8b
 - tags: get,generic-python-lib,_package.tokenizers
   skip_if_env:
-    MLC_TMP_ML_MODEL: 
-      - llama3_1-8b
+    MLC_TMP_ML_MODEL:
+    - llama3_1-8b
 - tags: get,generic-python-lib,_package.transformers
   skip_if_env:
-    MLC_TMP_ML_MODEL: 
-      - llama3_1-8b
+    MLC_TMP_ML_MODEL:
+    - llama3_1-8b
 - tags: get,generic-python-lib,_numpy
   skip_if_env:
-    MLC_TMP_ML_MODEL: 
-      - llama3_1-8b
+    MLC_TMP_ML_MODEL:
+    - llama3_1-8b
 prehook_deps:
-  - tags: get,rclone
-    enable_if_env:
-      MLC_TMP_REQUIRE_DOWNLOAD:
-        - yes
-      MLC_CNNDM_DOWNLOAD_TOOL: 
-        - rclone
-  - tags: get,rclone-config,_mlc-inference
-    force_cache: true
-    enable_if_env:
-      MLC_TMP_REQUIRE_DOWNLOAD:
-        - yes
-      MLC_CNNDM_DOWNLOAD_TOOL: 
-        - rclone
-  - enable_if_env:
-      MLC_TMP_REQUIRE_DOWNLOAD:
-      - 'yes'
-    env:
-      MLC_RCLONE_COPY_USING: copy
-    force_cache: true
-    names:
-      - dae
-    tags: download-and-extract
-    force_env_keys:
-      - MLC_OUTDIRNAME  
-    update_tags_from_env_with_prefix:
-      _url.:
-        - MLC_DOWNLOAD_URL
-env:
-  MLC_DATASET: CNNDM
-tags:
-- get
-- dataset
-- gpt-j
-- cnndm
-- cnn-dailymail
-- original
-uid: aed298c156e24257
+- tags: get,rclone
+  enable_if_env:
+    MLC_TMP_REQUIRE_DOWNLOAD:
+    - true
+    MLC_CNNDM_DOWNLOAD_TOOL:
+    - rclone
+- tags: get,rclone-config,_mlc-inference
+  force_cache: true
+  enable_if_env:
+    MLC_TMP_REQUIRE_DOWNLOAD:
+    - true
+    MLC_CNNDM_DOWNLOAD_TOOL:
+    - rclone
+- enable_if_env:
+    MLC_TMP_REQUIRE_DOWNLOAD:
+    - 'yes'
+  env:
+    MLC_RCLONE_COPY_USING: copy
+  force_cache: true
+  names:
+  - dae
+  tags: download-and-extract
+  force_env_keys:
+  - MLC_OUTDIRNAME
+  update_tags_from_env_with_prefix:
+    _url.:
+    - MLC_DOWNLOAD_URL
+
+# Variations
 variations:
-  llama3:
-    env:
-      MLC_TMP_ML_MODEL: llama3_1-8b
-  edge:
-    group: category
   datacenter:
     group: category
-  rclone:
-    env:
-      MLC_CNNDM_DOWNLOAD_TOOL: rclone
-    group: download-tool
-    add_deps_recursive:
-      dae:
-        tags: _rclone
-  r2-downloader:
-    env:
-      MLC_CNNDM_DOWNLOAD_TOOL: r2-downloader
-    group: download-tool
-    add_deps_recursive:
-      dae:
-        tags: _r2-downloader
-  dry-run:
-    group: run-mode
-    env:
-      MLC_DOWNLOAD_MODE: dry
-  dry-run,rclone:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  dry-run,r2-downloader:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
-  mlc:
-    group: download-src
-    prehook_deps:
-      - enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - 'yes'
-        env:
-          MLC_RCLONE_COPY_USING: copy
-        force_cache: true
-        names:
-          - dae
-        tags: download-and-extract
-        force_env_keys:
-          - MLC_OUTDIRNAME  
-        update_tags_from_env_with_prefix:
-          _url.:
-            - MLC_DOWNLOAD_URL
-    env:
-      MLC_DOWNLOAD_SRC: mlcommons
+  edge:
+    group: category
   calibration:
     env:
       MLC_DATASET_CALIBRATION: 'yes'
@@ -140,10 +104,6 @@ variations:
     new_env_keys:
     - MLC_CALIBRATION_DATASET_PATH
     - MLC_CALIBRATION_DATASET_CNNDM_PATH
-  intel: {}
-  intel,validation:
-    env:
-      MLC_CNNDM_INTEL_VARIATION: 'yes'
   validation:
     default: true
     env:
@@ -153,16 +113,89 @@ variations:
     - MLC_DATASET_PATH
     - MLC_DATASET_EVAL_PATH
     - MLC_DATASET_CNNDM_EVAL_PATH
-  validation,llama3:
-    default-variations:
-      download-tool: r2-downloader
-      download-src: mlc
-  validation,edge,llama3,mlc,rclone:
+  mlc:
+    group: download-src
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      env:
+        MLC_RCLONE_COPY_USING: copy
+      force_cache: true
+      names:
+      - dae
+      tags: download-and-extract
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+  r2-downloader:
+    env:
+      MLC_CNNDM_DOWNLOAD_TOOL: r2-downloader
+    group: download-tool
+    add_deps_recursive:
+      dae:
+        tags: _r2-downloader
+  rclone:
+    env:
+      MLC_CNNDM_DOWNLOAD_TOOL: rclone
+    group: download-tool
+    add_deps_recursive:
+      dae:
+        tags: _rclone
+  dry-run:
+    group: run-mode
+    env:
+      MLC_DOWNLOAD_MODE: dry
+  calibation,llama3,mlc,r2-downloader:
     adr:
       dae:
-        extra_cache_tags: cnndm,dataset,llama3,val,edge
+        extra_cache_tags: cnndm,dataset,llama3,calib
     env:
-      MLC_DATASET_CNNDM_FILENAME: cnn_eval_5000.json
+      MLC_DATASET_CNNDM_FILENAME: cnn_dailymail_calibration.json
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/llama3-1-8b-cnn-dailymail-calibration.uri
+      MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_CALIBRATION_DATASET_CNNDM_PATH
+      MLC_EXTRACT_FINAL_ENV_NAME: MLC_CALIBRATION_DATASET_CNNDM_PATH
+  calibation,llama3,mlc,rclone:
+    adr:
+      dae:
+        extra_cache_tags: cnndm,dataset,llama3,calib
+    env:
+      MLC_DATASET_CNNDM_FILENAME: cnn_dailymail_calibration.json
+      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/llama3.1_8b/<<<MLC_DATASET_CNNDM_FILENAME>>>
+      MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_CALIBRATION_DATASET_CNNDM_PATH
+      MLC_EXTRACT_FINAL_ENV_NAME: MLC_CALIBRATION_DATASET_CNNDM_PATH
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  intel: {}
+  intel,validation:
+    env:
+      MLC_CNNDM_INTEL_VARIATION: 'yes'
+  llama3:
+    env:
+      MLC_TMP_ML_MODEL: llama3_1-8b
+  validation,datacenter,llama3,mlc,r2-downloader:
+    adr:
+      dae:
+        extra_cache_tags: cnndm,dataset,llama3,val,datacenter
+    env:
+      MLC_DATASET_CNNDM_FILENAME: cnn_eval.json
+      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/llama3-1-8b-cnn-eval.uri
+      MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
+      MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
+  validation,datacenter,llama3,mlc,rclone:
+    adr:
+      dae:
+        extra_cache_tags: cnndm,dataset,llama3,val,datacenter
+    env:
+      MLC_DATASET_CNNDM_FILENAME: cnn_eval.json
       MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/llama3.1_8b/datasets/<<<MLC_DATASET_CNNDM_FILENAME>>>
       MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
       MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
@@ -175,48 +208,24 @@ variations:
       MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/llama3-1-8b-sample-cnn-eval-5000.uri
       MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
       MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
-  validation,datacenter,llama3,mlc,rclone:
+  validation,edge,llama3,mlc,rclone:
     adr:
       dae:
-        extra_cache_tags: cnndm,dataset,llama3,val,datacenter
+        extra_cache_tags: cnndm,dataset,llama3,val,edge
     env:
-      MLC_DATASET_CNNDM_FILENAME: cnn_eval.json
+      MLC_DATASET_CNNDM_FILENAME: cnn_eval_5000.json
       MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/llama3.1_8b/datasets/<<<MLC_DATASET_CNNDM_FILENAME>>>
       MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
       MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
-  validation,datacenter,llama3,mlc,r2-downloader:
-    adr:
-      dae:
-        extra_cache_tags: cnndm,dataset,llama3,val,datacenter
-    env:
-      MLC_DATASET_CNNDM_FILENAME: cnn_eval.json
-      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/llama3-1-8b-cnn-eval.uri
-      MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
-      MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_CNNDM_EVAL_PATH
-  calibation,llama3,mlc,rclone:
-    adr:
-      dae:
-        extra_cache_tags: cnndm,dataset,llama3,calib
-    env:
-      MLC_DATASET_CNNDM_FILENAME: cnn_dailymail_calibration.json
-      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/llama3.1_8b/<<<MLC_DATASET_CNNDM_FILENAME>>>
-      MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_CALIBRATION_DATASET_CNNDM_PATH
-      MLC_EXTRACT_FINAL_ENV_NAME: MLC_CALIBRATION_DATASET_CNNDM_PATH
-  calibation,llama3,mlc,r2-downloader:
-    adr:
-      dae:
-        extra_cache_tags: cnndm,dataset,llama3,calib
-    env:
-      MLC_DATASET_CNNDM_FILENAME: cnn_dailymail_calibration.json
-      MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/llama3-1-8b-cnn-dailymail-calibration.uri
-      MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_CALIBRATION_DATASET_CNNDM_PATH
-      MLC_EXTRACT_FINAL_ENV_NAME: MLC_CALIBRATION_DATASET_CNNDM_PATH
+  validation,llama3:
+    default_variations:
+      download-tool: r2-downloader
+      download-src: mlc
+
+# Tests
 tests:
   run_inputs:
   - variations_list:
-      # - validation,edge,rclone,llama3,mlc,dry-run
-      # - validation,datacenter,rclone,llama3,mlc,dry-run
-      - validation,edge,r2-downloader,llama3,mlc,dry-run
-      - validation,datacenter,r2-downloader,llama3,mlc,dry-run
-      - calibration,r2-downloader,llama3,mlc,dry-run
-      # - calibration,rclone,llama3,mlc,dry-run
+    - validation,edge,r2-downloader,llama3,mlc,dry-run
+    - validation,datacenter,r2-downloader,llama3,mlc,dry-run
+    - calibration,r2-downloader,llama3,mlc,dry-run

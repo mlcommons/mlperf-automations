@@ -1,34 +1,39 @@
 alias: get-dataset-coco
+uid: c198e1f60ac6445c
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
-deps:
-- tags: detect,os
-docker:
-  input_paths:
-  - store
-  - from
-  - to
-  mount_current_dir: 'yes'
-  skip_input_for_fake_run:
-  - store
-  - from
-  - to
-  skip_run_cmd: 'no'
+tags:
+- get
+- dataset
+- object-detection
+- coco
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_DATASET: COCO
   MLC_DATASET_COCO_URL_ANNOTATIONS: http://images.cocodataset.org/annotations
   MLC_DATASET_COCO_URL_DATA: http://images.cocodataset.org/zips
+new_env_keys:
+- MLC_DATASET_COCO*
+- MLC_DATASET_PATH
+- MLC_DATASET_PATH_ROOT
+
+# Input mapping
 input_mapping:
   from: MLC_FROM
   home: MLC_HOME_DIR
   store: MLC_STORE
   to: MLC_TO
-new_env_keys:
-- MLC_DATASET_COCO*
-- MLC_DATASET_PATH
-- MLC_DATASET_PATH_ROOT
+
+# Dependencies
+deps:
+- tags: detect,os
 prehook_deps:
 - env:
     MLC_DOWNLOAD_CHECKSUM: <<<MLC_DATASET_COCO_MD5SUM_DATA>>>
@@ -65,18 +70,9 @@ prehook_deps:
     _url.:
     - MLC_DATASET_COCO_URL_ANNOTATIONS_FULL
   verify: false
-tags:
-- get
-- dataset
-- object-detection
-- coco
-uid: c198e1f60ac6445c
+
+# Variations
 variations:
-  '2017':
-    default: true
-    env:
-      MLC_DATASET_COCO_VERSION: '2017'
-    group: version
   complete:
     default: true
     env:
@@ -95,3 +91,21 @@ variations:
     env:
       MLC_DATASET_COCO_TYPE: val
     group: type
+  '2017':
+    default: true
+    env:
+      MLC_DATASET_COCO_VERSION: '2017'
+    group: version
+
+# Docker / container
+docker:
+  input_paths:
+  - store
+  - from
+  - to
+  mount_current_dir: 'yes'
+  skip_input_for_fake_run:
+  - store
+  - from
+  - to
+  skip_run_cmd: 'no'

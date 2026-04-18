@@ -1,9 +1,38 @@
 alias: get-generic-python-lib
+uid: 94b62a682bc44791
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Python automation
+tags:
+- get
+- install
+- generic
+- pip-package
+- generic-python-lib
+tags_help: get generic-python-lib
+
+# Cache
+cache: true
+extra_cache_tags_from_env:
+- env: MLC_PYTHON_CACHE_TAGS
+  prefix: python-
 clean_files: []
+
+# Environment
+new_env_keys:
+- MLC_PYTHONLIB_*
+local_env_keys:
+- MLC_GENERIC_PYTHON_PACKAGE_VARIANT
+
+# Input mapping
+input_mapping:
+  extra_index_url: MLC_GENERIC_PYTHON_PIP_EXTRA_INDEX_URL
+  force_install: MLC_TMP_PYTHON_PACKAGE_FORCE_INSTALL
+  index_url: MLC_GENERIC_PYTHON_PIP_INDEX_URL
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -22,30 +51,13 @@ deps:
     MLC_GENERIC_PYTHON_PACKAGE_NAME:
     - pip
   tags: get,generic-python-lib,_pip
-extra_cache_tags_from_env:
-- env: MLC_PYTHON_CACHE_TAGS
-  prefix: python-
-input_mapping:
-  extra_index_url: MLC_GENERIC_PYTHON_PIP_EXTRA_INDEX_URL
-  force_install: MLC_TMP_PYTHON_PACKAGE_FORCE_INSTALL
-  index_url: MLC_GENERIC_PYTHON_PIP_INDEX_URL
-local_env_keys:
-- MLC_GENERIC_PYTHON_PACKAGE_VARIANT
-new_env_keys:
-- MLC_PYTHONLIB_*
 prehook_deps:
 - enable_if_env:
     MLC_INSTALL_ONNXRUNTIME_GPU_FROM_SRC:
     - 'yes'
   tags: install,onnxruntime,from.src,_cuda
-tags:
-- get
-- install
-- generic
-- pip-package
-- generic-python-lib
-tags_help: get generic-python-lib
-uid: 94b62a682bc44791
+
+# Variations
 variations:
   Pillow:
     env:
@@ -156,6 +168,9 @@ variations:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: fiftyone
     new_env_keys:
     - MLC_FIFTYONE_VERSION
+  find_links_url.#:
+    env:
+      MLC_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: '#'
   google-api-python-client:
     env:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: google_api_python_client
@@ -166,6 +181,11 @@ variations:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: google_auth_oauthlib
     new_env_keys:
     - MLC_GOOGLE_AUTH_OAUTHLIB_VERSION
+  google-genai:
+    env:
+      MLC_GENERIC_PYTHON_PACKAGE_NAME: google-genai
+    new_env_keys:
+    - MLC_GOOGLE_GENAI_VERSION
   google-generativeai:
     env:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: google-generativeai
@@ -358,9 +378,6 @@ variations:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: '#'
       MLC_GENERIC_PYTHON_PIP_UNINSTALL_DEPS: ''
       MLC_GENERIC_PYTHON_PIP_URL: ''
-  find_links_url.#:
-    env:
-      MLC_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: '#'
   package.torch,cxx11-abi:
     env:
       MLC_GENERIC_PYTHON_PIP_INDEX_URL: https://download.pytorch.org/whl/nightly/cpu-cxx11-abi
@@ -372,6 +389,11 @@ variations:
   path.#:
     env:
       MLC_GENERIC_PYTHON_PIP_URL: '#'
+  pdfplumber:
+    env:
+      MLC_GENERIC_PYTHON_PACKAGE_NAME: pdfplumber
+    new_env_keys:
+    - MLC_PDFPLUMBER_VERSION
   pillow:
     env:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: Pillow
@@ -391,11 +413,6 @@ variations:
       MLC_GENERIC_PYTHON_PIP_EXTRA_INDEX_URL: https://pypi.ngc.nvidia.com
     new_env_keys:
     - MLC_POLYGRAPHY_VERSION
-  pdfplumber:
-    env:
-      MLC_GENERIC_PYTHON_PACKAGE_NAME: pdfplumber
-    new_env_keys:
-    - MLC_PDFPLUMBER_VERSION  
   pre:
     env:
       MLC_GENERIC_PYTHON_DEV_VERSION: 'yes'
@@ -409,11 +426,6 @@ variations:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: psutil
     new_env_keys:
     - MLC_PSUTIL_VERSION
-  python-dotenv:
-    env:
-      MLC_GENERIC_PYTHON_PACKAGE_NAME: python-dotenv
-    new_env_keys:
-    - MLC_PYTHON_DOTENV_VERSION
   pycocotools:
     env:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: pycocotools
@@ -428,6 +440,11 @@ variations:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: pycuda
     new_env_keys:
     - MLC_PYCUDA_VERSION
+  python-dotenv:
+    env:
+      MLC_GENERIC_PYTHON_PACKAGE_NAME: python-dotenv
+    new_env_keys:
+    - MLC_PYTHON_DOTENV_VERSION
   quark-amd:
     deps:
     - env:

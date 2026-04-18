@@ -1,15 +1,32 @@
 alias: get-mlperf-power-dev
+uid: 72aa56768c994bcf
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLPerf Inference
+tags:
+- get
+- src
+- source
+- power
+- power-dev
+- mlperf
+- mlcommons
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_GIT_CHECKOUT_FOLDER: power-dev
   MLC_GIT_DEPTH: --depth 1
   MLC_GIT_PATCH: 'no'
-deps: []
 new_env_keys:
 - MLC_MLPERF_POWER_SOURCE
+
+# Dependencies
+deps: []
 prehook_deps:
 - env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_MLPERF_POWER_SOURCE
@@ -28,19 +45,20 @@ prehook_deps:
     - MLC_GIT_SHA
     _tag.:
     - MLC_GIT_CHECKOUT_TAG
-tags:
-- get
-- src
-- source
-- power
-- power-dev
-- mlperf
-- mlcommons
-uid: 72aa56768c994bcf
+
+# Variations
 variations:
   branch.#:
     env:
       MLC_GIT_CHECKOUT: '#'
+    group: checkout
+  sha.#:
+    env:
+      MLC_GIT_SHA: '#'
+    group: checkout
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
     group: checkout
   mlcommons:
     default: true
@@ -55,11 +73,3 @@ variations:
     env:
       MLC_GIT_URL: '#'
     group: repo
-  sha.#:
-    env:
-      MLC_GIT_SHA: '#'
-    group: checkout
-  tag.#:
-    env:
-      MLC_GIT_CHECKOUT_TAG: '#'
-    group: checkout

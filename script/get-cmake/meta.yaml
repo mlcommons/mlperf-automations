@@ -1,26 +1,36 @@
 alias: get-cmake
+uid: 52bf974d791b4fc8
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Detection or installation of tools and artifacts
-deps:
-- tags: detect,cpu
+tags:
+- get
+- cmake
+- get-cmake
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_REQUIRE_INSTALL: 'no'
 new_env_keys:
 - MLC_CMAKE_*
 - MLC_MAKE_CORES
 - +PATH
+
+# Dependencies
+deps:
+- tags: detect,cpu
 prehook_deps:
 - enable_if_env:
     MLC_REQUIRE_INSTALL:
     - 'yes'
   reuse_version: true
   tags: install,cmake,prebuilt
+
+# Output / debugging
 print_env_at_the_end:
   MLC_CMAKE_BIN_WITH_PATH: Path to the tool
-tags:
-- get
-- cmake
-- get-cmake
-uid: 52bf974d791b4fc8

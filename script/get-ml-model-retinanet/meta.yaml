@@ -1,8 +1,22 @@
 alias: get-ml-model-retinanet
+uid: 427bc5665e4541c2
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
+tags:
+- get
+- ml-model
+- raw
+- resnext50
+- retinanet
+- object-detection
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_ML_MODEL: retinanet
   MLC_ML_MODEL_DATASET: open-images
@@ -15,6 +29,8 @@ env:
 new_env_keys:
 - MLC_ML_MODEL_*
 - <<<MLC_ENV_NAME_ML_MODEL_FILE>>>
+
+# Dependencies
 prehook_deps:
 - env:
     MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_FILE_WITH_PATH
@@ -29,22 +45,24 @@ prehook_deps:
     - 'yes'
   tags: download-and-extract
   force_env_keys:
-    - MLC_OUTDIRNAME  
+  - MLC_OUTDIRNAME
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_PACKAGE_URL
-print_env_at_the_end:
-  MLC_ML_MODEL_ACCURACY: Model accuracy
-  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
-tags:
-- get
-- ml-model
-- raw
-- resnext50
-- retinanet
-- object-detection
-uid: 427bc5665e4541c2
+
+# Variations
 variations:
+  onnx:
+    default: true
+    env:
+      MLC_ML_MODEL_DATA_LAYOUT: NCHW
+      MLC_ML_MODEL_FRAMEWORK: onnx
+    group: framework
+  pytorch:
+    env:
+      MLC_ML_MODEL_DATA_LAYOUT: NCHW
+      MLC_ML_MODEL_FRAMEWORK: pytorch
+    group: framework
   fp32:
     default: true
     env:
@@ -57,12 +75,6 @@ variations:
       MLC_ML_MODEL_RETINANET_NO_NMS: 'yes'
       MLC_QAIC_PRINT_NODE_PRECISION_INFO: 'yes'
       MLC_TMP_ML_MODEL_RETINANET_NO_NMS: 'yes'
-  onnx:
-    default: true
-    env:
-      MLC_ML_MODEL_DATA_LAYOUT: NCHW
-      MLC_ML_MODEL_FRAMEWORK: onnx
-    group: framework
   onnx,fp32:
     env:
       MLC_DOWNLOAD_CHECKSUM: 4544f4e56e0a4684215831cc937ea45c
@@ -85,7 +97,7 @@ variations:
       force_cache: true
       tags: download,file,_url.https://raw.githubusercontent.com/arjunsuresh/ck-qaic/main/package/model-onnx-mlperf-retinanet-no-nms/remove-nms-and-extract-priors.patch
       force_env_keys:
-        - MLC_OUTDIRNAME  
+      - MLC_OUTDIRNAME
     - env:
         MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_MLPERF_TRAINING_REPO_PATCHED_PATH
         MLC_GIT_PATCH_FILEPATHS: <<<MLC_RETINANET_NO_NMS_PATCH_FILE_PATH>>>
@@ -104,11 +116,6 @@ variations:
       tags: get,generic-python-lib,_package.torch
       version_min: 1.13.1
     env: {}
-  pytorch:
-    env:
-      MLC_ML_MODEL_DATA_LAYOUT: NCHW
-      MLC_ML_MODEL_FRAMEWORK: pytorch
-    group: framework
   pytorch,fp32:
     env:
       MLC_DOWNLOAD_CHECKSUM: a55f6bec3464f605ce8d686da8ac1533
@@ -128,3 +135,8 @@ variations:
   weights:
     env:
       MLC_MODEL_WEIGHTS_FILE: 'yes'
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_ACCURACY: Model accuracy
+  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model

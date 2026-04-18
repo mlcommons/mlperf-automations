@@ -1,10 +1,23 @@
 alias: get-zephyr
+uid: d4105c2cdb044276
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: TinyML automation
+tags:
+- get
+- zephyr
+
+# Cache
+cache: true
 clean_files: []
-default_version: v2.7
+
+# Environment
+new_env_keys:
+- MLC_ZEPHYR_*
+
+# Dependencies
 deps:
 - names:
   - python3
@@ -14,12 +27,9 @@ deps:
 - tags: get,cmake
   version_min: 3.20.0
 - tags: get,generic-python-lib,_west
-new_env_keys:
-- MLC_ZEPHYR_*
-tags:
-- get
-- zephyr
-uid: d4105c2cdb044276
+
+# Versions
+default_version: v2.7
 versions:
   v2.7:
     env:

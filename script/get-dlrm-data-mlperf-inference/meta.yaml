@@ -1,32 +1,46 @@
 alias: get-dlrm-data-mlperf-inference
+uid: 34bdfcd9c8364935
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 tags:
 - get
 - dlrm
 - data
 - mlperf
 - inference
-uid: 34bdfcd9c8364935
-docker:
-  real_run: false
+
+# Cache
+cache: true
+
+# Environment
 new_env_keys:
-  - MLC_DLRM_DATA_PATH
-  - DLRM_DATA_PATH
+- MLC_DLRM_DATA_PATH
+- DLRM_DATA_PATH
+
+# Input mapping
 input_mapping:
-  dlrm_data_path: MLC_DLRM_DATA_PATH
   criteo_day23_raw_data_path: MLC_CRITEO_DAY23_RAW_DATA_PATH
+  dlrm_data_path: MLC_DLRM_DATA_PATH
+
+# Dependencies
 prehook_deps:
-  - tags: get,ml-model,dlrm,_pytorch
-    enable_if_env:
-      MLC_DLRM_MODEL_DOWNLOAD:
-        - "on"
-  - tags: get,dataset,preprocessed,criteo,_mlc
-    enable_if_env:
-      MLC_DLRM_DATASET_DOWNLOAD:
-        - "on"
+- tags: get,ml-model,dlrm,_pytorch
+  enable_if_env:
+    MLC_DLRM_MODEL_DOWNLOAD:
+    - 'on'
+- tags: get,dataset,preprocessed,criteo,_mlc
+  enable_if_env:
+    MLC_DLRM_DATASET_DOWNLOAD:
+    - 'on'
+
+# Variations
 variations:
+  intel:
+    group: implementation
+    env:
+      MLC_DLRM_DATA_VARIATION: intel
   nvidia:
     group: implementation
     default: true
@@ -35,7 +49,7 @@ variations:
     - MLC_DLRM_V2_AGGREGATION_TRACE_FILE_PATH
     env:
       MLC_DLRM_DATA_VARIATION: nvidia
-  intel:
-    group: implementation
-    env:
-      MLC_DLRM_DATA_VARIATION: intel
+
+# Docker / container
+docker:
+  real_run: false

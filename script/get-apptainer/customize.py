@@ -1,4 +1,5 @@
 from mlc import utils
+import shutil
 import os
 
 
@@ -70,7 +71,12 @@ def postprocess(i):
 
     version = r['version']
     tool = r['tool']
-    found_file_path = env['MLC_APPTAINER_BIN_WITH_PATH']
+    found_file_path = env.get('MLC_APPTAINER_BIN_WITH_PATH', '')
+    if not found_file_path:
+        found_file_path = shutil.which('apptainer') or ''
+        if not found_file_path:
+            return {'return': 1, 'error': 'Apptainer binary not found in PATH'}
+        env['MLC_APPTAINER_BIN_WITH_PATH'] = found_file_path
 
     found_path = os.path.dirname(found_file_path)
     env['MLC_APPTAINER_INSTALLED_PATH'] = found_path

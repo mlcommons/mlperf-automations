@@ -6,10 +6,10 @@
 [![MLPerf® Inference ABTF POC Test](https://github.com/mlcommons/mlperf-automations/actions/workflows/test-mlperf-inference-abtf-poc.yml/badge.svg)](https://github.com/mlcommons/mlperf-automations/actions/workflows/test-mlperf-inference-abtf-poc.yml)
 
 
+
 Welcome to the **MLPerf® Automations and Scripts** repository! This repository is your go-to resource for tools, automations, and scripts designed to streamline the execution of **MLPerf® benchmarks**—with a strong emphasis on **MLPerf® Inference benchmarks**.
 
 Starting **January 2025**, MLPerf® automation scripts is powered by [MLCFlow](https://github.com/mlcommons/mlcflow) automation interface. This new and simplified framework replaces the previous [Collective Mind (CM)](https://github.com/mlcommons/ck/tree/master/cm), providing a more robust, efficient, and self-contained solution for benchmarking workflows, making MLPerf® automations independent of any external projects. 
-
 
 ---
 
@@ -31,7 +31,7 @@ At its core, MLCFlow relies on a single powerful automation, the Script, which i
 ## 🤝 Contributing
 We welcome contributions from the community! To contribute:
 1. Submit pull requests (PRs) to the **`dev`** branch.
-2. Review our [CONTRIBUTORS.md](here) for guidelines and best practices.
+2. See [here](CONTRIBUTORS.md) for guidelines and best practices on contribution.
 3. Explore more about MLPerf® Inference automation in the official [MLPerf® Inference Documentation](https://docs.mlcommons.org/inference/).
 
 Your contributions help drive the project forward!
@@ -61,6 +61,7 @@ This project is made possible through the generous support of:
 - [cKnowledge.org](https://cKnowledge.org)
 - [cTuning Foundation](https://cTuning.org)
 - [GATEOverflow](https://gateoverflow.in)
+- [AMD](https://www.amd.com)
 - [MLCommons®](https://mlcommons.org)
 
 We appreciate their contributions and sponsorship!

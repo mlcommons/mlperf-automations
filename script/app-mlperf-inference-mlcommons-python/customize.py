@@ -73,7 +73,7 @@ def preprocess(i):
             str(env['MLC_MLPERF_LOADGEN_BATCH_SIZE'])
 
     if env.get('MLC_MLPERF_LOADGEN_QUERY_COUNT', '') != '' and not env.get('MLC_TMP_IGNORE_MLPERF_QUERY_COUNT', False) and (
-            env['MLC_MLPERF_LOADGEN_MODE'] == 'accuracy' or 'gptj' in env['MLC_MODEL'] or 'llama2' in env['MLC_MODEL'] or 'yolo' in env['MLC_MODEL'] or 'mixtral' in env['MLC_MODEL'] or 'llama3' in env['MLC_MODEL'] or 'pointpainting' in env['MLC_MODEL']) and (env.get('MLC_MLPERF_RUN_STYLE', '') != "valid" or 'pointpainting' in env['MLC_MODEL']):
+            env['MLC_MLPERF_LOADGEN_MODE'] == 'accuracy' or 'gptj' in env['MLC_MODEL'] or 'llama2' in env['MLC_MODEL'] or 'yolo' in env['MLC_MODEL'] or 'mixtral' in env['MLC_MODEL'] or 'llama3' in env['MLC_MODEL'] or 'pointpainting' in env['MLC_MODEL'] or 'wan-2.2-t2v-a14b' in env['MLC_MODEL']) and (env.get('MLC_MLPERF_RUN_STYLE', '') != "valid" or 'pointpainting' in env['MLC_MODEL']):
         env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] += " --count " + \
             env['MLC_MLPERF_LOADGEN_QUERY_COUNT']
 
@@ -638,8 +638,6 @@ def get_run_cmd_reference(
             "classification_and_detection",
             "yolo")
 
-        base_cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} yolo_loadgen.py"""
-
         cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} yolo_loadgen.py \
             --model {x}{env['MLC_ML_MODEL_YOLOV11_PATH']}{x} \
             --dataset-path {x}{env['MLC_ML_DATASET_MLPERF_INFERENCE_YOLO_COCO2017_FILTERED_DATASET_PATH']}{x} \
@@ -653,6 +651,30 @@ def get_run_cmd_reference(
             cmd = cmd.replace("--accuracy", "--AccuracyOnly")
         else:
             cmd += " --PerformanceOnly "
+
+    elif "wan-2.2-t2v-a14b" in env['MLC_MODEL']:
+        env['RUN_DIR'] = os.path.join(
+            env['MLC_MLPERF_INFERENCE_SOURCE'],
+            "text_to_video",
+            "wan2.2-t2v-14b",)
+
+        video_output_directory = os.path.join(
+            env['MLC_MLPERF_OUTPUT_DIR'], "generated_videos")
+        os.makedirs(video_output_directory, exist_ok=True)
+
+        torch_distributed_cmd = ""
+
+        if int(env.get('MLC_MLPERF_INFERENCE_NUM_PROCESSES_PER_GPU_NODE', 1)) > 1:
+            torch_distributed_cmd = f"torch.distributed.run --nproc_per_node={env.get('MLC_MLPERF_INFERENCE_NUM_PROCESSES_PER_GPU_NODE')}"
+
+        cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} {torch_distributed_cmd} run_mlperf.py \
+            --model-path {x}{env['MLC_ML_MODEL_WAN2_PATH']}{x} \
+            --dataset {x}{env['MLC_ML_DATASET_MLPERF_INFERENCE_TEXT_TO_VIDEO_DATASET_PATH']}{x} \
+            --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} \
+            --output-dir {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
+            --video_output_path {x}{video_output_directory}{x} \
+            {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} \
+            {scenario_extra_options} {mode_extra_options}"""
 
     if env.get('MLC_NETWORK_LOADGEN', '') in ["lon", "sut"]:
         cmd = cmd + " " + "--network " + env['MLC_NETWORK_LOADGEN']

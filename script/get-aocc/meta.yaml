@@ -1,43 +1,21 @@
 alias: get-aocc
+uid: 1ceb0656e99a44ec
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
-category: Compiler automation
-clean_files: []
-deps:
-- tags: detect,os
-- tags: download,file,_mlcutil
-  extra_cache_tags: aocc,download
-  update_tags_from_env_with_prefix:
-    _url.:
-      - MLC_AOCC_URL
-  force_cache: true
-  env:
-    MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_AOCC_TAR_FILE_PATH
-  enable_if_env:
-    MLC_AOCC_URL:
-      - on
-    MLC_AOCC_ACCEPT_EULA:
-      - on
-- tags: extract,file
-  update_tags_from_env_with_prefix:
-    _path.:
-      - MLC_AOCC_TAR_FILE_PATH
-  extra_cache_tags: aocc,extract
-  force_cache: true
-  env:
-    MLC_EXTRACT_FINAL_ENV_NAME: MLC_AOCC_DIR_PATH
-    MLC_EXTRACT_TO_FOLDER: aocc_install
-  enable_if_env:
-    MLC_AOCC_NEEDS_TAR:
-      - yes
 
-input_mapping:
-  tar_file_path: MLC_AOCC_TAR_FILE_PATH
-  aocc_dir: MLC_AOCC_DIR_PATH
-  accept_eula: MLC_AOCC_ACCEPT_EULA
-
+# Metadata
 name: Detect or install AOCC compiler
+category: Compiler automation
+tags:
+- compiler
+- get
+- aocc
+
+# Cache
+cache: true
+clean_files: []
+
+# Environment
 new_env_keys:
 - MLC_AOCC_*
 - MLC_C_COMPILER_*
@@ -51,37 +29,73 @@ new_env_keys:
 - + LDFLAGS
 - +MLC_HOST_OS_DEFAULT_INCLUDE_PATH
 - +PATH
-post_deps_off:
-- tags: get,compiler-flags
-sort: 500
-tags:
-- compiler
-- get
-- aocc
-uid: 1ceb0656e99a44ec
-versions:
-  5.0.0:
-    env:
-      MLC_AOCC_URL: https://download.amd.com/developer/eula/aocc/aocc-5-0/aocc-compiler-5.0.0.tar
-      MLC_DOWNLOAD_CHECKSUM: c01ee764a8370a2ed546c1a38e41bb42
-      MLC_AOCC_NEEDS_TAR: yes
-      MLC_VERSION: '5.0.0-Build#1377' 
+
+# Input mapping
+input_mapping:
+  accept_eula: MLC_AOCC_ACCEPT_EULA
+  aocc_dir: MLC_AOCC_DIR_PATH
+  tar_file_path: MLC_AOCC_TAR_FILE_PATH
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: download,file,_mlcutil
+  extra_cache_tags: aocc,download
+  update_tags_from_env_with_prefix:
+    _url.:
+    - MLC_AOCC_URL
+  force_cache: true
+  env:
+    MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_AOCC_TAR_FILE_PATH
+  enable_if_env:
+    MLC_AOCC_URL:
+    - true
+    MLC_AOCC_ACCEPT_EULA:
+    - true
+- tags: extract,file
+  update_tags_from_env_with_prefix:
+    _path.:
+    - MLC_AOCC_TAR_FILE_PATH
+  extra_cache_tags: aocc,extract
+  force_cache: true
+  env:
+    MLC_EXTRACT_FINAL_ENV_NAME: MLC_AOCC_DIR_PATH
+    MLC_EXTRACT_TO_FOLDER: aocc_install
+  enable_if_env:
+    MLC_AOCC_NEEDS_TAR:
+    - true
+
+# Variations
 variations:
   download-and-install:
     group: install-type
     default: true
-    default_version: "5.0.0"
-    env: 
-      MLC_AOCC_DOWNLOAD: yes
+    default_version: 5.0.0
+    env:
+      MLC_AOCC_DOWNLOAD: true
   local-install:
     group: install-type
-    env: 
-      MLC_AOCC_DOWNLOAD: no
+    env:
+      MLC_AOCC_DOWNLOAD: false
   path.#:
     default_variations:
       install-type: local-install
     env:
       MLC_AOCC_DIR_PATH: '#'
+
+# Versions
+versions:
+  5.0.0:
+    env:
+      MLC_AOCC_URL: https://download.amd.com/developer/eula/aocc/aocc-5-0/aocc-compiler-5.0.0.tar
+      MLC_DOWNLOAD_CHECKSUM: c01ee764a8370a2ed546c1a38e41bb42
+      MLC_AOCC_NEEDS_TAR: true
+      MLC_VERSION: 5.0.0-Build#1377
+
+# Output / debugging
+sort: 500
+
+# Tests
 tests:
   run_inputs:
-    - accept_eula: yes
+  - accept_eula: true

@@ -1,42 +1,33 @@
-# Identification of this MLC script
 alias: generate-mlperf-tiny-report
 uid: 709c3f3f9b3e4783
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
+# Metadata
 category: TinyML automation
-
-developers: "[Grigori Fursin](https://cKnowledge.org/gfursin)"
-
-default_env:
-  MLC_IMPORT_TINYMLPERF_REPO_TAGS: "1.1-private"
-
-# User-friendly tags to find this MLC script
+developers: '[Grigori Fursin](https://cKnowledge.org/gfursin)'
 tags:
-  - generate
-  - mlperf
-  - tiny
-  - mlperf-tiny
-  - report
+- generate
+- mlperf
+- tiny
+- mlperf-tiny
+- report
 
+# Environment
+default_env:
+  MLC_IMPORT_TINYMLPERF_REPO_TAGS: 1.1-private
+
+# Input mapping
 input_mapping:
   repo_tags: MLC_IMPORT_TINYMLPERF_REPO_TAGS
 
-# Dependencies on other MLC scripts
+# Dependencies
 deps:
-
-  # Detect host OS features
-  - tags: detect,os
-
-  # Install system dependencies on a given host
-  - tags: get,sys-utils-mlc
-
-  # Detect python3
-  - tags: get,python3
-    names:
-    - python
-    - python3
-
-  - tags: get,generic-python-lib,_xlsxwriter
-  - tags: get,generic-python-lib,_pandas
+- tags: detect,os
+- tags: get,sys-utils-mlc
+- tags: get,python3
+  names:
+  - python
+  - python3
+- tags: get,generic-python-lib,_xlsxwriter
+- tags: get,generic-python-lib,_pandas

@@ -50,8 +50,11 @@ jobs:
       run: |
         pip install mlcflow
     - name: Pull MLOps repository
+      env:
+        PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
       run: |
-        mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
+        mlc pull repo "$PR_HEAD_REPO" --branch="$PR_HEAD_REF"
     - name: Pull repo where test cases are uploaded
       run: |
         git clone -b submission-generation-tests https://github.com/mlcommons/inference.git submission_generation_tests

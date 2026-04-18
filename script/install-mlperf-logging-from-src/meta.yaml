@@ -1,30 +1,42 @@
 alias: install-mlperf-logging-from-src
+uid: f67cb84a5dc942c3
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLPerf Inference
-deps:
-  - tags: get,python3
-    names:
-      - python
-      - python3
-  - tags: get,git,repo,_repo.https://github.com/mlcommons/logging
-    extra_cache_tags: mlperf_logging
-    env:
-      MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_MLPERF_LOGGING_REPO_PATH
-new_env_keys:
-  - MLC_MLPERF_LOGGING_REPO_PATH
-new_state_keys: []
-post_deps: []
-posthook_deps: []
-prehook_deps: []
 tags:
 - install
 - mlperf
 - logging
 - from.src
-uid: f67cb84a5dc942c3
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_MLPERF_LOGGING_REPO_PATH
+new_state_keys: []
+
+# Dependencies
+deps:
+- tags: get,python3
+  names:
+  - python
+  - python3
+- tags: get,git,repo,_repo.https://github.com/mlcommons/logging
+  extra_cache_tags: mlperf_logging
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_MLPERF_LOGGING_REPO_PATH
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations: {}
+
+# Versions
 versions:
   master:
     env:

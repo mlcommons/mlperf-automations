@@ -1,10 +1,25 @@
 alias: get-dataset-imagenet-aux
+uid: bb2c6dd8c8c64217
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
+tags:
+- get
+- aux
+- dataset-aux
+- image-classification
+- imagenet-aux
+
+# Cache
+cache: true
+
+# Environment
 new_env_keys:
 - MLC_DATASET_AUX_*
+
+# Dependencies
 prehook_deps:
 - env:
     MLC_DOWNLOAD_URL: <<<MLC_PACKAGE_URL>>>
@@ -15,31 +30,13 @@ prehook_deps:
   force_cache: true
   tags: download-and-extract,_extract,_wget
   force_env_keys:
-    - MLC_OUTDIRNAME  
+  - MLC_OUTDIRNAME
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_PACKAGE_URL
-tags:
-- get
-- aux
-- dataset-aux
-- image-classification
-- imagenet-aux
-uid: bb2c6dd8c8c64217
+
+# Variations
 variations:
-  '2012':
-    env:
-      MLC_DATASET_AUX_VER: '2012'
-  from.go:
-    base:
-    - '2012'
-    default: true
-    env:
-      MLC_DOWNLOAD_CHECKSUM: ee346d67141e476df9c1a3f813552503
-      MLC_DOWNLOAD_CHECKSUM1: ee346d67141e476df9c1a3f813552503
-      MLC_PACKAGE_URL: https://armi.in/files/caffe_ilsvrc12.tar.gz
-      MLC_PACKAGE_URL1: https://www.dropbox.com/s/92n2fyej3lzy3s3/caffe_ilsvrc12.tar.gz
-    group: download-source
   from.berkeleyvision:
     base:
     - '2012'
@@ -58,6 +55,19 @@ variations:
       MLC_PACKAGE_URL: https://www.dropbox.com/s/92n2fyej3lzy3s3/caffe_ilsvrc12.tar.gz
       MLC_PACKAGE_URL1: http://dl.caffe.berkeleyvision.org/caffe_ilsvrc12.tar.gz
     group: download-source
+  from.go:
+    base:
+    - '2012'
+    default: true
+    env:
+      MLC_DOWNLOAD_CHECKSUM: ee346d67141e476df9c1a3f813552503
+      MLC_DOWNLOAD_CHECKSUM1: ee346d67141e476df9c1a3f813552503
+      MLC_PACKAGE_URL: https://armi.in/files/caffe_ilsvrc12.tar.gz
+      MLC_PACKAGE_URL1: https://www.dropbox.com/s/92n2fyej3lzy3s3/caffe_ilsvrc12.tar.gz
+    group: download-source
+  '2012':
+    env:
+      MLC_DATASET_AUX_VER: '2012'
   skip_ssl_verification:
     env:
       MLC_VERIFY_SSL: 'False'

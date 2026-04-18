@@ -1,32 +1,10 @@
 alias: install-tensorflow-from-src
+uid: a974533c4c854597
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML frameworks
-clean_files: []
-default_env:
-  MLC_GIT_DEPTH: '1'
-  MLC_GIT_URL: https://github.com/tensorflow/tensorflow
-  MLC_TFLITE: 'off'
-default_version: master
-deps:
-- tags: detect,cpu
-- tags: detect,os
-- enable_if_env:
-    MLC_HOST_OS_FLAVOR:
-    - ubuntu
-    MLC_HOST_OS_VERSION:
-    - '18.04'
-  tags: get,generic-sys-util,_zlib
-- tags: get,generic-python-lib,_package.numpy
-extra_cache_tags_from_env:
-- env: MLC_PYTHON_CACHE_TAGS
-  prefix: python-
-new_env_keys:
-- +C_INCLUDE_PATH
-- +CPLUS_INCLUDE_PATH
-- +LD_LIBRARY_PATH
-- +DYLD_FALLBACK_LIBRARY_PATH
 tags:
 - get
 - install
@@ -37,11 +15,45 @@ tags:
 - from-src
 - src
 - from.src
-uid: a974533c4c854597
+
+# Cache
+cache: true
+extra_cache_tags_from_env:
+- env: MLC_PYTHON_CACHE_TAGS
+  prefix: python-
+clean_files: []
+
+# Environment
+default_env:
+  MLC_GIT_DEPTH: '1'
+  MLC_GIT_URL: https://github.com/tensorflow/tensorflow
+  MLC_TFLITE: 'off'
+new_env_keys:
+- +C_INCLUDE_PATH
+- +CPLUS_INCLUDE_PATH
+- +LD_LIBRARY_PATH
+- +DYLD_FALLBACK_LIBRARY_PATH
+
+# Dependencies
+deps:
+- tags: detect,cpu
+- tags: detect,os
+- enable_if_env:
+    MLC_HOST_OS_FLAVOR:
+    - ubuntu
+    MLC_HOST_OS_VERSION:
+    - '18.04'
+  tags: get,generic-sys-util,_zlib
+- tags: get,generic-python-lib,_package.numpy
+
+# Variations
 variations:
   tflite:
     env:
       MLC_TFLITE: 'on'
+
+# Versions
+default_version: master
 versions:
   master:
     deps:
@@ -56,7 +68,7 @@ versions:
       version_max_usable: 17.0.6
       version_min: 17.0.6
     - tags: get,bazel
-      version: 7.4.1
+      version_min: 7.7.0
     env:
       MLC_GIT_CHECKOUT: master
   v1.15.0:
@@ -146,9 +158,9 @@ versions:
       tags: get,python
       version_max: 3.11.999
       version_max_usable: 3.11.12
-      version_min: 3.7.0
-    - tags: gcc,get
-      version_max: '12'
+      version_min: 3.8.0
+    - tags: get,gcc
+      version_max: '12.9'
       version_min: '9'
     - tags: get,bazel
       version: 5.3.0
@@ -194,7 +206,8 @@ versions:
       version_max_usable: 3.11.12
       version_min: 3.9.0
     - tags: get,llvm
-      version: 16.0.0
+      version_max: 16.9.999
+      version_min: 16.0.0
     - tags: get,bazel
       version: 6.1.0
     env:
@@ -344,38 +357,6 @@ versions:
       version: 5.0.0
     env:
       MLC_GIT_CHECKOUT: v2.9.0
-  v2.12.0:
-    deps:
-    - names:
-      - python
-      - python3
-      tags: get,python
-      version_max: 3.11.999
-      version_max_usable: 3.11.12
-      version_min: 3.8.0
-    - tags: get,gcc
-      version_max: '12.9'
-      version_min: '9'
-    - tags: get,bazel
-      version: 5.3.0
-    env:
-      MLC_GIT_CHECKOUT: v2.12.0
-  v2.15.0:
-    deps:
-    - names:
-      - python
-      - python3
-      tags: get,python
-      version_max: 3.11.999
-      version_max_usable: 3.11.12
-      version_min: 3.9.0
-    - tags: get,llvm
-      version_max: '16.9.999'
-      version_min: '16.0.0'
-    - tags: get,bazel
-      version: 6.1.0
-    env:
-      MLC_GIT_CHECKOUT: v2.15.0
   v2.18.0:
     deps:
     - names:
@@ -386,8 +367,8 @@ versions:
       version_max_usable: 3.12.12
       version_min: 3.9.0
     - tags: get,llvm
-      version_max: '17.9.999'
-      version_min: '17.0.6'
+      version_max: 17.9.999
+      version_min: 17.0.6
     - tags: get,bazel
       version: 6.5.0
     env:

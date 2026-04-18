@@ -21,12 +21,15 @@ def preprocess(i):
     if is_true(interactive):
         env['MLC_DOCKER_DETACHED_MODE'] = 'no'
 
-    if 'MLC_DOCKER_RUN_SCRIPT_TAGS' not in env:
-        env['MLC_DOCKER_RUN_SCRIPT_TAGS'] = "run,docker,container"
-        MLC_RUN_CMD = "mlc version"
-    else:
-        MLC_RUN_CMD = "mlcr " + \
-            env['MLC_DOCKER_RUN_SCRIPT_TAGS'] + ' --quiet'
+    if env.get('MLC_DOCKER_RUN_CMD', '') == '':
+        if 'MLC_DOCKER_RUN_SCRIPT_TAGS' not in env:
+            env['MLC_DOCKER_RUN_SCRIPT_TAGS'] = "run,docker,container"
+            MLC_RUN_CMD = "mlc version"
+        else:
+            MLC_RUN_CMD = "mlcr " + \
+                env['MLC_DOCKER_RUN_SCRIPT_TAGS'] + ' --quiet'
+
+        env['MLC_DOCKER_RUN_CMD'] = MLC_RUN_CMD
 
     r = mlc.access({'action': 'search',
                    'automation': 'script',
@@ -39,8 +42,6 @@ def preprocess(i):
 
     PATH = r['list'][0].path
     os.chdir(PATH)
-
-    env['MLC_DOCKER_RUN_CMD'] = MLC_RUN_CMD
 
     # Updating Docker info
     update_docker_info(env)
@@ -149,6 +150,7 @@ def postprocess(i):
     port_map_cmds = []
     run_opts = ''
 
+
     # not completed as su command breaks the execution sequence
     #
     # if env.get('MLC_DOCKER_PASS_USER_ID', '') != '':
@@ -176,8 +178,19 @@ def postprocess(i):
     if is_true(env.get('MLC_DOCKER_PRIVILEGED_MODE', '')):
         run_opts += " --privileged "
 
-    if env.get('MLC_DOCKER_ADD_NUM_GPUS', '') != '':
-        run_opts += " --gpus={}".format(env['MLC_DOCKER_ADD_NUM_GPUS'])
+    if env.get("MLC_DOCKER_GPU_DEVICES"):
+        if env.get('MLC_CONTAINER_TOOL') == "podman":
+            run_opts += f" -e NVIDIA_VISIBLE_DEVICES={env['MLC_DOCKER_GPU_DEVICES']}"
+            for d in env["MLC_DOCKER_GPU_DEVICES"].split(","):
+                run_opts += f" --device nvidia.com/gpu={d}"
+        else:
+            for d in env["MLC_DOCKER_GPU_DEVICES"].split(","):
+                run_opts += f" --gpus device={d}"
+    elif env.get('MLC_DOCKER_ADD_NUM_GPUS', '') != '':
+        if env.get('MLC_CONTAINER_TOOL') == "podman":
+            run_opts += f" --device nvidia.com/gpu={env['MLC_DOCKER_ADD_NUM_GPUS']}"
+        else:
+            run_opts += " --gpus={}".format(env['MLC_DOCKER_ADD_NUM_GPUS'])
     elif env.get('MLC_DOCKER_ADD_ALL_GPUS', '') != '':
         if env.get('MLC_CONTAINER_TOOL') == "podman":
             run_opts += " --device nvidia.com/gpu=all"
@@ -255,11 +268,14 @@ def postprocess(i):
                 'return': 1, 'error': 'Currently we don\'t support running Docker containers in detached mode on Windows - TBD'}
 
         existing_container_id = env.get('MLC_DOCKER_CONTAINER_ID', '')
+        # Escape single quotes inside run_cmd for bash -c '...' wrapping
+        escaped_run_cmd = run_cmd.replace("'", "'\\''")
         if existing_container_id:
-            CMD = f"""ID={existing_container_id} && {env['MLC_CONTAINER_TOOL']} exec $ID bash -c '""" + run_cmd + "'"
+            CMD = f"""ID={existing_container_id} && {env['MLC_CONTAINER_TOOL']} exec $ID bash -c '""" + \
+                escaped_run_cmd + "'"
         else:
             CONTAINER = f"""{env['MLC_CONTAINER_TOOL']} run -dt {run_opts} --rm  {docker_image_repo}/{docker_image_name}:{docker_image_tag} bash"""
-            CMD = f"""ID=`{CONTAINER}` && {env['MLC_CONTAINER_TOOL']} exec $ID bash -c '{run_cmd}'"""
+            CMD = f"""ID=`{CONTAINER}` && {env['MLC_CONTAINER_TOOL']} exec $ID bash -c '{escaped_run_cmd}'"""
 
             if is_true(env.get('MLC_KILL_DETACHED_CONTAINER', False)):
                 CMD += f""" && {env['MLC_CONTAINER_TOOL']} kill $ID >/dev/null"""
@@ -325,7 +341,12 @@ def postprocess(i):
 
         CONTAINER = f"{env['MLC_CONTAINER_TOOL']} run " + x1 + " --entrypoint " + x + x + " " + run_opts + \
             " " + docker_image_repo + "/" + docker_image_name + ":" + docker_image_tag
-        CMD = CONTAINER + " bash -c " + x + run_cmd_prefix + run_cmd + x2 + x
+        # Escape quotes inside run_cmd for bash -c wrapping
+        if x == "'":
+            escaped_run_cmd = run_cmd.replace("'", "'\\''")
+        else:
+            escaped_run_cmd = run_cmd.replace('"', '\\"')
+        CMD = CONTAINER + " bash -c " + x + run_cmd_prefix + escaped_run_cmd + x2 + x
 
         logger.info('')
         logger.info("Container launch command:")

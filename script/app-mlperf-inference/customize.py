@@ -180,6 +180,14 @@ def postprocess(i):
             out_baseline_accuracy_string = f""" --output-file {q}{os.path.join(output_dir, "accuracy", "baseline_accuracy.txt")}{q} """
             out_compliance_accuracy_string = f""" --output-file {q}{os.path.join(output_dir, "accuracy", "compliance_accuracy.txt")}{q} """
 
+        elif 'yolo' in model:
+            accuracy_filename = "accuracy-coco.py"
+            accuracy_filepath = os.path.join(
+                env['MLC_MLPERF_INFERENCE_CLASSIFICATION_AND_DETECTION_PATH'], "tools", accuracy_filename)
+            dataset_args = f""" --coco-dir {q}{env.get('MLC_ML_DATASET_MLPERF_INFERENCE_YOLO_COCO2017_FILTERED_DATASET_PATH')}{q} """
+            accuracy_log_file_option_name = " --mlperf-accuracy-file "
+            datatype_option = ""
+
         elif 'stable-diffusion-xl' in model:
             pass  # No compliance check for now
         elif 'gpt' in model:
