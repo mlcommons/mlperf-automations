@@ -25,12 +25,14 @@ def preprocess(i):
             env['MLC_TMP_PATH'] += "/opt/rh/gcc-toolset-12/root/usr/bin"
             env['MLC_TMP_PATH_IGNORE_NON_EXISTANT'] = 'yes'
 
+    detect_version = True if 'MLC_GCC_FORCE_VERSION' not in env else False
+
     if 'MLC_GCC_BIN_WITH_PATH' not in env:
         r = i['automation'].find_artifact({'file_name': file_name_c,
                                            'env': env,
                                            'os_info': os_info,
                                            'default_path_env_key': 'PATH',
-                                           'detect_version': True,
+                                           'detect_version': detect_version,
                                            'force_given_path': env.get('MLC_TMP_GCC_FORCE_GIVEN_PATH', False),
                                            'env_path_key': 'MLC_GCC_BIN_WITH_PATH',
                                            'run_script_input': i['run_script_input'],
@@ -51,15 +53,22 @@ def preprocess(i):
 
 
 def detect_version(i):
-    r = i['automation'].parse_version({'match_text': r'\s+([\d.]+(?:\s+\d{8})?)',
+
+    env = i['env']
+    if env.get('MLC_GCC_FORCE_VERSION', '') != '':
+        version = env['MLC_GCC_FORCE_VERSION']
+        env['MLC_GCC_VERSION'] = version
+    else:
+        r = i['automation'].parse_version({'match_text': r'\s+([\d.]+(?:\s+\d{8})?)',
                                        'group_number': 1,
                                        'env_key': 'MLC_GCC_VERSION',
                                        'which_env': i['env']})
-    if r['return'] > 0:
-        if 'clang' in r['error']:
-            return {'return': 0, 'version': -1}
-        return r
-    version = r['version']
+        if r['return'] > 0:
+            if 'clang' in r['error']:
+                return {'return': 0, 'version': -1}
+            return r
+        version = r['version']
+
     logger = i['automation'].logger
 
     logger.info(
