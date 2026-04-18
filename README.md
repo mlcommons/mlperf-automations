@@ -40,7 +40,7 @@ Your contributions help drive the project forward!
 ---
 
 ## 💬 Join the Discussion  
-Connect with us on the [MLCommons™ Benchmark Infra Discord channel](https://discord.gg/T9rHVwQFNX) to engage in discussions about **MLCFlow** and **MLPerf® Automations**. We’d love to hear your thoughts, questions, and ideas!  
+Connect with us on the [MLCommons® Benchmark Infra Discord channel](https://discord.gg/T9rHVwQFNX) to engage in discussions about **MLCFlow** and **MLPerf® Automations**. We’d love to hear your thoughts, questions, and ideas!  
 
 ---
 
@@ -61,7 +61,7 @@ This project is made possible through the generous support of:
 - [cKnowledge.org](https://cKnowledge.org)
 - [cTuning Foundation](https://cTuning.org)
 - [GATEOverflow](https://gateoverflow.in)
-- [MLCommons™](https://mlcommons.org)
+- [MLCommons®](https://mlcommons.org)
 
 We appreciate their contributions and sponsorship!
 

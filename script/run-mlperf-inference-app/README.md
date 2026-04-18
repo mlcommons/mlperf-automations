@@ -51,7 +51,7 @@ mlcr run-mlperf,inference
 | `--mode` | MLPerf® benchmark mode | ['', 'accuracy', 'performance'] | `` |
 | `--execution_mode` | MLPerf® execution mode | ['test', 'fast', 'valid'] | `test` |
 | `--sut` | SUT configuration (if known) |  | `` |
-| `--submitter` | Submitter name (without space) |  | `MLCommons™` |
+| `--submitter` | Submitter name (without space) |  | `MLCommons®` |
 | `--submission_dir` | Folder path to store MLPerf® submission tree |  | `` |
 | `--power` | Measure power | ['yes', 'no'] | `no` |
 | `--adr.mlperf-power-client.power_server` | MLPerf® Power server IP address |  | `192.168.0.15` |

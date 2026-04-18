@@ -1,8 +1,8 @@
 # Copyright Notice
 
-© 2024-2025 MLCommons™. All Rights Reserved.
+© 2024-2025 MLCommons®. All Rights Reserved.
 
-Grigori Fursin, the cTuning foundation and OctoML donated the CK and CM projects to MLCommons™ to benefit everyone and continue development as a community effort.
+Grigori Fursin, the cTuning foundation and OctoML donated the CK and CM projects to MLCommons® to benefit everyone and continue development as a community effort.
 
 Copyright (c) 2014-2021 cTuning foundation
 
