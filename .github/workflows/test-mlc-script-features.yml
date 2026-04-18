@@ -11,6 +11,9 @@ on:
 permissions:
   contents: read
 
+permissions:
+  contents: read
+
 jobs:
   test_mlc_script_features:
 
