@@ -134,6 +134,8 @@ variations:
       MLC_DATASET_MLCOMMONS_COGNATA_FILE_NAMES: Cognata_Camera_01_8M_ann.zip;Cognata_Camera_01_8M_ann_laneline.zip;Cognata_Camera_01_8M.zip
   abtf-poc:
     group: dataset-type
+    default_variations:
+      download-tool: gdrive
     default: true
     env:
       MLC_DATASET_MLCOMMONS_COGNATA_SERIAL_NUMBERS: 10002_Urban_Clear_Morning

@@ -252,6 +252,15 @@ variations:
         brew: gflags
         dnf: gflags-devel
         yum: gflags-devel
+  gfortran:
+    env:
+      MLC_SYS_UTIL_NAME: gfortran
+    state:
+      gfortran:
+        apt: gfortran
+        brew: gcc
+        dnf: gcc-gfortran
+        yum: gcc-gfortran
   gfortran-12-aarch64-linux-gnu:
     env:
       MLC_SYS_UTIL_NAME: gfortran-12-aarch64
@@ -515,6 +524,20 @@ variations:
         brew: ''
         dnf: numactl-libs
         yum: numactl-libs
+  libopenmpi-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libopenmpi-dev
+      MLC_SYS_UTIL_VERSION_CMD: dpkg -s libopenmpi-dev | grep 'Version'
+      MLC_SYS_UTIL_VERSION_RE: ([0-9]+(\.[0-9]+)+)
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 1
+    new_env_keys:
+    - MLC_LIBOPENMPI_DEV_VERSION
+    state:
+      libopenmpi-dev:
+        apt: libopenmpi-dev
+        brew: open-mpi
+        dnf: openmpi-devel
+        yum: openmpi-devel
   libpci-dev:
     env:
       MLC_SYS_UTIL_NAME: libpci-dev

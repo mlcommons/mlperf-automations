@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-04-16 18:55:55*
+*Last updated: 2026-04-18 05:31:02*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -329,9 +329,6 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-aocc](get-aocc/)**
   - Detect or install AOCC compiler
   - Tags: `compiler`, `get`, `aocc`
-- **[get-aocl](get-aocl/)**
-  - get-aocl
-  - Tags: `get`, `lib`, `aocl`, `amd-optimized`, `amd`
 - **[get-cl](get-cl/)**
   - Detect or install Microsoft C compiler
   - Tags: `get`, `cl`, `compiler`, `c-compiler`, `cpp-compiler`, `get-cl`
@@ -473,6 +470,39 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-javac](get-javac/)**
   - get-javac
   - Tags: `get`, `javac`
+- **[get-lib-aocl](get-lib-aocl/)**
+  - get-lib-aocl
+  - Tags: `get`, `lib`, `lib-aocl`, `aocl`, `aocl-all`
+- **[get-lib-aocl-blis](get-lib-aocl-blis/)**
+  - get-lib-aocl-blis
+  - Tags: `get`, `lib`, `lib-aocl-blis`, `aocl-blis`, `aocl`, `blis`
+- **[get-lib-aocl-compression](get-lib-aocl-compression/)**
+  - get-lib-aocl-compression
+  - Tags: `get`, `lib`, `lib-aocl-compression`, `aocl-compression`, `aocl`
+- **[get-lib-aocl-crypto](get-lib-aocl-crypto/)**
+  - get-lib-aocl-crypto
+  - Tags: `get`, `lib`, `lib-aocl-crypto`, `aocl-crypto`, `aocl`
+- **[get-lib-aocl-data-analytics](get-lib-aocl-data-analytics/)**
+  - get-lib-aocl-data-analytics
+  - Tags: `get`, `lib`, `lib-aocl-data-analytics`, `aocl-data-analytics`, `aocl`, `aocl-da`
+- **[get-lib-aocl-dlp](get-lib-aocl-dlp/)**
+  - get-lib-aocl-dlp
+  - Tags: `get`, `lib`, `lib-aocl-dlp`, `aocl-dlp`, `aocl`
+- **[get-lib-aocl-fftz](get-lib-aocl-fftz/)**
+  - get-lib-aocl-fftz
+  - Tags: `get`, `lib`, `lib-aocl-fftz`, `aocl-fftz`, `aocl`
+- **[get-lib-aocl-libflame](get-lib-aocl-libflame/)**
+  - get-lib-aocl-libflame
+  - Tags: `get`, `lib`, `lib-aocl-libflame`, `aocl-libflame`, `aocl`
+- **[get-lib-aocl-libm](get-lib-aocl-libm/)**
+  - get-lib-aocl-libm
+  - Tags: `get`, `lib`, `lib-aocl-libm`, `aocl-libm`, `aocl`
+- **[get-lib-aocl-scalapack](get-lib-aocl-scalapack/)**
+  - get-lib-aocl-scalapack
+  - Tags: `get`, `lib`, `lib-aocl-scalapack`, `aocl-scalapack`, `aocl`
+- **[get-lib-aocl-sparse](get-lib-aocl-sparse/)**
+  - get-lib-aocl-sparse
+  - Tags: `get`, `lib`, `lib-aocl-sparse`, `aocl-sparse`, `aocl`
 - **[get-lib-armnn](get-lib-armnn/)**
   - get-lib-armnn
   - Tags: `get`, `lib-armnn`, `lib`, `armnn`
@@ -512,6 +542,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-sys-utils-mlc](get-sys-utils-mlc/)**
   - get-sys-utils-mlc
   - Tags: `get`, `sys-utils-cm`, `sys-utils-mlc`
+- **[get-utils-aocl](get-utils-aocl/)**
+  - get-utils-aocl
+  - Tags: `get`, `utils`, `utils-aocl`, `aocl-utils`, `aocl`
 - **[get-xilinx-sdk](get-xilinx-sdk/)**
   - get-xilinx-sdk
   - Tags: `get`, `xilinx`, `sdk`
@@ -638,6 +671,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[app-cp2k](app-cp2k/)**
   - app-cp2k
   - Tags: `app`, `cp2k`
+- **[app-nwchem](app-nwchem/)**
+  - app-nwchem
+  - Tags: `app`, `nwchem`, `hpc`
 
 ## MLCommons automation
 
@@ -1129,7 +1165,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 328
+- **Total Scripts**: 340
 - **Categories**: 33
 
 ## Usage

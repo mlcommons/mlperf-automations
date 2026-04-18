@@ -32,7 +32,7 @@ def get_meta_paths(files):
     """Return deduplicated meta.yaml paths for directories with any trigger file changed."""
     filenames = files.split(",")
     dirs = get_trigger_directories(filenames)
-    return [os.path.join(d, 'meta.yaml') for d in dirs]
+    return [os.path.join(d, 'meta.yaml') for d in dirs if os.path.exists(os.path.join(d, 'meta.yaml'))]
 
 
 def process_files(files):
