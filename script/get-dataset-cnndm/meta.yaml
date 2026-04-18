@@ -36,7 +36,7 @@ deps:
     - llama3_1-8b
 - names:
   - inference-src
-  skip_if_env:
+  skip_if_any_env:
     MLC_CNNDM_INTEL_VARIATION:
     - 'yes'
     MLC_TMP_ML_MODEL:

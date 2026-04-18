@@ -42,7 +42,16 @@ def postprocess(i):
                     os.getcwd(), 'install', 'cnn_dailymail_calibration.json')
                 env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_CALIBRATION_DATASET_PATH']
         else:
-            env['MLC_DATASET_CNNDM_EVAL_PATH'] = os.path.join(
-                env['MLC_DATASET_CNNDM_EVAL_PATH'], env['MLC_DATASET_CNNDM_FILENAME'])
+            eval_path = env.get('MLC_DATASET_CNNDM_EVAL_PATH', '')
+            if eval_path == '':
+                download_dir = env.get('MLC_DOWNLOAD_PATH') or \
+                    env.get('MLC_OUTDIRNAME') or os.getcwd()
+                eval_path = os.path.join(
+                    download_dir, env['MLC_DATASET_CNNDM_FILENAME'])
+            elif os.path.isdir(eval_path):
+                eval_path = os.path.join(
+                    eval_path, env['MLC_DATASET_CNNDM_FILENAME'])
+            env['MLC_DATASET_CNNDM_EVAL_PATH'] = eval_path
+            env['MLC_GET_DEPENDENT_CACHED_PATH'] = eval_path
 
     return {'return': 0}
