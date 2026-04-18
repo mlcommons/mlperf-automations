@@ -1,31 +1,39 @@
 alias: get-ipol-src
+uid: b6fd8213d03d4aa4
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Reproducibility and artifact evaluation
-env:
-  MLC_IPOL_NUMBER: '439'
-  MLC_IPOL_SRC_URL: http://www.ipol.im/pub/art/{{MLC_IPOL_YEAR}}/{{MLC_IPOL_NUMBER}}/{{MLC_IPOL_NUMBER}}-master.zip
-  MLC_IPOL_YEAR: '2022'
-extra_cache_tags_from_env:
-- env: MLC_IPOL_NUMBER
-  prefix: number-
-- env: MLC_IPOL_YEAR
-  prefix: year-
-input_description:
-  number:
-    desc: IPOL publication number
-  year: 
-    desc: IPOL publication year
-input_mapping:
-  number: MLC_IPOL_NUMBER
-  year: MLC_IPOL_YEAR
-new_env_keys:
-- MLC_IPOL_*
 tags:
 - get
 - ipol
 - journal
 - src
 - ipol-src
-uid: b6fd8213d03d4aa4
+
+# Cache
+cache: true
+extra_cache_tags_from_env:
+- env: MLC_IPOL_NUMBER
+  prefix: number-
+- env: MLC_IPOL_YEAR
+  prefix: year-
+
+# Environment
+env:
+  MLC_IPOL_NUMBER: '439'
+  MLC_IPOL_SRC_URL: http://www.ipol.im/pub/art/{{MLC_IPOL_YEAR}}/{{MLC_IPOL_NUMBER}}/{{MLC_IPOL_NUMBER}}-master.zip
+  MLC_IPOL_YEAR: '2022'
+new_env_keys:
+- MLC_IPOL_*
+
+# Input mapping
+input_mapping:
+  number: MLC_IPOL_NUMBER
+  year: MLC_IPOL_YEAR
+input_description:
+  number:
+    desc: IPOL publication number
+  year:
+    desc: IPOL publication year

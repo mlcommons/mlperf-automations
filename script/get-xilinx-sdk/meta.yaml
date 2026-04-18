@@ -1,25 +1,39 @@
 alias: get-xilinx-sdk
+uid: 76d4d1bd09df4490
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Detection or installation of tools and artifacts
-default_version: '2019.1'
-deps: []
-input_description: {}
-input_mapping:
-  input: MLC_XILINX_SDK_FILE_PATH
-new_env_keys:
-- MLC_XILINX_*
-- +PATH
-new_state_keys: []
-post_deps: []
-posthook_deps: []
 tags:
 - get
 - xilinx
 - sdk
-uid: 76d4d1bd09df4490
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_XILINX_*
+- +PATH
+new_state_keys: []
+
+# Input mapping
+input_mapping:
+  input: MLC_XILINX_SDK_FILE_PATH
+input_description: {}
+
+# Dependencies
+deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations: {}
+
+# Versions
+default_version: '2019.1'
 versions:
   '2019.1':
     env:

@@ -1,8 +1,33 @@
 alias: prepare-training-data-resnet
+uid: d42a8a8ca2704f9f
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLPerf Training
+tags:
+- prepare
+- mlperf
+- training
+- data
+- input
+- resnet
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_MLPERF_TRAINING_RESNET_*
+- MLC_MLPERF_TRAINING_NVIDIA_RESNET_PREPROCESSED_PATH
+new_state_keys: []
+
+# Input mapping
+input_mapping:
+  data_dir: MLC_DATA_DIR
+input_description: {}
+
+# Dependencies
 deps:
 - names:
   - imagenet-train
@@ -11,15 +36,6 @@ deps:
   - imagenet-val
   tags: get,dataset,imagenet,val,original,_full
 - tags: get,generic-sys-util,_rsync
-input_description: {}
-input_mapping:
-  data_dir: MLC_DATA_DIR
-new_env_keys:
-- MLC_MLPERF_TRAINING_RESNET_*
-- MLC_MLPERF_TRAINING_NVIDIA_RESNET_PREPROCESSED_PATH
-new_state_keys: []
-post_deps: []
-posthook_deps: []
 prehook_deps:
 - env:
     MLC_DOWNLOAD_CHECKSUM: ''
@@ -37,18 +53,11 @@ prehook_deps:
   extra_cache_tags: imagenet_to_gcs,script
   force_cache: true
   tags: download,file,_wget,_url.https://raw.githubusercontent.com/tensorflow/tpu/master/tools/datasets/imagenet_to_gcs.py
-tags:
-- prepare
-- mlperf
-- training
-- data
-- input
-- resnet
-uid: d42a8a8ca2704f9f
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations:
-  mxnet.#:
-    env:
-      MLC_MXNET_VERSION: '#'
   nvidia:
     default: true
     deps:
@@ -75,4 +84,9 @@ variations:
     env:
       MLC_TMP_VARIATION: reference
     group: implementation
+  mxnet.#:
+    env:
+      MLC_MXNET_VERSION: '#'
+
+# Versions
 versions: {}

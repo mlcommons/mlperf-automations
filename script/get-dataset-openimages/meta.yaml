@@ -1,34 +1,25 @@
 alias: get-dataset-openimages
+uid: 0a9d49b644cf4142
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
 category_sort: 8500
+tags:
+- get
+- dataset
+- openimages
+- open-images
+- object-detection
+- original
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_DATASET_CALIBRATION: 'no'
-deps:
-- names:
-  - python
-  - python3
-  tags: get,python3
-- tags: get,generic-python-lib,_requests
-- force_env_keys:
-  - MLC_GIT_*
-  names:
-  - inference-src
-  tags: mlperf,inference,source
-- tags: get,generic-python-lib,_boto3
-- tags: get,generic-python-lib,_tqdm
-- tags: get,generic-python-lib,_numpy
-- tags: get,generic-python-lib,_opencv-python
-- tags: get,generic-python-lib,_pandas
-  names:
-    - pandas
-  version_max: 2.9
-  version_max_usable: 2.3
-- names:
-  - pycocotools
-  tags: get,generic-python-lib,_pycocotools
 env:
   MLC_DATASET: OPENIMAGES
 new_env_keys:
@@ -46,29 +37,48 @@ new_env_keys:
 - MLC_OPENIMAGES_CALIBRATION_DATASET_PATH
 - MLC_DATASET_OPENIMAGES_ANNOTATIONS_DIR_PATH
 - MLC_DATASET_OPENIMAGES_VALIDATION_ANNOTATIONS_FILE_PATH
+
+# Dependencies
+deps:
+- names:
+  - python
+  - python3
+  tags: get,python3
+- tags: get,generic-python-lib,_requests
+- force_env_keys:
+  - MLC_GIT_*
+  names:
+  - inference-src
+  tags: mlperf,inference,source
+- tags: get,generic-python-lib,_boto3
+- tags: get,generic-python-lib,_tqdm
+- tags: get,generic-python-lib,_numpy
+- tags: get,generic-python-lib,_opencv-python
+- tags: get,generic-python-lib,_pandas
+  names:
+  - pandas
+  version_max: 2.9
+  version_max_usable: 2.3
+- names:
+  - pycocotools
+  tags: get,generic-python-lib,_pycocotools
 posthook_deps:
 - enable_if_env:
     MLC_DATASET_OPENIMAGES_CUSTOM_ANNOTATIONS:
     - 'yes'
   tags: get,openimages,annotations
-tags:
-- get
-- dataset
-- openimages
-- open-images
-- object-detection
-- original
-uid: 0a9d49b644cf4142
+
+# Variations
 variations:
-  '50':
+  custom-annotations:
+    env:
+      MLC_DATASET_OPENIMAGES_CUSTOM_ANNOTATIONS: 'yes'
+    group: annotations
+  default-annotations:
     default: true
     env:
-      MLC_DATASET_SIZE: '50'
-    group: size
-  '500':
-    env:
-      MLC_DATASET_SIZE: '500'
-    group: size
+      MLC_DATASET_OPENIMAGES_CUSTOM_ANNOTATIONS: 'no'
+    group: annotations
   calibration:
     deps:
     - names:
@@ -81,40 +91,6 @@ variations:
     - MLC_DATASET_CALIBRATION_ANNOTATIONS_FILE_PATH
     - MLC_CALIBRATION_DATASET_PATH
     - MLC_CALIBRATION_DATASET_PATH_ROOT
-  custom-annotations:
-    env:
-      MLC_DATASET_OPENIMAGES_CUSTOM_ANNOTATIONS: 'yes'
-    group: annotations
-  default-annotations:
-    default: true
-    env:
-      MLC_DATASET_OPENIMAGES_CUSTOM_ANNOTATIONS: 'no'
-    group: annotations
-  filter: {}
-  filter,calibration:
-    ad:
-      openimages-calibration:
-        tags: _filter
-  filter-size.#:
-    ad:
-      openimages-calibration:
-        tags: _filter-size.#
-  full:
-    env:
-      MLC_DATASET_SIZE: ''
-    group: size
-  size.#:
-    env:
-      MLC_DATASET_SIZE: '#'
-    group: size
-  using-fiftyone:
-    add_deps_recursive:
-      inference-src:
-        version: r2.1
-    deps:
-    - tags: get,generic-python-lib,_fiftyone
-    - tags: get,openssl,lib
-      version: 1.1.1
   validation:
     default: true
     env:
@@ -128,3 +104,37 @@ variations:
     - MLC_DATASET_ANNOTATIONS_DIR_PATH
     - MLC_DATASET_ANNOTATIONS_FILE_PATH
     - MLC_DATASET_VALIDATION_ANNOTATIONS_FILE_PATH
+  '50':
+    default: true
+    env:
+      MLC_DATASET_SIZE: '50'
+    group: size
+  '500':
+    env:
+      MLC_DATASET_SIZE: '500'
+    group: size
+  full:
+    env:
+      MLC_DATASET_SIZE: ''
+    group: size
+  size.#:
+    env:
+      MLC_DATASET_SIZE: '#'
+    group: size
+  filter: {}
+  filter,calibration:
+    ad:
+      openimages-calibration:
+        tags: _filter
+  filter-size.#:
+    ad:
+      openimages-calibration:
+        tags: _filter-size.#
+  using-fiftyone:
+    add_deps_recursive:
+      inference-src:
+        version: r2.1
+    deps:
+    - tags: get,generic-python-lib,_fiftyone
+    - tags: get,openssl,lib
+      version: 1.1.1

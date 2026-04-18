@@ -1,8 +1,21 @@
 alias: install-cuda-package-manager
+uid: c1afdff8542f45be
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: CUDA automation
+tags:
+- install
+- package-manager
+- cuda
+- package-manager-cuda
+- install-pm-cuda
+
+# Cache
+cache: true
+
+# Dependencies
 deps:
 - tags: detect,os
 post_deps:
@@ -10,10 +23,3 @@ post_deps:
     MLC_REQUIRE_INSTALL:
     - 'yes'
   tags: get,cuda
-tags:
-- install
-- package-manager
-- cuda
-- package-manager-cuda
-- install-pm-cuda
-uid: c1afdff8542f45be

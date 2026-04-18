@@ -1,10 +1,38 @@
 alias: get-mlperf-inference-sut-description
+uid: e49a3f758b2d4e7b
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: MLPerf Inference
+tags:
+- get
+- mlperf
+- sut
+- description
+- system-under-test
+- system-description
+
+# Cache
+cache: false
+
+# Environment
 default_env:
   MLC_SUT_DESC_CACHE: 'no'
+new_env_keys:
+- MLC_HW_*
+- MLC_SUT_*
+new_state_keys:
+- MLC_SUT_*
+- MLC_HW_*
+
+# Input mapping
+input_mapping:
+  memory: MLC_DETERMINE_MEMORY_CONFIGURATION
+  name: MLC_HW_NAME
+  submitter: MLC_MLPERF_SUBMITTER
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -38,27 +66,11 @@ deps:
   extra_cache_tags: mlperf,inference,sut,descriptions
   tags: get,cache,dir,_name.mlperf-inference-sut-descriptions
 posthook_deps:
-  - tags: parse,dmidecode,memory,info
-    enable_if_env:
-      MLC_MEMINFO_FILE:
-        - on
+- tags: parse,dmidecode,memory,info
+  enable_if_env:
+    MLC_MEMINFO_FILE:
+    - true
+
+# Docker / container
 docker:
   run: false
-input_mapping:
-  name: MLC_HW_NAME
-  submitter: MLC_MLPERF_SUBMITTER
-  memory: MLC_DETERMINE_MEMORY_CONFIGURATION
-new_env_keys:
-- MLC_HW_*
-- MLC_SUT_*
-new_state_keys:
-- MLC_SUT_*
-- MLC_HW_*
-tags:
-- get
-- mlperf
-- sut
-- description
-- system-under-test
-- system-description
-uid: e49a3f758b2d4e7b

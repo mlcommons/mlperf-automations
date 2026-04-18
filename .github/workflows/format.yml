@@ -10,19 +10,34 @@ env:
 
 jobs:
   format-code:
+    if: github.actor != 'mlc-automations' && github.repository_owner == 'mlcommons'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.MLC_AUTOMATIONS_APP_ID }}
+          private-key: ${{ secrets.MLC_AUTOMATIONS_PRIVATE_KEY }}
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Set up Python ${{ env.python_version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.python_version }}
+
+      - name: Lint MLC metas
+        run: |
+          pip install mlcflow
+          mlc lint script --all
+          git add -- '*/meta.yaml' '*/meta.yml' 2>/dev/null || true
 
       - name: Format modified Python files
         env:
@@ -56,9 +71,9 @@ jobs:
           HAS_CHANGES=$(git diff --staged --name-only)
           if [ ${#HAS_CHANGES} -gt 0 ]; then
             # Use the GitHub actor's name and email
-            git config --global user.name github-actions[bot]
-            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git config --global user.name mlc-automations
+            git config --global user.email "3246381+mlc-automations@users.noreply.github.com"
             # Commit changes
-            git commit -m '[Automated Commit] Format Codebase [skip ci]'
+            git commit -m '[Automated Commit] Format Codebase'
             git push 
           fi

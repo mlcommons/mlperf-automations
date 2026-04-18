@@ -1,26 +1,38 @@
 alias: get-javac
+uid: 509280c497b24226
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Detection or installation of tools and artifacts
+tags:
+- get
+- javac
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_JAVAC_PREBUILT_BUILD: '36'
   MLC_JAVAC_PREBUILT_FILENAME: openjdk-${MLC_JAVAC_PREBUILT_VERSION}+${MLC_JAVAC_PREBUILT_BUILD}_${MLC_JAVAC_PREBUILT_HOST_OS}-x64_bin
   MLC_JAVAC_PREBUILT_URL: https://download.java.net/openjdk/jdk${MLC_JAVAC_PREBUILT_VERSION}/ri/
   MLC_JAVAC_PREBUILT_VERSION: '19'
-deps:
-- tags: detect,os
-input_mapping:
-  install: MLC_JAVAC_PREBUILT_INSTALL
 new_env_keys:
 - MLC_JAVAC_*
 - MLC_JAVA_*
 - JAVA_HOME
 - +PATH
-tags:
-- get
-- javac
-uid: 509280c497b24226
+
+# Input mapping
+input_mapping:
+  install: MLC_JAVAC_PREBUILT_INSTALL
+
+# Dependencies
+deps:
+- tags: detect,os
+
+# Variations
 variations:
   install:
     env:

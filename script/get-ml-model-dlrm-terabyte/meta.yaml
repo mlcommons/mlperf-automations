@@ -1,8 +1,24 @@
 alias: get-ml-model-dlrm-terabyte
+uid: 8fa7582c603a4db3
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
+tags:
+- get
+- ml-model
+- dlrm
+- raw
+- terabyte
+- criteo-terabyte
+- criteo
+- recommendation
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_FILE_WITH_PATH
   MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_MODEL_FILE_WITH_PATH
@@ -10,12 +26,16 @@ env:
   MLC_ML_MODEL_DATASET: criteo-terabyte
   MLC_ML_MODEL_RETRAINING: 'no'
   MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'no'
+new_env_keys:
+- MLC_ML_MODEL_*
+
+# Input mapping
 input_mapping:
   dir: MLC_DOWNLOAD_PATH
   download_path: MLC_DOWNLOAD_PATH
   to: MLC_DOWNLOAD_PATH
-new_env_keys:
-- MLC_ML_MODEL_*
+
+# Dependencies
 prehook_deps:
 - env:
     MLC_DOWNLOAD_DOWNLOADED_FILENAME: <<<MLC_ML_MODEL_FILE>>>
@@ -26,26 +46,38 @@ prehook_deps:
   - dae
   tags: download-and-extract
   force_env_keys:
-    - MLC_OUTDIRNAME  
+  - MLC_OUTDIRNAME
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_PACKAGE_URL
-print_env_at_the_end:
-  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
-tags:
-- get
-- ml-model
-- dlrm
-- raw
-- terabyte
-- criteo-terabyte
-- criteo
-- recommendation
-uid: 8fa7582c603a4db3
+
+# Variations
 variations:
-  debug:
+  r2-downloader:
+    ad:
+      dae:
+        tags: _r2-downloader
+    group: download-tool
+  rclone:
+    ad:
+      dae:
+        tags: _rclone
+    group: download-tool
+  wget:
+    ad:
+      dae:
+        tags: _wget
+    group: download-tool
+  onnx:
     env:
-      MLC_ML_MODEL_DEBUG: 'yes'
+      MLC_ML_MODEL_FRAMEWORK: onnx
+    group: framework
+  pytorch:
+    default: true
+    env:
+      MLC_ML_MODEL_FRAMEWORK: pytorch
+      MLC_TMP_MODEL_ADDITIONAL_NAME: dlrm_terabyte.pytorch
+    group: framework
   fp32:
     default: true
     env:
@@ -53,10 +85,24 @@ variations:
       MLC_ML_MODEL_PRECISION: fp32
       MLC_ML_MODEL_WEIGHT_DATA_TYPES: fp32
     group: precision
-  onnx:
+  dry-run:
+    group: run-mode
     env:
-      MLC_ML_MODEL_FRAMEWORK: onnx
-    group: framework
+      MLC_DOWNLOAD_MODE: dry
+  weight_sharded:
+    default: true
+    env:
+      MLC_DLRM_MULTIHOT_MODEL: 'yes'
+    group: type
+  debug:
+    env:
+      MLC_ML_MODEL_DEBUG: 'yes'
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
   onnx,fp32:
     env:
       MLC_DOWNLOAD_CHECKSUM: 763b964eaffe5f86e92cdcb60c5dc0de
@@ -73,12 +119,6 @@ variations:
       MLC_ML_MODEL_FILE: tb0875_10M.onnx
       MLC_PACKAGE_URL: https://dlrm.s3-us-west-1.amazonaws.com/models/tb0875_10M.onnx.tar
       MLC_UNTAR: 'yes'
-  pytorch:
-    default: true
-    env:
-      MLC_ML_MODEL_FRAMEWORK: pytorch
-      MLC_TMP_MODEL_ADDITIONAL_NAME: dlrm_terabyte.pytorch
-    group: framework
   pytorch,fp32:
     env:
       MLC_DOWNLOAD_CHECKSUM: 2d49a5288cddb37c3c64860a06d79bb9
@@ -100,49 +140,25 @@ variations:
       MLC_ML_MODEL_DLRM_MAX_INDEX_RANGE: '40000000'
       MLC_ML_MODEL_FILE: model_weights
       MLC_TMP_MODEL_ADDITIONAL_NAME: ''
+  pytorch,fp32,weight_sharded,r2-downloader:
+    env:
+      MLC_PACKAGE_URL: https://inference.mlcommons-storage.org/metadata/dlrm-v2-model-weights.uri
   pytorch,fp32,weight_sharded,rclone:
     env:
       MLC_PACKAGE_URL: mlc-inference:mlcommons-inference-wg-public/model_weights
       MLC_RCLONE_CONFIG_NAME: mlc-inference
-  pytorch,fp32,weight_sharded,r2-downloader:
-    env:
-      MLC_PACKAGE_URL: https://inference.mlcommons-storage.org/metadata/dlrm-v2-model-weights.uri
   pytorch,fp32,weight_sharded,wget:
     env:
       MLC_DAE_EXTRACT_DOWNLOADED: 'yes'
       MLC_DOWNLOAD_FILENAME: download
       MLC_EXTRACT_UNZIP: 'yes'
       MLC_PACKAGE_URL: https://cloud.mlcommons.org/index.php/s/XzfSeLgW8FYfR3S/download
-  rclone:
-    ad:
-      dae:
-        tags: _rclone
-    group: download-tool
-  r2-downloader:
-    ad:
-      dae:
-        tags: _r2-downloader
-    group: download-tool
-  dry-run:
-    group: run-mode
-    env:
-      MLC_DOWNLOAD_MODE: dry
-  dry-run,rclone:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
-  dry-run,r2-downloader:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
-  weight_sharded:
-    default: true
-    env:
-      MLC_DLRM_MULTIHOT_MODEL: 'yes'
-    group: type
-  wget:
-    ad:
-      dae:
-        tags: _wget
-    group: download-tool
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
+
+# Tests
 tests:
   run_inputs:
   - variations_list:

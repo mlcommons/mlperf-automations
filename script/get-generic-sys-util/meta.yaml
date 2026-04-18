@@ -1,104 +1,41 @@
 alias: get-generic-sys-util
+uid: bb0393afa8404a11
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Detection or installation of tools and artifacts
-default_env:
-  MLC_CLEAN_DIRS: bin
-  MLC_SUDO: sudo
-deps:
-- tags: detect,os
-- tags: detect,sudo
-env:
-  MLC_GENERIC_SYS_UTIL_INSTALL_NEEDED: 'no'
-  MLC_SYS_UTIL_VERSION_CMD: ''
-input_mapping:
-  fail_safe: MLC_TMP_FAIL_SAFE
-  ignore_missing: MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE
-new_env_keys:
-- +PATH
 tags:
 - get
 - sys-util
 - generic
 - generic-sys-util
-tests:
-  run_inputs:
-  - docker: 'yes'
-    docker_os: rhel
-    docker_os_version: '9'
-    env:
-      MLC_TMP_FAIL_SAFE: 'yes'
-    ignore_missing: 'yes'
-    test-all-variations: 'yes'
-  - docker: 'yes'
-    docker_os: ubuntu
-    docker_os_version: '20.04'
-    fail_safe: 'yes'
-    ignore_missing: 'yes'
-    test-all-variations: 'yes'
-  - docker: 'yes'
-    docker_os: ubuntu
-    docker_os_version: '22.04'
-    fail_safe: 'yes'
-    ignore_missing: 'yes'
-    test-all-variations: 'yes'
-    docker_prune: 'yes'
-  - docker: 'yes'
-    docker_os: ubuntu
-    docker_os_version: '24.04'
-    fail_safe: 'yes'
-    ignore_missing: 'yes'
-    test-all-variations: 'yes'
-    docker_prune: 'yes'
-uid: bb0393afa8404a11
+
+# Cache
+cache: true
+
+# Environment
+default_env:
+  MLC_CLEAN_DIRS: bin
+  MLC_SUDO: sudo
+env:
+  MLC_GENERIC_SYS_UTIL_INSTALL_NEEDED: 'no'
+  MLC_SYS_UTIL_VERSION_CMD: ''
+new_env_keys:
+- +PATH
+
+# Input mapping
+input_mapping:
+  fail_safe: MLC_TMP_FAIL_SAFE
+  ignore_missing: MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: detect,sudo
+
+# Variations
 variations:
-  autoconf:
-    env:
-      MLC_SYS_UTIL_NAME: autoconf
-      MLC_SYS_UTIL_VERSION_CMD: autoconf --version
-      MLC_SYS_UTIL_VERSION_RE: autoconf \(.*\) ([\d.]+)
-      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 1
-    new_env_keys:
-    - MLC_AUTOCONF_VERSION
-    state:
-      autoconf:
-        apt: autoconf
-        brew: autoconf
-        dnf: autoconf
-        yum: autoconf
-  coreutils:
-    env:
-      MLC_SYS_UTIL_NAME: coreutils
-      MLC_SYS_UTIL_CHECK_CMD: 'gtimeout 1s ls' 
-    state:
-      coreutils:
-        brew: coreutils
-  build-essential:
-    env:
-      MLC_SYS_UTIL_NAME: build-essential
-      MLC_SYS_UTIL_VERSION_CMD: make --version
-      MLC_SYS_UTIL_VERSION_RE: GNU Make ([\d.]+)
-      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 1
-    new_env_keys:
-    - MLC_MAKE_VERSION
-    state:
-      build-essential:
-        apt: build-essential
-  cmake:
-    env:
-      MLC_SYS_UTIL_NAME: cmake
-      MLC_SYS_UTIL_VERSION_CMD: cmake --version
-      MLC_SYS_UTIL_VERSION_RE: cmake version ([\d.]+)
-      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 1
-    new_env_keys:
-    - MLC_CMAKE_VERSION
-    state:
-      cmake:
-        apt: cmake
-        brew: cmake
-        dnf: cmake
-        yum: cmake
   detect:
     default: true
     env:
@@ -116,6 +53,94 @@ variations:
       skip_inherit_variation_groups:
       - mode
       tags: get,generic-sys-util,_install
+  install:
+    env:
+      MLC_GENERIC_SYS_UTIL_RUN_MODE: install
+    group: mode
+    new_env_keys:
+    - MLC_TMP_GENERIC_SYS_UTIL_PACKAGE_INSTALL_IGNORED
+    - MLC_GET_GENERIC_SYS_UTIL_INSTALL_FAILED
+  autoconf:
+    env:
+      MLC_SYS_UTIL_NAME: autoconf
+      MLC_SYS_UTIL_VERSION_CMD: autoconf --version
+      MLC_SYS_UTIL_VERSION_RE: autoconf \(.*\) ([\d.]+)
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 1
+    new_env_keys:
+    - MLC_AUTOCONF_VERSION
+    state:
+      autoconf:
+        apt: autoconf
+        brew: autoconf
+        dnf: autoconf
+        yum: autoconf
+  build-essential:
+    env:
+      MLC_SYS_UTIL_NAME: build-essential
+      MLC_SYS_UTIL_VERSION_CMD: make --version
+      MLC_SYS_UTIL_VERSION_RE: GNU Make ([\d.]+)
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 1
+    new_env_keys:
+    - MLC_MAKE_VERSION
+    state:
+      build-essential:
+        apt: build-essential
+  bzip2:
+    env:
+      MLC_SYS_UTIL_NAME: bzip2
+      MLC_SYS_UTIL_VERSION_CMD_OVERRIDE: bzcat --version 2>&1 | grep bzip > tmp-ver.out
+      MLC_SYS_UTIL_VERSION_RE: ([0-9]+(\.[0-9]+)+)
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 1
+    new_env_keys:
+    - MLC_BZIP2_VERSION
+    state:
+      bzip2:
+        apt: bzip2
+        brew: bzip2
+        dnf: bzip2
+        yum: bzip2
+  ccache:
+    env:
+      MLC_SYS_UTIL_NAME: ccache
+      MLC_SYS_UTIL_VERSION_CMD: ccache --version
+      MLC_SYS_UTIL_VERSION_RE: ccache version ([0-9.]+)
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+    - MLC_CCACHE_VERSION
+    state:
+      ccache:
+        apt: ccache
+        brew: ccache
+        dnf: ccache
+        yum: ccache
+  cmake:
+    env:
+      MLC_SYS_UTIL_NAME: cmake
+      MLC_SYS_UTIL_VERSION_CMD: cmake --version
+      MLC_SYS_UTIL_VERSION_RE: cmake version ([\d.]+)
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 1
+    new_env_keys:
+    - MLC_CMAKE_VERSION
+    state:
+      cmake:
+        apt: cmake
+        brew: cmake
+        dnf: cmake
+        yum: cmake
+  coreutils:
+    env:
+      MLC_SYS_UTIL_NAME: coreutils
+      MLC_SYS_UTIL_CHECK_CMD: gtimeout 1s ls
+    state:
+      coreutils:
+        brew: coreutils
+  crossbuild-essential-arm64:
+    env:
+      MLC_SYS_UTIL_NAME: crossbuild-essential-arm64
+      MLC_SYS_UTIL_CHECK_CMD: command -v aarch64-linux-gnu-gcc >/dev/null 2>&1
+    state:
+      crossbuild-essential-arm64:
+        apt: crossbuild-essential-arm64
   dmidecode:
     env:
       MLC_SYS_UTIL_NAME: dmidecode
@@ -130,140 +155,32 @@ variations:
         brew: ''
         dnf: dmidecode
         yum: dmidecode
-  flex:
-    env:
-      MLC_SYS_UTIL_NAME: flex
-      MLC_SYS_UTIL_VERSION_CMD: flex --version # tbd: regular expression for version
-      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
-    new_env_keys:
-    - MLC_FLEX_VERSION
-    state:
-      flex: # tbd: complete for other flavours of linux
-        apt: flex
-        brew: flex
-        dnf: flex
-        yum: flex
-  
   ffmpeg:
     env:
       MLC_SYS_UTIL_NAME: ffmpeg
-      MLC_SYS_UTIL_VERSION_CMD: ffmpeg -version # tbd: regular expression for version
+      MLC_SYS_UTIL_VERSION_CMD: ffmpeg -version
       MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
     new_env_keys:
     - MLC_FFMPEG_VERSION
     state:
-      ffmpeg: # tbd: complete for other flavours of linux
+      ffmpeg:
         apt: ffmpeg
-        brew: ''
-        dnf: ''   
-        yum: ''
-  
-  ipmitool:
-    env:
-      MLC_SYS_UTIL_NAME: ipmitool
-      MLC_SYS_UTIL_VERSION_CMD: ipmitool -V
-      MLC_SYS_UTIL_VERSION_RE: 'ipmitool version ([\d.]+)'
-      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
-    new_env_keys:
-    - MLC_IPMITOOL_VERSION
-    state:
-      ipmitool: # tbd: complete for other flavours of linux
-        apt: ipmitool
-        brew: ''
-        dnf: ''   
-        yum: ''
-  
-  sox:
-    env:
-      MLC_SYS_UTIL_NAME: sox
-      MLC_SYS_UTIL_VERSION_CMD: sox --version
-      MLC_SYS_UTIL_VERSION_RE: 'SoX ([\d.]+)'
-      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
-    new_env_keys:
-    - MLC_SOX_VERSION
-    state:
-      sox: # tbd: complete for other flavours of linux
-        apt: sox
-        brew: sox
-        dnf: sox   
-        yum: ''
-  gfortran-12-aarch64-linux-gnu: 
-    env:
-      MLC_SYS_UTIL_NAME: gfortran-12-aarch64
-    state:
-      gfortran-12-aarch64: # tbd: complete for other flavours of linux
-        apt: gfortran-12-aarch64-linux-gnu
-
-  gfortran-aarch64-linux-gnu: 
-    env:
-      MLC_SYS_UTIL_NAME: gfortran-aarch64
-    state:
-      gfortran-aarch64: # tbd: complete for other flavours of linux
-        apt: gfortran-aarch64-linux-gnu
-  lcov:
-    env:
-      MLC_SYS_UTIL_NAME: lcov
-      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
-    new_env_keys:
-    - MLC_LCOV_VERSION
-    state:
-      lcov:
-        apt: lcov
-        brew: ''
-        dnf: ''   
-        yum: ''
-  libgl:
-    env:
-      MLC_SYS_UTIL_NAME: libgl # tbd: regular expression for version as well as whether its installed?
-      MLC_SYS_UTIL_CHECK_CMD: 'ldconfig -p | grep -i libgl.so.*' 
-    default_env:
-      MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: yes
-    new_env_keys:
-    - MLC_LIBGL_VERSION
-    state:
-      libgl: # tbd: complete for other flavours of linux
-        apt: libgl1
-        brew: ''
-        dnf: mesa-libGL   
-        yum: mesa-libGL
-  libgl1-mesa-glx:
-    env:
-      MLC_SYS_UTIL_NAME: libgl1-mesa-glx # tbd: regular expression for version as well as whether its installed?
-      MLC_SYS_UTIL_CHECK_CMD: 'ldconfig -p | grep -i libGLX_mesa.so.*' 
-    default_env:
-      MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: yes
-    new_env_keys:
-    - MLC_LIBGLX_VERSION
-    state:
-      libgl1-mesa-glx: # tbd: complete for other flavours of linux
-        apt: libgl1-mesa-glx
         brew: ''
         dnf: ''
         yum: ''
-  libsm6:
+  flex:
     env:
-      MLC_SYS_UTIL_NAME: libsm6 # tbd: regular expression for version as well as whether its installed?
+      MLC_SYS_UTIL_NAME: flex
+      MLC_SYS_UTIL_VERSION_CMD: flex --version
       MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
     new_env_keys:
-    - MLC_LIBSM6_VERSION
+    - MLC_FLEX_VERSION
     state:
-      libsm6: # tbd: complete for other flavours of linux
-        apt: libsm6
-        brew: ''
-        dnf: ''   
-        yum: ''
-  libxext6:
-    env:
-      MLC_SYS_UTIL_NAME: libxext6 # tbd: regular expression for version as well as whether its installed?
-      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
-    new_env_keys:
-    - MLC_LIBEXT6_VERSION
-    state:
-      libxext6: # tbd: complete for other flavours of linux
-        apt: libxext6
-        brew: ''
-        dnf: ''   
-        yum: ''
+      flex:
+        apt: flex
+        brew: flex
+        dnf: flex
+        yum: flex
   g++-11:
     env:
       MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE: 'yes'
@@ -335,6 +252,27 @@ variations:
         brew: gflags
         dnf: gflags-devel
         yum: gflags-devel
+  gfortran:
+    env:
+      MLC_SYS_UTIL_NAME: gfortran
+    state:
+      gfortran:
+        apt: gfortran
+        brew: gcc
+        dnf: gcc-gfortran
+        yum: gcc-gfortran
+  gfortran-12-aarch64-linux-gnu:
+    env:
+      MLC_SYS_UTIL_NAME: gfortran-12-aarch64
+    state:
+      gfortran-12-aarch64:
+        apt: gfortran-12-aarch64-linux-gnu
+  gfortran-aarch64-linux-gnu:
+    env:
+      MLC_SYS_UTIL_NAME: gfortran-aarch64
+    state:
+      gfortran-aarch64:
+        apt: gfortran-aarch64-linux-gnu
   git-lfs:
     env:
       MLC_SYS_UTIL_NAME: git-lfs
@@ -349,20 +287,6 @@ variations:
         brew: git-lfs
         dnf: git-lfs
         yum: git-lfs
-  ccache:
-    env:
-      MLC_SYS_UTIL_NAME: ccache
-      MLC_SYS_UTIL_VERSION_CMD: ccache --version
-      MLC_SYS_UTIL_VERSION_RE: "ccache version ([0-9.]+)"
-      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
-    new_env_keys:
-    - MLC_CCACHE_VERSION
-    state:
-      ccache:
-        apt: ccache
-        brew: ccache
-        dnf: ccache
-        yum: ccache
   glog-dev:
     env:
       MLC_SYS_UTIL_NAME: glog-dev
@@ -374,13 +298,47 @@ variations:
         brew: glog
         dnf: glog-devel
         yum: glog-devel
-  install:
+  ipmitool:
     env:
-      MLC_GENERIC_SYS_UTIL_RUN_MODE: install
-    group: mode
+      MLC_SYS_UTIL_NAME: ipmitool
+      MLC_SYS_UTIL_VERSION_CMD: ipmitool -V
+      MLC_SYS_UTIL_VERSION_RE: ipmitool version ([\d.]+)
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
     new_env_keys:
-    - MLC_TMP_GENERIC_SYS_UTIL_PACKAGE_INSTALL_IGNORED
-    - MLC_GET_GENERIC_SYS_UTIL_INSTALL_FAILED
+    - MLC_IPMITOOL_VERSION
+    state:
+      ipmitool:
+        apt: ipmitool
+        brew: ''
+        dnf: ''
+        yum: ''
+  jq:
+    env:
+      MLC_SYS_UTIL_NAME: jq
+      MLC_SYS_UTIL_VERSION_CMD: jq --version
+      MLC_SYS_UTIL_VERSION_RE: jq-([\d.]+)
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+    - MLC_JQ_VERSION
+    state:
+      jq:
+        apt: jq
+        brew: jq
+        dnf: jq
+        yum: jq
+        zypper: jq
+  lcov:
+    env:
+      MLC_SYS_UTIL_NAME: lcov
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+    - MLC_LCOV_VERSION
+    state:
+      lcov:
+        apt: lcov
+        brew: ''
+        dnf: ''
+        yum: ''
   libboost-all-dev:
     env:
       MLC_SYS_UTIL_NAME: libboost-all-dev
@@ -395,20 +353,6 @@ variations:
         brew: ''
         dnf: boost-devel
         yum: boost-devel
-  bzip2:
-    env:
-      MLC_SYS_UTIL_NAME: bzip2
-      MLC_SYS_UTIL_VERSION_CMD_OVERRIDE: bzcat --version 2>&1 | grep bzip > tmp-ver.out
-      MLC_SYS_UTIL_VERSION_RE: ([0-9]+(\.[0-9]+)+)
-      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 1
-    new_env_keys:
-    - MLC_BZIP2_VERSION
-    state:
-      bzip2:
-        apt: bzip2
-        brew: bzip2
-        dnf: bzip2
-        yum: bzip2
   libbz2-dev:
     env:
       MLC_SYS_UTIL_NAME: libbz2_dev
@@ -455,8 +399,7 @@ variations:
   libffi7:
     env:
       MLC_SYS_UTIL_NAME: libffi7
-      MLC_SYS_UTIL_VERSION_CMD: dpkg -l libffi7 2>/dev/null | grep '^ii' | awk '{print
-        $3}' || rpm -q libffi7 2>/dev/null || pacman -Q libffi7 2>/dev/null
+      MLC_SYS_UTIL_VERSION_CMD: dpkg -l libffi7 2>/dev/null | grep '^ii' | awk '{print $3}' || rpm -q libffi7 2>/dev/null || pacman -Q libffi7 2>/dev/null
       MLC_SYS_UTIL_VERSION_RE: \d\.\d-[0-9]+
       MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
     new_env_keys:
@@ -483,6 +426,34 @@ variations:
     state:
       libgdbm_dev:
         apt: libgdbm-dev
+  libgl:
+    env:
+      MLC_SYS_UTIL_NAME: libgl
+      MLC_SYS_UTIL_CHECK_CMD: ldconfig -p | grep -i libgl.so.*
+    default_env:
+      MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
+    new_env_keys:
+    - MLC_LIBGL_VERSION
+    state:
+      libgl:
+        apt: libgl1
+        brew: ''
+        dnf: mesa-libGL
+        yum: mesa-libGL
+  libgl1-mesa-glx:
+    env:
+      MLC_SYS_UTIL_NAME: libgl1-mesa-glx
+      MLC_SYS_UTIL_CHECK_CMD: ldconfig -p | grep -i libGLX_mesa.so.*
+    default_env:
+      MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
+    new_env_keys:
+    - MLC_LIBGLX_VERSION
+    state:
+      libgl1-mesa-glx:
+        apt: libgl1-mesa-glx
+        brew: ''
+        dnf: ''
+        yum: ''
   libgmock-dev:
     env:
       MLC_SYS_UTIL_NAME: libgmock-dev
@@ -553,6 +524,20 @@ variations:
         brew: ''
         dnf: numactl-libs
         yum: numactl-libs
+  libopenmpi-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libopenmpi-dev
+      MLC_SYS_UTIL_VERSION_CMD: dpkg -s libopenmpi-dev | grep 'Version'
+      MLC_SYS_UTIL_VERSION_RE: ([0-9]+(\.[0-9]+)+)
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 1
+    new_env_keys:
+    - MLC_LIBOPENMPI_DEV_VERSION
+    state:
+      libopenmpi-dev:
+        apt: libopenmpi-dev
+        brew: open-mpi
+        dnf: openmpi-devel
+        yum: openmpi-devel
   libpci-dev:
     env:
       MLC_SYS_UTIL_NAME: libpci-dev
@@ -596,6 +581,18 @@ variations:
         apt: libreadline-dev
         dnf: libreadline-devel
         yum: readline-devel
+  libsm6:
+    env:
+      MLC_SYS_UTIL_NAME: libsm6
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+    - MLC_LIBSM6_VERSION
+    state:
+      libsm6:
+        apt: libsm6
+        brew: ''
+        dnf: ''
+        yum: ''
   libsqlite3-dev:
     env:
       MLC_SYS_UTIL_NAME: libsqlite3_dev
@@ -629,6 +626,18 @@ variations:
         brew: ''
         dnf: libudev-devl
         yum: libudev-devel
+  libxext6:
+    env:
+      MLC_SYS_UTIL_NAME: libxext6
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+    - MLC_LIBEXT6_VERSION
+    state:
+      libxext6:
+        apt: libxext6
+        brew: ''
+        dnf: ''
+        yum: ''
   linux-tools:
     env:
       MLC_SYS_UTIL_NAME: linux-tools
@@ -648,17 +657,31 @@ variations:
       MLC_SYS_UTIL_VERSION_RE: \b(\d+\.\d+(?:\.\d+)?)\b
       MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
     update_meta_if_env:
-      - enable_if_env:
-          MLC_HOST_OS_FLAVOR:
-            - macos
-        env:
-          MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE: yes
+    - enable_if_env:
+        MLC_HOST_OS_FLAVOR:
+        - macos
+      env:
+        MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE: true
     new_env_keys:
     - MLC_MD5SHA1SUM_VERSION
     state:
       md5sha1sum:
         apt: ''
         brew: md5sha1sum
+  nasm:
+    env:
+      MLC_SYS_UTIL_NAME: nasm
+      MLC_SYS_UTIL_VERSION_CMD: nasm --version
+      MLC_SYS_UTIL_VERSION_RE: NASM version ([\d.]+)
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+    - MLC_NASM_VERSION
+    state:
+      nasm:
+        apt: nasm
+        brew: nasm
+        dnf: nasm
+        yum: nasm
   ninja-build:
     env:
       MLC_SYS_UTIL_NAME: ninja-build
@@ -694,27 +717,6 @@ variations:
         brew: ''
         dnf: ntpdate
         yum: ntpdate
-  nasm:
-    env:
-      MLC_SYS_UTIL_NAME: nasm
-      MLC_SYS_UTIL_VERSION_CMD: nasm --version
-      MLC_SYS_UTIL_VERSION_RE: NASM version ([\d.]+)
-      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
-    new_env_keys:
-    - MLC_NASM_VERSION
-    state:
-      nasm:
-        apt: nasm
-        brew: nasm
-        dnf: nasm
-        yum: nasm
-  crossbuild-essential-arm64:
-    env:
-      MLC_SYS_UTIL_NAME: crossbuild-essential-arm64
-      MLC_SYS_UTIL_CHECK_CMD: 'command -v aarch64-linux-gnu-gcc >/dev/null 2>&1'
-    state:
-      crossbuild-essential-arm64:
-        apt: crossbuild-essential-arm64
   numactl:
     deps:
     - enable_if_env:
@@ -727,7 +729,7 @@ variations:
       tags: install,numactl,from.src
     env:
       MLC_SYS_UTIL_NAME: numactl
-      MLC_SYS_UTIL_CHECK_CMD: 'numactl -s'
+      MLC_SYS_UTIL_CHECK_CMD: numactl -s
     new_env_keys:
     - MLC_NUMACTL_VERSION
     state:
@@ -825,21 +827,6 @@ variations:
         dnf: screen
         yum: screen
         zypper: rsync
-  jq:
-    env:
-      MLC_SYS_UTIL_NAME: jq
-      MLC_SYS_UTIL_VERSION_CMD: jq --version
-      MLC_SYS_UTIL_VERSION_RE: jq-([\d.]+)
-      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
-    new_env_keys:
-      - MLC_JQ_VERSION
-    state:
-      jq:
-        apt: jq
-        brew: jq
-        dnf: jq
-        yum: jq
-        zypper: jq
   sox:
     env:
       MLC_SYS_UTIL_NAME: sox
@@ -906,7 +893,6 @@ variations:
         dnf: unzip
         yum: unzip
         choco: unzip
-
   vim-common:
     env:
       MLC_SYS_UTIL_NAME: vim_common
@@ -993,3 +979,34 @@ variations:
         dnf: zlib-devel
         yum: zlib-devel
         zypper: zlib-devel
+
+# Tests
+tests:
+  run_inputs:
+  - docker: 'yes'
+    docker_os: rhel
+    docker_os_version: '9'
+    env:
+      MLC_TMP_FAIL_SAFE: 'yes'
+    ignore_missing: 'yes'
+    test-all-variations: 'yes'
+  - docker: 'yes'
+    docker_os: ubuntu
+    docker_os_version: '20.04'
+    fail_safe: 'yes'
+    ignore_missing: 'yes'
+    test-all-variations: 'yes'
+  - docker: 'yes'
+    docker_os: ubuntu
+    docker_os_version: '22.04'
+    fail_safe: 'yes'
+    ignore_missing: 'yes'
+    test-all-variations: 'yes'
+    docker_prune: 'yes'
+  - docker: 'yes'
+    docker_os: ubuntu
+    docker_os_version: '24.04'
+    fail_safe: 'yes'
+    ignore_missing: 'yes'
+    test-all-variations: 'yes'
+    docker_prune: 'yes'

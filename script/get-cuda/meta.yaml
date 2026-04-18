@@ -1,9 +1,10 @@
 alias: get-cuda
 uid: 46d133d9ef92422d
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
+# Metadata
+category: CUDA automation
 tags:
 - get
 - cuda
@@ -16,31 +17,13 @@ tags:
 - get-cuda
 - 46d133d9ef92422d
 
+# Cache
 cache: true
 
-category: CUDA automation
-
+# Environment
 default_env:
   MLC_CUDA_PATH_LIB_CUDNN_EXISTS: 'no'
   MLC_REQUIRE_INSTALL: 'no'
-
-deps:
-- tags: detect,os
-- enable_if_env:
-    MLC_CUDA_FULL_TOOLKIT_INSTALL:
-    - 'yes'
-    MLC_HOST_OS_TYPE:
-    - windows
-  names:
-  - compiler
-  tags: get,cl
-
-input_mapping:
-  cudnn_tar_file: MLC_CUDNN_TAR_FILE_PATH
-  cudnn_tar_path: MLC_CUDNN_TAR_FILE_PATH
-  skip_sudo: CUDA_SKIP_SUDO
-  skip_cudnn_install: MLC_CUDA_SKIP_CUDNN_INSTALL
-
 new_env_keys:
 - CUDA_HOME
 - CUDA_PATH
@@ -54,6 +37,24 @@ new_env_keys:
 - +DYLD_FALLBACK_LIBRARY_PATH
 - + LDFLAGS
 
+# Input mapping
+input_mapping:
+  cudnn_tar_file: MLC_CUDNN_TAR_FILE_PATH
+  cudnn_tar_path: MLC_CUDNN_TAR_FILE_PATH
+  skip_cudnn_install: MLC_CUDA_SKIP_CUDNN_INSTALL
+  skip_sudo: CUDA_SKIP_SUDO
+
+# Dependencies
+deps:
+- tags: detect,os
+- enable_if_env:
+    MLC_CUDA_FULL_TOOLKIT_INSTALL:
+    - 'yes'
+    MLC_HOST_OS_TYPE:
+    - windows
+  names:
+  - compiler
+  tags: get,cl
 prehook_deps:
 - enable_if_env:
     MLC_REQUIRE_INSTALL:
@@ -67,17 +68,21 @@ prehook_deps:
     - 'yes'
   tags: get,generic-sys-util,_nvidia-cuda-toolkit
 
-print_env_at_the_end:
-  MLC_CUDA_PATH_LIB_CUDNN_EXISTS: ''
-  MLC_CUDA_VERSION: ''
-  MLC_CUDA_VERSION_STRING: ''
-  MLC_NVCC_BIN_WITH_PATH: ''
-  CUDA_HOME: ''
-
-print_files_if_script_error:
-- tmp-ver.out
-
+# Variations
 variations:
+  lib-only:
+    env:
+      MLC_CUDA_FULL_TOOLKIT_INSTALL: 'no'
+      MLC_TMP_FILE_TO_CHECK_UNIX: libcudart.so
+      MLC_TMP_FILE_TO_CHECK_WINDOWS: libcudart.dll
+    group: installation-mode
+  toolkit:
+    default: true
+    env:
+      MLC_CUDA_FULL_TOOLKIT_INSTALL: 'yes'
+      MLC_TMP_FILE_TO_CHECK_UNIX: nvcc
+      MLC_TMP_FILE_TO_CHECK_WINDOWS: nvcc.exe
+    group: installation-mode
   cudnn:
     env:
       MLC_CUDA_NEEDS_CUDNN: 'yes'
@@ -87,24 +92,20 @@ variations:
       tags: get,nvidia,cudnn
       skip_if_env:
         MLC_CUDA_SKIP_CUDNN_INSTALL:
-          - yes
-
-  lib-only:
-    env:
-      MLC_CUDA_FULL_TOOLKIT_INSTALL: 'no'
-      MLC_TMP_FILE_TO_CHECK_UNIX: libcudart.so
-      MLC_TMP_FILE_TO_CHECK_WINDOWS: libcudart.dll
-    group: installation-mode
+        - true
   package-manager:
     env:
       MLC_CUDA_PACKAGE_MANAGER_INSTALL: 'yes'
   prebuilt:
     env:
       MLC_REQUIRE_INSTALL: 'yes'
-  toolkit:
-    default: true
-    env:
-      MLC_CUDA_FULL_TOOLKIT_INSTALL: 'yes'
-      MLC_TMP_FILE_TO_CHECK_UNIX: nvcc
-      MLC_TMP_FILE_TO_CHECK_WINDOWS: nvcc.exe
-    group: installation-mode
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_CUDA_PATH_LIB_CUDNN_EXISTS: ''
+  MLC_CUDA_VERSION: ''
+  MLC_CUDA_VERSION_STRING: ''
+  MLC_NVCC_BIN_WITH_PATH: ''
+  CUDA_HOME: ''
+print_files_if_script_error:
+- tmp-ver.out

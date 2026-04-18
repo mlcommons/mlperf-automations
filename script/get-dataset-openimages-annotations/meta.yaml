@@ -1,24 +1,10 @@
 alias: get-dataset-openimages-annotations
+uid: 47e2158ed24c44e9
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
-new_env_keys:
-- MLC_DATASET_OPENIMAGES_ANNOTATIONS_*
-- MLC_DATASET_ANNOTATIONS_*
-prehook_deps:
-- env:
-    MLC_DAE_FINAL_ENV_NAME: MLC_DATASET_ANNOTATIONS_FILE_PATH
-  extra_cache_tags: retinanet,get,dataset-openimages-annotations
-  force_cache: true
-  tags: download-and-extract,_wget,_extract
-  force_env_keys:
-    - MLC_OUTDIRNAME  
-  update_tags_from_env_with_prefix:
-    _url.:
-    - MLC_PACKAGE_URL
-print_env_at_the_end:
-  MLC_DATASET_ANNOTATIONS_FILE_PATH: Path to OpenImages annotation file
 tags:
 - get
 - aux
@@ -26,7 +12,29 @@ tags:
 - object-detection
 - openimages
 - annotations
-uid: 47e2158ed24c44e9
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_DATASET_OPENIMAGES_ANNOTATIONS_*
+- MLC_DATASET_ANNOTATIONS_*
+
+# Dependencies
+prehook_deps:
+- env:
+    MLC_DAE_FINAL_ENV_NAME: MLC_DATASET_ANNOTATIONS_FILE_PATH
+  extra_cache_tags: retinanet,get,dataset-openimages-annotations
+  force_cache: true
+  tags: download-and-extract,_wget,_extract
+  force_env_keys:
+  - MLC_OUTDIRNAME
+  update_tags_from_env_with_prefix:
+    _url.:
+    - MLC_PACKAGE_URL
+
+# Variations
 variations:
   from.github:
     default: true
@@ -35,3 +43,7 @@ variations:
       MLC_DOWNLOAD_FILENAME: openimages-mlperf_annotations_2.1.json.zip
       MLC_PACKAGE_URL: https://github.com/mlcommons/inference/releases/download/v2.1/openimages-mlperf_annotations_2.1.json.zip
     group: download-source
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_DATASET_ANNOTATIONS_FILE_PATH: Path to OpenImages annotation file

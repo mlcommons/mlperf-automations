@@ -1,17 +1,10 @@
 alias: wrapper-reproduce-octoml-tinyml-submission
+uid: b946001e289c4480
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: TinyML automation
-default_version: r1.0
-deps:
-- names:
-  - python
-  - python3
-  tags: get,python3
-env: {}
-input_mapping:
-  flash: MLC_FLASH_BOARD
-  recreate_binary: MLC_RECREATE_BINARY
 tags:
 - run
 - generate-tiny
@@ -23,6 +16,23 @@ tags:
 - mlcommons
 - mlperf
 - octoml
-uid: b946001e289c4480
+
+# Environment
+env: {}
+
+# Input mapping
+input_mapping:
+  flash: MLC_FLASH_BOARD
+  recreate_binary: MLC_RECREATE_BINARY
+
+# Dependencies
+deps:
+- names:
+  - python
+  - python3
+  tags: get,python3
+
+# Versions
+default_version: r1.0
 versions:
   r1.0: {}

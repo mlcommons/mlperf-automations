@@ -1,26 +1,36 @@
 alias: install-cmake-prebuilt
+uid: 5a39ef05992b4103
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Detection or installation of tools and artifacts
-default_version: 3.28.3
-deps:
-- tags: detect,os
-new_env_keys:
-- MLC_CMAKE_*
-- MLC_GET_DEPENDENT_CACHED_PATH
-- +PATH
-- +LD_LIBRARY_PATH
-- +C_INCLUDE_PATH
-post_deps:
-- skip_if_env:
-    MLC_REQUIRE_INSTALL:
-    - 'yes'
-  tags: get,cmake
 tags:
 - install
 - prebuilt
 - cmake
 - prebuilt-cmake
 - install-prebuilt-cmake
-uid: 5a39ef05992b4103
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_CMAKE_*
+- MLC_GET_DEPENDENT_CACHED_PATH
+- +PATH
+- +LD_LIBRARY_PATH
+- +C_INCLUDE_PATH
+
+# Dependencies
+deps:
+- tags: detect,os
+post_deps:
+- skip_if_env:
+    MLC_REQUIRE_INSTALL:
+    - 'yes'
+  tags: get,cmake
+
+# Versions
+default_version: 3.28.3

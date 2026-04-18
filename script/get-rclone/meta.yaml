@@ -1,24 +1,33 @@
 alias: get-rclone
+uid: 22ffb43c49c9419e
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Detection or installation of tools and artifacts
-default_version: 1.65.2
+tags:
+- get
+- rclone
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_RCLONE_CACHE_TAGS
+- MLC_RCLONE_BIN_WITH_PATH
+- MLC_RCLONE_VERSION
+- +PATH
+
+# Dependencies
 deps:
 - tags: detect,os
 - enable_if_env:
     MLC_HOST_OS_TYPE:
     - windows
   tags: get,sys-utils-min
-new_env_keys:
-- MLC_RCLONE_CACHE_TAGS
-- MLC_RCLONE_BIN_WITH_PATH
-- MLC_RCLONE_VERSION
-- +PATH
-tags:
-- get
-- rclone
-uid: 22ffb43c49c9419e
+
+# Variations
 variations:
   gdrive:
     env:
@@ -28,3 +37,6 @@ variations:
       MLC_RCLONE_SYSTEM: 'yes'
     warnings:
     - This MLC script will install rclone using sudo/brew!
+
+# Versions
+default_version: 1.65.2

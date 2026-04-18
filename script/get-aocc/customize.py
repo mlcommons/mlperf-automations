@@ -56,11 +56,13 @@ def preprocess(i):
                         env['MLC_AOCC_DIR_PATH'] = aocc_path
                         env['MLC_TMP_PATH'] = os.path.join(aocc_path, 'bin')
 
+        detect_version = True if 'MLC_AOCC_FORCE_VERSION' not in env else False
+
         r = i['automation'].find_artifact({'file_name': exe_c,
                                            'env': env,
                                            'os_info': os_info,
                                            'default_path_env_key': 'PATH',
-                                           'detect_version': True,
+                                           'detect_version': detect_version,
                                            'env_path_key': 'MLC_AOCC_BIN_WITH_PATH',
                                            'run_script_input': i['run_script_input'],
                                            'recursion_spaces': i['recursion_spaces']})
@@ -73,13 +75,19 @@ def preprocess(i):
 def detect_version(i):
     logger = i['automation'].logger
 
-    r = i['automation'].parse_version({'match_text': r'CLANG:\s(?:AOCC_)?([\d.]+(?:pre)?(?:[-_\w#]+)*(?:-Build#\d+)?|Unknown-Revision)(?=[ )])',
+    env = i['env']
+    if env.get('MLC_AOCC_FORCE_VERSION', '') != '':
+        version = env['MLC_AOCC_FORCE_VERSION']
+        env['MLC_AOCC_VERSION'] = version
+    else:
+
+        r = i['automation'].parse_version({'match_text': r'CLANG:\s(?:AOCC_)?([\d.]+(?:pre)?(?:[-_\w#]+)*(?:-Build#\d+)?|Unknown-Revision)(?=[ )])',
                                        'group_number': 1,
                                        'env_key': 'MLC_AOCC_VERSION',
                                        'which_env': i['env']})
-    if r['return'] > 0:
-        return r
-    version = r['version']
+        if r['return'] > 0:
+            return r
+        version = r['version']
 
     logger.info(
         f"{i['recursion_spaces']}    Detected version: {version}")

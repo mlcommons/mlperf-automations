@@ -1,8 +1,24 @@
 alias: get-ml-model-bert-large-squad
+uid: 5e865dbdc65949d2
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
+tags:
+- get
+- ml-model
+- raw
+- bert
+- bert-large
+- bert-squad
+- language
+- language-processing
+
+# Cache
+cache: true
+
+# Environment
 env:
   MLC_ML_MODEL: BERT
   MLC_ML_MODEL_DATASET: squad-1.1
@@ -11,10 +27,8 @@ env:
   MLC_ML_MODEL_STARTING_WEIGHTS_FILENAME: <<<MLC_PACKAGE_URL>>>
 new_env_keys:
 - MLC_ML_MODEL*
-post_deps:
-- tags: get,dataset-aux,squad-vocab
-  force_env_keys:
-    - MLC_OUTDIRNAME
+
+# Dependencies
 prehook_deps:
 - env:
     MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_FILE_WITH_PATH
@@ -28,22 +42,16 @@ prehook_deps:
     - 'yes'
   tags: download-and-extract
   force_env_keys:
-    - MLC_OUTDIRNAME  
+  - MLC_OUTDIRNAME
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_PACKAGE_URL
-print_env_at_the_end:
-  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
-tags:
-- get
-- ml-model
-- raw
-- bert
-- bert-large
-- bert-squad
-- language
-- language-processing
-uid: 5e865dbdc65949d2
+post_deps:
+- tags: get,dataset-aux,squad-vocab
+  force_env_keys:
+  - MLC_OUTDIRNAME
+
+# Variations
 variations:
   amazon-s3:
     group: download-source
@@ -52,6 +60,10 @@ variations:
   custom-url.#:
     env:
       MLC_PACKAGE_URL: '#'
+    group: download-source
+  github:
+    group: download-source
+  zenodo:
     group: download-source
   deepsparse:
     default_variations:
@@ -64,26 +76,6 @@ variations:
       MLC_ML_MODEL_OUTPUT_END_LOGITS_NAME: output_end_logits
       MLC_ML_MODEL_OUTPUT_START_LOGITS_NAME: output_start_logits
     group: framework
-  deepsparse,int8:
-    env:
-      MLC_DAE_EXTRACT_DOWNLOADED: 'yes'
-      MLC_ML_MODEL_F1: '90.21282641816266'
-      MLC_ML_MODEL_FILE: oBERT-Large_95sparse_block4_qat.onnx
-  deepsparse,int8,github:
-    env:
-      MLC_PACKAGE_URL: https://github.com/mlcommons/inference_results_v2.1/raw/master/open/NeuralMagic/code/bert/deepsparse/models/oBERT-Large_95sparse_block4_qat.onnx.tar.xz
-  fp32:
-    default: true
-    env:
-      MLC_ML_MODEL_PRECISION: fp32
-    group: precision
-  github:
-    group: download-source
-  int8:
-    env:
-      MLC_ML_MODEL_PRECISION: int8
-      MLC_ML_MODEL_QUANTIZED: 'yes'
-    group: precision
   onnx:
     default: true
     default_variations:
@@ -96,32 +88,28 @@ variations:
       MLC_ML_MODEL_OUTPUT_END_LOGITS_NAME: output_end_logits
       MLC_ML_MODEL_OUTPUT_START_LOGITS_NAME: output_start_logits
     group: framework
-  onnx,fp32:
+  pytorch:
+    default_variations:
+      download-source: armi
     env:
-      MLC_DOWNLOAD_CHECKSUM: 819b25b19cd8e59080c10892689750ca
-      MLC_ML_MODEL_F1: '90.874'
-  onnx,fp32,armi:
+      MLC_ML_MODEL_FRAMEWORK: pytorch
+      MLC_ML_MODEL_INPUT_IDS_NAME: input_ids
+      MLC_ML_MODEL_INPUT_MASK_NAME: input_mask
+      MLC_ML_MODEL_INPUT_SEGMENTS_NAME: segment_ids
+      MLC_ML_MODEL_OUTPUT_END_LOGITS_NAME: output_end_logits
+      MLC_ML_MODEL_OUTPUT_START_LOGITS_NAME: output_start_logits
+    group: framework
+  tf:
+    default_variations:
+      download-source: zenodo
     env:
-      MLC_PACKAGE_URL: https://armi.in/files/model.onnx
-      MLC_PACKAGE_URL1: https://zenodo.org/record/3733910/files/model.onnx
-  onnx,fp32,zenodo:
-    env:
-      MLC_PACKAGE_URL: https://zenodo.org/record/3733910/files/model.onnx
-  onnx,int8:
-    env:
-      MLC_DOWNLOAD_CHECKSUM: 45f88ffb2915362242703c85c38ec2d4
-      MLC_ML_MODEL_F1: '90.067'
-      MLC_PACKAGE_URL: https://armi.in/files/bert_large_v1_1_fake_quant.onnx
-      MLC_PACKAGE_URL1: https://zenodo.org/record/3750364/files/bert_large_v1_1_fake_quant.onnx
-  onnx,int8,amazon-s3:
-    env:
-      MLC_PACKAGE_URL: https://mlperf-public.s3.us-west-2.amazonaws.com/bert_large_v1_1_fake_quant.onnx
-  onnx,int8,zenodo:
-    env:
-      MLC_PACKAGE_URL: https://zenodo.org/record/3750364/files/bert_large_v1_1_fake_quant.onnx
-  onnxruntime:
-    base:
-    - onnx
+      MLC_ML_MODEL_FRAMEWORK: tf
+      MLC_ML_MODEL_INPUT_IDS_NAME: input_ids
+      MLC_ML_MODEL_INPUT_MASK_NAME: input_mask
+      MLC_ML_MODEL_INPUT_SEGMENTS_NAME: segment_ids
+      MLC_ML_MODEL_OUTPUT_END_LOGITS_NAME: output_end_logits
+      MLC_ML_MODEL_OUTPUT_START_LOGITS_NAME: output_start_logits
+    group: framework
   packed:
     deps:
     - names:
@@ -207,17 +195,55 @@ variations:
       extra_cache_tags: bert,checkpoint,converter,code,bert-large
       force_cache: true
       tags: download,file,_wget,_url.https://raw.githubusercontent.com/krai/axs2kilt/main/model_onnx_bert_large_packed_recipe/convert_model.py
-  pytorch:
-    default_variations:
-      download-source: armi
+  unpacked:
+    default: true
     env:
-      MLC_ML_MODEL_FRAMEWORK: pytorch
-      MLC_ML_MODEL_INPUT_IDS_NAME: input_ids
-      MLC_ML_MODEL_INPUT_MASK_NAME: input_mask
-      MLC_ML_MODEL_INPUT_SEGMENTS_NAME: segment_ids
-      MLC_ML_MODEL_OUTPUT_END_LOGITS_NAME: output_end_logits
-      MLC_ML_MODEL_OUTPUT_START_LOGITS_NAME: output_start_logits
-    group: framework
+      MLC_ML_MODEL_BERT_PACKED: 'no'
+    group: packing
+  fp32:
+    default: true
+    env:
+      MLC_ML_MODEL_PRECISION: fp32
+    group: precision
+  int8:
+    env:
+      MLC_ML_MODEL_PRECISION: int8
+      MLC_ML_MODEL_QUANTIZED: 'yes'
+    group: precision
+  deepsparse,int8:
+    env:
+      MLC_DAE_EXTRACT_DOWNLOADED: 'yes'
+      MLC_ML_MODEL_F1: '90.21282641816266'
+      MLC_ML_MODEL_FILE: oBERT-Large_95sparse_block4_qat.onnx
+  deepsparse,int8,github:
+    env:
+      MLC_PACKAGE_URL: https://github.com/mlcommons/inference_results_v2.1/raw/master/open/NeuralMagic/code/bert/deepsparse/models/oBERT-Large_95sparse_block4_qat.onnx.tar.xz
+  onnx,fp32:
+    env:
+      MLC_DOWNLOAD_CHECKSUM: 819b25b19cd8e59080c10892689750ca
+      MLC_ML_MODEL_F1: '90.874'
+  onnx,fp32,armi:
+    env:
+      MLC_PACKAGE_URL: https://armi.in/files/model.onnx
+      MLC_PACKAGE_URL1: https://zenodo.org/record/3733910/files/model.onnx
+  onnx,fp32,zenodo:
+    env:
+      MLC_PACKAGE_URL: https://zenodo.org/record/3733910/files/model.onnx
+  onnx,int8:
+    env:
+      MLC_DOWNLOAD_CHECKSUM: 45f88ffb2915362242703c85c38ec2d4
+      MLC_ML_MODEL_F1: '90.067'
+      MLC_PACKAGE_URL: https://armi.in/files/bert_large_v1_1_fake_quant.onnx
+      MLC_PACKAGE_URL1: https://zenodo.org/record/3750364/files/bert_large_v1_1_fake_quant.onnx
+  onnx,int8,amazon-s3:
+    env:
+      MLC_PACKAGE_URL: https://mlperf-public.s3.us-west-2.amazonaws.com/bert_large_v1_1_fake_quant.onnx
+  onnx,int8,zenodo:
+    env:
+      MLC_PACKAGE_URL: https://zenodo.org/record/3750364/files/bert_large_v1_1_fake_quant.onnx
+  onnxruntime:
+    base:
+    - onnx
   pytorch,fp32:
     env:
       MLC_DOWNLOAD_CHECKSUM: 00fbcbfaebfa20d87ac9885120a6e9b4
@@ -243,17 +269,6 @@ variations:
   tensorflow:
     base:
     - tf
-  tf:
-    default_variations:
-      download-source: zenodo
-    env:
-      MLC_ML_MODEL_FRAMEWORK: tf
-      MLC_ML_MODEL_INPUT_IDS_NAME: input_ids
-      MLC_ML_MODEL_INPUT_MASK_NAME: input_mask
-      MLC_ML_MODEL_INPUT_SEGMENTS_NAME: segment_ids
-      MLC_ML_MODEL_OUTPUT_END_LOGITS_NAME: output_end_logits
-      MLC_ML_MODEL_OUTPUT_START_LOGITS_NAME: output_start_logits
-    group: framework
   tf,fp32:
     env:
       MLC_DOWNLOAD_CHECKSUM: dd72de12e8226f25f0128a1a864b97ad
@@ -261,10 +276,7 @@ variations:
   tf,fp32,zenodo:
     env:
       MLC_PACKAGE_URL: https://zenodo.org/record/3939747/files/model.pb
-  unpacked:
-    default: true
-    env:
-      MLC_ML_MODEL_BERT_PACKED: 'no'
-    group: packing
-  zenodo:
-    group: download-source
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model

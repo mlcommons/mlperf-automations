@@ -1,12 +1,10 @@
 alias: get-dataset-cifar10
+uid: 2f0c0bb3663b4ed7
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
-deps:
-- tags: detect,os
-new_env_keys:
-- MLC_DATASET_*
 tags:
 - get
 - dataset
@@ -14,7 +12,19 @@ tags:
 - image-classification
 - validation
 - training
-uid: 2f0c0bb3663b4ed7
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_DATASET_*
+
+# Dependencies
+deps:
+- tags: detect,os
+
+# Variations
 variations:
   python:
     default: true

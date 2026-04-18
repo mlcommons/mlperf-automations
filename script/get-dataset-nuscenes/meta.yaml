@@ -1,45 +1,53 @@
 alias: get-dataset-nuscenes
+uid: ec2a0842c9a644f5
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 tags:
 - get
 - dataset
 - nuscenes
-uid: ec2a0842c9a644f5
+
+# Cache
+cache: true
+
+# Environment
 new_env_keys:
-  - MLC_DATASET_NUSCENES_PATH
+- MLC_DATASET_NUSCENES_PATH
+
+# Variations
 variations:
   mlc:
     group: download-src
     default: true
     prehook_deps:
-      - tags: get,rclone
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-      - tags: get,rclone-config,_waymo
-        force_cache: true
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-      - enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - 'yes'
-        env:
-          MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_NUSCENES_PATH
-          MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_NUSCENES_PATH
-          MLC_DOWNLOAD_URL: mlc-nuscenes:nuscenes_dataset
-        extra_cache_tags: nuscenes,dataset
-        force_cache: true
-        names:
-          - dae
-        tags: download-and-extract
-        force_env_keys:
-          - MLC_OUTDIRNAME  
-        update_tags_from_env_with_prefix:
-          _url.:
-            - MLC_DOWNLOAD_URL
+    - tags: get,rclone
+      enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+    - tags: get,rclone-config,_waymo
+      force_cache: true
+      enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      env:
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_NUSCENES_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_NUSCENES_PATH
+        MLC_DOWNLOAD_URL: mlc-nuscenes:nuscenes_dataset
+      extra_cache_tags: nuscenes,dataset
+      force_cache: true
+      names:
+      - dae
+      tags: download-and-extract
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
     env:
       MLC_DOWNLOAD_SRC: mlcommons
   rclone:

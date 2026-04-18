@@ -1,23 +1,31 @@
 alias: run-mlperf-power-client
+uid: bf6a6d0cc97b48ae
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: MLPerf Inference
+tags:
+- run
+- mlc
+- mlcommons
+- mlperf
+- power
+- client
+- power-client
+
+# Cache
+cache: false
 clean_files: []
+
+# Environment
 default_env:
   MLC_MLPERF_POWER_LOG_DIR: logs
   MLC_MLPERF_POWER_NTP_SERVER: time.google.com
   MLC_MLPERF_POWER_SERVER_ADDRESS: localhost
   MLC_MLPERF_RUN_CMD: ''
-deps:
-- names:
-  - python
-  - python3
-  tags: get,python3
-- names:
-  - power-src
-  tags: get,mlperf,power,src
-- tags: get,generic-sys-util,_ntpdate
+
+# Input mapping
 input_mapping:
   loadgen_logs_dir: MLC_MLPERF_LOADGEN_LOGS_DIR
   log_dir: MLC_MLPERF_POWER_LOG_DIR
@@ -30,12 +38,14 @@ input_mapping:
   server: MLC_MLPERF_POWER_SERVER_ADDRESS
   server_port: MLC_MLPERF_POWER_SERVER_PORT
   timestamp: MLC_MLPERF_POWER_TIMESTAMP
-tags:
-- run
-- mlc
-- mlcommons
-- mlperf
-- power
-- client
-- power-client
-uid: bf6a6d0cc97b48ae
+
+# Dependencies
+deps:
+- names:
+  - python
+  - python3
+  tags: get,python3
+- names:
+  - power-src
+  tags: get,mlperf,power,src
+- tags: get,generic-sys-util,_ntpdate

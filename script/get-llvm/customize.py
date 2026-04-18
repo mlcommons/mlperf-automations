@@ -28,11 +28,15 @@ def preprocess(i):
                         env['MLC_LLVM_DIR_PATH'] = llvm_path
                         env['MLC_TMP_PATH'] = os.path.join(llvm_path, 'bin')
 
+        detect_version = True if 'MLC_LLVM_FORCE_VERSION' not in env else False
+
+
         r = i['automation'].find_artifact({'file_name': file_name_c,
                                            'env': env,
                                            'os_info': os_info,
                                            'default_path_env_key': 'PATH',
-                                           'detect_version': True,
+                                           'detect_version': detect_version,
+                                           'force_given_path': env.get('MLC_TMP_LLVM_FORCE_GIVEN_PATH', False),
                                            'env_path_key': 'MLC_LLVM_CLANG_BIN_WITH_PATH',
                                            'run_script_input': i['run_script_input'],
                                            'recursion_spaces': recursion_spaces})
@@ -43,20 +47,27 @@ def preprocess(i):
             else:
                 return r
 
+
     return {'return': 0}
 
 
 def detect_version(i):
 
-    r = i['automation'].parse_version({'match_text': r'clang version\s+([\w.]+)(?:.*?\s([0-9a-f]{8})[0-9a-f]{0,32})?',
+    env = i['env']
+    if env.get('MLC_LLVM_FORCE_VERSION', '') != '':
+        version = env['MLC_LLVM_FORCE_VERSION']
+        env['MLC_LLVM_CLANG_VERSION'] = version
+    else:
+        r = i['automation'].parse_version({'match_text': r'clang version\s+([\w.]+)(?:.*?\s([0-9a-f]{8})[0-9a-f]{0,32})?',
                                        'group_number': 1,
                                        'group_number_extra': 2,
                                        'env_key': 'MLC_LLVM_CLANG_VERSION',
                                        'which_env': i['env']})
-    if r['return'] > 0:
-        return r
+        if r['return'] > 0:
+            return r
 
-    version = r['version']
+        version = r['version']
+    
     logger = i['automation'].logger
 
     logger.info(

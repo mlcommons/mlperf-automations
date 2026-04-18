@@ -1,23 +1,10 @@
 alias: get-dataset-kits19
+uid: 79992bb221024ac5
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
-default_env:
-  MLC_GIT_CHECKOUT: master
-  MLC_GIT_DEPTH: --depth 2
-  MLC_GIT_PATCH: 'no'
-  MLC_GIT_RECURSE_SUBMODULES: ''
-  MLC_GIT_URL: https://github.com/neheller/kits19
-default_version: master
-deps:
-- tags: detect,os
-- names:
-  - python3
-  - python
-  tags: get,python3
-new_env_keys:
-- MLC_DATASET_*
 tags:
 - get
 - dataset
@@ -25,7 +12,29 @@ tags:
 - kits
 - original
 - kits19
-uid: 79992bb221024ac5
+
+# Cache
+cache: true
+
+# Environment
+default_env:
+  MLC_GIT_CHECKOUT: master
+  MLC_GIT_DEPTH: --depth 2
+  MLC_GIT_PATCH: 'no'
+  MLC_GIT_RECURSE_SUBMODULES: ''
+  MLC_GIT_URL: https://github.com/neheller/kits19
+new_env_keys:
+- MLC_DATASET_*
+
+# Dependencies
+deps:
+- tags: detect,os
+- names:
+  - python3
+  - python
+  tags: get,python3
+
+# Variations
 variations:
   calibration:
     env:
@@ -50,6 +59,9 @@ variations:
   validation:
     env:
       MLC_DATASET_VALIDATION: 'yes'
+
+# Versions
+default_version: master
 versions:
   custom:
     env:

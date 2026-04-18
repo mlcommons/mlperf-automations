@@ -1,17 +1,27 @@
 alias: get-dataset-waymo-calibration
+uid: 59d3a8d48d5e4767
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
-input_mapping:
-  waymo_calibration_path: MLC_DATASET_WAYMO_CALIBRATION_PATH
-new_env_keys:
-- MLC_DATASET_WAYMO_CALIBRATION_PATH
+
+# Metadata
 tags:
 - get
 - waymo
 - dataset
 - calibration
-uid: 59d3a8d48d5e4767
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_DATASET_WAYMO_CALIBRATION_PATH
+
+# Input mapping
+input_mapping:
+  waymo_calibration_path: MLC_DATASET_WAYMO_CALIBRATION_PATH
+
+# Variations
 variations:
   kitti_format:
     default: true
@@ -25,60 +35,62 @@ variations:
     group: download-src
     prehook_deps:
     - enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - 'yes'
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
       env:
         MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_WAYMO_CALIBRATION_PATH
         MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_WAYMO_CALIBRATION_PATH
       extra_cache_tags: waymo,dataset
       force_cache: true
       names:
-        - dae-waymo-calib
+      - dae-waymo-calib
       tags: download-and-extract
       force_env_keys:
-        - MLC_OUTDIRNAME  
+      - MLC_OUTDIRNAME
       update_tags_from_env_with_prefix:
         _url.:
-          - MLC_DOWNLOAD_URL
-  rclone:
-    group: download-tool
-    add_deps_recursive:
-      dae-waymo-calib:
-        tags: _rclone
-    prehook_deps:
-      - enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - true
-        tags: get,rclone
-      - enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - true
-        force_cache: true
-        tags: get,rclone-config,_waymo
-  rclone,mlc:
-    env:
-      MLC_DOWNLOAD_URL: mlc_waymo:waymo_preprocessed_dataset/kitti_format/testing
+        - MLC_DOWNLOAD_URL
   r2-downloader:
     group: download-tool
     add_deps_recursive:
       dae-waymo-calib:
         tags: _r2-downloader
     default: true
-  r2-downloader,mlc:
-    env:
-      MLC_DOWNLOAD_URL: https://waymo.mlcommons-storage.org/metadata/calibration-dataset.uri
-      MLC_DOWNLOAD_FILENAME: calibration-dataset
+  rclone:
+    group: download-tool
+    add_deps_recursive:
+      dae-waymo-calib:
+        tags: _rclone
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+      tags: get,rclone
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+      force_cache: true
+      tags: get,rclone-config,_waymo
   dry-run:
     group: run-mode
     env:
       MLC_DOWNLOAD_MODE: dry
-      MLC_BYPASS_RCLONE_AUTH: True
-  dry-run,rclone:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+      MLC_BYPASS_RCLONE_AUTH: true
   dry-run,r2-downloader:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  dry-run,rclone:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
+  r2-downloader,mlc:
+    env:
+      MLC_DOWNLOAD_URL: https://waymo.mlcommons-storage.org/metadata/calibration-dataset.uri
+      MLC_DOWNLOAD_FILENAME: calibration-dataset
+  rclone,mlc:
+    env:
+      MLC_DOWNLOAD_URL: mlc_waymo:waymo_preprocessed_dataset/kitti_format/testing
+
+# Tests
 tests:
   needs_pat: true
   run_inputs:

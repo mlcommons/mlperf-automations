@@ -1,21 +1,10 @@
 alias: get-mlperf-inference-results-dir
+uid: 84f3c5aad5e1444b
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLPerf Inference
-deps: []
-docker:
-  run: false
-input_description: {}
-input_mapping:
-  results_dir: MLC_MLPERF_INFERENCE_RESULTS_DIR
-new_env_keys:
-- MLC_MLPERF_INFERENCE_RESULTS_DIR
-- MLC_MLPERF_INFERENCE_RESULTS_VERSION
-new_state_keys: []
-post_deps: []
-posthook_deps: []
-prehook_deps: []
 tags:
 - get
 - mlperf
@@ -24,10 +13,29 @@ tags:
 - results
 - dir
 - directory
-uid: 84f3c5aad5e1444b
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_MLPERF_INFERENCE_RESULTS_DIR
+- MLC_MLPERF_INFERENCE_RESULTS_VERSION
+new_state_keys: []
+
+# Input mapping
+input_mapping:
+  results_dir: MLC_MLPERF_INFERENCE_RESULTS_DIR
+input_description: {}
+
+# Dependencies
+deps: []
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations:
-  path.#:
-    MLC_MLPERF_INFERENCE_RESULTS_DIR: '#'
   version.#:
     env:
       MLC_MLPERF_INFERENCE_RESULTS_VERSION: '#'
@@ -41,4 +49,12 @@ variations:
     env:
       MLC_MLPERF_INFERENCE_RESULTS_VERSION: 4_1-dev
     group: version
+  path.#:
+    MLC_MLPERF_INFERENCE_RESULTS_DIR: '#'
+
+# Versions
 versions: {}
+
+# Docker / container
+docker:
+  run: false

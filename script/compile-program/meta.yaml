@@ -1,17 +1,10 @@
 alias: compile-program
+uid: c05042ba005a4bfa
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: DevOps automation
-clean_files:
-- tmp-run.out
-default_env:
-  SKIP_RECOMPILE: 'no'
-deps:
-- tags: detect,cpu
-- names:
-  - compiler
-  tags: get,compiler
-- tags: get,compiler-flags
 tags:
 - compile
 - program
@@ -20,4 +13,19 @@ tags:
 - compile-program
 - compile-c-program
 - compile-cpp-program
-uid: c05042ba005a4bfa
+
+# Cache
+clean_files:
+- tmp-run.out
+
+# Environment
+default_env:
+  SKIP_RECOMPILE: 'no'
+
+# Dependencies
+deps:
+- tags: detect,cpu
+- names:
+  - compiler
+  tags: get,compiler
+- tags: get,compiler-flags

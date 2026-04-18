@@ -1,8 +1,32 @@
 alias: get-qaic-software-kit
+uid: 3344655922694bbb
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML frameworks
+tags:
+- get
+- qaic
+- software
+- kit
+- qaic-software-kit
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- +PATH
+- MLC_QAIC_SOFTWARE_KIT_PATH
+- MLC_QAIC_RUNNER_PATH
+new_state_keys: []
+
+# Input mapping
+input_mapping: {}
+input_description: {}
+
+# Dependencies
 deps:
 - extra_cache_tags: qaic-software-git-repo,qaic-software,qaic,software,kit
   names:
@@ -23,27 +47,12 @@ deps:
 - names:
   - compiler
   tags: get,compiler
-input_description: {}
-input_mapping: {}
-new_env_keys:
-- +PATH
-- MLC_QAIC_SOFTWARE_KIT_PATH
-- MLC_QAIC_RUNNER_PATH
-new_state_keys: []
-post_deps: []
-posthook_deps: []
 prehook_deps: []
-tags:
-- get
-- qaic
-- software
-- kit
-- qaic-software-kit
-uid: 3344655922694bbb
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations:
-  branch.#:
-    env:
-      MLC_GIT_CHECKOUT: '#'
   repo.#:
     env:
       MLC_GIT_URL: '#'
@@ -53,4 +62,9 @@ variations:
     env:
       MLC_GIT_URL: https://github.com/quic/software-kit-for-qualcomm-cloud-ai-100
     group: repo-source
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+
+# Versions
 versions: {}

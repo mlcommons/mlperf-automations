@@ -1,143 +1,145 @@
-uid: c3eff27c791048aa
 alias: run-vllm-server
-
+uid: c3eff27c791048aa
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
-cache: false
-
+# Metadata
 category: DevOps automation
-
 tags:
 - run
 - server
 - vllm
 - vllm-server
 
+# Cache
+cache: false
+
+# Input mapping
 input_mapping:
-  model: MLC_VLLM_SERVER_MODEL_NAME
-  tp_size: MLC_VLLM_SERVER_TP_SIZE
-  pp_size: MLC_VLLM_SERVER_PP_SIZE
-  distributed-executor-backend: MLC_VLLM_SERVER_DIST_EXEC_BACKEND
-  api_key: MLC_VLLM_SERVER_API_KEY
-  skip_docker_model_download: MLC_VLLM_SKIP_DOCKER_MODEL_DOWNLOAD
-  host: MLC_VLLM_SERVER_HOST
-  port: MLC_VLLM_SERVER_PORT
-  uvicorn_log_level: MLC_VLLM_SERVER_UVICORN_LOG_LEVEL
   allow_credentials: MLC_VLLM_SERVER_ALLOW_CREDENTIALS
-  allowed_origins: MLC_VLLM_SERVER_ALLOWED_ORIGINS
-  allowed_methods: MLC_VLLM_SERVER_ALLOWED_METHODS
   allowed_headers: MLC_VLLM_SERVER_ALLOWED_HEADERS
-  lora_modules: MLC_VLLM_SERVER_LORA_MODULES
-  prompt_adapters: MLC_VLLM_SERVER_PROMPT_ADAPTERS
-  chat_template: MLC_VLLM_SERVER_CHAT_TEMPLATE
-  response_role: MLC_VLLM_SERVER_RESPONSE_ROLE
-  ssl_keyfile: MLC_VLLM_SERVER_SSL_KEYFILE
-  ssl_certfile: MLC_VLLM_SERVER_SSL_CERTFILE
-  ssl_ca_certs: MLC_VLLM_SERVER_SSL_CA_CERTS
-  ssl_cert_reqs: MLC_VLLM_SERVER_SSL_CERT_REQS
-  root_path: MLC_VLLM_SERVER_ROOT_PATH
-  middleware: MLC_VLLM_SERVER_MIDDLEWARE
-  tokenizer: MLC_VLLM_SERVER_TOKENIZER
-  skip_tokenizer_init: MLC_VLLM_SERVER_SKIP_TOKENIZER_INIT
-  revision: MLC_VLLM_SERVER_REVISION
-  code_revision: MLC_VLLM_SERVER_CODE_REVISION
-  tokenizer_revision: MLC_VLLM_SERVER_TOKENIZER_REVISION
-  tokenizer_mode: MLC_VLLM_SERVER_TOKENIZER_MODE
-  trust_remote_code: MLC_VLLM_SERVER_TRUST_REMOTE_CODE
-  download_dir: MLC_VLLM_SERVER_DOWNLOAD_DIR
-  load_format: MLC_VLLM_SERVER_LOAD_FORMAT
-  dtype: MLC_VLLM_SERVER_DTYPE
-  kv_cache_dtype: MLC_VLLM_SERVER_KV_CACHE_DTYPE
-  quantization_param_path: MLC_VLLM_SERVER_QUANTIZATION_PARAM_PATH
-  max_model_len: MLC_VLLM_SERVER_MAX_MODEL_LEN
-  guided_decoding_backend: MLC_VLLM_SERVER_GUIDED_DECODING_BACKEND
-  worker_use_ray: MLC_VLLM_SERVER_WORKER_USE_RAY
-  pipeline_parallel_size: MLC_VLLM_SERVER_PIPELINE_PARALLEL_SIZE
-  max_parallel_loading_workers: MLC_VLLM_SERVER_MAX_PARALLEL_LOADING_WORKERS
-  ray_workers_use_nsight: MLC_VLLM_SERVER_RAY_WORKERS_USE_NSIGHT
+  allowed_methods: MLC_VLLM_SERVER_ALLOWED_METHODS
+  allowed_origins: MLC_VLLM_SERVER_ALLOWED_ORIGINS
+  api_key: MLC_VLLM_SERVER_API_KEY
   block_size: MLC_VLLM_SERVER_BLOCK_SIZE
-  enable_prefix_caching: MLC_VLLM_SERVER_ENABLE_PREFIX_CACHING
+  chat_template: MLC_VLLM_SERVER_CHAT_TEMPLATE
+  code_revision: MLC_VLLM_SERVER_CODE_REVISION
+  device: MLC_VLLM_SERVER_DEVICE
+  disable_custom_all_reduce: MLC_VLLM_SERVER_DISABLE_CUSTOM_ALL_REDUCE
+  disable_log_requests: MLC_VLLM_SERVER_DISABLE_LOG_REQUESTS
+  disable_log_stats: MLC_VLLM_SERVER_DISABLE_LOG_STATS
   disable_sliding_window: MLC_VLLM_SERVER_DISABLE_SLIDING_WINDOW
-  use_v2_block_manager: MLC_VLLM_SERVER_USE_V2_BLOCK_MANAGER
-  num_lookahead_slots: MLC_VLLM_SERVER_NUM_LOOKAHEAD_SLOTS
-  seed: MLC_VLLM_SERVER_SEED
-  swap_space: MLC_VLLM_SERVER_SWAP_SPACE
+  distributed-executor-backend: MLC_VLLM_SERVER_DIST_EXEC_BACKEND
+  download_dir: MLC_VLLM_SERVER_DOWNLOAD_DIR
+  dtype: MLC_VLLM_SERVER_DTYPE
+  enable_chunked_prefill: MLC_VLLM_SERVER_ENABLE_CHUNKED_PREFILL
+  enable_lora: MLC_VLLM_SERVER_ENABLE_LORA
+  enable_prefix_caching: MLC_VLLM_SERVER_ENABLE_PREFIX_CACHING
+  enable_prompt_adapter: MLC_VLLM_SERVER_ENABLE_PROMPT_ADAPTER
+  enforce_eager: MLC_VLLM_SERVER_ENFORCE_EAGER
+  engine_use_ray: MLC_VLLM_SERVER_ENGINE_USE_RAY
+  fully_sharded_loras: MLC_VLLM_SERVER_FULLY_SHARDED_LORAS
   gpu_memory_utilization: MLC_VLLM_SERVER_GPU_MEMORY_UTILIZATION
-  num_gpu_blocks_override: MLC_VLLM_SERVER_NUM_GPU_BLOCKS_OVERRIDE
+  guided_decoding_backend: MLC_VLLM_SERVER_GUIDED_DECODING_BACKEND
+  host: MLC_VLLM_SERVER_HOST
+  kv_cache_dtype: MLC_VLLM_SERVER_KV_CACHE_DTYPE
+  load_format: MLC_VLLM_SERVER_LOAD_FORMAT
+  long_lora_scaling_factors: MLC_VLLM_SERVER_LONG_LORA_SCALING_FACTORS
+  lora_dtype: MLC_VLLM_SERVER_LORA_DTYPE
+  lora_extra_vocab_size: MLC_VLLM_SERVER_LORA_EXTRA_VOCAB_SIZE
+  lora_modules: MLC_VLLM_SERVER_LORA_MODULES
+  max_context_len_to_capture: MLC_VLLM_SERVER_MAX_CONTEXT_LEN_TO_CAPTURE
+  max_cpu_loras: MLC_VLLM_SERVER_MAX_CPU_LORAS
+  max_log_len: MLC_VLLM_SERVER_MAX_LOG_LEN
+  max_logprobs: MLC_VLLM_SERVER_MAX_LOGPROBS
+  max_lora_rank: MLC_VLLM_SERVER_MAX_LORA_RANK
+  max_loras: MLC_VLLM_SERVER_MAX_LORAS
+  max_model_len: MLC_VLLM_SERVER_MAX_MODEL_LEN
   max_num_batched_tokens: MLC_VLLM_SERVER_MAX_NUM_BATCHED_TOKENS
   max_num_seqs: MLC_VLLM_SERVER_MAX_NUM_SEQS
-  max_logprobs: MLC_VLLM_SERVER_MAX_LOGPROBS
-  disable_log_stats: MLC_VLLM_SERVER_DISABLE_LOG_STATS
-  quantization: MLC_VLLM_SERVER_QUANTIZATION
-  rope_scaling: MLC_VLLM_SERVER_ROPE_SCALING
-  rope_theta: MLC_VLLM_SERVER_ROPE_THETA
-  enforce_eager: MLC_VLLM_SERVER_ENFORCE_EAGER
-  max_context_len_to_capture: MLC_VLLM_SERVER_MAX_CONTEXT_LEN_TO_CAPTURE
-  max_seq_len_to_capture: MLC_VLLM_SERVER_MAX_SEQ_LEN_TO_CAPTURE
-  disable_custom_all_reduce: MLC_VLLM_SERVER_DISABLE_CUSTOM_ALL_REDUCE
-  tokenizer_pool_size: MLC_VLLM_SERVER_TOKENIZER_POOL_SIZE
-  tokenizer_pool_type: MLC_VLLM_SERVER_TOKENIZER_POOL_TYPE
-  tokenizer_pool_extra_config: MLC_VLLM_SERVER_TOKENIZER_POOL_EXTRA_CONFIG
-  enable_lora: MLC_VLLM_SERVER_ENABLE_LORA
-  max_loras: MLC_VLLM_SERVER_MAX_LORAS
-  max_lora_rank: MLC_VLLM_SERVER_MAX_LORA_RANK
-  lora_extra_vocab_size: MLC_VLLM_SERVER_LORA_EXTRA_VOCAB_SIZE
-  lora_dtype: MLC_VLLM_SERVER_LORA_DTYPE
-  long_lora_scaling_factors: MLC_VLLM_SERVER_LONG_LORA_SCALING_FACTORS
-  max_cpu_loras: MLC_VLLM_SERVER_MAX_CPU_LORAS
-  fully_sharded_loras: MLC_VLLM_SERVER_FULLY_SHARDED_LORAS
-  enable_prompt_adapter: MLC_VLLM_SERVER_ENABLE_PROMPT_ADAPTER
-  max_prompt_adapters: MLC_VLLM_SERVER_MAX_PROMPT_ADAPTERS
+  max_parallel_loading_workers: MLC_VLLM_SERVER_MAX_PARALLEL_LOADING_WORKERS
   max_prompt_adapter_token: MLC_VLLM_SERVER_MAX_PROMPT_ADAPTER_TOKEN
-  device: MLC_VLLM_SERVER_DEVICE
-  scheduler_delay_factor: MLC_VLLM_SERVER_SCHEDULER_DELAY_FACTOR
-  enable_chunked_prefill: MLC_VLLM_SERVER_ENABLE_CHUNKED_PREFILL
-  speculative_model: MLC_VLLM_SERVER_SPECULATIVE_MODEL
-  num_speculative_tokens: MLC_VLLM_SERVER_NUM_SPECULATIVE_TOKENS
-  speculative_draft_tensor_parallel_size: MLC_VLLM_SERVER_SPECULATIVE_DRAFT_TENSOR_PARALLEL_SIZE
-  speculative_max_model_len: MLC_VLLM_SERVER_SPECULATIVE_MAX_MODEL_LEN
-  speculative_disable_by_batch_size: MLC_VLLM_SERVER_SPECULATIVE_DISABLE_BY_BATCH_SIZE
+  max_prompt_adapters: MLC_VLLM_SERVER_MAX_PROMPT_ADAPTERS
+  max_seq_len_to_capture: MLC_VLLM_SERVER_MAX_SEQ_LEN_TO_CAPTURE
+  middleware: MLC_VLLM_SERVER_MIDDLEWARE
+  model: MLC_VLLM_SERVER_MODEL_NAME
+  model_loader_extra_config: MLC_VLLM_SERVER_MODEL_LOADER_EXTRA_CONFIG
   ngram_prompt_lookup_max: MLC_VLLM_SERVER_NGRAM_PROMPT_LOOKUP_MAX
   ngram_prompt_lookup_min: MLC_VLLM_SERVER_NGRAM_PROMPT_LOOKUP_MIN
-  spec_decoding_acceptance_method: MLC_VLLM_SERVER_SPEC_DECODING_ACCEPTANCE_METHOD
-  typical_acceptance_sampler_posterior_threshold: MLC_VLLM_SERVER_TYPICAL_ACCEPTANCE_SAMPLER_POSTERIOR_THRESHOLD
-  typical_acceptance_sampler_posterior_alpha: MLC_VLLM_SERVER_TYPICAL_ACCEPTANCE_SAMPLER_POSTERIOR_ALPHA
-  model_loader_extra_config: MLC_VLLM_SERVER_MODEL_LOADER_EXTRA_CONFIG
-  preemption_mode: MLC_VLLM_SERVER_PREEMPTION_MODE
-  served_model_name: MLC_VLLM_SERVER_SERVED_MODEL_NAME
-  qlora_adapter_name_or_path: MLC_VLLM_SERVER_QLORA_ADAPTER_NAME_OR_PATH
+  num_gpu_blocks_override: MLC_VLLM_SERVER_NUM_GPU_BLOCKS_OVERRIDE
+  num_lookahead_slots: MLC_VLLM_SERVER_NUM_LOOKAHEAD_SLOTS
+  num_speculative_tokens: MLC_VLLM_SERVER_NUM_SPECULATIVE_TOKENS
   otlp_traces_endpoint: MLC_VLLM_SERVER_OTLP_TRACES_ENDPOINT
-  engine_use_ray: MLC_VLLM_SERVER_ENGINE_USE_RAY
-  disable_log_requests: MLC_VLLM_SERVER_DISABLE_LOG_REQUESTS
-  max_log_len: MLC_VLLM_SERVER_MAX_LOG_LEN
+  pipeline_parallel_size: MLC_VLLM_SERVER_PIPELINE_PARALLEL_SIZE
+  port: MLC_VLLM_SERVER_PORT
+  pp_size: MLC_VLLM_SERVER_PP_SIZE
+  preemption_mode: MLC_VLLM_SERVER_PREEMPTION_MODE
+  prompt_adapters: MLC_VLLM_SERVER_PROMPT_ADAPTERS
+  qlora_adapter_name_or_path: MLC_VLLM_SERVER_QLORA_ADAPTER_NAME_OR_PATH
+  quantization: MLC_VLLM_SERVER_QUANTIZATION
+  quantization_param_path: MLC_VLLM_SERVER_QUANTIZATION_PARAM_PATH
+  ray_workers_use_nsight: MLC_VLLM_SERVER_RAY_WORKERS_USE_NSIGHT
+  response_role: MLC_VLLM_SERVER_RESPONSE_ROLE
+  revision: MLC_VLLM_SERVER_REVISION
+  root_path: MLC_VLLM_SERVER_ROOT_PATH
+  rope_scaling: MLC_VLLM_SERVER_ROPE_SCALING
+  rope_theta: MLC_VLLM_SERVER_ROPE_THETA
+  scheduler_delay_factor: MLC_VLLM_SERVER_SCHEDULER_DELAY_FACTOR
+  seed: MLC_VLLM_SERVER_SEED
+  served_model_name: MLC_VLLM_SERVER_SERVED_MODEL_NAME
+  skip_docker_model_download: MLC_VLLM_SKIP_DOCKER_MODEL_DOWNLOAD
+  skip_tokenizer_init: MLC_VLLM_SERVER_SKIP_TOKENIZER_INIT
+  spec_decoding_acceptance_method: MLC_VLLM_SERVER_SPEC_DECODING_ACCEPTANCE_METHOD
+  speculative_disable_by_batch_size: MLC_VLLM_SERVER_SPECULATIVE_DISABLE_BY_BATCH_SIZE
+  speculative_draft_tensor_parallel_size: MLC_VLLM_SERVER_SPECULATIVE_DRAFT_TENSOR_PARALLEL_SIZE
+  speculative_max_model_len: MLC_VLLM_SERVER_SPECULATIVE_MAX_MODEL_LEN
+  speculative_model: MLC_VLLM_SERVER_SPECULATIVE_MODEL
+  ssl_ca_certs: MLC_VLLM_SERVER_SSL_CA_CERTS
+  ssl_cert_reqs: MLC_VLLM_SERVER_SSL_CERT_REQS
+  ssl_certfile: MLC_VLLM_SERVER_SSL_CERTFILE
+  ssl_keyfile: MLC_VLLM_SERVER_SSL_KEYFILE
+  swap_space: MLC_VLLM_SERVER_SWAP_SPACE
+  tokenizer: MLC_VLLM_SERVER_TOKENIZER
+  tokenizer_mode: MLC_VLLM_SERVER_TOKENIZER_MODE
+  tokenizer_pool_extra_config: MLC_VLLM_SERVER_TOKENIZER_POOL_EXTRA_CONFIG
+  tokenizer_pool_size: MLC_VLLM_SERVER_TOKENIZER_POOL_SIZE
+  tokenizer_pool_type: MLC_VLLM_SERVER_TOKENIZER_POOL_TYPE
+  tokenizer_revision: MLC_VLLM_SERVER_TOKENIZER_REVISION
+  tp_size: MLC_VLLM_SERVER_TP_SIZE
+  trust_remote_code: MLC_VLLM_SERVER_TRUST_REMOTE_CODE
+  typical_acceptance_sampler_posterior_alpha: MLC_VLLM_SERVER_TYPICAL_ACCEPTANCE_SAMPLER_POSTERIOR_ALPHA
+  typical_acceptance_sampler_posterior_threshold: MLC_VLLM_SERVER_TYPICAL_ACCEPTANCE_SAMPLER_POSTERIOR_THRESHOLD
+  use_v2_block_manager: MLC_VLLM_SERVER_USE_V2_BLOCK_MANAGER
+  uvicorn_log_level: MLC_VLLM_SERVER_UVICORN_LOG_LEVEL
+  worker_use_ray: MLC_VLLM_SERVER_WORKER_USE_RAY
 
+# Dependencies
 deps:
-  - tags: get,python3,get-python3
-    version_max: "3.11.999"
-    version_max_usable: "3.11.0"    
- 
-  - tags: get,cuda,_cudnn
-    names:
-      - cuda
+- tags: get,python3,get-python3
+  version_max: 3.11.999
+  version_max_usable: 3.11.0
+- tags: get,cuda,_cudnn
+  names:
+  - cuda
+- tags: get,ml-model,huggingface,zoo,_clone-repo
+  update_tags_from_env_with_prefix:
+    _model-stub.:
+    - MLC_VLLM_SERVER_MODEL_NAME
+  enable_if_env:
+    MLC_VLLM_SERVER_MODEL_NAME:
+    - true
+  skip_if_env:
+    MLC_VLLM_SKIP_DOCKER_MODEL_DOWNLOAD:
+    - true
+- tags: get,generic-python-lib,_package.vllm
 
-  - tags: get,ml-model,huggingface,zoo,_clone-repo
-    update_tags_from_env_with_prefix:
-      _model-stub.:
-      - MLC_VLLM_SERVER_MODEL_NAME
-    enable_if_env:
-      MLC_VLLM_SERVER_MODEL_NAME: [ on ]
-    skip_if_env:
-      MLC_VLLM_SKIP_DOCKER_MODEL_DOWNLOAD: [ on ]
-  
-  - tags: get,generic-python-lib,_package.vllm
-
+# Docker / container
 docker:
   port_maps:
-    - "8000:8000"
+  - 8000:8000
   base_image: nvcr.io/nvidia/pytorch:24.06-py3
-  interactive: True
+  interactive: true
   extra_run_args: ' --ulimit memlock=-1'
   all_gpus: 'yes'
-  os: "ubuntu"
-  os_version: "22.04"
+  os: ubuntu
+  os_version: '22.04'

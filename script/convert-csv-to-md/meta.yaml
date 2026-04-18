@@ -1,8 +1,30 @@
 alias: convert-csv-to-md
+uid: 200a95b80bee4a25
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: DevOps automation
+tags:
+- csv-to-md
+- convert
+- to-md
+- from-csv
+
+# Cache
+cache: false
+
+# Environment
+new_env_keys: []
+new_state_keys: []
+
+# Input mapping
+input_mapping:
+  csv_file: MLC_CSV_FILE
+  md_file: MLC_MD_FILE
+input_description: {}
+
+# Dependencies
 deps:
 - names:
   - python, python3
@@ -14,20 +36,12 @@ deps:
 - names:
   - tabulate
   tags: get,generic-python-lib,_package.tabulate
-input_description: {}
-input_mapping:
-  csv_file: MLC_CSV_FILE
-  md_file: MLC_MD_FILE
-new_env_keys: []
-new_state_keys: []
-post_deps: []
-posthook_deps: []
 prehook_deps: []
-tags:
-- csv-to-md
-- convert
-- to-md
-- from-csv
-uid: 200a95b80bee4a25
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations: {}
+
+# Versions
 versions: {}

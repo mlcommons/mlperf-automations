@@ -1,25 +1,37 @@
 alias: get-java
+uid: 9399d0e785704f8c
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Detection or installation of tools and artifacts
+tags:
+- get
+- java
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_JAVA_PREBUILT_BUILD: '36'
   MLC_JAVA_PREBUILT_FILENAME: openjdk-${MLC_JAVA_PREBUILT_VERSION}+${MLC_JAVA_PREBUILT_BUILD}_${MLC_JAVA_PREBUILT_HOST_OS}-x64_bin
   MLC_JAVA_PREBUILT_URL: https://download.java.net/openjdk/jdk${MLC_JAVA_PREBUILT_VERSION}/ri/
   MLC_JAVA_PREBUILT_VERSION: '19'
-deps:
-- tags: detect,os
-input_mapping:
-  install: MLC_JAVA_PREBUILT_INSTALL
 new_env_keys:
 - MLC_JAVA_*
 - JAVA_HOME
 - +PATH
-tags:
-- get
-- java
-uid: 9399d0e785704f8c
+
+# Input mapping
+input_mapping:
+  install: MLC_JAVA_PREBUILT_INSTALL
+
+# Dependencies
+deps:
+- tags: detect,os
+
+# Variations
 variations:
   install:
     env:

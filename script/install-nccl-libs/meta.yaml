@@ -1,13 +1,19 @@
 alias: install-nccl-libs
+uid: d1c76da2adb44201
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 tags:
 - install
 - nccl
 - libs
-uid: d1c76da2adb44201
+
+# Cache
+cache: false
+
+# Variations
 variations:
   cuda:
     deps:
-      - tags: get,cuda
+    - tags: get,cuda

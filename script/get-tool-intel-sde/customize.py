@@ -61,6 +61,7 @@ def postprocess(i):
     r = detect_version(i)
     if r['return'] > 0:
         return r
+    version = r['version']
 
     env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_INTEL_SDE_BIN_WITH_PATH']
     if '+PATH' not in env:
@@ -68,4 +69,4 @@ def postprocess(i):
 
     os_info = i['os_info']
 
-    return {'return': 0}
+    return {'return': 0, 'version': version}

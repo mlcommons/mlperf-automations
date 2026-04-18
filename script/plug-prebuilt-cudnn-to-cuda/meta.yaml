@@ -1,44 +1,38 @@
 alias: plug-prebuilt-cudnn-to-cuda
 uid: 894452315a3247ef
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
+# Metadata
+category: CUDA automation
 tags:
-  - plug
-  - prebuilt-cudnn
-  - to-cuda
+- plug
+- prebuilt-cudnn
+- to-cuda
 
+# Cache
 cache: true
 
-category: CUDA automation
-
+# Environment
 default_env:
   MLC_SUDO: sudo
+new_env_keys:
+- MLC_CUDNN_*
 
-default_version: 9.3.0
-
-deps:
-  - tags: detect,os
-  - tags: detect,cpu
-  - tags: get,cuda
-
-docker:
-  run: true
-
+# Input mapping
+input_mapping:
+  skip_sudo: CUDA_SKIP_SUDO
+  tar_file: MLC_CUDNN_TAR_FILE_PATH
 input_description:
   tar_file:
     desc: Full path to the cuDNN Tar file downloaded from Nvidia website (https://developer.nvidia.com/cudnn)
 
-input_mapping:
-  tar_file: MLC_CUDNN_TAR_FILE_PATH
-  skip_sudo: CUDA_SKIP_SUDO
-
-new_env_keys:
-- MLC_CUDNN_*
-
+# Dependencies
+deps:
+- tags: detect,os
+- tags: detect,cpu
+- tags: get,cuda
 prehook_deps:
-#- tags: get,generic-sys-util,_xz
 - tags: download,file
   env:
     MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_CUDNN_TAR_FILE_PATH
@@ -48,13 +42,19 @@ prehook_deps:
   - download-script
   skip_if_env:
     MLC_CUDNN_TAR_FILE_PATH:
-      - True
+    - true
   update_tags_from_env_with_prefix:
     _url.:
     - WGET_URL
 
+# Versions
+default_version: 9.3.0
 versions:
   9.3.0:
     env:
       MLC_CUDNN_TAR_FILE_NAME_TEMPLATE: cudnn-linux-x86_64-9.3.0.75_cuda{{CUDA_MAJOR_VERSION}}-archive.tar.xz
       MLC_CUDNN_TAR_MD5SUM: 2fa73268de8bbdab5560f4aa1a5a73ab
+
+# Docker / container
+docker:
+  run: true

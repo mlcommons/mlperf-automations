@@ -1,13 +1,10 @@
 alias: get-ml-model-using-imagenet-from-model-zoo
+uid: 153e08828c4e45cc
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
-env:
-  MLC_ML_MODEL: resnet
-  MLC_ML_MODEL_DATASET: imagenet
-new_env_keys:
-- MLC_ML_MODEL*
 tags:
 - get
 - ml-model
@@ -15,7 +12,18 @@ tags:
 - zoo
 - imagenet
 - image-classification
-uid: 153e08828c4e45cc
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_ML_MODEL: resnet
+  MLC_ML_MODEL_DATASET: imagenet
+new_env_keys:
+- MLC_ML_MODEL*
+
+# Variations
 variations:
   model.#:
     deps:

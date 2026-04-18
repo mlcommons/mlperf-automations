@@ -1,33 +1,36 @@
-uid: 30361fad3dff49ff
 alias: get-dataset-imagenet-calibration
-
+uid: 30361fad3dff49ff
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
-cache: true
-
+# Metadata
 category: AI/ML datasets
-
-deps:
-  - tags: download,file
-    force_env_keys:
-      - MLC_OUTDIRNAME
-    force_cache: true
-    extra_cache_tags: imagenet-calibration,imagenet,calibration
-    names:
-      - calibration-file-downloader
-    env:
-        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_MLPERF_IMAGENET_CALIBRATION_LIST_FILE_WITH_PATH
-
-new_env_keys:
-- MLC_MLPERF_IMAGENET_CALIBRATION_LIST_FILE_WITH_PATH
-
 tags:
 - get
 - dataset
 - imagenet
 - calibration
 
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_MLPERF_IMAGENET_CALIBRATION_LIST_FILE_WITH_PATH
+
+# Dependencies
+deps:
+- tags: download,file
+  force_env_keys:
+  - MLC_OUTDIRNAME
+  force_cache: true
+  extra_cache_tags: imagenet-calibration,imagenet,calibration
+  names:
+  - calibration-file-downloader
+  env:
+    MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_MLPERF_IMAGENET_CALIBRATION_LIST_FILE_WITH_PATH
+
+# Variations
 variations:
   mlperf.option1:
     group: calibration-option

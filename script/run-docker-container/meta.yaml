@@ -1,75 +1,76 @@
 alias: run-docker-container
 uid: 1e0c884107514b46
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
+# Metadata
+category: Docker automation
 tags:
 - run
 - docker
 - container
 
+# Cache
 cache: false
 
-category: Docker automation
-
+# Environment
 default_env:
   MLC_DOCKER_REUSE_EXISTING_CONTAINER: 'no'
   MLC_DOCKER_PRIVILEGED_MODE: 'no'
   MLC_PODMAN_MAP_USER_ID: 'no'
+new_env_keys:
+- MLC_DOCKER_CONTAINER_ID
 
+# Input mapping
 input_mapping:
   all_gpus: MLC_DOCKER_ADD_ALL_GPUS
-  num_gpus: MLC_DOCKER_ADD_NUM_GPUS
-  gpu_devices: MLC_DOCKER_GPU_DEVICE_IDS
   base: MLC_DOCKER_IMAGE_BASE
+  base_image: MLC_DOCKER_IMAGE_BASE
   cache: MLC_DOCKER_CACHE
-  mlc_repo: MLC_MLOPS_REPO
   detached: MLC_DOCKER_DETACHED_MODE
   device: MLC_DOCKER_ADD_DEVICE
-  docker_image_base: MLC_DOCKER_IMAGE_BASE
   docker_base_image: MLC_DOCKER_IMAGE_BASE
-  base_image: MLC_DOCKER_IMAGE_BASE
-  keep_detached: MLC_KEEP_DETACHED_CONTAINER
-  reuse_existing: MLC_DOCKER_REUSE_EXISTING_CONTAINER
+  docker_image_base: MLC_DOCKER_IMAGE_BASE
   docker_os: MLC_DOCKER_OS
   docker_os_version: MLC_DOCKER_OS_VERSION
-  os: MLC_DOCKER_OS
-  os_version: MLC_DOCKER_OS_VERSION
   extra_run_args: MLC_DOCKER_EXTRA_RUN_ARGS
   fake_run_option: MLC_DOCKER_FAKE_RUN_OPTION
   gh_token: MLC_GH_TOKEN
+  gpu_devices: MLC_DOCKER_GPU_DEVICE_IDS
   image_name: MLC_DOCKER_IMAGE_NAME
   image_repo: MLC_DOCKER_IMAGE_REPO
   image_tag: MLC_DOCKER_IMAGE_TAG
   image_tag_extra: MLC_DOCKER_IMAGE_TAG_EXTRA
   interactive: MLC_DOCKER_INTERACTIVE_MODE
   it: MLC_DOCKER_INTERACTIVE
+  keep_detached: MLC_KEEP_DETACHED_CONTAINER
+  mlc_repo: MLC_MLOPS_REPO
   mounts: MLC_DOCKER_VOLUME_MOUNTS
-  use_host_user_id: MLC_DOCKER_USE_HOST_USER_ID
-  use_host_group_id: MLC_DOCKER_USE_HOST_GROUP_ID
-  pass_user_id: MLC_DOCKER_PASS_USER_ID
+  num_gpus: MLC_DOCKER_ADD_NUM_GPUS
+  os: MLC_DOCKER_OS
+  os_version: MLC_DOCKER_OS_VERSION
   pass_user_group: MLC_DOCKER_PASS_USER_GROUP
+  pass_user_id: MLC_DOCKER_PASS_USER_ID
   port_maps: MLC_DOCKER_PORT_MAPS
   post_run_cmds: MLC_DOCKER_POST_RUN_COMMANDS
   pre_run_cmds: MLC_DOCKER_PRE_RUN_COMMANDS
   privileged: MLC_DOCKER_PRIVILEGED_MODE
   real_run: MLC_REAL_RUN
-  recreate: MLC_DOCKER_IMAGE_RECREATE
   rebuild: MLC_DOCKER_IMAGE_RECREATE
+  recreate: MLC_DOCKER_IMAGE_RECREATE
+  reuse_existing: MLC_DOCKER_REUSE_EXISTING_CONTAINER
   run_cmd: MLC_DOCKER_RUN_CMD
   run_cmd_extra: MLC_DOCKER_RUN_CMD_EXTRA
   save_script: MLC_DOCKER_SAVE_SCRIPT
   script_tags: MLC_DOCKER_RUN_SCRIPT_TAGS
   shm_size: MLC_DOCKER_SHM_SIZE
   use_google_dns: MLC_DOCKER_USE_GOOGLE_DNS
+  use_host_group_id: MLC_DOCKER_USE_HOST_GROUP_ID
+  use_host_user_id: MLC_DOCKER_USE_HOST_USER_ID
 
-new_env_keys:
-  - 'MLC_DOCKER_CONTAINER_ID'
-
+# Dependencies
 deps:
-  - tags: get,docker
-
+- tags: get,docker
 prehook_deps:
 - names:
   - build-docker-image
@@ -79,6 +80,6 @@ prehook_deps:
     MLC_DOCKER_SKIP_BUILD:
     - 'yes'
     MLC_DOCKER_CONTAINER_ID:
-    - on
+    - true
   tags: build,docker,image
 - tags: get,docker

@@ -1,14 +1,22 @@
 alias: get-lib-protobuf
+uid: db45f1eb73934f91
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Detection or installation of tools and artifacts
-default_version: 1.13.0
-deps:
-- tags: get,cmake
-- tags: get,gcc
-input_description: {}
-input_mapping: {}
+tags:
+- get
+- google-protobuf
+- protobuf
+- lib
+- lib-protobuf
+- google
+
+# Cache
+cache: true
+
+# Environment
 new_env_keys:
 - MLC_GOOGLE_PROTOBUF_SRC_PATH
 - MLC_GOOGLE_PROTOBUF_INSTALL_PATH
@@ -16,8 +24,15 @@ new_env_keys:
 - +CPLUS_INCLUDE_PATH
 - +LD_LIBRARY_PATH
 new_state_keys: []
-post_deps: []
-posthook_deps: []
+
+# Input mapping
+input_mapping: {}
+input_description: {}
+
+# Dependencies
+deps:
+- tags: get,cmake
+- tags: get,gcc
 prehook_deps:
 - extra_cache_tags: lib,protobuf,src
   force_env_keys:
@@ -30,14 +45,10 @@ prehook_deps:
     - MLC_TMP_GIT_URL
     _tag.:
     - MLC_GIT_CHECKOUT_TAG
-tags:
-- get
-- google-protobuf
-- protobuf
-- lib
-- lib-protobuf
-- google
-uid: db45f1eb73934f91
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations:
   branch.#:
     env:
@@ -45,4 +56,7 @@ variations:
   tag.#:
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
+
+# Versions
+default_version: 1.13.0
 versions: {}

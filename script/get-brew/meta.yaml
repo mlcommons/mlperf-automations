@@ -1,19 +1,33 @@
 alias: get-brew
+uid: 4a2c5eab1ccf484f
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: Detection or installation of tools and artifacts
-deps: []
-input_description: {}
-input_mapping: {}
-new_env_keys: []
-new_state_keys: []
-post_deps: []
-posthook_deps: []
-prehook_deps: []
 tags:
 - get
 - brew
-uid: 4a2c5eab1ccf484f
+
+# Cache
+cache: false
+
+# Environment
+new_env_keys: []
+new_state_keys: []
+
+# Input mapping
+input_mapping: {}
+input_description: {}
+
+# Dependencies
+deps: []
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations: {}
+
+# Versions
 versions: {}
