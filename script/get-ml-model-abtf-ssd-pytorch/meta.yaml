@@ -205,7 +205,7 @@ variations:
       MLC_DOWNLOAD_MODE: dry
   abtf-poc,gdown:
     env:
-      MLC_ML_MODEL_URL: https://drive.google.com/file/d/1kfJR_bs54KONprVd51kZu0PYmmh1wZZa/view
+      MLC_ML_MODEL_URL: https://drive.google.com/uc?id=1kfJR_bs54KONprVd51kZu0PYmmh1wZZa
   abtf-poc,rclone:
     env:
       MLC_RCLONE_COPY_USING: copyurl
