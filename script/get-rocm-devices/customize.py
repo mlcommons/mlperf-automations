@@ -8,7 +8,7 @@ def preprocess(i):
 
     env = i['env']
 
-    if is_true(str(env.get('MLC_DETECT_USING_HIP-PYTHON', ''))):
+    if is_true(str(env.get('MLC_DETECT_USING_HIP_PYTHON', ''))):
         i['run_script_input']['script_name'] = 'detect'
 
     return {'return': 0}
@@ -36,8 +36,6 @@ def postprocess(i):
     gpu_id = -1
 
     for line in lst:
-        # print (line)
-
         j = line.find(':')
 
         if j >= 0:
@@ -54,13 +52,20 @@ def postprocess(i):
             gpu[gpu_id][key] = val
             p[key] = val
 
-            key_env = 'MLC_ROMLC_DEVICE_PROP_' + key.upper().replace(' ', '_')
+            key_env = 'MLC_ROCM_DEVICE_PROP_' + key.upper().replace(' ', '_')
+
+            if key_env == 'MLC_ROCM_DEVICE_PROP_GPU_INTERCONNECT_TYPE':
+                val = '' if val == 'N/A' else val
+            elif key_env == 'MLC_ROCM_DEVICE_PROP_HOST_INTERCONNECT_TYPE':
+                if val and not val.startswith('PCIe'):
+                    val = 'PCIe ' + val
+
             env[key_env] = val
 
-    state['mlc_romlc_num_devices'] = gpu_id + 1
-    env['MLC_ROMLC_NUM_DEVICES'] = gpu_id + 1
+    state['mlc_rocm_num_devices'] = gpu_id + 1
+    env['MLC_ROCM_NUM_DEVICES'] = gpu_id + 1
 
-    state['mlc_romlc_device_prop'] = p
-    state['mlc_romlc_devices_prop'] = gpu
+    state['mlc_rocm_device_prop'] = p
+    state['mlc_rocm_devices_prop'] = gpu
 
     return {'return': 0}

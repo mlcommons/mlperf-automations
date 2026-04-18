@@ -11,11 +11,20 @@ tags:
 
 # Cache
 cache: false
+
+new_env_keys:
+- MLC_ROCM_*
+
 can_force_cache: true
 clean_files:
 - tmp-run.out
 
-# Docker / container
+deps:
+  - tags: get,python
+  - tags: get,generic-python-lib,_package.hip-python
+    env:
+      MLC_GENERIC_PYTHON_PIP_EXTRA_INDEX_URL: https://test.pypi.org/simple
+
 docker:
   run: false
   all_gpus: 'yes'
