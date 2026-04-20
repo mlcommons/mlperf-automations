@@ -80,10 +80,9 @@ def preprocess(i):
     if '+ LDCXXFLAGS' not in env:
         env['+ LDCXXFLAGS'] = []
 
-    env['+ LDCXXFLAGS'] += [
-        "-lmlperf_loadgen",
-        "-lpthread"
-    ]
+    env['+ LDCXXFLAGS'].append("-lmlperf_loadgen")
+    if os_info['platform'] != 'darwin':
+        env['+ LDCXXFLAGS'].append("-lpthread")
     # e.g. -lonnxruntime
     if 'MLC_MLPERF_BACKEND_LIB_NAMESPEC' in env:
         env['+ LDCXXFLAGS'].append('-l' +
