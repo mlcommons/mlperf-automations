@@ -8,7 +8,8 @@ from utils import *
 
 def _prepend_tensorflow_nvidia_libs_to_ld_library_path(env, logger):
     python_bin = env.get('MLC_PYTHON_BIN_WITH_PATH', env.get('MLC_PYTHON_BIN', 'python3'))
-    find_nvidia_lib_dirs = """
+    path_separator = os.pathsep
+    find_nvidia_lib_dirs = f"""
 import os
 import site
 import sysconfig
@@ -32,17 +33,17 @@ for root in roots:
         if os.path.isdir(lib_dir) and lib_dir not in lib_dirs:
             lib_dirs.append(lib_dir)
 
-print(':'.join(lib_dirs))
+print({path_separator!r}.join(lib_dirs))
 """
     try:
         output = subprocess.check_output(
             [python_bin, "-c", find_nvidia_lib_dirs], text=True).strip()
-    except BaseException as e:
+    except Exception as e:
         logger.warning("Unable to detect TensorFlow NVIDIA runtime library directories: %s", e)
         return
 
     if output:
-        lib_dirs = [x for x in output.split(':') if x]
+        lib_dirs = [x for x in output.split(path_separator) if x]
         if lib_dirs:
             if '+LD_LIBRARY_PATH' not in env:
                 env['+LD_LIBRARY_PATH'] = []
