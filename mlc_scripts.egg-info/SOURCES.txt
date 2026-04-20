@@ -1,0 +1,13 @@
+LICENSE.md
+LICENSE.third-party.md
+MANIFEST.in
+README.md
+VERSION
+git_commit_hash.txt
+pyproject.toml
+setup.py
+mlc_scripts.egg-info/PKG-INFO
+mlc_scripts.egg-info/SOURCES.txt
+mlc_scripts.egg-info/dependency_links.txt
+mlc_scripts.egg-info/requires.txt
+mlc_scripts.egg-info/top_level.txt
