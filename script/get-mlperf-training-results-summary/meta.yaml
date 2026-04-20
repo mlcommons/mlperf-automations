@@ -63,5 +63,5 @@ tests:
   run_inputs:
   - env:
       MLC_GIT_DEPTH: --depth 1
-      MLC_MLPERF_TRAINING_RESULTS_REPO_URL: https://github.com/mlcommons/training_results_v5.0
-      MLC_MLPERF_TRAINING_RESULTS_RULESET: 5.0.0
+      MLC_MLPERF_TRAINING_RESULTS_REPO_URL: https://github.com/mlcommons/training_results_v5.1
+      MLC_MLPERF_TRAINING_RESULTS_RULESET: 5.1.0
