@@ -4,9 +4,11 @@ import shutil
 
 
 def _extract_ruleset_from_repo(repo_url):
-    match = re.search(r'_v(\d+\.\d+)', repo_url)
+    match = re.search(r'_v(\d+\.\d+(?:\.\d+)?)', repo_url)
     if match:
-        return '{}.0'.format(match.group(1))
+        parts = match.group(1).split('.')
+        if len(parts) >= 2:
+            return '{}.{}.0'.format(parts[0], parts[1])
     return ''
 
 
@@ -39,10 +41,6 @@ def preprocess(i):
 
     env['MLC_MLPERF_TRAINING_RESULTS_SUMMARY_JSON'] = summary_json
     env['MLC_MLPERF_TRAINING_RESULTS_SUMMARY_CSV'] = summary_csv
-
-    env['MLC_RUN_CMD'] = '{} -m mlperf_logging.result_summarizer "$MLC_MLPERF_TRAINING_RESULTS_PATH" training {} --csv "{}"'.format(
-        env['MLC_PYTHON_BIN_WITH_PATH'], ruleset, summary_csv
-    )
 
     return {'return': 0}
 
