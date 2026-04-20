@@ -55,7 +55,7 @@ variations:
   repo.esi:
     default: true
     env:
-      MLC_GIT_REPO_URL: https://develop.openfoam.com/Development/openfoam.git
+      MLC_GIT_REPO_URL: https://gitlab.com/openfoam/core/openfoam.git
     group: repo
   repo.foundation:
     env:

@@ -16,6 +16,12 @@ echo "Source: ${SRC}"
 
 cd "${SRC}"
 
+# HMMER requires the Easel library to be cloned inside the source tree
+if [[ ! -d easel ]]; then
+    echo "Cloning Easel library..."
+    git clone https://github.com/EddyRivasLab/easel
+fi
+
 # HMMER uses autoconf
 if [[ ! -f configure ]]; then
     autoconf

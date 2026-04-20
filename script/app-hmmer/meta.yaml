@@ -24,7 +24,6 @@ deps:
   extra_cache_tags: hmmer,repo,hmmer-repo
   env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_HMMER_SRC_PATH
-    MLC_GIT_RECURSE_SUBMODULES: ' --recurse-submodules'
   force_env_keys:
   - MLC_GIT_*
   update_tags_from_env_with_prefix:

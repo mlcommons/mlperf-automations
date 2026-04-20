@@ -14,6 +14,9 @@ echo "Building OpenFOAM from: ${OPENFOAM_SRC}"
 
 cd "${OPENFOAM_SRC}"
 
+# Ensure standard system paths are available (needed by OpenFOAM's etc/bashrc)
+export PATH="/usr/local/bin:/usr/bin:/bin:${PATH}"
+
 # Source the OpenFOAM environment
 if [[ -f etc/bashrc ]]; then
     source etc/bashrc || true
