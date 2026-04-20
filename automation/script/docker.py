@@ -141,7 +141,7 @@ def dockerfile(self_module, input_params):
         comments = []
 
     # Push Docker image if specified
-    if str(input_params.get('docker_push_image')
+    if str(input_params.get('docker_push_image', input_params.get('docker_upload', ''))
            ).lower() in ['true', 'yes', '1']:
         env['MLC_DOCKER_PUSH_IMAGE'] = 'yes'
 
