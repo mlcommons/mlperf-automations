@@ -695,3 +695,87 @@ jobs:
         # detect-cpu depends on detect-os; we can pass adr options through
         mlcr detect,cpu --adr.detect-os.tags=detect,os --quiet
         echo "PASS: adr option correctly passed through to dependencies"
+
+    - name: Create test scripts for adr opt-out behavior
+      shell: bash
+      run: |
+        # Determine the MLC repo path (mlc pull repo clones to ~/MLC/repos/<owner>@<repo>)
+        # by parsing the output of `mlc find script --tags=detect,os`.
+        REPO_SCRIPT_DIR=$(python3 - <<'PY'
+        import os
+        import re
+        import subprocess
+        import sys
+
+        out = subprocess.run(
+            ['mlc', 'find', 'script', '--tags=detect,os', '--quiet'],
+            capture_output=True, text=True)
+        combined = out.stdout + out.stderr
+        match = re.search(r'Item path:\s*(.+)', combined)
+        if not match:
+            print('ERROR: Could not find script directory from mlc find output', file=sys.stderr)
+            sys.exit(1)
+        print(os.path.dirname(match.group(1).strip()))
+        PY
+        )
+        echo "MLC repo script dir: $REPO_SCRIPT_DIR"
+
+        mkdir -p "$REPO_SCRIPT_DIR/test-adr-recursive-local-child"
+        cat <<'EOF' > "$REPO_SCRIPT_DIR/test-adr-recursive-local-child/meta.yaml"
+        alias: test-adr-recursive-local-child
+        automation_alias: script
+        automation_uid: 5b4e0237da074764
+        deps:
+        - names:
+          - mydep
+          tags: detect,os
+          skip_add_deps_recursive: true
+        tags:
+        - test
+        - adr-recursive-local-child
+        uid: cccc1111dddd2222
+        EOF
+        printf '#!/bin/bash\necho "Child script runs"\n' > "$REPO_SCRIPT_DIR/test-adr-recursive-local-child/run.sh"
+        chmod +x "$REPO_SCRIPT_DIR/test-adr-recursive-local-child/run.sh"
+        printf '@echo off\necho Child script runs\n' > "$REPO_SCRIPT_DIR/test-adr-recursive-local-child/run.bat"
+
+        mkdir -p "$REPO_SCRIPT_DIR/test-adr-recursive-local-parent"
+        cat <<'EOF' > "$REPO_SCRIPT_DIR/test-adr-recursive-local-parent/meta.yaml"
+        alias: test-adr-recursive-local-parent
+        automation_alias: script
+        automation_uid: 5b4e0237da074764
+        deps:
+        - tags: test,adr-recursive-local-child
+        tags:
+        - test
+        - adr-recursive-local-parent
+        uid: cccc2222dddd3333
+        EOF
+        printf '#!/bin/bash\necho "Parent script runs"\n' > "$REPO_SCRIPT_DIR/test-adr-recursive-local-parent/run.sh"
+        chmod +x "$REPO_SCRIPT_DIR/test-adr-recursive-local-parent/run.sh"
+        printf '@echo off\necho Parent script runs\n' > "$REPO_SCRIPT_DIR/test-adr-recursive-local-parent/run.bat"
+
+    - name: Test skip_add_deps_recursive option
+      shell: bash
+      run: |
+        # Global adr override should not modify child dep marked with skip_add_deps_recursive: true
+        mlcr test,adr-recursive-local-parent --adr.mydep.tags=nonexistent,script,tags,xxxyyyzzz --print_deps --json --quiet > /tmp/mlc-adr-local-test.json 2>&1
+        python3 - <<'PY'
+        import json
+        import sys
+
+        with open('/tmp/mlc-adr-local-test.json', 'r') as f:
+            output = json.load(f)
+
+        dep_tags = [dep.get('tags', '') for dep in output.get('deps', [])]
+
+        if not any({'detect', 'os'}.issubset(set(tags.split(','))) for tags in dep_tags):
+            print(f"ERROR: Expected detect,os dependency tags in resolved deps. Got: {dep_tags}")
+            sys.exit(1)
+
+        if any('nonexistent' in tags.split(',') for tags in dep_tags):
+            print(f"ERROR: Recursive override leaked into local-only dependency. Got: {dep_tags}")
+            sys.exit(1)
+
+        print("PASS: skip_add_deps_recursive kept recursive adr override local-safe")
+        PY
