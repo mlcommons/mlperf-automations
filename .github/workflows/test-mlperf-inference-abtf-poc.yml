@@ -50,6 +50,7 @@ jobs:
       env:
         PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.html_url }}
         PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      shell: bash
       run: |
         mlc pull repo "$PR_HEAD_REPO" --branch="$PR_HEAD_REF"
         #cm pull repo mlcommons@cm4abtf --branch=poc
