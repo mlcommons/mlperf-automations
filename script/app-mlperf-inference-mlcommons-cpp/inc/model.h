@@ -121,4 +121,34 @@ private:
     float score_threshold;
 };
 
+
+class BertLarge : public Model {
+public:
+    BertLarge(std::string model_path, size_t max_seq_length) :
+        Model(
+            model_path,
+            3, {"input_ids", "input_mask", "segment_ids"},
+            {max_seq_length * sizeof(int64_t), max_seq_length * sizeof(int64_t), max_seq_length * sizeof(int64_t)},
+            {{max_seq_length}, {max_seq_length}, {max_seq_length}},
+            2, {"output_start_logits", "output_end_logits"},
+            {max_seq_length * sizeof(float), max_seq_length * sizeof(float)},
+            {{max_seq_length}, {max_seq_length}}),
+        max_seq_length(max_seq_length) {}
+
+    void PostProcess(
+            mlperf::QuerySampleIndex index,
+            const std::vector<void *> &raw,
+            const std::vector<std::vector<size_t>> &raw_shapes,
+            std::vector<uint8_t> &response_buffer) override {
+        // Concatenate start_logits and end_logits into response
+        size_t logits_bytes = max_seq_length * sizeof(float);
+        response_buffer.resize(2 * logits_bytes);
+        std::memcpy(response_buffer.data(), raw.at(0), logits_bytes);
+        std::memcpy(response_buffer.data() + logits_bytes, raw.at(1), logits_bytes);
+    }
+
+private:
+    size_t max_seq_length;
+};
+
 #endif // MODEL_H_

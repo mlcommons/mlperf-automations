@@ -19,6 +19,10 @@
 #include "onnxruntime_backend.h"
 #endif
 
+#ifdef MLC_MLPERF_BACKEND_PYTORCH
+#include "pytorch_backend.h"
+#endif
+
 class InputSettings {
 
 public:
@@ -36,6 +40,8 @@ public:
     dataset_path = getenv("MLC_DATASET_PATH", "");
     dataset_list = getenv("MLC_DATASET_LIST", "");
     imagenet_val_path = getenv("MLC_DATASET_AUX_PATH", "") + "/val.txt";
+    squad_tokenized_root = getenv("MLC_DATASET_SQUAD_TOKENIZED_ROOT", "");
+    max_seq_length = std::stol(getenv("MLC_DATASET_MAX_SEQ_LENGTH", "384"));
     scenario_name = getenv("MLC_MLPERF_LOADGEN_SCENARIO", "Offline");
     mode_name = getenv("MLC_MLPERF_LOADGEN_MODE", "PerformanceOnly");
     if (mode_name == "accuracy")
@@ -71,6 +77,8 @@ public:
   std::string dataset_path;
   std::string dataset_list;
   std::string imagenet_val_path;
+  std::string squad_tokenized_root;
+  size_t max_seq_length;
   std::string scenario_name;
   std::string mode_name;
   size_t performance_sample_count;
@@ -132,6 +140,9 @@ int main(int argc, const char *argv[]) {
       return 1;
     }
     model.reset(new Retinanet(input_settings.model_path, 800, 800, 0.05f));
+  } else if (input_settings.model_name == "bert-99" ||
+             input_settings.model_name == "bert-99.9") {
+    model.reset(new BertLarge(input_settings.model_path, input_settings.max_seq_length));
   } else {
     std::cerr << "model (" << input_settings.model_name << ") not supported"
               << std::endl;
@@ -139,7 +150,7 @@ int main(int argc, const char *argv[]) {
   }
 
   // build device
-  std::shared_ptr<Device> device;
+  std::shared_ptr<MlcDevice> device;
   if (input_settings.device_name == "cpu") {
     device.reset(new CPUDevice());
   } else if (input_settings.device_name == "gpu") {
@@ -171,10 +182,16 @@ int main(int argc, const char *argv[]) {
   if (max_sample_count == 0)
     max_sample_count = INT_MAX;
   // build backend
-  std::shared_ptr<Backend> backend;
+  std::shared_ptr<MlcBackend> backend;
   if (input_settings.backend_name == "onnxruntime") {
 #ifdef MLC_MLPERF_BACKEND_ONNXRUNTIME
     backend.reset(new OnnxRuntimeBackend(
+        model, device, performance_sample_count, input_settings.batch_size,
+        input_settings.device_name == "gpu"));
+#endif
+  } else if (input_settings.backend_name == "pytorch") {
+#ifdef MLC_MLPERF_BACKEND_PYTORCH
+    backend.reset(new PyTorchBackend(
         model, device, performance_sample_count, input_settings.batch_size,
         input_settings.device_name == "gpu"));
 #endif
@@ -194,6 +211,11 @@ int main(int argc, const char *argv[]) {
     qsl.reset(new Openimages(backend, max_sample_count,
                              input_settings.dataset_preprocessed_path,
                              input_settings.dataset_list));
+  } else if (input_settings.model_name == "bert-99" ||
+               input_settings.model_name == "bert-99.9") {
+    qsl.reset(new Squad(backend, max_sample_count,
+                        input_settings.squad_tokenized_root,
+                        input_settings.max_seq_length));
   } else {
     std::cerr << "dataset for model (" << input_settings.model_name
               << ") not supported" << std::endl;

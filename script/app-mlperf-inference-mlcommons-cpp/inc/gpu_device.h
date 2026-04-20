@@ -10,7 +10,7 @@
 
 #define CHECK_CUDA_SUCCESS(x) if ((x) != cudaSuccess) std::cerr << "encountered CUDA error" << std::endl;
 
-class GPUDevice : public Device {
+class GPUDevice : public MlcDevice {
     size_t NumConcurrency() const override {
         return NumMemory();
     }
