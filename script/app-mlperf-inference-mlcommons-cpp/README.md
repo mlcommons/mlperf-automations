@@ -96,5 +96,7 @@ mlcr app,mlcommons,mlperf,inference,cpp
 
 ### Model
 
+- `bert-99`
+- `bert-99.9`
 - `resnet50` (default)
 - `retinanet`
