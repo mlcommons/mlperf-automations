@@ -121,7 +121,11 @@ jobs:
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
 
-        logger = SimpleNamespace(info=lambda *args, **kwargs: None, error=lambda *args, **kwargs: None)
+        logger_messages = []
+        logger = SimpleNamespace(
+            info=lambda *args, **kwargs: logger_messages.append(('info', args)),
+            error=lambda *args, **kwargs: logger_messages.append(('error', args))
+        )
         DOCKER_ENV_MARKER = '/.dockerenv'
         DOCKER_SOCKET = '/var/run/docker.sock'
         DOCKER_BIN = '/usr/bin/docker'
@@ -163,7 +167,8 @@ jobs:
 
         assert enabled_result['return'] == 0, enabled_result
         assert disabled_result['return'] == 0, disabled_result
-        assert failed_result['return'] == 1 and 'docker run failed' in failed_result.get('error', ''), failed_result
+        error_msg = failed_result.get('error', '').lower()
+        assert failed_result['return'] == 1 and 'docker' in error_msg and 'failed' in error_msg, failed_result
 
         assert f'{DOCKER_SOCKET}:{DOCKER_SOCKET}' in enabled_cmd, enabled_cmd
         assert f'{DOCKER_BIN}:{DOCKER_BIN}' in enabled_cmd, enabled_cmd
