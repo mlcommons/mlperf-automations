@@ -23,7 +23,8 @@ def preprocess(i):
 
     install_prefix = env.get('MLC_CUDA_INSTALL_PREFIX', '').strip()
     if install_prefix == '':
-        if env.get('MLC_SUDO', '').strip() != '':
+        sudo_cmd = env.get('MLC_SUDO', '').strip()
+        if is_true(sudo_cmd) or sudo_cmd.lower().startswith('sudo'):
             install_prefix = '/opt/mlc-installs/cuda'
         else:
             install_prefix = os.getcwd()
