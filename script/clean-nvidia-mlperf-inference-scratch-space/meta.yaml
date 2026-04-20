@@ -27,6 +27,18 @@ deps:
 
 # Variations
 variations:
+  downloaded_data:
+    group: artifact
+    env:
+      MLC_CLEAN_ARTIFACT_NAME: downloaded_data
+  models:
+    group: artifact
+    env:
+      MLC_CLEAN_ARTIFACT_NAME: models
+  preprocessed_data:
+    group: artifact
+    env:
+      MLC_CLEAN_ARTIFACT_NAME: preprocessed_data
   downloaded-data:
     group: artifact
     env:
@@ -34,11 +46,63 @@ variations:
   downloaded-model:
     group: artifact
     env:
-      MLC_CLEAN_ARTIFACT_NAME: downloaded_model
+      MLC_CLEAN_ARTIFACT_NAME: models
   preprocessed-data:
     group: artifact
     env:
       MLC_CLEAN_ARTIFACT_NAME: preprocessed_data
+  3d-unet-99:
+    group: model
+    env:
+      MLC_MODEL: 3d-unet-99
+  3d-unet-99.9:
+    group: model
+    env:
+      MLC_MODEL: 3d-unet-99.9
+  bert-99:
+    group: model
+    env:
+      MLC_MODEL: bert-99
+  bert-99.9:
+    group: model
+    env:
+      MLC_MODEL: bert-99.9
+  dlrm-v2-99:
+    group: model
+    env:
+      MLC_MODEL: dlrm-v2-99
+  dlrm-v2-99.9:
+    group: model
+    env:
+      MLC_MODEL: dlrm-v2-99.9
+  gptj-99:
+    group: model
+    env:
+      MLC_MODEL: gptj-99
+  gptj-99.9:
+    group: model
+    env:
+      MLC_MODEL: gptj-99.9
+  llama2-70b-99:
+    group: model
+    env:
+      MLC_MODEL: llama2-70b-99
+  llama2-70b-99.9:
+    group: model
+    env:
+      MLC_MODEL: llama2-70b-99.9
+  resnet50:
+    group: model
+    env:
+      MLC_MODEL: resnet50
+  retinanet:
+    group: model
+    env:
+      MLC_MODEL: retinanet
+  rnnt:
+    group: model
+    env:
+      MLC_MODEL: rnnt
   sdxl:
     group: model
     env:
