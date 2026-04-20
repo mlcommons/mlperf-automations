@@ -103,6 +103,68 @@ jobs:
       run: |
         mlcr run,docker,container --adr.compiler.tags=gcc --docker_mlc_repo=mlcommons@mlperf-automations --docker_mlc_repo_branch=dev --image_name=mlc-script-app-image-classification-onnx-py --env.MLC_DOCKER_RUN_SCRIPT_TAGS=app,image-classification,onnx,python --env.MLC_DOCKER_IMAGE_BASE=ubuntu:22.04 --env.MLC_DOCKER_IMAGE_REPO=local --quiet
 
+    - name: Test nested Docker opt-in mount handling
+      shell: bash
+      run: |
+        python - <<'PY'
+        import importlib.util
+        import sys
+        from types import SimpleNamespace
+        from unittest.mock import patch
+
+        sys.path.insert(0, 'automation')
+
+        spec = importlib.util.spec_from_file_location(
+            'run_docker_customize',
+            'script/run-docker-container/customize.py'
+        )
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+
+        logger = SimpleNamespace(info=lambda *a, **k: None, error=lambda *a, **k: None)
+
+        def run_case(enable_nested):
+            captured = {'cmd': ''}
+
+            def fake_system(cmd):
+                captured['cmd'] = cmd
+                return 0
+
+            def fake_exists(path):
+                if path in ['/.dockerenv', '/var/run/docker.sock', '/usr/bin/docker']:
+                    return True
+                return False
+
+            env = {
+                'MLC_CONTAINER_TOOL': 'docker',
+                'MLC_DOCKER_RUN_SCRIPT_TAGS': 'run,docker,container',
+                'MLC_DOCKER_RUN_CMD': 'echo nested-docker-ci-check',
+                'MLC_DOCKER_ENABLE_NESTED': 'yes' if enable_nested else 'no'
+            }
+            i = {
+                'os_info': {'platform': 'linux'},
+                'env': env,
+                'automation': SimpleNamespace(logger=logger)
+            }
+
+            with patch.object(mod.os.path, 'exists', side_effect=fake_exists), \
+                    patch.object(mod.os, 'system', side_effect=fake_system), \
+                    patch.object(mod.shutil, 'which', return_value='/usr/bin/docker'):
+                result = mod.postprocess(i)
+
+            assert result['return'] == 0, result
+            return captured['cmd']
+
+        enabled_cmd = run_case(True)
+        disabled_cmd = run_case(False)
+
+        assert '/var/run/docker.sock:/var/run/docker.sock' in enabled_cmd, enabled_cmd
+        assert '/usr/bin/docker:/usr/bin/docker' in enabled_cmd, enabled_cmd
+        assert '/var/run/docker.sock:/var/run/docker.sock' not in disabled_cmd, disabled_cmd
+        assert '/usr/bin/docker:/usr/bin/docker' not in disabled_cmd, disabled_cmd
+        print('Nested Docker opt-in mount handling test passed')
+        PY
+
   test_experiment:
     runs-on: ${{ matrix.os }}
     strategy:
