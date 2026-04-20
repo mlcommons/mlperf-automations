@@ -27,18 +27,10 @@ deps:
 
 # Variations
 variations:
-  downloaded_data:
-    group: artifact
-    env:
-      MLC_CLEAN_ARTIFACT_NAME: downloaded_data
   models:
     group: artifact
     env:
       MLC_CLEAN_ARTIFACT_NAME: models
-  preprocessed_data:
-    group: artifact
-    env:
-      MLC_CLEAN_ARTIFACT_NAME: preprocessed_data
   downloaded-data:
     group: artifact
     env:
