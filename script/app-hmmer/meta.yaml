@@ -58,11 +58,11 @@ variations:
     default: true
     group: version
     env:
-      MLC_GIT_CHECKOUT_TAG: h3-release-3.4
+      MLC_GIT_CHECKOUT_TAG: hmmer-3.4
   version.3.3.2:
     group: version
     env:
-      MLC_GIT_CHECKOUT_TAG: h3-release-3.3.2
+      MLC_GIT_CHECKOUT_TAG: hmmer-3.3.2
   master:
     env:
       MLC_GIT_CHECKOUT: master
