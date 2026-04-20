@@ -3423,6 +3423,37 @@ class ScriptAutomation(Automation):
                         else:
                             return r
 
+                    if is_true(d.get('version_persistent')):
+                        dep_script_id = new_run_state.get('script_id', '')
+                        dep_version = ''
+
+                        dep_version_info = new_run_state.get('version_info', [])
+                        if dep_script_id and dep_version_info:
+                            dep_script_uid = dep_script_id.split(',')[-1]
+                            for dep_info in reversed(dep_version_info):
+                                if not isinstance(dep_info, dict) or not dep_info:
+                                    continue
+                                dep_key = next(iter(dep_info))
+                                dep_data = dep_info.get(dep_key, {})
+                                if dep_data.get('script_uid', '') == dep_script_uid:
+                                    dep_version = str(dep_data.get('version', '')).strip()
+                                    break
+
+                        if dep_version == '':
+                            dep_version = str(d.get('version', '')).strip()
+
+                        if dep_script_id != '' and dep_version != '':
+                            version_persistent = self.const_state.setdefault(
+                                'mlc_dependency_version_persistent', {})
+                            existing_dep_version = str(
+                                version_persistent.get(dep_script_id, '')).strip()
+
+                            if existing_dep_version != '' and existing_dep_version != dep_version:
+                                return {'return': 1, 'error': 'version_persistent mismatch for dependency "{}" (tags: {}): previously resolved version "{}" conflicts with "{}"'.format(
+                                    dep_script_id, d.get('tags', ''), existing_dep_version, dep_version)}
+
+                            version_persistent.setdefault(dep_script_id, dep_version)
+
                     run_state['version_info'] = new_run_state.get(
                         'version_info')
 
