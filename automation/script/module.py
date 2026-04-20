@@ -10,6 +10,7 @@
 import re
 import os
 import logging
+import subprocess
 
 from mlc.main import Automation
 from mlc.main import CacheAction
@@ -277,10 +278,13 @@ class ScriptAutomation(Automation):
           (skip_sudo) (bool): if True, set env['MLC_TMP_SKIP_SUDO']='yes'
                               to let scripts deal with that
 
-          (silent) (bool): if True, attempt to suppress all info if supported
-                           (sets MLC_TMP_SILENT=yes)
-          (s) (bool): the same as 'silent'
-          ...
+           (silent) (bool): if True, attempt to suppress all info if supported
+                            (sets MLC_TMP_SILENT=yes)
+           (s) (bool): the same as 'silent'
+           (auto_pull_repo) (bool): if True and updates are available for the current script repo,
+                                    auto-pull updates. If local changes are present, ask whether to
+                                    keep/discard them in interactive mode.
+           ...
 
         Returns:
           (MLC return dict):
@@ -646,6 +650,28 @@ class ScriptAutomation(Automation):
                 'alias', '')
             run_state['script_entry_repo_git'] = script_item.repo.meta.get(
                 'git', False)
+
+        auto_pull_repo = is_true(i.get('auto_pull_repo', env.get('MLC_AUTO_PULL_REPO', False)))
+        if auto_pull_repo:
+            env['MLC_AUTO_PULL_REPO'] = 'yes'
+
+        if not recursion and run_state.get('script_repo_git'):
+            script_relative_path = ''
+            try:
+                script_relative_path = os.path.relpath(path, script_repo_path)
+            except Exception:
+                pass
+
+            r = check_and_handle_repo_updates(
+                repo_path=script_repo_path,
+                repo_alias=run_state.get('script_repo_alias', ''),
+                script_relative_path=script_relative_path,
+                auto_pull_repo=auto_pull_repo,
+                quiet=quiet,
+                recursion_spaces=self.recursion_spaces,
+                logger=logger)
+            if r['return'] > 0:
+                return r
 
         deps = run_state['deps']
         post_deps = run_state['post_deps']
@@ -5930,6 +5956,155 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
 
     
     return {'return': 0}
+
+##############################################################################
+
+
+def _run_git_command(repo_path, args):
+    cmd = ['git', '-C', repo_path] + args
+    return subprocess.run(cmd, capture_output=True, text=True)
+
+
+def _get_repo_update_status(repo_path, script_relative_path=''):
+    status = {
+        'return': 0,
+        'update_available': False,
+        'commits_behind': 0,
+        'changed_files': [],
+        'script_changed': False
+    }
+
+    r = _run_git_command(repo_path, ['rev-parse', '--is-inside-work-tree'])
+    if r.returncode != 0:
+        return status
+
+    r = _run_git_command(repo_path, ['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'])
+    if r.returncode != 0:
+        status['warning'] = 'No upstream branch configured for current repository checkout.'
+        return status
+
+    r = _run_git_command(repo_path, ['fetch', '--quiet'])
+    if r.returncode != 0:
+        status['warning'] = 'Failed to fetch updates from remote repository.'
+        return status
+
+    r = _run_git_command(repo_path, ['rev-list', '--count', 'HEAD..@{u}'])
+    if r.returncode != 0:
+        return status
+
+    try:
+        commits_behind = int((r.stdout or '0').strip() or '0')
+    except ValueError:
+        commits_behind = 0
+
+    status['commits_behind'] = commits_behind
+    status['update_available'] = commits_behind > 0
+
+    if not status['update_available']:
+        return status
+
+    r = _run_git_command(repo_path, ['diff', '--name-only', 'HEAD..@{u}'])
+    if r.returncode == 0:
+        status['changed_files'] = [x.strip() for x in r.stdout.splitlines() if x.strip()]
+
+    if script_relative_path:
+        r = _run_git_command(
+            repo_path,
+            ['diff', '--name-only', 'HEAD..@{u}', '--', script_relative_path])
+        status['script_changed'] = (r.returncode == 0 and (r.stdout or '').strip() != '')
+
+    return status
+
+
+def _auto_pull_repo_updates(repo_path, quiet, logger, recursion_spaces):
+    local_changes = False
+    r = _run_git_command(repo_path, ['status', '--porcelain'])
+    if r.returncode == 0 and (r.stdout or '').strip() != '':
+        local_changes = True
+
+    if local_changes:
+        if quiet:
+            logger.warning(
+                recursion_spaces +
+                '  - Local changes detected. Skipping --auto-pull-repo in quiet mode.')
+            return {'return': 0, 'updated': False}
+
+        choice = input(
+            recursion_spaces +
+            '  - Local changes detected in repo checkout.\n'
+            + recursion_spaces +
+            '    [k]eep local changes and continue without pull, [d]iscard local changes and pull, [c]ancel: '
+        ).strip().lower()
+
+        if choice == 'c':
+            return {'return': 1, 'error': 'Cancelled by user due to local repository changes.'}
+        if choice != 'd':
+            logger.warning(
+                recursion_spaces +
+                '  - Keeping local changes and continuing without pulling remote updates.')
+            return {'return': 0, 'updated': False}
+
+        r = _run_git_command(repo_path, ['reset', '--hard', 'HEAD'])
+        if r.returncode != 0:
+            return {'return': 1, 'error': 'Failed to discard local changes with git reset --hard.'}
+
+        r = _run_git_command(repo_path, ['clean', '-fd'])
+        if r.returncode != 0:
+            return {'return': 1, 'error': 'Failed to clean untracked files before pulling updates.'}
+
+    r = _run_git_command(repo_path, ['pull', '--ff-only'])
+    if r.returncode != 0:
+        logger.warning(
+            recursion_spaces +
+            '  - Failed to auto-pull updates with --ff-only. Continuing with local checkout.')
+        return {'return': 0, 'updated': False}
+
+    return {'return': 0, 'updated': True}
+
+
+def check_and_handle_repo_updates(repo_path, repo_alias, script_relative_path,
+                                  auto_pull_repo, quiet, recursion_spaces, logger):
+    repo_label = repo_alias if repo_alias else repo_path
+    status = _get_repo_update_status(repo_path, script_relative_path)
+
+    if status.get('warning'):
+        logger.debug(recursion_spaces + '  - {}'.format(status['warning']))
+
+    if not status.get('update_available', False):
+        return {'return': 0}
+
+    logger.warning(recursion_spaces + '=================================================')
+    logger.warning(recursion_spaces + 'WARNING: Updates are available for repo "{}" ({} commit(s) behind).'.format(
+        repo_label, status.get('commits_behind', 0)))
+
+    if status.get('script_changed'):
+        logger.warning(recursion_spaces + '  - The selected script has changes in remote updates.')
+
+    changed_files = status.get('changed_files', [])
+    if changed_files:
+        files_to_show = changed_files[:20]
+        logger.warning(recursion_spaces + '  - Changed files in remote updates:')
+        for file_name in files_to_show:
+            logger.warning(recursion_spaces + '    * {}'.format(file_name))
+        if len(changed_files) > len(files_to_show):
+            logger.warning(recursion_spaces + '    ... and {} more file(s).'.format(
+                len(changed_files) - len(files_to_show)))
+
+    if auto_pull_repo:
+        logger.warning(recursion_spaces + '  - --auto-pull-repo is enabled. Attempting to pull updates...')
+        r = _auto_pull_repo_updates(repo_path, quiet, logger, recursion_spaces)
+        if r['return'] > 0:
+            return r
+        if r.get('updated'):
+            logger.warning(recursion_spaces + '  - Repository update completed.')
+    else:
+        logger.warning(recursion_spaces + '  - Continue current run, then update later with "mlc pull repo {}".'.format(
+            repo_label))
+        logger.warning(recursion_spaces + '  - Or restart with --auto-pull-repo to pull automatically.')
+
+    logger.warning(recursion_spaces + '=================================================')
+    return {'return': 0}
+
 
 ##############################################################################
 
