@@ -40,7 +40,10 @@ def get_framework_field(sut_info, system_framework):
     framework = (system_framework or "").strip()
     if framework == "":
         framework_name = (sut_info.get('framework', '') or '').strip()
-        framework_version = (sut_info.get('framework_version', '') or '').strip()
+        framework_version = (
+            sut_info.get(
+                'framework_version',
+                '') or '').strip()
         framework = (
             f"{framework_name} {framework_version}"
         ).strip()
