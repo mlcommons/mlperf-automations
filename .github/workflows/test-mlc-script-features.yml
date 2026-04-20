@@ -695,3 +695,29 @@ jobs:
         # detect-cpu depends on detect-os; we can pass adr options through
         mlcr detect,cpu --adr.detect-os.tags=detect,os --quiet
         echo "PASS: adr option correctly passed through to dependencies"
+
+    - name: Create test scripts for adr opt-out behavior
+      shell: bash
+      run: |
+        # Determine the MLC repo path (mlc pull repo clones to ~/MLC/repos/<owner>@<repo>)
+        REPO_SCRIPT_DIR=$(python3 -c "import subprocess, re, os; out = subprocess.run(['mlc', 'find', 'script', '--tags=detect,os', '--quiet'], capture_output=True, text=True); combined = out.stdout + out.stderr; match = re.search(r'Item path:\s*(.+)', combined); print(os.path.dirname(match.group(1).strip())) if match else exit(1)")
+        echo "MLC repo script dir: $REPO_SCRIPT_DIR"
+
+        mkdir -p "$REPO_SCRIPT_DIR/test-adr-recursive-local-child"
+        printf 'alias: test-adr-recursive-local-child\nautomation_alias: script\nautomation_uid: 5b4e0237da074764\ndeps:\n- names:\n  - mydep\n  tags: detect,os\n  skip_add_deps_recursive: true\ntags:\n- test\n- adr-recursive-local-child\nuid: cccc1111dddd2222\n' > "$REPO_SCRIPT_DIR/test-adr-recursive-local-child/meta.yaml"
+        printf '#!/bin/bash\necho "Child script runs"\n' > "$REPO_SCRIPT_DIR/test-adr-recursive-local-child/run.sh"
+        chmod +x "$REPO_SCRIPT_DIR/test-adr-recursive-local-child/run.sh"
+        printf '@echo off\necho Child script runs\n' > "$REPO_SCRIPT_DIR/test-adr-recursive-local-child/run.bat"
+
+        mkdir -p "$REPO_SCRIPT_DIR/test-adr-recursive-local-parent"
+        printf 'alias: test-adr-recursive-local-parent\nautomation_alias: script\nautomation_uid: 5b4e0237da074764\ndeps:\n- tags: test,adr-recursive-local-child\ntags:\n- test\n- adr-recursive-local-parent\nuid: cccc2222dddd3333\n' > "$REPO_SCRIPT_DIR/test-adr-recursive-local-parent/meta.yaml"
+        printf '#!/bin/bash\necho "Parent script runs"\n' > "$REPO_SCRIPT_DIR/test-adr-recursive-local-parent/run.sh"
+        chmod +x "$REPO_SCRIPT_DIR/test-adr-recursive-local-parent/run.sh"
+        printf '@echo off\necho Parent script runs\n' > "$REPO_SCRIPT_DIR/test-adr-recursive-local-parent/run.bat"
+
+    - name: Test skip_add_deps_recursive option
+      shell: bash
+      run: |
+        # Global adr override should not modify child dep marked with skip_add_deps_recursive: true
+        mlcr test,adr-recursive-local-parent --adr.mydep.tags=nonexistent,script,tags,xxxyyyzzz --quiet
+        echo "PASS: skip_add_deps_recursive kept recursive adr override local-safe"

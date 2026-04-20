@@ -5525,6 +5525,19 @@ def update_deps(deps, add_deps, fail_error=False, env={}):
 
 
 ##############################################################################
+def update_deps_recursive(deps, add_deps, env={}):
+    """
+    Internal: add deps tags, version etc. by name for recursive overrides.
+    """
+    recursive_updatable_deps = [
+        dep for dep in deps
+        if not is_true(dep.get('skip_add_deps_recursive', False))
+    ]
+
+    return update_deps(recursive_updatable_deps, add_deps, False, env)
+
+
+##############################################################################
 def append_deps(deps, new_deps):
     """
     Internal: add deps from meta
@@ -5619,17 +5632,21 @@ def update_deps_from_input(deps, post_deps, prehook_deps, posthook_deps, i):
             return r1
 
     if add_deps_recursive_info_from_input:
-        update_deps(deps, add_deps_recursive_info_from_input, False, env)
-        update_deps(post_deps, add_deps_recursive_info_from_input, False, env)
-        update_deps(
+        update_deps_recursive(
+            deps,
+            add_deps_recursive_info_from_input,
+            env)
+        update_deps_recursive(
+            post_deps,
+            add_deps_recursive_info_from_input,
+            env)
+        update_deps_recursive(
             prehook_deps,
             add_deps_recursive_info_from_input,
-            False,
             env)
-        update_deps(
+        update_deps_recursive(
             posthook_deps,
             add_deps_recursive_info_from_input,
-            False,
             env)
 
     return {'return': 0}
@@ -5940,10 +5957,10 @@ def update_adr_from_meta(deps, post_deps, prehook_deps,
     Internal: update add_deps_recursive from meta
     """
     if add_deps_recursive_info:
-        update_deps(deps, add_deps_recursive_info, False, env)
-        update_deps(post_deps, add_deps_recursive_info, False, env)
-        update_deps(prehook_deps, add_deps_recursive_info, False, env)
-        update_deps(posthook_deps, add_deps_recursive_info, False, env)
+        update_deps_recursive(deps, add_deps_recursive_info, env)
+        update_deps_recursive(post_deps, add_deps_recursive_info, env)
+        update_deps_recursive(prehook_deps, add_deps_recursive_info, env)
+        update_deps_recursive(posthook_deps, add_deps_recursive_info, env)
 
     return {'return': 0}
 
