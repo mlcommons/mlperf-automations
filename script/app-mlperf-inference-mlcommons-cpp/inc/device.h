@@ -19,7 +19,7 @@
  *
  * The Alloc, Free, Read, Write, Copy operations are for the corresponding device memory.
  */
-class Device {
+class MlcDevice {
 public:
     virtual size_t NumConcurrency() const = 0;
     virtual size_t NumMemory() const = 0;
@@ -33,7 +33,7 @@ public:
     virtual void SetConcurrencyIndex(size_t concurrency_index) {}
 };
 
-class CPUDevice : public Device {
+class CPUDevice : public MlcDevice {
     size_t NumConcurrency() const override {
         return 2;//std::thread::hardware_concurrency();
     }
