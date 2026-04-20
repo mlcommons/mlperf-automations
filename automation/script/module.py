@@ -5525,10 +5525,14 @@ def update_deps(deps, add_deps, fail_error=False, env={}):
 
 
 ##############################################################################
-def update_deps_recursive(deps, add_deps, env={}):
+def update_deps_recursive(deps, add_deps, env=None):
     """
-    Internal: add deps tags, version etc. by name for recursive overrides.
+    Internal: apply recursive dependency overrides while skipping deps marked
+    with skip_add_deps_recursive.
     """
+    if env is None:
+        env = {}
+
     recursive_updatable_deps = [
         dep for dep in deps
         if not is_true(dep.get('skip_add_deps_recursive', False))
