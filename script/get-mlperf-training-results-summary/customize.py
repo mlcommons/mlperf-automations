@@ -35,8 +35,7 @@ def preprocess(i):
     if not summary_file.endswith('.json'):
         return {'return': 1, 'error': 'MLC_MLPERF_TRAINING_RESULTS_SUMMARY_FILE should end with .json'}
 
-    summary_json = summary_file if os.path.isabs(
-        summary_file) else os.path.abspath(summary_file)
+    summary_json = summary_file if os.path.isabs(summary_file) else os.path.abspath(summary_file)
     summary_csv = summary_json[:-5] + '.csv'
 
     env['MLC_MLPERF_TRAINING_RESULTS_SUMMARY_JSON'] = summary_json

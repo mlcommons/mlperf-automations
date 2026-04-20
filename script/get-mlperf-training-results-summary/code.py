@@ -24,7 +24,16 @@ def main():
         '--csv',
         summary_csv
     ]
-    subprocess.run(cmd, check=True)
+    try:
+        subprocess.run(cmd, check=True)
+    except FileNotFoundError as exc:
+        raise RuntimeError('Python executable not found: {}'.format(cmd[0])) from exc
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(
+            'Failed to generate training summary using command: {} (exit code {})'.format(
+                ' '.join(cmd), exc.returncode
+            )
+        ) from exc
 
 
 if __name__ == '__main__':
