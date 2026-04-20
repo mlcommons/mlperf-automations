@@ -40,5 +40,13 @@ echo "$cmd"
 eval "$cmd"
 test "$?" -eq 0 || exit "$?"
 
-cmake --build ${BUILD_DIR} --config Release -j$(nproc)
+if command -v nproc >/dev/null 2>&1; then
+  BUILD_JOBS="$(nproc)"
+elif command -v sysctl >/dev/null 2>&1; then
+  BUILD_JOBS="$(sysctl -n hw.logicalcpu)"
+else
+  BUILD_JOBS=1
+fi
+
+cmake --build ${BUILD_DIR} --config Release -j"${BUILD_JOBS}"
 test "$?" -eq 0 || exit "$?"

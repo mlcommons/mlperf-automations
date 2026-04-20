@@ -23,3 +23,4 @@ repos.json
 index_script.json
 index_cache.json
 index_experiment.json
+*.egg-info/
