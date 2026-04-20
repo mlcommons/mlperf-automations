@@ -58,6 +58,13 @@ def _cp(returncode=0, stdout='', stderr=''):
 
 class RepoUpdateHandlingTests(unittest.TestCase):
     def test_get_repo_update_status_detects_updates_and_script_change(self):
+        # _run_git_command call sequence:
+        # 1) rev-parse --is-inside-work-tree
+        # 2) rev-parse --abbrev-ref --symbolic-full-name @{u}
+        # 3) fetch --quiet
+        # 4) rev-list --count HEAD..@{u}
+        # 5) diff --name-only HEAD..@{u}
+        # 6) diff --name-only HEAD..@{u} -- <script path>
         with patch.object(module, '_run_git_command', side_effect=[
             _cp(stdout='true\n'),
             _cp(stdout='origin/main\n'),

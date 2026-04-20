@@ -5962,7 +5962,15 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
 
 def _run_git_command(repo_path, args):
     cmd = ['git', '-C', repo_path] + args
-    return subprocess.run(cmd, capture_output=True, text=True)
+    try:
+        return subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+    except subprocess.TimeoutExpired as e:
+        return subprocess.CompletedProcess(
+            args=cmd,
+            returncode=124,
+            stdout=e.stdout or '',
+            stderr=(e.stderr or '') + '\nGit command timed out.'
+        )
 
 
 def _get_repo_update_status(repo_path, script_relative_path=''):
@@ -5992,8 +6000,9 @@ def _get_repo_update_status(repo_path, script_relative_path=''):
     if r.returncode != 0:
         return status
 
+    raw_commits_behind = (r.stdout or '').strip()
     try:
-        commits_behind = int((r.stdout or '0').strip() or '0')
+        commits_behind = int(raw_commits_behind) if raw_commits_behind else 0
     except ValueError:
         commits_behind = 0
 
@@ -6029,12 +6038,12 @@ def _auto_pull_repo_updates(repo_path, quiet, logger, recursion_spaces):
                 '  - Local changes detected. Skipping --auto-pull-repo in quiet mode.')
             return {'return': 0, 'updated': False}
 
-        choice = input(
-            recursion_spaces +
-            '  - Local changes detected in repo checkout.\n'
-            + recursion_spaces +
-            '    [k]eep local changes and continue without pull, [d]iscard local changes and pull, [c]ancel: '
-        ).strip().lower()
+        prompt = (
+            f'{recursion_spaces}  - Local changes detected in repo checkout.\n'
+            f'{recursion_spaces}    [k]eep local changes and continue without pull, '
+            f'[d]iscard local changes and pull, [c]ancel: '
+        )
+        choice = input(prompt).strip().lower()
 
         if choice == 'c':
             return {'return': 1, 'error': 'Cancelled by user due to local repository changes.'}
