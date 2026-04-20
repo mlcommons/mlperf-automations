@@ -39,17 +39,20 @@ def check_dict_filled(keys, sut_info):
 def get_framework_field(sut_info, system_framework):
     framework = (system_framework or "").strip()
     if framework == "":
+        framework_name = (sut_info.get('framework', '') or '').strip()
+        framework_version = (sut_info.get('framework_version', '') or '').strip()
         framework = (
-            (sut_info.get('framework', '') or '') +
-            (sut_info.get('framework_version', '') or '')
+            f"{framework_name} {framework_version}"
         ).strip()
 
     implementation = (sut_info.get('implementation', '') or '').strip()
     if implementation:
         implementation_prefix = implementation + " "
+        framework_lower = framework.lower()
+        implementation_lower = implementation.lower()
         if framework == "":
             framework = implementation
-        elif not framework.lower().startswith(implementation_prefix.lower()) and framework.lower() != implementation.lower():
+        elif not framework_lower.startswith(implementation_prefix.lower()) and framework_lower != implementation_lower:
             framework = implementation_prefix + framework
 
     return framework
