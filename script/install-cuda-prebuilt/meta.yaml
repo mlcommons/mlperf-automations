@@ -118,6 +118,8 @@ tests:
   - env:
       MLC_SUDO: sudo
   - env:
+      MLC_SUDO: 'true'
+  - env:
       CUDA_SKIP_SUDO: 'yes'
 
 # Docker / container
