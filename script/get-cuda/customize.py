@@ -50,7 +50,7 @@ def preprocess(i):
             if system_path:
                 system_path = system_path + ":"
             env['MLC_TMP_PATH'] = system_path + \
-                '/usr/local/cuda/bin:/usr/cuda/bin:/usr/local/cuda-11/bin:/usr/cuda-11/bin:/usr/local/cuda-12/bin:/usr/cuda-12/bin:/usr/local/packages/cuda'
+                '/usr/local/cuda/bin:/usr/cuda/bin:/usr/local/cuda-11/bin:/usr/cuda-11/bin:/usr/local/cuda-12/bin:/usr/cuda-12/bin:/usr/local/packages/cuda:/opt/mlc-installs/cuda/install/bin'
             env['MLC_TMP_PATH_IGNORE_NON_EXISTANT'] = 'yes'
 
     if is_true(env['MLC_CUDA_FULL_TOOLKIT_INSTALL']):
