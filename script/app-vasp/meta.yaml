@@ -1,0 +1,39 @@
+alias: app-vasp
+uid: dae7f8a9b0c2345e
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: HPC Application
+tags:
+- app
+- vasp
+- hpc
+cache: true
+new_env_keys:
+- MLC_VASP_SRC_PATH
+- MLC_VASP_INSTALL_PATH
+- MLC_VASP_BIN_PATH
+- +PATH
+- +LD_LIBRARY_PATH
+new_state_keys: []
+deps:
+- tags: detect,cpu
+- tags: get,generic,sys-util,_libopenmpi-dev
+- tags: get,generic,sys-util,_gfortran
+  names:
+  - gfortran
+- tags: get,generic,sys-util,_libfftw3-dev
+- tags: get,generic,sys-util,_libhdf5-openmpi-dev
+- tags: get,cmake
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+variations: {}
+default_env:
+  MLC_VASP_SRC_PATH: ''
+input_mapping:
+  vasp_src_path: MLC_VASP_SRC_PATH
+input_description:
+  vasp_src_path:
+    desc: Path to VASP source directory (VASP requires a license)
+tests:
+  run_inputs: []

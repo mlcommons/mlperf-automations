@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-04-18 05:31:02*
+*Last updated: 2026-04-20 15:26:08*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -668,12 +668,42 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## HPC Application
 
+- **[app-cloverleaf](app-cloverleaf/)**
+  - app-cloverleaf
+  - Tags: `app`, `cloverleaf`, `hpc`
 - **[app-cp2k](app-cp2k/)**
   - app-cp2k
   - Tags: `app`, `cp2k`
+- **[app-gromacs](app-gromacs/)**
+  - app-gromacs
+  - Tags: `app`, `gromacs`, `hpc`
+- **[app-hmmer](app-hmmer/)**
+  - app-hmmer
+  - Tags: `app`, `hmmer`, `hpc`
+- **[app-lammps](app-lammps/)**
+  - app-lammps
+  - Tags: `app`, `lammps`, `hpc`
+- **[app-namd](app-namd/)**
+  - app-namd
+  - Tags: `app`, `namd`, `hpc`
 - **[app-nwchem](app-nwchem/)**
   - app-nwchem
   - Tags: `app`, `nwchem`, `hpc`
+- **[app-openfoam](app-openfoam/)**
+  - app-openfoam
+  - Tags: `app`, `openfoam`, `hpc`
+- **[app-quantum-espresso](app-quantum-espresso/)**
+  - app-quantum-espresso
+  - Tags: `app`, `quantum-espresso`, `hpc`
+- **[app-roms](app-roms/)**
+  - app-roms
+  - Tags: `app`, `roms`, `hpc`
+- **[app-vasp](app-vasp/)**
+  - app-vasp
+  - Tags: `app`, `vasp`, `hpc`
+- **[app-wrf](app-wrf/)**
+  - app-wrf
+  - Tags: `app`, `wrf`, `hpc`
 
 ## MLCommons automation
 
@@ -932,6 +962,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[detect-cpu](detect-cpu/)**
   - detect-cpu
   - Tags: `detect`, `cpu`, `detect-cpu`, `info`
+- **[detect-host-system-details](detect-host-system-details/)**
+  - detect-host-system-details
+  - Tags: `detect`, `host`, `system`, `details`
 - **[detect-os](detect-os/)**
   - detect-os
   - Tags: `detect-os`, `detect`, `os`, `info`
@@ -1165,7 +1198,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 340
+- **Total Scripts**: 351
 - **Categories**: 33
 
 ## Usage
