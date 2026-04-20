@@ -7,6 +7,7 @@ develop-eggs/
 dist/
 eggs/
 .eggs/
+*.egg-info/
 lib/
 lib64/
 sdist/
