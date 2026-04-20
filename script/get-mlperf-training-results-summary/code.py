@@ -14,11 +14,17 @@ def main():
     if summary_csv == '':
         raise RuntimeError('MLC_MLPERF_TRAINING_RESULTS_SUMMARY_CSV is not set')
 
+    summarizer_input_dir = submission_dir
+    if not os.path.isdir(os.path.join(submission_dir, 'results')):
+        # Training results repos can be organized as /<org>/{systems,results,benchmarks}.
+        # In that case, ask result_summarizer to auto-discover all orgs.
+        summarizer_input_dir = os.path.join(submission_dir, '{*}')
+
     cmd = [
         os.environ.get('MLC_PYTHON_BIN_WITH_PATH', 'python'),
         '-m',
         'mlperf_logging.result_summarizer',
-        submission_dir,
+        summarizer_input_dir,
         'training',
         ruleset,
         '--csv',
