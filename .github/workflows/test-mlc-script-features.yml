@@ -121,17 +121,20 @@ jobs:
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
 
-        logger = SimpleNamespace(info=lambda *a, **k: None, error=lambda *a, **k: None)
+        logger = SimpleNamespace(info=lambda *args, **kwargs: None, error=lambda *args, **kwargs: None)
+        DOCKER_ENV_MARKER = '/.dockerenv'
+        DOCKER_SOCKET = '/var/run/docker.sock'
+        DOCKER_BIN = '/usr/bin/docker'
 
-        def run_case(enable_nested):
+        def run_case(enable_nested, docker_exit_code=0):
             captured = {'cmd': ''}
 
             def fake_system(cmd):
                 captured['cmd'] = cmd
-                return 0
+                return docker_exit_code
 
             def fake_exists(path):
-                if path in ['/.dockerenv', '/var/run/docker.sock', '/usr/bin/docker']:
+                if path in [DOCKER_ENV_MARKER, DOCKER_SOCKET, DOCKER_BIN]:
                     return True
                 return False
 
@@ -149,19 +152,23 @@ jobs:
 
             with patch.object(mod.os.path, 'exists', side_effect=fake_exists), \
                     patch.object(mod.os, 'system', side_effect=fake_system), \
-                    patch.object(mod.shutil, 'which', return_value='/usr/bin/docker'):
+                    patch.object(mod.shutil, 'which', return_value=DOCKER_BIN):
                 result = mod.postprocess(i)
 
-            assert result['return'] == 0, result
-            return captured['cmd']
+            return result, captured['cmd']
 
-        enabled_cmd = run_case(True)
-        disabled_cmd = run_case(False)
+        enabled_result, enabled_cmd = run_case(True, docker_exit_code=0)
+        disabled_result, disabled_cmd = run_case(False, docker_exit_code=0)
+        failed_result, _ = run_case(True, docker_exit_code=1)
 
-        assert '/var/run/docker.sock:/var/run/docker.sock' in enabled_cmd, enabled_cmd
-        assert '/usr/bin/docker:/usr/bin/docker' in enabled_cmd, enabled_cmd
-        assert '/var/run/docker.sock:/var/run/docker.sock' not in disabled_cmd, disabled_cmd
-        assert '/usr/bin/docker:/usr/bin/docker' not in disabled_cmd, disabled_cmd
+        assert enabled_result['return'] == 0, enabled_result
+        assert disabled_result['return'] == 0, disabled_result
+        assert failed_result['return'] == 1 and 'docker run failed' in failed_result.get('error', ''), failed_result
+
+        assert f'{DOCKER_SOCKET}:{DOCKER_SOCKET}' in enabled_cmd, enabled_cmd
+        assert f'{DOCKER_BIN}:{DOCKER_BIN}' in enabled_cmd, enabled_cmd
+        assert f'{DOCKER_SOCKET}:{DOCKER_SOCKET}' not in disabled_cmd, disabled_cmd
+        assert f'{DOCKER_BIN}:{DOCKER_BIN}' not in disabled_cmd, disabled_cmd
         print('Nested Docker opt-in mount handling test passed')
         PY
 
