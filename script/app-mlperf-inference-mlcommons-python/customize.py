@@ -37,8 +37,8 @@ print(os.pathsep.join(lib_dirs))
 """
     try:
         output = subprocess.check_output(
-            [python_bin, "-c", find_nvidia_lib_dirs], text=True).strip()
-    except Exception as e:
+            [python_bin, "-c", find_nvidia_lib_dirs], text=True, timeout=20).strip()
+    except (subprocess.SubprocessError, OSError, ValueError) as e:
         logger.warning("Unable to detect TensorFlow NVIDIA runtime library directories: %s", e)
         return
 
