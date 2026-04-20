@@ -23,12 +23,12 @@
  */
 class System : public mlperf::SystemUnderTest {
 public:
-    System(const std::string &name, std::shared_ptr<Backend> &backend)
+    System(const std::string &name, std::shared_ptr<MlcBackend> &backend)
         : name(name), backend(backend) {}
     const std::string &Name() override { return name; }
 
 protected:
-    std::shared_ptr<Backend> backend;
+    std::shared_ptr<MlcBackend> backend;
 
 private:
     std::string name;
@@ -36,7 +36,7 @@ private:
 
 class StreamSUT : public System {
 public:
-    StreamSUT(std::shared_ptr<Backend> &backend) : System("StreamSUT", backend) {}
+    StreamSUT(std::shared_ptr<MlcBackend> &backend) : System("StreamSUT", backend) {}
     
     void IssueQuery(const std::vector<mlperf::QuerySample> &samples) override {
         size_t max_batch_size = backend->MaxBatchSize();
@@ -57,7 +57,7 @@ public:
 
 class QueueSUT : public System {
 public:
-    QueueSUT(std::shared_ptr<Backend> &backend)
+    QueueSUT(std::shared_ptr<MlcBackend> &backend)
             : System("QueueSUT", backend) {
         // launch threads
         size_t num_threads = backend->NumConcurrency();

@@ -56,6 +56,18 @@ deps:
   - inference-src
 - enable_if_env:
     MLC_MLPERF_BACKEND:
+    - pytorch
+  names:
+  - pytorch
+  tags: get,generic-python-lib,_torch
+- enable_if_env:
+    MLC_MLPERF_BACKEND:
+    - pytorch
+  names:
+  - torchvision
+  tags: get,generic-python-lib,_torchvision
+- enable_if_env:
+    MLC_MLPERF_BACKEND:
     - onnxruntime
     MLC_MLPERF_DEVICE:
     - cpu
@@ -75,7 +87,17 @@ deps:
 - enable_if_env:
     MLC_MODEL:
     - resnet50
+    MLC_MLPERF_BACKEND:
+    - onnxruntime
   tags: get,ml-model,raw,resnet50,_onnx
+- enable_if_env:
+    MLC_MODEL:
+    - resnet50
+    MLC_MLPERF_BACKEND:
+    - pytorch
+  names:
+  - resnet50-pytorch-weights
+  tags: get,ml-model,raw,resnet50,_pytorch,_fp32
 - enable_if_env:
     MLC_MODEL:
     - retinanet
@@ -86,6 +108,27 @@ deps:
     MLC_MODEL:
     - retinanet
   tags: get,ml-model,retinanet,_onnx,_fp32
+- enable_if_env:
+    MLC_MODEL:
+    - bert-99
+    - bert-99.9
+  names:
+  - bert-model
+  tags: get,ml-model,language-processing,bert-large,_onnx
+- enable_if_env:
+    MLC_MODEL:
+    - bert-99
+    - bert-99.9
+  names:
+  - squad-preprocessed
+  tags: get,dataset,preprocessed,tokenized,squad,_raw
+- enable_if_env:
+    MLC_MODEL:
+    - bert-99
+    - bert-99.9
+  names:
+  - squad-vocab
+  tags: get,dataset-aux,squad-vocab
 - tags: generate,user-conf,mlperf,inference,_wg-inference
   names:
   - user-conf-generator
@@ -132,6 +175,7 @@ variations:
     group: framework
     env:
       MLC_MLPERF_BACKEND: pytorch
+      MLC_MLPERF_BACKEND_LIB_NAMESPEC: torch
   tf:
     group: framework
     env:
@@ -188,6 +232,32 @@ variations:
   resnet50,offline:
     default_env:
       MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 32
+  bert-99:
+    group: model
+    env:
+      MLC_MODEL: bert-99
+    default_env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 8
+      MLC_MLPERF_LOADGEN_PERFORMANCE_SAMPLE_COUNT: '10833'
+  bert-99.9:
+    group: model
+    env:
+      MLC_MODEL: bert-99.9
+    default_env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 8
+      MLC_MLPERF_LOADGEN_PERFORMANCE_SAMPLE_COUNT: '10833'
   resnet50,server:
     default_env:
       MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 32
+  bert-99,offline:
+    default_env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 8
+  bert-99.9,offline:
+    default_env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 8
+  bert-99,singlestream:
+    default_env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 1
+  bert-99.9,singlestream:
+    default_env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 1
