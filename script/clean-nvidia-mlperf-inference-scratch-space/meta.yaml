@@ -107,6 +107,10 @@ variations:
     group: model
     env:
       MLC_MODEL: sdxl
+  stable-diffusion-xl:
+    group: model
+    env:
+      MLC_MODEL: stable-diffusion-xl
   v4.0:
     group: version
     env:

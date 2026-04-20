@@ -1,6 +1,5 @@
-from mlc import utils
 import os
-from utils import is_true
+from utils import is_true, logger
 
 
 def preprocess(i):
@@ -24,6 +23,12 @@ def preprocess(i):
     artifact_name = env.get('MLC_CLEAN_ARTIFACT_NAME', '')
     if artifact_name == 'downloaded_model':
         artifact_name = 'models'
+    if model == '':
+        return {'return': 1, 'error': 'Please select a model variation to specify which model to clean'}
+
+    supported_artifacts = ['downloaded_data', 'preprocessed_data', 'models']
+    if artifact_name not in supported_artifacts:
+        return {'return': 1, 'error': f'Unsupported artifact variation: {artifact_name}. Supported values: {supported_artifacts}'}
 
     model_aliases = {
         'stable-diffusion-xl': 'sdxl',
@@ -39,8 +44,6 @@ def preprocess(i):
         'llama2-70b-99.9': 'llama2-70b'
     }
     model_name = model_aliases.get(model, model)
-    if model_name == '':
-        return {'return': 1, 'error': 'Please select a variation specifying the model to clean'}
 
     model_artifacts = {
         '3d-unet': {
@@ -93,6 +96,9 @@ def preprocess(i):
         }
     }
 
+    if model_name not in model_artifacts:
+        return {'return': 1, 'error': f'Unsupported model variation: {model}'}
+
     clean_paths = model_artifacts.get(model_name, {}).get(artifact_name, [])
     if clean_paths:
         full_clean_paths = [os.path.join(env['MLC_NVIDIA_MLPERF_SCRATCH_PATH'], p) for p in clean_paths]
@@ -114,7 +120,7 @@ def preprocess(i):
     if cache_rm_tags:
         r = mlc_cache.access({'action': 'rm', 'target': 'cache',
                               'tags': cache_rm_tags, 'f': True})
-        utils.logger.info(r)
+        logger.info(r)
         # Check if return code is 0 (success)
         # currently, the warning code is not being checked as the possibility
         # arises only for missing cache entry
