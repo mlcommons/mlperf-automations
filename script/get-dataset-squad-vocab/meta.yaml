@@ -1,24 +1,10 @@
 alias: get-dataset-squad-vocab
+uid: e38874fff5094577
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
-new_env_keys:
-- MLC_ML_MODEL_BERT_VOCAB_FILE_WITH_PATH
-- MLC_DATASET_SQUAD_VOCAB_PATH
-prehook_deps:
-- env:
-    MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_SQUAD_VOCAB_PATH
-  extra_cache_tags: bert,get,dataset-squad-vocab
-  force_cache: true
-  tags: download-and-extract,_wget
-  force_env_keys:
-    - MLC_OUTDIRNAME  
-  update_tags_from_env_with_prefix:
-    _url.:
-    - MLC_PACKAGE_URL
-print_env_at_the_end:
-  MLC_DATASET_SQUAD_VOCAB_PATH: Path to SQUAD vocab file
 tags:
 - get
 - aux
@@ -28,7 +14,29 @@ tags:
 - squad-aux
 - vocab
 - squad-vocab
-uid: e38874fff5094577
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_ML_MODEL_BERT_VOCAB_FILE_WITH_PATH
+- MLC_DATASET_SQUAD_VOCAB_PATH
+
+# Dependencies
+prehook_deps:
+- env:
+    MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_SQUAD_VOCAB_PATH
+  extra_cache_tags: bert,get,dataset-squad-vocab
+  force_cache: true
+  tags: download-and-extract,_wget
+  force_env_keys:
+  - MLC_OUTDIRNAME
+  update_tags_from_env_with_prefix:
+    _url.:
+    - MLC_PACKAGE_URL
+
+# Variations
 variations:
   from.zenodo:
     default: true
@@ -37,3 +45,7 @@ variations:
       MLC_DOWNLOAD_FILENAME: vocab.txt
       MLC_PACKAGE_URL: https://zenodo.org/record/3733868/files/vocab.txt
     group: download-source
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_DATASET_SQUAD_VOCAB_PATH: Path to SQUAD vocab file

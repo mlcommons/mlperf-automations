@@ -1,45 +1,43 @@
 alias: get-google-saxml
 uid: 5d7b17d84b5a48fb
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
-cache: true
-
+# Metadata
 category: AI/ML frameworks
-
-default_version: master
-
-deps:
-
-  - tags: detect,os
-
-  - names:
-    - python3
-    - python
-    tags: get,python3
-
-  - env:
-      MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_GOOGLE_SAXML_SRC
-    extra_cache_tags: google,saxsml,src
-    force_env_keys:
-    - MLC_GIT_CHECKOUT
-    names:
-    - google-saxml-git-src
-    tags: get,git,_repo.https://github.com/google/saxml
-
-  - tags: get,bazel
-    names:
-    - bazel
-
-extra_cache_tags_from_env:
-  - env: MLC_PYTHON_CACHE_TAGS
-    prefix: python-
-
-new_env_keys:
-- MLC_GOOGLE_SAXML*
-
 tags:
 - get
 - google
 - saxml
+
+# Cache
+cache: true
+extra_cache_tags_from_env:
+- env: MLC_PYTHON_CACHE_TAGS
+  prefix: python-
+
+# Environment
+new_env_keys:
+- MLC_GOOGLE_SAXML*
+
+# Dependencies
+deps:
+- tags: detect,os
+- names:
+  - python3
+  - python
+  tags: get,python3
+- env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_GOOGLE_SAXML_SRC
+  extra_cache_tags: google,saxsml,src
+  force_env_keys:
+  - MLC_GIT_CHECKOUT
+  names:
+  - google-saxml-git-src
+  tags: get,git,_repo.https://github.com/google/saxml
+- tags: get,bazel
+  names:
+  - bazel
+
+# Versions
+default_version: master

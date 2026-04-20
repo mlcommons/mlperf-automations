@@ -369,7 +369,7 @@ def run_validate_cache_if_present(i, cached_script):
         'path': script_path,
         'bat_ext': bat_ext,
         'os_info': os_info,
-        'recursion_spaces': i['recursion_spaces'],
+        'recursion_spaces': i['recursion_spaces'] + '    ',
         'tmp_file_run': i['self'].tmp_file_run,
         'self': i['self'],
         'meta': i['meta'],

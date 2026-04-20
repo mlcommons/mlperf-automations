@@ -1,13 +1,14 @@
 {
   "python-packages": [
-    "wheel", "mlcflow", "requests", "giturlparse", "tabulate"
-  ],
-  "ARGS": [
-    "MLC_GH_TOKEN"
+    "wheel",
+    "mlcflow",
+    "requests",
+    "giturlparse",
+    "tabulate"
   ],
   "ARGS_DEFAULT": {
-    "UID" : "1000",
-    "GID" : "1000"
+    "UID": "1000",
+    "GID": "1000"
   },
   "ENTRYPOINT": "[\"/bin/bash\", \"-c\"]",
   "ENV": {
@@ -26,61 +27,233 @@
     "ubuntu": {
       "USER": "ubuntu",
       "package-manager-update-cmd": "apt-get update -y",
-      "package-manager-get-cmd": "apt-get install -y", 
+      "package-manager-get-cmd": "apt-get install -y",
       "packages": [
-        "python3", "python3-pip", "git", "sudo", "wget", "python3-venv", "systemctl", "unzip", "ca-certificates", "ssl-cert"
+        "python3",
+        "python3-pip",
+        "git",
+        "sudo",
+        "wget",
+        "python3-venv",
+        "systemctl",
+        "unzip",
+        "ca-certificates",
+        "ssl-cert",
+        "binutils"
       ],
       "versions": {
-        "18.04": {
-          "FROM": "ubuntu:18.04"
-        },
         "20.04": {
           "FROM": "ubuntu:20.04"
         },
         "22.04": {
           "FROM": "ubuntu:22.04"
         },
-        "23.04": {
-          "FROM": "ubuntu:23.04"
-        },
         "24.04": {
           "FROM": "ubuntu:24.04"
+        },
+        "25.04": {
+          "FROM": "ubuntu:25.04"
+        },
+        "25.10": {
+          "FROM": "ubuntu:25.10"
         }
-      }
+      },
+      "default_version": "24.04"
     },
     "rhel": {
-      "FROM": "registry.access.redhat.com/ubi9", 
+      "FROM": "registry.access.redhat.com/ubi9",
       "package-manager-update-cmd": "dnf update -y",
-      "package-manager-get-cmd": "dnf install -y", 
+      "package-manager-get-cmd": "dnf install -y",
       "packages": [
-        "python3", "python-pip", "git", "wget", "sudo", "binutils"
+        "python3",
+        "python-pip",
+        "git",
+        "wget",
+        "sudo",
+        "binutils"
       ],
       "versions": {
-        "9": {
-        },
         "8": {
           "FROM": "registry.access.redhat.com/ubi8",
           "packages": [
-            "python39", "python39-pip", "git", "wget", "sudo", "binutils"
+            "python39",
+            "python39-pip",
+            "git",
+            "wget",
+            "sudo",
+            "binutils"
           ],
           "python-packages": [
-            "mlcflow", "requests", "giturlparse", "tabulate"
+            "mlcflow",
+            "requests",
+            "giturlparse",
+            "tabulate"
           ],
           "PYTHON": "python3.9"
-        }
-      }
+        },
+        "9": {}
+      },
+      "default_version": "9"
     },
     "arch": {
       "FROM": "archlinux",
       "package-manager-update-cmd": "pacman -Syu --noconfirm",
       "package-manager-get-cmd": "pacman -Sy --noconfirm",
       "packages": [
-        "python", "python-pip", "git", "wget", "sudo", "binutils"
+        "python",
+        "python-pip",
+        "git",
+        "wget",
+        "sudo",
+        "binutils"
       ],
       "versions": {
-        "latest": {
+        "latest": {}
+      },
+      "default_version": "latest"
+    },
+    "sles": {
+      "FROM": "registry.suse.com/bci/bci-base:15.6",
+      "package-manager-update-cmd": "zypper refresh",
+      "package-manager-get-cmd": "zypper install -y",
+      "packages": [
+        "python311",
+        "python311-pip",
+        "git",
+        "wget",
+        "sudo",
+        "unzip",
+        "ca-certificates",
+        "gzip",
+        "tar",
+        "gawk",
+        "binutils"
+      ],
+      "versions": {
+        "15.4": {
+          "FROM": "registry.suse.com/bci/bci-base:15.4",
+          "packages": [
+            "python310",
+            "python310-pip",
+            "git",
+            "wget",
+            "sudo",
+            "unzip",
+            "ca-certificates",
+            "gzip",
+            "tar",
+            "gawk",
+            "binutils"
+          ],
+          "PYTHON": "python3.10"
+        },
+        "15.5": {
+          "FROM": "registry.suse.com/bci/bci-base:15.5",
+          "packages": [
+            "python311",
+            "python311-pip",
+            "git",
+            "wget",
+            "sudo",
+            "unzip",
+            "ca-certificates",
+            "gzip",
+            "tar",
+            "gawk",
+            "binutils"
+          ],
+          "PYTHON": "python3.11"
+        },
+        "15.6": {
+          "FROM": "registry.suse.com/bci/bci-base:15.6"
         }
-      }
+      },
+      "default_version": "15.6",
+      "PYTHON": "python3.11"
+    },
+    "debian": {
+      "FROM": "debian:12",
+      "USER": "debian",
+      "package-manager-update-cmd": "apt-get update -y",
+      "package-manager-get-cmd": "apt-get install -y",
+      "packages": [
+        "python3",
+        "python3-pip",
+        "git",
+        "sudo",
+        "wget",
+        "python3-venv",
+        "unzip",
+        "ca-certificates"
+      ],
+      "versions": {
+        "11": {
+          "FROM": "debian:11"
+        },
+        "12": {
+          "FROM": "debian:12"
+        }
+      },
+      "default_version": "12"
+    },
+    "rocky": {
+      "FROM": "rockylinux:9",
+      "package-manager-update-cmd": "dnf update -y",
+      "package-manager-get-cmd": "dnf install -y",
+      "packages": [
+        "python3",
+        "python3-pip",
+        "git",
+        "wget",
+        "sudo",
+        "binutils"
+      ],
+      "versions": {
+        "8": {
+          "FROM": "rockylinux:8",
+          "packages": [
+            "python39",
+            "python39-pip",
+            "git",
+            "wget",
+            "sudo",
+            "binutils"
+          ],
+          "python-packages": [
+            "mlcflow",
+            "requests",
+            "giturlparse",
+            "tabulate"
+          ],
+          "PYTHON": "python3.9"
+        },
+        "9": {
+          "FROM": "rockylinux:9"
+        }
+      },
+      "default_version": "9"
+    },
+    "amazonlinux": {
+      "FROM": "amazonlinux:2023",
+      "package-manager-update-cmd": "dnf update -y",
+      "package-manager-get-cmd": "dnf install -y",
+      "packages": [
+        "python3",
+        "python3-pip",
+        "git",
+        "wget",
+        "sudo",
+        "tar",
+        "gzip",
+        "unzip",
+        "binutils"
+      ],
+      "versions": {
+        "2023": {
+          "FROM": "amazonlinux:2023"
+        }
+      },
+      "default_version": "2023"
     }
   }
 }

@@ -1,16 +1,26 @@
 alias: get-dataset-waymo
+uid: 21b269c753b64437
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 tags:
 - get
 - dataset
 - waymo
-uid: 21b269c753b64437
+
+# Cache
+cache: true
+
+# Environment
 new_env_keys:
-  - MLC_DATASET_WAYMO_PATH
+- MLC_DATASET_WAYMO_PATH
+
+# Input mapping
 input_mapping:
   waymo_path: MLC_DATASET_WAYMO_PATH
+
+# Variations
 variations:
   kitti_format:
     default: true
@@ -21,62 +31,64 @@ variations:
     group: download-src
     default: true
     prehook_deps:
-      - enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - 'yes'
-        env:
-          MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_WAYMO_PATH
-          MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_WAYMO_PATH
-        extra_cache_tags: waymo,dataset
-        force_cache: true
-        names:
-          - dae
-        tags: download-and-extract
-        force_env_keys:
-          - MLC_OUTDIRNAME  
-        update_tags_from_env_with_prefix:
-          _url.:
-            - MLC_DOWNLOAD_URL
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      env:
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_DATASET_WAYMO_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: MLC_DATASET_WAYMO_PATH
+      extra_cache_tags: waymo,dataset
+      force_cache: true
+      names:
+      - dae
+      tags: download-and-extract
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
     env:
       MLC_DOWNLOAD_SRC: mlcommons
-  rclone:
-    group: download-tool
-    add_deps_recursive:
-      dae:
-        tags: _rclone
-    prehook_deps:
-      - tags: get,rclone
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
-      - tags: get,rclone-config,_waymo
-        force_cache: true
-        enable_if_env:
-          MLC_TMP_REQUIRE_DOWNLOAD:
-          - yes
   r2-downloader:
     group: download-tool
     add_deps_recursive:
       dae:
         tags: _r2-downloader
     default: true
+  rclone:
+    group: download-tool
+    add_deps_recursive:
+      dae:
+        tags: _rclone
+    prehook_deps:
+    - tags: get,rclone
+      enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
+    - tags: get,rclone-config,_waymo
+      force_cache: true
+      enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - true
   dry-run:
     group: run-mode
     env:
       MLC_DOWNLOAD_MODE: dry
-  dry-run,rclone:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
   dry-run,r2-downloader:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
-  rclone,mlc:
+  dry-run,rclone:
     env:
-      MLC_DOWNLOAD_URL: mlc_waymo:waymo_preprocessed_dataset/kitti_format
+      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
   r2-downloader,mlc:
     env:
       MLC_DOWNLOAD_URL: https://waymo.mlcommons-storage.org/metadata/dataset.uri
       MLC_DOWNLOAD_FILENAME: dataset
+  rclone,mlc:
+    env:
+      MLC_DOWNLOAD_URL: mlc_waymo:waymo_preprocessed_dataset/kitti_format
+
+# Tests
 tests:
   needs_pat: true
   run_inputs:

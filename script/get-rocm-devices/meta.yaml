@@ -1,29 +1,39 @@
 alias: get-rocm-devices
 uid: c618239543364753
-
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
+# Metadata
+category: ROCM automation
 tags:
 - get
 - rocm-devices
 
+# Cache
 cache: false
 
+new_env_keys:
+- MLC_ROCM_*
+
 can_force_cache: true
-
-category: ROCM automation
-
 clean_files:
 - tmp-run.out
+
+deps:
+  - tags: get,python
+  - tags: get,generic-python-lib,_package.hip-python
+    env:
+      MLC_GENERIC_PYTHON_PIP_EXTRA_INDEX_URL: https://test.pypi.org/simple
+
 docker:
   run: false
   all_gpus: 'yes'
   skip_run_cmd: 'no'
   skip_mlc_sys_upgrade: 'yes'
-  mlc_repo_flags: '--checkout=dev'
+  mlc_repo_flags: --checkout=dev
   use_host_group_id: 'yes'
-  image_tag_extra: '-cm-dev'
+  image_tag_extra: -cm-dev
 
+# Output / debugging
 print_files_if_script_error:
 - tmp-run.out

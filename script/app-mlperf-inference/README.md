@@ -60,22 +60,22 @@ mlcr app,vision,language,mlcommons,mlperf,inference,generic
 | `--quiet` | Quiet run (select default values for all questions) |  | `False` |
 | `--readme` | Generate README with the reproducibility report |  | `` |
 | `--debug` | Debug MLPerf script |  | `` |
+| `--clean` |  |  | `` |
 | `--count` |  |  | `` |
 | `--docker` |  |  | `` |
+| `--gpu_name` |  |  | `` |
 | `--imagenet_path` |  |  | `` |
-| `--power` |  |  | `` |
-| `--power_server` |  |  | `` |
-| `--ntp_server` |  |  | `` |
 | `--max_amps` |  |  | `` |
 | `--max_volts` |  |  | `` |
-| `--clean` |  |  | `` |
+| `--multistream_target_latency` |  |  | `` |
+| `--ntp_server` |  |  | `` |
 | `--offline_target_qps` |  |  | `` |
+| `--power` |  |  | `` |
+| `--power_server` |  |  | `` |
+| `--pp_size` |  |  | `1` |
 | `--server_target_qps` |  |  | `` |
 | `--singlestream_target_latency` |  |  | `` |
-| `--multistream_target_latency` |  |  | `` |
-| `--gpu_name` |  |  | `` |
 | `--tp_size` |  |  | `2` |
-| `--pp_size` |  |  | `1` |
 | `--use_dataset_from_host` |  |  | `` |
 ### Generic Script Inputs
 

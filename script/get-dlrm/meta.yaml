@@ -1,26 +1,38 @@
 alias: get-dlrm
+uid: 63680ac2449a4241
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
-default_env:
-  MLC_GIT_DEPTH: --depth 10
-  MLC_GIT_PATCH: 'no'
-  MLC_GIT_URL: https://github.com/facebookresearch/dlrm.git
-default_version: main
-deps:
-- tags: detect,os
-new_env_keys:
-- DLRM_DIR
 tags:
 - get
 - src
 - dlrm
-uid: 63680ac2449a4241
+
+# Cache
+cache: true
+
+# Environment
+default_env:
+  MLC_GIT_DEPTH: --depth 10
+  MLC_GIT_PATCH: 'no'
+  MLC_GIT_URL: https://github.com/facebookresearch/dlrm.git
+new_env_keys:
+- DLRM_DIR
+
+# Dependencies
+deps:
+- tags: detect,os
+
+# Variations
 variations:
   full-history:
     env:
       MLC_GIT_DEPTH: ''
+
+# Versions
+default_version: main
 versions:
   main:
     env:

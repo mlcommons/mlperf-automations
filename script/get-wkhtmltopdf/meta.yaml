@@ -1,27 +1,37 @@
 alias: get-wkhtmltopdf
+uid: 67ec874a3dfe4b87
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 tags:
 - get
 - wkhtmltopdf
+
+# Cache
+cache: true
+
+# Dependencies
 deps:
-  - tags: detect,os
-  - tags: detect,sudo
-    skip_if_env:
-      MLC_HOST_OS_TYPE:
-        - windows
-  - tags: get,generic-sys-util,_wkhtmltopdf
-    enable_if_any_env:
-      MLC_INSTALL_FROM_PACKAGE_MANAGER:
-      - on
-      MLC_HOST_OS_TYPE:
-      - windows
-uid: 67ec874a3dfe4b87
-docker:
-  pre_run_cmds:
-    - mlc pull repo
+- tags: detect,os
+- tags: detect,sudo
+  skip_if_env:
+    MLC_HOST_OS_TYPE:
+    - windows
+- tags: get,generic-sys-util,_wkhtmltopdf
+  enable_if_any_env:
+    MLC_INSTALL_FROM_PACKAGE_MANAGER:
+    - true
+    MLC_HOST_OS_TYPE:
+    - windows
+
+# Variations
 variations:
   with-qt:
     group: qt
     default: true
+
+# Docker / container
+docker:
+  pre_run_cmds:
+  - mlc pull repo

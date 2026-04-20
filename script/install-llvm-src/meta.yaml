@@ -1,8 +1,40 @@
 alias: install-llvm-src
+uid: 2af16e9a6c5f4702
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
+name: Build LLVM compiler from sources (can take >30 min)
 category: Compiler automation
+tags:
+- install
+- src
+- llvm
+- from.src
+- src-llvm
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_GIT_URL: https://github.com/llvm/llvm-project
+new_env_keys:
+- MLC_LLVM_*
+- MLC_GET_DEPENDENT_CACHED_PATH
+- +PATH
+- +C_INCLUDE_PATH
+
+# Input mapping
+input_mapping:
+  clean: MLC_CLEAN
+  extra_options: MLC_LLVM_EXTRA_CMAKE_OPTIONS
+  per_target_runtime_dir: MLC_LLVM_PER_TARGET_RUNTIME_DIR
+  pull_changes: MLC_LLVM_REPO_PULL_CHANGES
+  target_triple: MLC_LLVM_TARGET_TRIPLE
+  targets: MLC_LLVM_TARGETS_TO_BUILD
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -24,7 +56,7 @@ deps:
   tags: get,git,repo
   skip_if_env:
     MLC_LLVM_INSTALLED_PATH:
-      - on
+    - true
   update_tags_from_env_with_prefix:
     _branch.:
     - MLC_GIT_CHECKOUT
@@ -38,27 +70,11 @@ deps:
     - MLC_VERSION
 - tags: pull,git,repo
   env:
-    MLC_GIT_CHECKOUT_PATH: '<<<MLC_LLVM_SRC_REPO_PATH>>>'
+    MLC_GIT_CHECKOUT_PATH: <<<MLC_LLVM_SRC_REPO_PATH>>>
   enable_if_env:
     MLC_LLVM_REPO_PULL_CHANGES:
-      - 'yes'
-
-input_mapping:
-  targets: MLC_LLVM_TARGETS_TO_BUILD
-  target_triple: MLC_LLVM_TARGET_TRIPLE
-  extra_options: MLC_LLVM_EXTRA_CMAKE_OPTIONS
-  per_target_runtime_dir: MLC_LLVM_PER_TARGET_RUNTIME_DIR
-  clean: MLC_CLEAN
-  pull_changes: MLC_LLVM_REPO_PULL_CHANGES
-
-env:
-  MLC_GIT_URL: https://github.com/llvm/llvm-project
-name: Build LLVM compiler from sources (can take >30 min)
-new_env_keys:
-- MLC_LLVM_*
-- MLC_GET_DEPENDENT_CACHED_PATH
-- +PATH
-- +C_INCLUDE_PATH
+    - 'yes'
+prehook_deps: []
 post_deps:
 - skip_if_env:
     MLC_REQUIRE_INSTALL:
@@ -66,21 +82,95 @@ post_deps:
   tags: get,llvm
   update_tags_from_env_with_prefix:
     _path.:
-      - MLC_LLVM_INSTALLED_PATH
-prehook_deps: []
-sort: 1000
-tags:
-- install
-- src
-- llvm
-- from.src
-- src-llvm
-uid: 2af16e9a6c5f4702
+    - MLC_LLVM_INSTALLED_PATH
+
+# Variations
 variations:
-  version.main:
-    group: version
-    base:
-      - branch.main
+  debug:
+    env:
+      MLC_LLVM_BUILD_TYPE: debug
+    group: build-type
+  release:
+    default: true
+    env:
+      MLC_LLVM_BUILD_TYPE: release
+    group: build-type
+  clang:
+    default: true
+    env:
+      +MLC_LLVM_ENABLE_PROJECTS:
+      - clang
+    group: clang
+  no-clang:
+    group: clang
+  compiler-rt:
+    group: compiler-rt
+    default: true
+    env:
+      +MLC_LLVM_ENABLE_RUNTIMES:
+      - compiler-rt
+  no-compiler-rt:
+    group: compiler-rt
+  flang:
+    env:
+      +MLC_LLVM_ENABLE_PROJECTS:
+      - flang
+      +MLC_LLVM_ENABLE_RUNTIMES:
+      - flang-rt
+    group: flang
+    default_variations:
+      openmp-rt: openmp-rt
+      openmp: no-openmp
+  libcxx:
+    group: libcxx
+    default: true
+    env:
+      +MLC_LLVM_ENABLE_RUNTIMES:
+      - libcxx
+      - libcxxabi
+      - libunwind
+  no-libcxx:
+    group: libcxx
+  lld:
+    default: true
+    env:
+      +MLC_LLVM_ENABLE_PROJECTS:
+      - lld
+      +MLC_LLVM_CMAKE_OPTIONS:
+      - -DCLANG_DEFAULT_LINKER=lld
+    group: lld
+  no-lld:
+    group: lld
+  no-openmp:
+    group: openmp
+  openmp:
+    default: true
+    env:
+      +MLC_LLVM_ENABLE_PROJECTS:
+      - openmp
+    group: openmp
+  no-openmp-rt:
+    group: openmp-rt
+  openmp-rt:
+    env:
+      +MLC_LLVM_CMAKE_OPTIONS:
+      - -DLIBOMP_USE_QUAD_PRECISION=OFF
+      +MLC_LLVM_ENABLE_RUNTIMES:
+      - openmp
+    group: openmp-rt
+  repo.#:
+    env:
+      MLC_GIT_URL: '#'
+    group: repo
+  no-tests:
+    group: tests
+    default: true
+    env:
+      MLC_LLVM_CHECK_ALL: ''
+  tests:
+    group: tests
+    env:
+      MLC_LLVM_CHECK_ALL: check-all
   version.#:
     group: version
     ad:
@@ -88,93 +178,25 @@ variations:
         tags: _full-history
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
+  version.main:
+    group: version
+    base:
+    - branch.main
   branch.#:
     cache_expiration: 5d
     env:
       MLC_GIT_CHECKOUT: '#'
-  clang:
-    default: true
-    env:
-      +MLC_LLVM_ENABLE_PROJECTS:
-        - clang
-    group: clang
-  no-clang:
-    group: clang
-  flang:
-    env:
-      +MLC_LLVM_ENABLE_PROJECTS:
-        - flang
-      +MLC_LLVM_ENABLE_RUNTIMES: 
-        - flang-rt
-    group: flang
-    default_variations:
-      openmp-rt: openmp-rt
-      openmp: no-openmp
-  compiler-rt:
-    group: compiler-rt
-    default: true
-    env:
-      +MLC_LLVM_ENABLE_RUNTIMES:
-        - compiler-rt
-  no-compiler-rt:
-    group: compiler-rt
-  libcxx:
-    group: libcxx
-    default: true
-    env:
-      +MLC_LLVM_ENABLE_RUNTIMES: 
-        - libcxx
-        - libcxxabi
-        - libunwind
-  no-libcxx:
-    group: libcxx
-  lld:
-    default: true
-    env:
-      +MLC_LLVM_ENABLE_PROJECTS:
-        - lld
-      +MLC_LLVM_CMAKE_OPTIONS:
-        - '-DCLANG_DEFAULT_LINKER=lld'
-    group: lld
-  no-lld:
-    group: lld
-  openmp-rt:
-    env:
-      +MLC_LLVM_CMAKE_OPTIONS:
-       - '-DLIBOMP_USE_QUAD_PRECISION=OFF'
-      +MLC_LLVM_ENABLE_RUNTIMES:
-        - openmp
-    group: openmp-rt
-  no-openmp-rt:
-    group: openmp-rt
-  openmp:
-    default: true
-    env:
-      +MLC_LLVM_ENABLE_PROJECTS:
-        - openmp
-    group: openmp
-  no-openmp:
-    group: openmp
-  debug:
-    env:
-      MLC_LLVM_BUILD_TYPE: debug
-    group: build-type
-  path.#:
-    env:
-       MLC_LLVM_INSTALLED_PATH: '#'
-       MLC_LLVM_USE_INSTALLED_DIR: yes
   cross-compile-x86-aarch64:
     deps:
-      - tags: get,generic-sys-util,_crossbuild-essential-arm64
-      - tags: get,generic-sys-util,_gfortran-12-aarch64-linux-gnu
-
+    - tags: get,generic-sys-util,_crossbuild-essential-arm64
+    - tags: get,generic-sys-util,_gfortran-12-aarch64-linux-gnu
     default_env:
       MLC_LLVM_TARGETS_TO_BUILD: AArch64
     env:
-      MLC_LLVM_CROSS_COMPILE_FLAGS: "-DCMAKE_SYSTEM_NAME=Linux  -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DLLVM_DEFAULT_TARGET_TRIPLE=aarch64-linux-gnu -DCMAKE_Fortran_COMPILER=aarch64-linux-gnu-gfortran-12 -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc  -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++"
+      MLC_LLVM_CROSS_COMPILE_FLAGS: -DCMAKE_SYSTEM_NAME=Linux  -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DLLVM_DEFAULT_TARGET_TRIPLE=aarch64-linux-gnu -DCMAKE_Fortran_COMPILER=aarch64-linux-gnu-gfortran-12 -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc  -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++
   cross-compile-x86-aarch64,flang:
     deps:
-      - tags: get,generic-sys-util,_gfortran-12-aarch64-linux-gnu
+    - tags: get,generic-sys-util,_gfortran-12-aarch64-linux-gnu
   for-intel-mlperf-inference-v3.1-bert:
     adr:
       conda-package:
@@ -294,19 +316,14 @@ variations:
     ad:
       llvm-src-repo:
         tags: _full-history
-  release:
-    default: true
+  path.#:
     env:
-      MLC_LLVM_BUILD_TYPE: release
-    group: build-type
-  repo.#:
-    env:
-      MLC_GIT_URL: '#'
-    group: repo
+      MLC_LLVM_INSTALLED_PATH: '#'
+      MLC_LLVM_USE_INSTALLED_DIR: true
   runtimes.#:
     env:
-      +MLC_LLVM_ENABLE_RUNTIMES: 
-        - '#'
+      +MLC_LLVM_ENABLE_RUNTIMES:
+      - '#'
   sha.#:
     env:
       MLC_GIT_CHECKOUT_SHA: '#'
@@ -315,22 +332,20 @@ variations:
     - full-history
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
-  no-tests:
-    group: tests
-    default: true
-    env:
-      MLC_LLVM_CHECK_ALL: ''
-  tests:
-    group: tests
-    env:
-      MLC_LLVM_CHECK_ALL: check-all
+
+# Versions
+versions: {}
+
+# Docker / container
 docker:
   skip_run_cmd: true
   pre_run_cmds:
-    - mlc pull repo
-versions: {}
+  - mlc pull repo
+
+# Output / debugging
+sort: 1000
+
+# Tests
 tests:
   run_inputs:
-    - version: "20.1.1"
-#    - variations_list: 
-#      - flang,branch.main
+  - version: 20.1.1

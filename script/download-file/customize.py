@@ -214,7 +214,7 @@ def preprocess(i):
             if env.get('MLC_DOWNLOAD_FILENAME', '') != '':
                 extra_download_options += f" --tries=3 -O {q}{env['MLC_DOWNLOAD_FILENAME']}{q} "
                 if not verify_ssl:
-                    extra_download_options += "--no-check-certificate "
+                    extra_download_options += " --no-check-certificate "
             env['MLC_DOWNLOAD_CMD'] = f"wget -nc {extra_download_options} {url}"
             for i in range(1, 5):
                 url = env.get('MLC_DOWNLOAD_URL' + str(i), '')
@@ -250,7 +250,7 @@ def preprocess(i):
 
         elif tool == "gdown":
             if not verify_ssl:
-                extra_download_options += "--no-check-certificate "
+                extra_download_options += " --no-check-certificate "
             env['MLC_DOWNLOAD_CMD'] = f"gdown {extra_download_options} {url}"
             for i in range(1, 5):
                 url = env.get('MLC_DOWNLOAD_URL' + str(i), '')

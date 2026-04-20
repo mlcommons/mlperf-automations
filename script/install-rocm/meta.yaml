@@ -1,19 +1,29 @@
 alias: install-rocm
+uid: 9d13f90463ce4545
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML frameworks
-clean_files: []
-default_version: 5.7.1
-deps:
-- tags: detect,os
-env: {}
-new_env_keys:
-- MLC_ROMLC_*
-- +PATH
 tags:
 - install
 - rocm
 - install-rocm
-uid: 9d13f90463ce4545
+
+# Cache
+cache: true
+clean_files: []
+
+# Environment
+env: {}
+new_env_keys:
+- MLC_ROMLC_*
+- +PATH
+
+# Dependencies
+deps:
+- tags: detect,os
+
+# Versions
+default_version: 5.7.1
 versions: {}

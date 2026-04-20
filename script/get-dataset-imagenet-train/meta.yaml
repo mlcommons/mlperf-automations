@@ -1,19 +1,34 @@
 alias: get-dataset-imagenet-train
+uid: 2bec165da5cc4ebf
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML datasets
-deps: []
-input_description: {}
-input_mapping:
-  input: IMAGENET_TRAIN_PATH
-  torrent: MLC_DATASET_IMAGENET_TRAIN_TORRENT_PATH
+tags:
+- get
+- imagenet
+- train
+- dataset
+- original
+
+# Cache
+cache: true
+
+# Environment
 new_env_keys:
 - MLC_DATASET_PATH
 - MLC_DATASET_IMAGENET_*
 new_state_keys: []
-post_deps: []
-posthook_deps: []
+
+# Input mapping
+input_mapping:
+  input: IMAGENET_TRAIN_PATH
+  torrent: MLC_DATASET_IMAGENET_TRAIN_TORRENT_PATH
+input_description: {}
+
+# Dependencies
+deps: []
 prehook_deps:
 - enable_if_env:
     MLC_DATASET_IMAGENET_VAL_REQUIRE_DAE:
@@ -37,12 +52,11 @@ prehook_deps:
   update_tags_from_env_with_prefix:
     _path.:
     - MLC_EXTRACT_PATH
-tags:
-- get
-- imagenet
-- train
-- dataset
-- original
-uid: 2bec165da5cc4ebf
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations: {}
+
+# Versions
 versions: {}

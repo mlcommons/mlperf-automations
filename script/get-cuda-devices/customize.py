@@ -1,6 +1,7 @@
 from mlc import utils
 from utils import *
 import os
+import re
 import subprocess
 
 
@@ -63,5 +64,32 @@ def postprocess(i):
 
     state['mlc_cuda_device_prop'] = p
     state['mlc_cuda_devices_prop'] = gpu
+
+    # Detect GPU interconnect type (NVLink vs PCIe) from nvidia-smi topo
+    try:
+        topo_out = subprocess.run(
+            ['nvidia-smi', 'topo', '-m'], capture_output=True, text=True).stdout
+        if re.search(r'\bNV\d+\b', topo_out):
+            env['MLC_CUDA_DEVICE_PROP_GPU_INTERCONNECT_TYPE'] = 'NVLink'
+        elif topo_out.strip():
+            env['MLC_CUDA_DEVICE_PROP_GPU_INTERCONNECT_TYPE'] = 'PCIe'
+    except Exception:
+        pass
+
+    # Detect host interconnect (PCIe gen/width) from nvidia-smi -q
+    try:
+        smi_out = subprocess.run(
+            ['nvidia-smi', '-q'], capture_output=True, text=True).stdout
+        gen = re.search(
+            r'PCIe Generation\s*\n\s*Max\s*:\s*\d+\s*\n\s*Current\s*:\s*(\d+)', smi_out)
+        width = re.search(
+            r'Link Width\s*\n\s*Max\s*:\s*\d+x\s*\n\s*Current\s*:\s*(\d+)x', smi_out)
+        if gen and width:
+            env['MLC_CUDA_DEVICE_PROP_HOST_INTERCONNECT_TYPE'] = \
+                f'PCIe Gen{gen.group(1)} x{width.group(1)}'
+        elif smi_out.strip():
+            env['MLC_CUDA_DEVICE_PROP_HOST_INTERCONNECT_TYPE'] = 'PCIe'
+    except Exception:
+        pass
 
     return {'return': 0}

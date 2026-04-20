@@ -149,6 +149,8 @@ def generate_docs(script_repo, metadata, script_path, generic_inputs):
     script_variations = metadata.get('variations', {})
     default_version = metadata.get('default_version')
 
+    if script_input_mapping is None:
+        print(metadata)
     for k in script_input_mapping:
         if k not in script_input_description:
             script_input_description[k] = {}

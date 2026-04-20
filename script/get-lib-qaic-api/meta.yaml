@@ -1,11 +1,21 @@
 alias: get-lib-qaic-api
+uid: 1e253ae184e44f23
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Detection or installation of tools and artifacts
-default_version: master
-deps:
-- tags: detect,os
+tags:
+- get
+- api
+- lib-qaic-api
+- lib
+- qaic
+
+# Cache
+cache: true
+
+# Environment
 env: {}
 new_env_keys:
 - MLC_LIB_QAIC_*
@@ -13,14 +23,14 @@ new_env_keys:
 - +C_INCLUDE_PATH
 - +CPLUS_INCLUDE_PATH
 - +LD_LIBRARY_PATH
+
+# Dependencies
+deps:
+- tags: detect,os
 prehook_deps: []
-tags:
-- get
-- api
-- lib-qaic-api
-- lib
-- qaic
-uid: 1e253ae184e44f23
+
+# Versions
+default_version: master
 versions:
   master:
     env:

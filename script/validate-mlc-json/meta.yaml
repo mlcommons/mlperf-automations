@@ -1,0 +1,19 @@
+alias: validate-mlc-json
+uid: cccc1111dddd2222
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: Testing
+tags:
+- validate
+- mlc-json
+
+# Input mapping
+input_mapping:
+  dep_tags: MLC_VALIDATE_DEP_TAGS
+  env_key_values: MLC_VALIDATE_ENV_KEY_VALUES
+  env_keys: MLC_VALIDATE_ENV_KEYS
+  expected_return: MLC_VALIDATE_EXPECTED_RETURN
+  json_file: MLC_VALIDATE_JSON_FILE
+  not_env_keys: MLC_VALIDATE_NOT_ENV_KEYS

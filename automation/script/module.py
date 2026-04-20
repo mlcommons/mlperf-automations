@@ -694,8 +694,8 @@ class ScriptAutomation(Automation):
         if input_mapping:
             update_env_from_input_mapping(
                 env, i, input_mapping, input_description)
-            update_env_from_input_mapping(
-                const, i, input_mapping, input_description)
+            # update_env_from_input_mapping(
+            #    const, i, input_mapping, input_description)
 
         # This mapping is done in docker script
         # if docker_input_mapping:
@@ -751,7 +751,8 @@ class ScriptAutomation(Automation):
         if version and f"version.{version}" not in variation_tags and (
                 f"version.{version}" in variations or "version.#" in variations):
             logger.debug(
-                f"version.{version} added as a variation tag from input version")
+                self.recursion_spaces +
+                f"  - version.{version} added as a variation tag from input version")
             variation_tags.append(f"version.{version}")
 
         run_state['docker'] = meta.get('docker', {})
@@ -770,6 +771,7 @@ class ScriptAutomation(Automation):
         if len(r.get('warnings', [])) > 0:
             warnings += r['warnings']
 
+        variation_tags = r['variation_tags']
         variation_tags_string = r['variation_tags_string']
         explicit_variation_tags = r['explicit_variation_tags']
 
@@ -1563,9 +1565,12 @@ class ScriptAutomation(Automation):
 
                 run_script_input['meta'] = meta
                 run_script_input['env'] = env
+                run_script_input['const'] = const
                 run_script_input['state'] = state
+                run_script_input['const_state'] = const_state
                 run_script_input['run_state'] = run_state
                 run_script_input['recursion'] = recursion
+                run_script_input['recursion_spaces'] = self.recursion_spaces
 
                 r = prepare_and_run_script_with_postprocessing(
                     run_script_input)
@@ -2653,6 +2658,11 @@ class ScriptAutomation(Automation):
 
         script_tags = i.get('script_tags', [])
         variation_tags = i.get('variation_tags', [])
+        
+        if not script_tags and tags_string:
+            r = get_variation_and_script_tags(tags_string.strip())
+            script_tags = r['script_tags']
+            variation_tags = r['variation_tags']
 
         excluded_tags = [v[1:] for v in script_tags if v.startswith("-")]
         common = set(script_tags).intersection(set(excluded_tags))
@@ -3717,6 +3727,8 @@ pip install mlcflow
                             f)]
 
                     for f in file_list:
+                        if os.path.isdir(f):
+                            continue
                         duplicate = False
                         for existing in found_files:
                             if os.path.samefile(existing, f):
@@ -3751,6 +3763,8 @@ pip install mlcflow
                     for suff in file_pattern_suffixes:
                         file_list = glob.glob(path_to_file + suff)
                         for f in file_list:
+                            if os.path.isdir(f):
+                                continue
                             duplicate = False
 
                             for existing in found_files:
@@ -3949,8 +3963,6 @@ pip install mlcflow
         rx = prepare_and_run_script_with_postprocessing(
             run_script_input, postprocess="detect_version")
 
-        run_script_input['recursion_spaces'] = self.recursion_spaces
-
         if rx['return'] == 0:
             # Version was detected
             detected_version = rx.get('version', '')
@@ -4018,6 +4030,7 @@ pip install mlcflow
         logger = self.action_object.logger
         run_script_input = i.get('run_script_input', {})
         extra_paths = i.get('extra_paths', {})
+        force_given_path = False
 
         # Create and work on a copy to avoid contamination
         env_copy = copy.deepcopy(env)
@@ -4043,6 +4056,9 @@ pip install mlcflow
                     return {'return': 1,
                             'error': 'path {} doesn\'t exist'.format(path_tmp)}
 
+        if path != '':
+            force_given_path = i.get('force_given_path', False)
+
         # Check if forced path and file name from --input (MLC_INPUT - local env
         # - will not be visible for higher-level script)
         forced_file = env.get('MLC_INPUT', '').strip()
@@ -4054,7 +4070,8 @@ pip install mlcflow
             file_name = os.path.basename(forced_file)
             path = os.path.dirname(forced_file)
 
-        default_path_list = self.get_default_path_list(i)
+        default_path_list = self.get_default_path_list(
+            i) if not force_given_path else []
         # [] if default_path_env_key == '' else \
         #   os.environ.get(default_path_env_key,'').split(os_info['env_separator'])
 
@@ -4063,14 +4080,15 @@ pip install mlcflow
         priority_folder = env.get('MLC_SEARCH_FOLDER_PATH', '').strip()
         priority_folder_paths = []
 
-        if priority_folder and os.path.isdir(priority_folder):
+        if priority_folder and os.path.isdir(
+                priority_folder) and not force_given_path:
             logger.info(
                 self.recursion_spaces +
                 '    # Prioritizing search in folder: {}'.format(priority_folder))
             # Add the folder and its subdirectories to priority paths (max
             # depth to avoid NFS issues)
             priority_folder_paths.append(priority_folder)
-            max_depth = int(env.get('MLC_TMP_FOLDER_MAX_DEPTH', '5'))
+            max_depth = int(env.get('MLC_TMP_FOLDER_MAX_DEPTH', '4'))
             for root, dirs, files_in_dir in os.walk(priority_folder):
                 # Calculate current depth relative to priority_folder
                 depth = root[len(priority_folder):].count(os.sep)
@@ -4450,6 +4468,12 @@ pip install mlcflow
 
     ############################################################
 
+    def validate(self, i):
+        from script.validate import validate_scripts
+        return validate_scripts(self, i)
+
+    ############################################################
+
     def dockerfile(self, i):
         from script.docker import dockerfile
         return dockerfile(self, i)
@@ -4459,6 +4483,16 @@ pip install mlcflow
         from script.docker import docker_run
         return docker_run(self, i)
 
+
+    ############################################################
+    def apptainerfile(self, i):
+        from script.apptainer import apptainerfile
+        return apptainerfile(self, i)
+
+    ############################################################
+    def apptainer(self, i):
+        from script.apptainer import apptainer_run
+        return apptainer_run(self, i)
     ############################################################
     def experiment(self, i):
         from script.experiment import experiment_run
@@ -4641,8 +4675,17 @@ def enable_or_skip_script(meta, env):
     (AND function)
     """
 
+    if not isinstance(meta, dict):
+        logging.warning(
+            f"enable_or_skip_script: expected dict but got {type(meta).__name__}: {meta}")
+        return True
+
     for key in meta:
-        meta_key = [str(v).lower() for v in meta[key]]
+        value_spec = meta[key]
+        if isinstance(value_spec, list):
+            meta_key = [str(v).lower() for v in value_spec]
+        else:
+            meta_key = [str(value_spec).lower()]
         if key in env:
             value = str(env[key]).lower().strip()
             if set(meta_key) & set(["yes", "on", "true", "1"]):
@@ -4674,12 +4717,21 @@ def any_enable_or_skip_script(meta, env):
     Internal: enable a dependency based on enable_if_env and skip_if_env meta information
     (OR function)
     """
+    if not isinstance(meta, dict):
+        logging.warning(
+            f"any_enable_or_skip_script: expected dict but got {type(meta).__name__}: {meta}")
+        return False
+
     for key in meta:
         found = False
         if key in env:
             value = str(env[key]).lower().strip()
 
-            meta_key = [str(v).lower() for v in meta[key]]
+            value_spec = meta[key]
+            if isinstance(value_spec, list):
+                meta_key = [str(v).lower() for v in value_spec]
+            else:
+                meta_key = [str(value_spec).lower()]
 
             if set(meta_key) & set(["yes", "on", "true", "1"]):
                 if not is_false(value) and value != '' and not re.findall(
@@ -4879,7 +4931,6 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
     local_env_keys_from_meta = i.get('local_env_keys_from_meta', [])
     posthook_deps = i.get('posthook_deps', [])
     add_deps_recursive = i.get('add_deps_recursive', {})
-    recursion_spaces = i['recursion_spaces']
     remembered_selections = i.get('remembered_selections', [])
     variation_tags_string = i.get('variation_tags_string', '')
     found_cached = i.get('found_cached', False)
@@ -4955,8 +5006,8 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
                 run_script,
                 cur_dir))
 
-        logger.info(recursion_spaces + '       ! cd {}'.format(cur_dir))
-        logger.info(
+        logger.debug(recursion_spaces + '       ! cd {}'.format(cur_dir))
+        logger.debug(
             recursion_spaces +
             '       ! call {} from {}'.format(
                 path_to_run_script,
@@ -5052,11 +5103,7 @@ def prepare_and_run_script_with_postprocessing(i, postprocess="postprocess"):
                 if repo_to_report == '':
                     repo_to_report = 'https://github.com/mlcommons/mlperf-automations/issues'
 
-                note = '''
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Please file an issue at {} along with the full MLC command being run and the relevant
-or full console log.
-'''.format(repo_to_report)
+                note = ''
 
                 rr = {
                     'return': 2,
@@ -5100,7 +5147,7 @@ or full console log.
 
     if postprocess != '' and customize_code is not None and postprocess in dir(
             customize_code):
-        logger.info(
+        logger.debug(
             recursion_spaces +
             '       ! call "{}" from {}'.format(
                 postprocess,
@@ -5155,6 +5202,7 @@ def run_detect_version(customize_code, customize_common_input,
         ii['env'] = env
         ii['state'] = state
         ii['meta'] = meta
+        ii['recursion_spaces'] = recursion_spaces
         ii['automation'] = customize_common_input['automation']
 
         r = customize_code.detect_version(ii)
@@ -5184,7 +5232,10 @@ def run_postprocess(customize_code, customize_common_input, recursion_spaces,
         ii = copy.deepcopy(customize_common_input)
         ii['env'] = env
         ii['state'] = state
+        ii['const'] = const
+        ii['const_state'] = const_state
         ii['meta'] = meta
+        ii['recursion_spaces'] = recursion_spaces
         ii['automation'] = customize_common_input['automation']
 
         if run_script_input is not None:
@@ -5877,6 +5928,7 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
     if folder_path_env_keys:
         run_state['folder_path_env_keys'] += folder_path_env_keys
 
+    
     return {'return': 0}
 
 ##############################################################################

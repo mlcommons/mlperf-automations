@@ -1,6 +1,7 @@
 from mlc import utils
 import os
 import shutil
+import subprocess
 from datetime import datetime
 import re
 
@@ -120,9 +121,17 @@ def generate_src_version_string(env):
     checkout = env.get("MLC_GIT_CHECKOUT", "unknown")
     sha = env.get("MLC_GIT_SHA", "00000000")
 
-    # Generate the date string (e.g., 20260224)
-    # This uses the current build/checkout date.
-    date_str = datetime.now().strftime("%Y%m%d")
+    # Generate the date string (e.g., 20260224) from the last commit in the
+    # checkout
+    git_checkout_path = env.get("MLC_GIT_CHECKOUT_PATH", "")
+    try:
+        date_str = subprocess.check_output(
+            ["git", "log", "-1", "--format=%cd", "--date=format:%Y%m%d"],
+            cwd=git_checkout_path,
+            text=True
+        ).strip()
+    except (subprocess.CalledProcessError, OSError):
+        date_str = datetime.now().strftime("%Y%m%d")
 
     # Sanitize checkout string (e.g., "feature/login" -> "feature-login")
     safe_checkout = re.sub(r'[^a-zA-Z0-9]', '-', checkout).strip('-').lower()

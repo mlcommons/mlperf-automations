@@ -1,0 +1,74 @@
+alias: app-lammps
+uid: e5f2a3b4c6d7890f
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: HPC Application
+tags:
+- app
+- lammps
+- hpc
+cache: true
+new_env_keys:
+- MLC_LAMMPS_SRC_PATH
+- MLC_LAMMPS_INSTALL_PATH
+- MLC_LAMMPS_BIN_PATH
+- +PATH
+- +LD_LIBRARY_PATH
+new_state_keys: []
+deps:
+- tags: detect,cpu
+- tags: get,generic,sys-util,_libopenmpi-dev
+- tags: get,cmake
+- tags: get,generic,sys-util,_libfftw3-dev
+- tags: get,git,repo
+  names:
+  - lammps-repo
+  extra_cache_tags: lammps,repo,lammps-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_LAMMPS_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+variations:
+  repo.#:
+    env:
+      MLC_GIT_REPO_URL: '#'
+    group: repo
+  repo.official:
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://github.com/lammps/lammps.git
+    group: repo
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  version.stable_29Aug2024_update1:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: stable_29Aug2024_update1
+  version.stable_2Aug2023_update3:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: stable_2Aug2023_update3
+  develop:
+    env:
+      MLC_GIT_CHECKOUT: develop
+default_env: {}
+tests:
+  run_inputs:
+  - variations_list:
+    - repo.official

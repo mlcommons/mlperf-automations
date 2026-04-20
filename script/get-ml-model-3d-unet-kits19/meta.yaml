@@ -1,17 +1,10 @@
 alias: get-ml-model-3d-unet-kits19
+uid: fb7e31419c0f4226
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
-env:
-  MLC_ML_MODEL: 3d-unet-kits19
-  MLC_ML_MODEL_DATASET: kits19
-  MLC_ML_MODEL_RETRAINING: 'no'
-  MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'no'
-new_env_keys:
-- MLC_ML_MODEL_*
-print_env_at_the_end:
-  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model
 tags:
 - get
 - ml-model
@@ -19,8 +12,34 @@ tags:
 - 3d-unet
 - kits19
 - medical-imaging
-uid: fb7e31419c0f4226
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_ML_MODEL: 3d-unet-kits19
+  MLC_ML_MODEL_DATASET: kits19
+  MLC_ML_MODEL_RETRAINING: 'no'
+  MLC_ML_MODEL_WEIGHT_TRANSFORMATIONS: 'no'
+new_env_keys:
+- MLC_ML_MODEL_*
+
+# Variations
 variations:
+  onnx:
+    default: true
+    env:
+      MLC_ML_MODEL_FRAMEWORK: onnx
+    group: framework
+  pytorch:
+    env:
+      MLC_ML_MODEL_FRAMEWORK: pytorch
+    group: framework
+  tf:
+    env:
+      MLC_ML_MODEL_FRAMEWORK: tensorflow
+    group: framework
   fp32:
     default: true
     env:
@@ -28,11 +47,6 @@ variations:
       MLC_ML_MODEL_PRECISION: fp32
       MLC_ML_MODEL_WEIGHT_DATA_TYPES: fp32
     group: precision
-  onnx:
-    default: true
-    env:
-      MLC_ML_MODEL_FRAMEWORK: onnx
-    group: framework
   onnx,fp32:
     deps:
     - env:
@@ -44,14 +58,10 @@ variations:
       force-cache: true
       tags: download,file,download-file,_wget
       force_env_keys:
-        - MLC_OUTDIRNAME
+      - MLC_OUTDIRNAME
     env:
       MLC_ML_MODEL_ACCURACY: '0.86170'
       MLC_ML_MODEL_FILE: 3dunet_kits19_128x128x128_dynbatch.onnx
-  pytorch:
-    env:
-      MLC_ML_MODEL_FRAMEWORK: pytorch
-    group: framework
   pytorch,fp32:
     deps:
     - env:
@@ -63,7 +73,7 @@ variations:
       force-cache: true
       tags: download,file,download-file,_wget
       force_env_keys:
-        - MLC_OUTDIRNAME
+      - MLC_OUTDIRNAME
     env:
       MLC_ML_MODEL_ACCURACY: '0.86170'
       MLC_ML_MODEL_FILE: 3dunet_kits19_pytorch.ptc
@@ -78,16 +88,12 @@ variations:
       force-cache: true
       tags: download-and-extract,_wget,_extract
       force_env_keys:
-        - MLC_OUTDIRNAME
+      - MLC_OUTDIRNAME
     env:
       MLC_ML_MODEL_ACCURACY: '0.86170'
       MLC_ML_MODEL_FILE: 3dunet_kits19_pytorch_checkpoint.pth
   tensorflow:
     alias: tf
-  tf:
-    env:
-      MLC_ML_MODEL_FRAMEWORK: tensorflow
-    group: framework
   tf,fp32:
     deps:
     - env:
@@ -99,10 +105,14 @@ variations:
       force-cache: true
       tags: download-and-extract,_wget,_extract
       force_env_keys:
-        - MLC_OUTDIRNAME
+      - MLC_OUTDIRNAME
     env:
       MLC_ML_MODEL_ACCURACY: '0.86170'
       MLC_ML_MODEL_FILE: 3dunet_kits19_128x128x128.tf
   weights:
     env:
       MLC_MODEL_WEIGHTS_FILE: 'yes'
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_FILE_WITH_PATH: Path to the ML model

@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-03-26 23:12:50*
+*Last updated: 2026-04-20 21:26:30*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -14,6 +14,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [CUDA automation](#cuda-automation)
 - [Cloud automation](#cloud-automation)
 - [Compiler automation](#compiler-automation)
+- [Container automation](#container-automation)
 - [Dashboard automation](#dashboard-automation)
 - [Detection or installation of tools and artifacts](#detection-or-installation-of-tools-and-artifacts)
 - [DevOps automation](#devops-automation)
@@ -33,6 +34,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [ROCm automation](#rocm-automation)
 - [Remote automation](#remote-automation)
 - [Reproducibility and artifact evaluation](#reproducibility-and-artifact-evaluation)
+- [Testing](#testing)
 - [Tests](#tests)
 - [TinyML automation](#tinyml-automation)
 - [Uncategorized](#uncategorized)
@@ -327,9 +329,6 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-aocc](get-aocc/)**
   - Detect or install AOCC compiler
   - Tags: `compiler`, `get`, `aocc`
-- **[get-aocl](get-aocl/)**
-  - get-aocl
-  - Tags: `get`, `lib`, `aocl`, `amd-optimized`, `amd`
 - **[get-cl](get-cl/)**
   - Detect or install Microsoft C compiler
   - Tags: `get`, `cl`, `compiler`, `c-compiler`, `cpp-compiler`, `get-cl`
@@ -403,6 +402,18 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - Build vllm from sources
   - Tags: `install-vllm-from-src`
 
+## Container automation
+
+- **[build-apptainer-image](build-apptainer-image/)**
+  - build-apptainer-image
+  - Tags: `build`, `apptainer`, `image`, `apptainer-image`
+- **[build-apptainerfile](build-apptainerfile/)**
+  - build-apptainerfile
+  - Tags: `build`, `apptainerfile`, `apptainer`, `definition`
+- **[run-apptainer-container](run-apptainer-container/)**
+  - run-apptainer-container
+  - Tags: `run`, `apptainer`, `container`
+
 ## Dashboard automation
 
 - **[publish-results-to-dashboard](publish-results-to-dashboard/)**
@@ -459,6 +470,39 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-javac](get-javac/)**
   - get-javac
   - Tags: `get`, `javac`
+- **[get-lib-aocl](get-lib-aocl/)**
+  - get-lib-aocl
+  - Tags: `get`, `lib`, `lib-aocl`, `aocl`, `aocl-all`
+- **[get-lib-aocl-blis](get-lib-aocl-blis/)**
+  - get-lib-aocl-blis
+  - Tags: `get`, `lib`, `lib-aocl-blis`, `aocl-blis`, `aocl`, `blis`
+- **[get-lib-aocl-compression](get-lib-aocl-compression/)**
+  - get-lib-aocl-compression
+  - Tags: `get`, `lib`, `lib-aocl-compression`, `aocl-compression`, `aocl`
+- **[get-lib-aocl-crypto](get-lib-aocl-crypto/)**
+  - get-lib-aocl-crypto
+  - Tags: `get`, `lib`, `lib-aocl-crypto`, `aocl-crypto`, `aocl`
+- **[get-lib-aocl-data-analytics](get-lib-aocl-data-analytics/)**
+  - get-lib-aocl-data-analytics
+  - Tags: `get`, `lib`, `lib-aocl-data-analytics`, `aocl-data-analytics`, `aocl`, `aocl-da`
+- **[get-lib-aocl-dlp](get-lib-aocl-dlp/)**
+  - get-lib-aocl-dlp
+  - Tags: `get`, `lib`, `lib-aocl-dlp`, `aocl-dlp`, `aocl`
+- **[get-lib-aocl-fftz](get-lib-aocl-fftz/)**
+  - get-lib-aocl-fftz
+  - Tags: `get`, `lib`, `lib-aocl-fftz`, `aocl-fftz`, `aocl`
+- **[get-lib-aocl-libflame](get-lib-aocl-libflame/)**
+  - get-lib-aocl-libflame
+  - Tags: `get`, `lib`, `lib-aocl-libflame`, `aocl-libflame`, `aocl`
+- **[get-lib-aocl-libm](get-lib-aocl-libm/)**
+  - get-lib-aocl-libm
+  - Tags: `get`, `lib`, `lib-aocl-libm`, `aocl-libm`, `aocl`
+- **[get-lib-aocl-scalapack](get-lib-aocl-scalapack/)**
+  - get-lib-aocl-scalapack
+  - Tags: `get`, `lib`, `lib-aocl-scalapack`, `aocl-scalapack`, `aocl`
+- **[get-lib-aocl-sparse](get-lib-aocl-sparse/)**
+  - get-lib-aocl-sparse
+  - Tags: `get`, `lib`, `lib-aocl-sparse`, `aocl-sparse`, `aocl`
 - **[get-lib-armnn](get-lib-armnn/)**
   - get-lib-armnn
   - Tags: `get`, `lib-armnn`, `lib`, `armnn`
@@ -498,6 +542,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-sys-utils-mlc](get-sys-utils-mlc/)**
   - get-sys-utils-mlc
   - Tags: `get`, `sys-utils-cm`, `sys-utils-mlc`
+- **[get-utils-aocl](get-utils-aocl/)**
+  - get-utils-aocl
+  - Tags: `get`, `utils`, `utils-aocl`, `aocl-utils`, `aocl`
 - **[get-xilinx-sdk](get-xilinx-sdk/)**
   - get-xilinx-sdk
   - Tags: `get`, `xilinx`, `sdk`
@@ -621,9 +668,42 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## HPC Application
 
+- **[app-cloverleaf](app-cloverleaf/)**
+  - app-cloverleaf
+  - Tags: `app`, `cloverleaf`, `hpc`
 - **[app-cp2k](app-cp2k/)**
   - app-cp2k
   - Tags: `app`, `cp2k`
+- **[app-gromacs](app-gromacs/)**
+  - app-gromacs
+  - Tags: `app`, `gromacs`, `hpc`
+- **[app-hmmer](app-hmmer/)**
+  - app-hmmer
+  - Tags: `app`, `hmmer`, `hpc`
+- **[app-lammps](app-lammps/)**
+  - app-lammps
+  - Tags: `app`, `lammps`, `hpc`
+- **[app-namd](app-namd/)**
+  - app-namd
+  - Tags: `app`, `namd`, `hpc`
+- **[app-nwchem](app-nwchem/)**
+  - app-nwchem
+  - Tags: `app`, `nwchem`, `hpc`
+- **[app-openfoam](app-openfoam/)**
+  - app-openfoam
+  - Tags: `app`, `openfoam`, `hpc`
+- **[app-quantum-espresso](app-quantum-espresso/)**
+  - app-quantum-espresso
+  - Tags: `app`, `quantum-espresso`, `hpc`
+- **[app-roms](app-roms/)**
+  - app-roms
+  - Tags: `app`, `roms`, `hpc`
+- **[app-vasp](app-vasp/)**
+  - app-vasp
+  - Tags: `app`, `vasp`, `hpc`
+- **[app-wrf](app-wrf/)**
+  - app-wrf
+  - Tags: `app`, `wrf`, `hpc`
 
 ## MLCommons automation
 
@@ -882,6 +962,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[detect-cpu](detect-cpu/)**
   - detect-cpu
   - Tags: `detect`, `cpu`, `detect-cpu`, `info`
+- **[detect-host-system-details](detect-host-system-details/)**
+  - detect-host-system-details
+  - Tags: `detect`, `host`, `system`, `details`
 - **[detect-os](detect-os/)**
   - detect-os
   - Tags: `detect-os`, `detect`, `os`, `info`
@@ -936,6 +1019,12 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-ipol-src](get-ipol-src/)**
   - get-ipol-src
   - Tags: `get`, `ipol`, `journal`, `src`, `ipol-src`
+
+## Testing
+
+- **[validate-mlc-json](validate-mlc-json/)**
+  - validate-mlc-json
+  - Tags: `validate`, `mlc-json`
 
 ## Tests
 
@@ -1109,8 +1198,8 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 324
-- **Categories**: 31
+- **Total Scripts**: 351
+- **Categories**: 33
 
 ## Usage
 

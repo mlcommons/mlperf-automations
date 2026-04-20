@@ -1,8 +1,24 @@
 alias: app-cp2k
+uid: 06ee7deaf8fd4b9d
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: HPC Application
+tags:
+- app
+- cp2k
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_CP2K_SRC_PATH
+- +LD_LIBRARY_PATH
+new_state_keys: []
+
+# Dependencies
 deps:
 - env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_CP2K_SRC_PATH
@@ -30,31 +46,12 @@ deps:
 - tags: get,blas
   names:
   - blas
-new_env_keys:
-- MLC_CP2K_SRC_PATH
-- +LD_LIBRARY_PATH
-new_state_keys: []
-post_deps: []
-posthook_deps: []
 prehook_deps: []
-tags:
-- app
-- cp2k
-tests:
-  run_inputs: []
-uid: 06ee7deaf8fd4b9d
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations:
-  with-amd:
-    deps:
-    - tags: get,aocc
-      names:
-      - aocc
-  branch.#:
-    env:
-      MLC_GIT_CHECKOUT: '#'
-  sha.#:
-    env:
-      MLC_GIT_SHA: '#'
   url.#:
     env:
       MLC_GIT_URL: '#'
@@ -64,6 +61,21 @@ variations:
     env:
       MLC_GIT_URL: https://github.com/cp2k/cp2k
     group: version
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+  sha.#:
+    env:
+      MLC_GIT_SHA: '#'
   version.official:
     base:
     - url.official
+  with-amd:
+    deps:
+    - tags: get,aocc
+      names:
+      - aocc
+
+# Tests
+tests:
+  run_inputs: []

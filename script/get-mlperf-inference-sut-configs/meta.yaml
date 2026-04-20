@@ -1,26 +1,10 @@
 alias: get-mlperf-inference-sut-configs
+uid: c2fbf72009e2445b
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: MLPerf Inference
-default_env:
-  MLC_GIT_URL: ''
-  MLC_SUT_CONFIGS_PATH: ''
-deps:
-- env:
-    MLC_CACHE_DIR_ENV_NAME: MLC_SUT_CONFIGS_PATH
-  extra_cache_tags: mlperf,inference,sut,configs
-  tags: get,cache,dir,_name.mlperf-inference-sut-configs
-input_mapping:
-  configs_git_url: MLC_GIT_URL
-  repo_path: MLC_SUT_CONFIGS_PATH
-  run_config: MLC_MLPERF_SUT_NAME_RUN_CONFIG_SUFFIX
-new_env_keys:
-- MLC_HW_*
-- MLC_SUT_*
-- MLC_MLPERF_INFERENCE_SUT_RUN_CONFIG
-new_state_keys:
-- MLC_SUT_*
 tags:
 - get
 - mlperf
@@ -28,5 +12,33 @@ tags:
 - sut
 - configs
 - sut-configs
-uid: c2fbf72009e2445b
+
+# Cache
+cache: false
+
+# Environment
+default_env:
+  MLC_GIT_URL: ''
+  MLC_SUT_CONFIGS_PATH: ''
+new_env_keys:
+- MLC_HW_*
+- MLC_SUT_*
+- MLC_MLPERF_INFERENCE_SUT_RUN_CONFIG
+new_state_keys:
+- MLC_SUT_*
+
+# Input mapping
+input_mapping:
+  configs_git_url: MLC_GIT_URL
+  repo_path: MLC_SUT_CONFIGS_PATH
+  run_config: MLC_MLPERF_SUT_NAME_RUN_CONFIG_SUFFIX
+
+# Dependencies
+deps:
+- env:
+    MLC_CACHE_DIR_ENV_NAME: MLC_SUT_CONFIGS_PATH
+  extra_cache_tags: mlperf,inference,sut,configs
+  tags: get,cache,dir,_name.mlperf-inference-sut-configs
+
+# Variations
 variations: {}

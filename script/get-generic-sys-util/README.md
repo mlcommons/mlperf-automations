@@ -1,5 +1,5 @@
 # README for get-generic-sys-util
-This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
+This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
 ```
@@ -50,10 +50,12 @@ mlcr get,sys-util,generic,generic-sys-util
 | `--output` | Output from the script passed using the env key `MLC_OUTPUT` |  | `` |
 | `--outdirname` | The directory to store the script output |  | `cache directory ($HOME/MLC/repos/local/cache/<>) if the script is cacheable or else the current directory` |
 | `--outbasename` | The output file/folder name |  | `` |
+| `--search_folder_path` | The folder path where executables of a given script need to be searched. Search is done recursively upto 4 levels. |  | `` |
 | `--name` |  |  | `` |
 | `--extra_cache_tags` | Extra cache tags to be added to the cached entry when the script results are saved |  | `` |
 | `--skip_compile` | Skip compilation |  | `False` |
 | `--skip_run` | Skip run |  | `False` |
+| `--skip_sudo` | Skip SUDO detection |  | `False` |
 | `--accept_license` | Accept the required license requirement to run the script |  | `False` |
 | `--skip_system_deps` | Skip installing any system dependencies |  | `False` |
 | `--git_ssh` | Use SSH for git repos |  | `False` |
@@ -76,6 +78,7 @@ mlcr get,sys-util,generic,generic-sys-util
 - `cmake`
 - `coreutils`
 - `crossbuild-essential-arm64`
+- `csh`
 - `dmidecode`
 - `ffmpeg`
 - `flex`
@@ -85,11 +88,13 @@ mlcr get,sys-util,generic,generic-sys-util
 - `gcc-11`
 - `gcc-9`
 - `gflags-dev`
+- `gfortran`
 - `gfortran-12-aarch64-linux-gnu`
 - `gfortran-aarch64-linux-gnu`
 - `git-lfs`
 - `glog-dev`
 - `ipmitool`
+- `jq`
 - `lcov`
 - `libboost-all-dev`
 - `libbz2-dev`
@@ -98,16 +103,23 @@ mlcr get,sys-util,generic,generic-sys-util
 - `libffi-dev`
 - `libffi7`
 - `libffi8`
+- `libfftw3-dev`
 - `libgdbm-dev`
 - `libgl`
 - `libgl1-mesa-glx`
 - `libgmock-dev`
+- `libhdf5-dev`
+- `libhdf5-openmpi-dev`
 - `liblzma-dev`
 - `libmkl-dev`
 - `libmpfr-dev`
 - `libncurses-dev`
+- `libnetcdf-dev`
+- `libnetcdff-dev`
 - `libnuma-dev`
+- `libopenmpi-dev`
 - `libpci-dev`
+- `libpnetcdf-dev`
 - `libpng-dev`
 - `libre2-dev`
 - `libreadline-dev`
@@ -118,6 +130,7 @@ mlcr get,sys-util,generic,generic-sys-util
 - `libxext6`
 - `linux-tools`
 - `md5sha1sum`
+- `nasm`
 - `ninja-build`
 - `nlohmann-json3-dev`
 - `ntpdate`

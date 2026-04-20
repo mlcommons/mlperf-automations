@@ -1,13 +1,34 @@
 alias: push-mlperf-inference-results-to-github
+uid: 36c2ffd5df5d453a
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: MLPerf Inference
+tags:
+- push
+- mlperf
+- mlperf-inference-results
+- publish-results
+- inference
+- submission
+- github
+
+# Environment
 default_env:
   MLC_MLPERF_RESULTS_GIT_REPO_URL: https://github.com/mlcommons/mlperf_inference_submissions_v4.0
-new_env_keys: 
-  - MLC_MLPERF_RESULTS_SYNC_DIR
-print_env_at_the_end:
-  MLC_MLPERF_RESULTS_SYNC_DIR: Path to the locally synced submission directory
+new_env_keys:
+- MLC_MLPERF_RESULTS_SYNC_DIR
+
+# Input mapping
+input_mapping:
+  branch: MLC_GIT_BRANCH
+  commit_message: MLC_MLPERF_RESULTS_REPO_COMMIT_MESSAGE
+  repo_branch: MLC_GIT_BRANCH
+  repo_url: MLC_MLPERF_RESULTS_GIT_REPO_URL
+  submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
+
+# Dependencies
 deps:
 - names:
   - python3
@@ -20,22 +41,11 @@ deps:
     MLC_MLPERF_INFERENCE_SUBMISSION_DIR:
     - 'on'
   tags: get,mlperf,submission,dir
-input_mapping:
-  branch: MLC_GIT_BRANCH
-  commit_message: MLC_MLPERF_RESULTS_REPO_COMMIT_MESSAGE
-  repo_branch: MLC_GIT_BRANCH
-  repo_url: MLC_MLPERF_RESULTS_GIT_REPO_URL
-  submission_dir: MLC_MLPERF_INFERENCE_SUBMISSION_DIR
 prehook_deps:
 - names:
   - get-git-repo
   tags: get,git,repo
-tags:
-- push
-- mlperf
-- mlperf-inference-results
-- publish-results
-- inference
-- submission
-- github
-uid: 36c2ffd5df5d453a
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_MLPERF_RESULTS_SYNC_DIR: Path to the locally synced submission directory

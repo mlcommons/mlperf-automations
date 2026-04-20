@@ -1,9 +1,33 @@
 alias: install-generic-conda-package
+uid: d9275487f5314195
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Python automation
+tags:
+- get
+- install
+- generic
+- generic-conda-lib
+- conda-lib
+- conda-package
+- generic-conda-package
+
+# Cache
+cache: true
+extra_cache_tags_from_env:
+- env: MLC_PYTHON_CACHE_TAGS
+  prefix: python-
 clean_files: []
+
+# Environment
+new_env_keys:
+- MLC_PYTHONLIB_*
+local_env_keys:
+- MLC_GENERIC_PYTHON_PACKAGE_VARIANT
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -13,23 +37,17 @@ deps:
 - names:
   - conda
   tags: get,conda
-extra_cache_tags_from_env:
-- env: MLC_PYTHON_CACHE_TAGS
-  prefix: python-
-local_env_keys:
-- MLC_GENERIC_PYTHON_PACKAGE_VARIANT
-new_env_keys:
-- MLC_PYTHONLIB_*
-tags:
-- get
-- install
-- generic
-- generic-conda-lib
-- conda-lib
-- conda-package
-- generic-conda-package
-uid: d9275487f5314195
+
+# Variations
 variations:
+  source.#:
+    env:
+      MLC_CONDA_PKG_SRC: '#'
+    group: package-source
+  source.intel:
+    env:
+      MLC_CONDA_PKG_SRC: https://software.repos.intel.com/python/conda/
+    group: package-source
   name.#:
     ad:
       conda:
@@ -42,11 +60,3 @@ variations:
       MLC_CONDA_PKG_NAME: python
     new_env_keys:
     - MLC_PYTHON_BIN_WITH_PATH
-  source.#:
-    env:
-      MLC_CONDA_PKG_SRC: '#'
-    group: package-source
-  source.intel:
-    env:
-      MLC_CONDA_PKG_SRC: https://software.repos.intel.com/python/conda/
-    group: package-source

@@ -1,7 +1,9 @@
 alias: clean-nvidia-mlperf-inference-scratch-space
+uid: bb41f6e3608e4e8a
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 tags:
 - clean
 - nvidia
@@ -9,37 +11,43 @@ tags:
 - space
 - mlperf
 - inference
-uid: bb41f6e3608e4e8a
+
+# Cache
+cache: false
+
+# Input mapping
 input_mapping:
   extra_cache_rm_tags: MLC_CLEAN_EXTRA_CACHE_RM_TAGS
-deps:
-  # Get Nvidia scratch space where data and models get downloaded
-  - tags: get,mlperf,inference,nvidia,scratch,space
-    names:
-    - nvidia-scratch-space
 
+# Dependencies
+deps:
+- tags: get,mlperf,inference,nvidia,scratch,space
+  names:
+  - nvidia-scratch-space
+
+# Variations
 variations:
-  sdxl:
-    group: model
-    env:
-      MLC_MODEL: sdxl
   downloaded-data:
     group: artifact
     env:
       MLC_CLEAN_ARTIFACT_NAME: downloaded_data
-  preprocessed-data:
-    group: artifact
-    env:
-      MLC_CLEAN_ARTIFACT_NAME: preprocessed_data
   downloaded-model:
     group: artifact
     env:
       MLC_CLEAN_ARTIFACT_NAME: downloaded_model
-  v4.1:
-    group: version
+  preprocessed-data:
+    group: artifact
     env:
-      MLC_NVIDIA_MLPERF_INFERENCE_CODE_VERSION: v4.1
+      MLC_CLEAN_ARTIFACT_NAME: preprocessed_data
+  sdxl:
+    group: model
+    env:
+      MLC_MODEL: sdxl
   v4.0:
     group: version
     env:
       MLC_NVIDIA_MLPERF_INFERENCE_CODE_VERSION: v4.0
+  v4.1:
+    group: version
+    env:
+      MLC_NVIDIA_MLPERF_INFERENCE_CODE_VERSION: v4.1

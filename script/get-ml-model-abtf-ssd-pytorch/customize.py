@@ -46,6 +46,10 @@ def postprocess(i):
                     env['MLC_ML_MODEL_SSD_PATH'], env['MLC_ML_MODEL_FILENAME'])
             env['MLC_ML_MODEL_FILE_WITH_PATH'] = env['MLC_ML_MODEL_SSD_PATH']
 
+    else:
+        if env.get('MLC_ML_MODEL_SSD_PATH', '') == '':
+            env['MLC_ML_MODEL_SSD_PATH'] = env['MLC_ML_MODEL_FILE_WITH_PATH']
+
     env['MLC_ML_MODEL_FILE'] = os.path.basename(
         env['MLC_ML_MODEL_FILE_WITH_PATH'])
 

@@ -1,16 +1,44 @@
 alias: get-mlperf-single-node-system-info
+uid: fe91d73029c94ec1
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: Platform information
+tags:
+- get
+- mlperf
+- single-node
+- system-info
+
+# Cache
+cache: false
+
+# Input mapping
+input_mapping:
+  node_id: MLC_SINGLE_NODE_SYSTEM_ID
+  out_dir_path: MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH
+  out_file_name: MLC_SINGLE_NODE_SYSTEM_INFO_FILE_NAME
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
 - tags: get,cuda-devices
-- skip_if_env:
+  enable_if_env:
+    MLC_GPU_PLATFORM: 
+      - cuda
+  skip_if_env:
     MLC_HOST_OS_TYPE:
     - windows
-  tags: detect,sudo
+- tags: get,rocm-devices
+  enable_if_env:
+    MLC_GPU_PLATFORM:
+    - rocm
+  skip_if_env:
+    MLC_HOST_OS_TYPE:
+    - windows
+- tags: detect,sudo
 - tags: get,python
   names:
   - python
@@ -18,10 +46,11 @@ deps:
 - tags: get,platform-details
   names:
   - platform-details
+- tags: detect,host,system,details
 input_mapping:
+  node_id: MLC_SINGLE_NODE_SYSTEM_ID
   out_dir_path: MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH
   out_file_name: MLC_SINGLE_NODE_SYSTEM_INFO_FILE_NAME
-  node_id: MLC_SINGLE_NODE_SYSTEM_ID
 tags:
 - get
 - mlperf
@@ -30,6 +59,13 @@ tags:
 uid: fe91d73029c94ec1
 variations:
   cuda:
+    group: gpu-platform
+    env:
+      MLC_GPU_PLATFORM: cuda
     adr:
       platform-details:
         tags: _cuda
+  rocm:
+    group: gpu-platform
+    env:
+      MLC_GPU_PLATFORM: rocm

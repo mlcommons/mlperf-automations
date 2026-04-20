@@ -63,10 +63,12 @@ def postprocess(i):
     if r['return'] > 0:
         return r
 
+    version = r['version']
+
     env['MLC_GET_DEPENDENT_CACHED_PATH'] = env['MLC_INTEL_PINTOOL_BIN_WITH_PATH']
     if '+PATH' not in env:
         env['+PATH'] = []
 
     os_info = i['os_info']
 
-    return {'return': 0}
+    return {'return': 0, 'version': version}

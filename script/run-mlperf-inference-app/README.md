@@ -1,5 +1,5 @@
 # README for run-mlperf-inference-app
-This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
+This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
 ```
@@ -42,8 +42,8 @@ mlcr run-mlperf,inference
 |------|-------------|---------|------|
 | `--division` | MLPerf division | ['open', 'closed'] | `open` |
 | `--category` | MLPerf category | ['edge', 'datacenter', 'network'] | `edge` |
-| `--device` | MLPerf device | ['cpu', 'cuda', 'rocm', 'qaic'] | `cpu` |
-| `--model` | MLPerf model | ['resnet50', 'retinanet', 'bert-99', 'bert-99.9', '3d-unet-99', '3d-unet-99.9', 'rnnt', 'dlrm-v2-99', 'dlrm-v2-99.9', 'gptj-99', 'gptj-99.9', 'sdxl', 'llama2-70b-99', 'llama2-70b-99.9', 'mixtral-8x7b', 'mobilenet', 'efficientnet', 'rgat', 'llama3_1-405b', 'pointpainting'] | `resnet50` |
+| `--device` | MLPerf device | ['cpu', 'cuda', 'rocm', 'qaic'] | `` |
+| `--model` | MLPerf model | ['resnet50', 'retinanet', 'bert-99', 'bert-99.9', '3d-unet-99', '3d-unet-99.9', 'rnnt', 'dlrm-v2-99', 'dlrm-v2-99.9', 'gptj-99', 'gptj-99.9', 'sdxl', 'llama2-70b-99', 'llama2-70b-99.9', 'mixtral-8x7b', 'mobilenet', 'efficientnet', 'rgat', 'llama3_1-405b', 'pointpainting', 'yolo-95', 'yolo-99', 'wan-2.2-t2v-a14b'] | `resnet50` |
 | `--precision` | MLPerf model precision | ['float32', 'float16', 'bfloat16', 'int8', 'uint8'] | `` |
 | `--implementation` | MLPerf implementation | ['mlcommons-python', 'mlcommons-cpp', 'nvidia', 'intel', 'qualcomm', 'ctuning-cpp-tflite'] | `reference` |
 | `--backend` | MLPerf framework (backend) | ['onnxruntime', 'tf', 'pytorch', 'deepsparse', 'tensorrt', 'glow', 'tvm-onnx'] | `` |
@@ -80,69 +80,72 @@ mlcr run-mlperf,inference
 | `--repro` | Record input/output/state/info files to make it easier to reproduce results |  | `False` |
 | `--time` | Print script execution time at the end of the run |  | `True` |
 | `--debug` | Debug this script |  | `False` |
+| `--all_models` |  |  | `` |
 | `--api_server` |  |  | `` |
 | `--batch_size` |  |  | `` |
 | `--beam_size` |  |  | `` |
+| `--client_id` |  |  | `` |
+| `--client_secret` |  |  | `` |
+| `--criteo_day23_raw_data_path` |  |  | `` |
 | `--custom_system_nvidia` |  |  | `` |
 | `--dashboard_wb_project` |  |  | `` |
 | `--dashboard_wb_user` |  |  | `` |
+| `--deeplab_resnet50_path` |  |  | `` |
 | `--dlrm_data_path` |  |  | `` |
 | `--docker` |  |  | `` |
+| `--docker_keep_alive` |  |  | `` |
 | `--dump_version_info` |  |  | `` |
-| `--save_console_log` |  |  | `` |
 | `--find_performance` |  |  | `` |
 | `--framework` | Alias for backend |  | `` |
-| `--status` |  |  | `` |
-| `--docker_keep_alive` |  |  | `` |
 | `--get_platform_details` |  |  | `` |
 | `--gpu_name` |  |  | `` |
-| `--pip_loadgen` |  |  | `` |
 | `--hw_notes_extra` |  |  | `` |
 | `--imagenet_path` |  |  | `` |
 | `--lang` | Alias for implementation |  | `` |
+| `--max_query_count` |  |  | `` |
+| `--max_test_duration` |  |  | `` |
 | `--min_duration` |  |  | `` |
 | `--min_query_count` |  |  | `` |
-| `--max_query_count` |  |  | `` |
 | `--network` |  |  | `` |
+| `--nm_model_zoo_stub` |  |  | `` |
+| `--num_workers` |  |  | `` |
+| `--number_of_processes_per_gpu_node` |  |  | `` |
+| `--nvidia_llama2_dataset_file_path` |  |  | `` |
 | `--nvidia_system_name` |  |  | `` |
 | `--output_dir` |  |  | `` |
 | `--output_summary` |  |  | `` |
 | `--output_tar` |  |  | `` |
 | `--performance_sample_count` |  |  | `` |
+| `--pip_loadgen` |  |  | `` |
+| `--pointpainting_checkpoint_path` |  |  | `` |
 | `--preprocess_submission` |  |  | `` |
-| `--push_to_github` |  |  | `` |
 | `--pull_changes` |  |  | `` |
 | `--pull_inference_changes` |  |  | `` |
+| `--push_to_github` |  |  | `` |
 | `--readme` |  |  | `` |
 | `--regenerate_accuracy_file` |  |  | `` |
 | `--regenerate_files` |  |  | `` |
 | `--rerun` |  |  | `` |
 | `--results_git_url` |  |  | `` |
+| `--rgat_checkpoint_path` |  |  | `` |
 | `--run_checker` |  |  | `` |
 | `--run_style` | Alias for execution_mode |  | `` |
+| `--save_console_log` |  |  | `` |
 | `--skip_submission_generation` |  |  | `False` |
 | `--skip_truncation` |  |  | `` |
+| `--status` |  |  | `` |
+| `--submitter_id` |  |  | `` |
 | `--sut_servers` |  |  | `` |
 | `--sw_notes_extra` | Alias for hw_notes_extra |  | `` |
 | `--system_type` | Alias for category |  | `` |
+| `--test_qps` |  |  | `` |
 | `--test_query_count` |  |  | `` |
 | `--threads` |  |  | `` |
-| `--nvidia_llama2_dataset_file_path` |  |  | `` |
 | `--tp_size` |  |  | `` |
-| `--vllm_tp_size` |  |  | `1` |
-| `--vllm_model_name` |  |  | `` |
-| `--num_workers` |  |  | `` |
-| `--max_test_duration` |  |  | `` |
-| `--all_models` |  |  | `` |
-| `--criteo_day23_raw_data_path` |  |  | `` |
-| `--rgat_checkpoint_path` |  |  | `` |
-| `--pointpainting_checkpoint_path` |  |  | `` |
-| `--deeplab_resnet50_path` |  |  | `` |
-| `--waymo_path` |  |  | `` |
-| `--nm_model_zoo_stub` |  |  | `` |
 | `--use_service_account` |  |  | `` |
-| `--client_id` |  |  | `` |
-| `--client_secret` |  |  | `` |
+| `--vllm_model_name` |  |  | `` |
+| `--vllm_tp_size` |  |  | `1` |
+| `--waymo_path` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -151,10 +154,12 @@ mlcr run-mlperf,inference
 | `--output` | Output from the script passed using the env key `MLC_OUTPUT` |  | `` |
 | `--outdirname` | The directory to store the script output |  | `cache directory ($HOME/MLC/repos/local/cache/<>) if the script is cacheable or else the current directory` |
 | `--outbasename` | The output file/folder name |  | `` |
+| `--search_folder_path` | The folder path where executables of a given script need to be searched. Search is done recursively upto 4 levels. |  | `` |
 | `--name` |  |  | `` |
 | `--extra_cache_tags` | Extra cache tags to be added to the cached entry when the script results are saved |  | `` |
 | `--skip_compile` | Skip compilation |  | `False` |
 | `--skip_run` | Skip run |  | `False` |
+| `--skip_sudo` | Skip SUDO detection |  | `False` |
 | `--accept_license` | Accept the required license requirement to run the script |  | `False` |
 | `--skip_system_deps` | Skip installing any system dependencies |  | `False` |
 | `--git_ssh` | Use SSH for git repos |  | `False` |
@@ -175,7 +180,8 @@ mlcr run-mlperf,inference
 - `r5.0`
 - `r5.0-dev`
 - `r5.1`
-- `r5.1-dev` (default)
+- `r5.1-dev`
+- `r6.0-dev` (default)
 
 ### Mode
 

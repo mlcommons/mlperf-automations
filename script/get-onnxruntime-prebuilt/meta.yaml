@@ -1,20 +1,10 @@
 alias: get-onnxruntime-prebuilt
+uid: be02c84ff57c4244
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML frameworks
-clean_files: []
-default_version: 1.20.1
-deps:
-- tags: detect,os
-new_env_keys:
-- MLC_ONNXRUNTIME_LIB_PATH
-- MLC_ONNXRUNTIME_INCLUDE_PATH
-- +PATH
-- +C_INCLUDE_PATH
-- +CPLUS_INCLUDE_PATH
-- +LD_LIBRARY_PATH
-- +DYLD_FALLBACK_LIBRARY_PATH
 tags:
 - install
 - onnxruntime
@@ -23,7 +13,26 @@ tags:
 - lib
 - lang-c
 - lang-cpp
-uid: be02c84ff57c4244
+
+# Cache
+cache: true
+clean_files: []
+
+# Environment
+new_env_keys:
+- MLC_ONNXRUNTIME_LIB_PATH
+- MLC_ONNXRUNTIME_INCLUDE_PATH
+- +PATH
+- +C_INCLUDE_PATH
+- +CPLUS_INCLUDE_PATH
+- +LD_LIBRARY_PATH
+- +DYLD_FALLBACK_LIBRARY_PATH
+
+# Dependencies
+deps:
+- tags: detect,os
+
+# Variations
 variations:
   cpu:
     default: true
@@ -34,3 +43,6 @@ variations:
     env:
       MLC_ONNXRUNTIME_DEVICE: gpu
     group: device
+
+# Versions
+default_version: 1.20.1

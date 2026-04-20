@@ -45,6 +45,7 @@ No script specific inputs
 | `--output` | Output from the script passed using the env key `MLC_OUTPUT` |  | `` |
 | `--outdirname` | The directory to store the script output |  | `cache directory ($HOME/MLC/repos/local/cache/<>) if the script is cacheable or else the current directory` |
 | `--outbasename` | The output file/folder name |  | `` |
+| `--search_folder_path` | The folder path where executables of a given script need to be searched. Search is done recursively upto 4 levels. |  | `` |
 | `--name` |  |  | `` |
 | `--extra_cache_tags` | Extra cache tags to be added to the cached entry when the script results are saved |  | `` |
 | `--skip_compile` | Skip compilation |  | `False` |

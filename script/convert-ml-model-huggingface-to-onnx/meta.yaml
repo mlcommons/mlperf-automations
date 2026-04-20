@@ -1,20 +1,10 @@
 alias: convert-ml-model-huggingface-to-onnx
+uid: eacb01655d7e49ac
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: AI/ML models
-deps:
-- names:
-  - python3
-  - python
-  tags: get,python3
-- tags: get,generic-python-lib,_transformers
-- tags: get,generic-python-lib,_onnxruntime
-env: {}
-new_env_keys:
-- MLC_ML_MODEL*
-- MLC_MODEL_HUGG_PATH
-- HUGGINGFACE_ONNX_FILE_PATH
 tags:
 - ml-model
 - model
@@ -22,7 +12,27 @@ tags:
 - onnx
 - huggingface
 - convert
-uid: eacb01655d7e49ac
+
+# Cache
+cache: true
+
+# Environment
+env: {}
+new_env_keys:
+- MLC_ML_MODEL*
+- MLC_MODEL_HUGG_PATH
+- HUGGINGFACE_ONNX_FILE_PATH
+
+# Dependencies
+deps:
+- names:
+  - python3
+  - python
+  tags: get,python3
+- tags: get,generic-python-lib,_transformers
+- tags: get,generic-python-lib,_onnxruntime
+
+# Variations
 variations:
   model-path.#:
     env:

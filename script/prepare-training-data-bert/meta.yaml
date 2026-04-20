@@ -1,18 +1,34 @@
 alias: prepare-training-data-bert
+uid: 1e06a7abe23545eb
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLPerf Training
-deps: []
-input_description: {}
-input_mapping:
-  clean: MLC_MLPERF_TRAINING_CLEAN_TFRECORDS
-  data_dir: MLC_DATA_DIR
+tags:
+- prepare
+- mlperf
+- training
+- data
+- input
+- bert
+
+# Cache
+cache: true
+
+# Environment
 new_env_keys:
 - MLC_MLPERF_TRAINING_BERT_*
 new_state_keys: []
-post_deps: []
-posthook_deps: []
+
+# Input mapping
+input_mapping:
+  clean: MLC_MLPERF_TRAINING_CLEAN_TFRECORDS
+  data_dir: MLC_DATA_DIR
+input_description: {}
+
+# Dependencies
+deps: []
 prehook_deps:
 - env:
     MLC_DOWNLOAD_CHECKSUM: 7f59165e21b7d566db610ff6756c926b
@@ -71,14 +87,10 @@ prehook_deps:
   extra_cache_tags: bert,checkpoint,meta
   force_cache: true
   tags: download,file,_gdown,_url.https://drive.google.com/uc?id=1vAcVmXSLsLeQ1q7gvHnQUSth5W_f_pwv
-tags:
-- prepare
-- mlperf
-- training
-- data
-- input
-- bert
-uid: 1e06a7abe23545eb
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations:
   nvidia:
     default: true
@@ -104,4 +116,6 @@ variations:
     env:
       MLC_TMP_VARIATION: reference
     group: implementation
+
+# Versions
 versions: {}

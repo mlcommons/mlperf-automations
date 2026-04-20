@@ -19,18 +19,18 @@ jobs:
         python-version: [ "3.9", "3.14" ]
         backend: [ "pytorch" ]
         implementation: [ "python" ]
-        docker: [ "", " --docker --docker_mlc_repo=${{ github.event.pull_request.head.repo.html_url }} --docker_mlc_repo_branch=${{ github.event.pull_request.head.ref }} --docker_dt" ]
+        docker: [ "", "docker" ]
         extra-args: [ "--adr.compiler.tags=gcc", "--env.MLC_MLPERF_LOADGEN_BUILD_FROM_SRC=off" ]
         exclude:
         - os: windows-latest
           extra-args: "--adr.compiler.tags=gcc"
         - os: windows-latest 
-          docker: " --docker --docker_mlc_repo=${{ github.event.pull_request.head.repo.html_url }} --docker_mlc_repo_branch=${{ github.event.pull_request.head.ref }} --docker_dt"
+          docker: "docker"
           # windows docker image is not supported in MLC yet
         - os: macos-latest
-          docker: " --docker --docker_mlc_repo=${{ github.event.pull_request.head.repo.html_url }} --docker_mlc_repo_branch=${{ github.event.pull_request.head.ref }} --docker_dt"
+          docker: "docker"
         - os: macos-15
-          docker: " --docker --docker_mlc_repo=${{ github.event.pull_request.head.repo.html_url }} --docker_mlc_repo_branch=${{ github.event.pull_request.head.ref }} --docker_dt"
+          docker: "docker"
 
     steps:
     - uses: actions/checkout@v3
@@ -47,8 +47,12 @@ jobs:
         pip install mlcflow
         pip install tabulate
     - name: Pull MLOps repository
+      env:
+        PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      shell: bash
       run: |
-        mlc pull repo ${{ github.event.pull_request.head.repo.html_url }} --branch=${{ github.event.pull_request.head.ref }}
+        mlc pull repo "$PR_HEAD_REPO" --branch="$PR_HEAD_REF"
         #cm pull repo mlcommons@cm4abtf --branch=poc
   
     - name: Install Docker on macos
@@ -105,5 +109,16 @@ jobs:
         Write-Output "Docker is up and running"
 
     - name: Test MLPerf Inference ABTF POC using ${{ matrix.backend }} on ${{ matrix.os }}
+      shell: bash
+      env:
+        PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        MATRIX_DOCKER: ${{ matrix.docker }}
+        MATRIX_EXTRA_ARGS: ${{ matrix.extra-args }}
       run: |
-        mlcr run-abtf,inference,_poc-demo --test_query_count=2  --quiet ${{ matrix.extra-args }} ${{ matrix.docker }} -v
+        if [ "$MATRIX_DOCKER" == "docker" ]; then
+          docker_flags=" --docker --docker_mlc_repo=$PR_HEAD_REPO --docker_mlc_repo_branch=$PR_HEAD_REF --docker_dt"
+        else
+          docker_flags=""
+        fi
+        mlcr run-abtf,inference,_poc-demo --test_query_count=2  --quiet $MATRIX_EXTRA_ARGS $docker_flags -v

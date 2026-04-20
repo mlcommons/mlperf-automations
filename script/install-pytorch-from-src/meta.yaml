@@ -1,8 +1,30 @@
 alias: install-pytorch-from-src
+uid: 64eaf3e81de94f41
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
+name: Build pytorch from sources
 category: Compiler automation
+tags:
+- install
+- get
+- src
+- from-src
+- from.src
+- pytorch
+- src-pytorch
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_GIT_URL: https://github.com/pytorch/pytorch
+new_env_keys:
+- MLC_PYTORCH_*
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -31,23 +53,19 @@ deps:
     - MLC_GIT_CHECKOUT_SHA
     _tag.:
     - MLC_GIT_CHECKOUT_TAG
-env:
-  MLC_GIT_URL: https://github.com/pytorch/pytorch
-name: Build pytorch from sources
-new_env_keys:
-- MLC_PYTORCH_*
 prehook_deps: []
-sort: 1000
-tags:
-- install
-- get
-- src
-- from-src
-- from.src
-- pytorch
-- src-pytorch
-uid: 64eaf3e81de94f41
+
+# Variations
 variations:
+  repo.#:
+    env:
+      MLC_GIT_URL: '#'
+    group: repo
+  repo.https://github.com/pytorch/pytorch:
+    default: true
+    env:
+      MLC_GIT_URL: https://github.com/pytorch/pytorch
+    group: repo
   branch.#:
     env:
       MLC_GIT_CHECKOUT: '#'
@@ -267,15 +285,6 @@ variations:
       pytorch-src-repo:
         tags: _pr-to-apply.#
     env: {}
-  repo.#:
-    env:
-      MLC_GIT_URL: '#'
-    group: repo
-  repo.https://github.com/pytorch/pytorch:
-    default: true
-    env:
-      MLC_GIT_URL: https://github.com/pytorch/pytorch
-    group: repo
   sha.#:
     env:
       MLC_GIT_CHECKOUT_SHA: '#'
@@ -285,4 +294,9 @@ variations:
         tags: _no-recurse-submodules,_full-history
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
+
+# Versions
 versions: {}
+
+# Output / debugging
+sort: 1000

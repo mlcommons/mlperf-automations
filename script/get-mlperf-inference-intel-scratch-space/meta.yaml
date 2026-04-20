@@ -1,21 +1,10 @@
 alias: get-mlperf-inference-intel-scratch-space
+uid: e83fca30851f45ef
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLPerf Inference
-deps: []
-docker:
-  run: false
-input_description: {}
-input_mapping:
-  scratch_path: MLPERF_INTEL_SCRATCH_PATH
-new_env_keys:
-- MLC_INTEL_MLPERF_SCRATCH_PATH
-- MLC_INTEL_SCRATCH_SPACE_VERSION
-new_state_keys: []
-post_deps: []
-posthook_deps: []
-prehook_deps: []
 tags:
 - get
 - mlperf
@@ -23,7 +12,28 @@ tags:
 - intel
 - scratch
 - space
-uid: e83fca30851f45ef
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_INTEL_MLPERF_SCRATCH_PATH
+- MLC_INTEL_SCRATCH_SPACE_VERSION
+new_state_keys: []
+
+# Input mapping
+input_mapping:
+  scratch_path: MLPERF_INTEL_SCRATCH_PATH
+input_description: {}
+
+# Dependencies
+deps: []
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
 variations:
   version.#:
     env:
@@ -34,4 +44,10 @@ variations:
     env:
       MLC_INTEL_SCRATCH_SPACE_VERSION: '4_0'
     group: version
+
+# Versions
 versions: {}
+
+# Docker / container
+docker:
+  run: false

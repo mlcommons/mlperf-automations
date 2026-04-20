@@ -1,20 +1,29 @@
 alias: get-mlperf-automotive-src
+uid: c3842e6e35d947ef
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: MLPerf Automotive
+tags:
+- get
+- src
+- source
+- automotive
+- automotive-src
+- automotive-source
+- mlperf
+- mlcommons
+
+# Cache
+cache: true
+
+# Environment
 default_env:
   MLC_GIT_CHECKOUT_FOLDER: automotive
   MLC_GIT_DEPTH: --depth 4
   MLC_GIT_PATCH: 'no'
   MLC_GIT_RECURSE_SUBMODULES: ''
-default_version: master
-deps:
-- tags: detect,os
-- names:
-  - python
-  - python3
-  tags: get,python3
 new_env_keys:
 - MLC_MLPERF_INFERENCE_BEVFORMER_PATH
 - MLC_MLPERF_INFERENCE_SSD_RESNET50_PATH
@@ -24,6 +33,14 @@ new_env_keys:
 - MLC_MLPERF_INFERENCE_SOURCE
 - MLC_MLPERF_INFERENCE_SOURCE_VERSION
 - +PYTHONPATH
+
+# Dependencies
+deps:
+- tags: detect,os
+- names:
+  - python
+  - python3
+  tags: get,python3
 prehook_deps:
 - env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_MLPERF_INFERENCE_SOURCE
@@ -42,27 +59,26 @@ prehook_deps:
     - MLC_GIT_SHA
     _submodules.:
     - MLC_GIT_SUBMODULES
-print_env_at_the_end:
-  MLC_MLPERF_INFERENCE_SOURCE: Path to MLPerf automotive benchmark source
-tags:
-- get
-- src
-- source
-- automotive
-- automotive-src
-- automotive-source
-- mlperf
-- mlcommons
-uid: c3842e6e35d947ef
+
+# Variations
 variations:
   branch.#:
     default_version: custom
     env:
       MLC_GIT_CHECKOUT: '#'
     group: checkout
+  sha.#:
+    env:
+      MLC_GIT_SHA: '#'
+    group: checkout
   full-history:
     env:
       MLC_GIT_DEPTH: ''
+    group: git-history
+  short-history:
+    default: true
+    env:
+      MLC_GIT_DEPTH: --depth 10
     group: git-history
   no-recurse-submodules:
     env:
@@ -82,18 +98,12 @@ variations:
   repo.#:
     env:
       MLC_GIT_URL: '#'
-  sha.#:
-    env:
-      MLC_GIT_SHA: '#'
-    group: checkout
-  short-history:
-    default: true
-    env:
-      MLC_GIT_DEPTH: --depth 10
-    group: git-history
   submodules.#:
     env:
       MLC_GIT_SUBMODULES: '#'
+
+# Versions
+default_version: master
 versions:
   custom:
     env:
@@ -108,3 +118,7 @@ versions:
     env:
       MLC_MLPERF_LAST_RELEASE: v1.0
       MLC_TMP_GIT_CHECKOUT: master
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_MLPERF_INFERENCE_SOURCE: Path to MLPerf automotive benchmark source

@@ -1,44 +1,10 @@
 alias: run-mlperf-training-submission-checker
+uid: cb5cb60ac9a74d09
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: MLPerf Training
-clean_files: []
-default_env:
-  MLC_MLPERF_SHORT_RUN: 'no'
-default_version: master
-deps:
-- names:
-  - python
-  - python3
-  tags: get,python3
-- names:
-  - inference-src
-  - submission-checker-src
-  tags: get,mlcommons,inference,src
-- tags: install,mlperf,logging,from.src
-input_mapping:
-  extra_args: MLC_MLPERF_SUBMISSION_CHECKER_EXTRA_ARGS
-  input: MLC_MLPERF_SUBMISSION_DIR
-  power: MLC_MLPERF_POWER
-  push_to_github: MLC_MLPERF_RESULT_PUSH_TO_GITHUB
-  skip_compliance: MLC_MLPERF_SKIP_COMPLIANCE
-  skip_power_check: MLC_MLPERF_SKIP_POWER_CHECK
-  src_version: MLC_MLPERF_SUBMISSION_CHECKER_VERSION
-  submission_dir: MLC_MLPERF_SUBMISSION_DIR
-  submitter: MLC_MLPERF_SUBMITTER
-  tar: MLC_TAR_SUBMISSION_DIR
-post_deps:
-- enable_if_env:
-    MLC_MLPERF_RESULT_PUSH_TO_GITHUB:
-    - 'on'
-  names:
-  - push-to-github
-  tags: publish-results,github
-- enable_if_env:
-    MLC_TAR_SUBMISSION_DIR:
-    - 'yes'
-  tags: run,tar
 tags:
 - run
 - mlc
@@ -51,11 +17,59 @@ tags:
 - checker
 - submission-checker
 - mlc-submission-checker
-uid: cb5cb60ac9a74d09
+
+# Cache
+cache: false
+clean_files: []
+
+# Environment
+default_env:
+  MLC_MLPERF_SHORT_RUN: 'no'
+
+# Input mapping
+input_mapping:
+  extra_args: MLC_MLPERF_SUBMISSION_CHECKER_EXTRA_ARGS
+  input: MLC_MLPERF_SUBMISSION_DIR
+  power: MLC_MLPERF_POWER
+  push_to_github: MLC_MLPERF_RESULT_PUSH_TO_GITHUB
+  skip_compliance: MLC_MLPERF_SKIP_COMPLIANCE
+  skip_power_check: MLC_MLPERF_SKIP_POWER_CHECK
+  src_version: MLC_MLPERF_SUBMISSION_CHECKER_VERSION
+  submission_dir: MLC_MLPERF_SUBMISSION_DIR
+  submitter: MLC_MLPERF_SUBMITTER
+  tar: MLC_TAR_SUBMISSION_DIR
+
+# Dependencies
+deps:
+- names:
+  - python
+  - python3
+  tags: get,python3
+- names:
+  - inference-src
+  - submission-checker-src
+  tags: get,mlcommons,inference,src
+- tags: install,mlperf,logging,from.src
+post_deps:
+- enable_if_env:
+    MLC_MLPERF_RESULT_PUSH_TO_GITHUB:
+    - 'on'
+  names:
+  - push-to-github
+  tags: publish-results,github
+- enable_if_env:
+    MLC_TAR_SUBMISSION_DIR:
+    - 'yes'
+  tags: run,tar
+
+# Variations
 variations:
   short-run:
     env:
       MLC_MLPERF_SHORT_RUN: 'yes'
+
+# Versions
+default_version: master
 versions:
   master:
     adr:

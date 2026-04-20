@@ -1,5 +1,5 @@
 # README for app-mlperf-inference-qualcomm
-This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
+This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
 ```
@@ -41,23 +41,23 @@ mlcr reproduce,mlcommons,mlperf,inference,harness,qualcomm-harness,qualcomm,kilt
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
 | `--count` |  |  | `` |
+| `--devices` |  |  | `0` |
 | `--max_batchsize` |  |  | `` |
 | `--mlperf_conf` |  |  | `` |
 | `--mode` |  |  | `performance` |
+| `--multistream_target_latency` |  |  | `` |
+| `--offline_target_qps` |  |  | `` |
 | `--output_dir` |  |  | `` |
 | `--performance_sample_count` |  |  | `` |
+| `--rerun` |  |  | `` |
 | `--scenario` |  |  | `Offline` |
-| `--user_conf` |  |  | `` |
-| `--devices` |  |  | `0` |
+| `--server_target_qps` |  |  | `` |
+| `--singlestream_target_latency` |  |  | `` |
 | `--skip_preprocess` |  |  | `no` |
 | `--skip_preprocessing` | Alias for skip_preprocess |  | `` |
-| `--target_qps` |  |  | `` |
-| `--offline_target_qps` |  |  | `` |
-| `--server_target_qps` |  |  | `` |
 | `--target_latency` |  |  | `` |
-| `--singlestream_target_latency` |  |  | `` |
-| `--multistream_target_latency` |  |  | `` |
-| `--rerun` |  |  | `` |
+| `--target_qps` |  |  | `` |
+| `--user_conf` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -66,6 +66,7 @@ mlcr reproduce,mlcommons,mlperf,inference,harness,qualcomm-harness,qualcomm,kilt
 | `--output` | Output from the script passed using the env key `MLC_OUTPUT` |  | `` |
 | `--outdirname` | The directory to store the script output |  | `cache directory ($HOME/MLC/repos/local/cache/<>) if the script is cacheable or else the current directory` |
 | `--outbasename` | The output file/folder name |  | `` |
+| `--search_folder_path` | The folder path where executables of a given script need to be searched. Search is done recursively upto 4 levels. |  | `` |
 | `--name` |  |  | `` |
 | `--extra_cache_tags` | Extra cache tags to be added to the cached entry when the script results are saved |  | `` |
 | `--skip_compile` | Skip compilation |  | `False` |

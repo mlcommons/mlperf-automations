@@ -1,20 +1,28 @@
 alias: get-terraform
+uid: 66b33c38a4d7461e
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: true
+
+# Metadata
 category: Cloud automation
+tags:
+- get
+- terraform
+- get-terraform
+
+# Cache
+cache: true
 clean_files: []
+
+# Environment
 new_env_keys:
 - MLC_TERRAFORM_*
 - +PATH
+
+# Dependencies
 prehook_deps:
 - enable_if_env:
     MLC_REQUIRE_INSTALL:
     - 'yes'
   reuse_version: true
   tags: install,terraform
-tags:
-- get
-- terraform
-- get-terraform
-uid: 66b33c38a4d7461e
