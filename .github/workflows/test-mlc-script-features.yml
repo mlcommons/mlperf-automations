@@ -168,7 +168,9 @@ jobs:
         assert enabled_result['return'] == 0, enabled_result
         assert disabled_result['return'] == 0, disabled_result
         error_msg = failed_result.get('error', '').lower()
-        assert failed_result['return'] == 1 and 'docker' in error_msg and 'failed' in error_msg, failed_result
+        assert failed_result['return'] == 1, failed_result
+        assert 'docker' in error_msg, failed_result
+        assert 'failed' in error_msg, failed_result
 
         assert f'{DOCKER_SOCKET}:{DOCKER_SOCKET}' in enabled_cmd, enabled_cmd
         assert f'{DOCKER_BIN}:{DOCKER_BIN}' in enabled_cmd, enabled_cmd
