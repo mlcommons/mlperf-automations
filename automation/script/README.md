@@ -788,6 +788,7 @@ mlcr "app,mlperf,inference" --docker_run --docker_image_repo=myrepo --docker_reb
 3. **Mount Handling**: Host directories are automatically mounted into the container based on environment variable paths.
 4. **Environment Passing**: Host env variables (proxies, tokens, etc.) are passed into the container.
 5. **Execution**: The MLC run command is re-executed inside the container with `--docker_run_deps` to handle Docker-specific dependency installation.
+6. **Nested Docker Support**: When MLC is itself running inside Docker, Docker socket (`/var/run/docker.sock`) and Docker CLI binary are mounted into launched containers (when available) to enable Docker-in-Docker style workflows.
 
 ### Docker Meta Configuration
 

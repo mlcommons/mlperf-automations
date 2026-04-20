@@ -1,6 +1,7 @@
 from mlc import utils
 import os
 import subprocess
+import shutil
 from os.path import exists
 import json
 from utils import *
@@ -167,6 +168,19 @@ def postprocess(i):
     if env.get('MLC_DOCKER_VOLUME_MOUNTS', []):
         for mounts in env['MLC_DOCKER_VOLUME_MOUNTS']:
             mount_cmds.append(mounts)
+
+    if os.path.exists("/.dockerenv") and env.get('MLC_CONTAINER_TOOL') == "docker":
+        docker_socket = "/var/run/docker.sock"
+        if os.path.exists(docker_socket):
+            docker_socket_mount = f"{docker_socket}:{docker_socket}"
+            if docker_socket_mount not in mount_cmds:
+                mount_cmds.append(docker_socket_mount)
+
+        docker_binary = env.get('MLC_DOCKER_BIN_WITH_PATH', '') or shutil.which("docker")
+        if docker_binary and os.path.exists(docker_binary):
+            docker_bin_mount = f"{docker_binary}:{docker_binary}"
+            if docker_bin_mount not in mount_cmds:
+                mount_cmds.append(docker_bin_mount)
 
     if env.get('MLC_DOCKER_PASS_USER_GROUP',
                '') != '' and os_info['platform'] != 'windows':
