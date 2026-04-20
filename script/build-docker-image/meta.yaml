@@ -48,3 +48,10 @@ prehook_deps:
     MLC_BUILD_DOCKERFILE:
     - 'yes'
   tags: build,dockerfile
+
+# Tests
+tests:
+  run_inputs:
+  - env:
+      MLC_DOCKER_PUSH_IMAGE: 'yes'
+      MLC_REAL_RUN: 'no'
