@@ -19,6 +19,10 @@ from utils import *
 from script.script_utils import *
 from script.cache_utils import *
 
+GIT_COMMAND_TIMEOUT_SECONDS = 30
+GIT_COMMAND_TIMEOUT_RETURNCODE = 124
+MAX_REPO_CHANGED_FILES_TO_DISPLAY = 20
+
 
 class ScriptAutomation(Automation):
 
@@ -5963,11 +5967,15 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
 def _run_git_command(repo_path, args):
     cmd = ['git', '-C', repo_path] + args
     try:
-        return subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        return subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=GIT_COMMAND_TIMEOUT_SECONDS)
     except subprocess.TimeoutExpired as e:
         return subprocess.CompletedProcess(
             args=cmd,
-            returncode=124,
+            returncode=GIT_COMMAND_TIMEOUT_RETURNCODE,
             stdout=e.stdout or '',
             stderr=(e.stderr or '') + '\nGit command timed out.'
         )
@@ -6091,7 +6099,7 @@ def check_and_handle_repo_updates(repo_path, repo_alias, script_relative_path,
 
     changed_files = status.get('changed_files', [])
     if changed_files:
-        files_to_show = changed_files[:20]
+        files_to_show = changed_files[:MAX_REPO_CHANGED_FILES_TO_DISPLAY]
         logger.warning(recursion_spaces + '  - Changed files in remote updates:')
         for file_name in files_to_show:
             logger.warning(recursion_spaces + '    * {}'.format(file_name))
