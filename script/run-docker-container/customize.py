@@ -6,6 +6,9 @@ from os.path import exists
 import json
 from utils import *
 
+DOCKER_ENV_MARKER = "/.dockerenv"
+DOCKER_SOCKET_PATH = "/var/run/docker.sock"
+
 
 def preprocess(i):
 
@@ -169,8 +172,8 @@ def postprocess(i):
         for mounts in env['MLC_DOCKER_VOLUME_MOUNTS']:
             mount_cmds.append(mounts)
 
-    if os.path.exists("/.dockerenv") and env.get('MLC_CONTAINER_TOOL') == "docker":
-        docker_socket = "/var/run/docker.sock"
+    if os.path.exists(DOCKER_ENV_MARKER) and env.get('MLC_CONTAINER_TOOL') == "docker":
+        docker_socket = DOCKER_SOCKET_PATH
         if os.path.exists(docker_socket):
             docker_socket_mount = f"{docker_socket}:{docker_socket}"
             if docker_socket_mount not in mount_cmds:
