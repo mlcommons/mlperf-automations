@@ -1,5 +1,8 @@
 name: MLPerf inference ResNet50
 
+permissions:
+  contents: read
+
 on:
   pull_request_target:
     branches: [ "main", "dev" ]
@@ -133,5 +136,19 @@ jobs:
         mlc pull repo "$REPO" --branch="$BRANCH"
     - name: Test MLPerf Inference ResNet50 (RHEL Docker)
       run: |
-        mlcd run-mlperf,inference,_submission,_short,_r6.0-dev --submitter="MLCommons" --pull_changes=yes --pull_inference_changes=yes --hw_name="gh_rhel9_docker x86" --model=resnet50 --implementation=python --backend=onnxruntime --device=cpu --scenario=Offline --test_query_count=500 --target_qps=1 --docker_os=rhel --docker_os_version=9 -v --quiet
+        mlcd run-mlperf,inference,_submission,_short,_r6.0-dev \
+          --submitter="MLCommons" \
+          --pull_changes=yes \
+          --pull_inference_changes=yes \
+          --hw_name="gh_rhel9_docker x86" \
+          --model=resnet50 \
+          --implementation=python \
+          --backend=onnxruntime \
+          --device=cpu \
+          --scenario=Offline \
+          --test_query_count=500 \
+          --target_qps=1 \
+          --docker_os=rhel \
+          --docker_os_version=9 \
+          -v --quiet
    
