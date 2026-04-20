@@ -2658,7 +2658,7 @@ class ScriptAutomation(Automation):
 
         script_tags = i.get('script_tags', [])
         variation_tags = i.get('variation_tags', [])
-        
+
         if not script_tags and tags_string:
             r = get_variation_and_script_tags(tags_string.strip())
             script_tags = r['script_tags']
@@ -4483,8 +4483,8 @@ pip install mlcflow
         from script.docker import docker_run
         return docker_run(self, i)
 
-
     ############################################################
+
     def apptainerfile(self, i):
         from script.apptainer import apptainerfile
         return apptainerfile(self, i)
@@ -4494,6 +4494,7 @@ pip install mlcflow
         from script.apptainer import apptainer_run
         return apptainer_run(self, i)
     ############################################################
+
     def experiment(self, i):
         from script.experiment import experiment_run
         return experiment_run(self, i)
@@ -5949,7 +5950,6 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
     if folder_path_env_keys:
         run_state['folder_path_env_keys'] += folder_path_env_keys
 
-    
     return {'return': 0}
 
 ##############################################################################
