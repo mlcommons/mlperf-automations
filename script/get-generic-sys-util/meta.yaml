@@ -1025,6 +1025,22 @@ variations:
         brew: tcsh
         dnf: tcsh
         yum: tcsh
+  libopenblas-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libopenblas-dev
+    state:
+      libopenblas-dev:
+        apt: libopenblas-dev
+        dnf: openblas-devel
+        yum: openblas-devel
+  liblapack-dev:
+    env:
+      MLC_SYS_UTIL_NAME: liblapack-dev
+    state:
+      liblapack-dev:
+        apt: liblapack-dev
+        dnf: lapack-devel
+        yum: lapack-devel
 tests:
   run_inputs:
   - docker: 'yes'

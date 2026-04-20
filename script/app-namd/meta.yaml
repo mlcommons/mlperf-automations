@@ -25,7 +25,7 @@ deps:
   extra_cache_tags: namd,repo,namd-repo
   env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_NAMD_SRC_PATH
-    MLC_GIT_RECURSE_SUBMODULES: 'yes'
+    MLC_GIT_RECURSE_SUBMODULES: ' --recurse-submodules'
   force_env_keys:
   - MLC_GIT_*
   update_tags_from_env_with_prefix:

@@ -23,6 +23,8 @@ deps:
   - gfortran
 - tags: get,cmake
 - tags: get,generic,sys-util,_libfftw3-dev
+- tags: get,generic,sys-util,_libopenblas-dev
+- tags: get,generic,sys-util,_liblapack-dev
 - tags: get,generic,sys-util,_libhdf5-openmpi-dev
 - tags: get,git,repo
   names:
