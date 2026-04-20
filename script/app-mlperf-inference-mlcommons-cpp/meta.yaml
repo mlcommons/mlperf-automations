@@ -261,3 +261,35 @@ variations:
   bert-99.9,singlestream:
     default_env:
       MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 1
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - resnet50,onnxruntime,cpu,offline
+    env:
+      MLC_MLPERF_LOADGEN_MODE: performance
+      MLC_MLPERF_LOADGEN_SCENARIO: Offline
+      MLC_MLPERF_LOADGEN_QUERY_COUNT: '10'
+      MLC_MLPERF_LOADGEN_PERFORMANCE_SAMPLE_COUNT: '10'
+  - variations_list:
+    - resnet50,onnxruntime,cpu,singlestream
+    env:
+      MLC_MLPERF_LOADGEN_MODE: performance
+      MLC_MLPERF_LOADGEN_SCENARIO: SingleStream
+      MLC_MLPERF_LOADGEN_QUERY_COUNT: '10'
+      MLC_MLPERF_LOADGEN_PERFORMANCE_SAMPLE_COUNT: '10'
+  - variations_list:
+    - resnet50,pytorch,cpu,offline
+    env:
+      MLC_MLPERF_LOADGEN_MODE: performance
+      MLC_MLPERF_LOADGEN_SCENARIO: Offline
+      MLC_MLPERF_LOADGEN_QUERY_COUNT: '10'
+      MLC_MLPERF_LOADGEN_PERFORMANCE_SAMPLE_COUNT: '10'
+  - variations_list:
+    - bert-99,onnxruntime,cpu,offline
+    env:
+      MLC_MLPERF_LOADGEN_MODE: performance
+      MLC_MLPERF_LOADGEN_SCENARIO: Offline
+      MLC_MLPERF_LOADGEN_QUERY_COUNT: '3'
+      MLC_MLPERF_LOADGEN_PERFORMANCE_SAMPLE_COUNT: '3'
