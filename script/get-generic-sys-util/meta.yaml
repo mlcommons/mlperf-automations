@@ -169,6 +169,14 @@ variations:
         brew: flex
         dnf: flex
         yum: flex
+  libfl-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libfl-dev
+    state:
+      libfl-dev:
+        apt: libfl-dev
+        dnf: flex-devel
+        yum: flex-devel
   g++-11:
     env:
       MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE: 'yes'

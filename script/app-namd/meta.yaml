@@ -35,7 +35,21 @@ deps:
     - MLC_GIT_REPO_URL
     _tag.:
     - MLC_GIT_CHECKOUT_TAG
-prehook_deps: []
+  skip_if_env:
+    MLC_NAMD_TARBALL_PATH:
+    - on
+prehook_deps:
+- tags: extract,file
+  names:
+  - namd-tarball-extract
+  extra_cache_tags: namd,tarball,extract
+  force_cache: true
+  env:
+    MLC_EXTRACT_FILEPATH: <<<MLC_NAMD_TARBALL_PATH>>>
+    MLC_EXTRACT_FINAL_ENV_NAME: MLC_NAMD_SRC_PATH
+  enable_if_env:
+    MLC_NAMD_TARBALL_PATH:
+    - on
 posthook_deps: []
 post_deps: []
 variations:
@@ -68,7 +82,13 @@ variations:
     env:
       MLC_GIT_CHECKOUT: master
 default_env: {}
+input_mapping:
+  namd_tarball_path: MLC_NAMD_TARBALL_PATH
+input_description:
+  namd_tarball_path:
+    desc: Path to a manually downloaded NAMD source tarball (NAMD requires registration at https://www.ks.uiuc.edu/Development/Download/download.cgi?PackageName=NAMD)
 tests:
+  needs_pat: true
   run_inputs:
   - variations_list:
     - repo.official

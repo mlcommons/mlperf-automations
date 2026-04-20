@@ -24,6 +24,7 @@ deps:
 - tags: get,generic,sys-util,_libopenmpi-dev
 - tags: get,generic,sys-util,_g++-12
 - tags: get,generic,sys-util,_flex
+- tags: get,generic,sys-util,_libfl-dev
 - tags: get,generic,sys-util,_libfftw3-dev
 - tags: get,generic,sys-util,_libboost-all-dev
 - tags: get,cmake
