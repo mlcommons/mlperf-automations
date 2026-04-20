@@ -1,0 +1,94 @@
+alias: app-wrf
+uid: 6c8e5d3b2a1f4907
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: HPC Application
+tags:
+- app
+- wrf
+- hpc
+cache: true
+new_env_keys:
+- MLC_WRF_SRC_PATH
+- MLC_WRF_INSTALL_PATH
+- MLC_WRF_BIN_PATH
+- +PATH
+- +LD_LIBRARY_PATH
+new_state_keys: []
+deps:
+- tags: detect,cpu
+- tags: get,generic,sys-util,_libopenmpi-dev
+- tags: get,generic,sys-util,_gfortran
+  names:
+  - gfortran
+- tags: get,generic,sys-util,_csh
+- tags: get,generic,sys-util,_libnetcdf-dev
+- tags: get,generic,sys-util,_libnetcdff-dev
+- tags: get,generic,sys-util,_libhdf5-openmpi-dev
+- tags: get,generic,sys-util,_libpnetcdf-dev
+- tags: get,git,repo
+  names:
+  - wrf-repo
+  extra_cache_tags: wrf,repo,wrf-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_WRF_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+variations:
+  repo.#:
+    env:
+      MLC_GIT_REPO_URL: '#'
+    group: repo
+  repo.official:
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://github.com/wrf-model/WRF.git
+    group: repo
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  version.4.6.1:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: v4.6.1
+  version.4.7.1:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: v4.7.1
+  version.4.4:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: v4.4
+  master:
+    env:
+      MLC_GIT_CHECKOUT: master
+default_env:
+  MLC_WRF_BUILD_TYPE: em_real
+  MLC_WRF_NESTING: '1'
+input_mapping:
+  build_type: MLC_WRF_BUILD_TYPE
+  nesting: MLC_WRF_NESTING
+input_description:
+  build_type:
+    desc: WRF build type (default is em_real)
+  nesting:
+    desc: WRF nesting option (default is 1 for basic)
+tests:
+  run_inputs:
+  - variations_list:
+    - repo.official

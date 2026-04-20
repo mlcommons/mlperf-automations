@@ -1,0 +1,94 @@
+alias: app-namd
+uid: c9d6e7f8a0b1234d
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: HPC Application
+tags:
+- app
+- namd
+- hpc
+cache: true
+new_env_keys:
+- MLC_NAMD_SRC_PATH
+- MLC_NAMD_INSTALL_PATH
+- MLC_NAMD_BIN_PATH
+- +PATH
+new_state_keys: []
+deps:
+- tags: detect,cpu
+- tags: get,generic,sys-util,_libopenmpi-dev
+- tags: get,generic,sys-util,_libfftw3-dev
+- tags: get,cmake
+- tags: get,git,repo
+  names:
+  - namd-repo
+  extra_cache_tags: namd,repo,namd-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_NAMD_SRC_PATH
+    MLC_GIT_RECURSE_SUBMODULES: ' --recurse-submodules'
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+  skip_if_env:
+    MLC_NAMD_TARBALL_PATH:
+    - on
+prehook_deps:
+- tags: extract,file
+  names:
+  - namd-tarball-extract
+  extra_cache_tags: namd,tarball,extract
+  force_cache: true
+  env:
+    MLC_EXTRACT_FILEPATH: <<<MLC_NAMD_TARBALL_PATH>>>
+    MLC_EXTRACT_FINAL_ENV_NAME: MLC_NAMD_SRC_PATH
+  enable_if_env:
+    MLC_NAMD_TARBALL_PATH:
+    - on
+posthook_deps: []
+post_deps: []
+variations:
+  repo.#:
+    env:
+      MLC_GIT_REPO_URL: '#'
+    group: repo
+  repo.official:
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://gitlab.com/tcbgUIUC/namd.git
+    group: repo
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  version.3.0.1:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: release-3-0-1
+  version.3.0:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: release-3-0
+  master:
+    env:
+      MLC_GIT_CHECKOUT: master
+default_env: {}
+input_mapping:
+  namd_tarball_path: MLC_NAMD_TARBALL_PATH
+input_description:
+  namd_tarball_path:
+    desc: Path to a manually downloaded NAMD source tarball (NAMD requires registration at https://www.ks.uiuc.edu/Development/Download/download.cgi?PackageName=NAMD)
+tests:
+  needs_pat: true
+  run_inputs:
+  - variations_list:
+    - repo.official

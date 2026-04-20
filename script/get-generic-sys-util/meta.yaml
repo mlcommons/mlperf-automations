@@ -2,19 +2,13 @@ alias: get-generic-sys-util
 uid: bb0393afa8404a11
 automation_alias: script
 automation_uid: 5b4e0237da074764
-
-# Metadata
 category: Detection or installation of tools and artifacts
 tags:
 - get
 - sys-util
 - generic
 - generic-sys-util
-
-# Cache
 cache: true
-
-# Environment
 default_env:
   MLC_CLEAN_DIRS: bin
   MLC_SUDO: sudo
@@ -23,18 +17,12 @@ env:
   MLC_SYS_UTIL_VERSION_CMD: ''
 new_env_keys:
 - +PATH
-
-# Input mapping
 input_mapping:
   fail_safe: MLC_TMP_FAIL_SAFE
   ignore_missing: MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE
-
-# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,sudo
-
-# Variations
 variations:
   detect:
     default: true
@@ -181,6 +169,14 @@ variations:
         brew: flex
         dnf: flex
         yum: flex
+  libfl-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libfl-dev
+    state:
+      libfl-dev:
+        apt: libfl-dev
+        dnf: flex-devel
+        yum: flex-devel
   g++-11:
     env:
       MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE: 'yes'
@@ -399,7 +395,8 @@ variations:
   libffi7:
     env:
       MLC_SYS_UTIL_NAME: libffi7
-      MLC_SYS_UTIL_VERSION_CMD: dpkg -l libffi7 2>/dev/null | grep '^ii' | awk '{print $3}' || rpm -q libffi7 2>/dev/null || pacman -Q libffi7 2>/dev/null
+      MLC_SYS_UTIL_VERSION_CMD: dpkg -l libffi7 2>/dev/null | grep '^ii' | awk '{print
+        $3}' || rpm -q libffi7 2>/dev/null || pacman -Q libffi7 2>/dev/null
       MLC_SYS_UTIL_VERSION_RE: \d\.\d-[0-9]+
       MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
     new_env_keys:
@@ -979,8 +976,79 @@ variations:
         dnf: zlib-devel
         yum: zlib-devel
         zypper: zlib-devel
-
-# Tests
+  libnetcdf-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libnetcdf-dev
+    state:
+      libnetcdf-dev:
+        apt: libnetcdf-dev
+        dnf: netcdf-devel
+        yum: netcdf-devel
+  libnetcdff-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libnetcdff-dev
+    state:
+      libnetcdff-dev:
+        apt: libnetcdff-dev
+        dnf: netcdf-fortran-devel
+        yum: netcdf-fortran-devel
+  libfftw3-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libfftw3-dev
+    state:
+      libfftw3-dev:
+        apt: libfftw3-dev
+        dnf: fftw-devel
+        yum: fftw-devel
+  libhdf5-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libhdf5-dev
+    state:
+      libhdf5-dev:
+        apt: libhdf5-dev
+        dnf: hdf5-devel
+        yum: hdf5-devel
+  libhdf5-openmpi-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libhdf5-openmpi-dev
+    state:
+      libhdf5-openmpi-dev:
+        apt: libhdf5-openmpi-dev
+        dnf: hdf5-openmpi-devel
+        yum: hdf5-openmpi-devel
+  libpnetcdf-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libpnetcdf-dev
+    state:
+      libpnetcdf-dev:
+        apt: libpnetcdf-dev
+        dnf: pnetcdf-devel
+        yum: pnetcdf-devel
+  csh:
+    env:
+      MLC_SYS_UTIL_NAME: csh
+    state:
+      csh:
+        apt: csh
+        brew: tcsh
+        dnf: tcsh
+        yum: tcsh
+  libopenblas-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libopenblas-dev
+    state:
+      libopenblas-dev:
+        apt: libopenblas-dev
+        dnf: openblas-devel
+        yum: openblas-devel
+  liblapack-dev:
+    env:
+      MLC_SYS_UTIL_NAME: liblapack-dev
+    state:
+      liblapack-dev:
+        apt: liblapack-dev
+        dnf: lapack-devel
+        yum: lapack-devel
 tests:
   run_inputs:
   - docker: 'yes'

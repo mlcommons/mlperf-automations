@@ -1,5 +1,5 @@
 # README for get-profiler-uprof
-This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
+This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
 ```
@@ -33,7 +33,7 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr get-uprof,get,uprof,uprof-profiler
+mlcr get-uprof,get,uprof,profiler,uprof-profiler
 ```
 
 ### Script Inputs
@@ -41,8 +41,8 @@ mlcr get-uprof,get,uprof,uprof-profiler
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
 | `--accept_eula` |  |  | `` |
-| `--uprof_dir` |  |  | `` |
 | `--tar_file_path` |  |  | `` |
+| `--uprof_dir` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -51,10 +51,12 @@ mlcr get-uprof,get,uprof,uprof-profiler
 | `--output` | Output from the script passed using the env key `MLC_OUTPUT` |  | `` |
 | `--outdirname` | The directory to store the script output |  | `cache directory ($HOME/MLC/repos/local/cache/<>) if the script is cacheable or else the current directory` |
 | `--outbasename` | The output file/folder name |  | `` |
+| `--search_folder_path` | The folder path where executables of a given script need to be searched. Search is done recursively upto 4 levels. |  | `` |
 | `--name` |  |  | `` |
 | `--extra_cache_tags` | Extra cache tags to be added to the cached entry when the script results are saved |  | `` |
 | `--skip_compile` | Skip compilation |  | `False` |
 | `--skip_run` | Skip run |  | `False` |
+| `--skip_sudo` | Skip SUDO detection |  | `False` |
 | `--accept_license` | Accept the required license requirement to run the script |  | `False` |
 | `--skip_system_deps` | Skip installing any system dependencies |  | `False` |
 | `--git_ssh` | Use SSH for git repos |  | `False` |

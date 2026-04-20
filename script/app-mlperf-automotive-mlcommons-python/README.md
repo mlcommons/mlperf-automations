@@ -1,5 +1,5 @@
 # README for app-mlperf-automotive-mlcommons-python
-This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
+This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
 ```
@@ -40,37 +40,37 @@ mlcr automotive,mlcommons,reference,run-mlperf-inference,object-detection,abtf-m
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
-| `--device` |  |  | `` |
+| `--clean` |  |  | `` |
+| `--constantstream_target_qps` |  |  | `` |
 | `--count` |  |  | `` |
+| `--dataset` |  |  | `` |
+| `--dataset_args` |  |  | `` |
+| `--device` |  |  | `` |
 | `--docker` |  |  | `` |
 | `--hw_name` |  |  | `` |
 | `--imagenet_path` |  |  | `` |
+| `--max_amps` |  |  | `` |
 | `--max_batchsize` |  |  | `` |
+| `--max_volts` |  |  | `` |
 | `--mode` |  |  | `accuracy` |
-| `--num_threads` |  |  | `` |
-| `--threads` | Alias for num_threads |  | `` |
-| `--dataset` |  |  | `` |
 | `--model` |  |  | `` |
+| `--multistream_target_latency` |  |  | `` |
+| `--ntp_server` |  |  | `` |
+| `--num_threads` |  |  | `` |
+| `--offline_target_qps` |  |  | `` |
+| `--output` |  |  | `` |
 | `--output_dir` |  |  | `` |
 | `--power` |  |  | `` |
 | `--power_server` |  |  | `` |
-| `--ntp_server` |  |  | `` |
-| `--max_amps` |  |  | `` |
-| `--max_volts` |  |  | `` |
 | `--regenerate_files` |  |  | `` |
 | `--rerun` |  |  | `` |
 | `--scenario` |  |  | `Offline` |
-| `--test_query_count` |  |  | `10` |
-| `--clean` |  |  | `` |
-| `--dataset_args` |  |  | `` |
-| `--target_qps` |  |  | `` |
-| `--target_latency` |  |  | `` |
-| `--offline_target_qps` |  |  | `` |
 | `--server_target_qps` |  |  | `` |
-| `--constantstream_target_qps` |  |  | `` |
 | `--singlestream_target_latency` |  |  | `` |
-| `--multistream_target_latency` |  |  | `` |
-| `--output` |  |  | `` |
+| `--target_latency` |  |  | `` |
+| `--target_qps` |  |  | `` |
+| `--test_query_count` |  |  | `10` |
+| `--threads` | Alias for num_threads |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -79,10 +79,12 @@ mlcr automotive,mlcommons,reference,run-mlperf-inference,object-detection,abtf-m
 | `--output` | Output from the script passed using the env key `MLC_OUTPUT` |  | `` |
 | `--outdirname` | The directory to store the script output |  | `cache directory ($HOME/MLC/repos/local/cache/<>) if the script is cacheable or else the current directory` |
 | `--outbasename` | The output file/folder name |  | `` |
+| `--search_folder_path` | The folder path where executables of a given script need to be searched. Search is done recursively upto 4 levels. |  | `` |
 | `--name` |  |  | `` |
 | `--extra_cache_tags` | Extra cache tags to be added to the cached entry when the script results are saved |  | `` |
 | `--skip_compile` | Skip compilation |  | `False` |
 | `--skip_run` | Skip run |  | `False` |
+| `--skip_sudo` | Skip SUDO detection |  | `False` |
 | `--accept_license` | Accept the required license requirement to run the script |  | `False` |
 | `--skip_system_deps` | Skip installing any system dependencies |  | `False` |
 | `--git_ssh` | Use SSH for git repos |  | `False` |
@@ -120,7 +122,9 @@ mlcr automotive,mlcommons,reference,run-mlperf-inference,object-detection,abtf-m
 - `abtf-poc-model` (default)
 - `bevformer`
 - `deeplabv3plus`
+- `llama3_1-8b`
 - `ssd`
+- `uniad`
 
 ### Ungrouped
 

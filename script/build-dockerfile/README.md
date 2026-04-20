@@ -40,20 +40,15 @@ mlcr build,dockerfile
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
+| `--base_image` |  |  | `` |
 | `--build` |  |  | `` |
 | `--cache` |  |  | `` |
-| `--mlc_repo` |  |  | `` |
-| `--mlc_repo_flags` |  |  | `` |
-| `--mlc_repos` |  |  | `` |
-| `--mlc_repo_branch` |  |  | `dev` |
 | `--comments` |  |  | `` |
 | `--copy_files` |  |  | `` |
-| `--base_image` |  |  | `` |
-| `--os` |  |  | `ubuntu` |
-| `--os_version` |  |  | `` |
 | `--docker_base_image` | Alias for base_image |  | `` |
-| `--docker_os` | Alias for os |  | `` |
-| `--docker_os_version` | Alias for os_version |  | `` |
+| `--docker_not_pull_update` |  |  | `False` |
+| `--docker_os` |  |  | `ubuntu` |
+| `--docker_os_version` |  |  | `` |
 | `--extra_sys_deps` |  |  | `` |
 | `--fake_docker_deps` |  |  | `` |
 | `--fake_run_option` |  |  | `` |
@@ -61,19 +56,24 @@ mlcr build,dockerfile
 | `--gh_token` |  |  | `` |
 | `--image_repo` |  |  | `` |
 | `--image_tag` |  |  | `` |
+| `--mlc_repo` |  |  | `` |
+| `--mlc_repo_branch` |  |  | `dev` |
+| `--mlc_repo_flags` |  |  | `` |
 | `--mlc_repo_path` |  |  | `` |
+| `--mlc_repos` |  |  | `` |
+| `--os` | Alias for docker_os |  | `` |
+| `--os_version` | Alias for docker_os_version |  | `` |
 | `--package_manager_update_cmd` |  |  | `` |
 | `--pip_extra_flags` |  |  | `` |
 | `--post_file` |  |  | `` |
 | `--post_run_cmds` |  |  | `` |
 | `--pre_run_cmds` |  |  | `` |
+| `--push_image` |  |  | `` |
 | `--real_run` |  |  | `` |
 | `--run_cmd` |  |  | `` |
 | `--run_cmd_extra` |  |  | `` |
 | `--script_tags` |  |  | `` |
 | `--skip_mlc_sys_upgrade` |  |  | `` |
-| `--push_image` |  |  | `` |
-| `--docker_not_pull_update` |  |  | `False` |
 | `--user` |  |  | `` |
 ### Generic Script Inputs
 

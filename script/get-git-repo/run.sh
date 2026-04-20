@@ -47,6 +47,14 @@ if [ ! -e "${MLC_TMP_GIT_PATH}" ]; then
     test $? -eq 0 || exit $?
 
   fi
+
+  # Update submodules after checkout if recurse-submodules was used
+  if [ ! -z "${MLC_GIT_RECURSE_SUBMODULES}" ]; then
+    echo ""
+    echo "Updating submodules after checkout..."
+    git submodule update --init --recursive
+    test $? -eq 0 || exit $?
+  fi
   # Note: The `else` block outputting to `../tmp-mlc-git-hash.out` has been removed.
   # The hash is now captured dynamically below.
 

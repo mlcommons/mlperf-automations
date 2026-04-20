@@ -1,0 +1,74 @@
+alias: app-gromacs
+uid: d4e1f2a3b5c6789e
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: HPC Application
+tags:
+- app
+- gromacs
+- hpc
+cache: true
+new_env_keys:
+- MLC_GROMACS_SRC_PATH
+- MLC_GROMACS_INSTALL_PATH
+- MLC_GROMACS_BIN_PATH
+- +PATH
+- +LD_LIBRARY_PATH
+new_state_keys: []
+deps:
+- tags: detect,cpu
+- tags: get,generic,sys-util,_libopenmpi-dev
+- tags: get,cmake
+- tags: get,generic,sys-util,_libfftw3-dev
+- tags: get,git,repo
+  names:
+  - gromacs-repo
+  extra_cache_tags: gromacs,repo,gromacs-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_GROMACS_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+variations:
+  repo.#:
+    env:
+      MLC_GIT_REPO_URL: '#'
+    group: repo
+  repo.official:
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://github.com/gromacs/gromacs.git
+    group: repo
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  version.2025.2:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: v2025.2
+  version.2024.5:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: v2024.5
+  main:
+    env:
+      MLC_GIT_CHECKOUT: main
+default_env: {}
+tests:
+  run_inputs:
+  - variations_list:
+    - repo.official

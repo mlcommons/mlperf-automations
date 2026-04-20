@@ -1,0 +1,97 @@
+alias: app-openfoam
+uid: 9b2c4e7f5a3d1680
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+category: HPC Application
+tags:
+- app
+- openfoam
+- hpc
+
+cache: true
+
+new_env_keys:
+- MLC_OPENFOAM_SRC_PATH
+- MLC_OPENFOAM_INSTALL_PATH
+- +PATH
+- +LD_LIBRARY_PATH
+
+new_state_keys: []
+
+deps:
+- tags: detect,cpu
+- tags: get,generic,sys-util,_libopenmpi-dev
+- tags: get,generic,sys-util,_g++-12
+- tags: get,generic,sys-util,_flex
+- tags: get,generic,sys-util,_libfl-dev
+- tags: get,generic,sys-util,_libfftw3-dev
+- tags: get,generic,sys-util,_libboost-all-dev
+- tags: get,cmake
+- tags: get,git,repo
+  names:
+  - openfoam-repo
+  extra_cache_tags: openfoam,repo,openfoam-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_OPENFOAM_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+variations:
+  repo.#:
+    env:
+      MLC_GIT_REPO_URL: '#'
+    group: repo
+  repo.esi:
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://gitlab.com/openfoam/core/openfoam.git
+    group: repo
+  repo.foundation:
+    env:
+      MLC_GIT_REPO_URL: https://github.com/OpenFOAM/OpenFOAM-12.git
+    group: repo
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  version.2412:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: OpenFOAM-v2412
+  version.2406:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: OpenFOAM-v2406
+  version.2312:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: OpenFOAM-v2312
+  master:
+    env:
+      MLC_GIT_CHECKOUT: master
+
+default_env: {}
+
+input_mapping: {}
+input_description: {}
+
+tests:
+  run_inputs:
+  - variations_list:
+    - repo.esi

@@ -1,5 +1,5 @@
 # README for app-mlperf-inference-nvidia
-This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
+This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
 ```
@@ -40,57 +40,57 @@ mlcr reproduce,mlcommons,mlperf,inference,harness,nvidia-harness,nvidia
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
+| `--audio_buffer_num_lines` |  |  | `` |
 | `--count` |  |  | `` |
-| `--max_batchsize` |  |  | `` |
-| `--mlperf_conf` |  |  | `` |
-| `--mode` |  |  | `performance` |
-| `--output_dir` |  |  | `` |
-| `--scenario` |  |  | `Offline` |
-| `--user_conf` |  |  | `` |
+| `--deque_timeout_usec` |  |  | `` |
 | `--devices` |  |  | `` |
-| `--skip_preprocess` |  |  | `no` |
-| `--skip_preprocessing` | Alias for skip_preprocess |  | `` |
-| `--target_qps` |  |  | `` |
-| `--offline_target_qps` |  |  | `` |
-| `--server_target_qps` |  |  | `` |
-| `--target_latency` |  |  | `` |
-| `--singlestream_target_latency` |  |  | `` |
-| `--multistream_target_latency` |  |  | `` |
-| `--use_triton` |  |  | `` |
-| `--gpu_copy_streams` |  |  | `` |
-| `--gpu_inference_streams` |  |  | `` |
-| `--gpu_batch_size` |  |  | `` |
+| `--dla_batch_size` |  |  | `` |
 | `--dla_copy_streams` |  |  | `` |
 | `--dla_inference_streams` |  |  | `` |
-| `--dla_batch_size` |  |  | `` |
-| `--input_format` |  |  | `` |
-| `--performance_sample_count` |  |  | `` |
-| `--workspace_size` |  |  | `` |
-| `--log_dir` |  |  | `` |
-| `--use_graphs` |  |  | `` |
-| `--run_infer_on_copy_streams` |  |  | `` |
-| `--start_from_device` |  |  | `` |
-| `--end_on_device` |  |  | `` |
-| `--max_dlas` |  |  | `` |
-| `--power_setting` |  |  | `` |
-| `--make_cmd` |  |  | `` |
-| `--rerun` |  |  | `` |
-| `--extra_run_options` |  |  | `` |
-| `--use_deque_limit` |  |  | `` |
-| `--deque_timeout_usec` |  |  | `` |
-| `--use_cuda_thread_per_device` |  |  | `` |
-| `--num_warmups` |  |  | `` |
-| `--graphs_max_seqlen` |  |  | `` |
-| `--num_issue_query_threads` |  |  | `` |
-| `--soft_drop` |  |  | `` |
-| `--use_small_tile_gemm_plugin` |  |  | `` |
-| `--audio_buffer_num_lines` |  |  | `` |
-| `--use_fp8` |  |  | `` |
-| `--enable_sort` |  |  | `` |
-| `--num_sort_segments` |  |  | `` |
-| `--skip_postprocess` |  |  | `` |
 | `--embedding_weights_on_gpu_part` |  |  | `` |
+| `--enable_sort` |  |  | `` |
+| `--end_on_device` |  |  | `` |
+| `--extra_run_options` |  |  | `` |
+| `--gpu_batch_size` |  |  | `` |
+| `--gpu_copy_streams` |  |  | `` |
+| `--gpu_inference_streams` |  |  | `` |
+| `--graphs_max_seqlen` |  |  | `` |
+| `--input_format` |  |  | `` |
+| `--log_dir` |  |  | `` |
+| `--make_cmd` |  |  | `` |
+| `--max_batchsize` |  |  | `` |
+| `--max_dlas` |  |  | `` |
+| `--mlperf_conf` |  |  | `` |
+| `--mode` |  |  | `performance` |
+| `--multistream_target_latency` |  |  | `` |
+| `--num_issue_query_threads` |  |  | `` |
+| `--num_sort_segments` |  |  | `` |
+| `--num_warmups` |  |  | `` |
+| `--offline_target_qps` |  |  | `` |
+| `--output_dir` |  |  | `` |
+| `--performance_sample_count` |  |  | `` |
+| `--power_setting` |  |  | `` |
+| `--rerun` |  |  | `` |
+| `--run_infer_on_copy_streams` |  |  | `` |
+| `--scenario` |  |  | `Offline` |
 | `--sdxl_batcher_time_limit` |  |  | `` |
+| `--server_target_qps` |  |  | `` |
+| `--singlestream_target_latency` |  |  | `` |
+| `--skip_postprocess` |  |  | `` |
+| `--skip_preprocess` |  |  | `no` |
+| `--skip_preprocessing` | Alias for skip_preprocess |  | `` |
+| `--soft_drop` |  |  | `` |
+| `--start_from_device` |  |  | `` |
+| `--target_latency` |  |  | `` |
+| `--target_qps` |  |  | `` |
+| `--use_cuda_thread_per_device` |  |  | `` |
+| `--use_deque_limit` |  |  | `` |
+| `--use_fp8` |  |  | `` |
+| `--use_graphs` |  |  | `` |
+| `--use_small_tile_gemm_plugin` |  |  | `` |
+| `--use_triton` |  |  | `` |
+| `--user_conf` |  |  | `` |
+| `--workspace_size` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -99,10 +99,12 @@ mlcr reproduce,mlcommons,mlperf,inference,harness,nvidia-harness,nvidia
 | `--output` | Output from the script passed using the env key `MLC_OUTPUT` |  | `` |
 | `--outdirname` | The directory to store the script output |  | `cache directory ($HOME/MLC/repos/local/cache/<>) if the script is cacheable or else the current directory` |
 | `--outbasename` | The output file/folder name |  | `` |
+| `--search_folder_path` | The folder path where executables of a given script need to be searched. Search is done recursively upto 4 levels. |  | `` |
 | `--name` |  |  | `` |
 | `--extra_cache_tags` | Extra cache tags to be added to the cached entry when the script results are saved |  | `` |
 | `--skip_compile` | Skip compilation |  | `False` |
 | `--skip_run` | Skip run |  | `False` |
+| `--skip_sudo` | Skip SUDO detection |  | `False` |
 | `--accept_license` | Accept the required license requirement to run the script |  | `False` |
 | `--skip_system_deps` | Skip installing any system dependencies |  | `False` |
 | `--git_ssh` | Use SSH for git repos |  | `False` |
@@ -210,7 +212,7 @@ mlcr reproduce,mlcommons,mlperf,inference,harness,nvidia-harness,nvidia
 - `download_model`
 - `prebuild`
 - `preprocess_data` (alias: preprocess-data)
-- `run_harness` (default)
+- `run_harness` (alias: run-harness) (default)
 
 ### Triton
 
@@ -220,12 +222,10 @@ mlcr reproduce,mlcommons,mlperf,inference,harness,nvidia-harness,nvidia
 
 - `3d-unet_`
 - `bert_`
-- `default_variations`
 - `dlrm_`
 - `env`
 - `gptj_`
 - `llama2-70b_`
-- `run-harness`
 - `v3.1` (base: pre5.0)
 
 ### Version
