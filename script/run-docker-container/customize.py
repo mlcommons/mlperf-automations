@@ -8,6 +8,7 @@ from utils import *
 
 DOCKER_ENV_MARKER = "/.dockerenv"
 DOCKER_SOCKET_PATH = "/var/run/docker.sock"
+NESTED_DOCKER_ENV_KEY = "MLC_DOCKER_ENABLE_NESTED"
 
 
 def preprocess(i):
@@ -172,14 +173,22 @@ def postprocess(i):
         for mounts in env['MLC_DOCKER_VOLUME_MOUNTS']:
             mount_cmds.append(mounts)
 
-    if os.path.exists(DOCKER_ENV_MARKER) and env.get('MLC_CONTAINER_TOOL') == "docker":
+    if is_true(env.get(NESTED_DOCKER_ENV_KEY, '')) and os.path.exists(
+            DOCKER_ENV_MARKER) and env.get('MLC_CONTAINER_TOOL') == "docker":
         docker_socket = DOCKER_SOCKET_PATH
         if os.path.exists(docker_socket):
             docker_socket_mount = f"{docker_socket}:{docker_socket}"
             if docker_socket_mount not in mount_cmds:
                 mount_cmds.append(docker_socket_mount)
 
-        docker_binary = env.get('MLC_DOCKER_BIN_WITH_PATH', '') or shutil.which("docker")
+        docker_binary = ''
+        docker_binary_from_env = env.get('MLC_DOCKER_BIN_WITH_PATH', '')
+        docker_binary_name = os.path.basename(docker_binary_from_env).lower()
+        if docker_binary_from_env and "docker" in docker_binary_name and os.path.exists(
+                docker_binary_from_env) and os.access(docker_binary_from_env, os.X_OK):
+            docker_binary = docker_binary_from_env
+        if not docker_binary:
+            docker_binary = shutil.which("docker")
         if docker_binary and os.path.exists(docker_binary):
             docker_bin_mount = f"{docker_binary}:{docker_binary}"
             if docker_bin_mount not in mount_cmds:
