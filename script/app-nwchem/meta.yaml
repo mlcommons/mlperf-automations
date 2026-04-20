@@ -1,0 +1,101 @@
+alias: app-nwchem
+uid: 8d024e4ac7034352
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+category: HPC Application
+tags:
+- app
+- nwchem
+- hpc
+
+cache: true
+
+new_env_keys:
+- MLC_NWCHEM_SRC_PATH
+- MLC_NWCHEM_INSTALL_PATH
+- MLC_NWCHEM_BIN_PATH
+- +PATH
+- +LD_LIBRARY_PATH
+
+new_state_keys: []
+
+deps:
+- tags: detect,cpu
+- tags: get,generic,sys-util,_libopenmpi-dev
+- tags: get,generic,sys-util,_gfortran
+  names:
+  - gfortran
+- tags: get,utils,aocl-utils
+- tags: get,lib,aocl-blis
+- tags: get,lib,aocl-libflame
+- tags: get,lib,aocl-scalapack
+- tags: get,git,repo
+  names:
+  - nwchem-repo
+  extra_cache_tags: nwchem,repo,nwchem-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_NWCHEM_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+variations:
+  repo.#:
+    env:
+      MLC_GIT_REPO_URL: '#'
+    group: repo
+  repo.official:
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://github.com/nwchemgit/nwchem.git
+    group: repo
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  version.7.2.3:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: v7.2.3-release
+  version.7.2.2:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: v7.2.2-release
+  master:
+    env:
+      MLC_GIT_CHECKOUT: master
+
+default_env:
+  MLC_NWCHEM_NWCHEM_MODULES: all
+  MLC_NWCHEM_ARMCI_NETWORK: MPI-PR
+  MLC_NWCHEM_USE_OPENMP: '1'
+
+input_mapping:
+  nwchem_modules: MLC_NWCHEM_NWCHEM_MODULES
+  armci_network: MLC_NWCHEM_ARMCI_NETWORK
+
+input_description:
+  nwchem_modules:
+    desc: NWChem modules to compile (default is 'all')
+  armci_network:
+    desc: ARMCI network to use (default is 'MPI-PR')
+
+tests:
+  run_inputs:
+  - variations_list:
+    - repo.official

@@ -40,11 +40,11 @@ mlcr install,src,gcc,src-gcc
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
-| `--targets` |  |  | `` |
-| `--host` |  |  | `` |
 | `--build` |  |  | `` |
 | `--extra` |  |  | `` |
+| `--host` |  |  | `` |
 | `--pull_changes` |  |  | `` |
+| `--targets` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |

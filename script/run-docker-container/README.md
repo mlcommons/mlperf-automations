@@ -1,5 +1,5 @@
 # README for run-docker-container
-This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
+This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
 ```
@@ -41,48 +41,49 @@ mlcr run,docker,container
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
 | `--all_gpus` |  |  | `` |
-| `--num_gpus` |  |  | `` |
 | `--base` |  |  | `` |
+| `--base_image` | Alias for base |  | `` |
 | `--cache` |  |  | `` |
-| `--mlc_repo` |  |  | `` |
 | `--detached` |  |  | `` |
 | `--device` |  |  | `` |
-| `--docker_image_base` | Alias for base |  | `` |
 | `--docker_base_image` | Alias for base |  | `` |
-| `--base_image` | Alias for base |  | `` |
-| `--keep_detached` |  |  | `` |
-| `--reuse_existing` |  |  | `no` |
+| `--docker_image_base` | Alias for base |  | `` |
 | `--docker_os` |  |  | `` |
 | `--docker_os_version` |  |  | `` |
-| `--os` | Alias for docker_os |  | `` |
-| `--os_version` | Alias for docker_os_version |  | `` |
 | `--extra_run_args` |  |  | `` |
 | `--fake_run_option` |  |  | `` |
 | `--gh_token` |  |  | `` |
+| `--gpu_devices` |  |  | `` |
 | `--image_name` |  |  | `` |
 | `--image_repo` |  |  | `` |
 | `--image_tag` |  |  | `` |
 | `--image_tag_extra` |  |  | `` |
 | `--interactive` |  |  | `` |
 | `--it` |  |  | `` |
+| `--keep_detached` |  |  | `` |
+| `--mlc_repo` |  |  | `` |
 | `--mounts` |  |  | `` |
-| `--use_host_user_id` |  |  | `` |
-| `--use_host_group_id` |  |  | `` |
-| `--pass_user_id` |  |  | `` |
+| `--num_gpus` |  |  | `` |
+| `--os` | Alias for docker_os |  | `` |
+| `--os_version` | Alias for docker_os_version |  | `` |
 | `--pass_user_group` |  |  | `` |
+| `--pass_user_id` |  |  | `` |
 | `--port_maps` |  |  | `` |
 | `--post_run_cmds` |  |  | `` |
 | `--pre_run_cmds` |  |  | `` |
 | `--privileged` |  |  | `no` |
 | `--real_run` |  |  | `` |
-| `--recreate` |  |  | `` |
-| `--rebuild` | Alias for recreate |  | `` |
+| `--rebuild` |  |  | `` |
+| `--recreate` | Alias for rebuild |  | `` |
+| `--reuse_existing` |  |  | `no` |
 | `--run_cmd` |  |  | `` |
 | `--run_cmd_extra` |  |  | `` |
 | `--save_script` |  |  | `` |
 | `--script_tags` |  |  | `` |
 | `--shm_size` |  |  | `` |
 | `--use_google_dns` |  |  | `` |
+| `--use_host_group_id` |  |  | `` |
+| `--use_host_user_id` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -91,10 +92,12 @@ mlcr run,docker,container
 | `--output` | Output from the script passed using the env key `MLC_OUTPUT` |  | `` |
 | `--outdirname` | The directory to store the script output |  | `cache directory ($HOME/MLC/repos/local/cache/<>) if the script is cacheable or else the current directory` |
 | `--outbasename` | The output file/folder name |  | `` |
+| `--search_folder_path` | The folder path where executables of a given script need to be searched. Search is done recursively upto 4 levels. |  | `` |
 | `--name` |  |  | `` |
 | `--extra_cache_tags` | Extra cache tags to be added to the cached entry when the script results are saved |  | `` |
 | `--skip_compile` | Skip compilation |  | `False` |
 | `--skip_run` | Skip run |  | `False` |
+| `--skip_sudo` | Skip SUDO detection |  | `False` |
 | `--accept_license` | Accept the required license requirement to run the script |  | `False` |
 | `--skip_system_deps` | Skip installing any system dependencies |  | `False` |
 | `--git_ssh` | Use SSH for git repos |  | `False` |

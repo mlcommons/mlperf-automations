@@ -40,28 +40,28 @@ mlcr benchmark,geekbench,benchmark-geekbench,benchmark-program-geekbench
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
+| `--core_pinning` |  |  | `no` |
+| `--cpu_workers` |  |  | `` |
+| `--export_html` |  |  | `` |
+| `--export_text` |  |  | `` |
+| `--export_xml` |  |  | `` |
+| `--extra_args` |  |  | `` |
+| `--gpu_device_id` |  |  | `` |
+| `--gpu_platform_id` |  |  | `` |
+| `--iterations` |  |  | `` |
 | `--license_email` |  |  | `` |
 | `--license_key` |  |  | `` |
-| `--workload` |  |  | `` |
-| `--iterations` |  |  | `` |
+| `--load` |  |  | `` |
 | `--num_runs` |  |  | `1` |
-| `--core_pinning` |  |  | `no` |
 | `--pinned_core` |  |  | `0` |
 | `--results_dir` |  |  | `` |
-| `--extra_args` |  |  | `` |
-| `--save` |  |  | `` |
-| `--load` |  |  | `` |
-| `--export_html` |  |  | `` |
-| `--export_xml` |  |  | `` |
-| `--export_text` |  |  | `` |
-| `--gpu_platform_id` |  |  | `` |
-| `--gpu_device_id` |  |  | `` |
-| `--section` |  |  | `` |
-| `--workload_ids` |  |  | `` |
-| `--cpu_workers` |  |  | `` |
-| `--workload_gap` |  |  | `` |
 | `--reuse_logs` |  |  | `` |
+| `--save` |  |  | `` |
+| `--section` |  |  | `` |
 | `--skip_platform_details` |  |  | `` |
+| `--workload` |  |  | `` |
+| `--workload_gap` |  |  | `` |
+| `--workload_ids` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |

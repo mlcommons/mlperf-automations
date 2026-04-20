@@ -1,0 +1,84 @@
+alias: app-roms
+uid: 3f7a2b9e1c054d68
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: HPC Application
+tags:
+- app
+- roms
+- hpc
+cache: true
+new_env_keys:
+- MLC_ROMS_SRC_PATH
+- MLC_ROMS_INSTALL_PATH
+- MLC_ROMS_BIN_PATH
+- +PATH
+- +LD_LIBRARY_PATH
+new_state_keys: []
+deps:
+- tags: detect,cpu
+- tags: get,generic,sys-util,_libopenmpi-dev
+- tags: get,generic,sys-util,_gfortran
+  names:
+  - gfortran
+- tags: get,generic,sys-util,_libnetcdf-dev
+- tags: get,generic,sys-util,_libnetcdff-dev
+- tags: get,cmake
+- tags: get,git,repo
+  names:
+  - roms-repo
+  extra_cache_tags: roms,repo,roms-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_ROMS_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+variations:
+  repo.#:
+    env:
+      MLC_GIT_REPO_URL: '#'
+    group: repo
+  repo.official:
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://github.com/myroms/roms.git
+    group: repo
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  version.4.2:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: roms-4.2
+  version.4.1:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: roms-4.1
+  develop:
+    env:
+      MLC_GIT_CHECKOUT: develop
+default_env:
+  MLC_ROMS_APPLICATION: BENCHMARK
+input_mapping:
+  roms_application: MLC_ROMS_APPLICATION
+input_description:
+  roms_application:
+    desc: ROMS application to build (default is BENCHMARK)
+tests:
+  run_inputs:
+  - variations_list:
+    - repo.official

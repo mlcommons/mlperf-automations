@@ -1,5 +1,5 @@
 # README for remote-run-commands
-This README is automatically generated. Add custom content in [info.md](info.md). Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
+This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
 ```
@@ -41,15 +41,18 @@ mlcr remote,run,cmds,remote-run,remote-run-cmds,ssh-run,ssh
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
 | `--client_refresh` |  |  | `10` |
+| `--copy_directory` |  |  | `.` |
+| `--files_to_copy` |  |  | `` |
+| `--files_to_copy_back` |  |  | `` |
 | `--host` |  |  | `localhost` |
 | `--password` |  |  | `` |
+| `--path_to_copy_back_files` |  |  | `` |
 | `--port` |  |  | `22` |
 | `--run_cmds` |  |  | `` |
-| `--files_to_copy` |  |  | `` |
 | `--skip_host_verify` |  |  | `` |
+| `--skip_ssh_key_file` |  |  | `` |
 | `--ssh_key_file` |  |  | `<<<HOME>>>/.ssh/id_rsa` |
 | `--user` |  |  | `` |
-| `--copy_directory` |  |  | `.` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -58,10 +61,12 @@ mlcr remote,run,cmds,remote-run,remote-run-cmds,ssh-run,ssh
 | `--output` | Output from the script passed using the env key `MLC_OUTPUT` |  | `` |
 | `--outdirname` | The directory to store the script output |  | `cache directory ($HOME/MLC/repos/local/cache/<>) if the script is cacheable or else the current directory` |
 | `--outbasename` | The output file/folder name |  | `` |
+| `--search_folder_path` | The folder path where executables of a given script need to be searched. Search is done recursively upto 4 levels. |  | `` |
 | `--name` |  |  | `` |
 | `--extra_cache_tags` | Extra cache tags to be added to the cached entry when the script results are saved |  | `` |
 | `--skip_compile` | Skip compilation |  | `False` |
 | `--skip_run` | Skip run |  | `False` |
+| `--skip_sudo` | Skip SUDO detection |  | `False` |
 | `--accept_license` | Accept the required license requirement to run the script |  | `False` |
 | `--skip_system_deps` | Skip installing any system dependencies |  | `False` |
 | `--git_ssh` | Use SSH for git repos |  | `False` |
