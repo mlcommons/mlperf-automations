@@ -52,7 +52,7 @@ def get_framework_field(sut_info, system_framework):
         implementation_lower = implementation.lower()
         if framework == "":
             framework = implementation
-        elif not framework_lower.startswith(implementation_prefix.lower()) and framework_lower != implementation_lower:
+        elif framework_lower != implementation_lower and not framework_lower.startswith(implementation_lower + " "):
             framework = implementation_prefix + framework
 
     return framework
