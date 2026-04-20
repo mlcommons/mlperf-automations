@@ -6,6 +6,49 @@ import subprocess
 from utils import *
 
 
+def _prepend_tensorflow_nvidia_libs_to_ld_library_path(env, logger):
+    python_bin = env.get('MLC_PYTHON_BIN_WITH_PATH', env.get('MLC_PYTHON_BIN', 'python3'))
+    find_nvidia_lib_dirs = """
+import os
+import site
+import sysconfig
+
+roots = []
+for path in site.getsitepackages() + [site.getusersitepackages()]:
+    if path and path not in roots:
+        roots.append(path)
+for key in ('purelib', 'platlib'):
+    path = sysconfig.get_paths().get(key)
+    if path and path not in roots:
+        roots.append(path)
+
+lib_dirs = []
+for root in roots:
+    nvidia_root = os.path.join(root, 'nvidia')
+    if not os.path.isdir(nvidia_root):
+        continue
+    for entry in os.listdir(nvidia_root):
+        lib_dir = os.path.join(nvidia_root, entry, 'lib')
+        if os.path.isdir(lib_dir) and lib_dir not in lib_dirs:
+            lib_dirs.append(lib_dir)
+
+print(':'.join(lib_dirs))
+"""
+    try:
+        output = subprocess.check_output(
+            [python_bin, "-c", find_nvidia_lib_dirs], text=True).strip()
+    except BaseException as e:
+        logger.warning("Unable to detect TensorFlow NVIDIA runtime library directories: %s", e)
+        return
+
+    if output:
+        lib_dirs = [x for x in output.split(':') if x]
+        if lib_dirs:
+            if '+LD_LIBRARY_PATH' not in env:
+                env['+LD_LIBRARY_PATH'] = []
+            env['+LD_LIBRARY_PATH'] = lib_dirs + env['+LD_LIBRARY_PATH']
+
+
 def preprocess(i):
 
     os_info = i['os_info']
@@ -201,6 +244,9 @@ def preprocess(i):
 
     if env.get('MLC_HOST_PLATFORM_FLAVOR', '') == "arm64":
         env['MLC_HOST_PLATFORM_FLAVOR'] = "aarch64"
+
+    if os_info['platform'] != 'windows' and env.get('MLC_MLPERF_BACKEND') == 'tf' and env.get('MLC_MLPERF_DEVICE') in ['gpu', 'cuda']:
+        _prepend_tensorflow_nvidia_libs_to_ld_library_path(env, logger)
 
     return {'return': 0}
 
