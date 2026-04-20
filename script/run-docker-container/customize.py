@@ -11,6 +11,15 @@ DOCKER_SOCKET_PATH = "/var/run/docker.sock"
 NESTED_DOCKER_ENV_KEY = "MLC_DOCKER_ENABLE_NESTED"
 
 
+def is_valid_docker_binary(path):
+    if not path:
+        return False
+    binary_name = os.path.basename(path).lower()
+    if binary_name not in ["docker", "docker.exe"]:
+        return False
+    return os.path.exists(path) and os.access(path, os.X_OK)
+
+
 def preprocess(i):
 
     os_info = i['os_info']
@@ -183,13 +192,13 @@ def postprocess(i):
 
         docker_binary = ''
         docker_binary_from_env = env.get('MLC_DOCKER_BIN_WITH_PATH', '')
-        docker_binary_name = os.path.basename(docker_binary_from_env).lower()
-        if docker_binary_from_env and "docker" in docker_binary_name and os.path.exists(
-                docker_binary_from_env) and os.access(docker_binary_from_env, os.X_OK):
+        if is_valid_docker_binary(docker_binary_from_env):
             docker_binary = docker_binary_from_env
         if not docker_binary:
-            docker_binary = shutil.which("docker")
-        if docker_binary and os.path.exists(docker_binary):
+            docker_binary_which = shutil.which("docker")
+            if is_valid_docker_binary(docker_binary_which):
+                docker_binary = docker_binary_which
+        if docker_binary:
             docker_bin_mount = f"{docker_binary}:{docker_binary}"
             if docker_bin_mount not in mount_cmds:
                 mount_cmds.append(docker_bin_mount)
