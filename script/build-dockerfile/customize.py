@@ -464,8 +464,7 @@ def preprocess(i):
         if r['return'] > 0:
             return r
         print_deps = r['new_state']['print_deps']
-        fake_run_str = " --fake_run" if (
-            split_mlc_run_cmd or enable_fake_deps) else ""
+        fake_run_str = " --fake_run" if enable_fake_deps else ""
         cmds = ["RUN " + dep for dep in print_deps]
         for cmd in cmds:
             f.write(cmd + fake_run_str + EOL)
