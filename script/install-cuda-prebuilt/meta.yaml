@@ -112,6 +112,16 @@ versions:
     env:
       MLC_CUDA_LINUX_FILENAME: cuda_13.1.1_590.48.01_linux.run
 
+# Tests
+tests:
+  run_inputs:
+  - env:
+      MLC_SUDO: sudo
+  - env:
+      MLC_SUDO: 'true'
+  - env:
+      CUDA_SKIP_SUDO: 'yes'
+
 # Docker / container
 docker:
   run: true
