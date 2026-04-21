@@ -383,7 +383,7 @@ def docker_run(self_module, i):
     docker_inputs['mounts'] = res['mounts']
     container_env_string = res['container_env_string']
     for key in ("input", "output", "outdirname"):
-        if key in f_run_cmd:
+        if key in i and key in f_run_cmd:
             i[key] = f_run_cmd[key]
 
     res = update_docker_environment(
