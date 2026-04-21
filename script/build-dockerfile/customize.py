@@ -460,7 +460,7 @@ def preprocess(i):
                      'fake_run': True,
                      'fake_deps': True
                      }
-        r = automation.action_object.access(mlc_input)
+        r = mlc.access(mlc_input)
         if r['return'] > 0:
             return r
         print_deps = r['new_state']['print_deps']
