@@ -113,6 +113,7 @@ def postprocess(i):
 
     env = i['env']
     logger = i['automation'].logger
+    real_run = not is_false(env.get('MLC_REAL_RUN', True))
 
     # Check if need to push docker image to the Docker Hub
     if is_true(env.get('MLC_DOCKER_PUSH_IMAGE', '')):
@@ -132,6 +133,12 @@ def postprocess(i):
         logger.info(PCMD)
 
         logger.info('')
+
+        if not real_run:
+            logger.info(
+                'Skipping docker image push since MLC_REAL_RUN is false (dry run).')
+            logger.info('')
+            return {'return': 0}
 
         r = os.system(PCMD)
         logger.info('')

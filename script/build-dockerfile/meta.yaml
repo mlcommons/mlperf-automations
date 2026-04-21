@@ -55,6 +55,7 @@ input_mapping:
   post_run_cmds: MLC_DOCKER_POST_RUN_COMMANDS
   pre_run_cmds: MLC_DOCKER_PRE_RUN_COMMANDS
   push_image: MLC_DOCKER_PUSH_IMAGE
+  upload: MLC_DOCKER_PUSH_IMAGE
   real_run: MLC_REAL_RUN
   run_cmd: MLC_DOCKER_RUN_CMD
   run_cmd_extra: MLC_DOCKER_RUN_CMD_EXTRA
