@@ -28,9 +28,9 @@
  * the location in memory of this batch, and passes this to RunInference implemented by
  * derived classes (e.g. OnnxRuntimeBackend).
  */
-class Backend {
+class MlcBackend {
 public:
-    Backend(std::shared_ptr<Model> &model, std::shared_ptr<Device> &device,
+    MlcBackend(std::shared_ptr<Model> &model, std::shared_ptr<MlcDevice> &device,
             size_t performance_sample_count, size_t batch_size)
             : model(model), device(device)
             , performance_sample_count(performance_sample_count), batch_size(batch_size)
@@ -60,7 +60,7 @@ public:
             std::cerr << "warning: performance sample count = 0" << std::endl;
     }
 
-    virtual ~Backend() {
+    virtual ~MlcBackend() {
         for (size_t i = 0; i < num_inputs; i++) {
             for (size_t j = 0; j < num_memory; j++) {
                 device->Free(j, sample_memory[i][j]);
@@ -175,6 +175,8 @@ public:
         size_t memory_index = device->GetMemoryIndex(concurrency_index);
         // might use batch_memory
         std::unique_lock<std::mutex> batch_memory_lock{batch_memory_mutex[memory_index], std::defer_lock};
+        if (!contiguous)
+            batch_memory_lock.lock();
         for (size_t i = 0; i < num_inputs; i++) {
             // if input is contiguous, use input directly as batch address
             // otherwise, gather a batch to batch_memory
@@ -182,7 +184,6 @@ public:
                 batch_data[i] = GetMemoryAddress(i, memory_index, node->index_in_memory);
             } else {
                 // copy data if not contiguous
-                batch_memory_lock.lock();
                 for (size_t k = 0; k < batch.size(); k++) {
                     const mlperf::QuerySample &sample = batch[k];
                     void *sample_address = GetMemoryAddress(i, memory_index, sample_map[sample.index].index_in_memory);
@@ -232,7 +233,7 @@ public:
 
 protected:
     std::shared_ptr<Model> model;
-    std::shared_ptr<Device> device;
+    std::shared_ptr<MlcDevice> device;
     size_t performance_sample_count;
     size_t batch_size;
     size_t num_memory;
@@ -275,12 +276,12 @@ private:
     Trie batches;
 };
 
-class DummyBackend : public Backend {
+class DummyBackend : public MlcBackend {
 public:
     DummyBackend(
-        std::shared_ptr<Model> &model, std::shared_ptr<Device> &device,
+        std::shared_ptr<Model> &model, std::shared_ptr<MlcDevice> &device,
         size_t performance_sample_count, size_t batch_size)
-        : Backend(model, device, performance_sample_count, batch_size) {}
+        : MlcBackend(model, device, performance_sample_count, batch_size) {}
 
     void RunInference(
             size_t concurrency_index,

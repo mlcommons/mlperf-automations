@@ -11,13 +11,13 @@
 
 #include "backend.h"
 
-class OnnxRuntimeBackend : public Backend {
+class OnnxRuntimeBackend : public MlcBackend {
 public:
     OnnxRuntimeBackend(
-            std::shared_ptr<Model> &model, std::shared_ptr<Device> &device,
+            std::shared_ptr<Model> &model, std::shared_ptr<MlcDevice> &device,
             size_t performance_sample_count, size_t batch_size,
             bool use_cuda)
-            : Backend(model, device, performance_sample_count, batch_size)
+            : MlcBackend(model, device, performance_sample_count, batch_size)
             , env(ORT_LOGGING_LEVEL_WARNING, "env") {
         for (size_t i = 0; i < device->NumMemory(); i++) {
             memory_infos.emplace_back(

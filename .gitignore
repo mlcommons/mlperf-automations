@@ -5,6 +5,7 @@ MANIFEST
 __pycache__
 develop-eggs/
 dist/
+*.egg-info/
 eggs/
 .eggs/
 *.egg-info/

@@ -21,12 +21,15 @@
 class SampleLibrary : public mlperf::QuerySampleLibrary {
 public:
     SampleLibrary(
-        const std::string &name, std::shared_ptr<Backend> &backend,
+        const std::string &name, std::shared_ptr<MlcBackend> &backend,
         size_t max_sample_count, size_t num_inputs)
             : name(name), backend(backend), max_sample_count(max_sample_count), num_inputs(num_inputs) {}
 
     const std::string &Name() override { return name; }
-    size_t PerformanceSampleCount() override { return backend->PerformanceSampleCount(); }
+    size_t PerformanceSampleCount() override {
+        size_t count = backend->PerformanceSampleCount();
+        return count != 0 ? count : TotalSampleCount();
+    }
     size_t TotalSampleCount() override {
         return max_sample_count != 0 ? std::min(max_sample_count, NumSamples()) : NumSamples();
     }
@@ -62,7 +65,7 @@ public:
         std::vector<size_t> &shape) = 0;
 
 protected:
-    std::shared_ptr<Backend> backend;
+    std::shared_ptr<MlcBackend> backend;
     size_t max_sample_count;
     size_t num_inputs;
 
@@ -81,7 +84,7 @@ public:
      * @param filenames filenames of npy files: <preprocessed_path>/<filename>
      */
     NumpyLibrary(
-        std::shared_ptr<Backend> &backend, size_t max_sample_count,
+        std::shared_ptr<MlcBackend> &backend, size_t max_sample_count,
         std::string preprocessed_path,
         const std::vector<std::string> &filenames)
             : SampleLibrary("NumpyLibrary", backend, max_sample_count, 1) {
@@ -119,7 +122,7 @@ private:
 class Imagenet : public NumpyLibrary {
 public:
     Imagenet(
-        std::shared_ptr<Backend> &backend, size_t max_sample_count,
+        std::shared_ptr<MlcBackend> &backend, size_t max_sample_count,
         std::string preprocessed_path, std::string val_map_path)
             : NumpyLibrary(
                 backend, max_sample_count, preprocessed_path,
@@ -148,7 +151,7 @@ private:
 class Openimages : public NumpyLibrary {
 public:
     Openimages(
-        std::shared_ptr<Backend> &backend, size_t max_sample_count,
+        std::shared_ptr<MlcBackend> &backend, size_t max_sample_count,
         std::string preprocessed_path, std::string annotations_path)
             : NumpyLibrary(
                 backend, max_sample_count, preprocessed_path,
@@ -175,6 +178,78 @@ private:
             annotations = match.suffix();
         }
         return filenames;
+    }
+};
+
+
+/**
+ * SQuAD dataset for BERT: reads tokenized samples from .raw binary files.
+ * Each .raw file contains [num_samples * seq_length] int64 values.
+ * Three files: input_ids.raw, input_mask.raw, segment_ids.raw
+ */
+class Squad : public SampleLibrary {
+public:
+    Squad(
+        std::shared_ptr<MlcBackend> &backend, size_t max_sample_count,
+        std::string tokenized_root, size_t max_seq_length)
+            : SampleLibrary("Squad", backend, max_sample_count, 3),
+              max_seq_length(max_seq_length) {
+        // Read the three raw files
+        std::string input_ids_path = tokenized_root + "/bert_tokenized_squad_v1_1_input_ids.raw";
+        std::string input_mask_path = tokenized_root + "/bert_tokenized_squad_v1_1_input_mask.raw";
+        std::string segment_ids_path = tokenized_root + "/bert_tokenized_squad_v1_1_segment_ids.raw";
+
+        input_ids_data = ReadRawFile(input_ids_path);
+        input_mask_data = ReadRawFile(input_mask_path);
+        segment_ids_data = ReadRawFile(segment_ids_path);
+
+        size_t sample_size = max_seq_length * sizeof(int64_t);
+        num_samples = input_ids_data.size() / sample_size;
+        std::cerr << "loaded squad with " << TotalSampleCount() << " samples"
+                  << " (seq_length=" << max_seq_length << ")" << std::endl;
+    }
+
+    size_t NumSamples() override {
+        return num_samples;
+    }
+
+    void GetSample(
+            mlperf::QuerySampleIndex sample_index,
+            size_t input_index,
+            std::vector<uint8_t> &data,
+            size_t &size,
+            std::vector<size_t> &shape) override {
+        size_t sample_bytes = max_seq_length * sizeof(int64_t);
+        size_t offset = sample_index * sample_bytes;
+
+        const std::vector<uint8_t> *source = nullptr;
+        if (input_index == 0) source = &input_ids_data;
+        else if (input_index == 1) source = &input_mask_data;
+        else source = &segment_ids_data;
+
+        data.assign(source->begin() + offset, source->begin() + offset + sample_bytes);
+        size = sample_bytes;
+        shape = {max_seq_length};
+    }
+
+private:
+    size_t max_seq_length;
+    size_t num_samples;
+    std::vector<uint8_t> input_ids_data;
+    std::vector<uint8_t> input_mask_data;
+    std::vector<uint8_t> segment_ids_data;
+
+    static std::vector<uint8_t> ReadRawFile(const std::string &path) {
+        std::ifstream file(path, std::ios::binary | std::ios::ate);
+        if (!file.good()) {
+            std::cerr << "error: could not open " << path << std::endl;
+            return {};
+        }
+        size_t file_size = file.tellg();
+        file.seekg(0, std::ios::beg);
+        std::vector<uint8_t> data(file_size);
+        file.read(reinterpret_cast<char *>(data.data()), file_size);
+        return data;
     }
 };
 
