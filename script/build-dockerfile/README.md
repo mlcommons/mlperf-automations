@@ -69,6 +69,7 @@ mlcr build,dockerfile
 | `--post_run_cmds` |  |  | `` |
 | `--pre_run_cmds` |  |  | `` |
 | `--push_image` |  |  | `` |
+| `--upload` | Alias for push_image |  | `` |
 | `--real_run` |  |  | `` |
 | `--run_cmd` |  |  | `` |
 | `--run_cmd_extra` |  |  | `` |
