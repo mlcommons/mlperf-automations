@@ -45,19 +45,25 @@ def preprocess(i):
 
             env['MLC_RUN_CMD'] = f"""{MLC_RUN_PREFIX} {q}{os.path.join(env['MLC_RUN_DIR'], env['MLC_BIN_NAME'])}{q} {env['MLC_RUN_SUFFIX']}"""
 
+    if env.get('MLC_RUN_DIR', '') == '':
+        env['MLC_RUN_DIR'] = os.getcwd()
+    logs_dir = env.get('MLC_LOGS_DIR', env['MLC_RUN_DIR'])
+
     x = env.get('MLC_RUN_PREFIX0', '')
     if x != '':
         env['MLC_RUN_CMD'] = x + ' ' + env.get('MLC_RUN_CMD', '')
 
     if os_info['platform'] != 'windows' and not is_false(
             env.get('MLC_SAVE_CONSOLE_LOG', True)):
-        logs_dir = env.get('MLC_LOGS_DIR', env['MLC_RUN_DIR'])
         env['MLC_RUN_CMD'] += r" 2>&1 | tee " + q + os.path.join(
             logs_dir, "console.out") + q + r"; echo \${PIPESTATUS[0]} > exitstatus"
 
-    # additional arguments and tags for measuring system informations(only if
-    # 'MLC_PROFILE_NVIDIA_POWER' is 'on')
-    if env.get('MLC_PROFILE_NVIDIA_POWER', '') == "on":
+    enable_system_info_profiling = env.get(
+        'MLC_PROFILE_NVIDIA_POWER', '') == "on" or is_true(
+        env.get('MLC_PROFILE_SYSTEM_INFO', ''))
+
+    # additional arguments and tags for measuring system informations
+    if enable_system_info_profiling:
         env['MLC_SYS_UTILISATION_SCRIPT_TAGS'] = ''
         # this section is for selecting the variation
         if env.get('MLC_MLPERF_DEVICE', '') == "gpu":
@@ -79,7 +85,7 @@ def preprocess(i):
     if env.get('MLC_PRE_RUN_CMD_EXTERNAL', '') != '':
         pre_run_cmd += env['MLC_PRE_RUN_CMD_EXTERNAL']
 
-    if env.get('MLC_PROFILE_NVIDIA_POWER', '') == "on":
+    if enable_system_info_profiling:
         if pre_run_cmd != '':
             pre_run_cmd += ' && '
 
@@ -96,7 +102,7 @@ def preprocess(i):
     # generate the post run cmd - for killing the process that records runtime
     # system infos
     post_run_cmd = ""
-    if env.get('MLC_PROFILE_NVIDIA_POWER', '') == "on":
+    if enable_system_info_profiling:
         post_run_cmd += r"echo killing process \$cmd_pid && kill -TERM \${cmd_pid}"
         print(
             f"Post run command for killing the process that measures the runtime system information: {post_run_cmd}")
