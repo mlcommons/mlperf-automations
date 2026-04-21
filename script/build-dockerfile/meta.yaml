@@ -59,6 +59,7 @@ input_mapping:
   run_cmd: MLC_DOCKER_RUN_CMD
   run_cmd_extra: MLC_DOCKER_RUN_CMD_EXTRA
   script_tags: MLC_DOCKER_RUN_SCRIPT_TAGS
+  split_mlc_run_cmd: MLC_DOCKER_SPLIT_MLC_RUN_CMD
   skip_mlc_sys_upgrade: MLC_DOCKER_SKIP_MLC_SYS_UPGRADE
   user: MLC_DOCKER_USER
 

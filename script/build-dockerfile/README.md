@@ -73,6 +73,7 @@ mlcr build,dockerfile
 | `--run_cmd` |  |  | `` |
 | `--run_cmd_extra` |  |  | `` |
 | `--script_tags` |  |  | `` |
+| `--split_mlc_run_cmd` | Split dependent MLC run commands into separate Dockerfile RUN layers (effective with cache enabled) |  | `` |
 | `--skip_mlc_sys_upgrade` |  |  | `` |
 | `--user` |  |  | `` |
 ### Generic Script Inputs
