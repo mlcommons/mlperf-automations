@@ -22,7 +22,7 @@ This directory provides a category-based view of all scripts using symbolic link
 - [MLCommons utilities](mlcommons-utilities/) (3 scripts)
 - [MLPerf Automotive](mlperf-automotive/) (5 scripts)
 - [MLPerf Inference](mlperf-inference/) (45 scripts)
-- [MLPerf Training](mlperf-training/) (8 scripts)
+- [MLPerf Training](mlperf-training/) (9 scripts)
 - [Modular AI/ML application pipeline](modular-ai-ml-application-pipeline/) (6 scripts)
 - [Platform information](platform-information/) (4 scripts)
 - [Python automation](python-automation/) (6 scripts)

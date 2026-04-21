@@ -923,6 +923,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-mlperf-training-src](get-mlperf-training-src/)**
   - get-mlperf-training-src
   - Tags: `get`, `src`, `source`, `training`, `training-src`, `training-source`, `mlperf`, `mlcommons`
+- **[get-mlperf-training-results-summary](get-mlperf-training-results-summary/)**
+  - get-mlperf-training-results-summary
+  - Tags: `get`, `mlperf`, `training`, `results`, `summary`, `summary-results`, `results-summary`
 - **[prepare-training-data-bert](prepare-training-data-bert/)**
   - prepare-training-data-bert
   - Tags: `prepare`, `mlperf`, `training`, `data`, `input`, `bert`
