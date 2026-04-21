@@ -35,6 +35,31 @@ def check_dict_filled(keys, sut_info):
             return False
     return True
 
+
+def get_framework_field(sut_info, system_framework):
+    framework = (system_framework or "").strip()
+    if framework == "":
+        framework_name = (sut_info.get('framework', '') or '').strip()
+        framework_version = (
+            sut_info.get(
+                'framework_version',
+                '') or '').strip()
+        framework = (
+            f"{framework_name} {framework_version}"
+        ).strip()
+
+    implementation = (sut_info.get('implementation', '') or '').strip()
+    if implementation:
+        implementation_prefix = implementation + " "
+        framework_lower = framework.lower()
+        implementation_lower = implementation.lower()
+        if framework == "":
+            framework = implementation
+        elif framework_lower != implementation_lower and not framework_lower.startswith(implementation_lower + " "):
+            framework = implementation_prefix + framework
+
+    return framework
+
 # The function checks whether the submitting model name belongs standard
 # model names for MLPef Inference
 
@@ -529,14 +554,11 @@ def generate_submission(env, state, inp, submission_division, logger):
                         # written
                         system_meta = {**system_meta_default, **system_meta}
                         logger.info(system_meta)
-                        # check if framework version is there in system_meta,
-                        # if not try to fill it from sut_info
+                        system_meta['framework'] = get_framework_field(
+                            sut_info, system_meta.get('framework', ''))
                         if system_meta['framework'] == "":
-                            system_meta['framework'] = sut_info.get(
-                                'framework', '') + sut_info.get('framework_version', '')
-                            if system_meta['framework'] == "":
-                                print(
-                                    "WARNING: framework field could not be filled from system_meta.json or sut_info.json. This will trigger error in submission checker")
+                            print(
+                                "WARNING: framework field could not be filled from system_meta.json or sut_info.json. This will trigger error in submission checker")
 
                     if not os.path.isdir(submission_results_path):
                         os.makedirs(submission_results_path)
