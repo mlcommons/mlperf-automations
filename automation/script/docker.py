@@ -382,6 +382,9 @@ def docker_run(self_module, i):
         return res
     docker_inputs['mounts'] = res['mounts']
     container_env_string = res['container_env_string']
+    for key in ("input", "output", "outdirname"):
+        if key in f_run_cmd:
+            i[key] = f_run_cmd[key]
 
     res = update_docker_environment(
         docker_settings, env, self_module.host_env_keys, container_env_string)
