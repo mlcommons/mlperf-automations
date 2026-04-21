@@ -142,7 +142,8 @@ int main(int argc, const char *argv[]) {
     model.reset(new Retinanet(input_settings.model_path, 800, 800, 0.05f));
   } else if (input_settings.model_name == "bert-99" ||
              input_settings.model_name == "bert-99.9") {
-    model.reset(new BertLarge(input_settings.model_path, input_settings.max_seq_length));
+    model.reset(new BertLarge(input_settings.model_path,
+                              input_settings.max_seq_length));
   } else {
     std::cerr << "model (" << input_settings.model_name << ") not supported"
               << std::endl;
@@ -191,9 +192,9 @@ int main(int argc, const char *argv[]) {
 #endif
   } else if (input_settings.backend_name == "pytorch") {
 #ifdef MLC_MLPERF_BACKEND_PYTORCH
-    backend.reset(new PyTorchBackend(
-        model, device, performance_sample_count, input_settings.batch_size,
-        input_settings.device_name == "gpu"));
+    backend.reset(new PyTorchBackend(model, device, performance_sample_count,
+                                     input_settings.batch_size,
+                                     input_settings.device_name == "gpu"));
 #endif
   } else {
     std::cerr << "backend (" << input_settings.backend_name << ") not supported"
@@ -212,7 +213,7 @@ int main(int argc, const char *argv[]) {
                              input_settings.dataset_preprocessed_path,
                              input_settings.dataset_list));
   } else if (input_settings.model_name == "bert-99" ||
-               input_settings.model_name == "bert-99.9") {
+             input_settings.model_name == "bert-99.9") {
     qsl.reset(new Squad(backend, max_sample_count,
                         input_settings.squad_tokenized_root,
                         input_settings.max_seq_length));

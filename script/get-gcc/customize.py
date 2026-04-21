@@ -103,6 +103,7 @@ def postprocess(i):
         found_path)  # /usr in case of /usr/bin/gcc
 
     env['MLC_GCC_DIR_PATH'] = env['MLC_GCC_INSTALLED_PATH']
+    env['MLC_GET_DEPENDENT_CACHED_PATH'] = found_file_path
 
     file_name_c = os.path.basename(found_file_path)
     # G: changed next line to handle cases like gcc-8
