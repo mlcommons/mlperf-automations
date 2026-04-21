@@ -1,6 +1,5 @@
-from mlc import utils
 import os
-from utils import is_true
+from utils import is_true, logger
 
 
 def preprocess(i):
@@ -20,16 +19,100 @@ def preprocess(i):
     extra_cache_rm_tags = env.get('MLC_CLEAN_EXTRA_CACHE_RM_TAGS', '').strip()
 
     extra_tags = "," + extra_cache_rm_tags if extra_cache_rm_tags != '' else ''
-    if env.get('MLC_MODEL', '') == 'sdxl':
-        if env.get('MLC_CLEAN_ARTIFACT_NAME', '') == 'downloaded_data':
-            clean_cmd = f"""rm -rf {os.path.join(env['MLC_NVIDIA_MLPERF_SCRATCH_PATH'], "data", "coco", "SDXL")} """
-            cache_rm_tags = "nvidia-harness,_preprocess_data,_sdxl"
-        if env.get('MLC_CLEAN_ARTIFACT_NAME', '') == 'preprocessed_data':
-            clean_cmd = f"""rm -rf {os.path.join(env['MLC_NVIDIA_MLPERF_SCRATCH_PATH'], "preprocessed_data", "coco2014-tokenized-sdxl")} """
-            cache_rm_tags = "nvidia-harness,_preprocess_data,_sdxl"
-        if env.get('MLC_CLEAN_ARTIFACT_NAME', '') == 'downloaded_model':
-            clean_cmd = f"""rm -rf {os.path.join(env['MLC_NVIDIA_MLPERF_SCRATCH_PATH'], "models", "SDXL")} """
-            cache_rm_tags = "nvidia-harness,_download_model,_sdxl"
+    model = env.get('MLC_MODEL', '')
+    artifact_name = env.get('MLC_CLEAN_ARTIFACT_NAME', '')
+    if artifact_name == 'downloaded_model':
+        artifact_name = 'models'
+    if model == '':
+        return {'return': 1, 'error': 'Please select a model variation to specify which model to clean'}
+
+    supported_artifacts = ['downloaded_data', 'preprocessed_data', 'models']
+    if artifact_name not in supported_artifacts:
+        return {'return': 1, 'error': f'Unsupported artifact variation: {artifact_name}. Supported values: {supported_artifacts}'}
+
+    model_aliases = {
+        'stable-diffusion-xl': 'sdxl',
+        '3d-unet-99': '3d-unet',
+        '3d-unet-99.9': '3d-unet',
+        'bert-99': 'bert',
+        'bert-99.9': 'bert',
+        'dlrm-v2-99': 'dlrm-v2',
+        'dlrm-v2-99.9': 'dlrm-v2',
+        'gptj-99': 'gptj',
+        'gptj-99.9': 'gptj',
+        'llama2-70b-99': 'llama2-70b',
+        'llama2-70b-99.9': 'llama2-70b'
+    }
+    model_name = model_aliases.get(model, model)
+
+    model_artifacts = {
+        '3d-unet': {
+            'downloaded_data': [os.path.join('data', 'KiTS19')],
+            'preprocessed_data': [os.path.join('preprocessed_data', 'KiTS19')],
+            'models': [os.path.join('models', '3d-unet-kits19')]
+        },
+        'bert': {
+            'downloaded_data': [os.path.join('data', 'squad')],
+            'preprocessed_data': [os.path.join('preprocessed_data', 'squad')],
+            'models': [os.path.join('models', 'bert')]
+        },
+        'dlrm-v2': {
+            'downloaded_data': [os.path.join('data', 'criteo')],
+            'preprocessed_data': [os.path.join('preprocessed_data', 'criteo')],
+            'models': [os.path.join('models', 'dlrm'), os.path.join('models', 'dlrm-v2')]
+        },
+        'gptj': {
+            'downloaded_data': [os.path.join('data', 'cnn-daily-mail')],
+            'preprocessed_data': [os.path.join('preprocessed_data', 'cnn-daily-mail')],
+            'models': [os.path.join('models', 'GPTJ-6B')]
+        },
+        'llama2-70b': {
+            'downloaded_data': [os.path.join('data', 'llama2-70b')],
+            'preprocessed_data': [os.path.join('preprocessed_data', 'open_orca')],
+            'models': [os.path.join('models', 'Llama2')]
+        },
+        'resnet50': {
+            'downloaded_data': [os.path.join('data', 'imagenet')],
+            'preprocessed_data': [os.path.join('preprocessed_data', 'imagenet')],
+            'models': [os.path.join('models', 'ResNet50')]
+        },
+        'retinanet': {
+            'downloaded_data': [os.path.join('data', 'open-images-v6-mlperf')],
+            'preprocessed_data': [os.path.join('preprocessed_data', 'open-images-v6-mlperf')],
+            'models': [os.path.join('models', 'retinanet-resnext50-32x4d')]
+        },
+        'rnnt': {
+            'downloaded_data': [os.path.join('data', 'LibriSpeech')],
+            'preprocessed_data': [
+                os.path.join('preprocessed_data', 'rnnt_dev_clean_500_raw'),
+                os.path.join('preprocessed_data', 'rnnt_train_clean_512_wav')
+            ],
+            'models': [os.path.join('models', 'rnn-t')]
+        },
+        'sdxl': {
+            'downloaded_data': [os.path.join('data', 'coco', 'SDXL')],
+            'preprocessed_data': [os.path.join('preprocessed_data', 'coco2014-tokenized-sdxl')],
+            'models': [os.path.join('models', 'SDXL')]
+        }
+    }
+
+    if model_name not in model_artifacts:
+        return {'return': 1, 'error': f'Unsupported model variation: {model}'}
+
+    clean_paths = model_artifacts.get(model_name, {}).get(artifact_name, [])
+    if clean_paths:
+        full_clean_paths = [os.path.join(env['MLC_NVIDIA_MLPERF_SCRATCH_PATH'], p) for p in clean_paths]
+        clean_cmd = " && ".join([f"rm -rf {p}" for p in full_clean_paths])
+
+    cache_action_tag = ''
+    if artifact_name in ['downloaded_data', 'preprocessed_data']:
+        cache_action_tag = '_preprocess_data'
+    elif artifact_name == 'models':
+        cache_action_tag = '_download_model'
+
+    if cache_action_tag:
+        cache_model_name = 'sdxl' if model == 'stable-diffusion-xl' else model
+        cache_rm_tags = f"nvidia-harness,{cache_action_tag},_{cache_model_name}"
 
     cache_rm_tags = cache_rm_tags + extra_tags
     mlc_cache = i['automation'].cache_action
