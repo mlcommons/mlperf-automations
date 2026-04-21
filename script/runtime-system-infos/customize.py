@@ -84,7 +84,8 @@ def preprocess(i):
         except (subprocess.CalledProcessError, FileNotFoundError, OSError):
             return None
 
-        lines = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+        lines = [line.strip()
+                 for line in result.stdout.splitlines() if line.strip()]
         if not lines:
             return None
 
