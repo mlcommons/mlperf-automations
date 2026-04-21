@@ -60,9 +60,9 @@ def detect_version(i):
         env['MLC_GCC_VERSION'] = version
     else:
         r = i['automation'].parse_version({'match_text': r'\s+([\d.]+(?:\s+\d{8})?)',
-                                       'group_number': 1,
-                                       'env_key': 'MLC_GCC_VERSION',
-                                       'which_env': i['env']})
+                                           'group_number': 1,
+                                           'env_key': 'MLC_GCC_VERSION',
+                                           'which_env': i['env']})
         if r['return'] > 0:
             if 'clang' in r['error']:
                 return {'return': 0, 'version': -1}
