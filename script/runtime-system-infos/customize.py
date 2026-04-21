@@ -18,13 +18,13 @@ import subprocess
 # argument frame: current stack frame
 
 
-f = None
+log_file_handle = None
 
 
 def signal_handler(sig, frame):
     print("Signal received, closing the system information file safely.")
-    if f:
-        f.close()
+    if log_file_handle:
+        log_file_handle.close()
     sys.exit(0)
 
 
@@ -68,7 +68,7 @@ def preprocess(i):
 
     # done to be made available to signal_handler function in case of kill signals
     # as of now handles for only SIGTERM
-    global f
+    global log_file_handle
 
     def _get_gpu_info():
         try:
@@ -81,7 +81,7 @@ def preprocess(i):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True)
-        except Exception:
+        except (subprocess.CalledProcessError, FileNotFoundError, OSError):
             return None
 
         lines = [line.strip() for line in result.stdout.splitlines() if line.strip()]
@@ -111,34 +111,41 @@ def preprocess(i):
             'total_gpu_memory_mb': total_memory,
             'used_gpu_memory_mb': used_memory}
 
-    while True:
-        with open(log_json_file_path, 'a', newline='') as f:
-            writer = csv.DictWriter(f, fieldnames=csv_headers)
-            # If the file is empty, write headers
-            if f.tell() == 0:
-                writer.writeheader()
+    with open(log_json_file_path, 'a', newline='') as log_file_handle:
+        writer = csv.DictWriter(log_file_handle, fieldnames=csv_headers)
+        # If the file is empty, write headers
+        if log_file_handle.tell() == 0:
+            writer.writeheader()
 
+        while True:
             memory = psutil.virtual_memory()
             cpu_util = psutil.cpu_percent(interval=0)
             total_memory_gb = memory.total / (1024 ** 3)
             used_memory_gb = memory.used / (1024 ** 3)
-            gpu_info = _get_gpu_info() or {}
+            gpu_info = _get_gpu_info() or {
+                'gpu_count': 0,
+                'avg_gpu_utilisation': 0.0,
+                'total_gpu_memory_mb': 0.0,
+                'used_gpu_memory_mb': 0.0}
 
             data = {
                 'timestamp': datetime.now(timezone.utc).isoformat(),
                 'cpu_utilisation': cpu_util,
                 'total_memory_gb': total_memory_gb,
                 'used_memory_gb': used_memory_gb,
-                'gpu_count': gpu_info.get('gpu_count', ''),
-                'avg_gpu_utilisation': gpu_info.get('avg_gpu_utilisation', ''),
-                'total_gpu_memory_mb': gpu_info.get('total_gpu_memory_mb', ''),
-                'used_gpu_memory_mb': gpu_info.get('used_gpu_memory_mb', '')
+                'gpu_count': gpu_info.get('gpu_count', 0),
+                'avg_gpu_utilisation': gpu_info.get(
+                    'avg_gpu_utilisation', 0.0),
+                'total_gpu_memory_mb': gpu_info.get(
+                    'total_gpu_memory_mb', 0.0),
+                'used_gpu_memory_mb': gpu_info.get(
+                    'used_gpu_memory_mb', 0.0)
             }
 
             # Write data as a row to CSV file
             writer.writerow(data)
+            log_file_handle.flush()
             time.sleep(interval)
-            f.close()
 
     return {'return': 0}
 
