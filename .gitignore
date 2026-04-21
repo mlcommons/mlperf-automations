@@ -8,6 +8,7 @@ dist/
 *.egg-info/
 eggs/
 .eggs/
+*.egg-info/
 lib/
 lib64/
 sdist/
