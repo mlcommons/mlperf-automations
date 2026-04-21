@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-04-20 21:26:30*
+*Last updated: 2026-04-21 04:32:01*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -923,6 +923,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-mlperf-training-src](get-mlperf-training-src/)**
   - get-mlperf-training-src
   - Tags: `get`, `src`, `source`, `training`, `training-src`, `training-source`, `mlperf`, `mlcommons`
+- **[get-mlperf-training-results-summary](get-mlperf-training-results-summary/)**
+  - get-mlperf-training-results-summary
+  - Tags: `get`, `mlperf`, `training`, `results`, `summary`, `summary-results`, `results-summary`
 - **[prepare-training-data-bert](prepare-training-data-bert/)**
   - prepare-training-data-bert
   - Tags: `prepare`, `mlperf`, `training`, `data`, `input`, `bert`
