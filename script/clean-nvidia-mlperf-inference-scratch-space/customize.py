@@ -24,7 +24,8 @@ def preprocess(i):
     if artifact_name == 'downloaded_model':
         artifact_name = 'models'
     if model == '':
-        return {'return': 1, 'error': 'Please select a model variation to specify which model to clean'}
+        return {
+            'return': 1, 'error': 'Please select a model variation to specify which model to clean'}
 
     supported_artifacts = ['downloaded_data', 'preprocessed_data', 'models']
     if artifact_name not in supported_artifacts:
@@ -101,7 +102,10 @@ def preprocess(i):
 
     clean_paths = model_artifacts.get(model_name, {}).get(artifact_name, [])
     if clean_paths:
-        full_clean_paths = [os.path.join(env['MLC_NVIDIA_MLPERF_SCRATCH_PATH'], p) for p in clean_paths]
+        full_clean_paths = [
+            os.path.join(
+                env['MLC_NVIDIA_MLPERF_SCRATCH_PATH'],
+                p) for p in clean_paths]
         clean_cmd = " && ".join([f"rm -rf {p}" for p in full_clean_paths])
 
     cache_action_tag = ''
