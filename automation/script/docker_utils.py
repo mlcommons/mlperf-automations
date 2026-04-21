@@ -142,6 +142,7 @@ def prepare_docker_inputs(input_params, docker_settings,
         "mlc_repos", "skip_mlc_sys_upgrade", "extra_sys_deps", "image_name",
         "gh_token", "fake_run_deps", "run_final_cmds", "real_run", "copy_files", "path", "user", "env", "build_env"
     ]
+    keys += ["cache", "split_mlc_run_cmd"]
 
     if run_stage:
         keys += [
