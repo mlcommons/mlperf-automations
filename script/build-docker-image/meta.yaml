@@ -53,5 +53,6 @@ prehook_deps:
 tests:
   run_inputs:
   - env:
+      MLC_DOCKER_IMAGE_NAME: mlc-script-test
       MLC_DOCKER_PUSH_IMAGE: 'yes'
       MLC_REAL_RUN: 'no'
