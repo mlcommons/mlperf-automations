@@ -60,9 +60,9 @@ def detect_version(i):
         env['MLC_GCC_VERSION'] = version
     else:
         r = i['automation'].parse_version({'match_text': r'\s+([\d.]+(?:\s+\d{8})?)',
-                                       'group_number': 1,
-                                       'env_key': 'MLC_GCC_VERSION',
-                                       'which_env': i['env']})
+                                           'group_number': 1,
+                                           'env_key': 'MLC_GCC_VERSION',
+                                           'which_env': i['env']})
         if r['return'] > 0:
             if 'clang' in r['error']:
                 return {'return': 0, 'version': -1}
@@ -103,6 +103,7 @@ def postprocess(i):
         found_path)  # /usr in case of /usr/bin/gcc
 
     env['MLC_GCC_DIR_PATH'] = env['MLC_GCC_INSTALLED_PATH']
+    env['MLC_GET_DEPENDENT_CACHED_PATH'] = found_file_path
 
     file_name_c = os.path.basename(found_file_path)
     # G: changed next line to handle cases like gcc-8

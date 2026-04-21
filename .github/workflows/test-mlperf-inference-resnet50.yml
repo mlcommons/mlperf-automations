@@ -1,5 +1,8 @@
 name: MLPerf inference ResNet50
 
+permissions:
+  contents: read
+
 on:
   pull_request_target:
     branches: [ "main", "dev" ]
@@ -107,4 +110,45 @@ jobs:
         git config --global credential.https://gist.github.com.helper ""
         git config --global credential.https://gist.github.com.helper "!gh auth git-credential"
         mlcr push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=auto-update --commit_message="Results from R50 GH action on ${{ matrix.os }}" --quiet
+ 
+  mlc-run-rhel-docker:
+    runs-on: ubuntu-latest
+    env:
+      MLC_INDEX: "on"
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.12"
+    - name: Install mlcflow
+      run: |
+        pip install mlcflow
+        pip install tabulate
+    - name: Pull MLOps repo
+      shell: bash
+      env:
+        REPO: ${{ github.event.pull_request.head.repo.html_url }}
+        BRANCH: ${{ github.event.pull_request.head.ref }}
+      run: |
+        mlc pull repo "$REPO" --branch="$BRANCH"
+    - name: Test MLPerf Inference ResNet50 (RHEL Docker)
+      run: |
+        mlcd run-mlperf,inference,_submission,_short,_r6.0-dev \
+          --submitter="MLCommons" \
+          --pull_changes=yes \
+          --pull_inference_changes=yes \
+          --hw_name="gh_rhel9_docker x86" \
+          --model=resnet50 \
+          --implementation=python \
+          --backend=onnxruntime \
+          --device=cpu \
+          --scenario=Offline \
+          --test_query_count=500 \
+          --target_qps=1 \
+          --docker_os=rhel \
+          --docker_os_version=9 \
+          -v --quiet
    
