@@ -45,7 +45,12 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd, run_state):
         if "${{ " + key + " }}:${{ " + key + " }}" not in mounts:
             mounts.append("${{ " + key + " }}:${{ " + key + " }}")
 
-    docker_input_mapping = docker_settings.get("input_mapping", {})
+    docker_input_mapping = {
+        "input": "MLC_INPUT",
+        "output": "MLC_OUTPUT",
+        "outdirname": "MLC_OUTDIRNAME"
+    }
+    docker_input_mapping.update(docker_settings.get("input_mapping", {}))
     container_env_string = ""
 
     for index in range(len(mounts)):
@@ -369,8 +374,6 @@ def regenerate_script_cmd(i):
         keys = sorted(command_dict.keys(), key=lambda x: x != "tags")
 
         for key in keys:
-            if key in ["input", "output", "outdirname"]:
-                continue  # We have the corresponding env keys in container env string
             # Construct the full key with the prefix.
             full_key = f"{prefix}.{key}" if prefix else key
 
