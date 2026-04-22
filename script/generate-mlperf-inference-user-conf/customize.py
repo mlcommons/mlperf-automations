@@ -592,7 +592,7 @@ def _get_submission_checker_constants_module():
     try:
         import submission_checker.constants as constants
         return constants
-    except BaseException:
+    except Exception:
         return checker
 
 
