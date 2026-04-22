@@ -589,8 +589,11 @@ def _get_submission_checker_constants_module():
     if all(hasattr(checker, attr) for attr in required_attrs):
         return checker
 
-    import submission_checker.constants as constants
-    return constants
+    try:
+        import submission_checker.constants as constants
+        return constants
+    except BaseException:
+        return checker
 
 
 def get_checker_files(env):
