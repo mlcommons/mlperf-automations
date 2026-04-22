@@ -21,6 +21,12 @@ def preprocess(i):
 
     mlperf_path = env['MLC_MLPERF_INFERENCE_SOURCE']
     submission_checker_dir = os.path.join(mlperf_path, "tools", "submission")
+    # Remove any stale submission_checker.py that would shadow the
+    # submission_checker package directory in newer inference versions
+    stale_checker = os.path.join(submission_checker_dir, "submission_checker.py")
+    if os.path.isfile(stale_checker) and os.path.isdir(
+            os.path.join(submission_checker_dir, "submission_checker")):
+        os.remove(stale_checker)
     sys.path.append(submission_checker_dir)
 
     version = env.get('MLC_MLPERF_INFERENCE_VERSION', "4.1")
