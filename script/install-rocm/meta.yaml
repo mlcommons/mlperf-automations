@@ -14,15 +14,21 @@ tags:
 cache: true
 clean_files: []
 
+# Input mapping
+input_mapping:
+  rocm_install_prefix: MLC_ROCM_INSTALL_PREFIX
+
 # Environment
 env: {}
 new_env_keys:
 - MLC_ROMLC_*
+- MLC_ROCM_INSTALL_PREFIX
 - +PATH
 
 # Dependencies
 deps:
 - tags: detect,os
+- tags: detect,sudo
 
 # Versions
 default_version: 7.2.2

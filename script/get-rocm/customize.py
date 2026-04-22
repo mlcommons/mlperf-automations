@@ -14,8 +14,18 @@ def preprocess(i):
     file_name = 'rocminfo.exe' if os_info['platform'] == 'windows' else 'rocminfo'
     env['FILE_NAME'] = file_name
 
-    # Build search paths: check /opt/rocm/bin and any versioned /opt/rocm-*/bin
+    # Build search paths: check custom install prefix, then /opt/rocm/bin and versioned /opt/rocm-*/bin
     rocm_paths = []
+
+    # Check custom install prefix (from install-rocm cache)
+    install_prefix = env.get('MLC_ROCM_INSTALL_PREFIX', '')
+    if install_prefix:
+        prefix_opt = os.path.join(install_prefix, 'opt')
+        for p in [os.path.join(prefix_opt, 'rocm', 'bin')] + sorted(glob.glob(os.path.join(prefix_opt, 'rocm-*', 'bin')), reverse=True):
+            if os.path.isdir(p):
+                rocm_paths.append(p)
+
+    # Standard paths
     if os.path.isdir("/opt/rocm/bin"):
         rocm_paths.append("/opt/rocm/bin")
     for p in sorted(glob.glob("/opt/rocm-*/bin"), reverse=True):

@@ -31,9 +31,14 @@ if [[ ${major_version} -ge 7 ]]; then
   test $? -eq 0 || exit 1
   chmod +x /tmp/${runfile_name}
 
-  # Install ROCm via runfile (no driver for CPU-only compatibility)
-  echo "Installing ROCm ${MLC_VERSION} via runfile..."
-  sudo bash /tmp/${runfile_name} deps=install target="/" rocm postrocm
+  # Install ROCm via runfile
+  install_prefix="${MLC_ROCM_INSTALL_PREFIX:-/}"
+  echo "Installing ROCm ${MLC_VERSION} via runfile to target=${install_prefix} ..."
+  if [[ "${install_prefix}" == "/" ]]; then
+    sudo bash /tmp/${runfile_name} deps=install target="/" rocm postrocm
+  else
+    bash /tmp/${runfile_name} deps=install target="${install_prefix}" rocm postrocm
+  fi
   test $? -eq 0 || exit 1
 
   rm -f /tmp/${runfile_name}
