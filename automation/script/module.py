@@ -5872,6 +5872,7 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
 
     input_mapping = meta.get('input_mapping', {})
     if input_mapping:
+        run_state['input_mapping'] = input_mapping
         update_env_from_input_mapping(
             env,
             input_update_env,

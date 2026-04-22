@@ -157,6 +157,7 @@ def dockerfile(self_module, input_params):
     state = {}
     state['dockerfile_env'] = dockerfile_env
     state['dockerfile_build_env'] = dockerfile_build_env
+
     # Generate Dockerfile
     mlc_docker_input = {
         'action': 'run', 'automation': 'script', 'tags': 'build,dockerfile',
@@ -170,6 +171,9 @@ def dockerfile(self_module, input_params):
 
     if docker_inputs.get('mlc_repo_path', '') != '':
         mlc_docker_input['mlc_repo_path'] = docker_inputs['mlc_repo_path']
+
+    if is_true(input_params.get('docker_host_mlc_repos', '')):
+        mlc_docker_input['host_mlc_repos'] = 'yes'
 
     docker_v = False
     docker_s = False
