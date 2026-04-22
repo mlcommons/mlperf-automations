@@ -30,6 +30,18 @@ deps:
 - tags: detect,os
 - tags: detect,sudo
 
+# Prehook dependencies
+prehook_deps:
+- tags: download,file
+  enable_if_env:
+    MLC_ROCM_USE_RUNFILE:
+    - 'yes'
+  env:
+    MLC_DOWNLOAD_FILENAME: <<<MLC_ROCM_RUNFILE_NAME>>>
+  force_env_keys:
+  - MLC_DOWNLOAD_URL
+  - MLC_DOWNLOAD_FILENAME
+
 # Versions
 default_version: 7.2.2
 versions:

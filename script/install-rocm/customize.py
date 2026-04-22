@@ -1,6 +1,12 @@
 from mlc import utils
 import os
 import glob
+import re
+
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
 
 
 def preprocess(i):
@@ -22,6 +28,35 @@ def preprocess(i):
             install_prefix = os.getcwd()
 
     env['MLC_ROCM_INSTALL_PREFIX'] = install_prefix
+
+    # For ROCm 7+, resolve the runfile download URL
+    version = env.get('MLC_VERSION', '')
+    major_version = int(version.split('.')[0]) if version else 0
+
+    if major_version >= 7:
+        os_flavor = env.get('MLC_HOST_OS_FLAVOR', 'ubuntu')
+        os_version = env.get('MLC_HOST_OS_VERSION', '')
+
+        if 'ubuntu' in os_flavor or 'debian' in os_flavor:
+            runfile_base_url = f"https://repo.radeon.com/rocm/installer/rocm-runfile-installer/rocm-rel-{version}/ubuntu/{os_version}/"
+        else:
+            runfile_base_url = f"https://repo.radeon.com/rocm/installer/rocm-runfile-installer/rocm-rel-{version}/rhel/{os_version}/"
+
+        # Fetch directory listing to find the runfile name
+        try:
+            response = urlopen(runfile_base_url)
+            html = response.read().decode('utf-8')
+            match = re.search(r'(rocm-installer[^"]+\.run)', html)
+            if match:
+                runfile_name = match.group(1)
+                env['MLC_DOWNLOAD_URL'] = runfile_base_url + runfile_name
+                env['MLC_DOWNLOAD_FILENAME'] = runfile_name
+                env['MLC_ROCM_RUNFILE_NAME'] = runfile_name
+                env['MLC_ROCM_USE_RUNFILE'] = 'yes'
+            else:
+                return {'return': 1, 'error': f'Could not find ROCm runfile installer at {runfile_base_url}'}
+        except Exception as e:
+            return {'return': 1, 'error': f'Failed to fetch ROCm runfile listing from {runfile_base_url}: {e}'}
 
     return {'return': 0}
 
