@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-04-20 21:26:30*
+*Last updated: 2026-04-23 02:01:43*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -326,6 +326,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Compiler automation
 
+- **[get-amdclang](get-amdclang/)**
+  - Detect amdclang compiler from ROCm
+  - Tags: `compiler`, `get`, `amdclang`, `c-compiler`, `cpp-compiler`, `f-compiler`
 - **[get-aocc](get-aocc/)**
   - Detect or install AOCC compiler
   - Tags: `compiler`, `get`, `aocc`
@@ -920,6 +923,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-mlperf-training-nvidia-code](get-mlperf-training-nvidia-code/)**
   - get-mlperf-training-nvidia-code
   - Tags: `get`, `nvidia`, `mlperf`, `training`, `code`, `training-code`
+- **[get-mlperf-training-results-summary](get-mlperf-training-results-summary/)**
+  - get-mlperf-training-results-summary
+  - Tags: `get`, `mlperf`, `training`, `results`, `summary`, `summary-results`, `results-summary`
 - **[get-mlperf-training-src](get-mlperf-training-src/)**
   - get-mlperf-training-src
   - Tags: `get`, `src`, `source`, `training`, `training-src`, `training-source`, `mlperf`, `mlcommons`
@@ -1198,7 +1204,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 351
+- **Total Scripts**: 353
 - **Categories**: 33
 
 ## Usage

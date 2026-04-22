@@ -1,0 +1,50 @@
+alias: get-amdclang
+uid: fd0e87bcc1bc45cc
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+name: Detect amdclang compiler from ROCm
+category: Compiler automation
+tags:
+- compiler
+- get
+- amdclang
+- c-compiler
+- cpp-compiler
+- f-compiler
+
+# Cache
+cache: true
+clean_files: []
+
+# Environment
+new_env_keys:
+- MLC_AMDCLANG_*
+- MLC_C_COMPILER_*
+- MLC_CXX_COMPILER_*
+- MLC_FORTRAN_COMPILER_*
+- MLC_COMPILER_*
+- MLC_LINKER_*
+- +PATH
+
+# Dependencies
+deps:
+- tags: get,rocm
+
+post_deps:
+- tags: get,compiler-flags
+
+# Variations
+variations:
+  path.#:
+    env:
+      MLC_AMDCLANG_DIR_PATH: '#'
+
+# Output / debugging
+sort: 500
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list: []

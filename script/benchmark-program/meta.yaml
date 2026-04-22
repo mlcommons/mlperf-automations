@@ -17,6 +17,8 @@ default_env:
   MLC_ENABLE_PROFILING: '0'
 new_env_keys:
 - MLC_RUN_CMD
+input_mapping:
+  profile_system_info: MLC_PROFILE_SYSTEM_INFO
 
 # Dependencies
 deps:

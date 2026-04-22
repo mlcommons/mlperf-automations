@@ -1,9 +1,23 @@
 from mlc import utils
 import os
 import subprocess
+import shutil
 from os.path import exists
 import json
 from utils import *
+
+DOCKER_ENV_MARKER = "/.dockerenv"
+DOCKER_SOCKET_PATH = "/var/run/docker.sock"
+NESTED_DOCKER_ENV_KEY = "MLC_DOCKER_ENABLE_NESTED"
+
+
+def is_valid_docker_binary(path):
+    if not path:
+        return False
+    binary_name = os.path.basename(path).lower()
+    if binary_name not in ["docker", "docker.exe"]:
+        return False
+    return os.path.exists(path) and os.access(path, os.X_OK)
 
 
 def preprocess(i):
@@ -150,7 +164,6 @@ def postprocess(i):
     port_map_cmds = []
     run_opts = ''
 
-
     # not completed as su command breaks the execution sequence
     #
     # if env.get('MLC_DOCKER_PASS_USER_ID', '') != '':
@@ -167,6 +180,27 @@ def postprocess(i):
     if env.get('MLC_DOCKER_VOLUME_MOUNTS', []):
         for mounts in env['MLC_DOCKER_VOLUME_MOUNTS']:
             mount_cmds.append(mounts)
+
+    if is_true(env.get(NESTED_DOCKER_ENV_KEY, '')) and os.path.exists(
+            DOCKER_ENV_MARKER) and env.get('MLC_CONTAINER_TOOL') == "docker":
+        docker_socket = DOCKER_SOCKET_PATH
+        if os.path.exists(docker_socket):
+            docker_socket_mount = f"{docker_socket}:{docker_socket}"
+            if docker_socket_mount not in mount_cmds:
+                mount_cmds.append(docker_socket_mount)
+
+        docker_binary = ''
+        docker_binary_from_env = env.get('MLC_DOCKER_BIN_WITH_PATH', '')
+        if is_valid_docker_binary(docker_binary_from_env):
+            docker_binary = docker_binary_from_env
+        if not docker_binary:
+            docker_binary_which = shutil.which("docker")
+            if is_valid_docker_binary(docker_binary_which):
+                docker_binary = docker_binary_which
+        if docker_binary:
+            docker_bin_mount = f"{docker_binary}:{docker_binary}"
+            if docker_bin_mount not in mount_cmds:
+                mount_cmds.append(docker_bin_mount)
 
     if env.get('MLC_DOCKER_PASS_USER_GROUP',
                '') != '' and os_info['platform'] != 'windows':
