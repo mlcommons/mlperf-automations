@@ -343,7 +343,50 @@ def preprocess(i):
     f.write(EOL + '# Download MLC repo for scripts' + EOL)
     pat = env.get('MLC_GH_TOKEN', '')
 
-    if use_copy_repo:
+    if is_true(env.get('MLC_DOCKER_HOST_MLC_REPOS', '')):
+        # Copy all host MLC repos into the Docker image
+        host_repos_path = i['automation'].action_object.repos_path
+        if host_repos_path and os.path.isdir(host_repos_path):
+            build_context_dir = os.path.dirname(
+                env.get('MLC_DOCKERFILE_WITH_PATH',
+                        os.path.join(os.getcwd(), "Dockerfile")))
+            host_repos_context = os.path.join(build_context_dir, "mlc_host_repos")
+            if os.path.exists(host_repos_context):
+                shutil.rmtree(host_repos_context)
+            os.makedirs(host_repos_context, exist_ok=True)
+
+            copied_repos = []
+            for item in os.listdir(host_repos_path):
+                item_path = os.path.join(host_repos_path, item)
+                if not os.path.isdir(item_path):
+                    continue
+                # Skip local cache, index files, etc.
+                if item in ['local']:
+                    continue
+                dest = os.path.join(host_repos_context, item)
+                logger.info(f"Copying host repo {item} to build context")
+                shutil.copytree(item_path, dest)
+                copied_repos.append(item)
+
+            if copied_repos:
+                docker_repos_dest = "$HOME/MLC/repos"
+                for repo_name in copied_repos:
+                    relative_path = os.path.relpath(
+                        os.path.join(host_repos_context, repo_name),
+                        build_context_dir)
+                    f.write(
+                        f'COPY --chown={docker_user}:{docker_group} {relative_path} {docker_repos_dest}/{repo_name}' +
+                        EOL)
+                f.write(EOL + '# Register host MLC repositories' + EOL)
+                for repo_name in copied_repos:
+                    f.write(
+                        f'RUN mlc add repo {docker_repos_dest}/{repo_name} --quiet' +
+                        EOL)
+                f.write(EOL)
+        else:
+            logger.warning(f"MLC_DOCKER_HOST_MLC_REPOS_PATH not found: {host_repos_path}")
+
+    elif use_copy_repo:
         repo_name = os.path.basename(relative_repo_path)
         docker_repo_dest = f"$HOME/MLC/repos/{repo_name}"
         f.write(
