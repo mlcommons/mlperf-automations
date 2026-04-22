@@ -47,6 +47,7 @@ input_mapping:
   mlc_repo_flags: MLC_DOCKER_ADD_FLAG_TO_MLC_MLOPS_REPO
   mlc_repo_path: MLC_REPO_PATH
   mlc_repos: MLC_DOCKER_EXTRA_MLC_REPOS
+  host_mlc_repos: MLC_DOCKER_HOST_MLC_REPOS
   os: MLC_DOCKER_OS
   os_version: MLC_DOCKER_OS_VERSION
   package_manager_update_cmd: MLC_PACKAGE_MANAGER_UPDATE_CMD

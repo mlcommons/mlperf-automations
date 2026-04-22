@@ -45,7 +45,7 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd, run_state):
         if "${{ " + key + " }}:${{ " + key + " }}" not in mounts:
             mounts.append("${{ " + key + " }}:${{ " + key + " }}")
 
-    docker_input_mapping = docker_settings.get("input_mapping", {})
+    docker_input_mapping = docker_settings.get("input_mapping", run_state.get("input_mapping", {}))
     container_env_string = ""
 
     for index in range(len(mounts)):
