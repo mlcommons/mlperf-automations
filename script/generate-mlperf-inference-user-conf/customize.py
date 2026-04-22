@@ -23,7 +23,9 @@ def preprocess(i):
     submission_checker_dir = os.path.join(mlperf_path, "tools", "submission")
     # Remove any stale submission_checker.py that would shadow the
     # submission_checker package directory in newer inference versions
-    stale_checker = os.path.join(submission_checker_dir, "submission_checker.py")
+    stale_checker = os.path.join(
+        submission_checker_dir,
+        "submission_checker.py")
     if os.path.isfile(stale_checker) and os.path.isdir(
             os.path.join(submission_checker_dir, "submission_checker")):
         os.remove(stale_checker)
@@ -581,6 +583,32 @@ def measure_files_exist(OUTPUT_DIR, run_files):
     return True
 
 
+def _get_submission_checker_constants_module():
+    required_attrs = [
+        "REQUIRED_ACC_FILES",
+        "REQUIRED_PERF_FILES",
+        "REQUIRED_POWER_FILES",
+        "REQUIRED_PERF_POWER_FILES",
+        "REQUIRED_MEASURE_FILES",
+        "OFFLINE_MIN_SPQ_SINCE_V4",
+    ]
+
+    try:
+        import submission_checker.constants as constants
+        if all(hasattr(constants, attr) for attr in required_attrs):
+            return constants
+    except (ImportError, ModuleNotFoundError, AttributeError):
+        pass
+
+    import submission_checker as checker
+    if all(hasattr(checker, attr) for attr in required_attrs):
+        return checker
+
+    raise AttributeError(
+        "submission_checker module is missing required constants for file checks"
+    )
+
+
 def get_checker_files(env):
     if is_true(env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
         import submission_checker.constants as constants
@@ -591,7 +619,7 @@ def get_checker_files(env):
         REQUIRED_PERF_POWER_FILES = constants.REQUIRED_PERF_POWER_FILES
         REQUIRED_MEASURE_FILES = constants.REQUIRED_MEASURE_FILES
     else:
-        import submission_checker as checker
+        checker = _get_submission_checker_constants_module()
         REQUIRED_ACC_FILES = checker.REQUIRED_ACC_FILES
         REQUIRED_PERF_FILES = checker.REQUIRED_PERF_FILES
         REQUIRED_POWER_FILES = checker.REQUIRED_POWER_FILES
@@ -609,7 +637,7 @@ def get_required_min_queries_offline(model, version, env):
         import submission_checker.constants as constants
         REQUIRED_MIN_QUERIES = constants.OFFLINE_MIN_SPQ_SINCE_V4
     else:
-        import submission_checker as checker
+        checker = _get_submission_checker_constants_module()
         REQUIRED_MIN_QUERIES = checker.OFFLINE_MIN_SPQ_SINCE_V4
 
     mlperf_model = model

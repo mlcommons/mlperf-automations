@@ -54,9 +54,11 @@ def preprocess(i):
                 env['MLC_ROCM_RUNFILE_NAME'] = runfile_name
                 env['MLC_ROCM_USE_RUNFILE'] = 'yes'
             else:
-                return {'return': 1, 'error': f'Could not find ROCm runfile installer at {runfile_base_url}'}
+                return {
+                    'return': 1, 'error': f'Could not find ROCm runfile installer at {runfile_base_url}'}
         except Exception as e:
-            return {'return': 1, 'error': f'Failed to fetch ROCm runfile listing from {runfile_base_url}: {e}'}
+            return {
+                'return': 1, 'error': f'Failed to fetch ROCm runfile listing from {runfile_base_url}: {e}'}
 
     return {'return': 0}
 
@@ -73,12 +75,14 @@ def postprocess(i):
     # Custom prefix: ROCm installs to <prefix>/opt/rocm-<version>
     prefix_opt = os.path.join(install_prefix, 'opt')
     if os.path.isdir(prefix_opt):
-        for p in [os.path.join(prefix_opt, 'rocm', 'bin')] + sorted(glob.glob(os.path.join(prefix_opt, 'rocm-*', 'bin')), reverse=True):
+        for p in [os.path.join(prefix_opt, 'rocm', 'bin')] + sorted(
+                glob.glob(os.path.join(prefix_opt, 'rocm-*', 'bin')), reverse=True):
             if os.path.isdir(p):
                 search_dirs.append(p)
 
     # Standard paths as fallback
-    for p in ["/opt/rocm/bin"] + sorted(glob.glob("/opt/rocm-*/bin"), reverse=True):
+    for p in ["/opt/rocm/bin"] + \
+            sorted(glob.glob("/opt/rocm-*/bin"), reverse=True):
         if os.path.isdir(p) and p not in search_dirs:
             search_dirs.append(p)
 
