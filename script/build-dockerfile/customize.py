@@ -350,7 +350,8 @@ def preprocess(i):
             build_context_dir = os.path.dirname(
                 env.get('MLC_DOCKERFILE_WITH_PATH',
                         os.path.join(os.getcwd(), "Dockerfile")))
-            host_repos_context = os.path.join(build_context_dir, "mlc_host_repos")
+            host_repos_context = os.path.join(
+                build_context_dir, "mlc_host_repos")
             if os.path.exists(host_repos_context):
                 shutil.rmtree(host_repos_context)
             os.makedirs(host_repos_context, exist_ok=True)
@@ -384,7 +385,8 @@ def preprocess(i):
                         EOL)
                 f.write(EOL)
         else:
-            logger.warning(f"MLC_DOCKER_HOST_MLC_REPOS_PATH not found: {host_repos_path}")
+            logger.warning(
+                f"MLC_DOCKER_HOST_MLC_REPOS_PATH not found: {host_repos_path}")
 
     elif use_copy_repo:
         repo_name = os.path.basename(relative_repo_path)

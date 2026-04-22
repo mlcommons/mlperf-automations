@@ -2658,7 +2658,7 @@ class ScriptAutomation(Automation):
 
         script_tags = i.get('script_tags', [])
         variation_tags = i.get('variation_tags', [])
-        
+
         if not script_tags and tags_string:
             r = get_variation_and_script_tags(tags_string.strip())
             script_tags = r['script_tags']
@@ -3427,18 +3427,23 @@ class ScriptAutomation(Automation):
                         dep_script_id = new_run_state.get('script_id', '')
                         dep_script_uid = ''
                         if dep_script_id:
-                            dep_script_uid = dep_script_id.split(',')[-1].strip()
+                            dep_script_uid = dep_script_id.split(
+                                ',')[-1].strip()
                         dep_version = ''
 
-                        dep_version_info = new_run_state.get('version_info', [])
+                        dep_version_info = new_run_state.get(
+                            'version_info', [])
                         if dep_script_uid and dep_version_info:
                             for dep_info in reversed(dep_version_info):
-                                if not isinstance(dep_info, dict) or not dep_info:
+                                if not isinstance(
+                                        dep_info, dict) or not dep_info:
                                     continue
                                 dep_key = next(iter(dep_info))
                                 dep_data = dep_info.get(dep_key, {})
-                                if dep_data.get('script_uid', '') == dep_script_uid:
-                                    dep_version = str(dep_data.get('version', '')).strip()
+                                if dep_data.get('script_uid',
+                                                '') == dep_script_uid:
+                                    dep_version = str(
+                                        dep_data.get('version', '')).strip()
                                     break
 
                         if not dep_version:
@@ -3454,7 +3459,8 @@ class ScriptAutomation(Automation):
                                 return {'return': 1, 'error': 'version_persistent conflict for dependency "{}" (tags: {}): expected version "{}" but got "{}"'.format(
                                     dep_script_id, d.get('tags', ''), existing_dep_version, dep_version)}
 
-                            version_persistent.setdefault(dep_script_id, dep_version)
+                            version_persistent.setdefault(
+                                dep_script_id, dep_version)
 
                     run_state['version_info'] = new_run_state.get(
                         'version_info')
@@ -4516,8 +4522,8 @@ pip install mlcflow
         from script.docker import docker_run
         return docker_run(self, i)
 
-
     ############################################################
+
     def apptainerfile(self, i):
         from script.apptainer import apptainerfile
         return apptainerfile(self, i)
@@ -4527,6 +4533,7 @@ pip install mlcflow
         from script.apptainer import apptainer_run
         return apptainer_run(self, i)
     ############################################################
+
     def experiment(self, i):
         from script.experiment import experiment_run
         return experiment_run(self, i)
@@ -5962,7 +5969,6 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
     if folder_path_env_keys:
         run_state['folder_path_env_keys'] += folder_path_env_keys
 
-    
     return {'return': 0}
 
 ##############################################################################
