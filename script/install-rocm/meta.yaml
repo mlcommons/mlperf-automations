@@ -25,5 +25,15 @@ deps:
 - tags: detect,os
 
 # Versions
-default_version: 5.7.1
-versions: {}
+default_version: 7.2.2
+versions:
+  '7.2.2': {}
+  '7.2.1': {}
+  '6.2.0': {}
+  '6.1.0': {}
+  '5.7.1': {}
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list: []

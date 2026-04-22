@@ -1,5 +1,6 @@
 from mlc import utils
 import os
+import glob
 
 
 def preprocess(i):
@@ -12,7 +13,21 @@ def preprocess(i):
 
     file_name = 'rocminfo.exe' if os_info['platform'] == 'windows' else 'rocminfo'
     env['FILE_NAME'] = file_name
-    env['MLC_TMP_PATH'] = "/opt/rocm/bin"
+
+    # Build search paths: check /opt/rocm/bin and any versioned /opt/rocm-*/bin
+    rocm_paths = []
+    if os.path.isdir("/opt/rocm/bin"):
+        rocm_paths.append("/opt/rocm/bin")
+    for p in sorted(glob.glob("/opt/rocm-*/bin"), reverse=True):
+        if os.path.isdir(p):
+            rocm_paths.append(p)
+
+    if rocm_paths:
+        env['MLC_TMP_PATH'] = os.pathsep.join(rocm_paths)
+    else:
+        # No ROCm found, skip search and trigger install
+        env['MLC_REQUIRE_INSTALL'] = "yes"
+        return {'return': 0}
 
     if 'MLC_ROMLC_BIN_WITH_PATH' not in env:
         r = i['automation'].find_artifact({'file_name': file_name,
