@@ -156,6 +156,81 @@ jobs:
 
         print("\nAll process_mounts tests passed!")
         PYTEST
+    - name: Test nested Docker opt-in mount handling
+      shell: bash
+      run: |
+        python - <<'PY'
+        import importlib.util
+        import sys
+        from types import SimpleNamespace
+        from unittest.mock import patch
+
+        sys.path.insert(0, 'automation')
+
+        spec = importlib.util.spec_from_file_location(
+            'run_docker_customize',
+            'script/run-docker-container/customize.py'
+        )
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+
+        logger_messages = []
+        logger = SimpleNamespace(
+            info=lambda *args, **kwargs: logger_messages.append(('info', args)),
+            error=lambda *args, **kwargs: logger_messages.append(('error', args))
+        )
+        DOCKER_ENV_MARKER = '/.dockerenv'
+        DOCKER_SOCKET = '/var/run/docker.sock'
+        DOCKER_BIN = '/usr/bin/docker'
+
+        def run_case(enable_nested, docker_exit_code=0):
+            captured = {'cmd': ''}
+
+            def fake_system(cmd):
+                captured['cmd'] = cmd
+                return docker_exit_code
+
+            def fake_exists(path):
+                if path in [DOCKER_ENV_MARKER, DOCKER_SOCKET, DOCKER_BIN]:
+                    return True
+                return False
+
+            env = {
+                'MLC_CONTAINER_TOOL': 'docker',
+                'MLC_DOCKER_RUN_SCRIPT_TAGS': 'run,docker,container',
+                'MLC_DOCKER_RUN_CMD': 'echo nested-docker-ci-check',
+                'MLC_DOCKER_ENABLE_NESTED': 'yes' if enable_nested else 'no'
+            }
+            i = {
+                'os_info': {'platform': 'linux'},
+                'env': env,
+                'automation': SimpleNamespace(logger=logger)
+            }
+
+            with patch.object(mod.os.path, 'exists', side_effect=fake_exists), \
+                    patch.object(mod.os, 'system', side_effect=fake_system), \
+                    patch.object(mod.shutil, 'which', return_value=DOCKER_BIN):
+                result = mod.postprocess(i)
+
+            return result, captured['cmd']
+
+        enabled_result, enabled_cmd = run_case(True, docker_exit_code=0)
+        disabled_result, disabled_cmd = run_case(False, docker_exit_code=0)
+        failed_result, _ = run_case(True, docker_exit_code=1)
+
+        assert enabled_result['return'] == 0, enabled_result
+        assert disabled_result['return'] == 0, disabled_result
+        error_msg = failed_result.get('error', '').lower()
+        assert failed_result['return'] == 1, failed_result
+        assert 'docker' in error_msg, failed_result
+        assert 'failed' in error_msg, failed_result
+
+        assert f'{DOCKER_SOCKET}:{DOCKER_SOCKET}' in enabled_cmd, enabled_cmd
+        assert f'{DOCKER_BIN}:{DOCKER_BIN}' in enabled_cmd, enabled_cmd
+        assert f'{DOCKER_SOCKET}:{DOCKER_SOCKET}' not in disabled_cmd, disabled_cmd
+        assert f'{DOCKER_BIN}:{DOCKER_BIN}' not in disabled_cmd, disabled_cmd
+        print('Nested Docker opt-in mount handling test passed')
+        PY
 
   test_experiment:
     runs-on: ${{ matrix.os }}

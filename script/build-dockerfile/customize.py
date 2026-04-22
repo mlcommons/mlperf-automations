@@ -470,10 +470,17 @@ def preprocess(i):
                 env['MLC_DOCKER_RUN_CMD']
 
     logger.info(env['MLC_DOCKER_RUN_CMD'])
+    split_mlc_run_cmd = is_true(env.get('MLC_DOCKER_SPLIT_MLC_RUN_CMD', ''))
+    if split_mlc_run_cmd and is_false(env.get('MLC_DOCKER_CACHE', "True")):
+        logger.warning(
+            "Ignoring docker_split_mlc_run_cmd since docker cache is disabled.")
+        split_mlc_run_cmd = False
+
     fake_run = env.get("MLC_DOCKER_FAKE_RUN_OPTION",
                        " --fake_run") + dockerfile_env_input_string
+    enable_fake_deps = env.get('MLC_DOCKER_FAKE_DEPS')
     fake_run = fake_run + \
-        " --fake_deps" if env.get('MLC_DOCKER_FAKE_DEPS') else fake_run
+        " --fake_deps" if enable_fake_deps else fake_run
 
     x = 'RUN ' + _run_secret_prefix + env['MLC_DOCKER_RUN_CMD']
 
@@ -484,8 +491,9 @@ def preprocess(i):
         if run_cmd_extra != '':
             x += ' ' + run_cmd_extra
 
-    if env.get('MLC_DOCKER_RUN_SCRIPT_TAGS', '') != '' and is_true(env.get(
-            'MLC_DOCKER_ADD_DEPENDENT_SCRIPTS_RUN_COMMANDS', '')):
+    if env.get('MLC_DOCKER_RUN_SCRIPT_TAGS', '') != '' and (
+            split_mlc_run_cmd or is_true(
+                env.get('MLC_DOCKER_ADD_DEPENDENT_SCRIPTS_RUN_COMMANDS', ''))):
         mlc_input = {'action': 'run',
                      'automation': 'script',
                      'tags': f"""{env['MLC_DOCKER_RUN_SCRIPT_TAGS']}""",
@@ -495,11 +503,11 @@ def preprocess(i):
                      'fake_run': True,
                      'fake_deps': True
                      }
-        r = self_module.mlc.access(mlc_input)
+        r = automation.action_object.access(mlc_input)
         if r['return'] > 0:
             return r
         print_deps = r['new_state']['print_deps']
-        fake_run_str = " --fake_run" if env.get('MLC_DOCKER_FAKE_DEPS') else ""
+        fake_run_str = " --fake_run" if enable_fake_deps else ""
         cmds = ["RUN " + dep for dep in print_deps]
         for cmd in cmds:
             f.write(cmd + fake_run_str + EOL)

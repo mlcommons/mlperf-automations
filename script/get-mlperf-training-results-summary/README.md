@@ -1,4 +1,4 @@
-# README for build-dockerfile
+# README for get-mlperf-training-results-summary
 This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,50 +33,17 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr build,dockerfile
+mlcr get,mlperf,training,results,summary,summary-results,results-summary
 ```
 
 ### Script Inputs
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
-| `--base_image` |  |  | `` |
-| `--build` |  |  | `` |
-| `--cache` |  |  | `` |
-| `--comments` |  |  | `` |
-| `--copy_files` |  |  | `` |
-| `--docker_base_image` | Alias for base_image |  | `` |
-| `--docker_not_pull_update` |  |  | `False` |
-| `--docker_os` |  |  | `ubuntu` |
-| `--docker_os_version` |  |  | `` |
-| `--extra_sys_deps` |  |  | `` |
-| `--fake_docker_deps` |  |  | `` |
-| `--fake_run_option` |  |  | `` |
-| `--file_path` |  |  | `` |
-| `--gh_token` |  |  | `` |
-| `--image_repo` |  |  | `` |
-| `--image_tag` |  |  | `` |
-| `--mlc_repo` |  |  | `` |
-| `--mlc_repo_branch` |  |  | `dev` |
-| `--mlc_repo_flags` |  |  | `` |
-| `--mlc_repo_path` |  |  | `` |
-| `--mlc_repos` |  |  | `` |
-| `--os` | Alias for docker_os |  | `` |
-| `--os_version` | Alias for docker_os_version |  | `` |
-| `--package_manager_update_cmd` |  |  | `` |
-| `--pip_extra_flags` |  |  | `` |
-| `--post_file` |  |  | `` |
-| `--post_run_cmds` |  |  | `` |
-| `--pre_run_cmds` |  |  | `` |
-| `--push_image` |  |  | `` |
-| `--upload` | Alias for push_image |  | `` |
-| `--real_run` |  |  | `` |
-| `--run_cmd` |  |  | `` |
-| `--run_cmd_extra` |  |  | `` |
-| `--script_tags` |  |  | `` |
-| `--split_mlc_run_cmd` |  |  | `` |
-| `--skip_mlc_sys_upgrade` |  |  | `` |
-| `--user` |  |  | `` |
+| `--repo` |  |  | `https://github.com/mlcommons/training_results_v4.1` |
+| `--repo_branch` |  |  | `main` |
+| `--ruleset` |  |  | `4.1.0` |
+| `--summary_file` |  |  | `summary_results.json` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -98,7 +65,3 @@ mlcr build,dockerfile
 | `--hf_token` | Huggingface Token |  | `` |
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
-
-### Ungrouped
-
-- `slim`
