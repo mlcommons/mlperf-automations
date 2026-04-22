@@ -585,15 +585,20 @@ def _get_submission_checker_constants_module():
         "OFFLINE_MIN_SPQ_SINCE_V4",
     ]
 
+    try:
+        import submission_checker.constants as constants
+        if all(hasattr(constants, attr) for attr in required_attrs):
+            return constants
+    except (ImportError, ModuleNotFoundError, AttributeError):
+        pass
+
     import submission_checker as checker
     if all(hasattr(checker, attr) for attr in required_attrs):
         return checker
 
-    try:
-        import submission_checker.constants as constants
-        return constants
-    except Exception:
-        return checker
+    raise AttributeError(
+        "submission_checker module is missing required constants for file checks"
+    )
 
 
 def get_checker_files(env):
