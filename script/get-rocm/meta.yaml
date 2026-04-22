@@ -26,3 +26,8 @@ prehook_deps:
     - 'yes'
   reuse_version: true
   tags: install,rocm
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list: []
