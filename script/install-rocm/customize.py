@@ -40,21 +40,32 @@ def preprocess(i):
         env['MLC_ROCM_INSTALL_PREFIX'] = build_install_prefix
 
         targets = 'AMDGPU;X86'
-        projects = 'clang;lld;compiler-rt;clang-tools-extra'
-        runtimes = 'libcxx;libcxxabi;openmp'
+        projects = 'clang;lld;clang-tools-extra'
 
         q = "'"
+
+        # Runtimes: libc++ and openmp if requested
+        if env.get('MLC_ROCM_SRC_WITH_RUNTIMES', '') == 'yes':
+            runtimes = 'libcxx;libcxxabi;openmp'
+            runtime_flags = (
+                f' -DLLVM_ENABLE_RUNTIMES={q}{runtimes}{q}'
+                f' -DLLVM_DEFAULT_TARGET_TRIPLE=x86_64-unknown-linux-gnu'
+                f' -DLIBCXXABI_USE_LLVM_UNWINDER=OFF'
+            )
+        else:
+            runtime_flags = f' -DLLVM_ENABLE_RUNTIMES={q}{q}'
+
         cmake_cmd = (
             f'cmake {os.path.join(src_path, "llvm")} -GNinja'
             f' -DCMAKE_BUILD_TYPE=Release'
             f' -DCMAKE_INSTALL_PREFIX={build_install_prefix}'
             f' -DLLVM_ENABLE_PROJECTS={q}{projects}{q}'
-            f' -DLLVM_ENABLE_RUNTIMES={q}{runtimes}{q}'
             f' -DLLVM_TARGETS_TO_BUILD={q}{targets}{q}'
             f' -DLLVM_ENABLE_RTTI=ON'
             f' -DLLVM_INSTALL_UTILS=ON'
             f' -DLLVM_ENABLE_ASSERTIONS=OFF'
             f' -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF'
+            + runtime_flags
         )
         env['MLC_ROCM_CMAKE_CMD'] = cmake_cmd
         i['run_script_input']['script_name'] = 'run-src'

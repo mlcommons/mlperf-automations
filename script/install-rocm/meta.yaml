@@ -55,6 +55,15 @@ variations:
         - MLC_GIT_CHECKOUT_TAG
         _repo.:
         - MLC_GIT_URL
+  with-runtimes:
+    default: true
+    group: runtimes
+    env:
+      MLC_ROCM_SRC_WITH_RUNTIMES: 'yes'
+  no-runtimes:
+    group: runtimes
+    env:
+      MLC_ROCM_SRC_WITH_RUNTIMES: 'no'
 default_version: 7.2.2
 versions:
   7.2.2: {}
