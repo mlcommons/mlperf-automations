@@ -32,7 +32,9 @@ if [[ ${major_version} -ge 7 ]]; then
   if [[ "${install_prefix}" == "/" ]]; then
     sudo bash "${runfile_path}" deps=install target="/" rocm postrocm
   else
-    bash "${runfile_path}" deps=skip target="${install_prefix}" rocm postrocm
+    # Use untar for non-root installs (no sudo required)
+    # Creates ${install_prefix}/rocm-${MLC_VERSION}/ with all ROCm components
+    bash "${runfile_path}" untar "${install_prefix}"
   fi
   test $? -eq 0 || exit 1
 

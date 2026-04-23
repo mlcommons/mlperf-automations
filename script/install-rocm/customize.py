@@ -43,13 +43,14 @@ def preprocess(i):
         projects = 'clang;lld;compiler-rt;clang-tools-extra'
         runtimes = 'libcxx;libcxxabi;openmp'
 
+        q = "'"
         cmake_cmd = (
             f'cmake {os.path.join(src_path, "llvm")} -GNinja'
             f' -DCMAKE_BUILD_TYPE=Release'
             f' -DCMAKE_INSTALL_PREFIX={build_install_prefix}'
-            f' -DLLVM_ENABLE_PROJECTS=\"{projects}\"'
-            f' -DLLVM_ENABLE_RUNTIMES=\"{runtimes}\"'
-            f' -DLLVM_TARGETS_TO_BUILD={targets}'
+            f' -DLLVM_ENABLE_PROJECTS={q}{projects}{q}'
+            f' -DLLVM_ENABLE_RUNTIMES={q}{runtimes}{q}'
+            f' -DLLVM_TARGETS_TO_BUILD={q}{targets}{q}'
             f' -DLLVM_ENABLE_RTTI=ON'
             f' -DLLVM_INSTALL_UTILS=ON'
             f' -DLLVM_ENABLE_ASSERTIONS=OFF'
@@ -132,11 +133,16 @@ def postprocess(i):
 
     search_dirs = []
     for prefix in search_prefixes:
+        # Standard package installs: /opt/rocm/bin, /opt/rocm-*/bin
         prefix_opt = os.path.join(prefix, 'opt')
         if os.path.isdir(prefix_opt):
             for p in [os.path.join(prefix_opt, 'rocm', 'bin')] + sorted(glob.glob(os.path.join(prefix_opt, 'rocm-*', 'bin')), reverse=True):
                 if os.path.isdir(p) and p not in search_dirs:
                     search_dirs.append(p)
+        # Untar installs: <prefix>/rocm-*/bin (no opt/ subdirectory)
+        for p in sorted(glob.glob(os.path.join(prefix, 'rocm-*', 'bin')), reverse=True):
+            if os.path.isdir(p) and p not in search_dirs:
+                search_dirs.append(p)
 
     print(f"  install_prefix = {install_prefix}")
     print(f"  cur_dir = {cur_dir}")
