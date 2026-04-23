@@ -44,6 +44,12 @@ prehook_deps:
   - MLC_DOWNLOAD_URL
   - MLC_DOWNLOAD_FILENAME
 
+# Variations
+variations:
+  compiler-only:
+    env:
+      MLC_ROCM_COMPILER_ONLY: 'yes'
+
 # Versions
 default_version: 7.2.2
 versions:

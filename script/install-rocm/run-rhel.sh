@@ -17,11 +17,19 @@ if [[ ${major_version} -ge 7 ]]; then
 
   # Install ROCm via runfile
   install_prefix="${MLC_ROCM_INSTALL_PREFIX:-/}"
-  echo "Installing ROCm ${MLC_VERSION} via runfile to target=${install_prefix} ..."
-  if [[ "${install_prefix}" == "/" ]]; then
-    sudo bash "${runfile_path}" deps=install target="/" rocm postrocm
+
+  # Determine install args based on compiler-only flag
+  if [[ "${MLC_ROCM_COMPILER_ONLY}" == "yes" ]]; then
+    rocm_install_args="rocm packages=rocm-llvm,rocm-llvm-dev,rocm-core,rocm-device-libs,rocminfo,comgr,openmp-extras-dev,openmp-extras-runtime,rocm-cmake"
   else
-    bash "${runfile_path}" deps=install target="${install_prefix}" rocm postrocm
+    rocm_install_args="rocm"
+  fi
+
+  echo "Installing ROCm ${MLC_VERSION} via runfile to target=${install_prefix} (args: ${rocm_install_args}) ..."
+  if [[ "${install_prefix}" == "/" ]]; then
+    sudo bash "${runfile_path}" deps=install target="/" ${rocm_install_args} postrocm
+  else
+    bash "${runfile_path}" deps=install target="${install_prefix}" ${rocm_install_args} postrocm
   fi
   test $? -eq 0 || exit 1
 
@@ -52,6 +60,10 @@ gpgkey=https://repo.radeon.com/rocm/rocm.gpg.key
 
   sudo yum install -y amdgpu-dkms
 
-  sudo yum install -y rocm-hip-libraries
+  if [[ "${MLC_ROCM_COMPILER_ONLY}" == "yes" ]]; then
+    sudo yum install -y rocm-llvm rocm-device-libs rocminfo
+  else
+    sudo yum install -y rocm-hip-libraries
+  fi
   test $? -eq 0 || exit 1
 fi
