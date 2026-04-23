@@ -11,7 +11,11 @@ def preprocess(i):
 
     recursion_spaces = i['recursion_spaces']
 
-    file_name = 'rocminfo.exe' if os_info['platform'] == 'windows' else 'rocminfo'
+    # Source build: search for clang instead of rocminfo
+    if env.get('MLC_ROCM_BUILD_FROM_SRC', '') == 'yes':
+        file_name = 'clang'
+    else:
+        file_name = 'rocminfo.exe' if os_info['platform'] == 'windows' else 'rocminfo'
     env['FILE_NAME'] = file_name
 
     # Build search paths: check /opt paths first, then custom install prefix
@@ -30,6 +34,10 @@ def preprocess(i):
         for p in [os.path.join(prefix_opt, 'rocm', 'bin')] + sorted(glob.glob(os.path.join(prefix_opt, 'rocm-*', 'bin')), reverse=True):
             if os.path.exists(p) and p not in rocm_paths:
                 rocm_paths.append(p)
+        # Source build: also check <prefix>/bin directly
+        prefix_bin = os.path.join(install_prefix, 'bin')
+        if os.path.exists(prefix_bin) and prefix_bin not in rocm_paths:
+            rocm_paths.append(prefix_bin)
 
     if rocm_paths:
         env['MLC_TMP_PATH'] = os.pathsep.join(rocm_paths)
