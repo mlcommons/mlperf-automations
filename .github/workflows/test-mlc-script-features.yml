@@ -349,6 +349,43 @@ jobs:
         chmod +x "$REPO_SCRIPT_DIR/test-posthookdep-failure/run.sh"
         printf '@echo off\necho Main script runs\n' > "$REPO_SCRIPT_DIR/test-posthookdep-failure/run.bat"
 
+        # Child script used for version_persistent conflict test
+        mkdir -p "$REPO_SCRIPT_DIR/test-version-persistent-child"
+        cat > "$REPO_SCRIPT_DIR/test-version-persistent-child/meta.yaml" << 'EOF'
+        alias: test-version-persistent-child
+        automation_alias: script
+        automation_uid: 5b4e0237da074764
+        tags:
+        - test
+        - version-persistent-child
+        uid: aaaa5555bbbb6666
+        EOF
+        printf '#!/bin/bash\necho "Version persistent child"\n' > "$REPO_SCRIPT_DIR/test-version-persistent-child/run.sh"
+        chmod +x "$REPO_SCRIPT_DIR/test-version-persistent-child/run.sh"
+        printf '@echo off\necho Version persistent child\n' > "$REPO_SCRIPT_DIR/test-version-persistent-child/run.bat"
+
+        # Parent script that calls the same dependency script with conflicting versions
+        mkdir -p "$REPO_SCRIPT_DIR/test-version-persistent-conflict"
+        cat > "$REPO_SCRIPT_DIR/test-version-persistent-conflict/meta.yaml" << 'EOF'
+        alias: test-version-persistent-conflict
+        automation_alias: script
+        automation_uid: 5b4e0237da074764
+        deps:
+        - tags: test,version-persistent-child
+          version: "1.0"
+          version_persistent: true
+        - tags: test,version-persistent-child
+          version: "2.0"
+          version_persistent: true
+        tags:
+        - test
+        - version-persistent-conflict
+        uid: aaaa6666bbbb7777
+        EOF
+        printf '#!/bin/bash\necho "This should not run due to dependency conflict"\n' > "$REPO_SCRIPT_DIR/test-version-persistent-conflict/run.sh"
+        chmod +x "$REPO_SCRIPT_DIR/test-version-persistent-conflict/run.sh"
+        printf '@echo off\necho This should not run due to dependency conflict\n' > "$REPO_SCRIPT_DIR/test-version-persistent-conflict/run.bat"
+
     - name: Test dep script search failure
       shell: bash
       run: |
@@ -387,6 +424,17 @@ jobs:
           exit 1
         else
           echo "PASS: posthook_dep search failure correctly caused an error"
+        fi
+
+    - name: Test version_persistent conflict
+      shell: bash
+      run: |
+        OUTPUT=$(mlcr test,version-persistent-conflict --quiet 2>&1 || true)
+        if echo "$OUTPUT" | grep -qi "version_persistent conflict"; then
+          echo "PASS: version_persistent conflict correctly caused an error"
+        else
+          echo "ERROR: Expected version_persistent conflict but got: $OUTPUT"
+          exit 1
         fi
 
   test_script_options:
