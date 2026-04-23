@@ -111,10 +111,9 @@ def preprocess(i):
     if '+ LDCXXFLAGS' not in env:
         env['+ LDCXXFLAGS'] = []
 
-    env['+ LDCXXFLAGS'] += [
-        "-lmlperf_loadgen",
-        "-lpthread"
-    ]
+    env['+ LDCXXFLAGS'].append("-lmlperf_loadgen")
+    if os_info['platform'] != 'darwin':
+        env['+ LDCXXFLAGS'].append("-lpthread")
 
     # For PyTorch, link against torch, torch_cpu, and c10
     if env.get('MLC_MLPERF_BACKEND', '') == 'pytorch':
