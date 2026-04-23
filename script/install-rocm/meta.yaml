@@ -33,6 +33,8 @@ deps:
 # Prehook dependencies
 prehook_deps:
 - tags: download,file
+  extra_cache_tags: rocm,installer,runfile
+  force_cache: true
   enable_if_env:
     MLC_ROCM_USE_RUNFILE:
     - 'yes'

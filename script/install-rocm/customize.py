@@ -66,30 +66,44 @@ def postprocess(i):
     env = i['env']
 
     install_prefix = env.get('MLC_ROCM_INSTALL_PREFIX', '/')
+    cur_dir = os.getcwd()
 
-    # Check install prefix paths first, then standard /opt paths
+    # Build search paths from multiple sources
+    search_prefixes = set()
+    search_prefixes.add(install_prefix)
+    search_prefixes.add(cur_dir)  # MLC cache dir where script ran
+    search_prefixes.add('/')      # standard /opt/rocm
+
     search_dirs = []
+    for prefix in search_prefixes:
+        prefix_opt = os.path.join(prefix, 'opt')
+        if os.path.isdir(prefix_opt):
+            for p in [os.path.join(prefix_opt, 'rocm', 'bin')] + sorted(glob.glob(os.path.join(prefix_opt, 'rocm-*', 'bin')), reverse=True):
+                if os.path.isdir(p) and p not in search_dirs:
+                    search_dirs.append(p)
 
-    # Custom prefix: ROCm installs to <prefix>/opt/rocm-<version>
-    prefix_opt = os.path.join(install_prefix, 'opt')
-    if os.path.isdir(prefix_opt):
-        for p in [os.path.join(prefix_opt, 'rocm', 'bin')] + sorted(glob.glob(os.path.join(prefix_opt, 'rocm-*', 'bin')), reverse=True):
-            if os.path.isdir(p):
-                search_dirs.append(p)
-
-    # Standard paths as fallback
-    for p in ["/opt/rocm/bin"] + sorted(glob.glob("/opt/rocm-*/bin"), reverse=True):
-        if os.path.isdir(p) and p not in search_dirs:
-            search_dirs.append(p)
+    print(f"  install_prefix = {install_prefix}")
+    print(f"  cur_dir = {cur_dir}")
+    print(f"  Searching for rocminfo in: {search_dirs}")
 
     installed_path = ""
     for candidate in search_dirs:
-        if os.path.isfile(os.path.join(candidate, "rocminfo")):
+        rocminfo_path = os.path.join(candidate, "rocminfo")
+        if os.path.isfile(rocminfo_path):
             installed_path = candidate
+            print(f"  Found rocminfo at: {rocminfo_path}")
             break
 
     if not installed_path:
-        return {'return': 1, 'error': 'ROCm installation not found after install'}
+        # Last resort: find rocminfo anywhere under current dir
+        for p in sorted(glob.glob(os.path.join(cur_dir, '**', 'rocminfo'), recursive=True)):
+            if os.path.isfile(p):
+                installed_path = os.path.dirname(p)
+                print(f"  Found rocminfo via recursive search at: {p}")
+                break
+
+    if not installed_path:
+        return {'return': 1, 'error': f'ROCm installation not found after install. Searched: {search_dirs}. Also searched recursively under {cur_dir}'}
 
     env['MLC_ROMLC_INSTALLED_PATH'] = installed_path
     env['MLC_ROMLC_BIN_WITH_PATH'] = os.path.join(installed_path, "rocminfo")
