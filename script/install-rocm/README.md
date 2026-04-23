@@ -36,7 +36,11 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 mlcr install,rocm,install-rocm
 ```
 
-No script specific inputs
+### Script Inputs
+
+| Name | Description | Choices | Default |
+|------|-------------|---------|------|
+| `--rocm_install_prefix` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
