@@ -65,7 +65,7 @@ def detect_version(i):
     env = i['env']
     logger = i['automation'].logger
 
-    r = i['automation'].parse_version({'match_text': r'AMD clang version\s+([\d.]+)',
+    r = i['automation'].parse_version({'match_text': r'(?:AMD )?clang version\s+([\d.]+)',
                                        'group_number': 1,
                                        'env_key': 'MLC_AMDCLANG_VERSION',
                                        'which_env': env})
