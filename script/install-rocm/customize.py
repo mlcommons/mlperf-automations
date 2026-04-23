@@ -29,8 +29,37 @@ def preprocess(i):
 
     env['MLC_ROCM_INSTALL_PREFIX'] = install_prefix
 
-    # For ROCm 7+, resolve the runfile download URL
     version = env.get('MLC_VERSION', '')
+
+    # Source build: set up git tag and cmake command, skip runfile logic
+    if env.get('MLC_ROCM_BUILD_FROM_SRC', '') == 'yes':
+        env['MLC_GIT_CHECKOUT_TAG'] = f'rocm-{version}'
+
+        src_path = env.get('MLC_ROCM_LLVM_SRC_PATH', '')
+        build_install_prefix = os.path.join(os.getcwd(), 'install')
+        env['MLC_ROCM_INSTALL_PREFIX'] = build_install_prefix
+
+        targets = 'AMDGPU;X86'
+        projects = 'clang;lld;compiler-rt;clang-tools-extra'
+        runtimes = 'libcxx;libcxxabi;openmp'
+
+        cmake_cmd = (
+            f'cmake {os.path.join(src_path, "llvm")} -GNinja'
+            f' -DCMAKE_BUILD_TYPE=Release'
+            f' -DCMAKE_INSTALL_PREFIX={build_install_prefix}'
+            f' -DLLVM_ENABLE_PROJECTS=\"{projects}\"'
+            f' -DLLVM_ENABLE_RUNTIMES=\"{runtimes}\"'
+            f' -DLLVM_TARGETS_TO_BUILD={targets}'
+            f' -DLLVM_ENABLE_RTTI=ON'
+            f' -DLLVM_INSTALL_UTILS=ON'
+            f' -DLLVM_ENABLE_ASSERTIONS=OFF'
+            f' -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF'
+        )
+        env['MLC_ROCM_CMAKE_CMD'] = cmake_cmd
+        i['run_script_input']['script_name'] = 'run-src'
+        return {'return': 0}
+
+    # For ROCm 7+, resolve the runfile download URL
     major_version = int(version.split('.')[0]) if version else 0
 
     if major_version >= 7:
@@ -64,6 +93,33 @@ def preprocess(i):
 def postprocess(i):
 
     env = i['env']
+
+    # Source build: look for clang in install dir, create amdclang symlinks
+    if env.get('MLC_ROCM_BUILD_FROM_SRC', '') == 'yes':
+        install_dir = env.get('MLC_ROCM_INSTALL_PREFIX', os.path.join(os.getcwd(), 'install'))
+        bin_dir = os.path.join(install_dir, 'bin')
+
+        clang_path = os.path.join(bin_dir, 'clang')
+        if not os.path.isfile(clang_path):
+            return {'return': 1, 'error': f'ROCm LLVM build failed: clang not found at {clang_path}'}
+
+        # Create amdclang symlinks
+        symlinks = {
+            'amdclang': 'clang',
+            'amdclang++': 'clang++',
+            'amdflang': 'flang-new',
+        }
+        for link_name, target in symlinks.items():
+            link_path = os.path.join(bin_dir, link_name)
+            target_path = os.path.join(bin_dir, target)
+            if os.path.isfile(target_path) and not os.path.exists(link_path):
+                os.symlink(target, link_path)
+                print(f'  Created symlink: {link_name} -> {target}')
+
+        env['MLC_ROMLC_INSTALLED_PATH'] = bin_dir
+        env['MLC_ROMLC_BIN_WITH_PATH'] = os.path.join(bin_dir, 'rocminfo') if os.path.isfile(os.path.join(bin_dir, 'rocminfo')) else clang_path
+        env['+PATH'] = [bin_dir]
+        return {'return': 0}
 
     install_prefix = env.get('MLC_ROCM_INSTALL_PREFIX', '/')
     cur_dir = os.getcwd()
