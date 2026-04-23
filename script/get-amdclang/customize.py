@@ -47,19 +47,26 @@ def preprocess(i):
         # For src builds: also check the install bin dir directly
         # and create amdclang symlinks if clang exists but amdclang doesn't
         if env.get('MLC_ROCM_BUILD_FROM_SRC', '') == 'yes':
+            # Try multiple sources for the bin dir
+            bin_dir = ''
+            installed_path = env.get('MLC_ROMLC_INSTALLED_PATH', '')
             install_prefix = env.get('MLC_ROCM_INSTALL_PREFIX', '')
-            if install_prefix:
+            if installed_path and os.path.isdir(installed_path):
+                # MLC_ROMLC_INSTALLED_PATH is the bin dir itself
+                bin_dir = installed_path
+            elif install_prefix:
                 bin_dir = os.path.join(install_prefix, 'bin')
-                if os.path.isdir(bin_dir):
-                    if bin_dir not in search_paths:
-                        search_paths.append(bin_dir)
-                    # Create symlinks if needed
-                    symlinks = {'amdclang': 'clang', 'amdclang++': 'clang++', 'amdflang': 'flang-new'}
-                    for link_name, target in symlinks.items():
-                        link_path = os.path.join(bin_dir, link_name)
-                        target_path = os.path.join(bin_dir, target)
-                        if os.path.isfile(target_path) and not os.path.exists(link_path):
-                            os.symlink(target, link_path)
+
+            if bin_dir and os.path.isdir(bin_dir):
+                if bin_dir not in search_paths:
+                    search_paths.append(bin_dir)
+                # Create symlinks if needed
+                symlinks = {'amdclang': 'clang', 'amdclang++': 'clang++', 'amdflang': 'flang-new'}
+                for link_name, target in symlinks.items():
+                    link_path = os.path.join(bin_dir, link_name)
+                    target_path = os.path.join(bin_dir, target)
+                    if os.path.isfile(target_path) and not os.path.exists(link_path):
+                        os.symlink(target, link_path)
 
         if search_paths:
             env['MLC_TMP_PATH'] = os.pathsep.join(search_paths)
