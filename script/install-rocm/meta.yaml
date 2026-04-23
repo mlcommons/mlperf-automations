@@ -2,35 +2,23 @@ alias: install-rocm
 uid: 9d13f90463ce4545
 automation_alias: script
 automation_uid: 5b4e0237da074764
-
-# Metadata
 category: AI/ML frameworks
 tags:
 - install
 - rocm
 - install-rocm
-
-# Cache
 cache: true
 clean_files: []
-
-# Input mapping
 input_mapping:
   rocm_install_prefix: MLC_ROCM_INSTALL_PREFIX
-
-# Environment
 env: {}
 new_env_keys:
 - MLC_ROMLC_*
 - MLC_ROCM_INSTALL_PREFIX
 - +PATH
-
-# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,sudo
-
-# Prehook dependencies
 prehook_deps:
 - tags: download,file
   extra_cache_tags: rocm,installer,runfile
@@ -43,17 +31,46 @@ prehook_deps:
   force_env_keys:
   - MLC_DOWNLOAD_URL
   - MLC_DOWNLOAD_FILENAME
-
-# Versions
+variations:
+  compiler-only:
+    env:
+      MLC_ROCM_COMPILER_ONLY: 'yes'
+  src:
+    env:
+      MLC_ROCM_BUILD_FROM_SRC: 'yes'
+      MLC_GIT_URL: https://github.com/ROCm/llvm-project
+    deps:
+    - tags: get,cmake
+    - tags: get,generic-sys-util,_ninja-build
+    - tags: get,git,repo
+      env:
+        MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_ROCM_LLVM_SRC_PATH
+      extra_cache_tags: rocm,llvm,src
+      force_env_keys:
+      - MLC_GIT_*
+      names:
+      - rocm-llvm-src-repo
+      update_tags_from_env_with_prefix:
+        _tag.:
+        - MLC_GIT_CHECKOUT_TAG
+        _repo.:
+        - MLC_GIT_URL
+  with-runtimes:
+    default: true
+    group: runtimes
+    env:
+      MLC_ROCM_SRC_WITH_RUNTIMES: 'yes'
+  no-runtimes:
+    group: runtimes
+    env:
+      MLC_ROCM_SRC_WITH_RUNTIMES: 'no'
 default_version: 7.2.2
 versions:
-  '7.2.2': {}
-  '7.2.1': {}
-  '6.2.0': {}
-  '6.1.0': {}
-  '5.7.1': {}
-
-# Tests
+  7.2.2: {}
+  7.2.1: {}
+  6.2.0: {}
+  6.1.0: {}
+  5.7.1: {}
 tests:
   run_inputs:
   - variations_list: []

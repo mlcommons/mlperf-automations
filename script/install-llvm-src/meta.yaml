@@ -2,8 +2,6 @@ alias: install-llvm-src
 uid: 2af16e9a6c5f4702
 automation_alias: script
 automation_uid: 5b4e0237da074764
-
-# Metadata
 name: Build LLVM compiler from sources (can take >30 min)
 category: Compiler automation
 tags:
@@ -12,11 +10,7 @@ tags:
 - llvm
 - from.src
 - src-llvm
-
-# Cache
 cache: true
-
-# Environment
 env:
   MLC_GIT_URL: https://github.com/llvm/llvm-project
 new_env_keys:
@@ -24,8 +18,6 @@ new_env_keys:
 - MLC_GET_DEPENDENT_CACHED_PATH
 - +PATH
 - +C_INCLUDE_PATH
-
-# Input mapping
 input_mapping:
   clean: MLC_CLEAN
   extra_options: MLC_LLVM_EXTRA_CMAKE_OPTIONS
@@ -34,8 +26,6 @@ input_mapping:
   target_triple: MLC_LLVM_TARGET_TRIPLE
   targets: MLC_LLVM_TARGETS_TO_BUILD
   src_path: MLC_LLVM_SRC_REPO_PATH
-
-# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,cpu
@@ -59,7 +49,7 @@ deps:
     MLC_LLVM_INSTALLED_PATH:
     - true
     MLC_LLVM_SRC_REPO_PATH:
-    - on
+    - true
   update_tags_from_env_with_prefix:
     _branch.:
     - MLC_GIT_CHECKOUT
@@ -86,8 +76,6 @@ post_deps:
   update_tags_from_env_with_prefix:
     _path.:
     - MLC_LLVM_INSTALLED_PATH
-
-# Variations
 variations:
   debug:
     env:
@@ -196,7 +184,9 @@ variations:
     default_env:
       MLC_LLVM_TARGETS_TO_BUILD: AArch64
     env:
-      MLC_LLVM_CROSS_COMPILE_FLAGS: -DCMAKE_SYSTEM_NAME=Linux  -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DLLVM_DEFAULT_TARGET_TRIPLE=aarch64-linux-gnu -DCMAKE_Fortran_COMPILER=aarch64-linux-gnu-gfortran-12 -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc  -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++
+      MLC_LLVM_CROSS_COMPILE_FLAGS: -DCMAKE_SYSTEM_NAME=Linux  -DCMAKE_SYSTEM_PROCESSOR=aarch64
+        -DLLVM_DEFAULT_TARGET_TRIPLE=aarch64-linux-gnu -DCMAKE_Fortran_COMPILER=aarch64-linux-gnu-gfortran-12
+        -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc  -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++
   cross-compile-x86-aarch64,flang:
     deps:
     - tags: get,generic-sys-util,_gfortran-12-aarch64-linux-gnu
@@ -335,22 +325,17 @@ variations:
     - full-history
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
-
-# Versions
+  custom-flags.#:
+    env:
+      MLC_LLVM_CUSTOM_FLAGS: '#'
 versions: {}
-
-# Docker / container
 docker:
   skip_run_cmd: true
   pre_run_cmds:
   - mlc pull repo
   mounts:
-    - ${{ MLC_LLVM_SRC_REPO_PATH }}:${{ MLC_LLVM_SRC_REPO_PATH }}
-
-# Output / debugging
+  - ${{ MLC_LLVM_SRC_REPO_PATH }}:${{ MLC_LLVM_SRC_REPO_PATH }}
 sort: 1000
-
-# Tests
 tests:
   run_inputs:
   - version: 20.1.1
