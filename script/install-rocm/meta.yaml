@@ -2,31 +2,21 @@ alias: install-rocm
 uid: 9d13f90463ce4545
 automation_alias: script
 automation_uid: 5b4e0237da074764
-
-# Metadata
 category: AI/ML frameworks
 tags:
 - install
 - rocm
 - install-rocm
-
-# Cache
 cache: true
 clean_files: []
-
-# Environment
 env: {}
 new_env_keys:
 - MLC_ROMLC_*
 - MLC_ROCM_INSTALL_PREFIX
 - +PATH
 - MLC_ROCM_CPULIBS_PATH
-
-# Input mapping
 input_mapping:
   rocm_install_prefix: MLC_ROCM_INSTALL_PREFIX
-
-# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,sudo
@@ -42,8 +32,6 @@ prehook_deps:
   force_env_keys:
   - MLC_DOWNLOAD_URL
   - MLC_DOWNLOAD_FILENAME
-
-# Variations
 variations:
   no-runtimes:
     group: runtimes
@@ -93,8 +81,6 @@ variations:
         - MLC_GIT_CHECKOUT_TAG
         _repo.:
         - MLC_GIT_URL
-
-# Versions
 default_version: 7.2.2
 versions:
   7.2.2: {}
@@ -102,8 +88,6 @@ versions:
   6.2.0: {}
   6.1.0: {}
   5.7.1: {}
-
-# Tests
 tests:
   run_inputs:
   - variations_list: []

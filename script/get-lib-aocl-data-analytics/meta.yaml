@@ -2,8 +2,6 @@ alias: get-lib-aocl-data-analytics
 uid: a7a6ddccdaa545dc
 automation_alias: script
 automation_uid: 5b4e0237da074764
-
-# Metadata
 category: Detection or installation of tools and artifacts
 tags:
 - get
@@ -12,11 +10,7 @@ tags:
 - aocl-data-analytics
 - aocl
 - aocl-da
-
-# Cache
 cache: true
-
-# Environment
 default_env:
   MLC_AOCL_ACCEPT_EULA: 'no'
 new_env_keys:
@@ -31,17 +25,17 @@ new_env_keys:
 - MLC_AOCL_BINARY_INSTALL_PATH
 - MLC_AOCL_DA_BINARY_PATH
 new_state_keys: []
-
-# Input mapping
 input_mapping:
   accept_eula: MLC_AOCL_ACCEPT_EULA
 input_description:
   accept_eula:
     desc: Accept the AMD EULA for binary downloads (yes/no)
-
-# Dependencies
 deps:
 - tags: get,cmake
+  skip_if_env:
+    MLC_AOCL_BINARY_DOWNLOAD:
+    - 'yes'
+- tags: get,generic,sys-util,_libboost-all-dev
   skip_if_env:
     MLC_AOCL_BINARY_DOWNLOAD:
     - 'yes'
@@ -80,8 +74,6 @@ deps:
   skip_if_env:
     MLC_AOCL_BINARY_DOWNLOAD:
     - 'yes'
-
-# Variations
 variations:
   binary.aocc:
     env:
@@ -147,8 +139,6 @@ variations:
   main:
     env:
       MLC_GIT_CHECKOUT: main
-
-# Tests
 tests:
   run_inputs:
   - variations_list:
