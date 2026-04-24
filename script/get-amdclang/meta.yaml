@@ -21,6 +21,7 @@ new_env_keys:
 - MLC_COMPILER_*
 - MLC_LINKER_*
 - +PATH
+- MLC_ROCM_CPULIBS_PATH
 deps:
 - tags: get,rocm
   names:
@@ -48,7 +49,16 @@ variations:
     adr:
       get-rocm:
         tags: _no-runtimes
+  cpulibs:
+    env:
+      MLC_ROCM_INSTALL_CPULIBS: 'yes'
+    adr:
+      get-rocm:
+        tags: _cpulibs
 sort: 500
 tests:
   run_inputs:
   - variations_list: []
+  - variations_list:
+    - src
+    - cpulibs
