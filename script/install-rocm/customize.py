@@ -41,20 +41,20 @@ def preprocess(i):
         env['MLC_ROCM_INSTALL_PREFIX'] = build_install_prefix
 
         targets = 'AMDGPU;X86'
-        projects = 'clang;lld;clang-tools-extra;flang;compiler-rt'
+        projects = 'clang;lld;clang-tools-extra;flang'
 
         q = "'"
 
         # Runtimes: libc++ and openmp if requested
         if env.get('MLC_ROCM_SRC_WITH_RUNTIMES', '') == 'yes':
-            runtimes = 'libcxx;libcxxabi;openmp'
+            runtimes = 'compiler-rt;libcxx;libcxxabi;openmp'
             runtime_flags = (
                 f' -DLLVM_ENABLE_RUNTIMES={q}{runtimes}{q}'
                 f' -DLLVM_DEFAULT_TARGET_TRIPLE=x86_64-unknown-linux-gnu'
                 f' -DLIBCXXABI_USE_LLVM_UNWINDER=OFF'
             )
         else:
-            runtime_flags = f' -DLLVM_ENABLE_RUNTIMES={q}{q}'
+            runtime_flags = f' -DLLVM_ENABLE_RUNTIMES={q}compiler-rt{q}'
 
         cmake_cmd = (
             f'cmake {os.path.join(src_path, "llvm")} -GNinja'
