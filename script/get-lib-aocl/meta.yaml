@@ -3,6 +3,7 @@ uid: b2a16ffc30a0467c
 automation_alias: script
 automation_uid: 5b4e0237da074764
 
+# Metadata
 category: Detection or installation of tools and artifacts
 tags:
 - get
@@ -11,8 +12,10 @@ tags:
 - aocl
 - aocl-all
 
+# Cache
 cache: false
 
+# Dependencies
 deps:
 - tags: get,utils,aocl-utils
 - tags: get,lib,aocl-libm
@@ -26,6 +29,7 @@ deps:
 - tags: get,lib,aocl-fftz
 - tags: get,lib,aocl-scalapack
 
+# Tests
 tests:
   run_inputs:
   - variations_list: []

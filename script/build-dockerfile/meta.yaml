@@ -40,6 +40,7 @@ input_mapping:
   fake_run_option: MLC_DOCKER_FAKE_RUN_OPTION
   file_path: MLC_DOCKERFILE_WITH_PATH
   gh_token: MLC_GH_TOKEN
+  host_mlc_repos: MLC_DOCKER_HOST_MLC_REPOS
   image_repo: MLC_DOCKER_IMAGE_REPO
   image_tag: MLC_DOCKER_IMAGE_TAG
   mlc_repo: MLC_MLOPS_REPO
@@ -47,7 +48,6 @@ input_mapping:
   mlc_repo_flags: MLC_DOCKER_ADD_FLAG_TO_MLC_MLOPS_REPO
   mlc_repo_path: MLC_REPO_PATH
   mlc_repos: MLC_DOCKER_EXTRA_MLC_REPOS
-  host_mlc_repos: MLC_DOCKER_HOST_MLC_REPOS
   os: MLC_DOCKER_OS
   os_version: MLC_DOCKER_OS_VERSION
   package_manager_update_cmd: MLC_PACKAGE_MANAGER_UPDATE_CMD
@@ -56,13 +56,13 @@ input_mapping:
   post_run_cmds: MLC_DOCKER_POST_RUN_COMMANDS
   pre_run_cmds: MLC_DOCKER_PRE_RUN_COMMANDS
   push_image: MLC_DOCKER_PUSH_IMAGE
-  upload: MLC_DOCKER_PUSH_IMAGE
   real_run: MLC_REAL_RUN
   run_cmd: MLC_DOCKER_RUN_CMD
   run_cmd_extra: MLC_DOCKER_RUN_CMD_EXTRA
   script_tags: MLC_DOCKER_RUN_SCRIPT_TAGS
-  split_mlc_run_cmd: MLC_DOCKER_SPLIT_MLC_RUN_CMD
   skip_mlc_sys_upgrade: MLC_DOCKER_SKIP_MLC_SYS_UPGRADE
+  split_mlc_run_cmd: MLC_DOCKER_SPLIT_MLC_RUN_CMD
+  upload: MLC_DOCKER_PUSH_IMAGE
   user: MLC_DOCKER_USER
 
 # Dependencies

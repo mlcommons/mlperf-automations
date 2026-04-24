@@ -2,21 +2,31 @@ alias: install-rocm
 uid: 9d13f90463ce4545
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: AI/ML frameworks
 tags:
 - install
 - rocm
 - install-rocm
+
+# Cache
 cache: true
 clean_files: []
-input_mapping:
-  rocm_install_prefix: MLC_ROCM_INSTALL_PREFIX
+
+# Environment
 env: {}
 new_env_keys:
 - MLC_ROMLC_*
 - MLC_ROCM_INSTALL_PREFIX
 - +PATH
 - MLC_ROCM_CPULIBS_PATH
+
+# Input mapping
+input_mapping:
+  rocm_install_prefix: MLC_ROCM_INSTALL_PREFIX
+
+# Dependencies
 deps:
 - tags: detect,os
 - tags: detect,sudo
@@ -32,10 +42,37 @@ prehook_deps:
   force_env_keys:
   - MLC_DOWNLOAD_URL
   - MLC_DOWNLOAD_FILENAME
+
+# Variations
 variations:
+  no-runtimes:
+    group: runtimes
+    env:
+      MLC_ROCM_SRC_WITH_RUNTIMES: 'no'
+  with-runtimes:
+    default: true
+    group: runtimes
+    env:
+      MLC_ROCM_SRC_WITH_RUNTIMES: 'yes'
   compiler-only:
     env:
       MLC_ROCM_COMPILER_ONLY: 'yes'
+  cpulibs:
+    env:
+      MLC_ROCM_INSTALL_CPULIBS: 'yes'
+    deps:
+    - tags: get,lib,jemalloc
+      names:
+      - jemalloc
+      inherit_variation_tags: true
+      skip_inherit_variation_groups:
+      - runtimes
+    - tags: get,lib,aocl-libm
+      names:
+      - aocl-libm
+      inherit_variation_tags: true
+      skip_inherit_variation_groups:
+      - runtimes
   src:
     env:
       MLC_ROCM_BUILD_FROM_SRC: 'yes'
@@ -56,31 +93,8 @@ variations:
         - MLC_GIT_CHECKOUT_TAG
         _repo.:
         - MLC_GIT_URL
-  with-runtimes:
-    default: true
-    group: runtimes
-    env:
-      MLC_ROCM_SRC_WITH_RUNTIMES: 'yes'
-  no-runtimes:
-    group: runtimes
-    env:
-      MLC_ROCM_SRC_WITH_RUNTIMES: 'no'
-  cpulibs:
-    env:
-      MLC_ROCM_INSTALL_CPULIBS: 'yes'
-    deps:
-    - tags: get,lib,jemalloc
-      names:
-      - jemalloc
-      inherit_variation_tags: true
-      skip_inherit_variation_groups:
-      - runtimes
-    - tags: get,lib,aocl-libm
-      names:
-      - aocl-libm
-      inherit_variation_tags: true
-      skip_inherit_variation_groups:
-      - runtimes
+
+# Versions
 default_version: 7.2.2
 versions:
   7.2.2: {}
@@ -88,6 +102,8 @@ versions:
   6.2.0: {}
   6.1.0: {}
   5.7.1: {}
+
+# Tests
 tests:
   run_inputs:
   - variations_list: []
