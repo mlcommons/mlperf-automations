@@ -609,20 +609,22 @@ def _get_submission_checker_constants_module():
 
 def get_checker_files(env):
     if is_true(env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
-        import submission_checker.constants as constants
-
-        REQUIRED_ACC_FILES = constants.REQUIRED_ACC_FILES
-        REQUIRED_PERF_FILES = constants.REQUIRED_PERF_FILES
-        REQUIRED_POWER_FILES = constants.REQUIRED_POWER_FILES
-        REQUIRED_PERF_POWER_FILES = constants.REQUIRED_PERF_POWER_FILES
-        REQUIRED_MEASURE_FILES = constants.REQUIRED_MEASURE_FILES
-    else:
-        checker = _get_submission_checker_constants_module()
-        REQUIRED_ACC_FILES = checker.REQUIRED_ACC_FILES
-        REQUIRED_PERF_FILES = checker.REQUIRED_PERF_FILES
-        REQUIRED_POWER_FILES = checker.REQUIRED_POWER_FILES
-        REQUIRED_PERF_POWER_FILES = checker.REQUIRED_PERF_POWER_FILES
-        REQUIRED_MEASURE_FILES = checker.REQUIRED_MEASURE_FILES
+        try:
+            import submission_checker.constants as constants
+            REQUIRED_ACC_FILES = constants.REQUIRED_ACC_FILES
+            REQUIRED_PERF_FILES = constants.REQUIRED_PERF_FILES
+            REQUIRED_POWER_FILES = constants.REQUIRED_POWER_FILES
+            REQUIRED_PERF_POWER_FILES = constants.REQUIRED_PERF_POWER_FILES
+            REQUIRED_MEASURE_FILES = constants.REQUIRED_MEASURE_FILES
+            return REQUIRED_ACC_FILES, REQUIRED_PERF_FILES, REQUIRED_POWER_FILES, REQUIRED_PERF_POWER_FILES, REQUIRED_MEASURE_FILES
+        except (ImportError, ModuleNotFoundError, AttributeError):
+            pass
+    checker = _get_submission_checker_constants_module()
+    REQUIRED_ACC_FILES = checker.REQUIRED_ACC_FILES
+    REQUIRED_PERF_FILES = checker.REQUIRED_PERF_FILES
+    REQUIRED_POWER_FILES = checker.REQUIRED_POWER_FILES
+    REQUIRED_PERF_POWER_FILES = checker.REQUIRED_PERF_POWER_FILES
+    REQUIRED_MEASURE_FILES = checker.REQUIRED_MEASURE_FILES
     return REQUIRED_ACC_FILES, REQUIRED_PERF_FILES, REQUIRED_POWER_FILES, REQUIRED_PERF_POWER_FILES, REQUIRED_MEASURE_FILES
 
 
@@ -632,8 +634,12 @@ def get_required_min_queries_offline(model, version, env):
         return 24756
 
     if is_true(env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
-        import submission_checker.constants as constants
-        REQUIRED_MIN_QUERIES = constants.OFFLINE_MIN_SPQ_SINCE_V4
+        try:
+            import submission_checker.constants as constants
+            REQUIRED_MIN_QUERIES = constants.OFFLINE_MIN_SPQ_SINCE_V4
+        except (ImportError, ModuleNotFoundError, AttributeError):
+            checker = _get_submission_checker_constants_module()
+            REQUIRED_MIN_QUERIES = checker.OFFLINE_MIN_SPQ_SINCE_V4
     else:
         checker = _get_submission_checker_constants_module()
         REQUIRED_MIN_QUERIES = checker.OFFLINE_MIN_SPQ_SINCE_V4

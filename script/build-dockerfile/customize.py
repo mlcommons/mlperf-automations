@@ -366,7 +366,8 @@ def preprocess(i):
                     continue
                 dest = os.path.join(host_repos_context, item)
                 logger.info(f"Copying host repo {item} to build context")
-                shutil.copytree(item_path, dest)
+                shutil.copytree(item_path, dest, symlinks=True,
+                                ignore_dangling_symlinks=True)
                 copied_repos.append(item)
 
             if copied_repos:

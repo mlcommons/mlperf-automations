@@ -16,6 +16,21 @@ def preprocess(i):
     if is_true(env.get('MLC_RUN_STATE_DOCKER', '')):
         return {'return': 0}
 
+    # Patch submission_checker/__init__.py if empty to expose ACC_PATTERN / MODEL_CONFIG
+    # The NVIDIA harness does `import submission_checker; submission_checker.ACC_PATTERN`
+    # but upstream __init__.py is empty; constants live in submission_checker/constants.py
+    nvidia_code_path = env.get('MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH', '')
+    if nvidia_code_path:
+        submission_checker_init = os.path.join(
+            nvidia_code_path, 'build', 'inference', 'tools', 'submission',
+            'submission_checker', '__init__.py')
+        if os.path.isfile(submission_checker_init):
+            with open(submission_checker_init, 'r') as _f:
+                _content = _f.read().strip()
+            if not _content:
+                with open(submission_checker_init, 'w') as _f:
+                    _f.write('from submission_checker.constants import *\n')
+
     if env.get('MLC_MODEL', '') == '':
         return {
             'return': 1, 'error': 'Please select a variation specifying the model to run'}
@@ -44,9 +59,13 @@ def preprocess(i):
     if env['MLC_MODEL'] == "resnet50":
         target_data_path = os.path.join(
             env['MLPERF_SCRATCH_PATH'], 'data', 'imagenet')
-        if not os.path.exists(target_data_path):
+        dataset_path = env['MLC_DATASET_IMAGENET_PATH']
+        # Always update symlink in case it points to a stale/wrong path
+        if not os.path.exists(target_data_path) or (
+                os.path.islink(target_data_path) and
+                os.readlink(target_data_path) != dataset_path):
             cmds.append(
-                f"""ln -sf {env['MLC_DATASET_IMAGENET_PATH']} {target_data_path}""")
+                f"""ln -sfn {dataset_path} {target_data_path}""")
 
         model_path = os.path.join(
             env['MLPERF_SCRATCH_PATH'],
