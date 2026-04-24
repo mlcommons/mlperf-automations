@@ -12,6 +12,7 @@ clean_files: []
 new_env_keys:
 - MLC_ROMLC_*
 - +PATH
+- MLC_ROCM_CPULIBS_PATH
 prehook_deps:
 - enable_if_env:
     MLC_REQUIRE_INSTALL:
@@ -41,3 +42,9 @@ variations:
     adr:
       install-rocm:
         tags: _no-runtimes
+  cpulibs:
+    env:
+      MLC_ROCM_INSTALL_CPULIBS: 'yes'
+    adr:
+      install-rocm:
+        tags: _cpulibs

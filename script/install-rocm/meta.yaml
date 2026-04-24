@@ -16,6 +16,7 @@ new_env_keys:
 - MLC_ROMLC_*
 - MLC_ROCM_INSTALL_PREFIX
 - +PATH
+- MLC_ROCM_CPULIBS_PATH
 deps:
 - tags: detect,os
 - tags: detect,sudo
@@ -64,6 +65,22 @@ variations:
     group: runtimes
     env:
       MLC_ROCM_SRC_WITH_RUNTIMES: 'no'
+  cpulibs:
+    env:
+      MLC_ROCM_INSTALL_CPULIBS: 'yes'
+    deps:
+    - tags: get,lib,jemalloc
+      names:
+      - jemalloc
+      inherit_variation_tags: true
+      skip_inherit_variation_groups:
+      - runtimes
+    - tags: get,lib,aocl-libm
+      names:
+      - aocl-libm
+      inherit_variation_tags: true
+      skip_inherit_variation_groups:
+      - runtimes
 default_version: 7.2.2
 versions:
   7.2.2: {}

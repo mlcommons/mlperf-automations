@@ -2,6 +2,7 @@ from mlc import utils
 import os
 import glob
 import re
+import shutil
 
 try:
     from urllib.request import urlopen
@@ -40,7 +41,7 @@ def preprocess(i):
         env['MLC_ROCM_INSTALL_PREFIX'] = build_install_prefix
 
         targets = 'AMDGPU;X86'
-        projects = 'clang;lld;clang-tools-extra'
+        projects = 'clang;lld;clang-tools-extra;flang;compiler-rt'
 
         q = "'"
 
@@ -131,6 +132,14 @@ def postprocess(i):
         env['MLC_ROMLC_INSTALLED_PATH'] = bin_dir
         env['MLC_ROMLC_BIN_WITH_PATH'] = os.path.join(bin_dir, 'rocminfo') if os.path.isfile(os.path.join(bin_dir, 'rocminfo')) else clang_path
         env['+PATH'] = [bin_dir]
+
+        # Install cpulibs if requested
+        if env.get('MLC_ROCM_INSTALL_CPULIBS', '') == 'yes':
+            lib_dir = os.path.join(install_dir, 'lib')
+            os.makedirs(lib_dir, exist_ok=True)
+            _install_cpulibs(env, lib_dir)
+            env['MLC_ROCM_CPULIBS_PATH'] = lib_dir
+
         return {'return': 0}
 
     install_prefix = env.get('MLC_ROCM_INSTALL_PREFIX', '/')
@@ -182,4 +191,69 @@ def postprocess(i):
     env['MLC_ROMLC_BIN_WITH_PATH'] = os.path.join(installed_path, "rocminfo")
     env['+PATH'] = [installed_path]
 
+    # Install cpulibs if requested
+    if env.get('MLC_ROCM_INSTALL_CPULIBS', '') == 'yes':
+        lib_dir = os.path.join(os.path.dirname(installed_path), 'lib')
+        if os.path.isdir(lib_dir):
+            _install_cpulibs(env, lib_dir)
+            env['MLC_ROCM_CPULIBS_PATH'] = lib_dir
+
     return {'return': 0}
+
+
+def _install_cpulibs(env, lib_dir):
+    """Copy jemalloc and amdlibm libs into the compiler lib directory."""
+
+    copied = []
+
+    # Copy jemalloc libs
+    jemalloc_lib_path = env.get('MLC_JEMALLOC_LIB_PATH', '')
+    if jemalloc_lib_path and os.path.isdir(jemalloc_lib_path):
+        for f in os.listdir(jemalloc_lib_path):
+            if f.startswith('libjemalloc') and (f.endswith('.so') or f.endswith('.a') or '.so.' in f):
+                src = os.path.join(jemalloc_lib_path, f)
+                dst = os.path.join(lib_dir, f)
+                if os.path.isfile(src) and not os.path.islink(src):
+                    shutil.copy2(src, dst)
+                    copied.append(f)
+                elif os.path.islink(src):
+                    link_target = os.readlink(src)
+                    if os.path.exists(dst) or os.path.islink(dst):
+                        os.remove(dst)
+                    os.symlink(link_target, dst)
+                    copied.append(f'{f} -> {link_target}')
+        # Create amdalloc -> jemalloc symlinks
+        for ext in ['.so', '.a']:
+            jemalloc_name = f'libjemalloc{ext}'
+            amdalloc_name = f'libamdalloc{ext}'
+            jemalloc_dst = os.path.join(lib_dir, jemalloc_name)
+            amdalloc_dst = os.path.join(lib_dir, amdalloc_name)
+            if os.path.isfile(jemalloc_dst) and not os.path.exists(amdalloc_dst):
+                os.symlink(jemalloc_name, amdalloc_dst)
+                copied.append(f'{amdalloc_name} -> {jemalloc_name}')
+        print(f'  Installed jemalloc libs: {copied}')
+    else:
+        print(f'  WARNING: jemalloc lib path not found: {jemalloc_lib_path}')
+
+    # Copy amdlibm (aocl-libm) libs
+    amdlibm_copied = []
+    amdlibm_lib_path = env.get('MLC_AOCL_LIBM_LIB_PATH', '')
+    if amdlibm_lib_path and os.path.isdir(amdlibm_lib_path):
+        for f in os.listdir(amdlibm_lib_path):
+            if (f.startswith('libalm') or f.startswith('libamdlibm')) and (f.endswith('.so') or f.endswith('.a') or '.so.' in f):
+                src = os.path.join(amdlibm_lib_path, f)
+                dst = os.path.join(lib_dir, f)
+                if os.path.isfile(src) and not os.path.islink(src):
+                    shutil.copy2(src, dst)
+                    amdlibm_copied.append(f)
+                elif os.path.islink(src):
+                    link_target = os.readlink(src)
+                    if os.path.exists(dst) or os.path.islink(dst):
+                        os.remove(dst)
+                    os.symlink(link_target, dst)
+                    amdlibm_copied.append(f'{f} -> {link_target}')
+        print(f'  Installed amdlibm libs: {amdlibm_copied}')
+    else:
+        print(f'  WARNING: amdlibm lib path not found: {amdlibm_lib_path}')
+
+    return copied + amdlibm_copied
