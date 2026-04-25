@@ -53,6 +53,74 @@ def preprocess(i):
 
     make_command = env['MLPERF_NVIDIA_RUN_COMMAND']
 
+    # For GPTJ on post-5.0 NVIDIA harness: apply persistent patches that survive container restarts.
+    # These are applied idempotently every run so a fresh container gets them automatically.
+    if "gptj" in env.get('MLC_MODEL', '') and is_true(env.get('MLC_MLPERF_INFERENCE_POST_5_0')) and nvidia_code_path:
+        import json as _json
+        import site as _site
+
+        # --- Patch A: modelopt QKV merge OOM-safe fallback ---
+        _sp_dirs = _site.getsitepackages() + [_site.getusersitepackages()]
+        for _sp in _sp_dirs:
+            _mc_path = os.path.join(_sp, 'modelopt', 'torch', 'export', 'model_config.py')
+            if os.path.isfile(_mc_path):
+                with open(_mc_path, 'r') as _f:
+                    _mc = _f.read()
+                if 'OutOfMemoryError' not in _mc:
+                    _old = 'return torch.cat((self.q.weight, self.k.weight, self.v.weight))'
+                    _new = ('try:\n'
+                            '            return torch.cat((self.q.weight, self.k.weight, self.v.weight))\n'
+                            '        except (torch.cuda.OutOfMemoryError, RuntimeError):\n'
+                            '            import gc; gc.collect(); torch.cuda.empty_cache()\n'
+                            '            return torch.cat((self.q.weight.cpu(), self.k.weight.cpu(), self.v.weight.cpu()))')
+                    if _old in _mc:
+                        with open(_mc_path, 'w') as _f:
+                            _f.write(_mc.replace(_old, _new, 1))
+                break
+
+        # --- Patch B: write fp8 custom.py for all registered custom systems ---
+        _custom_list_path = os.path.join(nvidia_code_path, 'code', 'common', 'systems', 'custom_list.json')
+        if os.path.isfile(_custom_list_path):
+            with open(_custom_list_path) as _f:
+                _custom_systems = _json.load(_f)
+            _gptj_scenarios = ['Offline', 'Server', 'SingleStream', 'MultiStream']
+            for _sys_name in _custom_systems:
+                for _scen in _gptj_scenarios:
+                    _custom_py = os.path.join(nvidia_code_path, 'configs', 'gptj', _scen, 'custom.py')
+                    if not os.path.isdir(os.path.dirname(_custom_py)):
+                        continue
+                    _needs_update = True
+                    if os.path.isfile(_custom_py):
+                        with open(_custom_py) as _f:
+                            _content = _f.read()
+                        if f'class {_sys_name}(' in _content and "'fp8'" in _content:
+                            _needs_update = False
+                    if _needs_update:
+                        _header = ('# Generated file by scripts/custom_systems/add_custom_system.py\n'
+                                   f'# Contains configs for all custom systems in code/common/systems/custom_list.json\n'
+                                   '\nfrom . import *\n\n\n')
+                        _base_cls = 'OfflineGPUBaseConfig' if _scen == 'Offline' else f'{_scen}GPUBaseConfig'
+                        _cls_body = (
+                            f'@ConfigRegistry.register(HarnessType.Custom, AccuracyTarget.k_99, PowerSetting.MaxP)\n'
+                            f'class {_sys_name}({_base_cls}):\n'
+                            f"    system = KnownSystem.{_sys_name}\n"
+                            f"    precision = \"fp8\"\n"
+                            f"    enable_sort = False\n"
+                            f"    gpu_batch_size = {{'gptj': 8}}\n"
+                            f"    offline_expected_qps = 2.0\n"
+                            f"    trtllm_checkpoint_flags = {{\n"
+                            f"        'kv_cache_dtype': 'fp8'\n"
+                            f"    }}\n\n\n"
+                            f'@ConfigRegistry.register(HarnessType.Custom, AccuracyTarget.k_99_9, PowerSetting.MaxP)\n'
+                            f'class {_sys_name}_HighAccuracy({_sys_name}):\n'
+                            f'    pass\n'
+                        )
+                        with open(_custom_py, 'w') as _f:
+                            _f.write(_header + _cls_body)
+        else:
+            # custom_list.json doesn't exist yet — register the system first
+            cmds.insert(0, f'cd {nvidia_code_path} && python3 scripts/custom_systems/add_custom_system.py')
+
     if make_command == "prebuild":
         cmds.append(f"""make prebuild NETWORK_NODE=SUT""")
 
