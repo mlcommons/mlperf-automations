@@ -377,6 +377,9 @@ def preprocess(i):
                 if not os.path.exists(os.path.join(model_path, 'config.json')):
                     return {
                         'return': 1, 'error': f'Quantised model absent - did not detect config.json in path {model_path}'}
+            elif "gptj" in env['MLC_MODEL'] and os.path.exists(fp32_model_path):
+                # checkpoint-final already present; FP8 quantization will happen during engine build
+                pass
             else:
                 cmds.append(f"make download_model BENCHMARKS='{model_name}'")
         elif "stable-diffusion" in env['MLC_MODEL']:
@@ -725,17 +728,18 @@ def preprocess(i):
                 run_config += f" --pipeline_parallelism={tmp_pp_size}"
 
         enable_sort = env.get('MLC_MLPERF_NVIDIA_HARNESS_ENABLE_SORT')
-        if enable_sort and not is_false(enable_sort):
+        is_post5_gptj = is_true(env.get('MLC_MLPERF_INFERENCE_POST_5_0')) and "gptj" in env.get('MLC_MODEL', '')
+        if enable_sort and not is_false(enable_sort) and not is_post5_gptj:
             run_config += f" --enable_sort"
 
         sdxl_server_batcher_time_limit = env.get(
             'MLC_MLPERF_NVIDIA_HARNESS_ENABLE_SORT')
-        if sdxl_server_batcher_time_limit:
+        if sdxl_server_batcher_time_limit and not is_post5_gptj:
             run_config += f" --sdxl_batcher_time_limit {sdxl_server_batcher_time_limit}"
 
         num_sort_segments = env.get(
             'MLC_MLPERF_NVIDIA_HARNESS_NUM_SORT_SEGMENTS')
-        if num_sort_segments:
+        if num_sort_segments and not is_post5_gptj:
             run_config += f" --num_sort_segments={num_sort_segments}"
 
         embedding_weights_on_gpu_part = env.get(
@@ -751,7 +755,7 @@ def preprocess(i):
             env.get(
                 'MLC_MLPERF_NVIDIA_HARNESS_SKIP_POSTPROCESS',
                 ''))
-        if skip_postprocess and not is_false(skip_postprocess):
+        if skip_postprocess and not is_false(skip_postprocess) and not is_post5_gptj:
             run_config += f" --skip_postprocess"
 
         if test_mode:
