@@ -67,6 +67,10 @@ variations:
     add_deps_recursive:
       mlperf-inference-results:
         tags: _code-only-for-v5.1,_v5.1-dev
+  v6.0:
+    add_deps_recursive:
+      mlperf-inference-results:
+        tags: _code-only,_v6.0
   v6.0-dev:
     add_deps_recursive:
       mlperf-inference-results:
@@ -104,3 +108,13 @@ versions:
       mlperf-inference-results:
         version: v4.0
         tags: _code-only-for-v5.0
+  r5.0:
+    add_deps_recursive:
+      mlperf-inference-results:
+        version: v5.0
+        tags: _code-only
+  r6.0:
+    add_deps_recursive:
+      mlperf-inference-results:
+        version: v6.0
+        tags: _code-only
