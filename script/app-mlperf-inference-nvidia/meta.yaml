@@ -913,6 +913,17 @@ variations:
     adr:
       pycuda:
         version: '2024.1'
+  v6.0:
+    base:
+    - v5.0+
+    group: version
+    env:
+      MLC_MLPERF_INFERENCE_CODE_VERSION: v6.0
+    adr:
+      pycuda:
+        version: '2024.1'
+      nvidia-scratch-space:
+        tags: _version.6.0
   3d-unet_:
     deps:
     - tags: get,generic-python-lib,_transformers
