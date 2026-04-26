@@ -57,6 +57,20 @@ def preprocess(i):
     # custom (non-NVIDIA-official) systems fall back to configs/minimal/ and find a bert config.
     # Applied idempotently so the container always has the correct files.
     _inference_version = env.get('MLC_MLPERF_INFERENCE_CODE_VERSION', '')
+    if _inference_version >= 'v6.0' and nvidia_code_path:
+        # Fix code/plugin/__init__.py: base_plugin_map lacks entries for benchmarks without plugins
+        # (e.g. ResNet50), causing KeyError crash. Use .get() with [] default instead.
+        _plugin_init = os.path.join(nvidia_code_path, 'code', 'plugin', '__init__.py')
+        if os.path.isfile(_plugin_init):
+            with open(_plugin_init, 'r') as _f:
+                _plugin_src = _f.read()
+            if 'base_plugin_map[benchmark]' in _plugin_src:
+                _plugin_src = _plugin_src.replace(
+                    'for plugin in base_plugin_map[benchmark]:',
+                    'for plugin in base_plugin_map.get(benchmark, []):')
+                with open(_plugin_init, 'w') as _f:
+                    _f.write(_plugin_src)
+
     if "bert" in env.get('MLC_MODEL', '') and _inference_version >= 'v6.0' and nvidia_code_path:
         # 1. Create code/bert/tensorrt/fields.py with Field definitions needed by bert configs
         _bert_fields_path = os.path.join(
@@ -136,6 +150,32 @@ EXPORTS = {{
                 )
                 with open(_bert_cfg_path, 'w') as _f:
                     _f.write(_content)
+
+    # For resnet50 on v6.0+ NVIDIA harness: the minimal config is missing map_path and uses a
+    # wrong tensor_path (missing int8_linear suffix). Fix idempotently.
+    if env.get('MLC_MODEL', '') == 'resnet50' and _inference_version >= 'v6.0' and nvidia_code_path:
+        _resnet_cfg_path = os.path.join(
+            nvidia_code_path, 'configs', 'minimal', 'Offline', 'resnet50.py')
+        if os.path.isfile(_resnet_cfg_path):
+            with open(_resnet_cfg_path, 'r') as _f:
+                _resnet_cfg = _f.read()
+            _changed = False
+            # Fix tensor_path: must point to int8_linear subdirectory
+            if "imagenet/ResNet50/'," in _resnet_cfg and 'int8_linear' not in _resnet_cfg:
+                _resnet_cfg = _resnet_cfg.replace(
+                    "harness_fields.tensor_path: 'build/preprocessed_data/imagenet/ResNet50/',",
+                    "harness_fields.tensor_path: 'build/preprocessed_data/imagenet/ResNet50/int8_linear',")
+                _changed = True
+            # Add map_path if missing
+            if 'map_path' not in _resnet_cfg:
+                _resnet_cfg = _resnet_cfg.replace(
+                    "harness_fields.tensor_path: 'build/preprocessed_data/imagenet/ResNet50/int8_linear',",
+                    "harness_fields.tensor_path: 'build/preprocessed_data/imagenet/ResNet50/int8_linear',\n"
+                    "    harness_fields.map_path: 'data_maps/imagenet/val_map.txt',")
+                _changed = True
+            if _changed:
+                with open(_resnet_cfg_path, 'w') as _f:
+                    _f.write(_resnet_cfg)
 
     # For GPTJ on post-5.0 NVIDIA harness: apply persistent patches that survive container restarts.
     # These are applied idempotently every run so a fresh container gets them automatically.
