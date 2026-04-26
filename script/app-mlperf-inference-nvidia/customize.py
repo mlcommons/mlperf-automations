@@ -58,6 +58,19 @@ def preprocess(i):
     # Applied idempotently so the container always has the correct files.
     _inference_version = env.get('MLC_MLPERF_INFERENCE_CODE_VERSION', '')
     if _inference_version >= 'v6.0' and nvidia_code_path:
+        # Fix code/harness/lwis/CMakeLists.txt: missing ${CUDA_INCLUDE_DIRS} causes
+        # "fatal error: cuda.h: No such file or directory" when building the v6.0 harness.
+        _lwis_cmake = os.path.join(nvidia_code_path, 'code', 'harness', 'lwis', 'CMakeLists.txt')
+        if os.path.isfile(_lwis_cmake):
+            with open(_lwis_cmake, 'r') as _f:
+                _lwis_src = _f.read()
+            if '${CUDA_INCLUDE_DIRS}' not in _lwis_src and 'target_include_directories(lwis' in _lwis_src:
+                _lwis_src = _lwis_src.replace(
+                    'target_include_directories(lwis\n    PUBLIC\n        ${LOADGEN_INCLUDE_DIR}',
+                    'target_include_directories(lwis\n    PUBLIC\n        ${CUDA_INCLUDE_DIRS}\n        ${LOADGEN_INCLUDE_DIR}')
+                with open(_lwis_cmake, 'w') as _f:
+                    _f.write(_lwis_src)
+
         # Fix code/plugin/__init__.py: base_plugin_map lacks entries for benchmarks without plugins
         # (e.g. ResNet50), causing KeyError crash. Use .get() with [] default instead.
         _plugin_init = os.path.join(nvidia_code_path, 'code', 'plugin', '__init__.py')
