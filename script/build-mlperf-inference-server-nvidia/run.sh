@@ -45,7 +45,13 @@ elif [[ -z "${LOADGEN_INCLUDE_DIR}" ]]; then
   LOADGEN_LIB_FILE=$(find ${HOME}/MLC/repos/local/cache -name "libmlperf_loadgen.a" 2>/dev/null | head -1)
   if [[ -n "${LOADGEN_LIB_FILE}" ]]; then
     export LOADGEN_LIB_DIR="$(dirname ${LOADGEN_LIB_FILE})"
-    export LOADGEN_INCLUDE_DIR="$(dirname ${LOADGEN_LIB_DIR})/include"
+    # Headers may be in parent/include or directly in parent (source layout)
+    _LOADGEN_PARENT="$(dirname ${LOADGEN_LIB_DIR})"
+    if [[ -f "${_LOADGEN_PARENT}/include/loadgen.h" ]]; then
+      export LOADGEN_INCLUDE_DIR="${_LOADGEN_PARENT}/include"
+    else
+      export LOADGEN_INCLUDE_DIR="${_LOADGEN_PARENT}"
+    fi
   fi
 fi
 echo "LOADGEN_INCLUDE_DIR=${LOADGEN_INCLUDE_DIR}"
