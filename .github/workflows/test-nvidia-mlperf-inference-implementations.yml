@@ -19,7 +19,7 @@ jobs:
           system: [ "GO-i9" ]
           # system: [ "mlc-server" ] 
           python-version: [ "3.12" ]
-          model: [ "resnet50" ]
+          model: [ "resnet50", "bert-99" ]
           exclude:
            - model: gptj-99.9
            - system: phoenix1
