@@ -58,6 +58,76 @@ def preprocess(i):
     # Applied idempotently so the container always has the correct files.
     _inference_version = env.get('MLC_MLPERF_INFERENCE_CODE_VERSION', '')
     if _inference_version >= 'v6.0' and nvidia_code_path:
+        # Install nvmitten.configurator stub if the full module is absent (outside official Docker).
+        # nvmitten v0.2.0 on PyPI only has a stub __init__.py without the configurator module.
+        # The full nvmitten is shipped inside the official NVIDIA Docker image.
+        import site as _site
+        for _sp in (_site.getsitepackages() + [_site.getusersitepackages()]):
+            _nvm_init = os.path.join(_sp, 'nvmitten', '__init__.py')
+            if os.path.isfile(_nvm_init):
+                _nvm_cfg = os.path.join(_sp, 'nvmitten', 'configurator.py')
+                if not os.path.isfile(_nvm_cfg):
+                    _configurator_stub = '''\
+# Stub nvmitten.configurator for v6.0 harness compatibility outside official NVIDIA Docker.
+from typing import Any, Optional
+
+
+class Field:
+    """Hashable configuration field descriptor used as dict keys in config files."""
+    def __init__(self, name: str, description: str = "", from_string=None, default=None, **kwargs):
+        self.name = name
+        self.description = description
+        self.from_string = from_string
+        self.default = default
+    def __repr__(self):
+        return f"Field({self.name!r})"
+    def __hash__(self):
+        return hash(self.name)
+    def __eq__(self, other):
+        if isinstance(other, Field):
+            return self.name == other.name
+        return NotImplemented
+
+
+class Configuration:
+    """Base class for configuration objects."""
+    pass
+
+
+class ConfigurationIndex:
+    """Index of configurations."""
+    def __init__(self, *args, **kwargs):
+        pass
+
+
+class HelpInfo:
+    """Provides help text and dependency information for configurator."""
+    @staticmethod
+    def add_configurator_dependency(*args, **kwargs):
+        pass
+
+
+def bind(*args, **kwargs):
+    """Decorator that binds configuration fields to a class."""
+    def _decorator(cls):
+        return cls
+    if len(args) == 1 and callable(args[0]) and not kwargs:
+        return args[0]
+    return _decorator
+
+
+def autoconfigure(*args, **kwargs):
+    """Decorator that autoconfigures a class."""
+    def _decorator(cls):
+        return cls
+    if len(args) == 1 and callable(args[0]) and not kwargs:
+        return args[0]
+    return _decorator
+'''
+                    with open(_nvm_cfg, 'w') as _f:
+                        _f.write(_configurator_stub)
+                break
+
         # Fix code/harness/lwis/CMakeLists.txt: missing ${CUDA_INCLUDE_DIRS} causes
         # "fatal error: cuda.h: No such file or directory" when building the v6.0 harness.
         _lwis_cmake = os.path.join(nvidia_code_path, 'code', 'harness', 'lwis', 'CMakeLists.txt')
