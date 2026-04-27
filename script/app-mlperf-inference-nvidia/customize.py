@@ -80,9 +80,11 @@ def preprocess(i):
             if os.path.isfile(_nvm_init):
                 _nvm_cfg_dir = os.path.join(_sp, 'nvmitten', 'configurator')
                 _nvm_cfg_file = os.path.join(_sp, 'nvmitten', 'configurator.py')
-                # Check if configurator package/module is missing
-                _nvm_cfg_missing = (not os.path.isdir(_nvm_cfg_dir) and not os.path.isfile(_nvm_cfg_file))
-                if _nvm_cfg_missing:
+                # Check if proper configurator package is missing or is the old no-op version
+                _nvm_core = os.path.join(_nvm_cfg_dir, '_core.py')
+                _needs_install = (not os.path.isdir(_nvm_cfg_dir) and not os.path.isfile(_nvm_cfg_file))
+                _needs_update = (os.path.isfile(_nvm_core) and '_parse_argv' not in open(_nvm_core).read())
+                if _needs_install or _needs_update:
                     os.makedirs(_nvm_cfg_dir, exist_ok=True)
                     _nvm_cfg_init = os.path.join(_nvm_cfg_dir, '__init__.py')
                     with open(_nvm_cfg_init, 'w') as _f:
@@ -92,25 +94,72 @@ def preprocess(i):
                                  '"ConfigurationIndex", "HelpInfo", "bind", "autoconfigure"]\n')
                     _nvm_cfg_core = os.path.join(_nvm_cfg_dir, '_core.py')
                     with open(_nvm_cfg_core, 'w') as _f:
-                        _f.write('from contextlib import contextmanager\n\n\n'
-                                 'class _NullCtx:\n'
-                                 '    def __enter__(self): return self\n'
-                                 '    def __exit__(self, *a): return False\n\n\n'
-                                 'class Configuration:\n'
-                                 '    def autoapply(self): return _NullCtx()\n'
-                                 '    def __enter__(self): return self\n'
-                                 '    def __exit__(self, *a): return False\n\n\n'
-                                 'class ConfigurationIndex:\n'
-                                 '    def __init__(self, *a, **kw): pass\n\n\n'
-                                 'class HelpInfo:\n'
-                                 '    @staticmethod\n'
-                                 '    def add_configurator_dependency(*a, **kw): pass\n\n\n'
-                                 'def bind(*a, **kw):\n'
-                                 '    def _d(cls): return cls\n'
-                                 '    return a[0] if len(a) == 1 and callable(a[0]) and not kw else _d\n\n\n'
-                                 'def autoconfigure(*a, **kw):\n'
-                                 '    def _d(cls): return cls\n'
-                                 '    return a[0] if len(a) == 1 and callable(a[0]) and not kw else _d\n')
+                        _f.write(
+                            'import sys\n\n'
+                            '_class_bindings = {}\n'
+                            '_parsed_values = {}\n\n\n'
+                            'def _parse_argv():\n'
+                            '    result = {}\n'
+                            '    args = sys.argv[1:]\n'
+                            '    i = 0\n'
+                            '    while i < len(args):\n'
+                            '        arg = args[i]\n'
+                            '        if arg.startswith("--"):\n'
+                            '            arg = arg[2:]\n'
+                            '            if "=" in arg:\n'
+                            '                key, val = arg.split("=", 1)\n'
+                            '                result[key] = val\n'
+                            '            elif i + 1 < len(args) and not args[i + 1].startswith("-"):\n'
+                            '                result[arg] = args[i + 1]\n'
+                            '                i += 1\n'
+                            '            else:\n'
+                            '                result[arg] = "true"\n'
+                            '        i += 1\n'
+                            '    return result\n\n\n'
+                            'class _AutoApplyCtx:\n'
+                            '    def __enter__(self):\n'
+                            '        global _parsed_values\n'
+                            '        _parsed_values = _parse_argv()\n'
+                            '        return self\n'
+                            '    def __exit__(self, *a):\n'
+                            '        global _parsed_values\n'
+                            '        _parsed_values = {}\n'
+                            '        return False\n\n\n'
+                            'class Configuration:\n'
+                            '    def autoapply(self): return _AutoApplyCtx()\n'
+                            '    def __enter__(self): return self\n'
+                            '    def __exit__(self, *a): return False\n\n\n'
+                            'class ConfigurationIndex:\n'
+                            '    def __init__(self, *a, **kw): pass\n\n\n'
+                            'class HelpInfo:\n'
+                            '    @staticmethod\n'
+                            '    def add_configurator_dependency(*a, **kw): pass\n\n\n'
+                            'def bind(field, *aliases):\n'
+                            '    def decorator(cls):\n'
+                            '        if cls not in _class_bindings:\n'
+                            '            _class_bindings[cls] = []\n'
+                            '        _class_bindings[cls].append(field)\n'
+                            '        return cls\n'
+                            '    if hasattr(field, "name") and hasattr(field, "from_string"):\n'
+                            '        return decorator\n'
+                            '    return field\n\n\n'
+                            'def autoconfigure(cls):\n'
+                            '    original_init = cls.__init__\n'
+                            '    def new_init(self, *args, **kwargs):\n'
+                            '        for f in _class_bindings.get(cls, []):\n'
+                            '            if f.name not in kwargs:\n'
+                            '                raw = _parsed_values.get(f.name)\n'
+                            '                if raw is not None:\n'
+                            '                    if f.from_string is not None:\n'
+                            '                        try: kwargs[f.name] = f.from_string(raw)\n'
+                            '                        except Exception: kwargs[f.name] = raw\n'
+                            '                    else: kwargs[f.name] = raw\n'
+                            '                elif f.default is not None:\n'
+                            '                    kwargs[f.name] = f.default\n'
+                            '        original_init(self, *args, **kwargs)\n'
+                            '    cls.__init__ = new_init\n'
+                            '    return cls\n'
+                        )
                     _nvm_cfg_fields = os.path.join(_nvm_cfg_dir, 'fields.py')
                     with open(_nvm_cfg_fields, 'w') as _f:
                         _f.write('from enum import Enum, auto\n\n\n'
