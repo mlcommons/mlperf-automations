@@ -83,7 +83,10 @@ def preprocess(i):
                 # Check if proper configurator package is missing or is the old no-op version
                 _nvm_core = os.path.join(_nvm_cfg_dir, '_core.py')
                 _needs_install = (not os.path.isdir(_nvm_cfg_dir) and not os.path.isfile(_nvm_cfg_file))
-                _needs_update = (os.path.isfile(_nvm_core) and '_parse_argv' not in open(_nvm_core).read())
+                _needs_update = (os.path.isfile(_nvm_core) and (
+                    '_parse_argv' not in open(_nvm_core).read() or
+                    'load_module' not in open(_nvm_core).read() or
+                    'def __setitem__' not in open(_nvm_core).read()))
                 if _needs_install or _needs_update:
                     os.makedirs(_nvm_cfg_dir, exist_ok=True)
                     _nvm_cfg_init = os.path.join(_nvm_cfg_dir, '__init__.py')
@@ -95,59 +98,131 @@ def preprocess(i):
                     _nvm_cfg_core = os.path.join(_nvm_cfg_dir, '_core.py')
                     with open(_nvm_cfg_core, 'w') as _f:
                         _f.write(
-                            'import sys\n\n'
+                            'import sys\n'
+                            'import inspect\n'
+                            '\n'
                             '_class_bindings = {}\n'
-                            '_parsed_values = {}\n\n\n'
+                            '_parsed_values = {}\n'
+                            '_current_config = None  # Set to the Configuration instance during config.autoapply()\n'
+                            '\n'
+                            '\n'
                             'def _parse_argv():\n'
                             '    result = {}\n'
                             '    args = sys.argv[1:]\n'
                             '    i = 0\n'
                             '    while i < len(args):\n'
                             '        arg = args[i]\n'
-                            '        if arg.startswith("--"):\n'
+                            '        if arg.startswith(\'--\'):\n'
                             '            arg = arg[2:]\n'
-                            '            if "=" in arg:\n'
-                            '                key, val = arg.split("=", 1)\n'
+                            '            if \'=\' in arg:\n'
+                            '                key, val = arg.split(\'=\', 1)\n'
                             '                result[key] = val\n'
-                            '            elif i + 1 < len(args) and not args[i + 1].startswith("-"):\n'
+                            '            elif i + 1 < len(args) and not args[i + 1].startswith(\'-\'):\n'
                             '                result[arg] = args[i + 1]\n'
                             '                i += 1\n'
                             '            else:\n'
-                            '                result[arg] = "true"\n'
+                            '                result[arg] = \'true\'\n'
                             '        i += 1\n'
-                            '    return result\n\n\n'
+                            '    return result\n'
+                            '\n'
+                            '\n'
                             'class _AutoApplyCtx:\n'
+                            '    def __init__(self, config=None):\n'
+                            '        self.config = config\n'
                             '    def __enter__(self):\n'
-                            '        global _parsed_values\n'
+                            '        global _parsed_values, _current_config\n'
                             '        _parsed_values = _parse_argv()\n'
+                            '        _current_config = self.config\n'
                             '        return self\n'
                             '    def __exit__(self, *a):\n'
-                            '        global _parsed_values\n'
+                            '        global _parsed_values, _current_config\n'
                             '        _parsed_values = {}\n'
-                            '        return False\n\n\n'
+                            '        _current_config = None\n'
+                            '        return False\n'
+                            '\n'
+                            '\n'
                             'class Configuration:\n'
-                            '    def autoapply(self): return _AutoApplyCtx()\n'
+                            '    def __init__(self, data=None):\n'
+                            '        self._data = dict(data) if data else {}\n'
+                            '\n'
+                            '    def autoapply(self): return _AutoApplyCtx(self)\n'
                             '    def __enter__(self): return self\n'
-                            '    def __exit__(self, *a): return False\n\n\n'
+                            '    def __exit__(self, *a): return False\n'
+                            '    def __setitem__(self, key, value): self._data[key] = value\n'
+                            '    def __getitem__(self, key): return self._data[key]\n'
+                            '    def __contains__(self, key): return key in self._data\n'
+                            '    def __iter__(self): return iter(self._data)\n'
+                            '    def items(self): return self._data.items()\n'
+                            '    def get(self, key, default=None): return self._data.get(key, default)\n'
+                            '    def update(self, other): self._data.update(other)\n'
+                            '    def __repr__(self): return f\'Configuration({self._data!r})\'\n'
+                            '\n'
+                            '\n'
                             'class ConfigurationIndex:\n'
-                            '    def __init__(self, *a, **kw): pass\n\n\n'
+                            '    def __init__(self, *a, **kw):\n'
+                            '        self._store = {}\n'
+                            '\n'
+                            '    def load_module(self, imp_path, prefix=None):\n'
+                            '        import importlib\n'
+                            '        prefix = list(prefix) if prefix else []\n'
+                            '        try:\n'
+                            '            if imp_path in sys.modules:\n'
+                            '                del sys.modules[imp_path]\n'
+                            '            parent = imp_path.split(\'.\')[0]\n'
+                            '            if parent in sys.modules:\n'
+                            '                del sys.modules[parent]\n'
+                            '            mod = importlib.import_module(imp_path)\n'
+                            '        except Exception:\n'
+                            '            return\n'
+                            '        exports = getattr(mod, \'EXPORTS\', {})\n'
+                            '        for workload_setting, cfg in exports.items():\n'
+                            '            key = tuple(prefix) + (workload_setting,)\n'
+                            '            self._store[key] = cfg\n'
+                            '\n'
+                            '    def get(self, keyspace):\n'
+                            '        raw = self._store.get(tuple(keyspace), None)\n'
+                            '        if raw is None:\n'
+                            '            return None\n'
+                            '        return Configuration(raw)\n'
+                            '\n'
+                            '\n'
                             'class HelpInfo:\n'
                             '    @staticmethod\n'
-                            '    def add_configurator_dependency(*a, **kw): pass\n\n\n'
+                            '    def add_configurator_dependency(*a, **kw): pass\n'
+                            '\n'
+                            '\n'
                             'def bind(field, *aliases):\n'
                             '    def decorator(cls):\n'
                             '        if cls not in _class_bindings:\n'
                             '            _class_bindings[cls] = []\n'
                             '        _class_bindings[cls].append(field)\n'
                             '        return cls\n'
-                            '    if hasattr(field, "name") and hasattr(field, "from_string"):\n'
+                            '    if hasattr(field, \'name\') and hasattr(field, \'from_string\'):\n'
                             '        return decorator\n'
-                            '    return field\n\n\n'
+                            '    return field\n'
+                            '\n'
+                            '\n'
                             'def autoconfigure(cls):\n'
                             '    original_init = cls.__init__\n'
+                            '    try:\n'
+                            '        sig = inspect.signature(original_init)\n'
+                            '        explicit_params = frozenset(\n'
+                            '            name for name, p in sig.parameters.items()\n'
+                            '            if p.kind in (inspect.Parameter.POSITIONAL_OR_KEYWORD,\n'
+                            '                          inspect.Parameter.KEYWORD_ONLY)\n'
+                            '        )\n'
+                            '    except Exception:\n'
+                            '        explicit_params = None\n'
                             '    def new_init(self, *args, **kwargs):\n'
                             '        for f in _class_bindings.get(cls, []):\n'
                             '            if f.name not in kwargs:\n'
+                            '                if explicit_params is not None and f.name not in explicit_params:\n'
+                            '                    continue\n'
+                            '                if _current_config is not None:\n'
+                            '                    val = _current_config.get(f)\n'
+                            '                    if val is not None:\n'
+                            '                        kwargs[f.name] = val\n'
+                            '                        continue\n'
                             '                raw = _parsed_values.get(f.name)\n'
                             '                if raw is not None:\n'
                             '                    if f.from_string is not None:\n'
@@ -159,6 +234,7 @@ def preprocess(i):
                             '        original_init(self, *args, **kwargs)\n'
                             '    cls.__init__ = new_init\n'
                             '    return cls\n'
+                            '\n'
                         )
                     _nvm_cfg_fields = os.path.join(_nvm_cfg_dir, 'fields.py')
                     with open(_nvm_cfg_fields, 'w') as _f:
@@ -186,6 +262,20 @@ def preprocess(i):
                     if 'from nvmitten.system.system import System' not in _sys_content:
                         with open(_nvm_sys_init, 'a') as _f:
                             _f.write('\nfrom nvmitten.system.system import System\n')
+
+                # Fix nvmitten AliasedNameEnum.valstr: PyPI v0.2.0 defines valstr() as a plain
+                # method, but v6.0 harness code accesses it as a property (arch.valstr, not arch.valstr()).
+                # Add the @property decorator if missing.
+                _nvm_alias = os.path.join(_sp, 'nvmitten', 'aliased_name.py')
+                if os.path.isfile(_nvm_alias):
+                    with open(_nvm_alias, 'r') as _f:
+                        _alias_src = _f.read()
+                    if '    def valstr(self)' in _alias_src and '    @property\n    def valstr(self)' not in _alias_src:
+                        _alias_src = _alias_src.replace(
+                            '    def valstr(self)',
+                            '    @property\n    def valstr(self)')
+                        with open(_nvm_alias, 'w') as _f:
+                            _f.write(_alias_src)
                 break
 
         # Fix code/harness/lwis/CMakeLists.txt: missing ${CUDA_INCLUDE_DIRS} causes
@@ -254,6 +344,32 @@ def preprocess(i):
                 _loadgen_src = _loadgen_src.replace(_lg_old, _lg_new)
                 with open(_loadgen_py, 'w') as _f:
                     _f.write(_loadgen_src)
+
+        # Fix code/common/workload.py: Workload.from_fields classmethod is missing in v6.0
+        # but main.py calls Workload.from_fields(...) at line 531.
+        # Add it as a classmethod that bypasses autoconfigure and constructs directly.
+        _workload_py = os.path.join(nvidia_code_path, 'code', 'common', 'workload.py')
+        if os.path.isfile(_workload_py):
+            with open(_workload_py, 'r') as _f:
+                _workload_src = _f.read()
+            if 'def from_fields' not in _workload_src and 'def __eq__(self, other):' in _workload_src:
+                _from_fields = (
+                    '\n'
+                    '    @classmethod\n'
+                    '    def from_fields(cls, benchmark, scenario, system=None, setting=None, **kwargs):\n'
+                    '        from code.common.systems.system_list import DETECTED_SYSTEM as _DS\n'
+                    '        import code.common.constants as _C\n'
+                    '        if system is None:\n'
+                    '            system = _DS\n'
+                    '        if setting is None:\n'
+                    '            setting = _C.WorkloadSetting()\n'
+                    '        return cls(benchmark, scenario, system=system, setting=setting, **kwargs)\n'
+                    '\n'
+                )
+                _workload_src = _workload_src.replace(
+                    '    def __eq__(self, other):', _from_fields + '    def __eq__(self, other):', 1)
+                with open(_workload_py, 'w') as _f:
+                    _f.write(_workload_src)
 
     if "bert" in env.get('MLC_MODEL', '') and _inference_version >= 'v6.0' and nvidia_code_path:
         # 1. Create code/bert/tensorrt/fields.py with Field definitions needed by bert configs
