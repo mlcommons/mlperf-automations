@@ -52,6 +52,20 @@ elif [[ -z "${LOADGEN_INCLUDE_DIR}" ]]; then
     else
       export LOADGEN_INCLUDE_DIR="${_LOADGEN_PARENT}"
     fi
+  elif [[ -n "${MLC_MLPERF_INFERENCE_SOURCE}" && -f "${MLC_MLPERF_INFERENCE_SOURCE}/loadgen/loadgen.h" ]]; then
+    # Build loadgen from inference source if not already built
+    echo "Building loadgen from ${MLC_MLPERF_INFERENCE_SOURCE}/loadgen ..."
+    _LOADGEN_SRC="${MLC_MLPERF_INFERENCE_SOURCE}/loadgen"
+    _LOADGEN_BUILD="${_LOADGEN_SRC}/build"
+    mkdir -p "${_LOADGEN_BUILD}"
+    pushd "${_LOADGEN_BUILD}" > /dev/null
+    cmake -DCMAKE_BUILD_TYPE=Release "${_LOADGEN_SRC}" && make -j mlperf_loadgen
+    popd > /dev/null
+    if [[ -f "${_LOADGEN_BUILD}/libmlperf_loadgen.a" ]]; then
+      export LOADGEN_LIB_DIR="${_LOADGEN_BUILD}"
+      export LOADGEN_INCLUDE_DIR="${_LOADGEN_SRC}"
+      echo "Loadgen built successfully."
+    fi
   fi
 fi
 echo "LOADGEN_INCLUDE_DIR=${LOADGEN_INCLUDE_DIR}"

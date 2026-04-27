@@ -84,6 +84,28 @@ def preprocess(i):
                 with open(_plugin_init, 'w') as _f:
                     _f.write(_plugin_src)
 
+        # Fix code/common/paths.py: SUBMODULES_DIR/TRTLLM_DIR/MLCOMMONS_INF_REPO all call
+        # _verify_path() at module import time, raising FileNotFoundError if 3rdparty is absent.
+        # Patch them to use create_if_missing=True so the dirs are auto-created.
+        _paths_py = os.path.join(nvidia_code_path, 'code', 'common', 'paths.py')
+        if os.path.isfile(_paths_py):
+            with open(_paths_py, 'r') as _f:
+                _paths_src = _f.read()
+            _paths_old = (
+                'SUBMODULES_DIR: Final[Path] = _verify_path(PROJECT_BASE_DIR / "3rdparty")\n'
+                'TRTLLM_DIR: Final[Path] = _verify_path(SUBMODULES_DIR / "trtllm")\n'
+                'MLCOMMONS_INF_REPO: Final[Path] = _verify_path(SUBMODULES_DIR / "mlc-inference")'
+            )
+            _paths_new = (
+                'SUBMODULES_DIR: Final[Path] = _verify_path(PROJECT_BASE_DIR / "3rdparty", create_if_missing=True)\n'
+                'TRTLLM_DIR: Final[Path] = _verify_path(SUBMODULES_DIR / "trtllm", create_if_missing=True)\n'
+                'MLCOMMONS_INF_REPO: Final[Path] = _verify_path(SUBMODULES_DIR / "mlc-inference", create_if_missing=True)'
+            )
+            if _paths_old in _paths_src:
+                _paths_src = _paths_src.replace(_paths_old, _paths_new)
+                with open(_paths_py, 'w') as _f:
+                    _f.write(_paths_src)
+
     if "bert" in env.get('MLC_MODEL', '') and _inference_version >= 'v6.0' and nvidia_code_path:
         # 1. Create code/bert/tensorrt/fields.py with Field definitions needed by bert configs
         _bert_fields_path = os.path.join(
