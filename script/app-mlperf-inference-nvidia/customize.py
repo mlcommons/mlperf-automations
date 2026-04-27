@@ -276,6 +276,33 @@ def preprocess(i):
                             '    @property\n    def valstr(self)')
                         with open(_nvm_alias, 'w') as _f:
                             _f.write(_alias_src)
+
+                # Fix nvmitten/nvidia/builder.py: normalize enum-like input_dtype/input_format
+                # to strings before the type assertion in TRTBuilder.
+                _nvm_builder = os.path.join(_sp, 'nvmitten', 'nvidia', 'builder.py')
+                if os.path.isfile(_nvm_builder):
+                    with open(_nvm_builder, 'r') as _f:
+                        _builder_src = _f.read()
+                    _builder_new = (
+                        '        def _mlc_valstr_or_self(_value):\n'
+                        '            return _value.valstr if hasattr(_value, "valstr") else _value\n'
+                        '        self.input_dtype = _mlc_valstr_or_self(self.input_dtype)\n'
+                        '        self.input_format = _mlc_valstr_or_self(self.input_format)\n'
+                        '        assert type(self.input_dtype) == type(self.input_format), "input_dtype and input_format must be the same type"')
+                    _builder_old_double = (
+                        '        assert type(self.input_dtype) == type(self.input_format), '
+                        '"input_dtype and input_format must be the same type"')
+                    _builder_old_single = (
+                        "        assert type(self.input_dtype) == type(self.input_format), "
+                        "'input_dtype and input_format must be the same type'")
+                    if '_mlc_valstr_or_self' not in _builder_src:
+                        if _builder_old_double in _builder_src:
+                            _builder_src = _builder_src.replace(_builder_old_double, _builder_new, 1)
+                        elif _builder_old_single in _builder_src:
+                            _builder_src = _builder_src.replace(_builder_old_single, _builder_new, 1)
+                        if '_mlc_valstr_or_self' in _builder_src:
+                            with open(_nvm_builder, 'w') as _f:
+                                _f.write(_builder_src)
                 break
 
         # Fix code/harness/lwis/CMakeLists.txt: missing ${CUDA_INCLUDE_DIRS} causes
@@ -327,11 +354,13 @@ def preprocess(i):
                     _f.write(_paths_src)
 
         # Fix code/common/mlcommons/loadgen.py: import_from() gets pathlib.Path objects in the
-        # import_path list, but Python's import machinery requires strings. Convert to str().
+        # import_path list, but Python's import machinery requires strings. Also guard the
+        # mlperf.conf export copy against SameFileError when src and dst resolve to the same path.
         _loadgen_py = os.path.join(nvidia_code_path, 'code', 'common', 'mlcommons', 'loadgen.py')
         if os.path.isfile(_loadgen_py):
             with open(_loadgen_py, 'r') as _f:
                 _loadgen_src = _f.read()
+            _loadgen_changed = False
             _lg_old = ('submission_checker_constants = import_from(\n'
                        '    [paths.MLCOMMONS_INF_REPO / "tools" / "submission" / "submission_checker"] + sys.path,\n'
                        '    "constants"\n'
@@ -342,8 +371,33 @@ def preprocess(i):
                        ')')
             if _lg_old in _loadgen_src:
                 _loadgen_src = _loadgen_src.replace(_lg_old, _lg_new)
+                _loadgen_changed = True
+            if '_mlc_copy_if_different' not in _loadgen_src and 'shutil.copy(' in _loadgen_src:
+                if 'import os\n' not in _loadgen_src:
+                    _loadgen_src = _loadgen_src.replace('import shutil\n', 'import os\nimport shutil\n', 1)
+                _loadgen_src = _loadgen_src.replace(
+                    'import shutil\n',
+                    'import shutil\n\n'
+                    'def _mlc_copy_if_different(src, dst):\n'
+                    '    if os.path.realpath(src) != os.path.realpath(dst):\n'
+                    '        shutil.copy(src, dst)\n\n',
+                    1)
+                _loadgen_src = _loadgen_src.replace('shutil.copy(', '_mlc_copy_if_different(', 1)
+                _loadgen_changed = True
+            if _loadgen_changed:
                 with open(_loadgen_py, 'w') as _f:
                     _f.write(_loadgen_src)
+
+        # Fix code/resnet50/tensorrt/builder.py: object.__init__() in the MRO does not accept
+        # calib_data_dir, so do not forward it in the super().__init__ call.
+        _resnet_builder_py = os.path.join(nvidia_code_path, 'code', 'resnet50', 'tensorrt', 'builder.py')
+        if os.path.isfile(_resnet_builder_py):
+            with open(_resnet_builder_py, 'r') as _f:
+                _resnet_builder_src = _f.read()
+            if 'calib_data_dir=calib_data_dir,' in _resnet_builder_src:
+                _resnet_builder_src = _resnet_builder_src.replace('calib_data_dir=calib_data_dir,', '', 1)
+                with open(_resnet_builder_py, 'w') as _f:
+                    _f.write(_resnet_builder_src)
 
         # Fix code/common/workload.py: Workload.from_fields classmethod is missing in v6.0
         # but main.py calls Workload.from_fields(...) at line 531.
@@ -463,11 +517,13 @@ EXPORTS = {{
                 'import code.fields.harness as harness_fields\n'
                 'import code.fields.models as model_fields\n'
                 'import code.fields.loadgen as loadgen_fields\n'
-                'from nvmitten.constants import Precision\n\n'
+                '\n'
                 '_base = {\n'
                 "    model_fields.gpu_batch_size: {'resnet50': 2048},\n"
                 '    loadgen_fields.offline_expected_qps: 30000,\n'
-                "    model_fields.precision: Precision.INT8,\n"
+                "    model_fields.precision: 'int8',\n"
+                "    model_fields.input_dtype: 'int8',\n"
+                "    model_fields.input_format: 'linear',\n"
                 "    harness_fields.tensor_path: 'build/preprocessed_data/imagenet/ResNet50/int8_linear',\n"
                 "    harness_fields.map_path: 'data_maps/imagenet/val_map.txt',\n"
                 '}\n\n'
@@ -481,6 +537,19 @@ EXPORTS = {{
             with open(_resnet_cfg_path, 'r') as _f:
                 _resnet_cfg = _f.read()
             _changed = False
+            if 'from nvmitten.constants import Precision\n' in _resnet_cfg:
+                _resnet_cfg = _resnet_cfg.replace('from nvmitten.constants import Precision\n', '')
+                _changed = True
+            if 'Precision.INT8' in _resnet_cfg:
+                _resnet_cfg = _resnet_cfg.replace('Precision.INT8', "'int8'")
+                _changed = True
+            if 'model_fields.input_dtype' not in _resnet_cfg and "model_fields.precision: 'int8'," in _resnet_cfg:
+                _resnet_cfg = _resnet_cfg.replace(
+                    "    model_fields.precision: 'int8',",
+                    "    model_fields.precision: 'int8',\n"
+                    "    model_fields.input_dtype: 'int8',\n"
+                    "    model_fields.input_format: 'linear',")
+                _changed = True
             # Fix tensor_path: must point to int8_linear subdirectory
             if "imagenet/ResNet50/'," in _resnet_cfg and 'int8_linear' not in _resnet_cfg:
                 _resnet_cfg = _resnet_cfg.replace(
