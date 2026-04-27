@@ -58,6 +58,19 @@ def preprocess(i):
     # Applied idempotently so the container always has the correct files.
     _inference_version = env.get('MLC_MLPERF_INFERENCE_CODE_VERSION', '')
     if _inference_version >= 'v6.0' and nvidia_code_path:
+        # Create 3rdparty/mlc-inference symlink to mlcommons/inference source and 3rdparty/trtllm
+        # as an empty directory. This must happen BEFORE paths.py is first imported by the harness,
+        # so that _verify_path() sees the symlink/dir and doesn't try to create empty directories.
+        _3rdparty_dir = os.path.join(nvidia_code_path, '3rdparty')
+        os.makedirs(_3rdparty_dir, exist_ok=True)
+        _mlc_inf_link = os.path.join(_3rdparty_dir, 'mlc-inference')
+        _mlcommons_inf_src = env.get('MLC_MLPERF_INFERENCE_SOURCE', '')
+        if os.path.islink(_mlc_inf_link) and not os.path.exists(_mlc_inf_link):
+            os.unlink(_mlc_inf_link)  # Remove broken symlink
+        if not os.path.exists(_mlc_inf_link) and _mlcommons_inf_src:
+            os.symlink(_mlcommons_inf_src, _mlc_inf_link)
+        os.makedirs(os.path.join(_3rdparty_dir, 'trtllm'), exist_ok=True)
+
         # Install nvmitten.configurator stub if the full module is absent (outside official Docker).
         # nvmitten v0.2.0 on PyPI only has a stub __init__.py without the configurator module.
         # The full nvmitten is shipped inside the official NVIDIA Docker image.
@@ -65,67 +78,65 @@ def preprocess(i):
         for _sp in (_site.getsitepackages() + [_site.getusersitepackages()]):
             _nvm_init = os.path.join(_sp, 'nvmitten', '__init__.py')
             if os.path.isfile(_nvm_init):
-                _nvm_cfg = os.path.join(_sp, 'nvmitten', 'configurator.py')
-                if not os.path.isfile(_nvm_cfg):
-                    _configurator_stub = '''\
-# Stub nvmitten.configurator for v6.0 harness compatibility outside official NVIDIA Docker.
-from typing import Any, Optional
+                _nvm_cfg_dir = os.path.join(_sp, 'nvmitten', 'configurator')
+                _nvm_cfg_file = os.path.join(_sp, 'nvmitten', 'configurator.py')
+                # Check if configurator package/module is missing
+                _nvm_cfg_missing = (not os.path.isdir(_nvm_cfg_dir) and not os.path.isfile(_nvm_cfg_file))
+                if _nvm_cfg_missing:
+                    os.makedirs(_nvm_cfg_dir, exist_ok=True)
+                    _nvm_cfg_init = os.path.join(_nvm_cfg_dir, '__init__.py')
+                    with open(_nvm_cfg_init, 'w') as _f:
+                        _f.write('from .fields import Field, AutoConfStrategy\n'
+                                 'from ._core import Configuration, ConfigurationIndex, HelpInfo, bind, autoconfigure\n'
+                                 '__all__ = ["Field", "AutoConfStrategy", "Configuration", '
+                                 '"ConfigurationIndex", "HelpInfo", "bind", "autoconfigure"]\n')
+                    _nvm_cfg_core = os.path.join(_nvm_cfg_dir, '_core.py')
+                    with open(_nvm_cfg_core, 'w') as _f:
+                        _f.write('from contextlib import contextmanager\n\n\n'
+                                 'class _NullCtx:\n'
+                                 '    def __enter__(self): return self\n'
+                                 '    def __exit__(self, *a): return False\n\n\n'
+                                 'class Configuration:\n'
+                                 '    def autoapply(self): return _NullCtx()\n'
+                                 '    def __enter__(self): return self\n'
+                                 '    def __exit__(self, *a): return False\n\n\n'
+                                 'class ConfigurationIndex:\n'
+                                 '    def __init__(self, *a, **kw): pass\n\n\n'
+                                 'class HelpInfo:\n'
+                                 '    @staticmethod\n'
+                                 '    def add_configurator_dependency(*a, **kw): pass\n\n\n'
+                                 'def bind(*a, **kw):\n'
+                                 '    def _d(cls): return cls\n'
+                                 '    return a[0] if len(a) == 1 and callable(a[0]) and not kw else _d\n\n\n'
+                                 'def autoconfigure(*a, **kw):\n'
+                                 '    def _d(cls): return cls\n'
+                                 '    return a[0] if len(a) == 1 and callable(a[0]) and not kw else _d\n')
+                    _nvm_cfg_fields = os.path.join(_nvm_cfg_dir, 'fields.py')
+                    with open(_nvm_cfg_fields, 'w') as _f:
+                        _f.write('from enum import Enum, auto\n\n\n'
+                                 'class AutoConfStrategy(Enum):\n'
+                                 '    Default = auto()\n'
+                                 '    DictUpdate = auto()\n'
+                                 '    Override = auto()\n\n\n'
+                                 'class Field:\n'
+                                 '    def __init__(self, name, description="", from_string=None, '
+                                 'default=None, autoconf_strategy=None, **kw):\n'
+                                 '        self.name = name; self.description = description\n'
+                                 '        self.from_string = from_string; self.default = default\n'
+                                 '        self.autoconf_strategy = autoconf_strategy\n'
+                                 '    def __repr__(self): return f"Field({self.name!r})"\n'
+                                 '    def __hash__(self): return hash(self.name)\n'
+                                 '    def __eq__(self, other):\n'
+                                 '        return self.name == other.name if isinstance(other, Field) else NotImplemented\n')
 
-
-class Field:
-    """Hashable configuration field descriptor used as dict keys in config files."""
-    def __init__(self, name: str, description: str = "", from_string=None, default=None, **kwargs):
-        self.name = name
-        self.description = description
-        self.from_string = from_string
-        self.default = default
-    def __repr__(self):
-        return f"Field({self.name!r})"
-    def __hash__(self):
-        return hash(self.name)
-    def __eq__(self, other):
-        if isinstance(other, Field):
-            return self.name == other.name
-        return NotImplemented
-
-
-class Configuration:
-    """Base class for configuration objects."""
-    pass
-
-
-class ConfigurationIndex:
-    """Index of configurations."""
-    def __init__(self, *args, **kwargs):
-        pass
-
-
-class HelpInfo:
-    """Provides help text and dependency information for configurator."""
-    @staticmethod
-    def add_configurator_dependency(*args, **kwargs):
-        pass
-
-
-def bind(*args, **kwargs):
-    """Decorator that binds configuration fields to a class."""
-    def _decorator(cls):
-        return cls
-    if len(args) == 1 and callable(args[0]) and not kwargs:
-        return args[0]
-    return _decorator
-
-
-def autoconfigure(*args, **kwargs):
-    """Decorator that autoconfigures a class."""
-    def _decorator(cls):
-        return cls
-    if len(args) == 1 and callable(args[0]) and not kwargs:
-        return args[0]
-    return _decorator
-'''
-                    with open(_nvm_cfg, 'w') as _f:
-                        _f.write(_configurator_stub)
+                # Also export System from nvmitten.system if missing
+                _nvm_sys_init = os.path.join(_sp, 'nvmitten', 'system', '__init__.py')
+                if os.path.isfile(_nvm_sys_init):
+                    with open(_nvm_sys_init, 'r') as _f:
+                        _sys_content = _f.read()
+                    if 'from nvmitten.system.system import System' not in _sys_content:
+                        with open(_nvm_sys_init, 'a') as _f:
+                            _f.write('\nfrom nvmitten.system.system import System\n')
                 break
 
         # Fix code/harness/lwis/CMakeLists.txt: missing ${CUDA_INCLUDE_DIRS} causes
@@ -154,9 +165,9 @@ def autoconfigure(*args, **kwargs):
                 with open(_plugin_init, 'w') as _f:
                     _f.write(_plugin_src)
 
-        # Fix code/common/paths.py: SUBMODULES_DIR/TRTLLM_DIR/MLCOMMONS_INF_REPO all call
-        # _verify_path() at module import time, raising FileNotFoundError if 3rdparty is absent.
-        # Patch them to use create_if_missing=True so the dirs are auto-created.
+        # Fix code/common/paths.py: SUBMODULES_DIR calls _verify_path() at module import time,
+        # raising FileNotFoundError if 3rdparty is absent. Patch to use create_if_missing=True
+        # for SUBMODULES_DIR only; mlc-inference and trtllm are created as symlinks/dirs above.
         _paths_py = os.path.join(nvidia_code_path, 'code', 'common', 'paths.py')
         if os.path.isfile(_paths_py):
             with open(_paths_py, 'r') as _f:
@@ -175,6 +186,25 @@ def autoconfigure(*args, **kwargs):
                 _paths_src = _paths_src.replace(_paths_old, _paths_new)
                 with open(_paths_py, 'w') as _f:
                     _f.write(_paths_src)
+
+        # Fix code/common/mlcommons/loadgen.py: import_from() gets pathlib.Path objects in the
+        # import_path list, but Python's import machinery requires strings. Convert to str().
+        _loadgen_py = os.path.join(nvidia_code_path, 'code', 'common', 'mlcommons', 'loadgen.py')
+        if os.path.isfile(_loadgen_py):
+            with open(_loadgen_py, 'r') as _f:
+                _loadgen_src = _f.read()
+            _lg_old = ('submission_checker_constants = import_from(\n'
+                       '    [paths.MLCOMMONS_INF_REPO / "tools" / "submission" / "submission_checker"] + sys.path,\n'
+                       '    "constants"\n'
+                       ')')
+            _lg_new = ('submission_checker_constants = import_from(\n'
+                       '    [str(paths.MLCOMMONS_INF_REPO / "tools" / "submission" / "submission_checker")] + [str(p) for p in sys.path],\n'
+                       '    "constants"\n'
+                       ')')
+            if _lg_old in _loadgen_src:
+                _loadgen_src = _loadgen_src.replace(_lg_old, _lg_new)
+                with open(_loadgen_py, 'w') as _f:
+                    _f.write(_loadgen_src)
 
     if "bert" in env.get('MLC_MODEL', '') and _inference_version >= 'v6.0' and nvidia_code_path:
         # 1. Create code/bert/tensorrt/fields.py with Field definitions needed by bert configs
