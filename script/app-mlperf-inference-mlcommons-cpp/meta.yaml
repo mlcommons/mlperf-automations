@@ -206,6 +206,20 @@ variations:
     env:
       MLC_MLPERF_LOADGEN_SCENARIO: SingleStream
       MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 1
+  bert-99:
+    group: model
+    env:
+      MLC_MODEL: bert-99
+    default_env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 8
+      MLC_MLPERF_LOADGEN_PERFORMANCE_SAMPLE_COUNT: '10833'
+  bert-99.9:
+    group: model
+    env:
+      MLC_MODEL: bert-99.9
+    default_env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 8
+      MLC_MLPERF_LOADGEN_PERFORMANCE_SAMPLE_COUNT: '10833'
   resnet50:
     group: model
     default: true
@@ -217,6 +231,18 @@ variations:
       MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 1
     env:
       MLC_MODEL: retinanet
+  bert-99,offline:
+    default_env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 8
+  bert-99,singlestream:
+    default_env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 1
+  bert-99.9,offline:
+    default_env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 8
+  bert-99.9,singlestream:
+    default_env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 1
   multistream,resnet50:
     default_variations:
       batch-size: batch-size.8
@@ -232,35 +258,9 @@ variations:
   resnet50,offline:
     default_env:
       MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 32
-  bert-99:
-    group: model
-    env:
-      MLC_MODEL: bert-99
-    default_env:
-      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 8
-      MLC_MLPERF_LOADGEN_PERFORMANCE_SAMPLE_COUNT: '10833'
-  bert-99.9:
-    group: model
-    env:
-      MLC_MODEL: bert-99.9
-    default_env:
-      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 8
-      MLC_MLPERF_LOADGEN_PERFORMANCE_SAMPLE_COUNT: '10833'
   resnet50,server:
     default_env:
       MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 32
-  bert-99,offline:
-    default_env:
-      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 8
-  bert-99.9,offline:
-    default_env:
-      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 8
-  bert-99,singlestream:
-    default_env:
-      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 1
-  bert-99.9,singlestream:
-    default_env:
-      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 1
 
 # Tests
 tests:

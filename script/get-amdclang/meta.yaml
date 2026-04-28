@@ -2,6 +2,8 @@ alias: get-amdclang
 uid: fd0e87bcc1bc45cc
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 name: Detect amdclang compiler from ROCm
 category: Compiler automation
 tags:
@@ -11,8 +13,12 @@ tags:
 - c-compiler
 - cpp-compiler
 - f-compiler
+
+# Cache
 cache: true
 clean_files: []
+
+# Environment
 new_env_keys:
 - MLC_AMDCLANG_*
 - MLC_C_COMPILER_*
@@ -21,13 +27,35 @@ new_env_keys:
 - MLC_COMPILER_*
 - MLC_LINKER_*
 - +PATH
+- MLC_ROCM_CPULIBS_PATH
+
+# Dependencies
 deps:
 - tags: get,rocm
   names:
   - get-rocm
 post_deps:
 - tags: get,compiler-flags
+
+# Variations
 variations:
+  no-runtimes:
+    group: runtimes
+    adr:
+      get-rocm:
+        tags: _no-runtimes
+  with-runtimes:
+    default: true
+    group: runtimes
+    adr:
+      get-rocm:
+        tags: _with-runtimes
+  cpulibs:
+    env:
+      MLC_ROCM_INSTALL_CPULIBS: 'yes'
+    adr:
+      get-rocm:
+        tags: _cpulibs
   path.#:
     env:
       MLC_AMDCLANG_DIR_PATH: '#'
@@ -37,18 +65,14 @@ variations:
     adr:
       get-rocm:
         tags: _src
-  with-runtimes:
-    default: true
-    group: runtimes
-    adr:
-      get-rocm:
-        tags: _with-runtimes
-  no-runtimes:
-    group: runtimes
-    adr:
-      get-rocm:
-        tags: _no-runtimes
+
+# Output / debugging
 sort: 500
+
+# Tests
 tests:
   run_inputs:
   - variations_list: []
+  - variations_list:
+    - src
+    - cpulibs
