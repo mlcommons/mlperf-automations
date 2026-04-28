@@ -36,7 +36,8 @@ def preprocess(i):
             shutil.copy2(src_path, stream_c)
             logger.info(f"Copied STREAM source from cache: {src_path}")
         else:
-            return {'return': 1, 'error': 'STREAM source not found. MLC_STREAM_SRC_PATH is not set.'}
+            return {
+                'return': 1, 'error': 'STREAM source not found. MLC_STREAM_SRC_PATH is not set.'}
 
     # Build compile command
     cflags = f"-O3 -DSTREAM_ARRAY_SIZE={array_size} -DNTIMES={ntimes}"
@@ -100,8 +101,10 @@ def postprocess(i):
                     'mean': round(statistics.mean(avg_times), 6),
                 }
             }
-            env[f'MLC_STREAM_{func.upper()}_BEST_RATE'] = str(round(max(best_rates), 2))
-            logger.info(f"STREAM {func}: best={max(best_rates):.2f} MB/s, mean={statistics.mean(best_rates):.2f} MB/s")
+            env[f'MLC_STREAM_{func.upper()}_BEST_RATE'] = str(
+                round(max(best_rates), 2))
+            logger.info(
+                f"STREAM {func}: best={max(best_rates):.2f} MB/s, mean={statistics.mean(best_rates):.2f} MB/s")
 
     summary_json = os.path.join(results_dir, 'stream_summary.json')
     with open(summary_json, 'w') as f:
