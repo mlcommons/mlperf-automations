@@ -1,0 +1,52 @@
+alias: benchmark-program-coremark
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: Benchmarking
+cache: true
+default_env:
+  MLC_COREMARK_NUM_RUNS: '3'
+  MLC_COREMARK_ITERATIONS: '0'
+  MLC_COREMARK_COMPILER: 'gcc'
+  MLC_COREMARK_EXTRA_CFLAGS: ''
+  MLC_COREMARK_NUM_THREADS: '1'
+deps:
+- tags: detect,os
+- tags: detect,cpu
+input_mapping:
+  num_runs: MLC_COREMARK_NUM_RUNS
+  iterations: MLC_COREMARK_ITERATIONS
+  compiler: MLC_COREMARK_COMPILER
+  extra_cflags: MLC_COREMARK_EXTRA_CFLAGS
+  num_threads: MLC_COREMARK_NUM_THREADS
+  results_dir: MLC_COREMARK_RESULTS_DIR
+  reuse_logs: MLC_COREMARK_REUSE_LOGS
+new_env_keys:
+- MLC_COREMARK_*
+tags:
+- benchmark
+- coremark
+- cpu
+- benchmark-coremark
+- benchmark-program-coremark
+uid: a1b2c3d4e5f60002
+variations:
+  single-thread:
+    default: true
+    env:
+      MLC_COREMARK_NUM_THREADS: '1'
+    group: threading
+  multi-thread:
+    env:
+      MLC_COREMARK_NUM_THREADS: '0'
+    group: threading
+
+tests:
+  run_inputs:
+  - variations_list:
+    - single-thread
+    env:
+      MLC_COREMARK_NUM_RUNS: '1'
+  - variations_list:
+    - multi-thread
+    env:
+      MLC_COREMARK_NUM_RUNS: '1'

@@ -1,0 +1,71 @@
+alias: benchmark-program-sysbench
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: Benchmarking
+cache: true
+default_env:
+  MLC_SYSBENCH_TEST: 'cpu'
+  MLC_SYSBENCH_NUM_RUNS: '3'
+  MLC_SYSBENCH_NUM_THREADS: '1'
+  MLC_SYSBENCH_TIME: '60'
+  MLC_SYSBENCH_CPU_MAX_PRIME: '20000'
+  MLC_SYSBENCH_MEMORY_BLOCK_SIZE: '1K'
+  MLC_SYSBENCH_MEMORY_TOTAL_SIZE: '10G'
+  MLC_SYSBENCH_EXTRA_ARGS: ''
+deps:
+- tags: detect,os
+- tags: detect,cpu
+input_mapping:
+  test: MLC_SYSBENCH_TEST
+  num_runs: MLC_SYSBENCH_NUM_RUNS
+  num_threads: MLC_SYSBENCH_NUM_THREADS
+  time: MLC_SYSBENCH_TIME
+  cpu_max_prime: MLC_SYSBENCH_CPU_MAX_PRIME
+  memory_block_size: MLC_SYSBENCH_MEMORY_BLOCK_SIZE
+  memory_total_size: MLC_SYSBENCH_MEMORY_TOTAL_SIZE
+  extra_args: MLC_SYSBENCH_EXTRA_ARGS
+  results_dir: MLC_SYSBENCH_RESULTS_DIR
+  reuse_logs: MLC_SYSBENCH_REUSE_LOGS
+new_env_keys:
+- MLC_SYSBENCH_*
+tags:
+- benchmark
+- sysbench
+- benchmark-sysbench
+- benchmark-program-sysbench
+uid: a1b2c3d4e5f60006
+variations:
+  cpu:
+    default: true
+    env:
+      MLC_SYSBENCH_TEST: 'cpu'
+    group: test
+  memory:
+    env:
+      MLC_SYSBENCH_TEST: 'memory'
+    group: test
+  fileio:
+    env:
+      MLC_SYSBENCH_TEST: 'fileio'
+    group: test
+  threads:
+    env:
+      MLC_SYSBENCH_TEST: 'threads'
+    group: test
+  mutex:
+    env:
+      MLC_SYSBENCH_TEST: 'mutex'
+    group: test
+
+tests:
+  run_inputs:
+  - variations_list:
+    - cpu
+    env:
+      MLC_SYSBENCH_NUM_RUNS: '1'
+      MLC_SYSBENCH_TIME: '10'
+  - variations_list:
+    - memory
+    env:
+      MLC_SYSBENCH_NUM_RUNS: '1'
+      MLC_SYSBENCH_TIME: '10'

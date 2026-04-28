@@ -1,0 +1,81 @@
+alias: benchmark-program-stress-ng
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: Benchmarking
+cache: true
+default_env:
+  MLC_STRESSNG_STRESSOR: 'cpu'
+  MLC_STRESSNG_NUM_RUNS: '3'
+  MLC_STRESSNG_WORKERS: '0'
+  MLC_STRESSNG_TIMEOUT: '60'
+  MLC_STRESSNG_METRICS: 'yes'
+  MLC_STRESSNG_EXTRA_ARGS: ''
+deps:
+- tags: detect,os
+- tags: detect,cpu
+input_mapping:
+  stressor: MLC_STRESSNG_STRESSOR
+  num_runs: MLC_STRESSNG_NUM_RUNS
+  workers: MLC_STRESSNG_WORKERS
+  timeout: MLC_STRESSNG_TIMEOUT
+  metrics: MLC_STRESSNG_METRICS
+  extra_args: MLC_STRESSNG_EXTRA_ARGS
+  results_dir: MLC_STRESSNG_RESULTS_DIR
+  reuse_logs: MLC_STRESSNG_REUSE_LOGS
+new_env_keys:
+- MLC_STRESSNG_*
+tags:
+- benchmark
+- stress-ng
+- stressng
+- benchmark-stress-ng
+- benchmark-program-stress-ng
+uid: a1b2c3d4e5f60007
+variations:
+  cpu:
+    default: true
+    env:
+      MLC_STRESSNG_STRESSOR: 'cpu'
+    group: stressor
+  cpu-all-methods:
+    env:
+      MLC_STRESSNG_STRESSOR: 'cpu'
+      MLC_STRESSNG_EXTRA_ARGS: '--cpu-method all'
+    group: stressor
+  matrix:
+    env:
+      MLC_STRESSNG_STRESSOR: 'matrix'
+    group: stressor
+  memory:
+    env:
+      MLC_STRESSNG_STRESSOR: 'vm'
+    group: stressor
+  cache:
+    env:
+      MLC_STRESSNG_STRESSOR: 'cache'
+    group: stressor
+  io:
+    env:
+      MLC_STRESSNG_STRESSOR: 'iomix'
+    group: stressor
+  pipe:
+    env:
+      MLC_STRESSNG_STRESSOR: 'pipe'
+    group: stressor
+  context-switch:
+    env:
+      MLC_STRESSNG_STRESSOR: 'switch'
+    group: stressor
+
+tests:
+  run_inputs:
+  - variations_list:
+    - cpu
+    env:
+      MLC_STRESSNG_NUM_RUNS: '1'
+      MLC_STRESSNG_TIMEOUT: '10'
+  - variations_list:
+    - matrix
+    env:
+      MLC_STRESSNG_NUM_RUNS: '1'
+      MLC_STRESSNG_TIMEOUT: '10'

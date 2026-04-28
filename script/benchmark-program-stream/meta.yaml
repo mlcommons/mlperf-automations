@@ -1,0 +1,54 @@
+alias: benchmark-program-stream
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: Benchmarking
+cache: true
+default_env:
+  MLC_STREAM_ARRAY_SIZE: '80000000'
+  MLC_STREAM_NUM_THREADS: '0'
+  MLC_STREAM_NTIMES: '20'
+  MLC_STREAM_NUM_RUNS: '3'
+  MLC_STREAM_COMPILER: 'gcc'
+  MLC_STREAM_EXTRA_CFLAGS: ''
+deps:
+- tags: detect,os
+- tags: detect,cpu
+input_mapping:
+  array_size: MLC_STREAM_ARRAY_SIZE
+  num_threads: MLC_STREAM_NUM_THREADS
+  ntimes: MLC_STREAM_NTIMES
+  num_runs: MLC_STREAM_NUM_RUNS
+  compiler: MLC_STREAM_COMPILER
+  extra_cflags: MLC_STREAM_EXTRA_CFLAGS
+  results_dir: MLC_STREAM_RESULTS_DIR
+  reuse_logs: MLC_STREAM_REUSE_LOGS
+new_env_keys:
+- MLC_STREAM_*
+tags:
+- benchmark
+- stream
+- memory-bandwidth
+- benchmark-stream
+- benchmark-program-stream
+uid: a1b2c3d4e5f60001
+variations:
+  default:
+    default: true
+    group: mode
+  omp:
+    env:
+      MLC_STREAM_USE_OPENMP: 'yes'
+    group: mode
+
+tests:
+  run_inputs:
+  - variations_list:
+    - default
+    env:
+      MLC_STREAM_NUM_RUNS: '1'
+      MLC_STREAM_ARRAY_SIZE: '10000000'
+  - variations_list:
+    - omp
+    env:
+      MLC_STREAM_NUM_RUNS: '1'
+      MLC_STREAM_ARRAY_SIZE: '10000000'

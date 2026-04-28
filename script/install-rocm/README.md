@@ -62,3 +62,14 @@ mlcr install,rocm,install-rocm
 | `--hf_token` | Huggingface Token |  | `` |
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
+
+### Runtimes
+
+- `no-runtimes`
+- `with-runtimes` (default)
+
+### Ungrouped
+
+- `compiler-only`
+- `cpulibs`
+- `src`

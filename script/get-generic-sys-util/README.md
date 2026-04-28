@@ -104,12 +104,14 @@ mlcr get,sys-util,generic,generic-sys-util
 - `libffi7`
 - `libffi8`
 - `libfftw3-dev`
+- `libfl-dev`
 - `libgdbm-dev`
 - `libgl`
 - `libgl1-mesa-glx`
 - `libgmock-dev`
 - `libhdf5-dev`
 - `libhdf5-openmpi-dev`
+- `liblapack-dev`
 - `liblzma-dev`
 - `libmkl-dev`
 - `libmpfr-dev`
@@ -117,6 +119,7 @@ mlcr get,sys-util,generic,generic-sys-util
 - `libnetcdf-dev`
 - `libnetcdff-dev`
 - `libnuma-dev`
+- `libopenblas-dev`
 - `libopenmpi-dev`
 - `libpci-dev`
 - `libpnetcdf-dev`
