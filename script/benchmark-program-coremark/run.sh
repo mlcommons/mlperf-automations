@@ -17,7 +17,11 @@ if [ -z "${MLC_COREMARK_SRC_PATH}" ]; then
   exit 1
 fi
 
-COREMARK_DIR="${MLC_COREMARK_SRC_PATH}"
+# Tarball extracts to a coremark-<version> subdirectory
+COREMARK_DIR=$(find "${MLC_COREMARK_SRC_PATH}" -maxdepth 1 -type d -name 'coremark*' | head -1)
+if [ -z "${COREMARK_DIR}" ]; then
+  COREMARK_DIR="${MLC_COREMARK_SRC_PATH}"
+fi
 cd "${COREMARK_DIR}"
 
 # Build CoreMark
