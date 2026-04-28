@@ -856,20 +856,6 @@ variations:
         brew: pkg-config
         dnf: pkg-config
         yum: pkg-config
-  phoronix-test-suite:
-    env:
-      MLC_SYS_UTIL_NAME: phoronix-test-suite
-      MLC_SYS_UTIL_VERSION_CMD: phoronix-test-suite version
-      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
-    new_env_keys:
-    - MLC_PHORONIX_VERSION
-    state:
-      phoronix-test-suite:
-        apt: phoronix-test-suite
-        brew: ""
-        dnf: ""
-        yum: ""
-  postfix:
     env:
       MLC_SYS_UTIL_NAME: postfix
       MLC_SYS_UTIL_VERSION_CMD: postconf mail_version

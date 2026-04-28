@@ -11,7 +11,6 @@ default_env:
 deps:
 - tags: detect,os
 - tags: detect,cpu
-- tags: get,generic-sys-util,_phoronix-test-suite
 input_mapping:
   test: MLC_PHORONIX_TEST
   num_runs: MLC_PHORONIX_NUM_RUNS
