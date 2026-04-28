@@ -2,12 +2,20 @@ alias: app-vasp
 uid: dae7f8a9b0c2345e
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: HPC Application
 tags:
 - app
 - vasp
 - hpc
+
+# Cache
 cache: true
+
+# Environment
+default_env:
+  MLC_VASP_SRC_PATH: ''
 new_env_keys:
 - MLC_VASP_SRC_PATH
 - MLC_VASP_INSTALL_PATH
@@ -15,6 +23,15 @@ new_env_keys:
 - +PATH
 - +LD_LIBRARY_PATH
 new_state_keys: []
+
+# Input mapping
+input_mapping:
+  vasp_src_path: MLC_VASP_SRC_PATH
+input_description:
+  vasp_src_path:
+    desc: Path to VASP source directory (VASP requires a license)
+
+# Dependencies
 deps:
 - tags: detect,cpu
 - tags: get,generic,sys-util,_libopenmpi-dev
@@ -27,13 +44,10 @@ deps:
 prehook_deps: []
 posthook_deps: []
 post_deps: []
+
+# Variations
 variations: {}
-default_env:
-  MLC_VASP_SRC_PATH: ''
-input_mapping:
-  vasp_src_path: MLC_VASP_SRC_PATH
-input_description:
-  vasp_src_path:
-    desc: Path to VASP source directory (VASP requires a license)
+
+# Tests
 tests:
   run_inputs: []
