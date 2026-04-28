@@ -1,6 +1,7 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-04-24 18:06:05*
+*Last updated: 2026-04-28 16:54:59*
+
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -272,9 +273,33 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Benchmarking
 
+- **[benchmark-program-coremark](benchmark-program-coremark/)**
+  - benchmark-program-coremark
+  - Tags: `benchmark`, `coremark`, `cpu`, `benchmark-coremark`, `benchmark-program-coremark`
+- **[benchmark-program-fio](benchmark-program-fio/)**
+  - benchmark-program-fio
+  - Tags: `benchmark`, `fio`, `storage`, `io`, `benchmark-fio`, `benchmark-program-fio`
 - **[benchmark-program-geekbench](benchmark-program-geekbench/)**
   - benchmark-program-geekbench
   - Tags: `benchmark`, `geekbench`, `benchmark-geekbench`, `benchmark-program-geekbench`
+- **[benchmark-program-linpack](benchmark-program-linpack/)**
+  - benchmark-program-linpack
+  - Tags: `benchmark`, `linpack`, `hpl`, `flops`, `benchmark-linpack`, `benchmark-program-linpack`
+- **[benchmark-program-phoronix](benchmark-program-phoronix/)**
+  - benchmark-program-phoronix
+  - Tags: `benchmark`, `phoronix`, `pts`, `benchmark-phoronix`, `benchmark-program-phoronix`
+- **[benchmark-program-pyperformance](benchmark-program-pyperformance/)**
+  - benchmark-program-pyperformance
+  - Tags: `benchmark`, `pyperformance`, `python`, `pybench`, `benchmark-pyperformance`, `benchmark-program-pyperformance`
+- **[benchmark-program-stream](benchmark-program-stream/)**
+  - benchmark-program-stream
+  - Tags: `benchmark`, `stream`, `memory-bandwidth`, `benchmark-stream`, `benchmark-program-stream`
+- **[benchmark-program-stress-ng](benchmark-program-stress-ng/)**
+  - benchmark-program-stress-ng
+  - Tags: `benchmark`, `stress-ng`, `stressng`, `benchmark-stress-ng`, `benchmark-program-stress-ng`
+- **[benchmark-program-sysbench](benchmark-program-sysbench/)**
+  - benchmark-program-sysbench
+  - Tags: `benchmark`, `sysbench`, `benchmark-sysbench`, `benchmark-program-sysbench`
 
 ## CUDA automation
 
@@ -1204,7 +1229,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 353
+- **Total Scripts**: 361
 - **Categories**: 33
 
 ## Usage
