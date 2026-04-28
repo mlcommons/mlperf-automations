@@ -88,8 +88,10 @@ def postprocess(i):
         summary['read_bw_kbs'] = {
             'mean': round(statistics.mean(read_bw_list), 2),
         }
-        env['MLC_FIO_READ_IOPS'] = str(round(statistics.mean(read_iops_list), 2))
-        logger.info(f"FIO read IOPS: mean={statistics.mean(read_iops_list):.2f}")
+        env['MLC_FIO_READ_IOPS'] = str(
+            round(statistics.mean(read_iops_list), 2))
+        logger.info(
+            f"FIO read IOPS: mean={statistics.mean(read_iops_list):.2f}")
 
     if write_iops_list:
         summary['write_iops'] = {
@@ -99,8 +101,10 @@ def postprocess(i):
         summary['write_bw_kbs'] = {
             'mean': round(statistics.mean(write_bw_list), 2),
         }
-        env['MLC_FIO_WRITE_IOPS'] = str(round(statistics.mean(write_iops_list), 2))
-        logger.info(f"FIO write IOPS: mean={statistics.mean(write_iops_list):.2f}")
+        env['MLC_FIO_WRITE_IOPS'] = str(
+            round(statistics.mean(write_iops_list), 2))
+        logger.info(
+            f"FIO write IOPS: mean={statistics.mean(write_iops_list):.2f}")
 
     summary_json = os.path.join(results_dir, 'fio_summary.json')
     with open(summary_json, 'w') as f:

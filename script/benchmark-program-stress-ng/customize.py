@@ -20,7 +20,8 @@ def preprocess(i):
         logger.info("Reuse logs mode: skipping execution")
         return {'return': 0}
     stressor = env.get('MLC_STRESSNG_STRESSOR', 'cpu')
-    logger.info(f"stress-ng stressor: {stressor}, workers={env.get('MLC_STRESSNG_WORKERS', '0')}")
+    logger.info(
+        f"stress-ng stressor: {stressor}, workers={env.get('MLC_STRESSNG_WORKERS', '0')}")
 
     return {'return': 0}
 
@@ -55,7 +56,8 @@ def postprocess(i):
         return {'return': 0}
 
     # Aggregate bogo ops
-    bogo_ops_list = [r['bogo_ops_per_sec'] for r in all_results if 'bogo_ops_per_sec' in r]
+    bogo_ops_list = [r['bogo_ops_per_sec']
+                     for r in all_results if 'bogo_ops_per_sec' in r]
 
     summary = {
         'stressor': env.get('MLC_STRESSNG_STRESSOR', ''),
@@ -69,8 +71,10 @@ def postprocess(i):
             'max': round(max(bogo_ops_list), 2),
             'min': round(min(bogo_ops_list), 2),
         }
-        env['MLC_STRESSNG_BOGO_OPS_PER_SEC'] = str(round(statistics.mean(bogo_ops_list), 2))
-        logger.info(f"stress-ng bogo ops/sec: mean={statistics.mean(bogo_ops_list):.2f}")
+        env['MLC_STRESSNG_BOGO_OPS_PER_SEC'] = str(
+            round(statistics.mean(bogo_ops_list), 2))
+        logger.info(
+            f"stress-ng bogo ops/sec: mean={statistics.mean(bogo_ops_list):.2f}")
 
     summary_json = os.path.join(results_dir, 'stressng_summary.json')
     with open(summary_json, 'w') as f:

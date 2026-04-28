@@ -42,7 +42,8 @@ def postprocess(i):
         except Exception as e:
             logger.warning(f"Could not parse Phoronix results JSON: {e}")
     else:
-        logger.info("No JSON results exported (phoronix result-file-to-json may not be available)")
+        logger.info(
+            "No JSON results exported (phoronix result-file-to-json may not be available)")
 
     # Parse the text output as fallback
     output_file = os.path.join(results_dir, 'phoronix_output.txt')

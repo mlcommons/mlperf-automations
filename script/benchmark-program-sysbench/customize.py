@@ -21,7 +21,8 @@ def preprocess(i):
         return {'return': 0}
 
     test = env.get('MLC_SYSBENCH_TEST', 'cpu')
-    logger.info(f"Sysbench test: {test}, threads={env.get('MLC_SYSBENCH_NUM_THREADS', '1')}")
+    logger.info(
+        f"Sysbench test: {test}, threads={env.get('MLC_SYSBENCH_NUM_THREADS', '1')}")
 
     return {'return': 0}
 
@@ -60,27 +61,33 @@ def postprocess(i):
     }
 
     # CPU test: events per second
-    eps_list = [r['events_per_second'] for r in all_results if 'events_per_second' in r]
+    eps_list = [r['events_per_second']
+                for r in all_results if 'events_per_second' in r]
     if eps_list:
         summary['events_per_second'] = {
             'mean': round(statistics.mean(eps_list), 2),
             'max': round(max(eps_list), 2),
             'min': round(min(eps_list), 2),
         }
-        env['MLC_SYSBENCH_EVENTS_PER_SEC'] = str(round(statistics.mean(eps_list), 2))
-        logger.info(f"Sysbench events/sec: mean={statistics.mean(eps_list):.2f}")
+        env['MLC_SYSBENCH_EVENTS_PER_SEC'] = str(
+            round(statistics.mean(eps_list), 2))
+        logger.info(
+            f"Sysbench events/sec: mean={statistics.mean(eps_list):.2f}")
 
     # Memory test: transfer rate
-    transfer_list = [r['transfer_mib_s'] for r in all_results if 'transfer_mib_s' in r]
+    transfer_list = [r['transfer_mib_s']
+                     for r in all_results if 'transfer_mib_s' in r]
     if transfer_list:
         summary['transfer_mib_s'] = {
             'mean': round(statistics.mean(transfer_list), 2),
             'max': round(max(transfer_list), 2),
         }
-        env['MLC_SYSBENCH_TRANSFER_MIB_S'] = str(round(statistics.mean(transfer_list), 2))
+        env['MLC_SYSBENCH_TRANSFER_MIB_S'] = str(
+            round(statistics.mean(transfer_list), 2))
 
     # Latency
-    lat_list = [r['latency_avg_ms'] for r in all_results if 'latency_avg_ms' in r]
+    lat_list = [r['latency_avg_ms']
+                for r in all_results if 'latency_avg_ms' in r]
     if lat_list:
         summary['latency_avg_ms'] = {
             'mean': round(statistics.mean(lat_list), 4),
