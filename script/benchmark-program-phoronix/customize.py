@@ -17,7 +17,7 @@ def preprocess(i):
     result_id = env.get('MLC_PHORONIX_RESULT_IDENTIFIER', 'mlc-benchmark')
     env['MLC_PHORONIX_RESULT_IDENTIFIER'] = result_id
 
-    logger.info(f"Phoronix test: {test}, result ID: {result_id}")
+    logger.info(f"Phoronix test: {env.get('MLC_PHORONIX_TEST', '')}, result ID: {result_id}")
 
     return {'return': 0}
 
