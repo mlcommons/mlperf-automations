@@ -19,15 +19,6 @@ def preprocess(i):
     if is_true(env.get('MLC_STRESSNG_REUSE_LOGS', '')):
         logger.info("Reuse logs mode: skipping execution")
         return {'return': 0}
-
-    # Check stress-ng is installed
-    check_cmd = 'which stress-ng' if os_info['platform'] != 'windows' else 'where stress-ng'
-    if os.system(f'{check_cmd} > /dev/null 2>&1' if os_info['platform'] != 'windows'
-                 else f'{check_cmd} > nul 2>&1') != 0:
-        return {'return': 1,
-                'error': 'stress-ng is not installed. '
-                         'Install via: sudo apt install stress-ng'}
-
     stressor = env.get('MLC_STRESSNG_STRESSOR', 'cpu')
     logger.info(f"stress-ng stressor: {stressor}, workers={env.get('MLC_STRESSNG_WORKERS', '0')}")
 

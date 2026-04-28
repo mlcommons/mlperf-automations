@@ -14,18 +14,6 @@ def preprocess(i):
     os.makedirs(results_dir, exist_ok=True)
     env['MLC_PHORONIX_RESULTS_DIR'] = results_dir
 
-    # Check phoronix-test-suite is installed
-    if os.system('phoronix-test-suite version > /dev/null 2>&1' if os_info['platform'] != 'windows'
-                 else 'phoronix-test-suite version > nul 2>&1') != 0:
-        return {'return': 1,
-                'error': 'phoronix-test-suite is not installed. '
-                         'Install via: sudo apt install phoronix-test-suite (Linux) '
-                         'or download from https://www.phoronix-test-suite.com/'}
-
-    test = env.get('MLC_PHORONIX_TEST', '').strip()
-    if not test:
-        return {'return': 1, 'error': 'MLC_PHORONIX_TEST is required'}
-
     result_id = env.get('MLC_PHORONIX_RESULT_IDENTIFIER', 'mlc-benchmark')
     env['MLC_PHORONIX_RESULT_IDENTIFIER'] = result_id
 

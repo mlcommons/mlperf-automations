@@ -20,14 +20,6 @@ def preprocess(i):
         logger.info("Reuse logs mode: skipping execution")
         return {'return': 0}
 
-    # Check sysbench is installed
-    check_cmd = 'which sysbench' if os_info['platform'] != 'windows' else 'where sysbench'
-    if os.system(f'{check_cmd} > /dev/null 2>&1' if os_info['platform'] != 'windows'
-                 else f'{check_cmd} > nul 2>&1') != 0:
-        return {'return': 1,
-                'error': 'sysbench is not installed. '
-                         'Install via: sudo apt install sysbench'}
-
     test = env.get('MLC_SYSBENCH_TEST', 'cpu')
     logger.info(f"Sysbench test: {test}, threads={env.get('MLC_SYSBENCH_NUM_THREADS', '1')}")
 

@@ -19,15 +19,6 @@ def preprocess(i):
         logger.info("Reuse logs mode: skipping execution")
         return {'return': 0}
 
-    # Check fio is installed
-    check_cmd = 'which fio' if os_info['platform'] != 'windows' else 'where fio'
-    if os.system(f'{check_cmd} > /dev/null 2>&1' if os_info['platform'] != 'windows'
-                 else f'{check_cmd} > nul 2>&1') != 0:
-        return {'return': 1,
-                'error': 'fio is not installed. '
-                         'Install via: sudo apt install fio (Linux) '
-                         'or download from https://github.com/axboe/fio'}
-
     rw = env.get('MLC_FIO_RW', 'randread')
     logger.info(f"FIO workload: {rw}, bs={env.get('MLC_FIO_BS', '4k')}, "
                 f"size={env.get('MLC_FIO_SIZE', '1G')}")

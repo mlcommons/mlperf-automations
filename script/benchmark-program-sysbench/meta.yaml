@@ -15,6 +15,7 @@ default_env:
 deps:
 - tags: detect,os
 - tags: detect,cpu
+- tags: get,generic-sys-util,_sysbench
 input_mapping:
   test: MLC_SYSBENCH_TEST
   num_runs: MLC_SYSBENCH_NUM_RUNS

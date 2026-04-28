@@ -13,6 +13,7 @@ default_env:
 deps:
 - tags: detect,os
 - tags: detect,cpu
+- tags: get,generic-sys-util,_stress-ng
 input_mapping:
   stressor: MLC_STRESSNG_STRESSOR
   num_runs: MLC_STRESSNG_NUM_RUNS

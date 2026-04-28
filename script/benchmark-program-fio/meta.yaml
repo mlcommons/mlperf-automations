@@ -17,6 +17,7 @@ default_env:
 deps:
 - tags: detect,os
 - tags: detect,cpu
+- tags: get,generic-sys-util,_fio
 input_mapping:
   num_runs: MLC_FIO_NUM_RUNS
   rw: MLC_FIO_RW
