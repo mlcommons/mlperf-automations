@@ -54,6 +54,7 @@ mlcr build,dockerfile
 | `--fake_run_option` |  |  | `` |
 | `--file_path` |  |  | `` |
 | `--gh_token` |  |  | `` |
+| `--host_mlc_repos` |  |  | `` |
 | `--image_repo` |  |  | `` |
 | `--image_tag` |  |  | `` |
 | `--mlc_repo` |  |  | `` |
@@ -61,7 +62,6 @@ mlcr build,dockerfile
 | `--mlc_repo_flags` |  |  | `` |
 | `--mlc_repo_path` |  |  | `` |
 | `--mlc_repos` |  |  | `` |
-| `--host_mlc_repos` |  |  | `` |
 | `--os` | Alias for docker_os |  | `` |
 | `--os_version` | Alias for docker_os_version |  | `` |
 | `--package_manager_update_cmd` |  |  | `` |
@@ -70,13 +70,13 @@ mlcr build,dockerfile
 | `--post_run_cmds` |  |  | `` |
 | `--pre_run_cmds` |  |  | `` |
 | `--push_image` |  |  | `` |
-| `--upload` | Alias for push_image |  | `` |
 | `--real_run` |  |  | `` |
 | `--run_cmd` |  |  | `` |
 | `--run_cmd_extra` |  |  | `` |
 | `--script_tags` |  |  | `` |
-| `--split_mlc_run_cmd` |  |  | `` |
 | `--skip_mlc_sys_upgrade` |  |  | `` |
+| `--split_mlc_run_cmd` |  |  | `` |
+| `--upload` | Alias for push_image |  | `` |
 | `--user` |  |  | `` |
 ### Generic Script Inputs
 
