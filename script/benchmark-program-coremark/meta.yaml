@@ -9,9 +9,20 @@ default_env:
   MLC_COREMARK_COMPILER: 'gcc'
   MLC_COREMARK_EXTRA_CFLAGS: ''
   MLC_COREMARK_NUM_THREADS: '1'
+  MLC_COREMARK_VERSION: 'v1.01'
 deps:
 - tags: detect,os
 - tags: detect,cpu
+- tags: download-and-extract
+  names:
+  - coremark-source
+  extra_cache_tags: coremark,source
+  force_cache: true
+  env:
+    MLC_DAE_URL: 'https://github.com/eembc/coremark/archive/refs/tags/<<<MLC_COREMARK_VERSION>>>.tar.gz'
+    MLC_DAE_EXTRACT_DOWNLOADED: 'yes'
+    MLC_EXTRACT_FINAL_ENV_NAME: MLC_COREMARK_SRC_PATH
+    MLC_VERIFY_SSL: 'no'
 input_mapping:
   num_runs: MLC_COREMARK_NUM_RUNS
   iterations: MLC_COREMARK_ITERATIONS

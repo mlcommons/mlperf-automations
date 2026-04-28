@@ -27,17 +27,16 @@ def preprocess(i):
     extra_cflags = env.get('MLC_STREAM_EXTRA_CFLAGS', '')
     use_openmp = is_true(env.get('MLC_STREAM_USE_OPENMP', ''))
 
-    # Download STREAM source if not present
+    # Copy cached STREAM source to results dir
     stream_c = os.path.join(results_dir, 'stream.c')
     if not os.path.isfile(stream_c):
-        download_cmd = (
-            f"curl -L -o {stream_c} "
-            "https://raw.githubusercontent.com/jeffhammond/STREAM/master/stream.c"
-        )
-        logger.info(f"Downloading STREAM source: {download_cmd}")
-        os.system(download_cmd)
-        if not os.path.isfile(stream_c):
-            return {'return': 1, 'error': 'Failed to download STREAM source'}
+        src_path = env.get('MLC_STREAM_SRC_PATH', '')
+        if src_path and os.path.isfile(src_path):
+            import shutil
+            shutil.copy2(src_path, stream_c)
+            logger.info(f"Copied STREAM source from cache: {src_path}")
+        else:
+            return {'return': 1, 'error': 'STREAM source not found. MLC_STREAM_SRC_PATH is not set.'}
 
     # Build compile command
     cflags = f"-O3 -DSTREAM_ARRAY_SIZE={array_size} -DNTIMES={ntimes}"

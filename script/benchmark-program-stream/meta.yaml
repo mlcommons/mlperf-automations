@@ -13,6 +13,15 @@ default_env:
 deps:
 - tags: detect,os
 - tags: detect,cpu
+- tags: download-and-extract
+  names:
+  - stream-source
+  extra_cache_tags: stream,source
+  force_cache: true
+  env:
+    MLC_DAE_URL: 'https://raw.githubusercontent.com/jeffhammond/STREAM/master/stream.c'
+    MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_STREAM_SRC_PATH
+    MLC_VERIFY_SSL: 'no'
 input_mapping:
   array_size: MLC_STREAM_ARRAY_SIZE
   num_threads: MLC_STREAM_NUM_THREADS
@@ -24,6 +33,7 @@ input_mapping:
   reuse_logs: MLC_STREAM_REUSE_LOGS
 new_env_keys:
 - MLC_STREAM_*
+- MLC_STREAM_SRC_PATH
 tags:
 - benchmark
 - stream

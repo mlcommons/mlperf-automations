@@ -11,18 +11,13 @@ cd "${MLC_RUN_DIR}"
 
 RESULTS_DIR=${MLC_COREMARK_RESULTS_DIR:-.}
 NUM_RUNS=${MLC_COREMARK_NUM_RUNS:-3}
-COREMARK_DIR="${MLC_RUN_DIR}/coremark"
-
-# Clone CoreMark if not present
-if [ ! -d "${COREMARK_DIR}" ]; then
-  echo "Cloning CoreMark repository..."
-  git clone https://github.com/eembc/coremark.git "${COREMARK_DIR}"
-  if [ $? -ne 0 ]; then
-    echo "ERROR: Failed to clone CoreMark"
-    exit 1
-  fi
+# Use cached CoreMark source from download-and-extract
+if [ -z "${MLC_COREMARK_SRC_PATH}" ]; then
+  echo "ERROR: MLC_COREMARK_SRC_PATH is not set"
+  exit 1
 fi
 
+COREMARK_DIR="${MLC_COREMARK_SRC_PATH}"
 cd "${COREMARK_DIR}"
 
 # Build CoreMark
