@@ -62,6 +62,7 @@ mlcr build,dockerfile
 | `--mlc_repo_flags` |  |  | `` |
 | `--mlc_repo_path` |  |  | `` |
 | `--mlc_repos` |  |  | `` |
+| `--host_mlc_repos` |  |  | `` |
 | `--os` | Alias for docker_os |  | `` |
 | `--os_version` | Alias for docker_os_version |  | `` |
 | `--package_manager_update_cmd` |  |  | `` |

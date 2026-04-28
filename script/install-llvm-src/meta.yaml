@@ -91,12 +91,12 @@ post_deps:
 variations:
   debug:
     env:
-      MLC_LLVM_BUILD_TYPE: debug
+      MLC_LLVM_BUILD_TYPE: Debug
     group: build-type
   release:
     default: true
     env:
-      MLC_LLVM_BUILD_TYPE: release
+      MLC_LLVM_BUILD_TYPE: Release
     group: build-type
   clang:
     default: true
