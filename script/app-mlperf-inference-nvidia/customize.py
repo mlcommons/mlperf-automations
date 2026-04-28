@@ -303,7 +303,22 @@ def preprocess(i):
                         if '_mlc_valstr_or_self' in _builder_src:
                             with open(_nvm_builder, 'w') as _f:
                                 _f.write(_builder_src)
-                break
+
+                # Fix nvmitten/pipeline/pipeline.py: preserve KeyboardInterrupt instance.
+                # Upstream code sets `exc = KeyboardInterrupt` (the class), then traceback
+                # extraction crashes on Python 3.12 with: "'getset_descriptor' object has
+                # no attribute 'tb_frame'" and masks the real underlying failure.
+                _nvm_pipeline = os.path.join(_sp, 'nvmitten', 'pipeline', 'pipeline.py')
+                if os.path.isfile(_nvm_pipeline):
+                    with open(_nvm_pipeline, 'r') as _f:
+                        _pipeline_src = _f.read()
+                    _needle = 'except KeyboardInterrupt as _exc:\n                exc = KeyboardInterrupt\n                status = OperationStatus.INTERRUPTED'
+                    _fixed = 'except KeyboardInterrupt as _exc:\n                exc = _exc\n                status = OperationStatus.INTERRUPTED'
+                    if _needle in _pipeline_src:
+                        _pipeline_src = _pipeline_src.replace(_needle, _fixed, 1)
+                        with open(_nvm_pipeline, 'w') as _f:
+                            _f.write(_pipeline_src)
+                continue
 
         # Fix code/harness/lwis/CMakeLists.txt: missing ${CUDA_INCLUDE_DIRS} causes
         # "fatal error: cuda.h: No such file or directory" when building the v6.0 harness.
@@ -504,8 +519,9 @@ EXPORTS = {{
                 with open(_bert_cfg_path, 'w') as _f:
                     _f.write(_content)
 
-    # For resnet50 on v6.0+ NVIDIA harness: create or fix the minimal config.
-    if env.get('MLC_MODEL', '') == 'resnet50' and _inference_version >= 'v6.0' and nvidia_code_path:
+    # For resnet50 on NVIDIA harness: create or fix the minimal config.
+    # Keep this unconditional on version string formatting (e.g. "6.0" vs "v6.0").
+    if env.get('MLC_MODEL', '') == 'resnet50' and nvidia_code_path:
         _resnet_minimal_dir = os.path.join(nvidia_code_path, 'configs', 'minimal', 'Offline')
         os.makedirs(_resnet_minimal_dir, exist_ok=True)
         _resnet_cfg_path = os.path.join(_resnet_minimal_dir, 'resnet50.py')
@@ -550,11 +566,17 @@ EXPORTS = {{
                     "    model_fields.input_dtype: 'int8',\n"
                     "    model_fields.input_format: 'linear',")
                 _changed = True
-            # Fix tensor_path: must point to int8_linear subdirectory
-            if "imagenet/ResNet50/'," in _resnet_cfg and 'int8_linear' not in _resnet_cfg:
+            # Normalize legacy base tensor path to int8_linear preprocessed data.
+            if "imagenet/ResNet50/'," in _resnet_cfg:
                 _resnet_cfg = _resnet_cfg.replace(
                     "harness_fields.tensor_path: 'build/preprocessed_data/imagenet/ResNet50/',",
                     "harness_fields.tensor_path: 'build/preprocessed_data/imagenet/ResNet50/int8_linear',")
+                _changed = True
+            if "model_fields.input_dtype: 'fp32'" in _resnet_cfg:
+                _resnet_cfg = _resnet_cfg.replace("model_fields.input_dtype: 'fp32'", "model_fields.input_dtype: 'int8'")
+                _changed = True
+            if 'ResNet50/fp32' in _resnet_cfg:
+                _resnet_cfg = _resnet_cfg.replace('ResNet50/fp32', 'ResNet50/int8_linear')
                 _changed = True
             # Add map_path if missing
             if 'map_path' not in _resnet_cfg:
@@ -664,6 +686,7 @@ EXPORTS = {{
         if not os.path.exists(model_path):
             cmds.append(
                 f"""ln -sf {env['MLC_ML_MODEL_FILE_WITH_PATH']} {model_path}""")
+
         model_name = "resnet50"
 
     elif "bert" in env['MLC_MODEL']:
@@ -1160,8 +1183,8 @@ EXPORTS = {{
         if gpu_inference_streams:
             run_config += f" --gpu_inference_streams={gpu_inference_streams}"
 
-        model_precision = env.get(
-            'MLC_MLPERF_MODEL_PRECISION').replace('float', 'fp')
+        _raw_model_precision = env.get('MLC_MLPERF_MODEL_PRECISION')
+        model_precision = _raw_model_precision.replace('float', 'fp') if _raw_model_precision else ''
         # by default we use the precision from the custom config
         if model_precision and "fp32" not in model_precision:
             run_config += f" --precision={model_precision}"
