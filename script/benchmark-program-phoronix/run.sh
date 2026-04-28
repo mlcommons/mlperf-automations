@@ -2,14 +2,15 @@
 
 # Benchmark Program - Phoronix Test Suite
 
-# Auto-install phoronix-test-suite if not found (not available in standard apt repos)
+# Install phoronix-test-suite from cached .deb if not already installed
 if ! command -v phoronix-test-suite &> /dev/null; then
-  echo "phoronix-test-suite not found, installing..."
-  PTS_VERSION=${MLC_PHORONIX_VERSION:-10.8.4}
-  PTS_DEB="phoronix-test-suite_${PTS_VERSION}_all.deb"
-  wget -q "https://github.com/phoronix-test-suite/phoronix-test-suite/releases/download/v${PTS_VERSION}/${PTS_DEB}" -O "/tmp/${PTS_DEB}" && \
-    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y /tmp/${PTS_DEB} && \
-    rm -f /tmp/${PTS_DEB}
+  if [ -n "${MLC_PHORONIX_DEB_PATH}" ] && [ -f "${MLC_PHORONIX_DEB_PATH}" ]; then
+    echo "Installing phoronix-test-suite from: ${MLC_PHORONIX_DEB_PATH}"
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "${MLC_PHORONIX_DEB_PATH}"
+  else
+    echo "ERROR: phoronix-test-suite not found and MLC_PHORONIX_DEB_PATH is not set"
+    exit 1
+  fi
   if ! command -v phoronix-test-suite &> /dev/null; then
     echo "ERROR: Failed to install phoronix-test-suite"
     exit 1

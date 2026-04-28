@@ -8,9 +8,22 @@ default_env:
   MLC_PHORONIX_NUM_RUNS: '3'
   MLC_PHORONIX_BATCH_MODE: 'yes'
   MLC_PHORONIX_EXTRA_ARGS: ''
+  MLC_PHORONIX_VERSION: '10.8.4'
 deps:
 - tags: detect,os
 - tags: detect,cpu
+- tags: download-and-extract
+  names:
+  - phoronix-deb
+  extra_cache_tags: phoronix,test-suite,deb
+  force_cache: true
+  skip_if_env:
+    MLC_PHORONIX_INSTALLED:
+    - 'yes'
+  env:
+    MLC_DAE_URL: 'https://github.com/phoronix-test-suite/phoronix-test-suite/releases/download/v<<<MLC_PHORONIX_VERSION>>>/phoronix-test-suite_<<<MLC_PHORONIX_VERSION>>>_all.deb'
+    MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_PHORONIX_DEB_PATH
+    MLC_VERIFY_SSL: 'no'
 input_mapping:
   test: MLC_PHORONIX_TEST
   num_runs: MLC_PHORONIX_NUM_RUNS
@@ -21,6 +34,7 @@ input_mapping:
   reuse_logs: MLC_PHORONIX_REUSE_LOGS
 new_env_keys:
 - MLC_PHORONIX_*
+- MLC_PHORONIX_DEB_PATH
 tags:
 - benchmark
 - phoronix
