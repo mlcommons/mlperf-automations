@@ -220,16 +220,9 @@ deps:
 - tags: get,generic-python-lib,_package.pycuda
   names:
   - pycuda
-- tags: get,generic-python-lib,_package.nvmitten
-  update_tags_from_env_with_prefix:
-    _path.:
-    - MLC_ENV_NVMITTEN_DOCKER_WHEEL_PATH
 - tags: get,nvidia,mitten
   names:
   - nvidia-mitten
-  enable_if_env:
-    MLC_NVIDIA_MITTEN_FROM_SRC:
-    - 'yes'
 prehook_deps:
 - enable_if_env:
     MLC_REQUIRE_GPTJ_MODEL_DOWNLOAD:
