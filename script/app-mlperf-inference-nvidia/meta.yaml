@@ -517,7 +517,7 @@ variations:
       MLC_MLPERF_NVIDIA_HARNESS_NUM_WARMUPS: 10
     deps:
     - tags: get,generic-python-lib,_onnx-graphsurgeon
-      version: 0.3.27
+      version: 0.3.25
   retinanet:
     group: model
     env:
@@ -933,7 +933,7 @@ variations:
   3d-unet_,pre5.0:
     deps:
     - tags: get,generic-python-lib,_onnx-graphsurgeon
-      version: 0.3.27
+      version: 0.3.25
     - tags: get,generic-python-lib,_package.onnx
       version: 1.13.1
   3d-unet_,v5.0:
