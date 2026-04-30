@@ -223,6 +223,9 @@ deps:
 - tags: get,generic-python-lib,_package.nvtx
   names:
   - nvtx
+- tags: get,generic-python-lib,_package.cuda-python
+  names:
+  - cuda-python
 - tags: get,nvidia,mitten
   names:
   - nvidia-mitten
