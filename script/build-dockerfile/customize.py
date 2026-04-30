@@ -318,7 +318,7 @@ def preprocess(i):
 
     docker_use_virtual_python = env.get('MLC_DOCKER_USE_VIRTUAL_PYTHON', "yes")
     if not is_false(docker_use_virtual_python):
-        f.write('RUN {} -m venv $HOME/venv/mlcflow'.format(python) + " " + EOL)
+        f.write('RUN {} -m venv --system-site-packages $HOME/venv/mlcflow'.format(python) + " " + EOL)
         f.write('ENV PATH="$HOME/venv/mlcflow/bin:$PATH"' + EOL)
     # f.write('RUN . /opt/venv/mlc/bin/activate' + EOL)
 
