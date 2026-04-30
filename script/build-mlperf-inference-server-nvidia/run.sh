@@ -101,6 +101,18 @@ fi
 
 # For v6.0+, build only necessary harness targets to avoid nvmitten dependency in py_harness_default
 if [[ "${MLC_MLPERF_INFERENCE_VERSION}" =~ ^[6-9]\.[0-9]+(-dev)?$ ]]; then
+  # Build and install loadgen Python binding (mlperf_loadgen)
+  if ! ${MLC_PYTHON_BIN_WITH_PATH} -c "import mlperf_loadgen" 2>/dev/null; then
+    echo "Installing mlperf_loadgen Python binding..."
+    _LOADGEN_SRC="${LOADGEN_INCLUDE_DIR}"
+    if [[ -f "${_LOADGEN_SRC}/setup.py" ]]; then
+      pushd "${_LOADGEN_SRC}" > /dev/null
+      PIP_EXTRA=$(${MLC_PYTHON_BIN_WITH_PATH} -c "import importlib.metadata; print(' --break-system-packages ' if int(importlib.metadata.version('pip').split('.')[0]) >= 23 else '')")
+      ${MLC_PYTHON_BIN_WITH_PATH} -m pip install . ${PIP_EXTRA}
+      popd > /dev/null
+    fi
+  fi
+
   SKIP_DRIVER_CHECK=1 make link_dirs
   mkdir -p ${MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH}/build/harness
   cd ${MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH}/build/harness
