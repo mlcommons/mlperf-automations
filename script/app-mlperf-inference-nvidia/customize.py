@@ -589,6 +589,52 @@ EXPORTS = {{
                 with open(_resnet_cfg_path, 'w') as _f:
                     _f.write(_resnet_cfg)
 
+    # Patch generate_engines.py to guard against calib_data_dir being None.
+    # The nvmitten autoconfigure mechanism can leave builder.calib_data_dir unset
+    # when the field is not bound on the builder class. Use a fallback path so that
+    # set_calibrator can still configure the calibration cache reader for INT8 engines.
+    if nvidia_code_path:
+        _gen_eng_path = os.path.join(nvidia_code_path, 'code', 'ops', 'generate_engines.py')
+        if os.path.isfile(_gen_eng_path):
+            with open(_gen_eng_path, 'r') as _f:
+                _gen_eng = _f.read()
+            _changed_ge = False
+            # Patch EngineBuilderOp.run() (line ~199)
+            _old_pattern = (
+                'if isinstance(builder, CalibratableTensorRTEngine):\n'
+                '                    builder.set_calibrator(scratch_space.path.joinpath("preprocessed_data",\n'
+                '                                                                       builder.calib_data_dir))'
+            )
+            _new_pattern = (
+                'if isinstance(builder, CalibratableTensorRTEngine):\n'
+                '                    from pathlib import Path as _Path\n'
+                '                    _calib_dir = builder.calib_data_dir or _Path(".")\n'
+                '                    builder.set_calibrator(scratch_space.path.joinpath("preprocessed_data",\n'
+                '                                                                       _calib_dir))'
+            )
+            if _old_pattern in _gen_eng and '_calib_dir = builder.calib_data_dir' not in _gen_eng:
+                _gen_eng = _gen_eng.replace(_old_pattern, _new_pattern)
+                _changed_ge = True
+            # Patch CalibrateEngineOp.run() (line ~115)
+            _old_calib = (
+                'if builder.need_calibration:\n'
+                '                builder.set_calibrator(scratch_space.path.joinpath("preprocessed_data",\n'
+                '                                                                   builder.calib_data_dir))'
+            )
+            _new_calib = (
+                'if builder.need_calibration:\n'
+                '                from pathlib import Path as _Path\n'
+                '                _calib_dir = builder.calib_data_dir or _Path(".")\n'
+                '                builder.set_calibrator(scratch_space.path.joinpath("preprocessed_data",\n'
+                '                                                                   _calib_dir))'
+            )
+            if _old_calib in _gen_eng and _new_calib not in _gen_eng:
+                _gen_eng = _gen_eng.replace(_old_calib, _new_calib)
+                _changed_ge = True
+            if _changed_ge:
+                with open(_gen_eng_path, 'w') as _f:
+                    _f.write(_gen_eng)
+
     # For GPTJ on post-5.0 NVIDIA harness: apply persistent patches that survive container restarts.
     # These are applied idempotently every run so a fresh container gets them automatically.
     if "gptj" in env.get('MLC_MODEL', '') and is_true(env.get('MLC_MLPERF_INFERENCE_POST_5_0')) and nvidia_code_path:
