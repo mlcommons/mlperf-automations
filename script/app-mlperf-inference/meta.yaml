@@ -2089,7 +2089,7 @@ variations:
         MLC_HOST_PLATFORM_FLAVOR:
         - x86_64
       docker:
-        base_image: nvcr.io/nvidia/mlperf/mlperf-inference:tensorrt_llm_release-feat-1.2-mlpinf-b5ddff4_mlperf-main-f538816_jan28_x86
+        base_image: nvcr.io/nvidia/pytorch:25.12-py3
     - skip_if_env:
         MLC_HOST_PLATFORM_FLAVOR:
         - x86_64
