@@ -81,6 +81,13 @@ fi
 # Set PYTHONPATH to include NVIDIA code root for setup.py imports
 export PYTHONPATH="${MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH}:${PYTHONPATH}"
 
+# Ensure CUDA include path is visible to the compiler (needed for CMake 3.27+ where FindCUDA is removed)
+if [[ -n "${MLC_CUDA_PATH_INCLUDE}" ]]; then
+  export CPATH="${MLC_CUDA_PATH_INCLUDE}:${CPATH}"
+elif [[ -d "/usr/local/cuda/include" ]]; then
+  export CPATH="/usr/local/cuda/include:${CPATH}"
+fi
+
 # For v6.0+, build only necessary harness targets to avoid nvmitten dependency in py_harness_default
 if [[ "${MLC_MLPERF_INFERENCE_VERSION}" =~ ^[6-9]\.[0-9]+(-dev)?$ ]]; then
   SKIP_DRIVER_CHECK=1 make link_dirs
