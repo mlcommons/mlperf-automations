@@ -220,6 +220,9 @@ deps:
 - tags: get,generic-python-lib,_package.pycuda
   names:
   - pycuda
+- tags: get,generic-python-lib,_package.nvtx
+  names:
+  - nvtx
 - tags: get,nvidia,mitten
   names:
   - nvidia-mitten
