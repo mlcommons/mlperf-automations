@@ -902,7 +902,7 @@ variations:
       MLC_GIT_CHECKOUT: 98bb85df8e936219ec7acd10ce1d702147fb1e21
     adr:
       pycuda:
-        version: '2025.1'
+        version: '2026.1'
   v5.1:
     base:
     - v5.0+
@@ -912,7 +912,7 @@ variations:
       MLC_NVIDIA_MITTEN_FROM_SRC: 'yes'
     adr:
       pycuda:
-        version: '2025.1'
+        version: '2026.1'
   v6.0:
     base:
     - v5.0+
@@ -921,7 +921,7 @@ variations:
       MLC_MLPERF_INFERENCE_CODE_VERSION: v6.0
     adr:
       pycuda:
-        version: '2025.1'
+        version: '2026.1'
       nvidia-scratch-space:
         tags: _version.6.0
   3d-unet_:
