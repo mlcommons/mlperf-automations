@@ -224,11 +224,6 @@ deps:
   update_tags_from_env_with_prefix:
     _path.:
     - MLC_ENV_NVMITTEN_DOCKER_WHEEL_PATH
-  enable_if_env:
-    MLC_RUN_STATE_DOCKER:
-    - 'yes'
-    MLC_ENV_NVMITTEN_DOCKER_WHEEL_PATH:
-    - 'yes'
 - tags: get,nvidia,mitten
   names:
   - nvidia-mitten
