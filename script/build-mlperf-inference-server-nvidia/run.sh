@@ -71,6 +71,17 @@ fi
 echo "LOADGEN_INCLUDE_DIR=${LOADGEN_INCLUDE_DIR}"
 echo "LOADGEN_LIB_DIR=${LOADGEN_LIB_DIR}"
 
+# Rebuild loadgen with -fPIC if needed (FFIUtils links it into a shared library)
+if [[ -n "${LOADGEN_LIB_DIR}" && -n "${LOADGEN_INCLUDE_DIR}" ]]; then
+  _LOADGEN_SRC_DIR="${LOADGEN_INCLUDE_DIR}"
+  if [[ -f "${_LOADGEN_SRC_DIR}/loadgen.h" && -f "${_LOADGEN_SRC_DIR}/CMakeLists.txt" ]]; then
+    echo "Rebuilding loadgen with -fPIC for shared library linking..."
+    pushd "${LOADGEN_LIB_DIR}" > /dev/null
+    cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_BUILD_TYPE=Release "${_LOADGEN_SRC_DIR}" && make -j mlperf_loadgen
+    popd > /dev/null
+  fi
+fi
+
 # Set CUDA architectures for cmake if GPU is detected
 if [[ -n "${MLC_CUDA_DEVICE_PROP_GPU_COMPUTE_CAPABILITY}" ]]; then
   export CUDA_ARCHITECTURES="${MLC_CUDA_DEVICE_PROP_GPU_COMPUTE_CAPABILITY}"
