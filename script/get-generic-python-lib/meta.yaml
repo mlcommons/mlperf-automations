@@ -438,6 +438,7 @@ variations:
       tags: get,cuda
     env:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: pycuda
+      CXXFLAGS: -Wno-deprecated-declarations
     new_env_keys:
     - MLC_PYCUDA_VERSION
   python-dotenv:
