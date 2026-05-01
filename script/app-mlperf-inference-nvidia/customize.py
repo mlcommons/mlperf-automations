@@ -1312,7 +1312,7 @@ EXPORTS = {{
         if env.get('MLC_MLPERF_LOADGEN_LOGS_DIR'):
             env['MLPERF_LOADGEN_LOGS_DIR'] = env['MLC_MLPERF_LOADGEN_LOGS_DIR']
 
-        log_dir = env.get('MLC_MLPERF_NVIDIA_HARNESS_LOG_DIR')
+        log_dir = env.get('MLC_MLPERF_NVIDIA_HARNESS_LOG_DIR', env.get('MLC_MLPERF_LOADGEN_LOGS_DIR', ''))
         if log_dir:
             run_config += f" --log_dir={log_dir}"
 
