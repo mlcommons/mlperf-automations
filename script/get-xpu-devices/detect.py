@@ -6,20 +6,27 @@ def get_xpu_info():
     xpu_devices = json.loads(xpus.stdout)["device_list"]
     num_xpus = len(xpu_devices)
     all_xpu_info = []
+    # Map device name variants
+    pci_dID_name_map = {
+        "Intel(R) Graphics [0xe212]": "Intel(R) Arc(TM) Pro B50 Graphics", # B50 name variant
+        "Intel(R) Graphics [0xe211]": "Intel(R) Arc(TM) Pro B60 Graphics", # B60
+        "Intel(R) Graphics [0xe223]": "Intel(R) Arc(TM) Pro B70 Graphics", # B70 name variant
+    }
 
+    memory_type_map = {
+        # Arc Pro Series memory types based on publicly available information. xpu-smi apis not returning memory type info, so using device name to map to memory type.
+        "Intel(R) Arc(TM) Pro B50 Graphics": "GDDR6",
+        "Intel(R) Arc(TM) Pro B60 Graphics": "GDDR6",
+        "Intel(R) Arc(TM) Pro B70 Graphics": "GDDR6",
+    }
     for i in range(num_xpus):
         
         device_id = i
         device_info = subprocess.run(["sudo", "xpu-smi", "discovery", "-d", str(device_id), "-j"], capture_output=True, text=True)
         device_info_json = json.loads(device_info.stdout)
         device_name = device_info_json["device_name"]
-
-        memory_type_map = {
-            # Arc Pro Series
-            "Intel(R) Arc(TM) Pro B50 Graphics": "GDDR6",
-            "Intel(R) Arc(TM) Pro B60 Graphics": "GDDR6",
-            "Intel(R) Arc(TM) Pro B70 Graphics": "GDDR6",
-        }
+        # Map device name variants
+        device_name = pci_dID_name_map.get(device_name, device_name)
 
         memory_type = memory_type_map.get(
             device_name, "Unknown / Not in lookup table")
