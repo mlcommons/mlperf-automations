@@ -5,8 +5,10 @@ MANIFEST
 __pycache__
 develop-eggs/
 dist/
+*.egg-info/
 eggs/
 .eggs/
+*.egg-info/
 lib/
 lib64/
 sdist/
@@ -23,3 +25,4 @@ repos.json
 index_script.json
 index_cache.json
 index_experiment.json
+*.egg-info/

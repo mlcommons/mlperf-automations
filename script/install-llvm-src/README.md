@@ -46,6 +46,7 @@ mlcr install,src,llvm,from.src,src-llvm
 | `--pull_changes` |  |  | `` |
 | `--target_triple` |  |  | `` |
 | `--targets` |  |  | `` |
+| `--src_path` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -120,6 +121,7 @@ mlcr install,src,llvm,from.src,src-llvm
 
 - `branch.#` _(# can be substituted dynamically)_
 - `cross-compile-x86-aarch64`
+- `custom-flags.#` _(# can be substituted dynamically)_
 - `for-intel-mlperf-inference-v3.1-bert` (base: tag.llvmorg-15.0.7, clang, release)
 - `for-intel-mlperf-inference-v3.1-gptj` (base: tag.llvmorg-16.0.6, clang, release)
 - `full-history`

@@ -18,6 +18,10 @@ default_env:
 new_env_keys:
 - MLC_RUN_CMD
 
+# Input mapping
+input_mapping:
+  profile_system_info: MLC_PROFILE_SYSTEM_INFO
+
 # Dependencies
 deps:
 - tags: detect,cpu

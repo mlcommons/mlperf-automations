@@ -40,6 +40,7 @@ input_mapping:
   fake_run_option: MLC_DOCKER_FAKE_RUN_OPTION
   file_path: MLC_DOCKERFILE_WITH_PATH
   gh_token: MLC_GH_TOKEN
+  host_mlc_repos: MLC_DOCKER_HOST_MLC_REPOS
   image_repo: MLC_DOCKER_IMAGE_REPO
   image_tag: MLC_DOCKER_IMAGE_TAG
   mlc_repo: MLC_MLOPS_REPO
@@ -60,6 +61,8 @@ input_mapping:
   run_cmd_extra: MLC_DOCKER_RUN_CMD_EXTRA
   script_tags: MLC_DOCKER_RUN_SCRIPT_TAGS
   skip_mlc_sys_upgrade: MLC_DOCKER_SKIP_MLC_SYS_UPGRADE
+  split_mlc_run_cmd: MLC_DOCKER_SPLIT_MLC_RUN_CMD
+  upload: MLC_DOCKER_PUSH_IMAGE
   user: MLC_DOCKER_USER
 
 # Dependencies
