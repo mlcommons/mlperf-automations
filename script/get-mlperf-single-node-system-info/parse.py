@@ -179,9 +179,7 @@ def main():
                 ensemble_type_subpart = "processor"
             elif target_key in ["host_memory_capacity", "host_memory_configuration"]:
                 ensemble_type_subpart = "host_memory"
-            elif target_key in ["accelerator_model_name", "accelerators_per_node", "accelerator_memory_capacity", "accelerator_memory_type", "accelerator_interconnect", "accelerator_host_interconnect"]:
-                ensemble_type_subpart = "accelerator"
-            elif target_key in ["accelerator_frequency"]:
+            elif target_key in ["accelerator_model_name", "accelerators_per_node", "accelerator_memory_capacity", "accelerator_memory_type", "accelerator_interconnect", "accelerator_host_interconnect", "accelerator_frequency"]:
                 ensemble_type_subpart = "accelerator"
             elif target_key in ["host_network_card_count", "host_networking"]:
                 ensemble_type_subpart = "networking"
