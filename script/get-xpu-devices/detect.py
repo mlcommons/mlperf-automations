@@ -1,11 +1,47 @@
 import json
 import subprocess
 
+
+def _run_xpu_smi_json(args, timeout_sec=30):
+    try:
+        result = subprocess.run(
+            args,
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=timeout_sec,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError(f"Command timed out: {' '.join(args)}") from exc
+    except subprocess.CalledProcessError as exc:
+        stderr = (exc.stderr or "").strip()
+        raise RuntimeError(
+            f"Command failed ({exc.returncode}): {' '.join(args)}; stderr: {stderr}"
+        ) from exc
+
+    try:
+        return json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(f"Invalid JSON from command: {' '.join(args)}") from exc
+
+
+def _require_keys(obj, keys, context):
+    missing = [key for key in keys if key not in obj]
+    if missing:
+        missing_str = ", ".join(missing)
+        raise RuntimeError(f"Missing required fields in {context}: {missing_str}")
+
+
 def get_xpu_info():
-    xpus = subprocess.run(["sudo", "xpu-smi", "discovery", "-j"], capture_output=True, text=True)
-    xpu_devices = json.loads(xpus.stdout)["device_list"]
+    # Keep timeout disabled for sudo path: it may legitimately wait for password input.
+    xpus_json = _run_xpu_smi_json(["sudo", "xpu-smi", "discovery", "-j"], timeout_sec=None)
+    xpu_devices = xpus_json.get("device_list")
+    if not isinstance(xpu_devices, list):
+        raise RuntimeError("xpu-smi discovery output missing list field: device_list")
+
     num_xpus = len(xpu_devices)
     all_xpu_info = []
+
     # Map device name variants
     pci_dID_name_map = {
         "Intel(R) Graphics [0xe212]": "Intel(R) Arc(TM) Pro B50 Graphics", # B50 name variant
@@ -20,10 +56,26 @@ def get_xpu_info():
         "Intel(R) Arc(TM) Pro B70 Graphics": "GDDR6",
     }
     for i in range(num_xpus):
-        
-        device_id = i
-        device_info = subprocess.run(["sudo", "xpu-smi", "discovery", "-d", str(device_id), "-j"], capture_output=True, text=True)
-        device_info_json = json.loads(device_info.stdout)
+        device_info_json = _run_xpu_smi_json(
+            ["sudo", "xpu-smi", "discovery", "-d", str(i), "-j"], timeout_sec=None
+        )
+        _require_keys(
+            device_info_json,
+            [
+                "pci_device_id",
+                "device_name",
+                "driver_version",
+                "memory_physical_size_byte",
+                "core_clock_rate_mhz",
+                "number_of_eus",
+                "number_of_threads_per_eu",
+                "pcie_generation",
+                "pcie_max_link_width",
+                "pcie_max_bandwidth",
+            ],
+            f"device {i}",
+        )
+
         device_name = device_info_json["device_name"]
         # Map device name variants
         device_name = pci_dID_name_map.get(device_name, device_name)
@@ -51,9 +103,12 @@ def get_xpu_info():
 
 # Print the XPU information for all available XPUs
 if __name__ == "__main__":
-    xpu_info_list = get_xpu_info()
-    with open("tmp-run.out", "w") as f:
-        for idx, xpu_info in enumerate(xpu_info_list):
-            print(f"XPU {idx}:")
+    try:
+        xpu_info_list = get_xpu_info()
+    except Exception as exc:
+        raise SystemExit(f"[ERROR] Failed to collect XPU info: {exc}")
+
+    with open("tmp-run.out", "w", encoding="utf-8") as f:
+        for xpu_info in xpu_info_list:
             for key, value in xpu_info.items():
                 f.write(f"{key}: {value}\n")

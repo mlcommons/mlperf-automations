@@ -1,5 +1,4 @@
 from mlc import utils
-from utils import *
 import os
 import re
 import subprocess
@@ -30,6 +29,18 @@ def postprocess(i):
     # properties
     p = {}
     gpu = {}
+    allowed_keys = {
+        "GPU Device ID",
+        "GPU Name",
+        "XPU driver version",
+        "Memory Type",
+        "Global memory",
+        "Max clock rate",
+        "Number of EUs",
+        "EU Threads per EU",
+        "Host Interconnect Type",
+        "Host Interconnect Bandwidth",
+    }
 
     gpu_id = -1
 
@@ -49,6 +60,9 @@ def postprocess(i):
             if gpu_id < 0:
                 continue
 
+            if key not in allowed_keys:
+                continue
+
             gpu[gpu_id][key] = val
             p[key] = val
 
@@ -60,6 +74,9 @@ def postprocess(i):
 
             env[key_env] = val
 
+    if gpu_id < 0:
+        return {'return': 1, 'error': 'No GPU Device ID entries found in tmp-run.out'}
+
     state['mlc_xpu_num_devices'] = gpu_id + 1
     env['MLC_XPU_NUM_DEVICES'] = gpu_id + 1
 
@@ -69,13 +86,18 @@ def postprocess(i):
     # GPU Interconnect Type
     try:
         topo_out = subprocess.run(
-            ['xpu-smi', 'topology', '-m'], capture_output=True, text=True).stdout
+            ['xpu-smi', 'topology', '-m'], capture_output=True, text=True, timeout=10
+        ).stdout
         if re.search(r'\bXL\d+\b', topo_out):
             env['MLC_XPU_DEVICE_PROP_GPU_INTERCONNECT_TYPE'] = 'XeLink'
         elif re.search(r'\bXL*\d+\b', topo_out):
             env['MLC_XPU_DEVICE_PROP_GPU_INTERCONNECT_TYPE'] = 'XeLink + MDF'
         elif topo_out.strip():
             env['MLC_XPU_DEVICE_PROP_GPU_INTERCONNECT_TYPE'] = ''
+    except subprocess.TimeoutExpired:
+        # Topology probing is optional; keep script successful if command hangs.
+        env['MLC_XPU_DEVICE_PROP_GPU_INTERCONNECT_TYPE'] = ''
     except Exception:
-        pass
+        # Topology probing is best-effort and should not fail device enumeration.
+        env['MLC_XPU_DEVICE_PROP_GPU_INTERCONNECT_TYPE'] = ''
     return {'return': 0}
