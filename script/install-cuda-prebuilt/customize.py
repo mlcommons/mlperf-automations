@@ -21,7 +21,13 @@ def preprocess(i):
         return {'return': 1, 'error': "Only CUDA versions {} are supported now".format(
             ', '.join(supported_versions))}
 
-    install_prefix = env.get('MLC_CUDA_INSTALL_PREFIX', os.getcwd())
+    install_prefix = env.get('MLC_CUDA_INSTALL_PREFIX', '').strip()
+    if install_prefix == '':
+        sudo_cmd = env.get('MLC_SUDO', '').strip()
+        if is_true(sudo_cmd) or sudo_cmd.lower().startswith('sudo'):
+            install_prefix = '/opt/mlc-installs/cuda'
+        else:
+            install_prefix = os.getcwd()
 
     env['MLC_CUDA_INSTALL_PREFIX'] = install_prefix
 

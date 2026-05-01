@@ -99,7 +99,6 @@ variations:
     adr:
       abtf-ml-model-weights-download:
         tags: _gdown
-  
   r2-downloader:
     group: download-tool
   rclone:

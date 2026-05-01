@@ -62,6 +62,9 @@ variations:
       llvm-install:
         tags: src,_clang
   branch.#: {}
+  custom-flags.#:
+    env:
+      MLC_LLVM_CUSTOM_FLAGS: '#'
   flang: {}
   path.#:
     env:

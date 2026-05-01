@@ -45,6 +45,7 @@ mlcr app,vision,language,mlcommons,mlperf,inference,generic
 | `--test_query_count` | Specifies the number of samples to be processed during a test run |  | `10` |
 | `--target_qps` | Target QPS |  | `` |
 | `--target_latency` | Target Latency |  | `` |
+| `--valid_rerun_max` | Maximum number of automatic reruns when performance result is invalid in valid mode (default 2) |  | `` |
 | `--max_batchsize` | Maximum batchsize to be used |  | `` |
 | `--num_threads` | Number of CPU threads to launch the application with |  | `` |
 | `--hw_name` | Hardware part of the SUT name |  | `` |

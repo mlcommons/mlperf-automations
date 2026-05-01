@@ -1,0 +1,81 @@
+alias: benchmark-program-pyperformance
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: Benchmarking
+cache: true
+default_env:
+  MLC_PYPERFORMANCE_NUM_RUNS: '1'
+  MLC_PYPERFORMANCE_BENCHMARKS: ''
+  MLC_PYPERFORMANCE_FAST: 'no'
+  MLC_PYPERFORMANCE_RIGOROUS: 'no'
+  MLC_PYPERFORMANCE_EXTRA_ARGS: ''
+  MLC_PYPERFORMANCE_PYTHON: ''
+deps:
+- tags: detect,os
+- tags: detect,cpu
+- tags: get,python3
+input_mapping:
+  num_runs: MLC_PYPERFORMANCE_NUM_RUNS
+  benchmarks: MLC_PYPERFORMANCE_BENCHMARKS
+  fast: MLC_PYPERFORMANCE_FAST
+  rigorous: MLC_PYPERFORMANCE_RIGOROUS
+  extra_args: MLC_PYPERFORMANCE_EXTRA_ARGS
+  python: MLC_PYPERFORMANCE_PYTHON
+  results_dir: MLC_PYPERFORMANCE_RESULTS_DIR
+  compare_json: MLC_PYPERFORMANCE_COMPARE_JSON
+  reuse_logs: MLC_PYPERFORMANCE_REUSE_LOGS
+new_env_keys:
+- MLC_PYPERFORMANCE_*
+tags:
+- benchmark
+- pyperformance
+- python
+- pybench
+- benchmark-pyperformance
+- benchmark-program-pyperformance
+uid: a1b2c3d4e5f60008
+variations:
+  all:
+    default: true
+    env:
+      MLC_PYPERFORMANCE_BENCHMARKS: ''
+    group: suite
+  fast:
+    env:
+      MLC_PYPERFORMANCE_FAST: 'yes'
+    group: speed
+  rigorous:
+    env:
+      MLC_PYPERFORMANCE_RIGOROUS: 'yes'
+    group: speed
+  startup:
+    env:
+      MLC_PYPERFORMANCE_BENCHMARKS: 'python_startup,python_startup_no_site'
+    group: suite
+  regex:
+    env:
+      MLC_PYPERFORMANCE_BENCHMARKS: 'regex_compile,regex_dna,regex_effbot,regex_v8'
+    group: suite
+  math:
+    env:
+      MLC_PYPERFORMANCE_BENCHMARKS: 'float,nbody,pidigits,spectral_norm'
+    group: suite
+  apps:
+    env:
+      MLC_PYPERFORMANCE_BENCHMARKS: '2to3,chameleon,django_template,html5lib,tornado_http'
+    group: suite
+  serialize:
+    env:
+      MLC_PYPERFORMANCE_BENCHMARKS: 'json_dumps,json_loads,pickle,pickle_dict,pickle_list,pickle_pure_python,unpickle,unpickle_list,unpickle_pure_python,xml_etree'
+    group: suite
+
+tests:
+  run_inputs:
+  - variations_list:
+    - startup,fast
+    env:
+      MLC_PYPERFORMANCE_NUM_RUNS: '1'
+  - variations_list:
+    - math,fast
+    env:
+      MLC_PYPERFORMANCE_NUM_RUNS: '1'

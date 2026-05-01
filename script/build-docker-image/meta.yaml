@@ -38,6 +38,7 @@ input_mapping:
   push_image: MLC_DOCKER_PUSH_IMAGE
   real_run: MLC_REAL_RUN
   script_tags: MLC_DOCKER_RUN_SCRIPT_TAGS
+  upload: MLC_DOCKER_PUSH_IMAGE
 
 # Dependencies
 deps:
@@ -47,3 +48,11 @@ prehook_deps:
     MLC_BUILD_DOCKERFILE:
     - 'yes'
   tags: build,dockerfile
+
+# Tests
+tests:
+  run_inputs:
+  - env:
+      MLC_DOCKER_IMAGE_NAME: mlc-script-test
+      MLC_DOCKER_PUSH_IMAGE: 'yes'
+      MLC_REAL_RUN: 'no'

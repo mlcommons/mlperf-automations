@@ -25,10 +25,10 @@ def dockerfile(self_module, input_params):
     # Step 2: Process Dockerfile-related configurations
     env = input_params.get('env', {})
 
-    host_only_env_keys = [ "HOME", "USER" ]
+    host_only_env_keys = ["HOME", "USER"]
     for key in host_only_env_keys:
         if key in env:
-            del(env[key])
+            del (env[key])
 
     state_data = input_params.get('state', {})
     constant_vars = input_params.get('const', {})
@@ -141,8 +141,9 @@ def dockerfile(self_module, input_params):
         comments = []
 
     # Push Docker image if specified
-    if str(input_params.get('docker_push_image')
-           ).lower() in ['true', 'yes', '1']:
+    docker_push_image = input_params.get(
+        'docker_push_image', input_params.get('docker_upload', ''))
+    if str(docker_push_image).lower() in ['true', 'yes', '1']:
         env['MLC_DOCKER_PUSH_IMAGE'] = 'yes'
 
     dockerfile_env = docker_inputs.get('env')
@@ -156,6 +157,7 @@ def dockerfile(self_module, input_params):
     state = {}
     state['dockerfile_env'] = dockerfile_env
     state['dockerfile_build_env'] = dockerfile_build_env
+
     # Generate Dockerfile
     mlc_docker_input = {
         'action': 'run', 'automation': 'script', 'tags': 'build,dockerfile',
@@ -169,6 +171,9 @@ def dockerfile(self_module, input_params):
 
     if docker_inputs.get('mlc_repo_path', '') != '':
         mlc_docker_input['mlc_repo_path'] = docker_inputs['mlc_repo_path']
+
+    if is_true(input_params.get('docker_host_mlc_repos', '')):
+        mlc_docker_input['host_mlc_repos'] = 'yes'
 
     docker_v = False
     docker_s = False
@@ -225,10 +230,10 @@ def docker_run(self_module, i):
     show_time = i.get('show_time', False)
     logger = self_module.logger
     env = i.get('env', {})
-    host_only_env_keys = [ "HOME", "USER" ]
+    host_only_env_keys = ["HOME", "USER"]
     for key in host_only_env_keys:
         if key in env:
-            del(env[key])
+            del (env[key])
 
     self_module.env = env
 

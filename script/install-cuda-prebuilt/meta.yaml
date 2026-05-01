@@ -118,3 +118,13 @@ docker:
 
 # Output / debugging
 sudo_install: true
+
+# Tests
+tests:
+  run_inputs:
+  - env:
+      MLC_SUDO: sudo
+  - env:
+      MLC_SUDO: 'true'
+  - env:
+      CUDA_SKIP_SUDO: 'yes'

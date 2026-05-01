@@ -77,6 +77,12 @@ variations:
         tags: _cuda
     env:
       MLC_ACCELERATOR_BACKEND: cuda
+  rocm:
+    adr:
+      mlperf-single-node-system-info:
+        tags: _rocm
+    env:
+      MLC_ACCELERATOR_BACKEND: rocm
   exclude_current_node:
     env:
       MLC_EXCLUDE_CURRENT_NODE: 'True'
