@@ -38,6 +38,13 @@ deps:
   skip_if_env:
     MLC_HOST_OS_TYPE:
     - windows
+- tags: get,xpu-devices
+  enable_if_env:
+    MLC_GPU_PLATFORM:
+    - xpu
+  skip_if_env:
+    MLC_HOST_OS_TYPE:
+    - windows
 - tags: detect,sudo
 - tags: get,python
   names:
@@ -61,3 +68,7 @@ variations:
     group: gpu-platform
     env:
       MLC_GPU_PLATFORM: rocm
+  xpu:
+    group: gpu-platform
+    env:
+      MLC_GPU_PLATFORM: xpu
