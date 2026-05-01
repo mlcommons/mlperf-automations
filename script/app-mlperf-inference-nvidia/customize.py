@@ -387,17 +387,20 @@ def preprocess(i):
             if _lg_old in _loadgen_src:
                 _loadgen_src = _loadgen_src.replace(_lg_old, _lg_new)
                 _loadgen_changed = True
-            if '_mlc_copy_if_different' not in _loadgen_src and 'shutil.copy(' in _loadgen_src:
+            if '_mlc_copy_if_different' not in _loadgen_src and ('shutil.copy(' in _loadgen_src or 'shutil.copyfile(' in _loadgen_src):
                 if 'import os\n' not in _loadgen_src:
                     _loadgen_src = _loadgen_src.replace('import shutil\n', 'import os\nimport shutil\n', 1)
                 _loadgen_src = _loadgen_src.replace(
                     'import shutil\n',
                     'import shutil\n\n'
                     'def _mlc_copy_if_different(src, dst):\n'
-                    '    if os.path.realpath(src) != os.path.realpath(dst):\n'
-                    '        shutil.copy(src, dst)\n\n',
+                    '    src_real = os.path.realpath(str(src))\n'
+                    '    dst_real = os.path.realpath(str(dst))\n'
+                    '    if src_real != dst_real:\n'
+                    '        shutil.copyfile(src, dst)\n\n',
                     1)
-                _loadgen_src = _loadgen_src.replace('shutil.copy(', '_mlc_copy_if_different(', 1)
+                _loadgen_src = _loadgen_src.replace('shutil.copyfile(', '_mlc_copy_if_different(')
+                _loadgen_src = _loadgen_src.replace('shutil.copy(', '_mlc_copy_if_different(')
                 _loadgen_changed = True
             if _loadgen_changed:
                 with open(_loadgen_py, 'w') as _f:
