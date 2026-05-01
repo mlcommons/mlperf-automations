@@ -589,10 +589,10 @@ EXPORTS = {{
                 with open(_resnet_cfg_path, 'w') as _f:
                     _f.write(_resnet_cfg)
 
-    # Patch generate_engines.py to guard against calib_data_dir being None.
-    # The nvmitten autoconfigure mechanism can leave builder.calib_data_dir unset
-    # when the field is not bound on the builder class. Use a fallback path so that
-    # set_calibrator can still configure the calibration cache reader for INT8 engines.
+    # Patch generate_engines.py to handle calib_data_dir being None or calibration
+    # data not existing on disk. When the calibration cache already exists, the TRT
+    # builder only needs cache data (quantization ranges), not actual images.
+    # We create a lightweight cache-only calibrator in that case.
     if nvidia_code_path:
         _gen_eng_path = os.path.join(nvidia_code_path, 'code', 'ops', 'generate_engines.py')
         if os.path.isfile(_gen_eng_path):
@@ -607,26 +607,39 @@ EXPORTS = {{
             )
             _new_pattern = (
                 'if isinstance(builder, CalibratableTensorRTEngine):\n'
-                '                    from pathlib import Path as _Path\n'
-                '                    _calib_dir = builder.calib_data_dir or _Path(".")\n'
-                '                    builder.set_calibrator(scratch_space.path.joinpath("preprocessed_data",\n'
-                '                                                                       _calib_dir))'
+                '                    _calib_data_path = None\n'
+                '                    if builder.calib_data_dir is not None:\n'
+                '                        _calib_data_path = scratch_space.path.joinpath("preprocessed_data", builder.calib_data_dir)\n'
+                '                    if _calib_data_path is not None and _calib_data_path.exists():\n'
+                '                        builder.set_calibrator(_calib_data_path)\n'
+                '                    elif not builder.need_calibration:\n'
+                '                        import tensorrt as _trt\n'
+                '                        class _CacheCalib(_trt.IInt8EntropyCalibrator2):\n'
+                '                            def __init__(self, cache_path):\n'
+                '                                super().__init__()\n'
+                '                                self._cache = cache_path\n'
+                '                            def get_batch_size(self): return 1\n'
+                '                            def get_batch(self, names, p_gpu_mem): return None\n'
+                '                            def read_calibration_cache(self):\n'
+                '                                if self._cache.exists():\n'
+                '                                    return self._cache.read_bytes()\n'
+                '                                return None\n'
+                '                            def write_calibration_cache(self, cache): pass\n'
+                '                        builder.calibrator = _CacheCalib(builder.cache_file)'
             )
-            if _old_pattern in _gen_eng and '_calib_dir = builder.calib_data_dir' not in _gen_eng:
+            if _old_pattern in _gen_eng and '_CacheCalib' not in _gen_eng:
                 _gen_eng = _gen_eng.replace(_old_pattern, _new_pattern)
                 _changed_ge = True
-            # Patch CalibrateEngineOp.run() (line ~115)
+            # Patch CalibrateEngineOp.run() (line ~115) - guard against None calib_data_dir
             _old_calib = (
                 'if builder.need_calibration:\n'
                 '                builder.set_calibrator(scratch_space.path.joinpath("preprocessed_data",\n'
                 '                                                                   builder.calib_data_dir))'
             )
             _new_calib = (
-                'if builder.need_calibration:\n'
-                '                from pathlib import Path as _Path\n'
-                '                _calib_dir = builder.calib_data_dir or _Path(".")\n'
+                'if builder.need_calibration and builder.calib_data_dir is not None:\n'
                 '                builder.set_calibrator(scratch_space.path.joinpath("preprocessed_data",\n'
-                '                                                                   _calib_dir))'
+                '                                                                   builder.calib_data_dir))'
             )
             if _old_calib in _gen_eng and _new_calib not in _gen_eng:
                 _gen_eng = _gen_eng.replace(_old_calib, _new_calib)
