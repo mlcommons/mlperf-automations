@@ -1339,6 +1339,8 @@ EXPORTS = {{
             env['MLPERF_LOADGEN_LOGS_DIR'] = env['MLC_MLPERF_LOADGEN_LOGS_DIR']
 
         log_dir = env.get('MLC_MLPERF_NVIDIA_HARNESS_LOG_DIR', '')
+        if not log_dir and env.get('MLC_MLPERF_LOADGEN_LOGS_DIR'):
+            log_dir = env['MLC_MLPERF_LOADGEN_LOGS_DIR']
         if log_dir:
             run_config += f" --log_dir={log_dir}"
 
@@ -1508,41 +1510,5 @@ def postprocess(i):
 
     env = i['env']
     state = i['state']
-
-    # Copy loadgen logs from NVIDIA's build/logs directory to the framework's results directory
-    loadgen_logs_dir = env.get('MLC_MLPERF_LOADGEN_LOGS_DIR', '')
-    if loadgen_logs_dir and os.path.isdir(loadgen_logs_dir):
-        # Check if loadgen logs already exist in the target dir
-        target_accuracy_log = os.path.join(loadgen_logs_dir, 'mlperf_log_accuracy.json')
-        if not os.path.exists(target_accuracy_log):
-            # First check if logs are in a subdirectory of loadgen_logs_dir
-            # (happens when --log_dir is passed and NVIDIA appends system/benchmark/scenario)
-            for root, dirs, files in os.walk(loadgen_logs_dir):
-                if root == loadgen_logs_dir:
-                    continue
-                if 'mlperf_log_accuracy.json' in files:
-                    for f in files:
-                        if f.startswith('mlperf_log_'):
-                            src = os.path.join(root, f)
-                            dst = os.path.join(loadgen_logs_dir, f)
-                            if not os.path.exists(dst):
-                                shutil.copy2(src, dst)
-                    break
-
-        if not os.path.exists(target_accuracy_log):
-            # Find logs in NVIDIA's default log location
-            nvidia_code_path = env.get('MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH', '')
-            if nvidia_code_path:
-                build_logs_default = os.path.join(nvidia_code_path, 'build', 'logs', 'default')
-                if os.path.isdir(build_logs_default):
-                    for root, dirs, files in os.walk(build_logs_default):
-                        if 'mlperf_log_accuracy.json' in files:
-                            for f in files:
-                                if f.startswith('mlperf_log_'):
-                                    src = os.path.join(root, f)
-                                    dst = os.path.join(loadgen_logs_dir, f)
-                                    if not os.path.exists(dst):
-                                        shutil.copy2(src, dst)
-                            break
 
     return {'return': 0}
