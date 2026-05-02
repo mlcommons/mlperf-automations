@@ -626,7 +626,7 @@ EXPORTS = {{
         _bert_init_path = os.path.join(nvidia_code_path, 'code', 'bert', 'tensorrt', '__init__.py')
         if not os.path.isfile(_bert_init_path):
             _bert_init_content = (
-                'from code.ops.harness import LWISExecutableHarness\n'
+                'from code.ops.harness import ExecutableHarness\n'
                 'from .constants import BERTComponent as Component\n'
                 '\n'
                 'def _get_builder():\n'
@@ -652,7 +652,25 @@ EXPORTS = {{
                 '\n'
                 'VALID_COMPONENT_SETS = {"gpu": [{Component.BERT}]}\n'
                 '\n'
-                'BenchmarkHarnessOp = LWISExecutableHarness\n'
+                'class BenchmarkHarnessOp(ExecutableHarness):\n'
+                '    def __init__(self):\n'
+                '        super().__init__(executable_fpath="./build/bin/harness_bert")\n'
+                '\n'
+                '    def build_flags(self, user_conf, engine_index):\n'
+                '        flags = super().build_flags(user_conf, engine_index)\n'
+                '        # harness_bert does not support gpu_engine_batch_size\n'
+                '        flags.pop("gpu_engine_batch_size", None)\n'
+                '        # Add required flags for harness_bert\n'
+                '        flags["scenario"] = engine_index.wl.scenario.valstr\n'
+                '        flags["model"] = "bert"\n'
+                '        flags["tensor_path"] = "build/preprocessed_data/squad_tokenized/input_ids.npy,build/preprocessed_data/squad_tokenized/segment_ids.npy,build/preprocessed_data/squad_tokenized/input_mask.npy"\n'
+                '        flags["map_path"] = "data_maps/squad/val_map.txt"\n'
+                '        # Override logfile_outdir if MLPERF_LOADGEN_LOGS_DIR is set\n'
+                '        import os\n'
+                '        logs_dir = os.environ.get("MLPERF_LOADGEN_LOGS_DIR", "")\n'
+                '        if logs_dir:\n'
+                '            flags["logfile_outdir"] = logs_dir\n'
+                '        return flags\n'
             )
             with open(_bert_init_path, 'w') as _f:
                 _f.write(_bert_init_content)

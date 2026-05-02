@@ -114,6 +114,54 @@ if [[ "${MLC_MLPERF_INFERENCE_VERSION}" =~ ^[6-9]\.[0-9]+(-dev)?$ ]]; then
   fi
 
   SKIP_DRIVER_CHECK=1 make link_dirs
+
+  # Copy BERT harness source if not already present
+  BERT_HARNESS_DIR="${MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH}/code/harness/harness_bert"
+  if [[ ! -d "${BERT_HARNESS_DIR}" ]]; then
+    # Look for bert harness source in the repo (e.g. from Lenovo submission)
+    BERT_SRC=$(find "${MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH}/../" -path "*/harness/harness_bert/main_bert.cc" -exec dirname {} \; 2>/dev/null | head -1)
+    if [[ -n "${BERT_SRC}" && -d "${BERT_SRC}" ]]; then
+      echo "Copying BERT harness source from ${BERT_SRC}..."
+      cp -r "${BERT_SRC}" "${BERT_HARNESS_DIR}"
+    fi
+  fi
+
+  # Append harness_bert target to CMakeLists.txt if source exists and target not yet added
+  HARNESS_CMAKE="${MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH}/code/harness/CMakeLists.txt"
+  if [[ -d "${BERT_HARNESS_DIR}" ]] && ! grep -q "harness_bert" "${HARNESS_CMAKE}"; then
+    cat >> "${HARNESS_CMAKE}" << 'EOF'
+
+######### BERT HARNESS ########
+execute_process(COMMAND echo "Building BERT harness...")
+add_executable(harness_bert
+    harness_bert/main_bert.cc
+    harness_bert/bert_server.cc
+    harness_bert/bert_core_vs.cc
+    common/logger.cpp
+)
+
+target_link_libraries(harness_bert
+    nvinfer
+    nvinfer_plugin
+    gflags
+    glog
+    ${CUDA_LIBRARIES}
+    lwis
+    ${LOADGEN_LIB}
+    numa
+)
+
+target_include_directories(harness_bert
+    PUBLIC
+        ${CUDA_INCLUDE_DIRS}
+        ${LOADGEN_INCLUDE_DIR}
+        ${LWIS_INCLUDE_DIR}
+        common
+        harness_bert
+)
+EOF
+  fi
+
   mkdir -p ${MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH}/build/harness
   cd ${MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH}/build/harness
   cmake -DPYTHON3_CMD=${MLC_PYTHON_BIN_WITH_PATH} \
@@ -124,7 +172,12 @@ if [[ "${MLC_MLPERF_INFERENCE_VERSION}" =~ ^[6-9]\.[0-9]+(-dev)?$ ]]; then
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
     ${MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH}/code/harness
   test $? -eq 0 || exit $?
-  make -j harness_default harness_dlrm_v2 FFIUtils lwis
+
+  BUILD_TARGETS="harness_default harness_dlrm_v2 FFIUtils lwis"
+  if [[ -d "${BERT_HARNESS_DIR}" ]]; then
+    BUILD_TARGETS="${BUILD_TARGETS} harness_bert"
+  fi
+  make -j ${BUILD_TARGETS}
   test $? -eq 0 || exit $?
   echo "Finished building harness."
 else
