@@ -81,6 +81,7 @@ mlcr get,sys-util,generic,generic-sys-util
 - `csh`
 - `dmidecode`
 - `ffmpeg`
+- `fio`
 - `flex`
 - `g++-11`
 - `g++-12`
@@ -146,6 +147,8 @@ mlcr get,sys-util,generic,generic-sys-util
 - `rsync`
 - `screen`
 - `sox`
+- `stress-ng`
+- `sysbench`
 - `systemd`
 - `tk-dev`
 - `transmission`

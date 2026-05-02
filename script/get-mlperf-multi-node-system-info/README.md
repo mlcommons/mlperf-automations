@@ -98,3 +98,4 @@ mlcr get-mlperf-multi-node-system-info
 
 - `cuda`
 - `exclude_current_node`
+- `rocm`

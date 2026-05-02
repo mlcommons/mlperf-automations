@@ -856,6 +856,7 @@ variations:
         brew: pkg-config
         dnf: pkg-config
         yum: pkg-config
+  postfix:
     env:
       MLC_SYS_UTIL_NAME: postfix
       MLC_SYS_UTIL_VERSION_CMD: postconf mail_version
