@@ -618,6 +618,100 @@ EXPORTS = {{
         # Set the env var so the engine build uses it
         env['MLPERF_RN50_DISABLE_FUSIONS'] = '1'
 
+    # Create missing __init__.py for bert/tensorrt module.
+    # NVIDIA's r6.0 code requires each benchmark module to export Component,
+    # COMPONENT_MAP and VALID_COMPONENT_SETS but bert/tensorrt/ is missing its __init__.py.
+    # Also patch builder.py to handle missing nvmitten classes.
+    if nvidia_code_path:
+        _bert_init_path = os.path.join(nvidia_code_path, 'code', 'bert', 'tensorrt', '__init__.py')
+        if not os.path.isfile(_bert_init_path):
+            _bert_init_content = (
+                'from code.ops.harness import LWISExecutableHarness\n'
+                'from .constants import BERTComponent as Component\n'
+                '\n'
+                'def _get_builder():\n'
+                '    from .builder import BERTBuilder\n'
+                '    return BERTBuilder\n'
+                '\n'
+                'class _LazyBuilderMeta(type):\n'
+                '    _real = None\n'
+                '    def __instancecheck__(cls, instance):\n'
+                '        if cls._real is None: cls._real = _get_builder()\n'
+                '        return isinstance(instance, cls._real)\n'
+                '    def __subclasscheck__(cls, subclass):\n'
+                '        if cls._real is None: cls._real = _get_builder()\n'
+                '        return issubclass(subclass, cls._real) or subclass is cls._real\n'
+                '    def __call__(cls, *args, **kwargs):\n'
+                '        if cls._real is None: cls._real = _get_builder()\n'
+                '        return cls._real(*args, **kwargs)\n'
+                '\n'
+                'class LazyBERTBuilder(metaclass=_LazyBuilderMeta):\n'
+                '    pass\n'
+                '\n'
+                'COMPONENT_MAP = {Component.BERT: LazyBERTBuilder}\n'
+                '\n'
+                'VALID_COMPONENT_SETS = {"gpu": [{Component.BERT}]}\n'
+                '\n'
+                'BenchmarkHarnessOp = LWISExecutableHarness\n'
+            )
+            with open(_bert_init_path, 'w') as _f:
+                _f.write(_bert_init_content)
+
+        # Patch builder.py to provide stubs for missing nvmitten classes
+        _bert_builder_path = os.path.join(nvidia_code_path, 'code', 'bert', 'tensorrt', 'builder.py')
+        if os.path.isfile(_bert_builder_path):
+            with open(_bert_builder_path, 'r') as _f:
+                _bert_builder = _f.read()
+            if '_MLC_PATCHED' not in _bert_builder:
+                # Fix nvmitten imports
+                _old_import = (
+                    'from nvmitten.nvidia.builder import (TRTBuilder,\n'
+                    '                                     CalibratableTensorRTEngine,\n'
+                    '                                     MLPerfInferenceEngine,\n'
+                    '                                     ONNXNetwork,\n'
+                    '                                     LegacyBuilder)'
+                )
+                _new_import = (
+                    '# _MLC_PATCHED: handle missing nvmitten classes and code.common modules\n'
+                    'from nvmitten.nvidia.builder import (TRTBuilder,\n'
+                    '                                     CalibratableTensorRTEngine,\n'
+                    '                                     ONNXNetwork)\n'
+                    'try:\n'
+                    '    from nvmitten.nvidia.builder import MLPerfInferenceEngine\n'
+                    'except ImportError:\n'
+                    '    class MLPerfInferenceEngine:\n'
+                    '        pass\n'
+                    'try:\n'
+                    '    from nvmitten.nvidia.builder import LegacyBuilder\n'
+                    'except ImportError:\n'
+                    '    class LegacyBuilder:\n'
+                    '        def __init__(self, op=None):\n'
+                    '            self.op = op'
+                )
+                _bert_builder = _bert_builder.replace(_old_import, _new_import)
+                # Remove non-existent code.common.fields import (unused)
+                _bert_builder = _bert_builder.replace(
+                    'from code.common.fields import Fields\n', '')
+                # Stub ArgDiscarder (code.common.mitten_compat doesn't exist)
+                _bert_builder = _bert_builder.replace(
+                    'from code.common.mitten_compat import ArgDiscarder',
+                    'class ArgDiscarder:\n    pass')
+                with open(_bert_builder_path, 'w') as _f:
+                    _f.write(_bert_builder)
+
+        # Patch loadgen.py to fix infinite recursion in _mlc_copy_if_different
+        _loadgen_py_path = os.path.join(nvidia_code_path, 'code', 'common', 'mlcommons', 'loadgen.py')
+        if os.path.isfile(_loadgen_py_path):
+            with open(_loadgen_py_path, 'r') as _f:
+                _loadgen_content = _f.read()
+            _bad_line = '        _mlc_copy_if_different(src, dst)'
+            if _bad_line in _loadgen_content:
+                _loadgen_content = _loadgen_content.replace(
+                    _bad_line,
+                    '        shutil.copy2(src_real, dst_real)')
+                with open(_loadgen_py_path, 'w') as _f:
+                    _f.write(_loadgen_content)
+
     # Patch generate_engines.py to handle calib_data_dir being None or calibration
     # data not existing on disk. When the calibration cache already exists, the TRT
     # builder only needs cache data (quantization ranges), not actual images.
