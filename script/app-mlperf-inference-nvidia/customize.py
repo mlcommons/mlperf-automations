@@ -665,11 +665,6 @@ EXPORTS = {{
                 '        flags["model"] = "bert"\n'
                 '        flags["tensor_path"] = "build/preprocessed_data/squad_tokenized/input_ids.npy,build/preprocessed_data/squad_tokenized/segment_ids.npy,build/preprocessed_data/squad_tokenized/input_mask.npy"\n'
                 '        flags["map_path"] = "data_maps/squad/val_map.txt"\n'
-                '        # Override logfile_outdir if MLPERF_LOADGEN_LOGS_DIR is set\n'
-                '        import os\n'
-                '        logs_dir = os.environ.get("MLPERF_LOADGEN_LOGS_DIR", "")\n'
-                '        if logs_dir:\n'
-                '            flags["logfile_outdir"] = logs_dir\n'
                 '        return flags\n'
             )
             with open(_bert_init_path, 'w') as _f:
@@ -776,6 +771,24 @@ EXPORTS = {{
                     _lg_logs_content = 'import os\n' + _lg_logs_content
                 with open(_lg_logs_path, 'w') as _f:
                     _f.write(_lg_logs_content)
+
+        # Patch harness.py: ExecutableHarness.build_flags() sets logfile_outdir to wl.log_dir
+        # (build/logs/default/...) but we need loadgen logs written to MLPERF_LOADGEN_LOGS_DIR
+        _harness_py_path = os.path.join(nvidia_code_path, 'code', 'ops', 'harness.py')
+        if os.path.isfile(_harness_py_path):
+            with open(_harness_py_path, 'r') as _f:
+                _harness_content = _f.read()
+            _old_logdir = '        log_dir = engine_index.wl.log_dir\n'
+            _new_logdir = (
+                '        import os as _os\n'
+                '        log_dir = _os.environ.get("MLPERF_LOADGEN_LOGS_DIR", "") or engine_index.wl.log_dir\n'
+                '        log_dir = Path(log_dir) if not hasattr(log_dir, "mkdir") else log_dir\n'
+                '        log_dir.mkdir(parents=True, exist_ok=True)\n'
+            )
+            if _old_logdir in _harness_content:
+                _harness_content = _harness_content.replace(_old_logdir, _new_logdir, 1)
+                with open(_harness_py_path, 'w') as _f:
+                    _f.write(_harness_content)
 
     # Patch generate_engines.py to handle calib_data_dir being None or calibration
     # data not existing on disk. When the calibration cache already exists, the TRT
