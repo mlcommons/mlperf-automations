@@ -592,6 +592,32 @@ EXPORTS = {{
                 with open(_resnet_cfg_path, 'w') as _f:
                     _f.write(_resnet_cfg)
 
+    # Patch rn50_graphsurgeon.py to disable custom TRT fusion plugins (RnRes2FullFusion_TRT,
+    # SmallTileGEMM_TRT) which are broken on TensorRT 10.x with non-official NVIDIA GPUs.
+    # These plugins produce garbage output (constant class 600). Disabling them lets TRT use
+    # its native kernels which produce correct 76%+ accuracy.
+    if env.get('MLC_MODEL', '') == 'resnet50' and nvidia_code_path:
+        _rn50_gs_path = os.path.join(nvidia_code_path, 'code', 'resnet50', 'tensorrt', 'rn50_graphsurgeon.py')
+        if os.path.isfile(_rn50_gs_path):
+            with open(_rn50_gs_path, 'r') as _f:
+                _rn50_gs = _f.read()
+            _changed_gs = False
+            # Add 'import os' if missing
+            if 'import os' not in _rn50_gs:
+                _rn50_gs = _rn50_gs.replace('import argparse', 'import argparse\nimport os', 1)
+                _changed_gs = True
+            # Patch no_fuse logic to check MLPERF_RN50_DISABLE_FUSIONS env var
+            _old_nofuse = "no_fuse = (device_type != 'gpu') or (need_calibration)"
+            _new_nofuse = "no_fuse = (device_type != 'gpu') or (need_calibration) or os.environ.get('MLPERF_RN50_DISABLE_FUSIONS', '0') == '1'"
+            if _old_nofuse in _rn50_gs and 'MLPERF_RN50_DISABLE_FUSIONS' not in _rn50_gs:
+                _rn50_gs = _rn50_gs.replace(_old_nofuse, _new_nofuse)
+                _changed_gs = True
+            if _changed_gs:
+                with open(_rn50_gs_path, 'w') as _f:
+                    _f.write(_rn50_gs)
+        # Set the env var so the engine build uses it
+        env['MLPERF_RN50_DISABLE_FUSIONS'] = '1'
+
     # Patch generate_engines.py to handle calib_data_dir being None or calibration
     # data not existing on disk. When the calibration cache already exists, the TRT
     # builder only needs cache data (quantization ranges), not actual images.
