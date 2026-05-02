@@ -730,11 +730,14 @@ EXPORTS = {{
                 with open(_loadgen_py_path, 'w') as _f:
                     _f.write(_loadgen_content)
 
-        # Patch lg_logs.py: glob.glob() in Python 3.12 doesn't accept PosixPath
+        # Patch lg_logs.py: glob.glob() in Python 3.12 doesn't accept PosixPath,
+        # and LoadgenLogReader may look in wrong dir when MLPERF_LOADGEN_LOGS_DIR is set
         _lg_logs_path = os.path.join(nvidia_code_path, 'code', 'common', 'mlcommons', 'lg_logs.py')
         if os.path.isfile(_lg_logs_path):
             with open(_lg_logs_path, 'r') as _f:
                 _lg_logs_content = _f.read()
+            _changed_lg = False
+            # Fix PosixPath in glob.glob()
             _bad_glob = 'glob.glob(base_path / "**" / "mlperf_log_detail.txt"'
             if _bad_glob in _lg_logs_content:
                 _lg_logs_content = _lg_logs_content.replace(
@@ -743,6 +746,34 @@ EXPORTS = {{
                 _lg_logs_content = _lg_logs_content.replace(
                     'glob.glob(base_path / "**" / "mlperf_log_summary.txt", recursive=True)',
                     'glob.glob(str(base_path / "**" / "mlperf_log_summary.txt"), recursive=True)')
+                _changed_lg = True
+            # Fix: fallback to MLPERF_LOADGEN_LOGS_DIR if detail log not found in wl.log_dir
+            _old_detail_check = (
+                '            detail = base_path / "mlperf_log_detail.txt"\n'
+                '            if not detail.exists():\n'
+                '                detail = Path(glob.glob(str(base_path / "**" / "mlperf_log_detail.txt"), recursive=True)[0])'
+            )
+            _new_detail_check = (
+                '            detail = base_path / "mlperf_log_detail.txt"\n'
+                '            if not detail.exists():\n'
+                '                _alt = os.environ.get("MLPERF_LOADGEN_LOGS_DIR", "")\n'
+                '                if _alt and Path(_alt, "mlperf_log_detail.txt").exists():\n'
+                '                    base_path = Path(_alt)\n'
+                '                    detail = base_path / "mlperf_log_detail.txt"\n'
+                '                else:\n'
+                '                    _found = glob.glob(str(base_path / "**" / "mlperf_log_detail.txt"), recursive=True)\n'
+                '                    if _found:\n'
+                '                        detail = Path(_found[0])\n'
+                '                    else:\n'
+                '                        raise FileNotFoundError(f"mlperf_log_detail.txt not found in {base_path}")'
+            )
+            if _old_detail_check in _lg_logs_content:
+                _lg_logs_content = _lg_logs_content.replace(_old_detail_check, _new_detail_check)
+                _changed_lg = True
+            if _changed_lg:
+                # Ensure os is imported
+                if 'import os' not in _lg_logs_content:
+                    _lg_logs_content = 'import os\n' + _lg_logs_content
                 with open(_lg_logs_path, 'w') as _f:
                     _f.write(_lg_logs_content)
 
