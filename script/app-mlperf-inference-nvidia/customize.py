@@ -730,6 +730,22 @@ EXPORTS = {{
                 with open(_loadgen_py_path, 'w') as _f:
                     _f.write(_loadgen_content)
 
+        # Patch lg_logs.py: glob.glob() in Python 3.12 doesn't accept PosixPath
+        _lg_logs_path = os.path.join(nvidia_code_path, 'code', 'common', 'mlcommons', 'lg_logs.py')
+        if os.path.isfile(_lg_logs_path):
+            with open(_lg_logs_path, 'r') as _f:
+                _lg_logs_content = _f.read()
+            _bad_glob = 'glob.glob(base_path / "**" / "mlperf_log_detail.txt"'
+            if _bad_glob in _lg_logs_content:
+                _lg_logs_content = _lg_logs_content.replace(
+                    'glob.glob(base_path / "**" / "mlperf_log_detail.txt", recursive=True)',
+                    'glob.glob(str(base_path / "**" / "mlperf_log_detail.txt"), recursive=True)')
+                _lg_logs_content = _lg_logs_content.replace(
+                    'glob.glob(base_path / "**" / "mlperf_log_summary.txt", recursive=True)',
+                    'glob.glob(str(base_path / "**" / "mlperf_log_summary.txt"), recursive=True)')
+                with open(_lg_logs_path, 'w') as _f:
+                    _f.write(_lg_logs_content)
+
     # Patch generate_engines.py to handle calib_data_dir being None or calibration
     # data not existing on disk. When the calibration cache already exists, the TRT
     # builder only needs cache data (quantization ranges), not actual images.
