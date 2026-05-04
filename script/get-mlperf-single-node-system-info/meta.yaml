@@ -58,17 +58,17 @@ deps:
 # Variations
 variations:
   cuda:
-    group: gpu-platform
+    group: accelerator-backend
     env:
-      MLC_GPU_PLATFORM: cuda
+      MLC_ACCELERATOR_BACKEND: cuda
     adr:
       platform-details:
         tags: _cuda
   rocm:
-    group: gpu-platform
+    group: accelerator-backend
     env:
-      MLC_GPU_PLATFORM: rocm
+      MLC_ACCELERATOR_BACKEND: rocm
   xpu:
-    group: gpu-platform
+    group: accelerator-backend
     env:
-      MLC_GPU_PLATFORM: xpu
+      MLC_ACCELERATOR_BACKEND: xpu
