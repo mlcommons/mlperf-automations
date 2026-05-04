@@ -320,8 +320,98 @@ def preprocess(i):
                             _f.write(_pipeline_src)
                 continue
 
-    # Set env var to disable broken TRT fusion plugins for resnet50
+        # Fix code/resnet50/tensorrt/builder.py: object.__init__() in the MRO does not accept
+        # calib_data_dir, so do not forward it in the super().__init__ call.
+        _resnet_builder_py = os.path.join(nvidia_code_path, 'code', 'resnet50', 'tensorrt', 'builder.py')
+        if os.path.isfile(_resnet_builder_py):
+            with open(_resnet_builder_py, 'r') as _f:
+                _resnet_builder_src = _f.read()
+            if 'calib_data_dir=calib_data_dir,' in _resnet_builder_src:
+                _resnet_builder_src = _resnet_builder_src.replace('calib_data_dir=calib_data_dir,', '', 1)
+                with open(_resnet_builder_py, 'w') as _f:
+                    _f.write(_resnet_builder_src)
+
+        # Patch generate_engines.py to handle calib_data_dir being None or calibration
+        # data not existing on disk. When the calibration cache already exists, the TRT
+        # builder only needs cache data (quantization ranges), not actual images.
+        # We create a lightweight cache-only calibrator in that case.
+        _gen_eng_path = os.path.join(nvidia_code_path, 'code', 'ops', 'generate_engines.py')
+        if os.path.isfile(_gen_eng_path):
+            with open(_gen_eng_path, 'r') as _f:
+                _gen_eng = _f.read()
+            _changed_ge = False
+            # Patch EngineBuilderOp.run()
+            _old_pattern = (
+                'if isinstance(builder, CalibratableTensorRTEngine):\n'
+                '                    builder.set_calibrator(scratch_space.path.joinpath("preprocessed_data",\n'
+                '                                                                       builder.calib_data_dir))'
+            )
+            _new_pattern = (
+                'if isinstance(builder, CalibratableTensorRTEngine):\n'
+                '                    _calib_data_path = None\n'
+                '                    if builder.calib_data_dir is not None:\n'
+                '                        _calib_data_path = scratch_space.path.joinpath("preprocessed_data", builder.calib_data_dir)\n'
+                '                    if _calib_data_path is not None and _calib_data_path.exists():\n'
+                '                        builder.set_calibrator(_calib_data_path)\n'
+                '                    elif not builder.need_calibration:\n'
+                '                        import tensorrt as _trt\n'
+                '                        class _CacheCalib(_trt.IInt8EntropyCalibrator2):\n'
+                '                            def __init__(self, cache_path):\n'
+                '                                super().__init__()\n'
+                '                                self._cache = cache_path\n'
+                '                            def get_batch_size(self): return 1\n'
+                '                            def get_batch(self, names, p_gpu_mem): return None\n'
+                '                            def read_calibration_cache(self):\n'
+                '                                if self._cache.exists():\n'
+                '                                    return self._cache.read_bytes()\n'
+                '                                return None\n'
+                '                            def write_calibration_cache(self, cache): pass\n'
+                '                        builder.calibrator = _CacheCalib(builder.cache_file)'
+            )
+            if _old_pattern in _gen_eng and '_CacheCalib' not in _gen_eng:
+                _gen_eng = _gen_eng.replace(_old_pattern, _new_pattern)
+                _changed_ge = True
+            # Patch CalibrateEngineOp.run() - guard against None calib_data_dir
+            _old_calib = (
+                'if builder.need_calibration:\n'
+                '                builder.set_calibrator(scratch_space.path.joinpath("preprocessed_data",\n'
+                '                                                                   builder.calib_data_dir))'
+            )
+            _new_calib = (
+                'if builder.need_calibration and builder.calib_data_dir is not None:\n'
+                '                builder.set_calibrator(scratch_space.path.joinpath("preprocessed_data",\n'
+                '                                                                   builder.calib_data_dir))'
+            )
+            if _old_calib in _gen_eng and _new_calib not in _gen_eng:
+                _gen_eng = _gen_eng.replace(_old_calib, _new_calib)
+                _changed_ge = True
+            if _changed_ge:
+                with open(_gen_eng_path, 'w') as _f:
+                    _f.write(_gen_eng)
+
+    # Patch rn50_graphsurgeon.py to disable custom TRT fusion plugins (RnRes2FullFusion_TRT,
+    # SmallTileGEMM_TRT) which are broken on TensorRT 10.x with non-official NVIDIA GPUs.
+    # These plugins produce garbage output (constant class 600). Disabling them lets TRT use
+    # its native kernels which produce correct 76%+ accuracy.
     if env.get('MLC_MODEL', '') == 'resnet50' and nvidia_code_path and _inference_version >= 'v6.0':
+        _rn50_gs_path = os.path.join(nvidia_code_path, 'code', 'resnet50', 'tensorrt', 'rn50_graphsurgeon.py')
+        if os.path.isfile(_rn50_gs_path):
+            with open(_rn50_gs_path, 'r') as _f:
+                _rn50_gs = _f.read()
+            _changed_gs = False
+            # Add 'import os' if missing
+            if 'import os' not in _rn50_gs:
+                _rn50_gs = _rn50_gs.replace('import argparse', 'import argparse\nimport os', 1)
+                _changed_gs = True
+            # Patch no_fuse logic to check MLPERF_RN50_DISABLE_FUSIONS env var
+            _old_nofuse = "no_fuse = (device_type != 'gpu') or (need_calibration)"
+            _new_nofuse = "no_fuse = (device_type != 'gpu') or (need_calibration) or os.environ.get('MLPERF_RN50_DISABLE_FUSIONS', '0') == '1'"
+            if _old_nofuse in _rn50_gs and 'MLPERF_RN50_DISABLE_FUSIONS' not in _rn50_gs:
+                _rn50_gs = _rn50_gs.replace(_old_nofuse, _new_nofuse)
+                _changed_gs = True
+            if _changed_gs:
+                with open(_rn50_gs_path, 'w') as _f:
+                    _f.write(_rn50_gs)
         env['MLPERF_RN50_DISABLE_FUSIONS'] = '1'
 
     # For GPTJ on post-5.0 NVIDIA harness: apply persistent patches that survive container restarts.
