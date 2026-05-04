@@ -65,7 +65,8 @@ mlcr get,mlperf,single-node,system-info
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
-### Gpu-platform
+### Accelerator-backend
 
 - `cuda`
 - `rocm`
+- `xpu`
