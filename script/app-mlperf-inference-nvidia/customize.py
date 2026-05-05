@@ -415,6 +415,10 @@ def preprocess(i):
                 with open(_gen_eng_path, 'w') as _f:
                     _f.write(_gen_eng)
                 _logging.info(f"NVIDIA preprocess: patched generate_engines.py at {_gen_eng_path}")
+                # Dump lines 195-230 of the patched file for debugging
+                _patched_lines = _gen_eng.split('\n')
+                for _li in range(194, min(230, len(_patched_lines))):
+                    _logging.info(f"  GEN_ENG[{_li+1}]: {_patched_lines[_li]}")
             else:
                 _logging.info(f"NVIDIA preprocess: generate_engines.py NOT patched. _old_pattern found={_old_pattern in _gen_eng}, _CacheCalib found={'_CacheCalib' in _gen_eng}")
 
