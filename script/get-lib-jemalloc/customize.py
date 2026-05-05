@@ -14,6 +14,8 @@ def preprocess(i):
         configure_command += f""" --with-lg-quantum={env['MLC_JEMALLOC_LG_QUANTUM']} """
     if env.get('MLC_JEMALLOC_LG_PAGE', '') != '':
         configure_command += f""" --with-lg-page={env['MLC_JEMALLOC_LG_PAGE']} """
+    if env.get('MLC_JEMALLOC_LG_HUGEPAGE', '') != '':
+        configure_command += f""" --with-lg-hugepage={env['MLC_JEMALLOC_LG_HUGEPAGE']} """
 
     if is_true(env.get('MLC_JEMALLOC_STATS')):
         configure_command += " --enable-stats "

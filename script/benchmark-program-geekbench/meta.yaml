@@ -32,6 +32,7 @@ input_mapping:
   export_text: MLC_GEEKBENCH_EXPORT_TEXT
   export_xml: MLC_GEEKBENCH_EXPORT_XML
   extra_args: MLC_GEEKBENCH_EXTRA_ARGS
+  geekbench_path: MLC_GEEKBENCH_INSTALLED_PATH
   gpu_device_id: MLC_GEEKBENCH_GPU_DEVICE_ID
   gpu_platform_id: MLC_GEEKBENCH_GPU_PLATFORM_ID
   iterations: MLC_GEEKBENCH_ITERATIONS
@@ -56,6 +57,9 @@ deps:
 - names:
   - get-geekbench
   tags: get,geekbench
+  skip_if_env:
+    MLC_GEEKBENCH_INSTALLED_PATH:
+      - on
 - names:
   - get-platform-details
   tags: get,platform,details
