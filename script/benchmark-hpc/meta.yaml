@@ -1,0 +1,147 @@
+alias: benchmark-hpc
+uid: b81a4203e59f419e
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: Benchmarking
+tags:
+- benchmark
+- hpc
+- benchmark-hpc
+
+# Cache
+cache: false
+
+# Environment
+default_env:
+  MLC_HPC_BENCH_NUM_MPI_RANKS: '1'
+  MLC_HPC_BENCH_OMP_THREADS: ''
+  MLC_HPC_BENCH_NUM_RUNS: '1'
+  MLC_HPC_BENCH_EXTRA_ARGS: ''
+
+new_env_keys:
+- MLC_HPC_BENCH_*
+new_state_keys: []
+
+# Input mapping
+input_mapping:
+  num_ranks: MLC_HPC_BENCH_NUM_MPI_RANKS
+  omp_threads: MLC_HPC_BENCH_OMP_THREADS
+  num_runs: MLC_HPC_BENCH_NUM_RUNS
+  extra_args: MLC_HPC_BENCH_EXTRA_ARGS
+  benchmark: MLC_HPC_BENCH_INPUT
+  results_dir: MLC_HPC_BENCH_RESULTS_DIR
+
+input_description:
+  num_ranks:
+    desc: Number of MPI ranks to use (default 1)
+  omp_threads:
+    desc: Number of OpenMP threads per rank (default all cores / num_ranks)
+  num_runs:
+    desc: Number of benchmark runs for averaging
+  benchmark:
+    desc: "Benchmark input name, e.g. H2O-64, H2O-128 (for CP2K)"
+  extra_args:
+    desc: Extra arguments to pass to the application
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: detect,cpu
+
+# Variations
+
+variations:
+  # ---- Application group ----
+  cp2k:
+    default: true
+    group: application
+    env:
+      MLC_HPC_BENCH_APP: cp2k
+      MLC_HPC_BENCH_INPUT: H2O-64
+    deps:
+    - tags: get,blas
+      names:
+      - blas
+
+  # ---- Compiler group ----
+  aocc:
+    group: compiler
+    env:
+      MLC_HPC_BENCH_COMPILER: aocc
+    deps:
+    - tags: app,cp2k,_aocc
+      names:
+      - app-cp2k
+      enable_if_env:
+        MLC_HPC_BENCH_APP:
+        - cp2k
+
+  gcc:
+    group: compiler
+    default: true
+    env:
+      MLC_HPC_BENCH_COMPILER: gcc
+    deps:
+    - tags: app,cp2k,_gcc
+      names:
+      - app-cp2k
+      enable_if_env:
+        MLC_HPC_BENCH_APP:
+        - cp2k
+
+  llvm:
+    group: compiler
+    env:
+      MLC_HPC_BENCH_COMPILER: llvm
+    deps:
+    - tags: app,cp2k,_llvm
+      names:
+      - app-cp2k
+      enable_if_env:
+        MLC_HPC_BENCH_APP:
+        - cp2k
+
+  oneapi:
+    group: compiler
+    env:
+      MLC_HPC_BENCH_COMPILER: oneapi
+    deps:
+    - tags: app,cp2k,_oneapi
+      names:
+      - app-cp2k
+      enable_if_env:
+        MLC_HPC_BENCH_APP:
+        - cp2k
+
+  # ---- Benchmark size group (CP2K QS water boxes) ----
+  h2o-32:
+    env:
+      MLC_HPC_BENCH_INPUT: H2O-32
+    group: benchmark-size
+  h2o-64:
+    default: true
+    env:
+      MLC_HPC_BENCH_INPUT: H2O-64
+    group: benchmark-size
+  h2o-128:
+    env:
+      MLC_HPC_BENCH_INPUT: H2O-128
+    group: benchmark-size
+  h2o-256:
+    env:
+      MLC_HPC_BENCH_INPUT: H2O-256
+    group: benchmark-size
+  h2o-512:
+    env:
+      MLC_HPC_BENCH_INPUT: H2O-512
+    group: benchmark-size
+  h2o-1024:
+    env:
+      MLC_HPC_BENCH_INPUT: H2O-1024
+    group: benchmark-size
+
+# Tests
+tests:
+  run_inputs: []

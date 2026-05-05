@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-05-06 00:15:59*
+*Last updated: 2026-05-06 00:16:44*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -39,6 +39,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [TinyML automation](#tinyml-automation)
 - [Uncategorized](#uncategorized)
 - [Utilities](#utilities)
+- [XPU automation](#xpu-automation)
 
 ---
 
@@ -1227,12 +1228,18 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - send-mail
   - Tags: `send`, `mail`, `email`
 
+## XPU automation
+
+- **[get-xpu-devices](get-xpu-devices/)**
+  - get-xpu-devices
+  - Tags: `get`, `xpu-devices`
+
 ---
 
 ## Statistics
 
-- **Total Scripts**: 362
-- **Categories**: 33
+- **Total Scripts**: 363
+- **Categories**: 34
 
 ## Usage
 
