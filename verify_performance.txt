@@ -1,6 +1,0 @@
-[2026-02-13 06:34:30,019 log_parser.py:72 INFO] Sucessfully loaded MLPerf log from /home/arjun/MLC/repos/local/cache/get-mlperf-inference-results-dir_3ba3b012/valid_results/intel_spr_i9-reference-gpu-pytorch-v2.3.1-cu131/yolo-95/offline/performance/run_1/mlperf_log_detail.txt.
-[2026-02-13 06:34:30,019 log_parser.py:72 INFO] Sucessfully loaded MLPerf log from /home/arjun/MLC/repos/local/cache/get-mlperf-inference-results-dir_3ba3b012/valid_results/intel_spr_i9-reference-gpu-pytorch-v2.3.1-cu131/yolo-95/offline/TEST01/mlperf_log_detail.txt.
-Verifying performance.
-Reference score = 12.2981
-Test score = 11.9855
-TEST PASS
