@@ -320,14 +320,26 @@ def preprocess(i):
                             _f.write(_pipeline_src)
                 continue
 
-        # Fix code/resnet50/tensorrt/builder.py: object.__init__() in the MRO does not accept
-        # calib_data_dir, so do not forward it in the super().__init__ call.
+        # Fix code/resnet50/tensorrt/builder.py:
+        # 1. object.__init__() in the MRO does not accept calib_data_dir
+        # 2. create_builder_config() accesses self.calibrator unconditionally but
+        #    set_calibrator() only sets it for INT8 precision. Guard the access.
         _resnet_builder_py = os.path.join(nvidia_code_path, 'code', 'resnet50', 'tensorrt', 'builder.py')
         if os.path.isfile(_resnet_builder_py):
             with open(_resnet_builder_py, 'r') as _f:
                 _resnet_builder_src = _f.read()
+            _changed_rb = False
             if 'calib_data_dir=calib_data_dir,' in _resnet_builder_src:
                 _resnet_builder_src = _resnet_builder_src.replace('calib_data_dir=calib_data_dir,', '', 1)
+                _changed_rb = True
+            # Guard self.calibrator access: only set int8_calibrator if calibrator exists
+            _old_calib_line = 'builder_config.int8_calibrator = self.calibrator'
+            _new_calib_line = ('if hasattr(self, "calibrator") and self.calibrator is not None:\n'
+                              '            builder_config.int8_calibrator = self.calibrator')
+            if _old_calib_line in _resnet_builder_src and 'hasattr(self, "calibrator")' not in _resnet_builder_src:
+                _resnet_builder_src = _resnet_builder_src.replace(_old_calib_line, _new_calib_line, 1)
+                _changed_rb = True
+            if _changed_rb:
                 with open(_resnet_builder_py, 'w') as _f:
                     _f.write(_resnet_builder_src)
 
