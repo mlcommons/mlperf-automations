@@ -365,8 +365,10 @@ def preprocess(i):
                 '                    _calib_data_path = None\n'
                 '                    if builder.calib_data_dir is not None:\n'
                 '                        _calib_data_path = scratch_space.path.joinpath("preprocessed_data", builder.calib_data_dir)\n'
+                '                    logging.info(f"[MLC-DEBUG] calib_data_dir={builder.calib_data_dir!r}, _calib_data_path={_calib_data_path}, exists={_calib_data_path.exists() if _calib_data_path else None}, precision={builder.precision!r}, need_calibration={builder.need_calibration}, cache_file={builder.cache_file!r}")\n'
                 '                    if _calib_data_path is not None and _calib_data_path.exists():\n'
                 '                        builder.set_calibrator(_calib_data_path)\n'
+                '                        logging.info(f"[MLC-DEBUG] set_calibrator called, hasattr calibrator={hasattr(builder, \'calibrator\')}, calibrator={getattr(builder, \'calibrator\', None)}")\n'
                 '                    elif not builder.need_calibration:\n'
                 '                        import tensorrt as _trt\n'
                 '                        class _CacheCalib(_trt.IInt8EntropyCalibrator2):\n'
@@ -380,7 +382,8 @@ def preprocess(i):
                 '                                    return self._cache.read_bytes()\n'
                 '                                return None\n'
                 '                            def write_calibration_cache(self, cache): pass\n'
-                '                        builder.calibrator = _CacheCalib(builder.cache_file)'
+                '                        builder.calibrator = _CacheCalib(builder.cache_file)\n'
+                '                        logging.info(f"[MLC-DEBUG] _CacheCalib set, cache_file={builder.cache_file}, exists={builder.cache_file.exists()}")'
             )
             if _old_pattern in _gen_eng and '_CacheCalib' not in _gen_eng:
                 _gen_eng = _gen_eng.replace(_old_pattern, _new_pattern)
