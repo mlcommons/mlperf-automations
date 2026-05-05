@@ -328,6 +328,13 @@ def preprocess(i):
         #    set_calibrator() only sets it for INT8 precision. Guard the access.
         _resnet_builder_py = os.path.join(nvidia_code_path, 'code', 'resnet50', 'tensorrt', 'builder.py')
         if os.path.isfile(_resnet_builder_py):
+            # Restore original from git to ensure current patch version applies
+            _rel_rb_path = 'closed/NVIDIA/code/resnet50/tensorrt/builder.py'
+            try:
+                _sp.check_output(['git', 'checkout', 'HEAD', '--', _rel_rb_path],
+                                 cwd=os.path.abspath(_git_dir), stderr=_sp.DEVNULL)
+            except Exception:
+                pass
             with open(_resnet_builder_py, 'r') as _f:
                 _resnet_builder_src = _f.read()
             _changed_rb = False
@@ -335,7 +342,7 @@ def preprocess(i):
             _old_calib_line = 'builder_config.int8_calibrator = self.calibrator'
             _new_calib_line = ('if hasattr(self, "calibrator") and self.calibrator is not None:\n'
                               '            builder_config.int8_calibrator = self.calibrator')
-            if _old_calib_line in _resnet_builder_src and 'hasattr(self, "calibrator")' not in _resnet_builder_src:
+            if _old_calib_line in _resnet_builder_src:
                 _resnet_builder_src = _resnet_builder_src.replace(_old_calib_line, _new_calib_line, 1)
                 _changed_rb = True
             if _changed_rb:
@@ -351,6 +358,16 @@ def preprocess(i):
         # We create a lightweight cache-only calibrator in that case.
         _gen_eng_path = os.path.join(nvidia_code_path, 'code', 'ops', 'generate_engines.py')
         if os.path.isfile(_gen_eng_path):
+            # Restore the original file from git to ensure we always apply our CURRENT patch
+            # (handles case where an older version of the patch was applied during Docker build)
+            import subprocess as _sp
+            _git_dir = os.path.join(nvidia_code_path, '..', '..')  # repo root
+            _rel_path = 'closed/NVIDIA/code/ops/generate_engines.py'
+            try:
+                _orig = _sp.check_output(['git', 'checkout', 'HEAD', '--', _rel_path],
+                                         cwd=os.path.abspath(_git_dir), stderr=_sp.DEVNULL)
+            except Exception:
+                pass  # If git restore fails, proceed with current file
             with open(_gen_eng_path, 'r') as _f:
                 _gen_eng = _f.read()
             _changed_ge = False
@@ -361,19 +378,14 @@ def preprocess(i):
                 '                                                                       builder.calib_data_dir))'
             )
             _new_pattern = (
-                'import sys as _sys\n'
-                '                _sys.stderr.write(f"[MLC-DEBUG] about to check isinstance, builder_cls={builder_cls}, isinstance={isinstance(builder, CalibratableTensorRTEngine)}\\n")\n'
-                '                _sys.stderr.flush()\n'
-                '                if isinstance(builder, CalibratableTensorRTEngine):\n'
+                'if isinstance(builder, CalibratableTensorRTEngine):\n'
                 '                    _calib_data_path = None\n'
                 '                    if builder.calib_data_dir is not None:\n'
                 '                        _calib_data_path = scratch_space.path.joinpath("preprocessed_data", builder.calib_data_dir)\n'
-                '                    _sys.stderr.write(f"[MLC-DEBUG] calib_data_dir={builder.calib_data_dir!r}, _calib_data_path={_calib_data_path}, exists={_calib_data_path.exists() if _calib_data_path else None}, precision={builder.precision!r}, need_calibration={builder.need_calibration}, cache_file={builder.cache_file!r}\\n")\n'
-                '                    _sys.stderr.flush()\n'
+                '                    logging.info(f"[MLC] calib_data_dir={builder.calib_data_dir!r}, exists={_calib_data_path.exists() if _calib_data_path else None}, need_calibration={builder.need_calibration}")\n'
                 '                    if _calib_data_path is not None and _calib_data_path.exists():\n'
                 '                        builder.set_calibrator(_calib_data_path)\n'
-                '                        _sys.stderr.write(f"[MLC-DEBUG] set_calibrator done, hasattr calibrator={hasattr(builder, \'calibrator\')}, calibrator={getattr(builder, \'calibrator\', None)}\\n")\n'
-                '                        _sys.stderr.flush()\n'
+                '                        logging.info(f"[MLC] set_calibrator called, calibrator={getattr(builder, \'calibrator\', None)}")\n'
                 '                    elif not builder.need_calibration:\n'
                 '                        import tensorrt as _trt\n'
                 '                        class _CacheCalib(_trt.IInt8EntropyCalibrator2):\n'
@@ -388,13 +400,9 @@ def preprocess(i):
                 '                                return None\n'
                 '                            def write_calibration_cache(self, cache): pass\n'
                 '                        builder.calibrator = _CacheCalib(builder.cache_file)\n'
-                '                        _sys.stderr.write(f"[MLC-DEBUG] _CacheCalib set, cache_file={builder.cache_file}, exists={builder.cache_file.exists()}\\n")\n'
-                '                        _sys.stderr.flush()\n'
-                '                    else:\n'
-                '                        _sys.stderr.write(f"[MLC-DEBUG] NO calibrator set! calib_data_path exists={_calib_data_path.exists() if _calib_data_path else None}, need_calibration={builder.need_calibration}\\n")\n'
-                '                        _sys.stderr.flush()'
+                '                        logging.info(f"[MLC] _CacheCalib fallback used, cache_file={builder.cache_file}, exists={builder.cache_file.exists()}")'
             )
-            if _old_pattern in _gen_eng and '_CacheCalib' not in _gen_eng:
+            if _old_pattern in _gen_eng:
                 _gen_eng = _gen_eng.replace(_old_pattern, _new_pattern)
                 _changed_ge = True
             # Patch CalibrateEngineOp.run() - guard against None calib_data_dir
@@ -408,7 +416,7 @@ def preprocess(i):
                 '                builder.set_calibrator(scratch_space.path.joinpath("preprocessed_data",\n'
                 '                                                                   builder.calib_data_dir))'
             )
-            if _old_calib in _gen_eng and _new_calib not in _gen_eng:
+            if _old_calib in _gen_eng:
                 _gen_eng = _gen_eng.replace(_old_calib, _new_calib)
                 _changed_ge = True
             if _changed_ge:
