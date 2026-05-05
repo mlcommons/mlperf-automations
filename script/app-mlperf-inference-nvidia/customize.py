@@ -13,9 +13,6 @@ def preprocess(i):
     env = i['env']
     state = i['state']
 
-    if is_true(env.get('MLC_RUN_STATE_DOCKER', '')):
-        return {'return': 0}
-
     # Patch submission_checker/__init__.py if empty to expose ACC_PATTERN / MODEL_CONFIG
     # The NVIDIA harness does `import submission_checker; submission_checker.ACC_PATTERN`
     # but upstream __init__.py is empty; constants live in submission_checker/constants.py
