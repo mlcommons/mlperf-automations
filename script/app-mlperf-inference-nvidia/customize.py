@@ -54,8 +54,6 @@ def preprocess(i):
     # custom (non-NVIDIA-official) systems fall back to configs/minimal/ and find a bert config.
     # Applied idempotently so the container always has the correct files.
     _inference_version = env.get('MLC_MLPERF_INFERENCE_CODE_VERSION', '')
-    import logging as _logging
-    _logging.info(f"NVIDIA preprocess: _inference_version={_inference_version!r}, nvidia_code_path={nvidia_code_path!r}, make_command={make_command!r}")
     if _inference_version >= 'v6.0' and nvidia_code_path:
         # Create 3rdparty/mlc-inference symlink to mlcommons/inference source and 3rdparty/trtllm
         # as an empty directory. This must happen BEFORE paths.py is first imported by the harness,
@@ -379,9 +377,6 @@ def preprocess(i):
             if _changed_rb:
                 with open(_resnet_builder_py, 'w') as _f:
                     _f.write(_resnet_builder_src)
-                _logging.info(f"NVIDIA preprocess: patched resnet50 builder.py at {_resnet_builder_py}")
-            else:
-                _logging.info(f"NVIDIA preprocess: resnet50 builder.py NOT patched (no changes needed)")
 
         # Patch generate_engines.py to handle calib_data_dir being None or calibration
         # data not existing on disk. When the calibration cache already exists, the TRT
@@ -395,9 +390,7 @@ def preprocess(i):
             try:
                 _sp.check_output(['git', 'checkout', 'HEAD', '--', _rel_path],
                                  cwd=_git_dir, stderr=_sp.STDOUT)
-                _logging.info(f"NVIDIA preprocess: git-restored {_rel_path}")
-            except Exception as _e:
-                _logging.info(f"NVIDIA preprocess: git-restore failed: {_e}")
+            except Exception:
                 # Fallback: if old patch is present, manually restore the original pattern
                 with open(_gen_eng_path, 'r') as _f:
                     _tmp = _f.read()
@@ -414,7 +407,6 @@ def preprocess(i):
                     _tmp = _pattern.sub(_orig_block, _tmp)
                     with open(_gen_eng_path, 'w') as _f:
                         _f.write(_tmp)
-                    _logging.info(f"NVIDIA preprocess: regex-restored generate_engines.py original pattern")
             with open(_gen_eng_path, 'r') as _f:
                 _gen_eng = _f.read()
             _changed_ge = False
@@ -469,13 +461,7 @@ def preprocess(i):
             if _changed_ge:
                 with open(_gen_eng_path, 'w') as _f:
                     _f.write(_gen_eng)
-                _logging.info(f"NVIDIA preprocess: patched generate_engines.py at {_gen_eng_path}")
-                # Dump lines 195-230 of the patched file for debugging
-                _patched_lines = _gen_eng.split('\n')
-                for _li in range(194, min(230, len(_patched_lines))):
-                    _logging.info(f"  GEN_ENG[{_li+1}]: {_patched_lines[_li]}")
-            else:
-                _logging.info(f"NVIDIA preprocess: generate_engines.py NOT patched. _old_pattern found={_old_pattern in _gen_eng}, _CacheCalib found={'_CacheCalib' in _gen_eng}")
+
 
     # Patch rn50_graphsurgeon.py to disable custom TRT fusion plugins (RnRes2FullFusion_TRT,
     # SmallTileGEMM_TRT) which are broken on TensorRT 10.x with non-official NVIDIA GPUs.
