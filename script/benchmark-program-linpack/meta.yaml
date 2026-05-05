@@ -1,0 +1,50 @@
+alias: benchmark-program-linpack
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: Benchmarking
+cache: true
+default_env:
+  MLC_LINPACK_NUM_RUNS: '3'
+  MLC_LINPACK_PROBLEM_SIZE: '20000'
+  MLC_LINPACK_BLOCK_SIZE: '256'
+  MLC_LINPACK_NUM_THREADS: '0'
+  MLC_LINPACK_VARIANT: 'xhpl'
+deps:
+- tags: detect,os
+- tags: detect,cpu
+input_mapping:
+  num_runs: MLC_LINPACK_NUM_RUNS
+  problem_size: MLC_LINPACK_PROBLEM_SIZE
+  block_size: MLC_LINPACK_BLOCK_SIZE
+  num_threads: MLC_LINPACK_NUM_THREADS
+  variant: MLC_LINPACK_VARIANT
+  results_dir: MLC_LINPACK_RESULTS_DIR
+  reuse_logs: MLC_LINPACK_REUSE_LOGS
+new_env_keys:
+- MLC_LINPACK_*
+tags:
+- benchmark
+- linpack
+- hpl
+- flops
+- benchmark-linpack
+- benchmark-program-linpack
+uid: a1b2c3d4e5f60004
+variations:
+  xhpl:
+    default: true
+    env:
+      MLC_LINPACK_VARIANT: 'xhpl'
+    group: variant
+  intel-mp:
+    env:
+      MLC_LINPACK_VARIANT: 'intel-mp'
+    group: variant
+
+tests:
+  run_inputs:
+  - variations_list:
+    - xhpl
+    env:
+      MLC_LINPACK_NUM_RUNS: '1'
+      MLC_LINPACK_PROBLEM_SIZE: '5000'

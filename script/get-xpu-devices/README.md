@@ -1,4 +1,4 @@
-# README for benchmark-program-geekbench
+# README for get-xpu-devices
 This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,36 +33,10 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr benchmark,geekbench,benchmark-geekbench,benchmark-program-geekbench
+mlcr get,xpu-devices
 ```
 
-### Script Inputs
-
-| Name | Description | Choices | Default |
-|------|-------------|---------|------|
-| `--core_pinning` |  |  | `no` |
-| `--cpu_workers` |  |  | `` |
-| `--export_html` |  |  | `` |
-| `--export_text` |  |  | `` |
-| `--export_xml` |  |  | `` |
-| `--extra_args` |  |  | `` |
-| `--geekbench_path` |  |  | `` |
-| `--gpu_device_id` |  |  | `` |
-| `--gpu_platform_id` |  |  | `` |
-| `--iterations` |  |  | `` |
-| `--license_email` |  |  | `` |
-| `--license_key` |  |  | `` |
-| `--load` |  |  | `` |
-| `--num_runs` |  |  | `1` |
-| `--pinned_core` |  |  | `0` |
-| `--results_dir` |  |  | `` |
-| `--reuse_logs` |  |  | `` |
-| `--save` |  |  | `` |
-| `--section` |  |  | `` |
-| `--skip_platform_details` |  |  | `` |
-| `--workload` |  |  | `` |
-| `--workload_gap` |  |  | `` |
-| `--workload_ids` |  |  | `` |
+No script specific inputs
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -84,34 +58,3 @@ mlcr benchmark,geekbench,benchmark-geekbench,benchmark-program-geekbench
 | `--hf_token` | Huggingface Token |  | `` |
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
-
-### Core-mode
-
-- `all-cores` (default)
-- `multi-core`
-- `single-core`
-
-### Ungrouped
-
-- `gpu-list`
-- `sysinfo`
-- `workload-list`
-
-### Upload-mode
-
-- `no-upload` (default)
-- `upload`
-
-### Workload
-
-- `compute`
-- `compute-cuda`
-- `compute-metal`
-- `compute-opencl`
-- `compute-vulkan`
-- `cpu` (default)
-- `gpu`
-- `gpu-cuda`
-- `gpu-metal`
-- `gpu-opencl`
-- `gpu-vulkan`

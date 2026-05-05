@@ -177,6 +177,19 @@ variations:
         brew: ''
         dnf: ''
         yum: ''
+  fio:
+    env:
+      MLC_SYS_UTIL_NAME: fio
+      MLC_SYS_UTIL_VERSION_CMD: fio --version
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+    - MLC_FIO_VERSION
+    state:
+      fio:
+        apt: fio
+        brew: fio
+        dnf: fio
+        yum: fio
   flex:
     env:
       MLC_SYS_UTIL_NAME: flex
@@ -921,6 +934,32 @@ variations:
         apt: sox
         brew: sox
         dnf: sox
+  stress-ng:
+    env:
+      MLC_SYS_UTIL_NAME: stress-ng
+      MLC_SYS_UTIL_VERSION_CMD: stress-ng --version
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+    - MLC_STRESSNG_VERSION
+    state:
+      stress-ng:
+        apt: stress-ng
+        brew: stress-ng
+        dnf: stress-ng
+        yum: stress-ng
+  sysbench:
+    env:
+      MLC_SYS_UTIL_NAME: sysbench
+      MLC_SYS_UTIL_VERSION_CMD: sysbench --version
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+    new_env_keys:
+    - MLC_SYSBENCH_VERSION
+    state:
+      sysbench:
+        apt: sysbench
+        brew: sysbench
+        dnf: sysbench
+        yum: sysbench
   systemd:
     env:
       MLC_SYS_UTIL_NAME: systemd
