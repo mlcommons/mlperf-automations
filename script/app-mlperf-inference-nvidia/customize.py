@@ -326,15 +326,26 @@ def preprocess(i):
         # 1. object.__init__() in the MRO does not accept calib_data_dir
         # 2. create_builder_config() accesses self.calibrator unconditionally but
         #    set_calibrator() only sets it for INT8 precision. Guard the access.
+        import subprocess as _sp
+        _git_dir = os.path.abspath(os.path.join(nvidia_code_path, '..', '..'))  # repo root
         _resnet_builder_py = os.path.join(nvidia_code_path, 'code', 'resnet50', 'tensorrt', 'builder.py')
         if os.path.isfile(_resnet_builder_py):
             # Restore original from git to ensure current patch version applies
             _rel_rb_path = 'closed/NVIDIA/code/resnet50/tensorrt/builder.py'
             try:
                 _sp.check_output(['git', 'checkout', 'HEAD', '--', _rel_rb_path],
-                                 cwd=os.path.abspath(_git_dir), stderr=_sp.DEVNULL)
+                                 cwd=_git_dir, stderr=_sp.STDOUT)
             except Exception:
-                pass
+                # Fallback: if hasattr guard already present, restore original line
+                with open(_resnet_builder_py, 'r') as _f:
+                    _tmp = _f.read()
+                if 'hasattr(self, "calibrator")' in _tmp:
+                    _tmp = _tmp.replace(
+                        'if hasattr(self, "calibrator") and self.calibrator is not None:\n'
+                        '            builder_config.int8_calibrator = self.calibrator',
+                        'builder_config.int8_calibrator = self.calibrator')
+                    with open(_resnet_builder_py, 'w') as _f:
+                        _f.write(_tmp)
             with open(_resnet_builder_py, 'r') as _f:
                 _resnet_builder_src = _f.read()
             _changed_rb = False
@@ -360,14 +371,30 @@ def preprocess(i):
         if os.path.isfile(_gen_eng_path):
             # Restore the original file from git to ensure we always apply our CURRENT patch
             # (handles case where an older version of the patch was applied during Docker build)
-            import subprocess as _sp
-            _git_dir = os.path.join(nvidia_code_path, '..', '..')  # repo root
             _rel_path = 'closed/NVIDIA/code/ops/generate_engines.py'
             try:
-                _orig = _sp.check_output(['git', 'checkout', 'HEAD', '--', _rel_path],
-                                         cwd=os.path.abspath(_git_dir), stderr=_sp.DEVNULL)
-            except Exception:
-                pass  # If git restore fails, proceed with current file
+                _sp.check_output(['git', 'checkout', 'HEAD', '--', _rel_path],
+                                 cwd=_git_dir, stderr=_sp.STDOUT)
+                _logging.info(f"NVIDIA preprocess: git-restored {_rel_path}")
+            except Exception as _e:
+                _logging.info(f"NVIDIA preprocess: git-restore failed: {_e}")
+                # Fallback: if old patch is present, manually restore the original pattern
+                with open(_gen_eng_path, 'r') as _f:
+                    _tmp = _f.read()
+                if '_CacheCalib' in _tmp:
+                    import re as _re
+                    # Replace the entire patched isinstance block with the original
+                    _pattern = _re.compile(
+                        r'if isinstance\(builder, CalibratableTensorRTEngine\):.*?'
+                        r'(?=\n                network = builder\.create_network)',
+                        _re.DOTALL)
+                    _orig_block = ('if isinstance(builder, CalibratableTensorRTEngine):\n'
+                                   '                    builder.set_calibrator(scratch_space.path.joinpath("preprocessed_data",\n'
+                                   '                                                                       builder.calib_data_dir))')
+                    _tmp = _pattern.sub(_orig_block, _tmp)
+                    with open(_gen_eng_path, 'w') as _f:
+                        _f.write(_tmp)
+                    _logging.info(f"NVIDIA preprocess: regex-restored generate_engines.py original pattern")
             with open(_gen_eng_path, 'r') as _f:
                 _gen_eng = _f.read()
             _changed_ge = False
