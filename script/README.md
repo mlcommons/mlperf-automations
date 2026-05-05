@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-04-29 17:22:48*
+*Last updated: 2026-05-06 00:15:59*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -272,6 +272,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Benchmarking
 
+- **[benchmark-hpc](benchmark-hpc/)**
+  - benchmark-hpc
+  - Tags: `benchmark`, `hpc`, `benchmark-hpc`
 - **[benchmark-program-coremark](benchmark-program-coremark/)**
   - benchmark-program-coremark
   - Tags: `benchmark`, `coremark`, `cpu`, `benchmark-coremark`, `benchmark-program-coremark`
@@ -1228,7 +1231,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 361
+- **Total Scripts**: 362
 - **Categories**: 33
 
 ## Usage
