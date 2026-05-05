@@ -581,22 +581,42 @@ def measure_files_exist(OUTPUT_DIR, run_files):
     return True
 
 
-def get_checker_files(env):
-    if is_true(env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
-        import submission_checker.constants as constants
+def _get_submission_checker_constants_module():
+    required_attrs = [
+        "REQUIRED_ACC_FILES",
+        "REQUIRED_PERF_FILES",
+        "REQUIRED_POWER_FILES",
+        "REQUIRED_PERF_POWER_FILES",
+        "REQUIRED_MEASURE_FILES",
+        "OFFLINE_MIN_SPQ_SINCE_V4",
+    ]
 
-        REQUIRED_ACC_FILES = constants.REQUIRED_ACC_FILES
-        REQUIRED_PERF_FILES = constants.REQUIRED_PERF_FILES
-        REQUIRED_POWER_FILES = constants.REQUIRED_POWER_FILES
-        REQUIRED_PERF_POWER_FILES = constants.REQUIRED_PERF_POWER_FILES
-        REQUIRED_MEASURE_FILES = constants.REQUIRED_MEASURE_FILES
-    else:
+    try:
+        import submission_checker.constants as constants
+        if all(hasattr(constants, attr) for attr in required_attrs):
+            return constants
+    except (ImportError, ModuleNotFoundError, AttributeError):
+        pass
+
+    try:
         import submission_checker as checker
-        REQUIRED_ACC_FILES = checker.REQUIRED_ACC_FILES
-        REQUIRED_PERF_FILES = checker.REQUIRED_PERF_FILES
-        REQUIRED_POWER_FILES = checker.REQUIRED_POWER_FILES
-        REQUIRED_PERF_POWER_FILES = checker.REQUIRED_PERF_POWER_FILES
-        REQUIRED_MEASURE_FILES = checker.REQUIRED_MEASURE_FILES
+        if all(hasattr(checker, attr) for attr in required_attrs):
+            return checker
+    except (ImportError, ModuleNotFoundError, AttributeError):
+        pass
+
+    raise AttributeError(
+        "submission_checker module is missing required constants for file checks"
+    )
+
+
+def get_checker_files(env):
+    constants = _get_submission_checker_constants_module()
+    REQUIRED_ACC_FILES = constants.REQUIRED_ACC_FILES
+    REQUIRED_PERF_FILES = constants.REQUIRED_PERF_FILES
+    REQUIRED_POWER_FILES = constants.REQUIRED_POWER_FILES
+    REQUIRED_PERF_POWER_FILES = constants.REQUIRED_PERF_POWER_FILES
+    REQUIRED_MEASURE_FILES = constants.REQUIRED_MEASURE_FILES
     return REQUIRED_ACC_FILES, REQUIRED_PERF_FILES, REQUIRED_POWER_FILES, REQUIRED_PERF_POWER_FILES, REQUIRED_MEASURE_FILES
 
 
@@ -605,12 +625,8 @@ def get_required_min_queries_offline(model, version, env):
     if int(version[0]) < 4:
         return 24756
 
-    if is_true(env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
-        import submission_checker.constants as constants
-        REQUIRED_MIN_QUERIES = constants.OFFLINE_MIN_SPQ_SINCE_V4
-    else:
-        import submission_checker as checker
-        REQUIRED_MIN_QUERIES = checker.OFFLINE_MIN_SPQ_SINCE_V4
+    constants = _get_submission_checker_constants_module()
+    REQUIRED_MIN_QUERIES = constants.OFFLINE_MIN_SPQ_SINCE_V4
 
     mlperf_model = model
     mlperf_model = mlperf_model.replace("resnet50", "resnet")
