@@ -331,9 +331,6 @@ def preprocess(i):
             with open(_resnet_builder_py, 'r') as _f:
                 _resnet_builder_src = _f.read()
             _changed_rb = False
-            if 'calib_data_dir=calib_data_dir,' in _resnet_builder_src:
-                _resnet_builder_src = _resnet_builder_src.replace('calib_data_dir=calib_data_dir,', '', 1)
-                _changed_rb = True
             # Guard self.calibrator access: only set int8_calibrator if calibrator exists
             _old_calib_line = 'builder_config.int8_calibrator = self.calibrator'
             _new_calib_line = ('if hasattr(self, "calibrator") and self.calibrator is not None:\n'
