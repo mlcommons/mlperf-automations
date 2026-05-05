@@ -73,3 +73,6 @@ sort: 500
 tests:
   run_inputs:
   - variations_list: []
+  - variations_list:
+    - src
+    - cpulibs
