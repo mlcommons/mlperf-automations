@@ -361,15 +361,19 @@ def preprocess(i):
                 '                                                                       builder.calib_data_dir))'
             )
             _new_pattern = (
-                'print(f"[MLC-DEBUG] about to check isinstance, builder_cls={builder_cls}, isinstance={isinstance(builder, CalibratableTensorRTEngine)}", flush=True)\n'
+                'import sys as _sys\n'
+                '                _sys.stderr.write(f"[MLC-DEBUG] about to check isinstance, builder_cls={builder_cls}, isinstance={isinstance(builder, CalibratableTensorRTEngine)}\\n")\n'
+                '                _sys.stderr.flush()\n'
                 '                if isinstance(builder, CalibratableTensorRTEngine):\n'
                 '                    _calib_data_path = None\n'
                 '                    if builder.calib_data_dir is not None:\n'
                 '                        _calib_data_path = scratch_space.path.joinpath("preprocessed_data", builder.calib_data_dir)\n'
-                '                    print(f"[MLC-DEBUG] calib_data_dir={builder.calib_data_dir!r}, _calib_data_path={_calib_data_path}, exists={_calib_data_path.exists() if _calib_data_path else None}, precision={builder.precision!r}, need_calibration={builder.need_calibration}, cache_file={builder.cache_file!r}", flush=True)\n'
+                '                    _sys.stderr.write(f"[MLC-DEBUG] calib_data_dir={builder.calib_data_dir!r}, _calib_data_path={_calib_data_path}, exists={_calib_data_path.exists() if _calib_data_path else None}, precision={builder.precision!r}, need_calibration={builder.need_calibration}, cache_file={builder.cache_file!r}\\n")\n'
+                '                    _sys.stderr.flush()\n'
                 '                    if _calib_data_path is not None and _calib_data_path.exists():\n'
                 '                        builder.set_calibrator(_calib_data_path)\n'
-                '                        print(f"[MLC-DEBUG] set_calibrator done, hasattr calibrator={hasattr(builder, \'calibrator\')}, calibrator={getattr(builder, \'calibrator\', None)}", flush=True)\n'
+                '                        _sys.stderr.write(f"[MLC-DEBUG] set_calibrator done, hasattr calibrator={hasattr(builder, \'calibrator\')}, calibrator={getattr(builder, \'calibrator\', None)}\\n")\n'
+                '                        _sys.stderr.flush()\n'
                 '                    elif not builder.need_calibration:\n'
                 '                        import tensorrt as _trt\n'
                 '                        class _CacheCalib(_trt.IInt8EntropyCalibrator2):\n'
@@ -384,9 +388,11 @@ def preprocess(i):
                 '                                return None\n'
                 '                            def write_calibration_cache(self, cache): pass\n'
                 '                        builder.calibrator = _CacheCalib(builder.cache_file)\n'
-                '                        print(f"[MLC-DEBUG] _CacheCalib set, cache_file={builder.cache_file}, exists={builder.cache_file.exists()}", flush=True)\n'
+                '                        _sys.stderr.write(f"[MLC-DEBUG] _CacheCalib set, cache_file={builder.cache_file}, exists={builder.cache_file.exists()}\\n")\n'
+                '                        _sys.stderr.flush()\n'
                 '                    else:\n'
-                '                        print(f"[MLC-DEBUG] NO calibrator set! calib_data_path exists={_calib_data_path.exists() if _calib_data_path else None}, need_calibration={builder.need_calibration}", flush=True)'
+                '                        _sys.stderr.write(f"[MLC-DEBUG] NO calibrator set! calib_data_path exists={_calib_data_path.exists() if _calib_data_path else None}, need_calibration={builder.need_calibration}\\n")\n'
+                '                        _sys.stderr.flush()'
             )
             if _old_pattern in _gen_eng and '_CacheCalib' not in _gen_eng:
                 _gen_eng = _gen_eng.replace(_old_pattern, _new_pattern)
