@@ -336,25 +336,45 @@ def preprocess(i):
                 _sp.check_output(['git', 'checkout', 'HEAD', '--', _rel_rb_path],
                                  cwd=_git_dir, stderr=_sp.STDOUT)
             except Exception:
-                # Fallback: if hasattr guard already present, restore original line
+                # Fallback: if already patched, restore original line
                 with open(_resnet_builder_py, 'r') as _f:
                     _tmp = _f.read()
-                if 'hasattr(self, "calibrator")' in _tmp:
+                if '_MLC_PATCHED_' in _tmp or 'hasattr(self, "calibrator")' in _tmp:
                     _tmp = _tmp.replace(
                         'if hasattr(self, "calibrator") and self.calibrator is not None:\n'
                         '            builder_config.int8_calibrator = self.calibrator',
                         'builder_config.int8_calibrator = self.calibrator')
+                    # Remove any previous MLC patch block
+                    import re as _re
+                    _tmp = _re.sub(r'\n        # _MLC_PATCHED_.*?(?=\n        if self\.energy_aware_kernels|\n        return builder_config)',
+                                   '', _tmp, flags=_re.DOTALL)
                     with open(_resnet_builder_py, 'w') as _f:
                         _f.write(_tmp)
             with open(_resnet_builder_py, 'r') as _f:
                 _resnet_builder_src = _f.read()
             _changed_rb = False
-            # Guard self.calibrator access: only set int8_calibrator if calibrator exists
+            # Replace the unconditional self.calibrator access with a robust fallback:
+            # If set_calibrator was called, use self.calibrator.
+            # If not, but cache_file exists and precision is INT8, create a cache-only calibrator.
             _old_calib_line = 'builder_config.int8_calibrator = self.calibrator'
-            _new_calib_line = ('if hasattr(self, "calibrator") and self.calibrator is not None:\n'
-                              '            builder_config.int8_calibrator = self.calibrator')
+            _new_calib_block = (
+                '# _MLC_PATCHED_ calibrator access\n'
+                '        if hasattr(self, "calibrator") and self.calibrator is not None:\n'
+                '            builder_config.int8_calibrator = self.calibrator\n'
+                '        elif self.precision == Precision.INT8 and hasattr(self, "cache_file") and self.cache_file.exists():\n'
+                '            import tensorrt as _trt\n'
+                '            class _FallbackCalib(_trt.IInt8EntropyCalibrator2):\n'
+                '                def __init__(self, cache_path):\n'
+                '                    super().__init__()\n'
+                '                    self._cache = cache_path\n'
+                '                def get_batch_size(self): return 1\n'
+                '                def get_batch(self, names, p_gpu_mem): return None\n'
+                '                def read_calibration_cache(self):\n'
+                '                    return self._cache.read_bytes()\n'
+                '                def write_calibration_cache(self, cache): pass\n'
+                '            builder_config.int8_calibrator = _FallbackCalib(self.cache_file)')
             if _old_calib_line in _resnet_builder_src:
-                _resnet_builder_src = _resnet_builder_src.replace(_old_calib_line, _new_calib_line, 1)
+                _resnet_builder_src = _resnet_builder_src.replace(_old_calib_line, _new_calib_block, 1)
                 _changed_rb = True
             if _changed_rb:
                 with open(_resnet_builder_py, 'w') as _f:
