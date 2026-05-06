@@ -639,7 +639,7 @@ def _get_submission_checker_constants_module(submission_checker_dir=None):
 
 def get_checker_files(env):
     submission_checker_dir = os.path.join(
-        env.get('MLC_MLPERF_INFERENCE_SOURCE', ''), "tools", "submission")
+        env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission")
     constants = _get_submission_checker_constants_module(submission_checker_dir)
     REQUIRED_ACC_FILES = constants.REQUIRED_ACC_FILES
     REQUIRED_PERF_FILES = constants.REQUIRED_PERF_FILES
@@ -655,7 +655,7 @@ def get_required_min_queries_offline(model, version, env):
         return 24756
 
     submission_checker_dir = os.path.join(
-        env.get('MLC_MLPERF_INFERENCE_SOURCE', ''), "tools", "submission")
+        env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission")
     constants = _get_submission_checker_constants_module(submission_checker_dir)
     REQUIRED_MIN_QUERIES = constants.OFFLINE_MIN_SPQ_SINCE_V4
 
