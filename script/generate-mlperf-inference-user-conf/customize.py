@@ -29,7 +29,8 @@ def preprocess(i):
     if os.path.isfile(stale_checker) and os.path.isdir(
             os.path.join(submission_checker_dir, "submission_checker")):
         os.remove(stale_checker)
-    sys.path.append(submission_checker_dir)
+    if submission_checker_dir not in sys.path:
+        sys.path.insert(0, submission_checker_dir)
 
     version = env.get('MLC_MLPERF_INFERENCE_VERSION', "4.1")
 
@@ -583,7 +584,7 @@ def measure_files_exist(OUTPUT_DIR, run_files):
     return True
 
 
-def _get_submission_checker_constants_module():
+def _get_submission_checker_constants_module(submission_checker_dir=None):
     required_attrs = [
         "REQUIRED_ACC_FILES",
         "REQUIRED_PERF_FILES",
@@ -592,6 +593,12 @@ def _get_submission_checker_constants_module():
         "REQUIRED_MEASURE_FILES",
         "OFFLINE_MIN_SPQ_SINCE_V4",
     ]
+
+    # Ensure the caller's directory is at the front of sys.path so that
+    # both submission_checker.py and its log_parser dependency are found
+    # before any other copy that might be on sys.path.
+    if submission_checker_dir and submission_checker_dir not in sys.path:
+        sys.path.insert(0, submission_checker_dir)
 
     try:
         import submission_checker.constants as constants
@@ -607,13 +614,33 @@ def _get_submission_checker_constants_module():
     except (ImportError, ModuleNotFoundError, AttributeError):
         pass
 
+    # importlib fallback: load submission_checker.py directly from the
+    # provided directory, bypassing sys.modules caching and any sys.path
+    # ordering issues that could cause the standard imports above to pick up
+    # the wrong (or no) module.
+    if submission_checker_dir:
+        checker_file = os.path.join(submission_checker_dir, "submission_checker.py")
+        if os.path.isfile(checker_file):
+            try:
+                import importlib.util
+                spec = importlib.util.spec_from_file_location(
+                    "submission_checker_direct", checker_file)
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+                if all(hasattr(mod, attr) for attr in required_attrs):
+                    return mod
+            except Exception:
+                pass
+
     raise AttributeError(
         "submission_checker module is missing required constants for file checks"
     )
 
 
 def get_checker_files(env):
-    constants = _get_submission_checker_constants_module()
+    submission_checker_dir = os.path.join(
+        env.get('MLC_MLPERF_INFERENCE_SOURCE', ''), "tools", "submission")
+    constants = _get_submission_checker_constants_module(submission_checker_dir)
     REQUIRED_ACC_FILES = constants.REQUIRED_ACC_FILES
     REQUIRED_PERF_FILES = constants.REQUIRED_PERF_FILES
     REQUIRED_POWER_FILES = constants.REQUIRED_POWER_FILES
@@ -627,7 +654,9 @@ def get_required_min_queries_offline(model, version, env):
     if int(version[0]) < 4:
         return 24756
 
-    constants = _get_submission_checker_constants_module()
+    submission_checker_dir = os.path.join(
+        env.get('MLC_MLPERF_INFERENCE_SOURCE', ''), "tools", "submission")
+    constants = _get_submission_checker_constants_module(submission_checker_dir)
     REQUIRED_MIN_QUERIES = constants.OFFLINE_MIN_SPQ_SINCE_V4
 
     mlperf_model = model
