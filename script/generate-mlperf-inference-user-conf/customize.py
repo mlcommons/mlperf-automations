@@ -1,4 +1,5 @@
 from mlc import utils
+import importlib.util
 import os
 import json
 import shutil
@@ -622,14 +623,13 @@ def _get_submission_checker_constants_module(submission_checker_dir=None):
         checker_file = os.path.join(submission_checker_dir, "submission_checker.py")
         if os.path.isfile(checker_file):
             try:
-                import importlib.util
                 spec = importlib.util.spec_from_file_location(
                     "submission_checker_direct", checker_file)
                 mod = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(mod)
                 if all(hasattr(mod, attr) for attr in required_attrs):
                     return mod
-            except Exception:
+            except (ImportError, ModuleNotFoundError, AttributeError, OSError):
                 pass
 
     raise AttributeError(
@@ -637,10 +637,12 @@ def _get_submission_checker_constants_module(submission_checker_dir=None):
     )
 
 
+def _get_submission_checker_dir(env):
+    return os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission")
+
+
 def get_checker_files(env):
-    submission_checker_dir = os.path.join(
-        env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission")
-    constants = _get_submission_checker_constants_module(submission_checker_dir)
+    constants = _get_submission_checker_constants_module(_get_submission_checker_dir(env))
     REQUIRED_ACC_FILES = constants.REQUIRED_ACC_FILES
     REQUIRED_PERF_FILES = constants.REQUIRED_PERF_FILES
     REQUIRED_POWER_FILES = constants.REQUIRED_POWER_FILES
@@ -654,9 +656,7 @@ def get_required_min_queries_offline(model, version, env):
     if int(version[0]) < 4:
         return 24756
 
-    submission_checker_dir = os.path.join(
-        env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission")
-    constants = _get_submission_checker_constants_module(submission_checker_dir)
+    constants = _get_submission_checker_constants_module(_get_submission_checker_dir(env))
     REQUIRED_MIN_QUERIES = constants.OFFLINE_MIN_SPQ_SINCE_V4
 
     mlperf_model = model
