@@ -620,7 +620,9 @@ def _get_submission_checker_constants_module(submission_checker_dir=None):
     # ordering issues that could cause the standard imports above to pick up
     # the wrong (or no) module.
     if submission_checker_dir:
-        checker_file = os.path.join(submission_checker_dir, "submission_checker.py")
+        checker_file = os.path.join(
+            submission_checker_dir,
+            "submission_checker.py")
         if os.path.isfile(checker_file):
             try:
                 spec = importlib.util.spec_from_file_location(
@@ -638,11 +640,13 @@ def _get_submission_checker_constants_module(submission_checker_dir=None):
 
 
 def _get_submission_checker_dir(env):
-    return os.path.join(env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission")
+    return os.path.join(
+        env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission")
 
 
 def get_checker_files(env):
-    constants = _get_submission_checker_constants_module(_get_submission_checker_dir(env))
+    constants = _get_submission_checker_constants_module(
+        _get_submission_checker_dir(env))
     REQUIRED_ACC_FILES = constants.REQUIRED_ACC_FILES
     REQUIRED_PERF_FILES = constants.REQUIRED_PERF_FILES
     REQUIRED_POWER_FILES = constants.REQUIRED_POWER_FILES
@@ -656,7 +660,8 @@ def get_required_min_queries_offline(model, version, env):
     if int(version[0]) < 4:
         return 24756
 
-    constants = _get_submission_checker_constants_module(_get_submission_checker_dir(env))
+    constants = _get_submission_checker_constants_module(
+        _get_submission_checker_dir(env))
     REQUIRED_MIN_QUERIES = constants.OFFLINE_MIN_SPQ_SINCE_V4
 
     mlperf_model = model
