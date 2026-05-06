@@ -338,6 +338,7 @@ variations:
   cuda:
     docker:
       all_gpus: 'yes'
+      system_site_packages: 'yes'
       deps:
       - tags: get,nvidia-docker
         skip_if_env:
