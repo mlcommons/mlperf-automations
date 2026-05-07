@@ -20,6 +20,10 @@ new_env_keys:
 input_mapping:
   profile_system_info: MLC_PROFILE_SYSTEM_INFO
 
+# Input mapping
+input_mapping:
+  profile_system_info: MLC_PROFILE_SYSTEM_INFO
+
 # Dependencies
 deps:
 - tags: detect,cpu

@@ -58,3 +58,13 @@ No script specific inputs
 | `--hf_token` | Huggingface Token |  | `` |
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
+
+### Runtimes
+
+- `no-runtimes`
+- `with-runtimes` (default)
+
+### Ungrouped
+
+- `cpulibs`
+- `src`

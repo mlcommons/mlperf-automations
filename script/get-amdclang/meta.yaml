@@ -27,19 +27,44 @@ new_env_keys:
 - MLC_COMPILER_*
 - MLC_LINKER_*
 - +PATH
+- MLC_ROCM_CPULIBS_PATH
 
 # Dependencies
 deps:
 - tags: get,rocm
-
+  names:
+  - get-rocm
 post_deps:
 - tags: get,compiler-flags
 
 # Variations
 variations:
+  no-runtimes:
+    group: runtimes
+    adr:
+      get-rocm:
+        tags: _no-runtimes
+  with-runtimes:
+    default: true
+    group: runtimes
+    adr:
+      get-rocm:
+        tags: _with-runtimes
+  cpulibs:
+    env:
+      MLC_ROCM_INSTALL_CPULIBS: 'yes'
+    adr:
+      get-rocm:
+        tags: _cpulibs
   path.#:
     env:
       MLC_AMDCLANG_DIR_PATH: '#'
+  src:
+    env:
+      MLC_ROCM_BUILD_FROM_SRC: 'yes'
+    adr:
+      get-rocm:
+        tags: _src
 
 # Output / debugging
 sort: 500
@@ -48,3 +73,6 @@ sort: 500
 tests:
   run_inputs:
   - variations_list: []
+  - variations_list:
+    - src
+    - cpulibs

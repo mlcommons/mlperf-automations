@@ -2,12 +2,19 @@ alias: app-lammps
 uid: e5f2a3b4c6d7890f
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: HPC Application
 tags:
 - app
 - lammps
 - hpc
+
+# Cache
 cache: true
+
+# Environment
+default_env: {}
 new_env_keys:
 - MLC_LAMMPS_SRC_PATH
 - MLC_LAMMPS_INSTALL_PATH
@@ -15,6 +22,8 @@ new_env_keys:
 - +PATH
 - +LD_LIBRARY_PATH
 new_state_keys: []
+
+# Dependencies
 deps:
 - tags: detect,cpu
 - tags: get,generic,sys-util,_libopenmpi-dev
@@ -38,6 +47,8 @@ deps:
 prehook_deps: []
 posthook_deps: []
 post_deps: []
+
+# Variations
 variations:
   repo.#:
     env:
@@ -48,9 +59,6 @@ variations:
     env:
       MLC_GIT_REPO_URL: https://github.com/lammps/lammps.git
     group: repo
-  branch.#:
-    env:
-      MLC_GIT_CHECKOUT: '#'
   tag.#:
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
@@ -64,10 +72,14 @@ variations:
     group: version
     env:
       MLC_GIT_CHECKOUT_TAG: stable_2Aug2023_update3
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
   develop:
     env:
       MLC_GIT_CHECKOUT: develop
-default_env: {}
+
+# Tests
 tests:
   run_inputs:
   - variations_list:

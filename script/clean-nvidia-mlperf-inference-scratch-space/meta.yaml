@@ -27,15 +27,15 @@ deps:
 
 # Variations
 variations:
-  models:
-    group: artifact
-    env:
-      MLC_CLEAN_ARTIFACT_NAME: models
   downloaded-data:
     group: artifact
     env:
       MLC_CLEAN_ARTIFACT_NAME: downloaded_data
   downloaded-model:
+    group: artifact
+    env:
+      MLC_CLEAN_ARTIFACT_NAME: models
+  models:
     group: artifact
     env:
       MLC_CLEAN_ARTIFACT_NAME: models

@@ -46,6 +46,7 @@ mlcr benchmark,geekbench,benchmark-geekbench,benchmark-program-geekbench
 | `--export_text` |  |  | `` |
 | `--export_xml` |  |  | `` |
 | `--extra_args` |  |  | `` |
+| `--geekbench_path` |  |  | `` |
 | `--gpu_device_id` |  |  | `` |
 | `--gpu_platform_id` |  |  | `` |
 | `--iterations` |  |  | `` |
