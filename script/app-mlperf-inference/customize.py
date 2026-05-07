@@ -398,14 +398,14 @@ def postprocess(i):
                 elif scenario == "Offline":
                     # For Offline, reduce target QPS to 90% of measured
                     measured_value = float(result)
-                    adjusted_value = str(round(measured_value * 0.9, 3))
+                    adjusted_value = str(round(measured_value, 3))
                     logger.info(f"Adjusting target_qps from measured {result} to {adjusted_value} (90%)")
                     rerun_env['MLC_MLPERF_LOADGEN_TARGET_QPS'] = adjusted_value
                     rerun_env['MLC_MLPERF_LOADGEN_OFFLINE_TARGET_QPS'] = adjusted_value
                 elif scenario.endswith("Stream"):
                     # For Stream, increase target latency to 110% of measured
                     measured_value = float(result)
-                    adjusted_value = str(round(measured_value * 1.1, 3))
+                    adjusted_value = str(round(measured_value, 3))
                     logger.info(f"Adjusting target_latency from measured {result} ms to {adjusted_value} ms (110%)")
                     rerun_env['MLC_MLPERF_LOADGEN_TARGET_LATENCY'] = adjusted_value
                     if scenario == "SingleStream":

@@ -334,10 +334,9 @@ variations:
     new_env_keys:
     - MLC_ONNX_VERSION
   onnx-graphsurgeon:
-    deps:
-    - tags: get,generic-python-lib,_package.nvidia-pyindex
     env:
       MLC_GENERIC_PYTHON_PACKAGE_NAME: onnx_graphsurgeon
+      MLC_GENERIC_PYTHON_PIP_EXTRA_INDEX_URL: https://pypi.nvidia.com
     new_env_keys:
     - MLC_ONNX_GRAPHSURGEON_VERSION
   onnxruntime:
