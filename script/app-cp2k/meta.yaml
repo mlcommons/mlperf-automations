@@ -15,8 +15,17 @@ cache: true
 # Environment
 new_env_keys:
 - MLC_CP2K_SRC_PATH
+- MLC_CP2K_INSTALL_PATH
 - +LD_LIBRARY_PATH
+- +PATH
 new_state_keys: []
+
+# Input mapping
+input_mapping:
+  clean: MLC_CP2K_CLEAN_BUILD
+input_description:
+  clean:
+    desc: Set to 'true' to do a clean build (removes build and toolchain install dirs)
 
 # Dependencies
 deps:
@@ -43,6 +52,7 @@ deps:
     MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
   tags: get,generic-sys-util,_build-essential
 - tags: detect,cpu
+- tags: get,cmake
 - tags: get,blas
   names:
   - blas
@@ -70,11 +80,41 @@ variations:
   version.official:
     base:
     - url.official
-  with-amd:
+
+  # Compiler variations
+  aocc:
+    group: compiler
+    env:
+      MLC_CP2K_COMPILER: aocc
     deps:
     - tags: get,aocc
       names:
       - aocc
+  gcc:
+    group: compiler
+    default: true
+    env:
+      MLC_CP2K_COMPILER: gcc
+    deps:
+    - tags: get,gcc
+      names:
+      - gcc
+  llvm:
+    group: compiler
+    env:
+      MLC_CP2K_COMPILER: llvm
+    deps:
+    - tags: get,llvm
+      names:
+      - llvm
+  oneapi:
+    group: compiler
+    env:
+      MLC_CP2K_COMPILER: oneapi
+    deps:
+    - tags: get,oneapi
+      names:
+      - oneapi
 
 # Tests
 tests:
