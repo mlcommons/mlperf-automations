@@ -62,6 +62,7 @@ input_mapping:
   script_tags: MLC_DOCKER_RUN_SCRIPT_TAGS
   skip_mlc_sys_upgrade: MLC_DOCKER_SKIP_MLC_SYS_UPGRADE
   split_mlc_run_cmd: MLC_DOCKER_SPLIT_MLC_RUN_CMD
+  system_site_packages: MLC_DOCKER_SYSTEM_SITE_PACKAGES
   upload: MLC_DOCKER_PUSH_IMAGE
   user: MLC_DOCKER_USER
 
