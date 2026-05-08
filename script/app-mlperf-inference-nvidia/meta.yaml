@@ -220,21 +220,15 @@ deps:
 - tags: get,generic-python-lib,_package.pycuda
   names:
   - pycuda
-- tags: get,generic-python-lib,_package.nvmitten
-  update_tags_from_env_with_prefix:
-    _path.:
-    - MLC_ENV_NVMITTEN_DOCKER_WHEEL_PATH
-  enable_if_env:
-    MLC_RUN_STATE_DOCKER:
-    - 'yes'
-    MLC_ENV_NVMITTEN_DOCKER_WHEEL_PATH:
-    - 'yes'
+- tags: get,generic-python-lib,_package.nvtx
+  names:
+  - nvtx
+- tags: get,generic-python-lib,_package.cuda-python
+  names:
+  - cuda-python
 - tags: get,nvidia,mitten
   names:
   - nvidia-mitten
-  enable_if_env:
-    MLC_NVIDIA_MITTEN_FROM_SRC:
-    - 'yes'
 prehook_deps:
 - enable_if_env:
     MLC_REQUIRE_GPTJ_MODEL_DOWNLOAD:
@@ -517,7 +511,7 @@ variations:
       MLC_MLPERF_NVIDIA_HARNESS_NUM_WARMUPS: 10
     deps:
     - tags: get,generic-python-lib,_onnx-graphsurgeon
-      version: 0.3.27
+      version: 0.3.25
   retinanet:
     group: model
     env:
@@ -901,10 +895,8 @@ variations:
       MLC_NVIDIA_MITTEN_FROM_SRC: 'yes'
       MLC_GIT_CHECKOUT: 98bb85df8e936219ec7acd10ce1d702147fb1e21
     adr:
-      pytorch:
-        tags: _for-nvidia-mlperf-inference-v5.0
       pycuda:
-        version: '2024.1'
+        version: '2026.1'
   v5.1:
     base:
     - v5.0+
@@ -914,7 +906,18 @@ variations:
       MLC_NVIDIA_MITTEN_FROM_SRC: 'yes'
     adr:
       pycuda:
-        version: '2024.1'
+        version: '2026.1'
+  v6.0:
+    base:
+    - v5.0+
+    group: version
+    env:
+      MLC_MLPERF_INFERENCE_CODE_VERSION: v6.0
+    adr:
+      pycuda:
+        version: '2026.1'
+      nvidia-scratch-space:
+        tags: _version.6.0
   3d-unet_:
     deps:
     - tags: get,generic-python-lib,_transformers
@@ -924,7 +927,7 @@ variations:
   3d-unet_,pre5.0:
     deps:
     - tags: get,generic-python-lib,_onnx-graphsurgeon
-      version: 0.3.27
+      version: 0.3.25
     - tags: get,generic-python-lib,_package.onnx
       version: 1.13.1
   3d-unet_,v5.0:
@@ -1002,6 +1005,9 @@ variations:
     - tags: install,pytorch,from.src
       names:
       - pytorch
+      skip_if_env:
+        MLC_MLPERF_INFERENCE_POST_5_0:
+        - 'yes'
     - tags: get,cmake
       version_min: 3.25.0
   gptj_,build_engine:
@@ -1009,6 +1015,9 @@ variations:
     - tags: install,pytorch,from.src
       names:
       - pytorch
+      skip_if_env:
+        MLC_MLPERF_INFERENCE_POST_5_0:
+        - 'yes'
     - tags: get,cmake
       version_min: 3.25.0
   gptj_,run_harness:
@@ -1016,13 +1025,18 @@ variations:
     - tags: install,pytorch,from.src
       names:
       - pytorch
+      skip_if_env:
+        MLC_MLPERF_INFERENCE_POST_5_0:
+        - 'yes'
     - tags: get,cmake
       version_min: 3.25.0
     env:
       MLC_MLPERF_NVIDIA_HARNESS_USE_FP8: 'True'
-      MLC_MLPERF_NVIDIA_HARNESS_ENABLE_SORT: 'True'
       MLC_MLPERF_NVIDIA_HARNESS_NUM_SORT_SEGMENTS: '2'
       MLC_MLPERF_NVIDIA_HARNESS_SKIP_POSTPROCESS: true
+  gptj_,run_harness,pre5.0:
+    env:
+      MLC_MLPERF_NVIDIA_HARNESS_ENABLE_SORT: 'True'
   gpu_memory.140,pre5.0,sdxl,offline,run_harness:
     default_variations:
       batch-size: batch_size.8
