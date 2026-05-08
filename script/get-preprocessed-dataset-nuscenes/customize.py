@@ -41,4 +41,15 @@ def postprocess(i):
                             env['MLC_PREPROCESSED_DATASET_NUSCENES_PATH'].rstrip("/")),
                         env['MLC_DATASET_NUSCENES_SCENE_PICKLE_FILENAME']))
 
+    # Ensure scene_lengths.pkl is alongside the dataset directory regardless of how it was obtained
+    dataset_path = env.get('MLC_PREPROCESSED_DATASET_NUSCENES_PATH', '').rstrip('/')
+    pickle_filename = env.get('MLC_DATASET_NUSCENES_SCENE_PICKLE_FILENAME', 'scene_lengths.pkl')
+    if dataset_path:
+        expected = os.path.join(os.path.dirname(dataset_path), pickle_filename)
+        if not os.path.exists(expected):
+            # Look one level higher (e.g. when downloaded outside the preprocessed dir)
+            candidate = os.path.join(os.path.dirname(os.path.dirname(dataset_path)), pickle_filename)
+            if os.path.exists(candidate):
+                shutil.copy(candidate, expected)
+
     return {'return': 0}
