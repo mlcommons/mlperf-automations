@@ -2,12 +2,20 @@ alias: app-roms
 uid: 3f7a2b9e1c054d68
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: HPC Application
 tags:
 - app
 - roms
 - hpc
+
+# Cache
 cache: true
+
+# Environment
+default_env:
+  MLC_ROMS_APPLICATION: BENCHMARK
 new_env_keys:
 - MLC_ROMS_SRC_PATH
 - MLC_ROMS_INSTALL_PATH
@@ -15,6 +23,15 @@ new_env_keys:
 - +PATH
 - +LD_LIBRARY_PATH
 new_state_keys: []
+
+# Input mapping
+input_mapping:
+  roms_application: MLC_ROMS_APPLICATION
+input_description:
+  roms_application:
+    desc: ROMS application to build (default is BENCHMARK)
+
+# Dependencies
 deps:
 - tags: detect,cpu
 - tags: get,generic,sys-util,_libopenmpi-dev
@@ -42,6 +59,8 @@ deps:
 prehook_deps: []
 posthook_deps: []
 post_deps: []
+
+# Variations
 variations:
   repo.#:
     env:
@@ -52,32 +71,27 @@ variations:
     env:
       MLC_GIT_REPO_URL: https://github.com/myroms/roms.git
     group: repo
-  branch.#:
-    env:
-      MLC_GIT_CHECKOUT: '#'
   tag.#:
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
     group: version
+  version.4.1:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: roms-4.1
   version.4.2:
     default: true
     group: version
     env:
       MLC_GIT_CHECKOUT_TAG: roms-4.2
-  version.4.1:
-    group: version
+  branch.#:
     env:
-      MLC_GIT_CHECKOUT_TAG: roms-4.1
+      MLC_GIT_CHECKOUT: '#'
   develop:
     env:
       MLC_GIT_CHECKOUT: develop
-default_env:
-  MLC_ROMS_APPLICATION: BENCHMARK
-input_mapping:
-  roms_application: MLC_ROMS_APPLICATION
-input_description:
-  roms_application:
-    desc: ROMS application to build (default is BENCHMARK)
+
+# Tests
 tests:
   run_inputs:
   - variations_list:

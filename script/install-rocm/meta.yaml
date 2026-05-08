@@ -2,28 +2,92 @@ alias: install-rocm
 uid: 9d13f90463ce4545
 automation_alias: script
 automation_uid: 5b4e0237da074764
-
-# Metadata
 category: AI/ML frameworks
 tags:
 - install
 - rocm
 - install-rocm
-
-# Cache
 cache: true
 clean_files: []
-
-# Environment
 env: {}
 new_env_keys:
 - MLC_ROMLC_*
+- MLC_ROCM_INSTALL_PREFIX
 - +PATH
-
-# Dependencies
+- MLC_ROCM_CPULIBS_PATH
+input_mapping:
+  rocm_install_prefix: MLC_ROCM_INSTALL_PREFIX
 deps:
 - tags: detect,os
-
-# Versions
-default_version: 5.7.1
-versions: {}
+- tags: detect,sudo
+prehook_deps:
+- tags: download,file
+  extra_cache_tags: rocm,installer,runfile
+  force_cache: true
+  enable_if_env:
+    MLC_ROCM_USE_RUNFILE:
+    - 'yes'
+  env:
+    MLC_DOWNLOAD_FILENAME: <<<MLC_ROCM_RUNFILE_NAME>>>
+  force_env_keys:
+  - MLC_DOWNLOAD_URL
+  - MLC_DOWNLOAD_FILENAME
+variations:
+  no-runtimes:
+    group: runtimes
+    env:
+      MLC_ROCM_SRC_WITH_RUNTIMES: 'no'
+  with-runtimes:
+    default: true
+    group: runtimes
+    env:
+      MLC_ROCM_SRC_WITH_RUNTIMES: 'yes'
+  compiler-only:
+    env:
+      MLC_ROCM_COMPILER_ONLY: 'yes'
+  cpulibs:
+    env:
+      MLC_ROCM_INSTALL_CPULIBS: 'yes'
+    deps:
+    - tags: get,lib,jemalloc
+      names:
+      - jemalloc
+      inherit_variation_tags: true
+      skip_inherit_variation_groups:
+      - runtimes
+    - tags: get,lib,aocl-libm
+      names:
+      - aocl-libm
+      inherit_variation_tags: true
+      skip_inherit_variation_groups:
+      - runtimes
+  src:
+    env:
+      MLC_ROCM_BUILD_FROM_SRC: 'yes'
+      MLC_GIT_URL: https://github.com/ROCm/llvm-project
+    deps:
+    - tags: get,cmake
+    - tags: get,generic-sys-util,_ninja-build
+    - tags: get,git,repo
+      env:
+        MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_ROCM_LLVM_SRC_PATH
+      extra_cache_tags: rocm,llvm,src
+      force_env_keys:
+      - MLC_GIT_*
+      names:
+      - rocm-llvm-src-repo
+      update_tags_from_env_with_prefix:
+        _tag.:
+        - MLC_GIT_CHECKOUT_TAG
+        _repo.:
+        - MLC_GIT_URL
+default_version: 7.2.2
+versions:
+  7.2.2: {}
+  7.2.1: {}
+  6.2.0: {}
+  6.1.0: {}
+  5.7.1: {}
+tests:
+  run_inputs:
+  - variations_list: []

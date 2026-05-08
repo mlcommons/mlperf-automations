@@ -45,7 +45,8 @@ def process_mounts(mounts, env, docker_settings, f_run_cmd, run_state):
         if "${{ " + key + " }}:${{ " + key + " }}" not in mounts:
             mounts.append("${{ " + key + " }}:${{ " + key + " }}")
 
-    docker_input_mapping = docker_settings.get("input_mapping", {})
+    docker_input_mapping = docker_settings.get(
+        "input_mapping", run_state.get("input_mapping", {}))
     container_env_string = ""
 
     for index in range(len(mounts)):
@@ -142,6 +143,7 @@ def prepare_docker_inputs(input_params, docker_settings,
         "mlc_repos", "skip_mlc_sys_upgrade", "extra_sys_deps", "image_name",
         "gh_token", "fake_run_deps", "run_final_cmds", "real_run", "copy_files", "path", "user", "env", "build_env"
     ]
+    keys += ["cache", "split_mlc_run_cmd"]
 
     if run_stage:
         keys += [

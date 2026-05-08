@@ -96,7 +96,7 @@ variations:
     base:
     - custom-config
     env:
-      MLC_JEMALLOC_LG_PAGE: '#'
+      MLC_JEMALLOC_LG_HUGEPAGE: '#'
   lg-page.#:
     base:
     - custom-config
