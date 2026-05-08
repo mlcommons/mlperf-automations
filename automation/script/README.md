@@ -479,6 +479,8 @@ adr:
 
 > **Best Practice:** Always prefer `ad` over `adr` in `meta.yaml`. Using `adr` inside a script's meta can unintentionally change dependency versions or tags in deeply nested scripts that the author did not anticipate. Reserve `adr` for **CLI overrides** where the user explicitly intends a global effect.
 
+You can also set `version_persistent: true` on a dependency override. When enabled, MLC remembers the first resolved version for that dependency script (by script ID) and raises an error if the same dependency script is later resolved to a different version in the same workflow execution.
+
 ---
 
 ## Environment Export Control (`new_env_keys` / `new_state_keys`)
