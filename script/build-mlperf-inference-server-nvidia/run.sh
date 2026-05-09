@@ -162,6 +162,22 @@ target_include_directories(harness_bert
 EOF
   fi
 
+  # Build TensorRT plugins (NMSOptPlugin, retinanetConcatPlugin, DLRMv2EmbeddingLookupPlugin)
+  # These are needed by retinanet and dlrm-v2 during preprocessing and engine building.
+  PLUGIN_DIR="${MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH}/code/plugin"
+  if [[ -d "${PLUGIN_DIR}" ]]; then
+    for _plugin_src in "${PLUGIN_DIR}"/*/CMakeLists.txt; do
+      _plugin_name="$(basename "$(dirname "${_plugin_src}")")"
+      _plugin_build="${MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH}/build/plugins/${_plugin_name}"
+      mkdir -p "${_plugin_build}"
+      echo "Building plugin ${_plugin_name}..."
+      pushd "${_plugin_build}" > /dev/null
+      cmake -DCMAKE_BUILD_TYPE=Release "$(dirname "${_plugin_src}")" && make -j
+      popd > /dev/null
+    done
+    echo "Finished building plugins."
+  fi
+
   mkdir -p ${MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH}/build/harness
   cd ${MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH}/build/harness
   cmake -DPYTHON3_CMD=${MLC_PYTHON_BIN_WITH_PATH} \
