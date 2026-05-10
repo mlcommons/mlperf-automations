@@ -1348,7 +1348,8 @@ def preprocess(i):
                         f'mkdir -p {_pbuild} && cd {_pbuild} && CPLUS_INCLUDE_PATH=/usr/local/cuda/include cmake -DCMAKE_BUILD_TYPE=Release {os.path.join(_plugin_dir, _entry)} && CPLUS_INCLUDE_PATH=/usr/local/cuda/include make -j'
                     )
             if _plugin_cmds:
-                cmds = _plugin_cmds + cmds
+                # cd back to nvidia_code_path after plugin builds so subsequent cmds run from correct dir
+                cmds = _plugin_cmds + [f'cd {nvidia_code_path}'] + cmds
 
     run_cmd = " && ".join(cmds)
     env['MLC_MLPERF_RUN_CMD'] = run_cmd
