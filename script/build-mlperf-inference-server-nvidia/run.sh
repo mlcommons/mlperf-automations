@@ -166,6 +166,13 @@ EOF
   # These are needed by retinanet and dlrm-v2 during preprocessing and engine building.
   PLUGIN_DIR="${MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH}/code/plugin"
   if [[ -d "${PLUGIN_DIR}" ]]; then
+    # Patch NMSOptPlugin for CUDA 13+ (cub::Sum removed in CCCL 3.0)
+    _NMS_GATHER="${PLUGIN_DIR}/NMSOptPlugin/src/gatherTopDetectionsOpt.cu"
+    if [[ -f "${_NMS_GATHER}" ]] && grep -q 'cub::Sum()' "${_NMS_GATHER}"; then
+      echo "Patching NMSOptPlugin for CUDA 13+ compatibility..."
+      sed -i 's/cub::Sum()/::cuda::std::plus<>{}/' "${_NMS_GATHER}"
+      grep -q 'cuda/std/functional' "${_NMS_GATHER}" || sed -i '1i #include <cuda/std/functional>' "${_NMS_GATHER}"
+    fi
     for _plugin_src in "${PLUGIN_DIR}"/*/CMakeLists.txt; do
       _plugin_name="$(basename "$(dirname "${_plugin_src}")")"
       _plugin_build="${MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH}/build/plugins/${_plugin_name}"

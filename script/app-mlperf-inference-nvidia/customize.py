@@ -1332,6 +1332,14 @@ def preprocess(i):
         _plugin_dir = os.path.join(nvidia_code_path, 'code', 'plugin')
         if os.path.isdir(_plugin_dir):
             _plugin_cmds = []
+            # Patch NMSOptPlugin for CUDA 13+ (cub::Sum removed in CCCL 3.0)
+            _nms_gather = os.path.join(_plugin_dir, 'NMSOptPlugin', 'src', 'gatherTopDetectionsOpt.cu')
+            _plugin_cmds.append(
+                f"sed -i 's/cub::Sum()/::cuda::std::plus<>{{}}/' {_nms_gather} 2>/dev/null || true"
+            )
+            _plugin_cmds.append(
+                f"grep -q 'cuda/std/functional' {_nms_gather} || sed -i '1i #include <cuda/std/functional>' {_nms_gather} 2>/dev/null || true"
+            )
             for _entry in sorted(os.listdir(_plugin_dir)):
                 _cmake_file = os.path.join(_plugin_dir, _entry, 'CMakeLists.txt')
                 if os.path.isfile(_cmake_file):
