@@ -179,7 +179,7 @@ EOF
       mkdir -p "${_plugin_build}"
       echo "Building plugin ${_plugin_name}..."
       pushd "${_plugin_build}" > /dev/null
-      cmake -DCMAKE_BUILD_TYPE=Release "$(dirname "${_plugin_src}")" && make -j
+      CUDA_INC_DIR=/usr/local/cuda/include CPLUS_INCLUDE_PATH=/usr/local/cuda/include cmake -DCMAKE_BUILD_TYPE=Release "$(dirname "${_plugin_src}")" && CPLUS_INCLUDE_PATH=/usr/local/cuda/include make -j
       popd > /dev/null
     done
     echo "Finished building plugins."

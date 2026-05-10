@@ -1345,7 +1345,7 @@ def preprocess(i):
                 if os.path.isfile(_cmake_file):
                     _pbuild = os.path.join(nvidia_code_path, 'build', 'plugins', _entry)
                     _plugin_cmds.append(
-                        f'mkdir -p {_pbuild} && cd {_pbuild} && cmake -DCMAKE_BUILD_TYPE=Release {os.path.join(_plugin_dir, _entry)} && make -j'
+                        f'mkdir -p {_pbuild} && cd {_pbuild} && CPLUS_INCLUDE_PATH=/usr/local/cuda/include cmake -DCMAKE_BUILD_TYPE=Release {os.path.join(_plugin_dir, _entry)} && CPLUS_INCLUDE_PATH=/usr/local/cuda/include make -j'
                     )
             if _plugin_cmds:
                 cmds = _plugin_cmds + cmds
