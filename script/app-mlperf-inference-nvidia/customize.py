@@ -1347,6 +1347,16 @@ def preprocess(i):
                     _plugin_cmds.append(
                         f'mkdir -p {_pbuild} && cd {_pbuild} && CPLUS_INCLUDE_PATH=/usr/local/cuda/include cmake -DCMAKE_BUILD_TYPE=Release {os.path.join(_plugin_dir, _entry)} && CPLUS_INCLUDE_PATH=/usr/local/cuda/include make -j'
                     )
+            # Fix retinanet ONNX model path: builder.py hardcodes 'torch2.1' but the
+            # actual PyTorch version may differ (e.g., 2.10 in newer containers).
+            # Patch builder.py to use the installed torch version.
+            if env.get('MLC_MODEL', '') == 'retinanet':
+                _retinanet_builder = os.path.join(nvidia_code_path, 'code', 'retinanet', 'tensorrt', 'builder.py')
+                _plugin_cmds.append(
+                    f'TORCH_VER=$(python3 -c "import torch; print(\\".\\".join(torch.__version__.split(\\".\\")[:2]))") && '
+                    f'sed -i "s/torch2.1-postprocessed/torch${{TORCH_VER}}-postprocessed/g" {_retinanet_builder} 2>/dev/null || true'
+                )
+
             if _plugin_cmds:
                 # cd back to nvidia_code_path after plugin builds so subsequent cmds run from correct dir
                 cmds = _plugin_cmds + [f'cd {nvidia_code_path}'] + cmds
