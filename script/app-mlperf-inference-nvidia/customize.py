@@ -488,6 +488,36 @@ def preprocess(i):
                     _f.write(_rn50_gs)
         env['MLPERF_RN50_DISABLE_FUSIONS'] = '1'
 
+    # For retinanet on v6.0+: create minimal config if missing (v6.0 NVIDIA submission
+    # dropped retinanet configs for B200/B300, so we need to provide one for custom systems).
+    if env.get('MLC_MODEL', '') == 'retinanet' and _inference_version >= 'v6.0' and nvidia_code_path:
+        _retinanet_config_content = (
+            'import code.common.constants as C\n'
+            'import code.fields.models as model_fields\n'
+            'import code.fields.loadgen as loadgen_fields\n'
+            'import code.fields.harness as harness_fields\n\n'
+            'base = {\n'
+            "    model_fields.gpu_batch_size: {\n"
+            "        'retinanet': 2,\n"
+            '    },\n'
+            "    model_fields.precision: 'int8',\n"
+            "    model_fields.input_dtype: 'int8',\n"
+            "    model_fields.input_format: 'linear',\n"
+            "    harness_fields.tensor_path: 'build/preprocessed_data/open-images-v6-mlperf/validation/Retinanet/int8_linear',\n"
+            "    harness_fields.map_path: 'data_maps/open-images-v6-mlperf/val_map.txt',\n"
+            '    loadgen_fields.offline_expected_qps: 100,\n'
+            '    harness_fields.use_graphs: True,\n'
+            '}\n\n'
+            'EXPORTS = {\n'
+            '    C.WorkloadSetting(C.HarnessType.Custom, C.AccuracyTarget(0.99), C.PowerSetting.MaxP): base,\n'
+            '}\n'
+        )
+        for _scen_dir in ['Offline', 'SingleStream', 'MultiStream', 'Server']:
+            _retinanet_cfg = os.path.join(nvidia_code_path, 'configs', 'minimal', _scen_dir, 'retinanet.py')
+            if os.path.isdir(os.path.dirname(_retinanet_cfg)) and not os.path.isfile(_retinanet_cfg):
+                with open(_retinanet_cfg, 'w') as _f:
+                    _f.write(_retinanet_config_content)
+
     # For GPTJ on post-5.0 NVIDIA harness: apply persistent patches that survive container restarts.
     # These are applied idempotently every run so a fresh container gets them automatically.
     if "gptj" in env.get('MLC_MODEL', '') and is_true(env.get('MLC_MLPERF_INFERENCE_POST_5_0')) and nvidia_code_path:
@@ -1293,6 +1323,43 @@ def preprocess(i):
         run_config += " --no_audit_verify"
 
         cmds.append(f"""make {make_command} RUN_ARGS=' --benchmarks={model_name} --scenarios={scenario} {test_mode_string} {run_config} {extra_build_engine_options_string} {extra_run_options_string}'""")
+
+    # Build TensorRT plugins for models that need them (retinanet, dlrm-v2).
+    # Plugins must be built inside the runtime code directory, not just during Docker image build,
+    # because the NVIDIA code repo may be freshly cloned at container startup.
+    _plugin_models = {'retinanet', 'dlrm-v2', 'dlrm-v2-99', 'dlrm-v2-99.9'}
+    if env.get('MLC_MODEL', '') in _plugin_models and nvidia_code_path:
+        _plugin_dir = os.path.join(nvidia_code_path, 'code', 'plugin')
+        if os.path.isdir(_plugin_dir):
+            _plugin_cmds = []
+            # Patch NMSOptPlugin for CUDA 13+ (cub::Sum removed in CCCL 3.0)
+            _nms_gather = os.path.join(_plugin_dir, 'NMSOptPlugin', 'src', 'gatherTopDetectionsOpt.cu')
+            _plugin_cmds.append(
+                f"sed -i 's/cub::Sum()/::cuda::std::plus<>{{}}/' {_nms_gather} 2>/dev/null || true"
+            )
+            _plugin_cmds.append(
+                f"grep -q 'cuda/std/functional' {_nms_gather} || sed -i '1i #include <cuda/std/functional>' {_nms_gather} 2>/dev/null || true"
+            )
+            for _entry in sorted(os.listdir(_plugin_dir)):
+                _cmake_file = os.path.join(_plugin_dir, _entry, 'CMakeLists.txt')
+                if os.path.isfile(_cmake_file):
+                    _pbuild = os.path.join(nvidia_code_path, 'build', 'plugins', _entry)
+                    _plugin_cmds.append(
+                        f'mkdir -p {_pbuild} && cd {_pbuild} && CPLUS_INCLUDE_PATH=/usr/local/cuda/include cmake -DCMAKE_BUILD_TYPE=Release {os.path.join(_plugin_dir, _entry)} && CPLUS_INCLUDE_PATH=/usr/local/cuda/include make -j'
+                    )
+            # Fix retinanet ONNX model path: builder.py hardcodes 'torch2.1' but the
+            # actual PyTorch version may differ (e.g., 2.10 in newer containers).
+            # Patch builder.py to use the installed torch version.
+            if env.get('MLC_MODEL', '') == 'retinanet':
+                _retinanet_builder = os.path.join(nvidia_code_path, 'code', 'retinanet', 'tensorrt', 'builder.py')
+                _plugin_cmds.append(
+                    f'TORCH_VER=$(python3 -c "import torch; print(\\".\\".join(torch.__version__.split(\\".\\")[:2]))") && '
+                    f'sed -i "s/torch2.1-postprocessed/torch${{TORCH_VER}}-postprocessed/g" {_retinanet_builder} 2>/dev/null || true'
+                )
+
+            if _plugin_cmds:
+                # cd back to nvidia_code_path after plugin builds so subsequent cmds run from correct dir
+                cmds = _plugin_cmds + [f'cd {nvidia_code_path}'] + cmds
 
     run_cmd = " && ".join(cmds)
     env['MLC_MLPERF_RUN_CMD'] = run_cmd

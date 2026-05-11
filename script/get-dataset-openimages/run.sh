@@ -26,7 +26,7 @@ else
   else
     calibration_file_string=""
   fi
-  cmd="./openimages_calibration_mlperf.sh -d \"${INSTALL_DIR} ${calibration_file_string}\""
+  cmd="./openimages_calibration_mlperf.sh -d \"${INSTALL_DIR}\" ${calibration_file_string}"
   echo $cmd
   eval $cmd
   test $? -eq 0 || exit 1
