@@ -37,7 +37,8 @@ def preprocess(i):
 
     # Patch submission_checker/__init__.py if empty to expose ACC_PATTERN / MODEL_CONFIG
     # The NVIDIA harness does `import submission_checker; submission_checker.ACC_PATTERN`
-    # but upstream __init__.py is empty; constants live in submission_checker/constants.py
+    # but upstream __init__.py is empty; constants live in
+    # submission_checker/constants.py
     nvidia_code_path = env.get('MLC_MLPERF_INFERENCE_NVIDIA_CODE_PATH', '')
     if nvidia_code_path:
         submission_checker_init = os.path.join(
@@ -79,7 +80,8 @@ def preprocess(i):
     if _inference_version >= 'v6.0' and nvidia_code_path:
         # Create 3rdparty/mlc-inference symlink to mlcommons/inference source and 3rdparty/trtllm
         # as an empty directory. This must happen BEFORE paths.py is first imported by the harness,
-        # so that _verify_path() sees the symlink/dir and doesn't try to create empty directories.
+        # so that _verify_path() sees the symlink/dir and doesn't try to create
+        # empty directories.
         _3rdparty_dir = os.path.join(nvidia_code_path, '3rdparty')
         os.makedirs(_3rdparty_dir, exist_ok=True)
         _mlc_inf_link = os.path.join(_3rdparty_dir, 'mlc-inference')
@@ -98,10 +100,13 @@ def preprocess(i):
             _nvm_init = os.path.join(_sp, 'nvmitten', '__init__.py')
             if os.path.isfile(_nvm_init):
                 _nvm_cfg_dir = os.path.join(_sp, 'nvmitten', 'configurator')
-                _nvm_cfg_file = os.path.join(_sp, 'nvmitten', 'configurator.py')
-                # Check if proper configurator package is missing or is the old no-op version
+                _nvm_cfg_file = os.path.join(
+                    _sp, 'nvmitten', 'configurator.py')
+                # Check if proper configurator package is missing or is the old
+                # no-op version
                 _nvm_core = os.path.join(_nvm_cfg_dir, '_core.py')
-                _needs_install = (not os.path.isdir(_nvm_cfg_dir) and not os.path.isfile(_nvm_cfg_file))
+                _needs_install = (
+                    not os.path.isdir(_nvm_cfg_dir) and not os.path.isfile(_nvm_cfg_file))
                 _needs_update = (os.path.isfile(_nvm_core) and (
                     '_parse_argv' not in open(_nvm_core).read() or
                     'load_module' not in open(_nvm_core).read() or
@@ -277,13 +282,15 @@ def preprocess(i):
                                  '        return self.name == other.name if isinstance(other, Field) else NotImplemented\n')
 
                 # Also export System from nvmitten.system if missing
-                _nvm_sys_init = os.path.join(_sp, 'nvmitten', 'system', '__init__.py')
+                _nvm_sys_init = os.path.join(
+                    _sp, 'nvmitten', 'system', '__init__.py')
                 if os.path.isfile(_nvm_sys_init):
                     with open(_nvm_sys_init, 'r') as _f:
                         _sys_content = _f.read()
                     if 'from nvmitten.system.system import System' not in _sys_content:
                         with open(_nvm_sys_init, 'a') as _f:
-                            _f.write('\nfrom nvmitten.system.system import System\n')
+                            _f.write(
+                                '\nfrom nvmitten.system.system import System\n')
 
                 # Fix nvmitten AliasedNameEnum.valstr: PyPI v0.2.0 defines valstr() as a plain
                 # method, but v6.0 harness code accesses it as a property (arch.valstr, not arch.valstr()).
@@ -301,7 +308,8 @@ def preprocess(i):
 
                 # Fix nvmitten/nvidia/builder.py: normalize enum-like input_dtype/input_format
                 # to strings before the type assertion in TRTBuilder.
-                _nvm_builder = os.path.join(_sp, 'nvmitten', 'nvidia', 'builder.py')
+                _nvm_builder = os.path.join(
+                    _sp, 'nvmitten', 'nvidia', 'builder.py')
                 if os.path.isfile(_nvm_builder):
                     with open(_nvm_builder, 'r') as _f:
                         _builder_src = _f.read()
@@ -319,9 +327,11 @@ def preprocess(i):
                         "'input_dtype and input_format must be the same type'")
                     if '_mlc_valstr_or_self' not in _builder_src:
                         if _builder_old_double in _builder_src:
-                            _builder_src = _builder_src.replace(_builder_old_double, _builder_new, 1)
+                            _builder_src = _builder_src.replace(
+                                _builder_old_double, _builder_new, 1)
                         elif _builder_old_single in _builder_src:
-                            _builder_src = _builder_src.replace(_builder_old_single, _builder_new, 1)
+                            _builder_src = _builder_src.replace(
+                                _builder_old_single, _builder_new, 1)
                         if '_mlc_valstr_or_self' in _builder_src:
                             with open(_nvm_builder, 'w') as _f:
                                 _f.write(_builder_src)
@@ -329,15 +339,18 @@ def preprocess(i):
                 # Fix nvmitten/pipeline/pipeline.py: preserve KeyboardInterrupt instance.
                 # Upstream code sets `exc = KeyboardInterrupt` (the class), then traceback
                 # extraction crashes on Python 3.12 with: "'getset_descriptor' object has
-                # no attribute 'tb_frame'" and masks the real underlying failure.
-                _nvm_pipeline = os.path.join(_sp, 'nvmitten', 'pipeline', 'pipeline.py')
+                # no attribute 'tb_frame'" and masks the real underlying
+                # failure.
+                _nvm_pipeline = os.path.join(
+                    _sp, 'nvmitten', 'pipeline', 'pipeline.py')
                 if os.path.isfile(_nvm_pipeline):
                     with open(_nvm_pipeline, 'r') as _f:
                         _pipeline_src = _f.read()
                     _needle = 'except KeyboardInterrupt as _exc:\n                exc = KeyboardInterrupt\n                status = OperationStatus.INTERRUPTED'
                     _fixed = 'except KeyboardInterrupt as _exc:\n                exc = _exc\n                status = OperationStatus.INTERRUPTED'
                     if _needle in _pipeline_src:
-                        _pipeline_src = _pipeline_src.replace(_needle, _fixed, 1)
+                        _pipeline_src = _pipeline_src.replace(
+                            _needle, _fixed, 1)
                         with open(_nvm_pipeline, 'w') as _f:
                             _f.write(_pipeline_src)
                 continue
@@ -345,10 +358,19 @@ def preprocess(i):
         # Fix code/resnet50/tensorrt/builder.py:
         # 1. object.__init__() in the MRO does not accept calib_data_dir
         # 2. create_builder_config() accesses self.calibrator unconditionally but
-        #    set_calibrator() only sets it for INT8 precision. Guard the access.
+        # set_calibrator() only sets it for INT8 precision. Guard the access.
         import subprocess as _sp
-        _git_dir = os.path.abspath(os.path.join(nvidia_code_path, '..', '..'))  # repo root
-        _resnet_builder_py = os.path.join(nvidia_code_path, 'code', 'resnet50', 'tensorrt', 'builder.py')
+        _git_dir = os.path.abspath(
+            os.path.join(
+                nvidia_code_path,
+                '..',
+                '..'))  # repo root
+        _resnet_builder_py = os.path.join(
+            nvidia_code_path,
+            'code',
+            'resnet50',
+            'tensorrt',
+            'builder.py')
         if os.path.isfile(_resnet_builder_py):
             # Restore original from git to ensure current patch version applies
             _rel_rb_path = 'closed/NVIDIA/code/resnet50/tensorrt/builder.py'
@@ -375,7 +397,8 @@ def preprocess(i):
             _changed_rb = False
             # Replace the unconditional self.calibrator access with a robust fallback:
             # If set_calibrator was called, use self.calibrator.
-            # If not, but cache_file exists and precision is INT8, create a cache-only calibrator.
+            # If not, but cache_file exists and precision is INT8, create a
+            # cache-only calibrator.
             _old_calib_line = 'builder_config.int8_calibrator = self.calibrator'
             _new_calib_block = (
                 '# _MLC_PATCHED_ calibrator access\n'
@@ -394,7 +417,8 @@ def preprocess(i):
                 '                def write_calibration_cache(self, cache): pass\n'
                 '            builder_config.int8_calibrator = _FallbackCalib(self.cache_file)')
             if _old_calib_line in _resnet_builder_src:
-                _resnet_builder_src = _resnet_builder_src.replace(_old_calib_line, _new_calib_block, 1)
+                _resnet_builder_src = _resnet_builder_src.replace(
+                    _old_calib_line, _new_calib_block, 1)
                 _changed_rb = True
             if _changed_rb:
                 with open(_resnet_builder_py, 'w') as _f:
@@ -404,7 +428,8 @@ def preprocess(i):
         # data not existing on disk. When the calibration cache already exists, the TRT
         # builder only needs cache data (quantization ranges), not actual images.
         # We create a lightweight cache-only calibrator in that case.
-        _gen_eng_path = os.path.join(nvidia_code_path, 'code', 'ops', 'generate_engines.py')
+        _gen_eng_path = os.path.join(
+            nvidia_code_path, 'code', 'ops', 'generate_engines.py')
         if os.path.isfile(_gen_eng_path):
             # Restore the original file from git to ensure we always apply our CURRENT patch
             # (handles case where an older version of the patch was applied during Docker build)
@@ -413,12 +438,14 @@ def preprocess(i):
                 _sp.check_output(['git', 'checkout', 'HEAD', '--', _rel_path],
                                  cwd=_git_dir, stderr=_sp.STDOUT)
             except Exception:
-                # Fallback: if old patch is present, manually restore the original pattern
+                # Fallback: if old patch is present, manually restore the
+                # original pattern
                 with open(_gen_eng_path, 'r') as _f:
                     _tmp = _f.read()
                 if '_CacheCalib' in _tmp:
                     import re as _re
-                    # Replace the entire patched isinstance block with the original
+                    # Replace the entire patched isinstance block with the
+                    # original
                     _pattern = _re.compile(
                         r'if isinstance\(builder, CalibratableTensorRTEngine\):.*?'
                         r'(?=\n                network = builder\.create_network)',
@@ -484,20 +511,26 @@ def preprocess(i):
                 with open(_gen_eng_path, 'w') as _f:
                     _f.write(_gen_eng)
 
-
     # Patch rn50_graphsurgeon.py to disable custom TRT fusion plugins (RnRes2FullFusion_TRT,
     # SmallTileGEMM_TRT) which are broken on TensorRT 10.x with non-official NVIDIA GPUs.
     # These plugins produce garbage output (constant class 600). Disabling them lets TRT use
     # its native kernels which produce correct 76%+ accuracy.
-    if env.get('MLC_MODEL', '') == 'resnet50' and nvidia_code_path and _inference_version >= 'v6.0':
-        _rn50_gs_path = os.path.join(nvidia_code_path, 'code', 'resnet50', 'tensorrt', 'rn50_graphsurgeon.py')
+    if env.get(
+            'MLC_MODEL', '') == 'resnet50' and nvidia_code_path and _inference_version >= 'v6.0':
+        _rn50_gs_path = os.path.join(
+            nvidia_code_path,
+            'code',
+            'resnet50',
+            'tensorrt',
+            'rn50_graphsurgeon.py')
         if os.path.isfile(_rn50_gs_path):
             with open(_rn50_gs_path, 'r') as _f:
                 _rn50_gs = _f.read()
             _changed_gs = False
             # Add 'import os' if missing
             if 'import os' not in _rn50_gs:
-                _rn50_gs = _rn50_gs.replace('import argparse', 'import argparse\nimport os', 1)
+                _rn50_gs = _rn50_gs.replace(
+                    'import argparse', 'import argparse\nimport os', 1)
                 _changed_gs = True
             # Patch no_fuse logic to check MLPERF_RN50_DISABLE_FUSIONS env var
             _old_nofuse = "no_fuse = (device_type != 'gpu') or (need_calibration)"
@@ -511,8 +544,10 @@ def preprocess(i):
         env['MLPERF_RN50_DISABLE_FUSIONS'] = '1'
 
     # For retinanet on v6.0+: create minimal config if missing (v6.0 NVIDIA submission
-    # dropped retinanet configs for B200/B300, so we need to provide one for custom systems).
-    if env.get('MLC_MODEL', '') == 'retinanet' and _inference_version >= 'v6.0' and nvidia_code_path:
+    # dropped retinanet configs for B200/B300, so we need to provide one for
+    # custom systems).
+    if env.get(
+            'MLC_MODEL', '') == 'retinanet' and _inference_version >= 'v6.0' and nvidia_code_path:
         _retinanet_config_content = (
             'import code.common.constants as C\n'
             'import code.fields.models as model_fields\n'
@@ -535,21 +570,30 @@ def preprocess(i):
             '}\n'
         )
         for _scen_dir in ['Offline', 'SingleStream', 'MultiStream', 'Server']:
-            _retinanet_cfg = os.path.join(nvidia_code_path, 'configs', 'minimal', _scen_dir, 'retinanet.py')
-            if os.path.isdir(os.path.dirname(_retinanet_cfg)) and not os.path.isfile(_retinanet_cfg):
+            _retinanet_cfg = os.path.join(
+                nvidia_code_path,
+                'configs',
+                'minimal',
+                _scen_dir,
+                'retinanet.py')
+            if os.path.isdir(os.path.dirname(_retinanet_cfg)
+                             ) and not os.path.isfile(_retinanet_cfg):
                 with open(_retinanet_cfg, 'w') as _f:
                     _f.write(_retinanet_config_content)
 
     # For GPTJ on post-5.0 NVIDIA harness: apply persistent patches that survive container restarts.
-    # These are applied idempotently every run so a fresh container gets them automatically.
-    if "gptj" in env.get('MLC_MODEL', '') and is_true(env.get('MLC_MLPERF_INFERENCE_POST_5_0')) and nvidia_code_path:
+    # These are applied idempotently every run so a fresh container gets them
+    # automatically.
+    if "gptj" in env.get('MLC_MODEL', '') and is_true(
+            env.get('MLC_MLPERF_INFERENCE_POST_5_0')) and nvidia_code_path:
         import json as _json
         import site as _site
 
         # --- Patch A: modelopt QKV merge OOM-safe fallback ---
         _sp_dirs = _site.getsitepackages() + [_site.getusersitepackages()]
         for _sp in _sp_dirs:
-            _mc_path = os.path.join(_sp, 'modelopt', 'torch', 'export', 'model_config.py')
+            _mc_path = os.path.join(
+                _sp, 'modelopt', 'torch', 'export', 'model_config.py')
             if os.path.isfile(_mc_path):
                 with open(_mc_path, 'r') as _f:
                     _mc = _f.read()
@@ -566,14 +610,24 @@ def preprocess(i):
                 break
 
         # --- Patch B: write fp8 custom.py for all registered custom systems ---
-        _custom_list_path = os.path.join(nvidia_code_path, 'code', 'common', 'systems', 'custom_list.json')
+        _custom_list_path = os.path.join(
+            nvidia_code_path,
+            'code',
+            'common',
+            'systems',
+            'custom_list.json')
         if os.path.isfile(_custom_list_path):
             with open(_custom_list_path) as _f:
                 _custom_systems = _json.load(_f)
-            _gptj_scenarios = ['Offline', 'Server', 'SingleStream', 'MultiStream']
+            _gptj_scenarios = [
+                'Offline',
+                'Server',
+                'SingleStream',
+                'MultiStream']
             for _sys_name in _custom_systems:
                 for _scen in _gptj_scenarios:
-                    _custom_py = os.path.join(nvidia_code_path, 'configs', 'gptj', _scen, 'custom.py')
+                    _custom_py = os.path.join(
+                        nvidia_code_path, 'configs', 'gptj', _scen, 'custom.py')
                     if not os.path.isdir(os.path.dirname(_custom_py)):
                         continue
                     _needs_update = True
@@ -606,9 +660,15 @@ def preprocess(i):
                             _f.write(_header + _cls_body)
         else:
             # custom_list.json doesn't exist yet — register the system first
-            add_custom_script = os.path.join(nvidia_code_path, 'scripts', 'custom_systems', 'add_custom_system.py')
+            add_custom_script = os.path.join(
+                nvidia_code_path,
+                'scripts',
+                'custom_systems',
+                'add_custom_system.py')
             if os.path.isfile(add_custom_script):
-                cmds.insert(0, f'cd {nvidia_code_path} && python3 scripts/custom_systems/add_custom_system.py')
+                cmds.insert(
+                    0,
+                    f'cd {nvidia_code_path} && python3 scripts/custom_systems/add_custom_system.py')
             # else: v6.0+ uses SYSTEM_NAME env var, no add_custom_system.py
 
     if make_command == "prebuild":
@@ -937,7 +997,8 @@ def preprocess(i):
                     return {
                         'return': 1, 'error': f'Quantised model absent - did not detect config.json in path {model_path}'}
             elif "gptj" in env['MLC_MODEL'] and os.path.exists(fp32_model_path):
-                # checkpoint-final already present; FP8 quantization will happen during engine build
+                # checkpoint-final already present; FP8 quantization will
+                # happen during engine build
                 pass
             else:
                 cmds.append(f"make download_model BENCHMARKS='{model_name}'")
@@ -1135,7 +1196,8 @@ def preprocess(i):
             run_config += f" --gpu_inference_streams={gpu_inference_streams}"
 
         _raw_model_precision = env.get('MLC_MLPERF_MODEL_PRECISION')
-        model_precision = _raw_model_precision.replace('float', 'fp') if _raw_model_precision else ''
+        model_precision = _raw_model_precision.replace(
+            'float', 'fp') if _raw_model_precision else ''
         # by default we use the precision from the custom config
         if model_precision and "fp32" not in model_precision:
             run_config += f" --precision={model_precision}"
@@ -1153,7 +1215,8 @@ def preprocess(i):
         gpu_batch_size = env.get('MLC_MLPERF_NVIDIA_HARNESS_GPU_BATCH_SIZE')
         if gpu_batch_size:
             # v6.0+ requires component:batch_size format
-            inference_version = env.get('MLC_MLPERF_INFERENCE_CODE_VERSION', '')
+            inference_version = env.get(
+                'MLC_MLPERF_INFERENCE_CODE_VERSION', '')
             if inference_version >= 'v6.0' and ':' not in str(gpu_batch_size):
                 gpu_batch_size = f"{model_name}:{gpu_batch_size}"
             run_config += f" --gpu_batch_size={gpu_batch_size}".replace(
@@ -1293,7 +1356,9 @@ def preprocess(i):
                 run_config += f" --pipeline_parallelism={tmp_pp_size}"
 
         enable_sort = env.get('MLC_MLPERF_NVIDIA_HARNESS_ENABLE_SORT')
-        is_post5_gptj = is_true(env.get('MLC_MLPERF_INFERENCE_POST_5_0')) and "gptj" in env.get('MLC_MODEL', '')
+        is_post5_gptj = is_true(
+            env.get('MLC_MLPERF_INFERENCE_POST_5_0')) and "gptj" in env.get(
+            'MLC_MODEL', '')
         if enable_sort and not is_false(enable_sort) and not is_post5_gptj:
             run_config += f" --enable_sort"
 
@@ -1320,7 +1385,8 @@ def preprocess(i):
             env.get(
                 'MLC_MLPERF_NVIDIA_HARNESS_SKIP_POSTPROCESS',
                 ''))
-        if skip_postprocess and not is_false(skip_postprocess) and not is_post5_gptj:
+        if skip_postprocess and not is_false(
+                skip_postprocess) and not is_post5_gptj:
             run_config += f" --skip_postprocess"
 
         if test_mode:
@@ -1355,7 +1421,11 @@ def preprocess(i):
         if os.path.isdir(_plugin_dir):
             _plugin_cmds = []
             # Patch NMSOptPlugin for CUDA 13+ (cub::Sum removed in CCCL 3.0)
-            _nms_gather = os.path.join(_plugin_dir, 'NMSOptPlugin', 'src', 'gatherTopDetectionsOpt.cu')
+            _nms_gather = os.path.join(
+                _plugin_dir,
+                'NMSOptPlugin',
+                'src',
+                'gatherTopDetectionsOpt.cu')
             _plugin_cmds.append(
                 f"sed -i 's/cub::Sum()/::cuda::std::plus<>{{}}/' {_nms_gather} 2>/dev/null || true"
             )
@@ -1363,9 +1433,11 @@ def preprocess(i):
                 f"grep -q 'cuda/std/functional' {_nms_gather} || sed -i '1i #include <cuda/std/functional>' {_nms_gather} 2>/dev/null || true"
             )
             for _entry in sorted(os.listdir(_plugin_dir)):
-                _cmake_file = os.path.join(_plugin_dir, _entry, 'CMakeLists.txt')
+                _cmake_file = os.path.join(
+                    _plugin_dir, _entry, 'CMakeLists.txt')
                 if os.path.isfile(_cmake_file):
-                    _pbuild = os.path.join(nvidia_code_path, 'build', 'plugins', _entry)
+                    _pbuild = os.path.join(
+                        nvidia_code_path, 'build', 'plugins', _entry)
                     _plugin_cmds.append(
                         f'mkdir -p {_pbuild} && cd {_pbuild} && CPLUS_INCLUDE_PATH=/usr/local/cuda/include cmake -DCMAKE_BUILD_TYPE=Release {os.path.join(_plugin_dir, _entry)} && CPLUS_INCLUDE_PATH=/usr/local/cuda/include make -j'
                     )
@@ -1373,14 +1445,16 @@ def preprocess(i):
             # actual PyTorch version may differ (e.g., 2.10 in newer containers).
             # Patch builder.py to use the installed torch version.
             if env.get('MLC_MODEL', '') == 'retinanet':
-                _retinanet_builder = os.path.join(nvidia_code_path, 'code', 'retinanet', 'tensorrt', 'builder.py')
+                _retinanet_builder = os.path.join(
+                    nvidia_code_path, 'code', 'retinanet', 'tensorrt', 'builder.py')
                 _plugin_cmds.append(
                     f'TORCH_VER=$(python3 -c "import torch; print(\\".\\".join(torch.__version__.split(\\".\\")[:2]))") && '
                     f'sed -i "s/torch2.1-postprocessed/torch${{TORCH_VER}}-postprocessed/g" {_retinanet_builder} 2>/dev/null || true'
                 )
 
             if _plugin_cmds:
-                # cd back to nvidia_code_path after plugin builds so subsequent cmds run from correct dir
+                # cd back to nvidia_code_path after plugin builds so subsequent
+                # cmds run from correct dir
                 cmds = _plugin_cmds + [f'cd {nvidia_code_path}'] + cmds
 
     run_cmd = " && ".join(cmds)
