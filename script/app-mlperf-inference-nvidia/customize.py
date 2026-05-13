@@ -395,6 +395,10 @@ def preprocess(i):
             with open(_resnet_builder_py, 'r') as _f:
                 _resnet_builder_src = _f.read()
             _changed_rb = False
+            _resnet_builder_src_escaped = _resnet_builder_src.replace(' \\+ ', ' \\\\+ ')
+            if _resnet_builder_src_escaped != _resnet_builder_src:
+                _resnet_builder_src = _resnet_builder_src_escaped
+                _changed_rb = True
             # Replace the unconditional self.calibrator access with a robust fallback:
             # If set_calibrator was called, use self.calibrator.
             # If not, but cache_file exists and precision is INT8, create a
@@ -510,6 +514,21 @@ def preprocess(i):
             if _changed_ge:
                 with open(_gen_eng_path, 'w') as _f:
                     _f.write(_gen_eng)
+
+        # Patch code/main.py to tolerate class objects for power_context.
+        # Some harness versions pass a class (ABCMeta) instead of an instance,
+        # causing `with power_context:` to crash with TypeError.
+        _main_py = os.path.join(nvidia_code_path, 'code', 'main.py')
+        if os.path.isfile(_main_py):
+            with open(_main_py, 'r') as _f:
+                _main_src = _f.read()
+            _main_old = 'with power_context:'
+            _main_new = 'with (power_context() if isinstance(power_context, type) else power_context):  # _MLC_PATCHED_power_context'
+            if '_MLC_PATCHED_power_context' not in _main_src and _main_old in _main_src:
+                _main_src = _main_src.replace(_main_old, _main_new, 1)
+                with open(_main_py, 'w') as _f:
+                    _f.write(_main_src)
+
 
     # Patch rn50_graphsurgeon.py to disable custom TRT fusion plugins (RnRes2FullFusion_TRT,
     # SmallTileGEMM_TRT) which are broken on TensorRT 10.x with non-official NVIDIA GPUs.
