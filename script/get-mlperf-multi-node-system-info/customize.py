@@ -153,7 +153,7 @@ def postprocess(i):
                 single_node_system_info = json.load(f)
         node_details['system_node_ensemble_id'] = node_id
         node_details['number_of_nodes'] = 1
-        node_details['system_node_name'] = f"{single_node_system_info['hardware_ensemble']['processor'].get('host_processor_model_name', '')}-{single_node_system_info['hardware_ensemble']['accelerator'].get('accelerator_model_name', '')}"
+        node_details['system_node_name'] = f"{single_node_system_info['hardware_ensemble']['processor'].get('host_processor_model_name', '')}-{single_node_system_info['hardware_ensemble']['accelerator'].get('accelerators_per_node', '')}x{single_node_system_info['hardware_ensemble']['accelerator'].get('accelerator_model_name', '')}"
         node_details['hardware_ensemble'] = single_node_system_info['hardware_ensemble']
         node_details['software_ensemble'] = single_node_system_info['software_ensemble']
 
@@ -169,17 +169,23 @@ def postprocess(i):
         else:
             parsed_node_details.append(node_details)
 
-    # Scenario where the host system is not being excluded
-    if not is_true(env.get('MLC_EXCLUDE_CURRENT_NODE', False)):
+    exclude_current = is_true(env.get('MLC_EXCLUDE_CURRENT_NODE', False))
+    remote_node_id_start = 0 if exclude_current else 1
+
+    if not exclude_current:
         logger.info("Obtaining system information from the host system")
-        update_parsed_node_details(node_id="current")
+        update_parsed_node_details(node_id=0)
 
     # For systems other than the host system
     logger.info("Obtaining system information from the remote systems")
-    for node_id in range(int(env['MLC_REMOTE_RUN_SSH_ID_COUNT'])):
-        update_parsed_node_details(node_id=node_id)
+    for i in range(int(env['MLC_REMOTE_RUN_SSH_ID_COUNT'])):
+        update_parsed_node_details(node_id=remote_node_id_start + i)
 
     sut['node_types'] = parsed_node_details
+    sut["system_metadata"]["system_node_ensemble_count"] = len(parsed_node_details)
+    sut["system_metadata"]["system_node_ensemble_total"] = sum(entry['number_of_nodes'] for entry in parsed_node_details)
+    node_name_parts = [f"{entry['number_of_nodes']}x({entry['system_node_name']})" for entry in parsed_node_details]
+    sut["system_metadata"]["system_name"] = ",".join([sut["system_metadata"]["system_name"]] + node_name_parts)
 
     parsed_multinode_system_info = {
         "organization_metadata": organization_metadata,
