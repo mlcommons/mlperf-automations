@@ -45,11 +45,11 @@ input_mapping:
   submission_id: MLC_MLPERF_SUBMISSION_ID
   submitter_contact: MLC_MLPERF_SUBMITTER_CONTACT
   submitter_org_name: MLC_MLPERF_SUBMITTER
+  node_config_file: MLC_NODE_CONFIG_FILE
   system_name: MLC_MLPERF_SYSTEM_NAME
   system_node_ensemble_count: MLC_MLPERF_SYSTEM_NODE_ENSEMBLE_COUNT
   system_node_ensemble_total: MLC_MLPERF_SYSTEM_NODE_ENSEMBLE_TOTAL
   system_size: MLC_MLPERF_SYSTEM_SIZE
-  system_type_detail: MLC_MLPERF_SUBMISSION_SYSTEM_TYPE_DETAIL
 
 # Dependencies
 deps:
