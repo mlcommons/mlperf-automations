@@ -1,9 +1,11 @@
 from mlc import utils
 from utils import *
 import os
+import re
 import mlc
 import subprocess
 import json
+import yaml
 
 
 def preprocess(i):
@@ -95,6 +97,99 @@ def preprocess(i):
     return {'return': 0}
 
 
+def _match_node_name(accelerator_model_name, yaml_node_names):
+    """Match an accelerator model name against YAML node name candidates."""
+    accel_lower = accelerator_model_name.lower()
+    for node_name in yaml_node_names:
+        if node_name.lower() in accel_lower:
+            return node_name
+        if re.search(r'\b' + re.escape(node_name) + r'\b', accelerator_model_name, re.IGNORECASE):
+            return node_name
+    return None
+
+
+def _load_node_config(node_config_file, logger):
+    """Load and parse the node_config YAML file."""
+    if not node_config_file or not os.path.exists(node_config_file):
+        return None
+    try:
+        with open(node_config_file) as f:
+            data = yaml.safe_load(f)
+        return data.get("system_info", {}).get("node_config", {})
+    except Exception as e:
+        logger.error(f"Failed to load node_config file {node_config_file}: {e}")
+        return None
+
+
+def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
+    """
+    Match detected single-node hardware to YAML node names and build the
+    node_types list with function groupings and authoritative node counts.
+
+    Returns (node_types, system_size).
+    """
+    all_yaml_node_names = []
+    for func_nodes in node_config.values():
+        for entry in func_nodes:
+            name = entry.get("node_name", "")
+            if name and name not in all_yaml_node_names:
+                all_yaml_node_names.append(name)
+
+    # Map YAML node_name → hardware/software details from single-node results
+    yaml_name_to_details = {}
+    for node_detail in parsed_node_details:
+        accel_name = (node_detail
+                      .get("hardware_ensemble", {})
+                      .get("accelerator", {})
+                      .get("accelerator_model_name", ""))
+        matched = _match_node_name(accel_name, all_yaml_node_names)
+        if matched and matched not in yaml_name_to_details:
+            yaml_name_to_details[matched] = node_detail
+            logger.info(f"Matched single-node result ('{accel_name}') → YAML node '{matched}'")
+
+    node_types = []
+    ensemble_id = 1
+    node_type_totals = {}  # node_name → total count across all functions
+
+    for func_key, func_nodes in node_config.items():
+        for entry in func_nodes:
+            node_name = entry.get("node_name", "")
+            no_of_nodes = int(entry.get("no_of_nodes", 1))
+
+            node_type = {
+                "system_node_ensemble_id": ensemble_id,
+                "function": func_key,
+                "number_of_nodes": no_of_nodes,
+                "system_node_name": node_name,
+            }
+
+            if node_name in yaml_name_to_details:
+                details = yaml_name_to_details[node_name]
+                node_type["hardware_ensemble"] = details.get("hardware_ensemble", {})
+                node_type["software_ensemble"] = details.get("software_ensemble", {})
+            else:
+                logger.warning(f"No single-node data found for YAML node '{node_name}'")
+
+            node_types.append(node_type)
+            node_type_totals[node_name] = node_type_totals.get(node_name, 0) + no_of_nodes
+            ensemble_id += 1
+
+    system_size_parts = [f"{count}x {name}" for name, count in node_type_totals.items()]
+    system_size = " + ".join(system_size_parts)
+
+    return node_types, system_size
+
+
+def _build_system_size_from_nodes(parsed_node_details):
+    """Compute system_size from detected node types when no YAML is provided."""
+    parts = []
+    for entry in parsed_node_details:
+        n = entry.get("number_of_nodes", 1)
+        node_name = entry.get("system_node_name", "")
+        parts.append(f"{n}x({node_name})")
+    return " + ".join(parts)
+
+
 def postprocess(i):
 
     state = i['state']
@@ -115,10 +210,7 @@ def postprocess(i):
 
     sut = {
         "system_metadata": {
-            "system_name": env.get("MLC_MLPERF_SYSTEM_NAME", "Insert system name here"),
             "system_category": env.get("MLC_MLPERF_SUBMISSION_SYSTEM_TYPE", "Insert system category here"),
-            "system_type_detail": env.get("MLC_MLPERF_SUBMISSION_SYSTEM_TYPE_DETAIL", "Insert system type detail here"),
-            "system_node_ensemble_total": env['MLC_REMOTE_RUN_SSH_ID_COUNT'],
             "system_availability_status": env.get("MLC_MLPERF_SUBMISSION_SYSTEM_STATUS", "Insert system availability status here"),
         },
     }
@@ -157,14 +249,12 @@ def postprocess(i):
         node_details['hardware_ensemble'] = single_node_system_info['hardware_ensemble']
         node_details['software_ensemble'] = single_node_system_info['software_ensemble']
 
-        # ---- Check for duplicate system_node_name ----
         existing_entry = next(
             (entry for entry in parsed_node_details
              if entry['system_node_name'] == node_details['system_node_name']),
             None
         )
         if existing_entry:
-            # Increment node count
             existing_entry['number_of_nodes'] += 1
         else:
             parsed_node_details.append(node_details)
@@ -176,16 +266,30 @@ def postprocess(i):
         logger.info("Obtaining system information from the host system")
         update_parsed_node_details(node_id=0)
 
-    # For systems other than the host system
     logger.info("Obtaining system information from the remote systems")
-    for i in range(int(env['MLC_REMOTE_RUN_SSH_ID_COUNT'])):
-        update_parsed_node_details(node_id=remote_node_id_start + i)
+    for idx in range(int(env['MLC_REMOTE_RUN_SSH_ID_COUNT'])):
+        update_parsed_node_details(node_id=remote_node_id_start + idx)
 
-    sut['node_types'] = parsed_node_details
-    sut["system_metadata"]["system_node_ensemble_count"] = len(parsed_node_details)
-    sut["system_metadata"]["system_node_ensemble_total"] = sum(entry['number_of_nodes'] for entry in parsed_node_details)
-    node_name_parts = [f"{entry['number_of_nodes']}x({entry['system_node_name']})" for entry in parsed_node_details]
-    sut["system_metadata"]["system_name"] = ",".join([sut["system_metadata"]["system_name"]] + node_name_parts)
+    # Apply node_config YAML if provided
+    node_config_file = env.get("MLC_NODE_CONFIG_FILE", "")
+    node_config = _load_node_config(node_config_file, logger)
+
+    if node_config:
+        node_types, system_size = _build_node_types_from_yaml(
+            node_config, parsed_node_details, logger)
+    else:
+        node_types = parsed_node_details
+        system_size = _build_system_size_from_nodes(parsed_node_details)
+
+    sut['node_types'] = node_types
+    sut["system_metadata"]["system_size"] = env.get("MLC_MLPERF_SYSTEM_SIZE", system_size)
+    sut["system_metadata"]["system_node_ensemble_count"] = len(node_types)
+    sut["system_metadata"]["system_node_ensemble_total"] = sum(
+        entry['number_of_nodes'] for entry in node_types)
+
+    # system_name: use explicit user input, or fall back to system_size
+    user_system_name = env.get("MLC_MLPERF_SYSTEM_NAME", "")
+    sut["system_metadata"]["system_name"] = user_system_name if user_system_name else system_size
 
     parsed_multinode_system_info = {
         "organization_metadata": organization_metadata,

@@ -1,5 +1,6 @@
 import json
 import argparse
+import subprocess
 from pathlib import Path
 import sys
 import os
@@ -90,9 +91,17 @@ EXTRACT_RULES = {
     },
 
     # ---------------- Software Ensemble ----------------
-    "framework": {
-        "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_CUDA_DRIVER_VERSION", "MLC_CUDA_DEVICE_PROP_CUDA_RUNTIME_VERSION"],
+    "serving_framework": {
+        "source": "detect",
+        "candidates": [],
+    },
+    "inference_backend": {
+        "source": "detect",
+        "candidates": [],
+    },
+    "driver": {
+        "source": "detect",
+        "candidates": [],
     },
     "operating_system": {
         "source": "env",
@@ -123,18 +132,97 @@ def parse_args():
 # -------------------------------------------------------------------
 
 
-def extract_value(rule, field_key):
-    value = ""
+def _run(cmd, timeout=10):
+    try:
+        return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+    except Exception:
+        return None
 
-    if field_key == "framework":
-        for candidate in rule["candidates"]:
-            env_output = os.environ.get(candidate, "")
-            if env_output:
-                if "cuda_runtime" in candidate.lower():
-                    value += f"Cuda runtime version {env_output} ; "
-                elif "cuda_driver" in candidate.lower():
-                    value += f"Cuda driver version {env_output} ; "
-        return value
+
+def _pip_version(package):
+    r = _run(["pip", "show", package])
+    if r and r.returncode == 0:
+        for line in r.stdout.splitlines():
+            if line.startswith("Version:"):
+                return line.split(":", 1)[1].strip()
+    return None
+
+
+def detect_serving_framework():
+    """Detect installed serving frameworks: vLLM, SGLang, TensorRT-LLM."""
+    found = []
+
+    v = _pip_version("vllm")
+    if v:
+        found.append(f"vLLM v{v}")
+
+    v = _pip_version("sglang")
+    if v:
+        found.append(f"SGLang v{v}")
+
+    v = _pip_version("tensorrt_llm") or _pip_version("tensorrt-llm")
+    if v:
+        found.append(f"TRT-LLM v{v}")
+
+    return ", ".join(found)
+
+
+def detect_inference_backend():
+    """Build inference backend string from CUDA/ROCm + cuDNN versions."""
+    parts = []
+
+    cuda_runtime = os.environ.get("MLC_CUDA_DEVICE_PROP_CUDA_RUNTIME_VERSION", "")
+    if cuda_runtime:
+        parts.append(f"CUDA {cuda_runtime}")
+
+    rocm_version = (os.environ.get("MLC_ROCM_VERSION", "")
+                    or os.environ.get("MLC_ROCM_DEVICE_PROP_ROCM_VERSION", ""))
+    if rocm_version:
+        parts.append(f"ROCm {rocm_version}")
+
+    cudnn_version = None
+    for pkg in ("nvidia-cudnn-cu12", "nvidia-cudnn-cu11", "cudnn"):
+        cudnn_version = _pip_version(pkg)
+        if cudnn_version:
+            break
+    if cudnn_version:
+        parts.append(f"cuDNN {cudnn_version}")
+
+    return ", ".join(parts)
+
+
+def detect_driver():
+    """Detect GPU kernel driver version (NVIDIA or AMD)."""
+    r = _run(["nvidia-smi", "--query-gpu=driver_version", "--format=csv,noheader"])
+    if r and r.returncode == 0 and r.stdout.strip():
+        version = r.stdout.strip().splitlines()[0].strip()
+        if version:
+            return f"Driver {version}"
+
+    r = _run(["rocm-smi", "--showdriverversion"])
+    if r and r.returncode == 0 and r.stdout.strip():
+        for line in r.stdout.splitlines():
+            if "driver" in line.lower() and "version" in line.lower():
+                parts = line.split(":", 1)
+                if len(parts) > 1:
+                    return f"ROCm Driver {parts[1].strip()}"
+
+    return ""
+
+# -------------------------------------------------------------------
+
+
+def extract_value(rule, field_key):
+    if rule.get("source") == "detect":
+        if field_key == "serving_framework":
+            return detect_serving_framework()
+        if field_key == "inference_backend":
+            return detect_inference_backend()
+        if field_key == "driver":
+            return detect_driver()
+        return ""
+
+    value = ""
 
     for candidate in rule["candidates"]:
         value += f" {os.environ.get(candidate, '')}"
@@ -198,7 +286,8 @@ def main():
                     parsed[ensemble_type][ensemble_type_subpart] = {}
                 parsed[ensemble_type][ensemble_type_subpart][target_key] = extract_value(
                     rule, target_key)
-            elif target_key in ["framework", "operating_system", "filesystem", "other_software_stack", "sw_notes"]:
+            elif target_key in ["serving_framework", "inference_backend", "driver",
+                                 "operating_system", "filesystem", "other_software_stack", "sw_notes"]:
                 ensemble_type = "software_ensemble"
                 if ensemble_type not in parsed:
                     parsed[ensemble_type] = {}
