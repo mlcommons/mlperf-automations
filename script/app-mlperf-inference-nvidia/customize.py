@@ -395,7 +395,8 @@ def preprocess(i):
             with open(_resnet_builder_py, 'r') as _f:
                 _resnet_builder_src = _f.read()
             _changed_rb = False
-            _resnet_builder_src_escaped = _resnet_builder_src.replace(' \\+ ', ' \\\\+ ')
+            _resnet_builder_src_escaped = _resnet_builder_src.replace(
+                ' \\+ ', ' \\\\+ ')
             if _resnet_builder_src_escaped != _resnet_builder_src:
                 _resnet_builder_src = _resnet_builder_src_escaped
                 _changed_rb = True
@@ -528,7 +529,6 @@ def preprocess(i):
                 _main_src = _main_src.replace(_main_old, _main_new, 1)
                 with open(_main_py, 'w') as _f:
                     _f.write(_main_src)
-
 
     # Patch rn50_graphsurgeon.py to disable custom TRT fusion plugins (RnRes2FullFusion_TRT,
     # SmallTileGEMM_TRT) which are broken on TensorRT 10.x with non-official NVIDIA GPUs.
