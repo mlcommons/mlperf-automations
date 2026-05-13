@@ -54,7 +54,7 @@ EXTRACT_RULES = {
     },
     "accelerator_memory_type": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_MEMORY_TYPE",  "MLC_XPU_DEVICE_PROP_MEMORY_TYPE"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_MEMORY_TYPE", "MLC_XPU_DEVICE_PROP_MEMORY_TYPE"],
     },
     "accelerator_interconnect": {
         "source": "env",
@@ -134,7 +134,8 @@ def parse_args():
 
 def _run(cmd, timeout=10):
     try:
-        return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+        return subprocess.run(cmd, capture_output=True,
+                              text=True, timeout=timeout)
     except Exception:
         return None
 
@@ -171,7 +172,8 @@ def detect_inference_backend():
     """Build inference backend string from CUDA/ROCm + cuDNN versions."""
     parts = []
 
-    cuda_runtime = os.environ.get("MLC_CUDA_DEVICE_PROP_CUDA_RUNTIME_VERSION", "")
+    cuda_runtime = os.environ.get(
+        "MLC_CUDA_DEVICE_PROP_CUDA_RUNTIME_VERSION", "")
     if cuda_runtime:
         parts.append(f"CUDA {cuda_runtime}")
 
@@ -193,7 +195,9 @@ def detect_inference_backend():
 
 def detect_driver():
     """Detect GPU kernel driver version (NVIDIA or AMD)."""
-    r = _run(["nvidia-smi", "--query-gpu=driver_version", "--format=csv,noheader"])
+    r = _run(["nvidia-smi",
+              "--query-gpu=driver_version",
+              "--format=csv,noheader"])
     if r and r.returncode == 0 and r.stdout.strip():
         version = r.stdout.strip().splitlines()[0].strip()
         if version:
@@ -287,7 +291,7 @@ def main():
                 parsed[ensemble_type][ensemble_type_subpart][target_key] = extract_value(
                     rule, target_key)
             elif target_key in ["serving_framework", "inference_backend", "driver",
-                                 "operating_system", "filesystem", "other_software_stack", "sw_notes"]:
+                                "operating_system", "filesystem", "other_software_stack", "sw_notes"]:
                 ensemble_type = "software_ensemble"
                 if ensemble_type not in parsed:
                     parsed[ensemble_type] = {}
