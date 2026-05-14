@@ -16,6 +16,13 @@ if [[ -z ${MLC_AOCL_SPARSE_SRC_PATH} ]]; then
     exit 1
 fi
 
+# Determine install prefix
+AOCL_VERSION="${MLC_AOCL_SPARSE_VERSION:-${MLC_GIT_CHECKOUT:-unknown}}"
+if [[ -n "${MLC_OUTDIRNAME}" ]]; then
+    INSTALL_PREFIX="${MLC_OUTDIRNAME}/aocl-sparse/${AOCL_VERSION}"
+else
+    INSTALL_PREFIX="${MLC_AOCL_SPARSE_SRC_PATH}/install"
+fi
 cd ${MLC_AOCL_SPARSE_SRC_PATH}
 
 # Create a unified AOCL root with symlinks for cmake discovery

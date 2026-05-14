@@ -16,6 +16,13 @@ if [[ -z ${MLC_AOCL_LIBFLAME_SRC_PATH} ]]; then
     exit 1
 fi
 
+# Determine install prefix
+AOCL_VERSION="${MLC_AOCL_LIBFLAME_VERSION:-${MLC_GIT_CHECKOUT:-unknown}}"
+if [[ -n "${MLC_OUTDIRNAME}" ]]; then
+    INSTALL_PREFIX="${MLC_OUTDIRNAME}/aocl-libflame/${AOCL_VERSION}"
+else
+    INSTALL_PREFIX="${MLC_AOCL_LIBFLAME_SRC_PATH}/install"
+fi
 cd ${MLC_AOCL_LIBFLAME_SRC_PATH}
 mkdir -p build && cd build
 

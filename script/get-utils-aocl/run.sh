@@ -11,6 +11,14 @@ if [[ "${MLC_AOCL_BINARY_DOWNLOAD}" == "yes" ]]; then
     exit 0
 fi
 
+# Determine install prefix
+AOCL_VERSION="${MLC_AOCL_UTILS_VERSION:-${MLC_GIT_CHECKOUT:-unknown}}"
+if [[ -n "${MLC_OUTDIRNAME}" ]]; then
+    INSTALL_PREFIX="${MLC_OUTDIRNAME}/aocl-utils/${AOCL_VERSION}"
+else
+    INSTALL_PREFIX="${MLC_AOCL_UTILS_SRC_PATH}/install"
+fi
+
 if [[ -z ${MLC_AOCL_UTILS_SRC_PATH} ]]; then
     echo "Git repository not found!"
     exit 1

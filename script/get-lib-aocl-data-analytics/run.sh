@@ -16,6 +16,13 @@ if [[ -z ${MLC_AOCL_DA_SRC_PATH} ]]; then
     exit 1
 fi
 
+# Determine install prefix
+AOCL_VERSION="${MLC_AOCL_DA_VERSION:-${MLC_GIT_CHECKOUT:-unknown}}"
+if [[ -n "${MLC_OUTDIRNAME}" ]]; then
+    INSTALL_PREFIX="${MLC_OUTDIRNAME}/aocl-data-analytics/${AOCL_VERSION}"
+else
+    INSTALL_PREFIX="${MLC_AOCL_DA_SRC_PATH}/install"
+fi
 cd ${MLC_AOCL_DA_SRC_PATH}
 
 # Create a unified AOCL root with flat lib_LP64 / include_LP64 layout
