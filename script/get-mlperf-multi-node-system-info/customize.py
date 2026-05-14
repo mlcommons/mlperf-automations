@@ -107,7 +107,8 @@ def _match_node_name(accelerator_model_name, yaml_node_names):
     for node_name in yaml_node_names:
         if node_name.lower() in accel_lower:
             return node_name
-        if re.search(r'\b' + re.escape(node_name) + r'\b', accelerator_model_name, re.IGNORECASE):
+        if re.search(r'\b' + re.escape(node_name) + r'\b',
+                     accelerator_model_name, re.IGNORECASE):
             return node_name
     return None
 
@@ -121,7 +122,8 @@ def _load_node_config(node_config_file, logger):
             data = yaml.safe_load(f)
         return data.get("system_info", {}).get("node_config", {})
     except Exception as e:
-        logger.error(f"Failed to load node_config file {node_config_file}: {e}")
+        logger.error(
+            f"Failed to load node_config file {node_config_file}: {e}")
         return None
 
 
@@ -149,7 +151,8 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
         matched = _match_node_name(accel_name, all_yaml_node_names)
         if matched and matched not in yaml_name_to_details:
             yaml_name_to_details[matched] = node_detail
-            logger.info(f"Matched single-node result ('{accel_name}') → YAML node '{matched}'")
+            logger.info(
+                f"Matched single-node result ('{accel_name}') → YAML node '{matched}'")
 
     node_types = []
     ensemble_id = 1
@@ -169,16 +172,22 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
 
             if node_name in yaml_name_to_details:
                 details = yaml_name_to_details[node_name]
-                node_type["hardware_ensemble"] = details.get("hardware_ensemble", {})
-                node_type["software_ensemble"] = details.get("software_ensemble", {})
+                node_type["hardware_ensemble"] = details.get(
+                    "hardware_ensemble", {})
+                node_type["software_ensemble"] = details.get(
+                    "software_ensemble", {})
             else:
-                logger.warning(f"No single-node data found for YAML node '{node_name}'")
+                logger.warning(
+                    f"No single-node data found for YAML node '{node_name}'")
 
             node_types.append(node_type)
-            node_type_totals[node_name] = node_type_totals.get(node_name, 0) + no_of_nodes
+            node_type_totals[node_name] = node_type_totals.get(
+                node_name, 0) + no_of_nodes
             ensemble_id += 1
 
-    system_size_parts = [f"{count}x {name}" for name, count in node_type_totals.items()]
+    system_size_parts = [
+        f"{count}x {name}" for name,
+        count in node_type_totals.items()]
     system_size = " + ".join(system_size_parts)
 
     return node_types, system_size
@@ -245,7 +254,8 @@ def postprocess(i):
         single_node_system_info_path = os.path.join(
             env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'], f"mlperf-system-info-single-node-{node_id}.json")
         if not os.path.exists(single_node_system_info_path):
-            logger.warning(f"Single-node info file not found: {single_node_system_info_path}")
+            logger.warning(
+                f"Single-node info file not found: {single_node_system_info_path}")
             return
         with open(single_node_system_info_path) as f:
             single_node_system_info = json.load(f)
@@ -303,7 +313,8 @@ def postprocess(i):
             node_type["software_ensemble"]["container_link"] = container_link
 
     sut['node_types'] = node_types
-    sut["system_metadata"]["system_size"] = env.get("MLC_MLPERF_SYSTEM_SIZE", system_size)
+    sut["system_metadata"]["system_size"] = env.get(
+        "MLC_MLPERF_SYSTEM_SIZE", system_size)
     sut["system_metadata"]["system_node_ensemble_count"] = len(node_types)
     sut["system_metadata"]["system_node_ensemble_total"] = sum(
         entry['number_of_nodes'] for entry in node_types)
