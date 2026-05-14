@@ -18,16 +18,38 @@ cache: false
 # Dependencies
 deps:
 - tags: get,utils,aocl-utils
+  force_env_keys:
+  - MLC_OUTDIRNAME
 - tags: get,lib,aocl-libm
+  force_env_keys:
+  - MLC_OUTDIRNAME
 - tags: get,lib,aocl-blis
+  force_env_keys:
+  - MLC_OUTDIRNAME
 - tags: get,lib,aocl-libflame
+  force_env_keys:
+  - MLC_OUTDIRNAME
 - tags: get,lib,aocl-sparse
+  force_env_keys:
+  - MLC_OUTDIRNAME
 - tags: get,lib,aocl-compression
+  force_env_keys:
+  - MLC_OUTDIRNAME
 - tags: get,lib,aocl-crypto
+  force_env_keys:
+  - MLC_OUTDIRNAME
 - tags: get,lib,aocl-data-analytics
+  force_env_keys:
+  - MLC_OUTDIRNAME
 - tags: get,lib,aocl-dlp
+  force_env_keys:
+  - MLC_OUTDIRNAME
 - tags: get,lib,aocl-fftz
+  force_env_keys:
+  - MLC_OUTDIRNAME
 - tags: get,lib,aocl-scalapack
+  force_env_keys:
+  - MLC_OUTDIRNAME
 
 # Tests
 tests:

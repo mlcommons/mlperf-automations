@@ -1,4 +1,10 @@
 #!/bin/bash
+
+# Skip when user-provided library path is supplied (path.# variation)
+if [[ "${MLC_AOCL_LIB_PATH_PROVIDED}" == "yes" ]]; then
+    echo "User-provided library path mode - skipping build"
+    exit 0
+fi
 # Skip build for binary download
 if [[ "${MLC_AOCL_BINARY_DOWNLOAD}" == "yes" ]]; then
     echo "Binary download mode - skipping build"
@@ -10,6 +16,13 @@ if [[ -z ${MLC_AOCL_DA_SRC_PATH} ]]; then
     exit 1
 fi
 
+# Determine install prefix
+AOCL_VERSION="${MLC_AOCL_DA_VERSION:-${MLC_GIT_CHECKOUT:-unknown}}"
+if [[ -n "${MLC_OUTDIRNAME}" ]]; then
+    INSTALL_PREFIX="${MLC_OUTDIRNAME}/aocl-data-analytics/${AOCL_VERSION}"
+else
+    INSTALL_PREFIX="${MLC_AOCL_DA_SRC_PATH}/install"
+fi
 cd ${MLC_AOCL_DA_SRC_PATH}
 
 # Create a unified AOCL root with flat lib_LP64 / include_LP64 layout
@@ -56,7 +69,7 @@ mkdir -p build && cd build
 
 export AOCL_ROOT=${AOCL_ROOT}
 cmake .. \
-    -DCMAKE_INSTALL_PREFIX=${MLC_AOCL_DA_SRC_PATH}/install \
+    -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_AOCL_ROOT=${AOCL_ROOT} \
     -DBUILD_SHARED_LIBS=ON \

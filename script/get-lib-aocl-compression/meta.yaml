@@ -23,6 +23,8 @@ new_env_keys:
 - MLC_AOCL_COMPRESSION_BUILD_PATH
 - MLC_AOCL_COMPRESSION_INSTALL_PATH
 - MLC_AOCL_COMPRESSION_LIB_PATH
+- MLC_AOCL_COMPRESSION_VERSION
+- MLC_DEPENDENT_CACHED_PATH
 - +LD_LIBRARY_PATH
 - +LIBRARY_PATH
 - +C_INCLUDE_PATH
@@ -41,13 +43,20 @@ input_description:
 # Dependencies
 deps:
 - tags: get,cmake
-  skip_if_env:
+  skip_if_any_env:
     MLC_AOCL_BINARY_DOWNLOAD:
     - 'yes'
+    MLC_AOCL_LIB_PATH_PROVIDED:
+    - 'yes'
 - tags: detect,cpu
-- tags: get,utils,aocl-utils
   skip_if_env:
+    MLC_AOCL_LIB_PATH_PROVIDED:
+    - 'yes'
+- tags: get,utils,aocl-utils
+  skip_if_any_env:
     MLC_AOCL_BINARY_DOWNLOAD:
+    - 'yes'
+    MLC_AOCL_LIB_PATH_PROVIDED:
     - 'yes'
 - tags: get,git,repo
   names:
@@ -55,8 +64,10 @@ deps:
   extra_cache_tags: aocl-compression,repo,aocl-compression-repo
   env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_AOCL_COMPRESSION_SRC_PATH
+    MLC_GIT_REPO_VERSION_ENV_NAME: MLC_AOCL_COMPRESSION_VERSION
   force_env_keys:
   - MLC_GIT_*
+  - MLC_OUTDIRNAME
   update_tags_from_env_with_prefix:
     _branch.:
     - MLC_GIT_CHECKOUT
@@ -64,12 +75,19 @@ deps:
     - MLC_GIT_REPO_URL
     _tag.:
     - MLC_GIT_CHECKOUT_TAG
-  skip_if_env:
+  skip_if_any_env:
     MLC_AOCL_BINARY_DOWNLOAD:
+    - 'yes'
+    MLC_AOCL_LIB_PATH_PROVIDED:
     - 'yes'
 
 # Variations
 variations:
+  path.#:
+    group: install-mode
+    env:
+      MLC_AOCL_COMPRESSION_LIB_PATH: '#'
+      MLC_AOCL_LIB_PATH_PROVIDED: 'yes'
   binary.aocc:
     env:
       MLC_AOCL_BINARY_COMPILER: aocc
