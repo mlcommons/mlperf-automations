@@ -90,6 +90,20 @@ EXTRACT_RULES = {
         "candidates": ["MLC_HOST_STORAGE_TYPE"],
     },
 
+    # ---------------- Other hardware metadata ----------------
+    "other_hardware": {
+        "source": "env",
+        "candidates": ["MLC_MLPERF_OTHER_HARDWARE"],
+    },
+    "hw_notes": {
+        "source": "env",
+        "candidates": ["MLC_MLPERF_HARDWARE_NOTES"],
+    },
+    "cooling": {
+        "source": "env",
+        "candidates": ["MLC_MLPERF_COOLING"],
+    },
+
     # ---------------- Software Ensemble ----------------
     "serving_framework": {
         "source": "detect",
@@ -110,6 +124,10 @@ EXTRACT_RULES = {
     "filesystem": {
         "source": "env",
         "candidates": ["MLC_HOST_FILESYSTEMS"],
+    },
+    "container_link": {
+        "source": "env",
+        "candidates": ["MLC_MLPERF_CONTAINER_LINK"],
     },
     "other_software_stack": {
         "source": "env",
@@ -246,6 +264,9 @@ def extract_value(rule, field_key):
         else:
             return f"{int(value_bytes)}GB"
 
+    if field_key == "host_storage_type" and value.strip() == "No disk layout data found":
+        return ""
+
     return value.strip()
 
 # -------------------------------------------------------------------
@@ -287,7 +308,8 @@ def main():
                 parsed[ensemble_type][ensemble_type_subpart][target_key] = extract_value(
                     rule, target_key)
             elif target_key in ["serving_framework", "inference_backend", "driver",
-                                 "operating_system", "filesystem", "other_software_stack", "sw_notes"]:
+                                 "operating_system", "filesystem", "container_link",
+                                 "other_software_stack", "sw_notes"]:
                 ensemble_type = "software_ensemble"
                 if ensemble_type not in parsed:
                     parsed[ensemble_type] = {}

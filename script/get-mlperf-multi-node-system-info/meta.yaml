@@ -47,6 +47,8 @@ input_mapping:
   submitter_org_name: MLC_MLPERF_SUBMITTER
   node_config_file: MLC_NODE_CONFIG_FILE
   system_name: MLC_MLPERF_SYSTEM_NAME
+  container_link: MLC_MLPERF_CONTAINER_LINK
+  measured_accuracy_score: MLC_MLPERF_MEASURED_ACCURACY_SCORE
   system_node_ensemble_count: MLC_MLPERF_SYSTEM_NODE_ENSEMBLE_COUNT
   system_node_ensemble_total: MLC_MLPERF_SYSTEM_NODE_ENSEMBLE_TOTAL
   system_size: MLC_MLPERF_SYSTEM_SIZE

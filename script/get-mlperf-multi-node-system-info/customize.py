@@ -287,6 +287,21 @@ def postprocess(i):
         node_types = parsed_node_details
         system_size = _build_system_size_from_nodes(parsed_node_details)
 
+    # Inject user-provided hardware/software metadata into each node type
+    other_hw = env.get("MLC_MLPERF_OTHER_HARDWARE", "")
+    hw_notes = env.get("MLC_MLPERF_HARDWARE_NOTES", "")
+    cooling = env.get("MLC_MLPERF_COOLING", "")
+    container_link = env.get("MLC_MLPERF_CONTAINER_LINK", "")
+    for node_type in node_types:
+        if "hardware_ensemble" in node_type:
+            node_type["hardware_ensemble"]["other"] = {
+                "other_hardware": other_hw,
+                "hw_notes": hw_notes,
+                "cooling": cooling,
+            }
+        if "software_ensemble" in node_type:
+            node_type["software_ensemble"]["container_link"] = container_link
+
     sut['node_types'] = node_types
     sut["system_metadata"]["system_size"] = env.get("MLC_MLPERF_SYSTEM_SIZE", system_size)
     sut["system_metadata"]["system_node_ensemble_count"] = len(node_types)
@@ -297,11 +312,16 @@ def postprocess(i):
     user_system_name = env.get("MLC_MLPERF_SYSTEM_NAME", "")
     sut["system_metadata"]["system_name"] = user_system_name if user_system_name else system_size
 
+    accuracy = {
+        "measured_accuracy_score": env.get("MLC_MLPERF_MEASURED_ACCURACY_SCORE", ""),
+    }
+
     parsed_multinode_system_info = {
         "organization_metadata": organization_metadata,
         "system_under_test": sut,
         "model_metadata": model_metadata,
         "dataset_metadata": dataset_metadata,
+        "accuracy": accuracy,
     }
 
     try:
