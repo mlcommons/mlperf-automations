@@ -67,7 +67,7 @@ prehook_deps:
     - 'True'
   env:
     MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH: <<<MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH>>>
-    MLC_SINGLE_NODE_SYSTEM_INFO_FILE_NAME: mlperf-system-info-single-node-current.json
+    MLC_SINGLE_NODE_SYSTEM_INFO_FILE_NAME: mlperf-system-info-single-node-0.json
 
 # Variations
 variations:

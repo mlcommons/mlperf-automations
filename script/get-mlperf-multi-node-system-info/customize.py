@@ -52,6 +52,9 @@ def preprocess(i):
 
         env['MLC_REMOTE_RUN_SSH_ID_COUNT'] = len(ssh_ids)
 
+        exclude_current = is_true(env.get('MLC_EXCLUDE_CURRENT_NODE', False))
+        remote_node_id_start = 0 if exclude_current else 1
+
         for index, sshid in enumerate(ssh_ids):
             sshid_parts = [part.strip()
                            for part in sshid.split(':') if part.strip()]
@@ -68,23 +71,24 @@ def preprocess(i):
             else:
                 host = id
                 user = "user"
+            actual_node_id = remote_node_id_start + index
             r = mlc.access({
                 'action': 'remote_run',
                 'automation': 'script',
                 'tags': rr_tags,
                 'run_cmd': f"{rr_tags}",
                 'mlc_run_cmd': f"mlcr {rr_tags}",
-                'node_id': index,
+                'node_id': actual_node_id,
                 'out_dir_path': f"/tmp/mlperf-system-info-single-node",
                 'remote_host': host,
                 'remote_user': user,
                 'remote_port': port,
-                'files_to_copy_back': [f"/tmp/mlperf-system-info-single-node/mlperf-system-info-single-node-{index}.json"],
+                'files_to_copy_back': [f"/tmp/mlperf-system-info-single-node/mlperf-system-info-single-node-{actual_node_id}.json"],
                 'path_to_copy_back_files': env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'],
                 'run_state': run_state,
                 'skip_ssh_key_file': env.get('MLC_SKIP_SSH_KEY_FILE', ''),
+                'remote_branch': 'sysinfov2',
                 'quiet': True,
-                # 'remote_pull_mlc_repos': True
             })
 
             if r['return'] > 0:
@@ -240,9 +244,11 @@ def postprocess(i):
         node_details = {}
         single_node_system_info_path = os.path.join(
             env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'], f"mlperf-system-info-single-node-{node_id}.json")
-        if os.path.exists(single_node_system_info_path):
-            with open(single_node_system_info_path) as f:
-                single_node_system_info = json.load(f)
+        if not os.path.exists(single_node_system_info_path):
+            logger.warning(f"Single-node info file not found: {single_node_system_info_path}")
+            return
+        with open(single_node_system_info_path) as f:
+            single_node_system_info = json.load(f)
         node_details['system_node_ensemble_id'] = node_id
         node_details['number_of_nodes'] = 1
         node_details['system_node_name'] = f"{single_node_system_info['hardware_ensemble']['processor'].get('host_processor_model_name', '')}-{single_node_system_info['hardware_ensemble']['accelerator'].get('accelerators_per_node', '')}x{single_node_system_info['hardware_ensemble']['accelerator'].get('accelerator_model_name', '')}"
@@ -267,7 +273,7 @@ def postprocess(i):
         update_parsed_node_details(node_id=0)
 
     logger.info("Obtaining system information from the remote systems")
-    for idx in range(int(env['MLC_REMOTE_RUN_SSH_ID_COUNT'])):
+    for idx in range(int(env.get('MLC_REMOTE_RUN_SSH_ID_COUNT', 0))):
         update_parsed_node_details(node_id=remote_node_id_start + idx)
 
     # Apply node_config YAML if provided
