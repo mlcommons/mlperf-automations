@@ -304,11 +304,9 @@ def postprocess(i):
     container_link = env.get("MLC_MLPERF_CONTAINER_LINK", "")
     for node_type in node_types:
         if "hardware_ensemble" in node_type:
-            node_type["hardware_ensemble"]["other"] = {
-                "other_hardware": other_hw,
-                "hw_notes": hw_notes,
-                "cooling": cooling,
-            }
+            node_type["hardware_ensemble"]["other_hardware"] = other_hw
+            node_type["hardware_ensemble"]["hw_notes"] = hw_notes
+            node_type["hardware_ensemble"]["cooling"] = cooling
         if "software_ensemble" in node_type:
             node_type["software_ensemble"]["container_link"] = container_link
 

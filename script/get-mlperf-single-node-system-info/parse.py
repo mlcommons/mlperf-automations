@@ -294,12 +294,12 @@ def main():
                 ensemble_type_subpart = "networking"
             elif target_key in ["host_storage_capacity", "host_storage_type"]:
                 ensemble_type_subpart = "storage"
-            elif target_key in ["other_hardware", "cooling", "hw_notes"]:
-                ensemble_type_subpart = "other"
 
             # get ensemble type
-            if ensemble_type_subpart in [
-                    "processor", "host_memory", "accelerator", "networking", "storage", "other"]:
+            if target_key in ["other_hardware", "cooling", "hw_notes"]:
+                parsed.setdefault("hardware_ensemble", {})[target_key] = extract_value(rule, target_key)
+            elif ensemble_type_subpart in [
+                    "processor", "host_memory", "accelerator", "networking", "storage"]:
                 ensemble_type = "hardware_ensemble"
                 if ensemble_type not in parsed:
                     parsed[ensemble_type] = {}
