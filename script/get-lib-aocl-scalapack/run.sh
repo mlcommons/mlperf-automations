@@ -1,4 +1,10 @@
 #!/bin/bash
+
+# Skip when user-provided library path is supplied (path.# variation)
+if [[ "${MLC_AOCL_LIB_PATH_PROVIDED}" == "yes" ]]; then
+    echo "User-provided library path mode - skipping build"
+    exit 0
+fi
 # Skip build for binary download
 if [[ "${MLC_AOCL_BINARY_DOWNLOAD}" == "yes" ]]; then
     echo "Binary download mode - skipping build"
@@ -59,9 +65,9 @@ cmake --build . --target scalapack -j${MLC_HOST_CPU_TOTAL_PHYSICAL_CORES}
 test $? -eq 0 || exit $?
 
 # Manual install to avoid cmake trying to install non-existent reference LAPACK/BLAS
-mkdir -p ${MLC_AOCL_SCALAPACK_SRC_PATH}/install/lib
-cp -f lib/libscalapack.a ${MLC_AOCL_SCALAPACK_SRC_PATH}/install/lib/
+mkdir -p ${INSTALL_PREFIX}/lib
+cp -f lib/libscalapack.a ${INSTALL_PREFIX}/lib/
 # Also copy shared lib if built
-cp -f lib/libscalapack.so* ${MLC_AOCL_SCALAPACK_SRC_PATH}/install/lib/ 2>/dev/null || true
+cp -f lib/libscalapack.so* ${INSTALL_PREFIX}/lib/ 2>/dev/null || true
 
 echo "get-lib-aocl-scalapack built and installed successfully."

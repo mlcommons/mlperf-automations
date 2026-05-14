@@ -1,4 +1,10 @@
 #!/bin/bash
+
+# Skip when user-provided library path is supplied (path.# variation)
+if [[ "${MLC_AOCL_LIB_PATH_PROVIDED}" == "yes" ]]; then
+    echo "User-provided library path mode - skipping build"
+    exit 0
+fi
 # Skip build for binary download
 if [[ "${MLC_AOCL_BINARY_DOWNLOAD}" == "yes" ]]; then
     echo "Binary download mode - skipping build"
@@ -56,7 +62,7 @@ mkdir -p build && cd build
 
 export AOCL_ROOT=${AOCL_ROOT}
 cmake .. \
-    -DCMAKE_INSTALL_PREFIX=${MLC_AOCL_DA_SRC_PATH}/install \
+    -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_AOCL_ROOT=${AOCL_ROOT} \
     -DBUILD_SHARED_LIBS=ON \
