@@ -219,11 +219,13 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
             combined_to_node_name[combined_name] = node_name
             ensemble_id += 1
 
-    # system_name: config-derived labels with function (e.g. "1x 5090(Prefill)")
+    # system_name: config-derived labels with function (e.g. "1x
+    # 5090(Prefill)")
     system_name = " + ".join(
         f"{count}x {name}" for name, count in node_type_totals.items())
 
-    # system_size: official detected format (e.g. "1x(CPU-1xNVIDIA GeForce RTX 5090)")
+    # system_size: official detected format (e.g. "1x(CPU-1xNVIDIA GeForce RTX
+    # 5090)")
     system_size_parts = []
     for combined_name, count in node_type_totals.items():
         node_name = combined_to_node_name[combined_name]
@@ -369,7 +371,8 @@ def postprocess(i):
     sut["system_metadata"]["system_node_ensemble_total"] = sum(
         entry['number_of_nodes'] for entry in node_types)
 
-    # system_name: use explicit user input, or fall back to config-derived labels
+    # system_name: use explicit user input, or fall back to config-derived
+    # labels
     user_system_name = env.get("MLC_MLPERF_SYSTEM_NAME", "")
     sut["system_metadata"]["system_name"] = user_system_name if user_system_name else system_name_from_config
 
