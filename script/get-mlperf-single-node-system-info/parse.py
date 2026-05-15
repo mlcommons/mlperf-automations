@@ -224,7 +224,8 @@ def detect_storage_capacity():
 
     if r is None or r.returncode != 0:
         try:
-            r = subprocess.run(['df', '-h'], capture_output=True, text=True, timeout=10)
+            r = subprocess.run(
+                ['df', '-h'], capture_output=True, text=True, timeout=10)
         except Exception:
             return []
         if r.returncode != 0:
@@ -234,7 +235,8 @@ def detect_storage_capacity():
             parts = line.split()
             if len(parts) < 6 or not parts[0].startswith('/dev/'):
                 continue
-            entries.append({"filesystem": parts[0], "size": parts[1], "mount": ' '.join(parts[5:])})
+            entries.append(
+                {"filesystem": parts[0], "size": parts[1], "mount": ' '.join(parts[5:])})
         return entries
 
     entries = []
@@ -242,7 +244,8 @@ def detect_storage_capacity():
         parts = line.split()
         if len(parts) < 3 or not parts[0].startswith('/dev/'):
             continue
-        entries.append({"filesystem": parts[0], "size": parts[1], "mount": ' '.join(parts[2:])})
+        entries.append(
+            {"filesystem": parts[0], "size": parts[1], "mount": ' '.join(parts[2:])})
     return entries
 
 
