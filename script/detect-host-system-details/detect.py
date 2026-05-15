@@ -104,7 +104,8 @@ def _classify_disk(name, tran, rota, model):
     model_up = model.upper()
     if "SSD" in model_up:
         return "SSD"
-    if "HDD" in model_up or any(x in model for x in ["ST", "WD", "HGST", "Toshiba", "Seagate"]):
+    if "HDD" in model_up or any(
+            x in model for x in ["ST", "WD", "HGST", "Toshiba", "Seagate"]):
         return "HDD"
     return "Other"
 
@@ -148,7 +149,8 @@ def detect_storage_type(system_info):
             if t:
                 types_found.add(t)
 
-    # Path 2: structured disks list (system-info.json style from get-platform-details)
+    # Path 2: structured disks list (system-info.json style from
+    # get-platform-details)
     if not types_found:
         for disk in system_info.get("disks", []):
             if not isinstance(disk, dict) or disk.get("type") != "disk":
