@@ -90,69 +90,80 @@ def detect_memory_configuration(system_info):
     return f"{dimm_count} x {dimm_size}GB {dimm_type}-{dimm_speed}".rstrip("-")
 
 
+_KNOWN_TRAN = {'nvme', 'sata', 'ata', 'usb', 'scsi', 'ide', 'mmc', 'fc'}
+
+
+def _classify_disk(name, tran, rota, model):
+    """Return storage type string for a single disk."""
+    if name.startswith("nvme") or tran == "nvme":
+        return "NVMe SSD"
+    if rota == "0":
+        return "SSD"
+    if rota == "1":
+        return "HDD"
+    model_up = model.upper()
+    if "SSD" in model_up:
+        return "SSD"
+    if "HDD" in model_up or any(x in model for x in ["ST", "WD", "HGST", "Toshiba", "Seagate"]):
+        return "HDD"
+    return "Other"
+
+
 def detect_storage_type(system_info):
-    """Parses disk_layout (lsblk output) from system_info JSON.
-    Returns a string like 'NVMe SSD', 'SSD', 'HDD', or combinations joined by ' + '.
+    """Returns a string like 'NVMe SSD', 'SSD', 'HDD', or combinations joined by ' + '.
+
+    Reads either raw lsblk text (disk_layout key) or the structured disks list
+    produced by get-platform-details (disks key).  Both paths handle an optional
+    VENDOR column that can displace ROTA when parsing by whitespace splitting.
     """
+    types_found = set()
+
+    # Path 1: raw lsblk text (system-info-raw.json style)
     output = ""
     for dump_key, dump in system_info.items():
         if "disk_layout" in dump_key.lower():
-            output = dump.get("output", "").strip()
+            if isinstance(dump, dict):
+                output = dump.get("output", "").strip()
             break
 
-    if not output:
-        return "No disk layout data found"
+    if output:
+        for line in output.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            parts = re.split(r'\s+', line)
+            if len(parts) < 3 or parts[1] != "disk":
+                continue
+            name = parts[0]
+            rota = "unknown"
+            tran = "unknown"
+            for j in range(len(parts) - 1, 1, -1):
+                if parts[j] in ('0', '1'):
+                    rota = parts[j]
+                    tran_candidate = parts[j - 1] if j - 1 > 2 else ""
+                    tran = tran_candidate if tran_candidate.lower() in _KNOWN_TRAN else "unknown"
+                    break
+            model = " ".join(parts[3:]) if len(parts) > 3 else ""
+            t = _classify_disk(name, tran, rota, model)
+            if t:
+                types_found.add(t)
 
-    types_found = set()
-
-    for line in output.splitlines():
-        line = line.strip()
-        if not line:
-            continue
-
-        parts = re.split(r'\s+', line)
-
-        if len(parts) < 5:
-            continue
-
-        name = parts[0]
-        dev_type = parts[1]
-
-        # ROTA is always '0' (non-rotating) or '1' (rotating).
-        # Scan from the right so an optional VENDOR column doesn't displace it.
-        rota = "unknown"
-        tran = "unknown"
-        for j in range(len(parts) - 1, 1, -1):
-            if parts[j] in ('0', '1'):
-                rota = parts[j]
-                tran = parts[j - 1] if j - 1 > 1 else "unknown"
-                break
-
-        if dev_type != "disk":
-            continue
-
-        if name.startswith("nvme") or tran == "nvme":
-            types_found.add("NVMe SSD")
-        elif rota == "0":
-            types_found.add("SSD")
-        elif rota == "1":
-            types_found.add("HDD")
-        else:
-            model_start = 3
-            model_end = len(parts) - 2
-            model = " ".join(parts[model_start:model_end]
-                             ) if model_end > model_start else ""
-            if "SSD" in model.upper():
-                types_found.add("SSD")
-            elif "HDD" in model.upper() or any(
-                x in model for x in ["ST", "WD", "HGST", "Toshiba", "Seagate"]
-            ):
-                types_found.add("HDD")
-            else:
-                types_found.add("Other")
+    # Path 2: structured disks list (system-info.json style from get-platform-details)
+    if not types_found:
+        for disk in system_info.get("disks", []):
+            if not isinstance(disk, dict) or disk.get("type") != "disk":
+                continue
+            t = _classify_disk(
+                disk.get("name", ""),
+                disk.get("transport", ""),
+                disk.get("rotational", ""),
+                disk.get("model", ""),
+            )
+            if t:
+                types_found.add(t)
 
     if not types_found:
-        return "No physical disks detected"
+        return "No disk layout data found"
 
     ordered = []
     for t in ["NVMe SSD", "SSD", "HDD", "Other"]:
