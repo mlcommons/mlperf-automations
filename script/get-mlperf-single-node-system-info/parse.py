@@ -83,8 +83,8 @@ EXTRACT_RULES = {
 
     # ---------------- Storage ----------------
     "host_storage_capacity": {
-        "source": "env",
-        "candidates": ["MLC_HOST_DISK_CAPACITY"],
+        "source": "detect",
+        "candidates": [],
     },
     "host_storage_type": {
         "source": "env",
@@ -212,6 +212,40 @@ def detect_inference_backend():
     return ", ".join(parts)
 
 
+def detect_storage_capacity():
+    """Return list of real block-device mounts with human-readable sizes (excludes tmpfs etc)."""
+    try:
+        r = subprocess.run(
+            ['df', '-h', '--output=source,size,target'],
+            capture_output=True, text=True, timeout=10
+        )
+    except Exception:
+        r = None
+
+    if r is None or r.returncode != 0:
+        try:
+            r = subprocess.run(['df', '-h'], capture_output=True, text=True, timeout=10)
+        except Exception:
+            return []
+        if r.returncode != 0:
+            return []
+        entries = []
+        for line in r.stdout.splitlines()[1:]:
+            parts = line.split()
+            if len(parts) < 6 or not parts[0].startswith('/dev/'):
+                continue
+            entries.append({"filesystem": parts[0], "size": parts[1], "mount": ' '.join(parts[5:])})
+        return entries
+
+    entries = []
+    for line in r.stdout.splitlines()[1:]:
+        parts = line.split()
+        if len(parts) < 3 or not parts[0].startswith('/dev/'):
+            continue
+        entries.append({"filesystem": parts[0], "size": parts[1], "mount": ' '.join(parts[2:])})
+    return entries
+
+
 def detect_driver():
     """Detect GPU kernel driver version (NVIDIA or AMD)."""
     r = _run(["nvidia-smi",
@@ -243,6 +277,8 @@ def extract_value(rule, field_key):
             return detect_inference_backend()
         if field_key == "driver":
             return detect_driver()
+        if field_key == "host_storage_capacity":
+            return detect_storage_capacity()
         return ""
 
     value = ""
@@ -274,18 +310,6 @@ def extract_value(rule, field_key):
 
     if field_key == "host_storage_type" and value.strip() == "No disk layout data found":
         return ""
-
-    if field_key == "host_storage_capacity":
-        raw = value.strip()
-        if not raw:
-            return []
-        try:
-            parsed = json.loads(raw)
-            if isinstance(parsed, list):
-                return parsed
-        except (json.JSONDecodeError, ValueError):
-            pass
-        return raw
 
     return value.strip()
 
