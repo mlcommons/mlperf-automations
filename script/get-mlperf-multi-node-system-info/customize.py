@@ -188,7 +188,8 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
 
     node_types = []
     ensemble_id = 1
-    node_type_totals = {}  # combined_name → total count
+    node_type_totals = {}        # combined_name → total count
+    combined_to_node_name = {}   # combined_name → yaml node_name
 
     for func_key, func_nodes in node_config.items():
         for entry in func_nodes:
@@ -210,14 +211,26 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
             node_types.append(node_type)
             node_type_totals[combined_name] = node_type_totals.get(
                 combined_name, 0) + no_of_nodes
+            combined_to_node_name[combined_name] = node_name
             ensemble_id += 1
 
-    system_size_parts = [
-        f"{count}x {name}" for name,
-        count in node_type_totals.items()]
+    # system_name: config-derived labels with function (e.g. "1x 5090(Prefill)")
+    system_name = " + ".join(
+        f"{count}x {name}" for name, count in node_type_totals.items())
+
+    # system_size: official detected format (e.g. "1x(CPU-1xNVIDIA GeForce RTX 5090)")
+    system_size_parts = []
+    for combined_name, count in node_type_totals.items():
+        node_name = combined_to_node_name[combined_name]
+        accel = (yaml_name_to_details.get(node_name, {})
+                 .get("hardware_ensemble", {})
+                 .get("accelerator", {}))
+        n_gpu = accel.get("accelerators_per_node", "")
+        gpu_name = accel.get("accelerator_model_name", "")
+        system_size_parts.append(f"{count}x(CPU-{n_gpu}x{gpu_name})")
     system_size = " + ".join(system_size_parts)
 
-    return node_types, system_size, []
+    return node_types, system_size, system_name, []
 
 
 def _build_system_size_from_nodes(parsed_node_details):
@@ -225,8 +238,10 @@ def _build_system_size_from_nodes(parsed_node_details):
     parts = []
     for entry in parsed_node_details:
         n = entry.get("number_of_nodes", 1)
-        node_name = entry.get("system_node_name", "")
-        parts.append(f"{n}x({node_name})")
+        accel = entry.get("hardware_ensemble", {}).get("accelerator", {})
+        n_gpu = accel.get("accelerators_per_node", "")
+        gpu_name = accel.get("accelerator_model_name", "")
+        parts.append(f"{n}x(CPU-{n_gpu}x{gpu_name})")
     return " + ".join(parts)
 
 
@@ -318,7 +333,7 @@ def postprocess(i):
     node_config = _load_node_config(node_config_file, logger)
 
     if node_config:
-        node_types, system_size, errors = _build_node_types_from_yaml(
+        node_types, system_size, system_name_from_config, errors = _build_node_types_from_yaml(
             node_config, parsed_node_details, logger)
         if errors:
             for err in errors:
@@ -327,6 +342,7 @@ def postprocess(i):
     else:
         node_types = parsed_node_details
         system_size = _build_system_size_from_nodes(parsed_node_details)
+        system_name_from_config = system_size
 
     # Inject user-provided hardware/software metadata into each node type
     other_hw = env.get("MLC_MLPERF_OTHER_HARDWARE", "")
@@ -348,9 +364,9 @@ def postprocess(i):
     sut["system_metadata"]["system_node_ensemble_total"] = sum(
         entry['number_of_nodes'] for entry in node_types)
 
-    # system_name: use explicit user input, or fall back to system_size
+    # system_name: use explicit user input, or fall back to config-derived labels
     user_system_name = env.get("MLC_MLPERF_SYSTEM_NAME", "")
-    sut["system_metadata"]["system_name"] = user_system_name if user_system_name else system_size
+    sut["system_metadata"]["system_name"] = user_system_name if user_system_name else system_name_from_config
 
     accuracy = {
         "measured_accuracy_score": env.get("MLC_MLPERF_MEASURED_ACCURACY_SCORE", ""),
