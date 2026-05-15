@@ -117,8 +117,16 @@ def detect_storage_type(system_info):
 
         name = parts[0]
         dev_type = parts[1]
-        tran = parts[-2] if len(parts) >= 6 else "unknown"
-        rota = parts[-1] if len(parts) >= 6 else "unknown"
+
+        # ROTA is always '0' (non-rotating) or '1' (rotating).
+        # Scan from the right so an optional VENDOR column doesn't displace it.
+        rota = "unknown"
+        tran = "unknown"
+        for j in range(len(parts) - 1, 1, -1):
+            if parts[j] in ('0', '1'):
+                rota = parts[j]
+                tran = parts[j - 1] if j - 1 > 1 else "unknown"
+                break
 
         if dev_type != "disk":
             continue
