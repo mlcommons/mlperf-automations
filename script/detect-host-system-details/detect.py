@@ -192,6 +192,42 @@ def detect_network_card_count():
     return str(count)
 
 
+def detect_storage_capacity():
+    """Runs df and returns a list of real block-device mounts with human-readable size.
+    Filters to /dev/ filesystems only (excludes tmpfs, overlay, efivarfs, etc).
+    """
+    try:
+        r = subprocess.run(
+            ['df', '-h', '--output=source,size,target'],
+            capture_output=True, text=True, timeout=10
+        )
+    except Exception:
+        r = None
+
+    if r is None or r.returncode != 0:
+        try:
+            r = subprocess.run(['df', '-h'], capture_output=True, text=True, timeout=10)
+        except Exception:
+            return []
+        if r.returncode != 0:
+            return []
+        entries = []
+        for line in r.stdout.splitlines()[1:]:
+            parts = line.split()
+            if len(parts) < 6 or not parts[0].startswith('/dev/'):
+                continue
+            entries.append({"filesystem": parts[0], "size": parts[1], "mount": ' '.join(parts[5:])})
+        return entries
+
+    entries = []
+    for line in r.stdout.splitlines()[1:]:
+        parts = line.split()
+        if len(parts) < 3 or not parts[0].startswith('/dev/'):
+            continue
+        entries.append({"filesystem": parts[0], "size": parts[1], "mount": ' '.join(parts[2:])})
+    return entries
+
+
 def detect_networking():
     """Scans /sys/class/infiniband for RDMA devices.
     Returns 'Ethernet' if no IB devices found, otherwise per-device InfiniBand/RoCE strings.
@@ -235,6 +271,7 @@ def main():
     results = {
         "MLC_HOST_MEMORY_CONFIGURATION": detect_memory_configuration(system_info),
         "MLC_HOST_STORAGE_TYPE": detect_storage_type(system_info),
+        "MLC_HOST_DISK_CAPACITY": json.dumps(detect_storage_capacity(), separators=(',', ':')),
         "MLC_HOST_NETWORK_CARD_COUNT": detect_network_card_count(),
         "MLC_HOST_NETWORKING": detect_networking(),
     }

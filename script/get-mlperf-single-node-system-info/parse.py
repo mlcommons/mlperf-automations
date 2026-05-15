@@ -275,6 +275,18 @@ def extract_value(rule, field_key):
     if field_key == "host_storage_type" and value.strip() == "No disk layout data found":
         return ""
 
+    if field_key == "host_storage_capacity":
+        raw = value.strip()
+        if not raw:
+            return []
+        try:
+            parsed = json.loads(raw)
+            if isinstance(parsed, list):
+                return parsed
+        except (json.JSONDecodeError, ValueError):
+            pass
+        return raw
+
     return value.strip()
 
 # -------------------------------------------------------------------
