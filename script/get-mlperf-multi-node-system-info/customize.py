@@ -197,12 +197,17 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
         for entry in func_nodes:
             node_name = entry.get("node_name", "")
             no_of_nodes = int(entry.get("no_of_nodes", 1))
-            combined_name = f"{node_name}({func_key})"
+            combined_name = f"{node_name}({func_key})"  # config-based, used for system_name
+
+            detected_gpu_name = (yaml_name_to_details.get(node_name, {})
+                                 .get("hardware_ensemble", {})
+                                 .get("accelerator", {})
+                                 .get("accelerator_model_name", node_name))
 
             node_type = {
                 "system_node_ensemble_id": ensemble_id,
                 "number_of_nodes": no_of_nodes,
-                "system_node_name": combined_name,
+                "system_node_name": f"{detected_gpu_name}({func_key})",
             }
 
             # node_name guaranteed to exist in yaml_name_to_details (validated
