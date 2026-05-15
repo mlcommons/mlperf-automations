@@ -197,7 +197,8 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
         for entry in func_nodes:
             node_name = entry.get("node_name", "")
             no_of_nodes = int(entry.get("no_of_nodes", 1))
-            combined_name = f"{node_name}({func_key})"  # config-based, used for system_name
+            # config-based, used for system_name
+            combined_name = f"{node_name}({func_key})"
 
             detected_gpu_name = (yaml_name_to_details.get(node_name, {})
                                  .get("hardware_ensemble", {})
