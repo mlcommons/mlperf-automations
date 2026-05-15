@@ -233,12 +233,17 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
     system_name = " + ".join(
         f"{count}x {name}" for name, count in node_type_totals.items())
 
-    # system_size: official detected format (e.g. "1x(Intel Xeon ...-1xNVIDIA A40)")
+    # system_size: official detected format (e.g. "1x(Intel Xeon ...-1xNVIDIA
+    # A40)")
     system_size_parts = []
     for combined_name, count in node_type_totals.items():
         node_name = combined_to_node_name[combined_name]
-        hw = yaml_name_to_details.get(node_name, {}).get("hardware_ensemble", {})
-        cpu_name = hw.get("processor", {}).get("host_processor_model_name", "CPU")
+        hw = yaml_name_to_details.get(
+            node_name, {}).get(
+            "hardware_ensemble", {})
+        cpu_name = hw.get(
+            "processor", {}).get(
+            "host_processor_model_name", "CPU")
         accel = hw.get("accelerator", {})
         n_gpu = accel.get("accelerators_per_node", "")
         gpu_name = accel.get("accelerator_model_name", "")
@@ -254,7 +259,9 @@ def _build_system_size_from_nodes(parsed_node_details):
     for entry in parsed_node_details:
         n = entry.get("number_of_nodes", 1)
         hw = entry.get("hardware_ensemble", {})
-        cpu_name = hw.get("processor", {}).get("host_processor_model_name", "CPU")
+        cpu_name = hw.get(
+            "processor", {}).get(
+            "host_processor_model_name", "CPU")
         accel = hw.get("accelerator", {})
         n_gpu = accel.get("accelerators_per_node", "")
         gpu_name = accel.get("accelerator_model_name", "")
