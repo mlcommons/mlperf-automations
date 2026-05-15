@@ -209,7 +209,13 @@ _SKIP_FSTYPES_CAP = frozenset([
 
 
 def _parse_df_size(s):
-    size_map = {'T': 1024**4, 'G': 1024**3, 'M': 1024**2, 'K': 1024, 'B': 1, '': 1}
+    size_map = {
+        'T': 1024**4,
+        'G': 1024**3,
+        'M': 1024**2,
+        'K': 1024,
+        'B': 1,
+        '': 1}
     m = re.match(r'^(\d+(?:\.\d+)?)([TGMKB]?)$', s.strip(), re.IGNORECASE)
     if not m:
         return 0
@@ -234,7 +240,8 @@ def _local_storage_type(device):
         )
         if r.returncode == 0 and r.stdout.strip():
             parts = r.stdout.strip().splitlines()[0].split()
-            rota, tran = parts[0] if parts else '', parts[1] if len(parts) > 1 else ''
+            rota, tran = parts[0] if parts else '', parts[1] if len(
+                parts) > 1 else ''
             if tran == 'nvme':
                 return 'NVMe SSD'
             if rota == '0':
@@ -284,7 +291,8 @@ def detect_storage_capacity():
                 rows.append((parts[0], parts[1], parts[2]))
     else:
         try:
-            r = subprocess.run(['df', '-T', '-h'], capture_output=True, text=True, timeout=10)
+            r = subprocess.run(['df', '-T', '-h'],
+                               capture_output=True, text=True, timeout=10)
         except Exception:
             return ''
         if not r or r.returncode != 0:
@@ -307,13 +315,15 @@ def detect_storage_capacity():
             continue
         size_bytes = _parse_df_size(size_str)
         if size_bytes > 0:
-            type_bytes[storage_type] = type_bytes.get(storage_type, 0) + size_bytes
+            type_bytes[storage_type] = type_bytes.get(
+                storage_type, 0) + size_bytes
 
     if not type_bytes:
         return ''
 
     order = ['NVMe SSD', 'SSD', 'HDD']
-    parts = [f"{_bytes_to_str(type_bytes[t])} {t}" for t in order if t in type_bytes]
+    parts = [
+        f"{_bytes_to_str(type_bytes[t])} {t}" for t in order if t in type_bytes]
     for t in sorted(type_bytes):
         if t not in order:
             parts.append(f"{_bytes_to_str(type_bytes[t])} {t}")
