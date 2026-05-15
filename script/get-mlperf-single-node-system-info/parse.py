@@ -1,5 +1,6 @@
 import json
 import argparse
+import math
 import subprocess
 from pathlib import Path
 import sys
@@ -262,11 +263,13 @@ def extract_value(rule, field_key):
         value_bytes = float(value)
         if value_bytes == 0:
             return ""
-        # get as decimal gigabytes as marketed by the vendors
-        if value_bytes >= 1000**3:
-            return f"{int(value_bytes/(1000**3))}GB"
+        # Report in GiB (binary) using ceil to align with GPU product marketing values.
+        # CUDA global memory is slightly below the marketed GiB due to driver reservation;
+        # ceil absorbs that gap so e.g. 31.37 GiB → 32 GiB (matching "32 GB" on the box).
+        if value_bytes >= 1024**3:
+            return f"{math.ceil(value_bytes / (1024**3))}GiB"
         else:
-            return f"{int(value_bytes)}GB"
+            return f"{int(value_bytes)}GiB"
 
     if field_key == "host_storage_type" and value.strip() == "No disk layout data found":
         return ""

@@ -132,7 +132,8 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
     Match detected single-node hardware to YAML node names and build the
     node_types list with function groupings and authoritative node counts.
 
-    Returns (node_types, system_size).
+    Returns (node_types, system_size, errors). On validation failure,
+    node_types and system_size are None and errors is a non-empty list.
     """
     all_yaml_node_names = []
     for func_nodes in node_config.values():
@@ -141,8 +142,9 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
             if name and name not in all_yaml_node_names:
                 all_yaml_node_names.append(name)
 
-    # Map YAML node_name → hardware/software details from single-node results
+    # Map YAML node_name → hardware/software details and probed count
     yaml_name_to_details = {}
+    yaml_name_to_probed_count = {}
     for node_detail in parsed_node_details:
         accel_name = (node_detail
                       .get("hardware_ensemble", {})
@@ -151,38 +153,63 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
         matched = _match_node_name(accel_name, all_yaml_node_names)
         if matched and matched not in yaml_name_to_details:
             yaml_name_to_details[matched] = node_detail
+            yaml_name_to_probed_count[matched] = node_detail.get("number_of_nodes", 1)
             logger.info(
                 f"Matched single-node result ('{accel_name}') → YAML node '{matched}'")
 
+    # Aggregate total declared no_of_nodes per unique node_name across all functions
+    declared_per_name = {}
+    for func_nodes in node_config.values():
+        for entry in func_nodes:
+            name = entry.get("node_name", "")
+            declared_per_name[name] = declared_per_name.get(
+                name, 0) + int(entry.get("no_of_nodes", 1))
+
+    # Validate declared counts against probed counts
+    errors = []
+    for name, declared_total in declared_per_name.items():
+        if name not in yaml_name_to_probed_count:
+            errors.append(
+                f"node_name '{name}' declared in node_config has no matching probed node. "
+                f"Ensure an SSH target with a '{name}' GPU was included and info was collected successfully."
+            )
+        else:
+            probed_count = yaml_name_to_probed_count[name]
+            if declared_total > probed_count:
+                errors.append(
+                    f"node_config declares {declared_total} '{name}' node(s) across all function groups "
+                    f"but only {probed_count} '{name}' node(s) were probed. "
+                    f"Add {declared_total - probed_count} more SSH ID(s) for this node type "
+                    f"or adjust no_of_nodes in node_config."
+                )
+
+    if errors:
+        return None, None, errors
+
     node_types = []
     ensemble_id = 1
-    node_type_totals = {}  # node_name → total count across all functions
+    node_type_totals = {}  # combined_name → total count
 
     for func_key, func_nodes in node_config.items():
         for entry in func_nodes:
             node_name = entry.get("node_name", "")
             no_of_nodes = int(entry.get("no_of_nodes", 1))
+            combined_name = f"{node_name}({func_key})"
 
             node_type = {
                 "system_node_ensemble_id": ensemble_id,
-                "function": func_key,
                 "number_of_nodes": no_of_nodes,
-                "system_node_name": node_name,
+                "system_node_name": combined_name,
             }
 
-            if node_name in yaml_name_to_details:
-                details = yaml_name_to_details[node_name]
-                node_type["hardware_ensemble"] = details.get(
-                    "hardware_ensemble", {})
-                node_type["software_ensemble"] = details.get(
-                    "software_ensemble", {})
-            else:
-                logger.warning(
-                    f"No single-node data found for YAML node '{node_name}'")
+            # node_name guaranteed to exist in yaml_name_to_details (validated above)
+            details = yaml_name_to_details[node_name]
+            node_type["hardware_ensemble"] = details.get("hardware_ensemble", {})
+            node_type["software_ensemble"] = details.get("software_ensemble", {})
 
             node_types.append(node_type)
-            node_type_totals[node_name] = node_type_totals.get(
-                node_name, 0) + no_of_nodes
+            node_type_totals[combined_name] = node_type_totals.get(
+                combined_name, 0) + no_of_nodes
             ensemble_id += 1
 
     system_size_parts = [
@@ -190,7 +217,7 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
         count in node_type_totals.items()]
     system_size = " + ".join(system_size_parts)
 
-    return node_types, system_size
+    return node_types, system_size, []
 
 
 def _build_system_size_from_nodes(parsed_node_details):
@@ -291,8 +318,12 @@ def postprocess(i):
     node_config = _load_node_config(node_config_file, logger)
 
     if node_config:
-        node_types, system_size = _build_node_types_from_yaml(
+        node_types, system_size, errors = _build_node_types_from_yaml(
             node_config, parsed_node_details, logger)
+        if errors:
+            for err in errors:
+                logger.error(err)
+            return {'return': 1, 'error': '; '.join(errors)}
     else:
         node_types = parsed_node_details
         system_size = _build_system_size_from_nodes(parsed_node_details)
