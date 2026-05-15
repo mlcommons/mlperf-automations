@@ -199,20 +199,18 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
             no_of_nodes = int(entry.get("no_of_nodes", 1))
             combined_name = f"{node_name}({func_key})"  # config-based, used for system_name
 
-            detected_gpu_name = (yaml_name_to_details.get(node_name, {})
-                                 .get("hardware_ensemble", {})
-                                 .get("accelerator", {})
-                                 .get("accelerator_model_name", node_name))
+            # node_name guaranteed to exist in yaml_name_to_details (validated above)
+            details = yaml_name_to_details[node_name]
+            hw = details.get("hardware_ensemble", {})
+            cpu_name = hw.get("processor", {}).get("host_processor_model_name", "")
+            n_gpu = hw.get("accelerator", {}).get("accelerators_per_node", "")
+            gpu_name = hw.get("accelerator", {}).get("accelerator_model_name", "")
 
             node_type = {
                 "system_node_ensemble_id": ensemble_id,
                 "number_of_nodes": no_of_nodes,
-                "system_node_name": f"{detected_gpu_name}({func_key})",
+                "system_node_name": f"{cpu_name}-{n_gpu}x{gpu_name}({func_key})",
             }
-
-            # node_name guaranteed to exist in yaml_name_to_details (validated
-            # above)
-            details = yaml_name_to_details[node_name]
             node_type["hardware_ensemble"] = details.get(
                 "hardware_ensemble", {})
             node_type["software_ensemble"] = details.get(
