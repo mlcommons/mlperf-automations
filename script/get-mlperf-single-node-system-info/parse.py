@@ -304,7 +304,11 @@ def main():
 
             # get ensemble type
             if target_key in ["other_hardware", "cooling", "hw_notes"]:
-                parsed.setdefault("hardware_ensemble", {})[target_key] = extract_value(rule, target_key)
+                parsed.setdefault(
+                    "hardware_ensemble",
+                    {})[target_key] = extract_value(
+                    rule,
+                    target_key)
             elif ensemble_type_subpart in [
                     "processor", "host_memory", "accelerator", "networking", "storage"]:
                 ensemble_type = "hardware_ensemble"
