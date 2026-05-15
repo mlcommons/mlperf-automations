@@ -153,11 +153,13 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
         matched = _match_node_name(accel_name, all_yaml_node_names)
         if matched and matched not in yaml_name_to_details:
             yaml_name_to_details[matched] = node_detail
-            yaml_name_to_probed_count[matched] = node_detail.get("number_of_nodes", 1)
+            yaml_name_to_probed_count[matched] = node_detail.get(
+                "number_of_nodes", 1)
             logger.info(
                 f"Matched single-node result ('{accel_name}') → YAML node '{matched}'")
 
-    # Aggregate total declared no_of_nodes per unique node_name across all functions
+    # Aggregate total declared no_of_nodes per unique node_name across all
+    # functions
     declared_per_name = {}
     for func_nodes in node_config.values():
         for entry in func_nodes:
@@ -203,10 +205,13 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
                 "system_node_name": combined_name,
             }
 
-            # node_name guaranteed to exist in yaml_name_to_details (validated above)
+            # node_name guaranteed to exist in yaml_name_to_details (validated
+            # above)
             details = yaml_name_to_details[node_name]
-            node_type["hardware_ensemble"] = details.get("hardware_ensemble", {})
-            node_type["software_ensemble"] = details.get("software_ensemble", {})
+            node_type["hardware_ensemble"] = details.get(
+                "hardware_ensemble", {})
+            node_type["software_ensemble"] = details.get(
+                "software_ensemble", {})
 
             node_types.append(node_type)
             node_type_totals[combined_name] = node_type_totals.get(
