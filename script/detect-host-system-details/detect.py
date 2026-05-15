@@ -220,7 +220,7 @@ def detect_storage_capacity():
             if len(parts) < 6 or not parts[0].startswith('/dev/'):
                 continue
             entries.append(
-                {"filesystem": parts[0], "size": parts[1], "mount": ' '.join(parts[5:])})
+                {"device": parts[0], "size": parts[1], "mount": ' '.join(parts[5:])})
         return entries
 
     entries = []
@@ -229,7 +229,7 @@ def detect_storage_capacity():
         if len(parts) < 3 or not parts[0].startswith('/dev/'):
             continue
         entries.append(
-            {"filesystem": parts[0], "size": parts[1], "mount": ' '.join(parts[2:])})
+            {"device": parts[0], "size": parts[1], "mount": ' '.join(parts[2:])})
     return entries
 
 
