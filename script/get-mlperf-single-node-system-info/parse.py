@@ -212,41 +212,147 @@ def detect_inference_backend():
     return ", ".join(parts)
 
 
-def detect_storage_capacity():
-    """Return list of real block-device mounts with human-readable sizes (excludes tmpfs etc)."""
+_NETWORK_FSTYPES = frozenset([
+    'cifs', 'smb3', 'smbfs', 'nfs', 'nfs4', 'nfs3',
+    'glusterfs', 'fuse.glusterfs', 'lustre', 'davfs', 'fuse.sshfs',
+])
+
+_SKIP_FSTYPES = frozenset([
+    'tmpfs', 'devtmpfs', 'overlay', 'proc', 'sysfs', 'cgroup', 'cgroup2',
+    'pstore', 'securityfs', 'debugfs', 'tracefs', 'bpf', 'hugetlbfs',
+    'mqueue', 'configfs', 'fusectl', 'efivarfs', 'binfmt_misc', 'squashfs',
+    'iso9660', 'devpts', 'ramfs', 'rpc_pipefs', 'sunrpc', 'autofs', 'fuse',
+    'udev',
+])
+
+
+def _parse_df_size(s):
+    """Parse a df -h size string ('1.8T', '455G') to bytes (1024-based)."""
+    import re as _re
+    m = _re.match(r'^(\d+(?:\.\d+)?)([TGMKB]?)$', s.strip(), _re.IGNORECASE)
+    if not m:
+        return 0
+    val = float(m.group(1))
+    unit = m.group(2).upper()
+    return int(val * {'T': 1024**4, 'G': 1024**3, 'M': 1024**2,
+                      'K': 1024, 'B': 1, '': 1}.get(unit, 1))
+
+
+def _bytes_to_str(n):
+    """Format bytes to a size string using 1024-based units, 1 decimal place."""
+    for unit, div in [('TB', 1024**4), ('GB', 1024**3), ('MB', 1024**2)]:
+        if n >= div:
+            s = f"{n / div:.1f}"
+            if s.endswith('.0'):
+                s = s[:-2]
+            return f"{s} {unit}"
+    return f"{n} B"
+
+
+def _local_storage_type(device):
+    """Return 'NVMe SSD', 'SSD', or 'HDD' for a local /dev/ device."""
+    if os.path.basename(device).startswith('nvme'):
+        return 'NVMe SSD'
+    # Direct lsblk lookup (works for most partitions)
     try:
         r = subprocess.run(
-            ['df', '-h', '--output=source,size,target'],
+            ['lsblk', '-n', '-o', 'ROTA,TRAN', device],
+            capture_output=True, text=True, timeout=5
+        )
+        if r.returncode == 0 and r.stdout.strip():
+            parts = r.stdout.strip().splitlines()[0].split()
+            rota = parts[0] if parts else ''
+            tran = parts[1] if len(parts) > 1 else ''
+            if tran == 'nvme':
+                return 'NVMe SSD'
+            if rota == '0':
+                return 'SSD'
+            if rota == '1':
+                return 'HDD'
+    except Exception:
+        pass
+    # LVM/RAID/mapper: trace back to the underlying physical disk
+    try:
+        r = subprocess.run(
+            ['lsblk', '-n', '-s', '-o', 'NAME,TYPE,ROTA,TRAN', device],
+            capture_output=True, text=True, timeout=5
+        )
+        if r.returncode == 0:
+            for line in r.stdout.strip().splitlines():
+                parts = line.split()
+                if len(parts) >= 2 and parts[1] == 'disk':
+                    name = parts[0]
+                    rota = parts[2] if len(parts) > 2 else ''
+                    tran = parts[3] if len(parts) > 3 else ''
+                    if name.startswith('nvme') or tran == 'nvme':
+                        return 'NVMe SSD'
+                    if rota == '0':
+                        return 'SSD'
+                    if rota == '1':
+                        return 'HDD'
+    except Exception:
+        pass
+    return 'SSD'
+
+
+def detect_storage_capacity():
+    """Return a storage summary string e.g. '1.8 TB NVMe SSD, 5 TB CIFS'.
+
+    Classifies local /dev/ mounts as NVMe SSD/SSD/HDD via lsblk and network
+    mounts (cifs, nfs, etc.) by their filesystem type. Sums sizes per type.
+    """
+    try:
+        r = subprocess.run(
+            ['df', '-T', '-h', '--output=source,fstype,size,target'],
             capture_output=True, text=True, timeout=10
         )
     except Exception:
         r = None
 
-    if r is None or r.returncode != 0:
-        try:
-            r = subprocess.run(
-                ['df', '-h'], capture_output=True, text=True, timeout=10)
-        except Exception:
-            return []
-        if r.returncode != 0:
-            return []
-        entries = []
+    rows = []  # (source, fstype, size_str)
+    if r is not None and r.returncode == 0:
         for line in r.stdout.splitlines()[1:]:
             parts = line.split()
-            if len(parts) < 6 or not parts[0].startswith('/dev/'):
-                continue
-            entries.append(
-                {"device": parts[0], "size": parts[1], "mount": ' '.join(parts[5:])})
-        return entries
+            if len(parts) >= 3:
+                rows.append((parts[0], parts[1], parts[2]))
+    else:
+        # Fallback: df -T -h (no --output)
+        try:
+            r = subprocess.run(['df', '-T', '-h'], capture_output=True, text=True, timeout=10)
+        except Exception:
+            return ''
+        if not r or r.returncode != 0:
+            return ''
+        for line in r.stdout.splitlines()[1:]:
+            parts = line.split()
+            if len(parts) >= 7:          # Filesystem Type Size Used Avail Use% Mount
+                rows.append((parts[0], parts[1], parts[2]))
 
-    entries = []
-    for line in r.stdout.splitlines()[1:]:
-        parts = line.split()
-        if len(parts) < 3 or not parts[0].startswith('/dev/'):
+    type_bytes: dict = {}
+    for source, fstype, size_str in rows:
+        ft = fstype.lower()
+        if ft in _SKIP_FSTYPES:
             continue
-        entries.append(
-            {"device": parts[0], "size": parts[1], "mount": ' '.join(parts[2:])})
-    return entries
+        if ft in _NETWORK_FSTYPES:
+            storage_type = fstype.upper()
+        elif source.startswith('/dev/'):
+            storage_type = _local_storage_type(source)
+        else:
+            continue
+        size_bytes = _parse_df_size(size_str)
+        if size_bytes > 0:
+            type_bytes[storage_type] = type_bytes.get(storage_type, 0) + size_bytes
+
+    if not type_bytes:
+        return ''
+
+    order = ['NVMe SSD', 'SSD', 'HDD']
+    parts = [f"{_bytes_to_str(type_bytes[t])} {t}"
+             for t in order if t in type_bytes]
+    for t in sorted(type_bytes):
+        if t not in order:
+            parts.append(f"{_bytes_to_str(type_bytes[t])} {t}")
+    return ', '.join(parts)
 
 
 def detect_driver():
