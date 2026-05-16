@@ -33,6 +33,7 @@ def remote_run(self_module, i):
     env = i.get('env', {})
     remote_host = i.get('remote_host', 'localhost')
     remote_port = i.get('remote_port', '22')
+    remote_action = i.get('remote_action', 'run')
 
     prune_result = prune_input(
         {'input': i, 'extra_keys_starts_with': ['remote_']})
@@ -87,7 +88,7 @@ def remote_run(self_module, i):
     remote_env = r.get('remote_env', {})
 
     mlc_script_input = {
-        'action': 'run', 'target': 'script'
+        'action': remote_action, 'target': 'script'
     }
 
     run_cmds = []
