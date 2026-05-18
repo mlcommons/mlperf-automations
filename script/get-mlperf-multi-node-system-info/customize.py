@@ -132,8 +132,8 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
     Match detected single-node hardware to YAML node names and build the
     node_types list with function groupings and authoritative node counts.
 
-    Returns (node_types, system_size, errors). On validation failure,
-    node_types and system_size are None and errors is a non-empty list.
+    Returns (node_types, system_size, system_name, errors). On validation failure,
+    all three output values are None and errors is a non-empty list.
     """
     all_yaml_node_names = []
     for func_nodes in node_config.values():
@@ -186,7 +186,7 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
                 )
 
     if errors:
-        return None, None, errors
+        return None, None, None, errors
 
     node_types = []
     ensemble_id = 1

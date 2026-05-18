@@ -19,14 +19,17 @@ EXTRACT_RULES = {
     "host_processors_per_node": {
         "source": "env",
         "candidates": ["MLC_HOST_CPU_SOCKETS"],
+        "type": "int",
     },
     "host_processor_core_count": {
         "source": "env",
         "candidates": ["MLC_HOST_CPU_TOTAL_PHYSICAL_CORES"],
+        "type": "int",
     },
     "host_processor_vcpu_count": {
         "source": "env",
         "candidates": ["MLC_HOST_CPU_TOTAL_LOGICAL_CORES"],
+        "type": "int",
     },
 
     # ---------------- Memory ----------------
@@ -66,11 +69,6 @@ EXTRACT_RULES = {
         "candidates": ["MLC_CUDA_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_ROCM_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_XPU_DEVICE_PROP_HOST_INTERCONNECT_TYPE"],
     },
 
-    "accelerator_frequency": {
-        "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_MAX_CLOCK_RATE", "MLC_ROCM_DEVICE_PROP_MAX_CLOCK_RATE", "MLC_XPU_DEVICE_PROP_MAX_CLOCK_RATE"],
-    },
-
     # ---------------- Networking ----------------
     "host_network_card_count": {
         "source": "env",
@@ -95,14 +93,17 @@ EXTRACT_RULES = {
     "other_hardware": {
         "source": "env",
         "candidates": ["MLC_MLPERF_OTHER_HARDWARE"],
+        "optional": True,
     },
     "hw_notes": {
         "source": "env",
         "candidates": ["MLC_MLPERF_HARDWARE_NOTES"],
+        "optional": True,
     },
     "cooling": {
         "source": "env",
         "candidates": ["MLC_MLPERF_COOLING"],
+        "optional": True,
     },
 
     # ---------------- Software Ensemble ----------------
@@ -129,14 +130,17 @@ EXTRACT_RULES = {
     "container_link": {
         "source": "env",
         "candidates": ["MLC_MLPERF_CONTAINER_LINK"],
+        "optional": True,
     },
     "other_software_stack": {
         "source": "env",
         "candidates": [],
+        "optional": True,
     },
     "sw_notes": {
         "source": "env",
         "candidates": [],
+        "optional": True,
     }
 }
 
@@ -381,50 +385,82 @@ def detect_driver():
 
 
 def extract_value(rule, field_key):
+    """Return (value, note). note is None on success; a string explaining why on failure.
+    Optional fields return (None, None) when empty — no note added.
+    """
     if rule.get("source") == "detect":
-        if field_key == "serving_framework":
-            return detect_serving_framework()
-        if field_key == "inference_backend":
-            return detect_inference_backend()
-        if field_key == "driver":
-            return detect_driver()
-        if field_key == "host_storage_capacity":
-            return detect_storage_capacity()
-        return ""
+        try:
+            if field_key == "serving_framework":
+                v = detect_serving_framework()
+            elif field_key == "inference_backend":
+                v = detect_inference_backend()
+            elif field_key == "driver":
+                v = detect_driver()
+            elif field_key == "host_storage_capacity":
+                v = detect_storage_capacity()
+            else:
+                return None, "Unknown detect target"
+            return (v, None) if v else (None, "Detection returned no result")
+        except Exception as e:
+            return None, f"Detection failed: {e}"
 
-    value = ""
-
-    for candidate in rule["candidates"]:
-        value += f" {os.environ.get(candidate, '')}"
+    # Collect non-empty env var values
+    parts = [os.environ.get(c, "") for c in rule.get("candidates", [])]
+    value = " ".join(p for p in parts if p).strip()
 
     if field_key == "accelerators_per_node":
-        value = sum(int(elem) for elem in value.split() if elem.isdigit())
-        return str(value)
+        nums = [int(x) for x in value.split() if x.isdigit()]
+        if not nums:
+            return None, f"Not captured: none of {rule['candidates']} env vars set"
+        return sum(nums), None
 
     if field_key == "accelerator_memory_capacity":
-        value = value.strip()
-        if len(value.split()) == 2:
-            value = value.split()[0]
         if not value:
-            return ""
-        value_bytes = float(value)
+            return None, f"Not captured: none of {rule['candidates']} env vars set"
+        raw = value.split()[0]
+        try:
+            value_bytes = float(raw)
+        except ValueError:
+            return None, f"Could not parse memory value '{raw}'"
         if value_bytes == 0:
-            return ""
+            return None, "Accelerator memory reported as 0"
         # Report in GiB (binary) using ceil to align with GPU product marketing values.
         # CUDA global memory is slightly below the marketed GiB due to driver reservation;
-        # ceil absorbs that gap so e.g. 31.37 GiB → 32 GiB (matching "32 GB" on
-        # the box).
-        if value_bytes >= 1024**3:
-            return f"{math.ceil(value_bytes / (1024**3))}GiB"
-        else:
-            return f"{int(value_bytes)}GiB"
+        # ceil absorbs that gap so e.g. 31.37 GiB → 32 GiB (matching "32 GB" on the box).
+        if value_bytes >= 1024 ** 3:
+            return f"{math.ceil(value_bytes / (1024 ** 3))}GiB", None
+        return f"{int(value_bytes)}GiB", None
 
-    if field_key == "host_storage_type" and value.strip() == "No disk layout data found":
-        return ""
+    if field_key == "host_storage_type" and value == "No disk layout data found":
+        return None, "No disk layout data found in system"
 
-    return value.strip()
+    if rule.get("type") == "int":
+        if not value:
+            return None, f"Not captured: none of {rule['candidates']} env vars set"
+        try:
+            return int(value), None
+        except (ValueError, TypeError):
+            return None, f"Could not parse '{value}' as integer"
+
+    if rule.get("optional"):
+        return (value if value else None), None
+
+    if not value:
+        candidates = rule.get("candidates", [])
+        if candidates:
+            return None, f"Not captured: none of {candidates} env vars set"
+        return None, "Not captured"
+
+    return value, None
 
 # -------------------------------------------------------------------
+
+
+def _set_field(container, key, value, note):
+    """Write value into container[key]; if note is present also write container[key + '_note']."""
+    container[key] = value
+    if note is not None:
+        container[f"{key}_note"] = note
 
 
 def main():
@@ -437,45 +473,37 @@ def main():
     for target_key, rule in EXTRACT_RULES.items():
         try:
             ensemble_type_subpart = ""
-            # get ensemble type subpart
             if target_key in ["host_processor_model_name", "host_processors_per_node",
                               "host_processor_core_count", "host_processor_vcpu_count"]:
                 ensemble_type_subpart = "processor"
             elif target_key in ["host_memory_capacity", "host_memory_configuration"]:
                 ensemble_type_subpart = "host_memory"
-            elif target_key in ["accelerator_model_name", "accelerators_per_node", "accelerator_memory_capacity", "accelerator_memory_type", "accelerator_interconnect", "accelerator_host_interconnect", "accelerator_frequency"]:
+            elif target_key in ["accelerator_model_name", "accelerators_per_node",
+                                "accelerator_memory_capacity", "accelerator_memory_type",
+                                "accelerator_interconnect", "accelerator_host_interconnect"]:
                 ensemble_type_subpart = "accelerator"
             elif target_key in ["host_network_card_count", "host_networking"]:
                 ensemble_type_subpart = "networking"
             elif target_key in ["host_storage_capacity", "host_storage_type"]:
                 ensemble_type_subpart = "storage"
 
-            # get ensemble type
+            value, note = extract_value(rule, target_key)
+
             if target_key in ["other_hardware", "cooling", "hw_notes"]:
-                parsed.setdefault(
-                    "hardware_ensemble",
-                    {})[target_key] = extract_value(
-                    rule,
-                    target_key)
+                container = parsed.setdefault("hardware_ensemble", {})
+                _set_field(container, target_key, value, note)
             elif ensemble_type_subpart in [
                     "processor", "host_memory", "accelerator", "networking", "storage"]:
-                ensemble_type = "hardware_ensemble"
-                if ensemble_type not in parsed:
-                    parsed[ensemble_type] = {}
-                if ensemble_type_subpart not in parsed[ensemble_type]:
-                    parsed[ensemble_type][ensemble_type_subpart] = {}
-                parsed[ensemble_type][ensemble_type_subpart][target_key] = extract_value(
-                    rule, target_key)
+                container = parsed.setdefault(
+                    "hardware_ensemble", {}).setdefault(ensemble_type_subpart, {})
+                _set_field(container, target_key, value, note)
             elif target_key in ["serving_framework", "inference_backend", "driver",
                                 "operating_system", "filesystem", "container_link",
                                 "other_software_stack", "sw_notes"]:
-                ensemble_type = "software_ensemble"
-                if ensemble_type not in parsed:
-                    parsed[ensemble_type] = {}
-                parsed[ensemble_type][target_key] = extract_value(
-                    rule, target_key)
+                container = parsed.setdefault("software_ensemble", {})
+                _set_field(container, target_key, value, note)
         except Exception as e:
-            parsed[target_key] = ""
+            parsed[target_key] = None
             print(
                 f"[WARN] Failed to extract {target_key}: {e}",
                 file=sys.stderr)
