@@ -214,7 +214,8 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
                 combined_name, 0) + no_of_nodes
             ensemble_id += 1
 
-    # system_name: config-derived labels with function (e.g. "1x L40S(Prefill)")
+    # system_name: config-derived labels with function (e.g. "1x
+    # L40S(Prefill)")
     system_name = " + ".join(
         f"{count}x {name}" for name, count in node_type_totals.items())
 
@@ -246,7 +247,8 @@ def _compute_system_size(node_entries):
         accel_name = accel.get("accelerator_model_name", "")
         accel_per_node = accel.get("accelerators_per_node", 0)
 
-        if not _is_not_detected(accel_name) and not _is_not_detected(accel_per_node):
+        if not _is_not_detected(
+                accel_name) and not _is_not_detected(accel_per_node):
             try:
                 qty = n_nodes * int(accel_per_node)
             except (ValueError, TypeError):
