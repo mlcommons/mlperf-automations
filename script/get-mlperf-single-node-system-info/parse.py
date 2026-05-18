@@ -381,29 +381,30 @@ def detect_driver():
 
     return ""
 
+
 # Human-readable reasons for fields that cannot be captured.
 _NOT_CAPTURED = {
-    "host_processor_model_name":    "Not detected: CPU model name unavailable",
-    "host_processors_per_node":     "Not detected: CPU socket count unavailable",
-    "host_processor_core_count":    "Not detected: CPU core count unavailable",
-    "host_processor_vcpu_count":    "Not detected: vCPU count unavailable",
-    "host_memory_capacity":         "Not detected: Memory capacity unavailable",
-    "host_memory_configuration":    "Not detected: SUDO access required for DIMM configuration (dmidecode)",
-    "accelerator_model_name":       "Not detected: No GPU/accelerator drivers found",
-    "accelerators_per_node":        "Not detected: No GPU/accelerator drivers found",
-    "accelerator_memory_capacity":  "Not detected: No GPU/accelerator drivers found",
-    "accelerator_memory_type":      "Not detected: No GPU/accelerator drivers found",
-    "accelerator_interconnect":     "Not detected: No GPU/accelerator drivers found",
-    "accelerator_host_interconnect":"Not detected: No GPU/accelerator drivers found",
-    "host_network_card_count":      "Not detected: Network interface information unavailable",
-    "host_networking":              "Not detected: Network interface information unavailable",
-    "host_storage_capacity":        "Not detected: Storage information unavailable",
-    "host_storage_type":            "Not detected: No disk layout data found",
-    "serving_framework":            "Not detected: No supported serving framework installed (vLLM, SGLang, TRT-LLM)",
-    "inference_backend":            "Not detected: No CUDA/ROCm/XPU environment found",
-    "driver":                       "Not detected: No GPU driver found (nvidia-smi/rocm-smi not available)",
-    "operating_system":             "Not detected: OS information unavailable",
-    "filesystem":                   "Not detected: Filesystem information unavailable",
+    "host_processor_model_name": "Not detected: CPU model name unavailable",
+    "host_processors_per_node": "Not detected: CPU socket count unavailable",
+    "host_processor_core_count": "Not detected: CPU core count unavailable",
+    "host_processor_vcpu_count": "Not detected: vCPU count unavailable",
+    "host_memory_capacity": "Not detected: Memory capacity unavailable",
+    "host_memory_configuration": "Not detected: SUDO access required for DIMM configuration (dmidecode)",
+    "accelerator_model_name": "Not detected: No GPU/accelerator drivers found",
+    "accelerators_per_node": "Not detected: No GPU/accelerator drivers found",
+    "accelerator_memory_capacity": "Not detected: No GPU/accelerator drivers found",
+    "accelerator_memory_type": "Not detected: No GPU/accelerator drivers found",
+    "accelerator_interconnect": "Not detected: No GPU/accelerator drivers found",
+    "accelerator_host_interconnect": "Not detected: No GPU/accelerator drivers found",
+    "host_network_card_count": "Not detected: Network interface information unavailable",
+    "host_networking": "Not detected: Network interface information unavailable",
+    "host_storage_capacity": "Not detected: Storage information unavailable",
+    "host_storage_type": "Not detected: No disk layout data found",
+    "serving_framework": "Not detected: No supported serving framework installed (vLLM, SGLang, TRT-LLM)",
+    "inference_backend": "Not detected: No CUDA/ROCm/XPU environment found",
+    "driver": "Not detected: No GPU driver found (nvidia-smi/rocm-smi not available)",
+    "operating_system": "Not detected: OS information unavailable",
+    "filesystem": "Not detected: Filesystem information unavailable",
 }
 
 # -------------------------------------------------------------------
