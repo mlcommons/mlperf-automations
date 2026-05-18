@@ -190,32 +190,19 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
 
     node_types = []
     ensemble_id = 1
-    node_type_totals = {}        # combined_name → total count
-    combined_to_node_name = {}   # combined_name → yaml node_name
+    node_type_totals = {}
 
     for func_key, func_nodes in node_config.items():
         for entry in func_nodes:
             node_name = entry.get("node_name", "")
             no_of_nodes = int(entry.get("no_of_nodes", 1))
-            # config-based, used for system_name
             combined_name = f"{node_name}({func_key})"
 
-            # node_name guaranteed to exist in yaml_name_to_details (validated
-            # above)
             details = yaml_name_to_details[node_name]
-            hw = details.get("hardware_ensemble", {})
-            cpu_name = hw.get(
-                "processor", {}).get(
-                "host_processor_model_name", "")
-            n_gpu = hw.get("accelerator", {}).get("accelerators_per_node", "")
-            gpu_name = hw.get(
-                "accelerator", {}).get(
-                "accelerator_model_name", "")
 
             node_type = {
                 "system_node_ensemble_id": ensemble_id,
                 "number_of_nodes": no_of_nodes,
-                "system_node_name": f"{cpu_name}-{n_gpu}x{gpu_name}({func_key})",
             }
             node_type["hardware_ensemble"] = details.get(
                 "hardware_ensemble", {})
@@ -225,48 +212,63 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
             node_types.append(node_type)
             node_type_totals[combined_name] = node_type_totals.get(
                 combined_name, 0) + no_of_nodes
-            combined_to_node_name[combined_name] = node_name
             ensemble_id += 1
 
-    # system_name: config-derived labels with function (e.g. "1x
-    # 5090(Prefill)")
+    # system_name: config-derived labels with function (e.g. "1x L40S(Prefill)")
     system_name = " + ".join(
         f"{count}x {name}" for name, count in node_type_totals.items())
 
-    # system_size: official detected format (e.g. "1x(Intel Xeon ...-1xNVIDIA
-    # A40)")
-    system_size_parts = []
-    for combined_name, count in node_type_totals.items():
-        node_name = combined_to_node_name[combined_name]
-        hw = yaml_name_to_details.get(
-            node_name, {}).get(
-            "hardware_ensemble", {})
-        cpu_name = hw.get(
-            "processor", {}).get(
-            "host_processor_model_name", "CPU")
-        accel = hw.get("accelerator", {})
-        n_gpu = accel.get("accelerators_per_node", "")
-        gpu_name = accel.get("accelerator_model_name", "")
-        system_size_parts.append(f"{count}x({cpu_name}-{n_gpu}x{gpu_name})")
-    system_size = " + ".join(system_size_parts)
+    system_size = _compute_system_size(node_types)
 
     return node_types, system_size, system_name, []
 
 
+def _is_not_detected(val):
+    """Return True if val is a detection-failure reason string or empty/zero."""
+    if val is None or val == "" or val == 0:
+        return True
+    return isinstance(val, str) and val.lower().startswith("not detected")
+
+
+def _compute_system_size(node_entries):
+    """Compute system_size per data dictionary spec.
+
+    For each node type: if accelerators are present, use
+    (number_of_nodes × accelerators_per_node)x accelerator_model_name;
+    otherwise use (number_of_nodes × host_processors_per_node)x
+    host_processor_model_name. Parts joined with ' + '.
+    """
+    parts = []
+    for entry in node_entries:
+        n_nodes = entry.get("number_of_nodes", 1)
+        hw = entry.get("hardware_ensemble", {})
+        accel = hw.get("accelerator", {})
+        accel_name = accel.get("accelerator_model_name", "")
+        accel_per_node = accel.get("accelerators_per_node", 0)
+
+        if not _is_not_detected(accel_name) and not _is_not_detected(accel_per_node):
+            try:
+                qty = n_nodes * int(accel_per_node)
+            except (ValueError, TypeError):
+                qty = n_nodes
+            parts.append(f"{qty}x {accel_name}")
+        else:
+            cpu_name = hw.get("processor", {}).get(
+                "host_processor_model_name", "")
+            cpu_per_node = hw.get("processor", {}).get(
+                "host_processors_per_node", 1)
+            if not _is_not_detected(cpu_name):
+                try:
+                    qty = n_nodes * int(cpu_per_node)
+                except (ValueError, TypeError):
+                    qty = n_nodes
+                parts.append(f"{qty}x {cpu_name}")
+    return " + ".join(parts)
+
+
 def _build_system_size_from_nodes(parsed_node_details):
     """Compute system_size from detected node types when no YAML is provided."""
-    parts = []
-    for entry in parsed_node_details:
-        n = entry.get("number_of_nodes", 1)
-        hw = entry.get("hardware_ensemble", {})
-        cpu_name = hw.get(
-            "processor", {}).get(
-            "host_processor_model_name", "CPU")
-        accel = hw.get("accelerator", {})
-        n_gpu = accel.get("accelerators_per_node", "")
-        gpu_name = accel.get("accelerator_model_name", "")
-        parts.append(f"{n}x({cpu_name}-{n_gpu}x{gpu_name})")
-    return " + ".join(parts)
+    return _compute_system_size(parsed_node_details)
 
 
 def postprocess(i):
@@ -300,7 +302,7 @@ def postprocess(i):
         "model_name": env.get("MLC_MLPERF_MODEL", "Insert model name here"),
         "model_precision": env.get("MLC_MLPERF_MODEL_PRECISION", "Insert model precision here"),
         "link_to_model": env.get("MLC_MLPERF_MODEL_LINK", "Insert link to model here"),
-        "link_to_model_transformations": env.get("MLC_MLPERF_MODEL_TRANSFORMATIONS_LINK", "Insert link to model transformations here"),
+        "link_to_model_transformation": env.get("MLC_MLPERF_MODEL_TRANSFORMATIONS_LINK", "Insert link to model transformations here"),
         "model_notes": env.get("MLC_MLPERF_MODEL_NOTES", "Insert any relevant notes about the model here"),
     }
 
@@ -367,6 +369,9 @@ def postprocess(i):
         node_types = parsed_node_details
         system_size = _build_system_size_from_nodes(parsed_node_details)
         system_name_from_config = system_size
+
+    for nt in node_types:
+        nt.pop("system_node_name", None)
 
     # Inject user-provided hardware/software metadata into each node type
     other_hw = env.get("MLC_MLPERF_OTHER_HARDWARE", "")

@@ -440,6 +440,14 @@ def extract_value(rule, field_key):
         nums = [int(x) for x in value.split() if x.isdigit()]
         return sum(nums) if nums else not_captured
 
+    if field_key == "host_network_card_count":
+        networking = os.environ.get("MLC_HOST_NETWORKING", "").strip()
+        if value and networking:
+            return f"{value}x {networking}"
+        if value:
+            return f"{value}x"
+        return not_captured
+
     if field_key == "accelerator_memory_capacity":
         if not value:
             return not_captured
