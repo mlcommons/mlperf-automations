@@ -452,7 +452,8 @@ def extract_value(rule, field_key):
             return not_captured
         # Report in GiB (binary) using ceil to align with GPU product marketing values.
         # CUDA global memory is slightly below the marketed GiB due to driver reservation;
-        # ceil absorbs that gap so e.g. 31.37 GiB → 32 GiB (matching "32 GB" on the box).
+        # ceil absorbs that gap so e.g. 31.37 GiB → 32 GiB (matching "32 GB" on
+        # the box).
         if value_bytes >= 1024 ** 3:
             return f"{math.ceil(value_bytes / (1024 ** 3))}GiB"
         return f"{int(value_bytes)}GiB"
