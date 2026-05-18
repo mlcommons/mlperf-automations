@@ -302,7 +302,7 @@ def postprocess(i):
         "model_name": env.get("MLC_MLPERF_MODEL", "Insert model name here"),
         "model_precision": env.get("MLC_MLPERF_MODEL_PRECISION", "Insert model precision here"),
         "link_to_model": env.get("MLC_MLPERF_MODEL_LINK", "Insert link to model here"),
-        "link_to_model_transformation": env.get("MLC_MLPERF_MODEL_TRANSFORMATIONS_LINK", "Insert link to model transformations here"),
+        "link_to_model_transformation": env.get("MLC_MLPERF_MODEL_TRANSFORMATION_LINK", "Insert link to model transformations here"),
         "model_notes": env.get("MLC_MLPERF_MODEL_NOTES", "Insert any relevant notes about the model here"),
     }
 
