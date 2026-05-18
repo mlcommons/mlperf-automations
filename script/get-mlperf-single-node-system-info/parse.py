@@ -381,13 +381,41 @@ def detect_driver():
 
     return ""
 
+# Human-readable reasons for fields that cannot be captured.
+_NOT_CAPTURED = {
+    "host_processor_model_name":    "Not detected: CPU model name unavailable",
+    "host_processors_per_node":     "Not detected: CPU socket count unavailable",
+    "host_processor_core_count":    "Not detected: CPU core count unavailable",
+    "host_processor_vcpu_count":    "Not detected: vCPU count unavailable",
+    "host_memory_capacity":         "Not detected: Memory capacity unavailable",
+    "host_memory_configuration":    "Not detected: SUDO access required for DIMM configuration (dmidecode)",
+    "accelerator_model_name":       "Not detected: No GPU/accelerator drivers found",
+    "accelerators_per_node":        "Not detected: No GPU/accelerator drivers found",
+    "accelerator_memory_capacity":  "Not detected: No GPU/accelerator drivers found",
+    "accelerator_memory_type":      "Not detected: No GPU/accelerator drivers found",
+    "accelerator_interconnect":     "Not detected: No GPU/accelerator drivers found",
+    "accelerator_host_interconnect":"Not detected: No GPU/accelerator drivers found",
+    "host_network_card_count":      "Not detected: Network interface information unavailable",
+    "host_networking":              "Not detected: Network interface information unavailable",
+    "host_storage_capacity":        "Not detected: Storage information unavailable",
+    "host_storage_type":            "Not detected: No disk layout data found",
+    "serving_framework":            "Not detected: No supported serving framework installed (vLLM, SGLang, TRT-LLM)",
+    "inference_backend":            "Not detected: No CUDA/ROCm/XPU environment found",
+    "driver":                       "Not detected: No GPU driver found (nvidia-smi/rocm-smi not available)",
+    "operating_system":             "Not detected: OS information unavailable",
+    "filesystem":                   "Not detected: Filesystem information unavailable",
+}
+
 # -------------------------------------------------------------------
 
 
 def extract_value(rule, field_key):
-    """Return (value, note). note is None on success; a string explaining why on failure.
-    Optional fields return (None, None) when empty — no note added.
+    """Return the field value on success, or a human-readable reason string on failure.
+    Optional fields return None when empty (no reason string).
+    Int-typed fields return an int on success or a reason string on failure.
     """
+    not_captured = _NOT_CAPTURED.get(field_key, "Not detected")
+
     if rule.get("source") == "detect":
         try:
             if field_key == "serving_framework":
@@ -399,10 +427,10 @@ def extract_value(rule, field_key):
             elif field_key == "host_storage_capacity":
                 v = detect_storage_capacity()
             else:
-                return None, "Unknown detect target"
-            return (v, None) if v else (None, "Detection returned no result")
-        except Exception as e:
-            return None, f"Detection failed: {e}"
+                return not_captured
+            return v if v else not_captured
+        except Exception:
+            return not_captured
 
     # Collect non-empty env var values
     parts = [os.environ.get(c, "") for c in rule.get("candidates", [])]
@@ -410,57 +438,42 @@ def extract_value(rule, field_key):
 
     if field_key == "accelerators_per_node":
         nums = [int(x) for x in value.split() if x.isdigit()]
-        if not nums:
-            return None, f"Not captured: none of {rule['candidates']} env vars set"
-        return sum(nums), None
+        return sum(nums) if nums else not_captured
 
     if field_key == "accelerator_memory_capacity":
         if not value:
-            return None, f"Not captured: none of {rule['candidates']} env vars set"
+            return not_captured
         raw = value.split()[0]
         try:
             value_bytes = float(raw)
         except ValueError:
-            return None, f"Could not parse memory value '{raw}'"
+            return not_captured
         if value_bytes == 0:
-            return None, "Accelerator memory reported as 0"
+            return not_captured
         # Report in GiB (binary) using ceil to align with GPU product marketing values.
         # CUDA global memory is slightly below the marketed GiB due to driver reservation;
         # ceil absorbs that gap so e.g. 31.37 GiB → 32 GiB (matching "32 GB" on the box).
         if value_bytes >= 1024 ** 3:
-            return f"{math.ceil(value_bytes / (1024 ** 3))}GiB", None
-        return f"{int(value_bytes)}GiB", None
+            return f"{math.ceil(value_bytes / (1024 ** 3))}GiB"
+        return f"{int(value_bytes)}GiB"
 
     if field_key == "host_storage_type" and value == "No disk layout data found":
-        return None, "No disk layout data found in system"
+        return not_captured
 
     if rule.get("type") == "int":
         if not value:
-            return None, f"Not captured: none of {rule['candidates']} env vars set"
+            return not_captured
         try:
-            return int(value), None
+            return int(value)
         except (ValueError, TypeError):
-            return None, f"Could not parse '{value}' as integer"
+            return not_captured
 
     if rule.get("optional"):
-        return (value if value else None), None
+        return value if value else None
 
-    if not value:
-        candidates = rule.get("candidates", [])
-        if candidates:
-            return None, f"Not captured: none of {candidates} env vars set"
-        return None, "Not captured"
-
-    return value, None
+    return value if value else not_captured
 
 # -------------------------------------------------------------------
-
-
-def _set_field(container, key, value, note):
-    """Write value into container[key]; if note is present also write container[key + '_note']."""
-    container[key] = value
-    if note is not None:
-        container[f"{key}_note"] = note
 
 
 def main():
@@ -487,23 +500,20 @@ def main():
             elif target_key in ["host_storage_capacity", "host_storage_type"]:
                 ensemble_type_subpart = "storage"
 
-            value, note = extract_value(rule, target_key)
+            value = extract_value(rule, target_key)
 
             if target_key in ["other_hardware", "cooling", "hw_notes"]:
-                container = parsed.setdefault("hardware_ensemble", {})
-                _set_field(container, target_key, value, note)
+                parsed.setdefault("hardware_ensemble", {})[target_key] = value
             elif ensemble_type_subpart in [
                     "processor", "host_memory", "accelerator", "networking", "storage"]:
-                container = parsed.setdefault(
-                    "hardware_ensemble", {}).setdefault(ensemble_type_subpart, {})
-                _set_field(container, target_key, value, note)
+                parsed.setdefault("hardware_ensemble", {}).setdefault(
+                    ensemble_type_subpart, {})[target_key] = value
             elif target_key in ["serving_framework", "inference_backend", "driver",
                                 "operating_system", "filesystem", "container_link",
                                 "other_software_stack", "sw_notes"]:
-                container = parsed.setdefault("software_ensemble", {})
-                _set_field(container, target_key, value, note)
+                parsed.setdefault("software_ensemble", {})[target_key] = value
         except Exception as e:
-            parsed[target_key] = None
+            parsed[target_key] = f"Not detected: extraction error ({e})"
             print(
                 f"[WARN] Failed to extract {target_key}: {e}",
                 file=sys.stderr)
