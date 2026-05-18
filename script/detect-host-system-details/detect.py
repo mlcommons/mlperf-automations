@@ -231,8 +231,7 @@ def _bytes_to_str(n):
 
 
 def _local_storage_type(device):
-    if os.path.basename(device).startswith('nvme'):
-        return 'NVMe SSD'
+    name = os.path.basename(device)
     try:
         r = subprocess.run(
             ['lsblk', '-n', '-o', 'ROTA,TRAN', device],
@@ -240,14 +239,11 @@ def _local_storage_type(device):
         )
         if r.returncode == 0 and r.stdout.strip():
             parts = r.stdout.strip().splitlines()[0].split()
-            rota, tran = parts[0] if parts else '', parts[1] if len(
-                parts) > 1 else ''
-            if tran == 'nvme':
-                return 'NVMe SSD'
-            if rota == '0':
-                return 'SSD'
-            if rota == '1':
-                return 'HDD'
+            rota = parts[0] if parts else ''
+            tran = parts[1] if len(parts) > 1 else ''
+            t = _classify_disk(name, tran, rota, '')
+            if t != 'Other':
+                return t
     except Exception:
         pass
     try:
@@ -259,15 +255,12 @@ def _local_storage_type(device):
             for line in r.stdout.strip().splitlines():
                 parts = line.split()
                 if len(parts) >= 2 and parts[1] == 'disk':
-                    name = parts[0]
+                    disk_name = parts[0]
                     rota = parts[2] if len(parts) > 2 else ''
                     tran = parts[3] if len(parts) > 3 else ''
-                    if name.startswith('nvme') or tran == 'nvme':
-                        return 'NVMe SSD'
-                    if rota == '0':
-                        return 'SSD'
-                    if rota == '1':
-                        return 'HDD'
+                    t = _classify_disk(disk_name, tran, rota, '')
+                    if t != 'Other':
+                        return t
     except Exception:
         pass
     return 'SSD'

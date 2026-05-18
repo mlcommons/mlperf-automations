@@ -108,8 +108,9 @@ EXTRACT_RULES = {
 
     # ---------------- Software Ensemble ----------------
     "serving_framework": {
-        "source": "detect",
-        "candidates": [],
+        "source": "env",
+        "candidates": ["MLC_MLPERF_SERVING_FRAMEWORK"],
+        "optional": True,
     },
     "inference_backend": {
         "source": "detect",
@@ -172,24 +173,6 @@ def _pip_version(package):
     return None
 
 
-def detect_serving_framework():
-    """Detect installed serving frameworks: vLLM, SGLang, TensorRT-LLM."""
-    found = []
-
-    v = _pip_version("vllm")
-    if v:
-        found.append(f"vLLM v{v}")
-
-    v = _pip_version("sglang")
-    if v:
-        found.append(f"SGLang v{v}")
-
-    v = _pip_version("tensorrt_llm") or _pip_version("tensorrt-llm")
-    if v:
-        found.append(f"TRT-LLM v{v}")
-
-    return ", ".join(found)
-
 
 def detect_inference_backend():
     """Build inference backend string from CUDA/ROCm + cuDNN versions."""
@@ -216,31 +199,6 @@ def detect_inference_backend():
     return ", ".join(parts)
 
 
-# Human-readable reasons for fields that cannot be captured.
-_NOT_CAPTURED = {
-    "host_processor_model_name": "Not detected: CPU model name unavailable",
-    "host_processors_per_node": "Not detected: CPU socket count unavailable",
-    "host_processor_core_count": "Not detected: CPU core count unavailable",
-    "host_processor_vcpu_count": "Not detected: vCPU count unavailable",
-    "host_memory_capacity": "Not detected: Memory capacity unavailable",
-    "host_memory_configuration": "Not detected: SUDO access required for DIMM configuration (dmidecode)",
-    "accelerator_model_name": "Not detected: No GPU/accelerator drivers found",
-    "accelerators_per_node": "Not detected: No GPU/accelerator drivers found",
-    "accelerator_memory_capacity": "Not detected: No GPU/accelerator drivers found",
-    "accelerator_memory_type": "Not detected: No GPU/accelerator drivers found",
-    "accelerator_interconnect": "Not detected: No GPU/accelerator drivers found",
-    "accelerator_host_interconnect": "Not detected: No GPU/accelerator drivers found",
-    "host_network_card_count": "Not detected: Network interface information unavailable",
-    "host_networking": "Not detected: Network interface information unavailable",
-    "host_storage_capacity": "Not detected: Storage information unavailable",
-    "host_storage_type": "Not detected: No disk layout data found",
-    "serving_framework": "Not detected: No supported serving framework installed (vLLM, SGLang, TRT-LLM)",
-    "inference_backend": "Not detected: No CUDA/ROCm/XPU environment found",
-    "driver": "Not detected: No GPU driver version found in device properties",
-    "operating_system": "Not detected: OS information unavailable",
-    "filesystem": "Not detected: Filesystem information unavailable",
-}
-
 # -------------------------------------------------------------------
 
 
@@ -249,27 +207,24 @@ def extract_value(rule, field_key):
     Optional fields return None when empty (no reason string).
     Int-typed fields return an int on success or a reason string on failure.
     """
-    not_captured = _NOT_CAPTURED.get(field_key, "Not detected")
-
     if rule.get("source") == "detect":
         try:
-            if field_key == "serving_framework":
-                v = detect_serving_framework()
-            elif field_key == "inference_backend":
+            if field_key == "inference_backend":
                 v = detect_inference_backend()
+                return v if v else "Not detected: CUDA/ROCm/XPU runtime not found"
             else:
-                return not_captured
-            return v if v else not_captured
-        except Exception:
-            return not_captured
+                return "Not available"
+        except Exception as e:
+            return f"Not detected: {field_key} detection error ({e})"
 
     # Collect non-empty env var values
-    parts = [os.environ.get(c, "") for c in rule.get("candidates", [])]
+    candidates = rule.get("candidates", [])
+    parts = [os.environ.get(c, "") for c in candidates]
     value = " ".join(p for p in parts if p).strip()
 
     if field_key == "accelerators_per_node":
         nums = [int(x) for x in value.split() if x.isdigit()]
-        return sum(nums) if nums else not_captured
+        return sum(nums) if nums else "Not available"
 
     if field_key == "host_network_card_count":
         networking = os.environ.get("MLC_HOST_NETWORKING", "").strip()
@@ -277,18 +232,18 @@ def extract_value(rule, field_key):
             return f"{value}x {networking}"
         if value:
             return f"{value}x"
-        return not_captured
+        return "Not available"
 
     if field_key == "accelerator_memory_capacity":
         if not value:
-            return not_captured
+            return "Not available"
         raw = value.split()[0]
         try:
             value_bytes = float(raw)
         except ValueError:
-            return not_captured
+            return "Not available"
         if value_bytes == 0:
-            return not_captured
+            return "Not available"
         # Report in GiB (binary) using ceil to align with GPU product marketing values.
         # CUDA global memory is slightly below the marketed GiB due to driver reservation;
         # ceil absorbs that gap so e.g. 31.37 GiB → 32 GiB (matching "32 GB" on
@@ -298,20 +253,20 @@ def extract_value(rule, field_key):
         return f"{int(value_bytes)}GiB"
 
     if field_key == "host_storage_type" and value == "No disk layout data found":
-        return not_captured
+        return "Not available"
 
     if rule.get("type") == "int":
         if not value:
-            return not_captured
+            return "Not available"
         try:
             return int(value)
         except (ValueError, TypeError):
-            return not_captured
+            return "Not available"
 
     if rule.get("optional"):
         return value if value else None
 
-    return value if value else not_captured
+    return value if value else "Not available"
 
 # -------------------------------------------------------------------
 
