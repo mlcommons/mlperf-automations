@@ -330,6 +330,35 @@ def detect_storage_capacity():
     return ', '.join(parts)
 
 
+def detect_gpu_driver_version():
+    """Return kernel GPU driver version string, e.g. 'Driver 575.57.08' or 'ROCm Driver 6.0'."""
+    try:
+        r = subprocess.run(
+            ["nvidia-smi", "--query-gpu=driver_version", "--format=csv,noheader"],
+            capture_output=True, text=True, timeout=10
+        )
+        if r.returncode == 0 and r.stdout.strip():
+            version = r.stdout.strip().splitlines()[0].strip()
+            if version:
+                return f"Driver {version}"
+    except Exception:
+        pass
+
+    try:
+        r = subprocess.run(["rocm-smi", "--showdriverversion"],
+                           capture_output=True, text=True, timeout=10)
+        if r.returncode == 0 and r.stdout.strip():
+            for line in r.stdout.splitlines():
+                if "driver" in line.lower() and "version" in line.lower():
+                    parts = line.split(":", 1)
+                    if len(parts) > 1:
+                        return f"ROCm Driver {parts[1].strip()}"
+    except Exception:
+        pass
+
+    return ""
+
+
 def detect_networking():
     """Scans /sys/class/infiniband for RDMA devices.
     Returns 'Ethernet' if no IB devices found, otherwise per-device InfiniBand/RoCE strings.
@@ -376,6 +405,7 @@ def main():
         "MLC_HOST_DISK_CAPACITY": detect_storage_capacity(),
         "MLC_HOST_NETWORK_CARD_COUNT": detect_network_card_count(),
         "MLC_HOST_NETWORKING": detect_networking(),
+        "MLC_HOST_GPU_DRIVER_VERSION": detect_gpu_driver_version(),
     }
 
     with open("tmp-run.out", "w") as f:

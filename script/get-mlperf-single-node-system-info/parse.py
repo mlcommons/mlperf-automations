@@ -117,7 +117,7 @@ EXTRACT_RULES = {
     },
     "driver": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_CUDA_DRIVER_VERSION", "MLC_ROCM_DEVICE_PROP_ROCM_DRIVER_VERSION"],
+        "candidates": ["MLC_HOST_GPU_DRIVER_VERSION"],
     },
     "operating_system": {
         "source": "env",
@@ -266,15 +266,6 @@ def extract_value(rule, field_key):
     # Collect non-empty env var values
     parts = [os.environ.get(c, "") for c in rule.get("candidates", [])]
     value = " ".join(p for p in parts if p).strip()
-
-    if field_key == "driver":
-        cuda_ver = os.environ.get("MLC_CUDA_DEVICE_PROP_CUDA_DRIVER_VERSION", "").strip()
-        if cuda_ver:
-            return f"Driver {cuda_ver}"
-        rocm_ver = os.environ.get("MLC_ROCM_DEVICE_PROP_ROCM_DRIVER_VERSION", "").strip()
-        if rocm_ver:
-            return f"ROCm Driver {rocm_ver}"
-        return not_captured
 
     if field_key == "accelerators_per_node":
         nums = [int(x) for x in value.split() if x.isdigit()]
