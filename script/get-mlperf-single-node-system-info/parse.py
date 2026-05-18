@@ -116,8 +116,8 @@ EXTRACT_RULES = {
         "candidates": [],
     },
     "driver": {
-        "source": "detect",
-        "candidates": [],
+        "source": "env",
+        "candidates": ["MLC_CUDA_DEVICE_PROP_CUDA_DRIVER_VERSION", "MLC_ROCM_DEVICE_PROP_ROCM_DRIVER_VERSION"],
     },
     "operating_system": {
         "source": "env",
@@ -216,27 +216,6 @@ def detect_inference_backend():
     return ", ".join(parts)
 
 
-def detect_driver():
-    """Detect GPU kernel driver version (NVIDIA or AMD)."""
-    r = _run(["nvidia-smi",
-              "--query-gpu=driver_version",
-              "--format=csv,noheader"])
-    if r and r.returncode == 0 and r.stdout.strip():
-        version = r.stdout.strip().splitlines()[0].strip()
-        if version:
-            return f"Driver {version}"
-
-    r = _run(["rocm-smi", "--showdriverversion"])
-    if r and r.returncode == 0 and r.stdout.strip():
-        for line in r.stdout.splitlines():
-            if "driver" in line.lower() and "version" in line.lower():
-                parts = line.split(":", 1)
-                if len(parts) > 1:
-                    return f"ROCm Driver {parts[1].strip()}"
-
-    return ""
-
-
 # Human-readable reasons for fields that cannot be captured.
 _NOT_CAPTURED = {
     "host_processor_model_name": "Not detected: CPU model name unavailable",
@@ -257,7 +236,7 @@ _NOT_CAPTURED = {
     "host_storage_type": "Not detected: No disk layout data found",
     "serving_framework": "Not detected: No supported serving framework installed (vLLM, SGLang, TRT-LLM)",
     "inference_backend": "Not detected: No CUDA/ROCm/XPU environment found",
-    "driver": "Not detected: No GPU driver found (nvidia-smi/rocm-smi not available)",
+    "driver": "Not detected: No GPU driver version found in device properties",
     "operating_system": "Not detected: OS information unavailable",
     "filesystem": "Not detected: Filesystem information unavailable",
 }
@@ -278,8 +257,6 @@ def extract_value(rule, field_key):
                 v = detect_serving_framework()
             elif field_key == "inference_backend":
                 v = detect_inference_backend()
-            elif field_key == "driver":
-                v = detect_driver()
             else:
                 return not_captured
             return v if v else not_captured
@@ -289,6 +266,15 @@ def extract_value(rule, field_key):
     # Collect non-empty env var values
     parts = [os.environ.get(c, "") for c in rule.get("candidates", [])]
     value = " ".join(p for p in parts if p).strip()
+
+    if field_key == "driver":
+        cuda_ver = os.environ.get("MLC_CUDA_DEVICE_PROP_CUDA_DRIVER_VERSION", "").strip()
+        if cuda_ver:
+            return f"Driver {cuda_ver}"
+        rocm_ver = os.environ.get("MLC_ROCM_DEVICE_PROP_ROCM_DRIVER_VERSION", "").strip()
+        if rocm_ver:
+            return f"ROCm Driver {rocm_ver}"
+        return not_captured
 
     if field_key == "accelerators_per_node":
         nums = [int(x) for x in value.split() if x.isdigit()]

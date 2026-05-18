@@ -232,7 +232,7 @@ def _is_not_detected(val):
 
 
 def _compute_system_size(node_entries):
-    """Compute system_size per data dictionary spec.
+    """Compute system_size per MLPerf Per Submission Data Dictionary spec.
 
     For each node type: if accelerators are present, use
     (number_of_nodes × accelerators_per_node)x accelerator_model_name;
