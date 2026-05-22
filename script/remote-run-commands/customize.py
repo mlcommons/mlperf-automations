@@ -77,7 +77,9 @@ def preprocess(i):
 
     run_cmds = env.get('MLC_SSH_RUN_COMMANDS', [])
 
-    run_cmds = pre_run_cmds + run_cmds
+    post_run_cmds = env.get('MLC_SSH_POST_RUN_CMDS', [])
+
+    run_cmds = pre_run_cmds + run_cmds + post_run_cmds
 
     for i, cmd in enumerate(run_cmds):
         if 'cm ' in cmd:
