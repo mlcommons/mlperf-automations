@@ -46,7 +46,7 @@ def preprocess(i):
                 env['+ CFLAGS'] += ['-isysroot', sdkroot]
                 env['+ CXXFLAGS'] += ['-isysroot', sdkroot]
                 env['+ LDFLAGS'] += ['-isysroot', sdkroot]
-        except Exception:
+        except (subprocess.CalledProcessError, FileNotFoundError):
             pass
 
     sys_cmd = "cpp -v /dev/null -o /dev/null 2>&1"
