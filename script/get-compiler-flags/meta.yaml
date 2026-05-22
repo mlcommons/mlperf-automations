@@ -16,6 +16,7 @@ new_env_keys:
 - + FFLAGS
 - + LDFLAGS
 - +MLC_HOST_OS_DEFAULT_INCLUDE_PATH
+- SDKROOT
 
 # Dependencies
 deps:

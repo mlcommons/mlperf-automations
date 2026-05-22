@@ -58,3 +58,7 @@ No script specific inputs
 | `--hf_token` | Huggingface Token |  | `` |
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
+
+### Ungrouped
+
+- `version.#` _(# can be substituted dynamically)_
