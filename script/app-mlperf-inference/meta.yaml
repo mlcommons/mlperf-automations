@@ -338,6 +338,7 @@ variations:
   cuda:
     docker:
       all_gpus: 'yes'
+      system_site_packages: 'yes'
       deps:
       - tags: get,nvidia-docker
         skip_if_env:
@@ -1434,6 +1435,26 @@ variations:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
       MLC_MLPERF_INFERENCE_VERSION: '5.1'
+  r6.0_default:
+    group: reproducibility
+    add_deps_recursive:
+      nvidia-inference-common-code:
+        tags: _mlcommons,_v6.0
+      nvidia-inference-server:
+        version: r6.0
+        tags: _mlcommons
+        env:
+          MLC_MAKE_BUILD_COMMAND: link_dirs build_harness
+      nvidia-harness:
+        tags: _v6.0
+      nvidia-scratch-space:
+        tags: _version.6.0
+      pycuda:
+        version_min: '2024.1'
+    default_env:
+      MLC_SKIP_SYS_UTILS: 'yes'
+      MLC_REGENERATE_MEASURE_FILES: 'yes'
+      MLC_MLPERF_INFERENCE_VERSION: '6.0'
   r6.0-dev_default:
     default: true
     group: reproducibility
@@ -2055,6 +2076,16 @@ variations:
       - tags: get,dataset,preprocessed,openorca,_validation,_mlcommons,_nvidia
     env:
       BUILD_TRTLLM: 1
+  nvidia-original,r6.0_default:
+    docker:
+      os_version: '24.04'
+      user: ubuntu
+      build_deps:
+      - tags: detect,os
+      image_name: mlperf-inference-nvidia-v6.0-common
+      build_env:
+        ENV: release
+      base_image: nvcr.io/nvidia/pytorch:25.12-py3
   nvidia-original,r6.0-dev_default:
     env:
       MLC_NVIDIA_MITTEN_FROM_SRC: 'yes'
@@ -2295,7 +2326,7 @@ docker:
   extra_run_args: ' --cap-add SYS_ADMIN  --cap-add SYS_TIME --security-opt apparmor=unconfined --security-opt seccomp=unconfined'
   use_google_dns: true
   os: ubuntu
-  user: mlcuser
+  user: ubuntu
   mlc_repo: mlcommons@mlperf-automations
   mlc_repo_branch: dev
   real_run: false

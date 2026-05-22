@@ -64,11 +64,15 @@ No script specific inputs
 - `custom-config`
 - `default-config` (default)
 
+### Install-mode
+
+- `path.#` _(# can be substituted dynamically)_
+
 ### Repo
 
 - `url.#` _(# can be substituted dynamically)_
-- `url.facebook` (default)
-- `url.official`
+- `url.facebook`
+- `url.official` (default)
 
 ### Ungrouped
 

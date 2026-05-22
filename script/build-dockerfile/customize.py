@@ -318,7 +318,10 @@ def preprocess(i):
 
     docker_use_virtual_python = env.get('MLC_DOCKER_USE_VIRTUAL_PYTHON', "yes")
     if not is_false(docker_use_virtual_python):
-        f.write('RUN {} -m venv $HOME/venv/mlcflow'.format(python) + " " + EOL)
+        venv_flags = ''
+        if is_true(env.get('MLC_DOCKER_SYSTEM_SITE_PACKAGES', '')):
+            venv_flags = ' --system-site-packages'
+        f.write('RUN {} -m venv{} $HOME/venv/mlcflow'.format(python, venv_flags) + " " + EOL)
         f.write('ENV PATH="$HOME/venv/mlcflow/bin:$PATH"' + EOL)
     # f.write('RUN . /opt/venv/mlc/bin/activate' + EOL)
 
@@ -366,7 +369,8 @@ def preprocess(i):
                     continue
                 dest = os.path.join(host_repos_context, item)
                 logger.info(f"Copying host repo {item} to build context")
-                shutil.copytree(item_path, dest)
+                shutil.copytree(item_path, dest, symlinks=True,
+                                ignore_dangling_symlinks=True)
                 copied_repos.append(item)
 
             if copied_repos:

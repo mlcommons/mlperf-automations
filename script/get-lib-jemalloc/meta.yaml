@@ -2,27 +2,20 @@ alias: get-lib-jemalloc
 uid: 406439a446e04fb7
 automation_alias: script
 automation_uid: 5b4e0237da074764
-
-# Metadata
 category: Detection or installation of tools and artifacts
 tags:
 - get
 - lib
 - lib-jemalloc
 - jemalloc
-
-# Cache
 cache: true
-
-# Environment
 new_env_keys:
 - MLC_JEMALLOC_PATH
 - MLC_JEMALLOC_LIB_PATH
 - MLC_JEMALLOC_VERSION
 - +LD_LIBRARY_PATH
+- MLC_DEPENDENT_CACHED_PATH
 new_state_keys: []
-
-# Dependencies
 deps:
 - tags: get,git,repo
   env:
@@ -30,6 +23,7 @@ deps:
     MLC_GIT_REPO_VERSION_ENV_NAME: MLC_JEMALLOC_VERSION
   force_env_keys:
   - MLC_GIT_*
+  - MLC_OUTDIRNAME
   update_tags_from_env_with_prefix:
     _branch.:
     - MLC_GIT_CHECKOUT
@@ -44,15 +38,22 @@ deps:
   names:
   - jemalloc-repo
   extra_cache_tags: jemalloc,repo,jemalloc-repo
+  skip_if_env:
+    MLC_JEMALLOC_LIB_PATH_PROVIDED:
+    - 'yes'
 - tags: get,generic-sys-util,_autoconf
+  skip_if_env:
+    MLC_JEMALLOC_LIB_PATH_PROVIDED:
+    - 'yes'
 - tags: get,generic-sys-util,_build-essential
   env:
     MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
+  skip_if_env:
+    MLC_JEMALLOC_LIB_PATH_PROVIDED:
+    - 'yes'
 prehook_deps: []
 posthook_deps: []
 post_deps: []
-
-# Variations
 variations:
   custom-config:
     group: config
@@ -65,12 +66,12 @@ variations:
       MLC_GIT_URL: '#'
   url.facebook:
     group: repo
-    default: true
     env:
       MLC_GIT_URL: https://github.com/facebook/jemalloc.git
       MLC_JEMALLOC_VERSION_PREFIX: facebook-dev
   url.official:
     group: repo
+    default: true
     env:
       MLC_GIT_URL: https://github.com/jemalloc/jemalloc.git
       MLC_JEMALLOC_VERSION_PREFIX: jemalloc-dev
@@ -87,26 +88,36 @@ variations:
     - custom-config
     env:
       MLC_JEMALLOC_PROF: true
+      +MLC_INSTALL_SUFFIX_TAGS:
+      - prof
   enable-stats:
     base:
     - custom-config
     env:
       MLC_JEMALLOC_STATS: true
+      +MLC_INSTALL_SUFFIX_TAGS:
+      - stats
   lg-hugepage.#:
     base:
     - custom-config
     env:
       MLC_JEMALLOC_LG_HUGEPAGE: '#'
+      +MLC_INSTALL_SUFFIX_TAGS:
+      - lg-hugepage-#
   lg-page.#:
     base:
     - custom-config
     env:
       MLC_JEMALLOC_LG_PAGE: '#'
+      +MLC_INSTALL_SUFFIX_TAGS:
+      - lg-page-#
   lg-quantum.#:
     base:
     - custom-config
     env:
       MLC_JEMALLOC_LG_QUANTUM: '#'
+      +MLC_INSTALL_SUFFIX_TAGS:
+      - lg-quantum-#
   sha.#:
     env:
       MLC_GIT_SHA: '#'
@@ -116,8 +127,11 @@ variations:
   version.official:
     base:
     - url.official
-
-# Tests
+  path.#:
+    group: install-mode
+    env:
+      MLC_JEMALLOC_LIB_PATH: '#'
+      MLC_JEMALLOC_LIB_PATH_PROVIDED: 'yes'
 tests:
   run_inputs:
   - variations_list:

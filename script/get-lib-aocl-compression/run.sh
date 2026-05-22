@@ -1,4 +1,10 @@
 #!/bin/bash
+
+# Skip when user-provided library path is supplied (path.# variation)
+if [[ "${MLC_AOCL_LIB_PATH_PROVIDED}" == "yes" ]]; then
+    echo "User-provided library path mode - skipping build"
+    exit 0
+fi
 # Skip build for binary download
 if [[ "${MLC_AOCL_BINARY_DOWNLOAD}" == "yes" ]]; then
     echo "Binary download mode - skipping build"
@@ -10,11 +16,18 @@ if [[ -z ${MLC_AOCL_COMPRESSION_SRC_PATH} ]]; then
     exit 1
 fi
 
+# Determine install prefix
+AOCL_VERSION="${MLC_AOCL_COMPRESSION_VERSION:-${MLC_GIT_CHECKOUT:-unknown}}"
+if [[ -n "${MLC_OUTDIRNAME}" ]]; then
+    INSTALL_PREFIX="${MLC_OUTDIRNAME}/aocl-compression/${AOCL_VERSION}"
+else
+    INSTALL_PREFIX="${MLC_AOCL_COMPRESSION_SRC_PATH}/install"
+fi
 cd ${MLC_AOCL_COMPRESSION_SRC_PATH}
 mkdir -p build && cd build
 
 cmake .. \
-    -DCMAKE_INSTALL_PREFIX=${MLC_AOCL_COMPRESSION_SRC_PATH}/install \
+    -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
     -DCMAKE_BUILD_TYPE=Release \
     ${MLC_CMAKE_EXTRA_FLAGS}
 test $? -eq 0 || exit $?
