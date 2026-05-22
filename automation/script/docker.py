@@ -207,7 +207,7 @@ def dockerfile(self_module, input_params):
     if dockerfile_result['return'] > 0:
         return dockerfile_result
 
-    #logger.info(f"Dockerfile generated at {dockerfile_path}")
+    # logger.info(f"Dockerfile generated at {dockerfile_path}")
 
     return {'return': 0}
 

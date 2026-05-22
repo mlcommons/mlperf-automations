@@ -167,12 +167,15 @@ def get_valid_models(mlperf_version, mlperf_path, env):
 
     if submission_checker_modularised:
         # Remove a stale submission_checker.py that would shadow the package
-        stale_checker = os.path.join(submission_checker_root, "submission_checker.py")
+        stale_checker = os.path.join(
+            submission_checker_root,
+            "submission_checker.py")
         if os.path.isfile(stale_checker):
             os.remove(stale_checker)
         # Clear any previously cached (non-package) submission_checker module
         for _key in list(sys.modules.keys()):
-            if _key == 'submission_checker' or _key.startswith('submission_checker.'):
+            if _key == 'submission_checker' or _key.startswith(
+                    'submission_checker.'):
                 del sys.modules[_key]
         # Insert at the front so the correct package path wins
         sys.path.insert(0, submission_checker_root)

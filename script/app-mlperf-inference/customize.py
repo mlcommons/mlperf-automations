@@ -385,28 +385,35 @@ def postprocess(i):
             max_retries = int(env.get('MLC_MLPERF_VALID_RERUN_MAX', '2'))
             if retry_count < max_retries:
                 retry_count += 1
-                logger.warning(f"Performance result is INVALID. Automatically rerunning with adjusted parameters (attempt {retry_count}/{max_retries})...")
+                logger.warning(
+                    f"Performance result is INVALID. Automatically rerunning with adjusted parameters (attempt {retry_count}/{max_retries})...")
 
                 rerun_env = copy.deepcopy(env)
 
                 if scenario == "Server":
-                    # Use loadgen's FindPeakPerformance mode to discover the optimal QPS
-                    logger.info("Using loadgen FindPeakPerformance mode to discover optimal Server target QPS...")
-                    extra_opts = rerun_env.get('MLC_MLPERF_LOADGEN_EXTRA_OPTIONS', '')
+                    # Use loadgen's FindPeakPerformance mode to discover the
+                    # optimal QPS
+                    logger.info(
+                        "Using loadgen FindPeakPerformance mode to discover optimal Server target QPS...")
+                    extra_opts = rerun_env.get(
+                        'MLC_MLPERF_LOADGEN_EXTRA_OPTIONS', '')
                     if '--find-peak-performance' not in extra_opts:
-                        rerun_env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] = extra_opts + ' --find-peak-performance '
+                        rerun_env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] = extra_opts + \
+                            ' --find-peak-performance '
                 elif scenario == "Offline":
                     # For Offline, reduce target QPS to 90% of measured
                     measured_value = float(result)
                     adjusted_value = str(round(measured_value, 3))
-                    logger.info(f"Adjusting target_qps from measured {result} to {adjusted_value} (90%)")
+                    logger.info(
+                        f"Adjusting target_qps from measured {result} to {adjusted_value} (90%)")
                     rerun_env['MLC_MLPERF_LOADGEN_TARGET_QPS'] = adjusted_value
                     rerun_env['MLC_MLPERF_LOADGEN_OFFLINE_TARGET_QPS'] = adjusted_value
                 elif scenario.endswith("Stream"):
                     # For Stream, increase target latency to 110% of measured
                     measured_value = float(result)
                     adjusted_value = str(round(measured_value, 3))
-                    logger.info(f"Adjusting target_latency from measured {result} ms to {adjusted_value} ms (110%)")
+                    logger.info(
+                        f"Adjusting target_latency from measured {result} ms to {adjusted_value} ms (110%)")
                     rerun_env['MLC_MLPERF_LOADGEN_TARGET_LATENCY'] = adjusted_value
                     if scenario == "SingleStream":
                         rerun_env['MLC_MLPERF_LOADGEN_SINGLESTREAM_TARGET_LATENCY'] = adjusted_value
@@ -436,13 +443,14 @@ def postprocess(i):
 
                 # Update state with results from the rerun
                 if 'new_state' in r:
-                    for key in ['mlc-mlperf-inference-results', 'mlc-mlperf-inference-results-last']:
+                    for key in ['mlc-mlperf-inference-results',
+                                'mlc-mlperf-inference-results-last']:
                         if key in r['new_state']:
                             state[key] = r['new_state'][key]
                 return {'return': 0}
             else:
-                logger.warning(f"Performance result is INVALID after {max_retries} rerun attempt(s). Giving up.")
-
+                logger.warning(
+                    f"Performance result is INVALID after {max_retries} rerun attempt(s). Giving up.")
 
         # Record basic host info
         host_info = {
@@ -675,14 +683,19 @@ def postprocess(i):
 
         # Automatic rerun for compliance if check failed
         if not is_valid and env.get('MLC_MLPERF_RUN_STYLE', '') == 'valid':
-            retry_count = int(env.get('MLC_MLPERF_COMPLIANCE_RERUN_COUNT', '0'))
+            retry_count = int(
+                env.get(
+                    'MLC_MLPERF_COMPLIANCE_RERUN_COUNT',
+                    '0'))
             max_retries = int(env.get('MLC_MLPERF_COMPLIANCE_RERUN_MAX', '3'))
             if retry_count < max_retries:
                 retry_count += 1
-                logger.warning(f"Compliance {test} check FAILED. Automatically rerunning (attempt {retry_count}/{max_retries})...")
+                logger.warning(
+                    f"Compliance {test} check FAILED. Automatically rerunning (attempt {retry_count}/{max_retries})...")
 
                 rerun_env = copy.deepcopy(env)
-                rerun_env['MLC_MLPERF_COMPLIANCE_RERUN_COUNT'] = str(retry_count)
+                rerun_env['MLC_MLPERF_COMPLIANCE_RERUN_COUNT'] = str(
+                    retry_count)
                 # Remove cached output path so a fresh run is triggered
                 rerun_env.pop('MLC_MLPERF_OUTPUT_DIR', None)
 
@@ -705,12 +718,14 @@ def postprocess(i):
 
                 # Update state with results from the rerun
                 if 'new_state' in r:
-                    for key in ['mlc-mlperf-inference-results', 'mlc-mlperf-inference-results-last']:
+                    for key in ['mlc-mlperf-inference-results',
+                                'mlc-mlperf-inference-results-last']:
                         if key in r['new_state']:
                             state[key] = r['new_state'][key]
                 return {'return': 0}
             else:
-                logger.warning(f"Compliance {test} FAILED after {max_retries} rerun attempt(s). Giving up.")
+                logger.warning(
+                    f"Compliance {test} FAILED after {max_retries} rerun attempt(s). Giving up.")
 
     # portion of the code where the avg utilisation and system informations are extracted
     # NOTE: The section is under development and print statements are added
