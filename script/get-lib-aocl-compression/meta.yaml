@@ -2,6 +2,8 @@ alias: get-lib-aocl-compression
 uid: a3200df6015e4b0a
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: Detection or installation of tools and artifacts
 tags:
 - get
@@ -9,12 +11,20 @@ tags:
 - lib-aocl-compression
 - aocl-compression
 - aocl
+
+# Cache
 cache: true
+
+# Environment
+default_env:
+  MLC_AOCL_ACCEPT_EULA: 'no'
 new_env_keys:
 - MLC_AOCL_COMPRESSION_SRC_PATH
 - MLC_AOCL_COMPRESSION_BUILD_PATH
 - MLC_AOCL_COMPRESSION_INSTALL_PATH
 - MLC_AOCL_COMPRESSION_LIB_PATH
+- MLC_AOCL_COMPRESSION_VERSION
+- MLC_DEPENDENT_CACHED_PATH
 - +LD_LIBRARY_PATH
 - +LIBRARY_PATH
 - +C_INCLUDE_PATH
@@ -22,15 +32,31 @@ new_env_keys:
 - MLC_AOCL_BINARY_INSTALL_PATH
 - MLC_AOCL_COMPRESSION_BINARY_PATH
 new_state_keys: []
+
+# Input mapping
+input_mapping:
+  accept_eula: MLC_AOCL_ACCEPT_EULA
+input_description:
+  accept_eula:
+    desc: Accept the AMD EULA for binary downloads (yes/no)
+
+# Dependencies
 deps:
 - tags: get,cmake
-  skip_if_env:
+  skip_if_any_env:
     MLC_AOCL_BINARY_DOWNLOAD:
     - 'yes'
+    MLC_AOCL_LIB_PATH_PROVIDED:
+    - 'yes'
 - tags: detect,cpu
-- tags: get,utils,aocl-utils
   skip_if_env:
+    MLC_AOCL_LIB_PATH_PROVIDED:
+    - 'yes'
+- tags: get,utils,aocl-utils
+  skip_if_any_env:
     MLC_AOCL_BINARY_DOWNLOAD:
+    - 'yes'
+    MLC_AOCL_LIB_PATH_PROVIDED:
     - 'yes'
 - tags: get,git,repo
   names:
@@ -38,8 +64,10 @@ deps:
   extra_cache_tags: aocl-compression,repo,aocl-compression-repo
   env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_AOCL_COMPRESSION_SRC_PATH
+    MLC_GIT_REPO_VERSION_ENV_NAME: MLC_AOCL_COMPRESSION_VERSION
   force_env_keys:
   - MLC_GIT_*
+  - MLC_OUTDIRNAME
   update_tags_from_env_with_prefix:
     _branch.:
     - MLC_GIT_CHECKOUT
@@ -47,17 +75,28 @@ deps:
     - MLC_GIT_REPO_URL
     _tag.:
     - MLC_GIT_CHECKOUT_TAG
-  skip_if_env:
+  skip_if_any_env:
     MLC_AOCL_BINARY_DOWNLOAD:
     - 'yes'
+    MLC_AOCL_LIB_PATH_PROVIDED:
+    - 'yes'
+
+# Variations
 variations:
-  branch.#:
+  path.#:
+    group: install-mode
     env:
-      MLC_GIT_CHECKOUT: '#'
-  tag.#:
+      MLC_AOCL_COMPRESSION_LIB_PATH: '#'
+      MLC_AOCL_LIB_PATH_PROVIDED: 'yes'
+  binary.aocc:
     env:
-      MLC_GIT_CHECKOUT_TAG: '#'
-    group: version
+      MLC_AOCL_BINARY_COMPILER: aocc
+    group: binary-compiler
+    default: true
+  binary.gcc:
+    env:
+      MLC_AOCL_BINARY_COMPILER: gcc
+    group: binary-compiler
   repo.#:
     env:
       MLC_GIT_REPO_URL: '#'
@@ -67,6 +106,26 @@ variations:
     env:
       MLC_GIT_REPO_URL: https://github.com/amd/aocl-compression.git
     group: repo
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  version.5.2:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT: '5.2'
+      MLC_AOCL_BINARY_VERSION: 5.2.0
+      MLC_AOCL_BINARY_VERSION_PATH: 5-2
+  version.5.2.0:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT: '5.2'
+      MLC_AOCL_BINARY_VERSION: 5.2.0
+      MLC_AOCL_BINARY_VERSION_PATH: 5-2
+  amd-main:
+    env:
+      MLC_GIT_CHECKOUT: amd-main
   binary:
     env:
       MLC_AOCL_BINARY_DOWNLOAD: 'yes'
@@ -90,31 +149,11 @@ variations:
       - MLC_OUTDIRNAME
     default-variations:
       version: version.5.2.0
-  binary.aocc:
+  branch.#:
     env:
-      MLC_AOCL_BINARY_COMPILER: aocc
-    group: binary-compiler
-    default: true
-  binary.gcc:
-    env:
-      MLC_AOCL_BINARY_COMPILER: gcc
-    group: binary-compiler
-  version.5.2:
-    default: true
-    group: version
-    env:
-      MLC_GIT_CHECKOUT: '5.2'
-      MLC_AOCL_BINARY_VERSION: 5.2.0
-      MLC_AOCL_BINARY_VERSION_PATH: 5-2
-  version.5.2.0:
-    group: version
-    env:
-      MLC_GIT_CHECKOUT: '5.2'
-      MLC_AOCL_BINARY_VERSION: 5.2.0
-      MLC_AOCL_BINARY_VERSION_PATH: 5-2
-  amd-main:
-    env:
-      MLC_GIT_CHECKOUT: amd-main
+      MLC_GIT_CHECKOUT: '#'
+
+# Tests
 tests:
   run_inputs:
   - variations_list:
@@ -123,10 +162,3 @@ tests:
     - binary
     env:
       MLC_AOCL_ACCEPT_EULA: 'yes'
-default_env:
-  MLC_AOCL_ACCEPT_EULA: 'no'
-input_mapping:
-  accept_eula: MLC_AOCL_ACCEPT_EULA
-input_description:
-  accept_eula:
-    desc: Accept the AMD EULA for binary downloads (yes/no)

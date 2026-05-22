@@ -54,6 +54,7 @@ mlcr build,dockerfile
 | `--fake_run_option` |  |  | `` |
 | `--file_path` |  |  | `` |
 | `--gh_token` |  |  | `` |
+| `--host_mlc_repos` |  |  | `` |
 | `--image_repo` |  |  | `` |
 | `--image_tag` |  |  | `` |
 | `--mlc_repo` |  |  | `` |
@@ -74,6 +75,9 @@ mlcr build,dockerfile
 | `--run_cmd_extra` |  |  | `` |
 | `--script_tags` |  |  | `` |
 | `--skip_mlc_sys_upgrade` |  |  | `` |
+| `--split_mlc_run_cmd` |  |  | `` |
+| `--system_site_packages` |  |  | `` |
+| `--upload` | Alias for push_image |  | `` |
 | `--user` |  |  | `` |
 ### Generic Script Inputs
 

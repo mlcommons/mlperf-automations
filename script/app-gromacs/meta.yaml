@@ -2,12 +2,19 @@ alias: app-gromacs
 uid: d4e1f2a3b5c6789e
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: HPC Application
 tags:
 - app
 - gromacs
 - hpc
+
+# Cache
 cache: true
+
+# Environment
+default_env: {}
 new_env_keys:
 - MLC_GROMACS_SRC_PATH
 - MLC_GROMACS_INSTALL_PATH
@@ -15,6 +22,8 @@ new_env_keys:
 - +PATH
 - +LD_LIBRARY_PATH
 new_state_keys: []
+
+# Dependencies
 deps:
 - tags: detect,cpu
 - tags: get,generic,sys-util,_libopenmpi-dev
@@ -38,6 +47,8 @@ deps:
 prehook_deps: []
 posthook_deps: []
 post_deps: []
+
+# Variations
 variations:
   repo.#:
     env:
@@ -48,26 +59,27 @@ variations:
     env:
       MLC_GIT_REPO_URL: https://github.com/gromacs/gromacs.git
     group: repo
-  branch.#:
-    env:
-      MLC_GIT_CHECKOUT: '#'
   tag.#:
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
     group: version
+  version.2024.5:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: v2024.5
   version.2025.2:
     default: true
     group: version
     env:
       MLC_GIT_CHECKOUT_TAG: v2025.2
-  version.2024.5:
-    group: version
+  branch.#:
     env:
-      MLC_GIT_CHECKOUT_TAG: v2024.5
+      MLC_GIT_CHECKOUT: '#'
   main:
     env:
       MLC_GIT_CHECKOUT: main
-default_env: {}
+
+# Tests
 tests:
   run_inputs:
   - variations_list:

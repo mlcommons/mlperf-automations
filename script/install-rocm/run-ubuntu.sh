@@ -1,32 +1,67 @@
 #!/bin/bash
-# Make the directory if it doesn't exist yet.
-# This location is recommended by the distribution maintainers.
-sudo mkdir --parents --mode=0755 /etc/apt/keyrings
-# Download the key, convert the signing-key to a full
-# keyring required by apt and store in the keyring directory
-wget https://repo.radeon.com/rocm/rocm.gpg.key -O - | \
-    gpg --dearmor | sudo tee /etc/apt/keyrings/rocm.gpg > /dev/null
+
+# ROCm Runfile Installer for Ubuntu
+# Supports ROCm 7.x via runfile, falls back to package manager for older versions
 
 ubuntuflavor="jammy"
-if [[ ${MLC_HOST_OS_VERSION} == "22.04" ]]; then
+ubuntu_ver="${MLC_HOST_OS_VERSION}"
+if [[ ${ubuntu_ver} == "24.04" ]]; then
+  ubuntuflavor="noble"
+elif [[ ${ubuntu_ver} == "22.04" ]]; then
   ubuntuflavor="jammy"
-elif [[ ${MLC_HOST_OS_VERSION} == "20.04" ]]; then
+elif [[ ${ubuntu_ver} == "20.04" ]]; then
   ubuntuflavor="focal"
 fi
 
-# Kernel driver repository
-deb1="deb [arch=amd64 signed-by=/etc/apt/keyrings/rocm.gpg] https://repo.radeon.com/amdgpu/${MLC_VERSION}/ubuntu ${ubuntuflavor} main"
-echo $deb1 | sudo tee /etc/apt/sources.list.d/amdgpu.list
+major_version="${MLC_VERSION%%.*}"
 
-# ROCm repository
-deb2="deb [arch=amd64 signed-by=/etc/apt/keyrings/rocm.gpg] https://repo.radeon.com/rocm/apt/debian ${ubuntuflavor} main"
-echo $deb2 | sudo tee /etc/apt/sources.list.d/rocm.list
+if [[ ${major_version} -ge 7 ]]; then
+  # ROCm 7.x: Use runfile installer (downloaded via download,file script)
+  runfile_path="${MLC_DOWNLOAD_DOWNLOADED_PATH}"
+  if [[ -z "${runfile_path}" || ! -f "${runfile_path}" ]]; then
+    echo "ERROR: ROCm runfile not found at ${runfile_path}"
+    exit 1
+  fi
 
-# Prefer packages from the rocm repository over system packages
-echo -e 'Package: *\nPin: release o=repo.radeon.com\nPin-Priority: 600' | sudo tee /etc/apt/preferences.d/rocm-pin-600
+  chmod +x "${runfile_path}"
 
-sudo apt update
+  # Install ROCm via runfile
+  install_prefix="${MLC_ROCM_INSTALL_PREFIX:-/}"
 
-sudo apt install amdgpu-dkms
+  echo "Installing ROCm ${MLC_VERSION} via runfile to target=${install_prefix} ..."
+  if [[ "${install_prefix}" == "/" ]]; then
+    sudo bash "${runfile_path}" deps=install target="/" rocm postrocm
+  else
+    # Use untar for non-root installs (no sudo required)
+    # Creates ${install_prefix}/rocm-${MLC_VERSION}/ with all ROCm components
+    bash "${runfile_path}" untar "${install_prefix}"
+  fi
+  test $? -eq 0 || exit 1
 
-sudo apt install rocm-hip-libraries
+else
+  # ROCm 5.x/6.x: Use package manager method
+  sudo mkdir --parents --mode=0755 /etc/apt/keyrings
+  wget https://repo.radeon.com/rocm/rocm.gpg.key -O - | \
+      gpg --dearmor | sudo tee /etc/apt/keyrings/rocm.gpg > /dev/null
+
+  deb1="deb [arch=amd64 signed-by=/etc/apt/keyrings/rocm.gpg] https://repo.radeon.com/amdgpu/${MLC_VERSION}/ubuntu ${ubuntuflavor} main"
+  echo $deb1 | sudo tee /etc/apt/sources.list.d/amdgpu.list
+
+  deb2="deb [arch=amd64 signed-by=/etc/apt/keyrings/rocm.gpg] https://repo.radeon.com/rocm/apt/debian ${ubuntuflavor} main"
+  echo $deb2 | sudo tee /etc/apt/sources.list.d/rocm.list
+
+  echo -e 'Package: *\nPin: release o=repo.radeon.com\nPin-Priority: 600' | sudo tee /etc/apt/preferences.d/rocm-pin-600
+
+  sudo apt update
+
+  if dpkg -l | grep -q "linux-headers-$(uname -r)" 2>/dev/null; then
+    sudo apt install -y amdgpu-dkms
+  fi
+
+  if [[ "${MLC_ROCM_COMPILER_ONLY}" == "yes" ]]; then
+    sudo apt install -y rocm-llvm rocm-device-libs rocminfo
+  else
+    sudo apt install -y rocm-hip-libraries
+  fi
+  test $? -eq 0 || exit 1
+fi

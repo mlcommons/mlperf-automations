@@ -89,6 +89,12 @@ def preprocess(i):
 
             cmake_cmd = f"""cmake {os.path.join(env["MLC_LLVM_SRC_REPO_PATH"], "llvm")} -GNinja -DCMAKE_BUILD_TYPE={llvm_build_type} -DLLVM_ENABLE_PROJECTS={q}{enable_projects}{q} -DLLVM_ENABLE_RUNTIMES={q}{enable_runtimes}{q} -DCMAKE_INSTALL_PREFIX={q}{install_prefix}{q} -DLLVM_ENABLE_RTTI=ON  -DLLVM_INSTALL_UTILS=ON -DLLVM_TARGETS_TO_BUILD={targets_to_build} {cross_compile_options} {target_triple_string} {compiler_rt_target_triple_string} {extra_cmake_options}"""
 
+            # Append custom C/CXX flags if specified via _custom-flags.# variation
+            custom_flags = env.get('MLC_LLVM_CUSTOM_FLAGS', '').strip()
+            if custom_flags:
+                cmake_cmd += f' -DCMAKE_C_FLAGS={q}{custom_flags}{q}'
+                cmake_cmd += f' -DCMAKE_CXX_FLAGS={q}{custom_flags}{q}'
+
             env['MLC_LLVM_CMAKE_CMD'] = cmake_cmd
 
     need_version = env.get('MLC_VERSION', '')

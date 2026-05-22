@@ -103,6 +103,135 @@ jobs:
       run: |
         mlcr run,docker,container --adr.compiler.tags=gcc --docker_mlc_repo=mlcommons@mlperf-automations --docker_mlc_repo_branch=dev --image_name=mlc-script-app-image-classification-onnx-py --env.MLC_DOCKER_RUN_SCRIPT_TAGS=app,image-classification,onnx,python --env.MLC_DOCKER_IMAGE_BASE=ubuntu:22.04 --env.MLC_DOCKER_IMAGE_REPO=local --quiet
 
+    - name: Test docker process_mounts input_mapping fallback (src_path fix)
+      shell: bash
+      run: |
+        python3 << 'PYTEST'
+        import subprocess, re, sys, os
+
+        # Find the automation/script directory via mlc
+        out = subprocess.run(['mlc', 'find', 'script', '--tags=detect,os', '--quiet'],
+                             capture_output=True, text=True)
+        match = re.search(r'Item path:\s*(.+)', out.stdout + out.stderr)
+        if not match:
+            print("ERROR: Could not locate MLC repo via 'mlc find script'")
+            sys.exit(1)
+        repo_root = os.path.dirname(os.path.dirname(match.group(1).strip()))
+        sys.path.insert(0, os.path.join(repo_root, 'automation'))
+
+        from script.docker_utils import process_mounts
+
+        # Test 1: input_mapping in run_state is used as fallback for docker path remapping
+        docker_settings = {'user': 'mlcuser'}
+        mounts = ['${{ MLC_SRC_REPO_PATH }}:${{ MLC_SRC_REPO_PATH }}']
+        env = {'MLC_SRC_REPO_PATH': '/home/user/repos/my-project'}
+        run_state = {
+            'input_mapping': {'src_path': 'MLC_SRC_REPO_PATH'},
+            'file_path_env_keys': [],
+            'folder_path_env_keys': []
+        }
+        f_run_cmd = {'src_path': '/home/user/repos/my-project'}
+
+        result = process_mounts(mounts, env, docker_settings, f_run_cmd, run_state)
+        assert result['return'] == 0, f"process_mounts failed: {result}"
+        assert f_run_cmd['src_path'] != '/home/user/repos/my-project', \
+            f"FAIL: src_path was not remapped to container path! Got: {f_run_cmd['src_path']}"
+        assert '/mlc-mount/' in f_run_cmd['src_path'], \
+            f"FAIL: Expected /mlc-mount/ in remapped path, got: {f_run_cmd['src_path']}"
+        print(f"PASS: src_path correctly remapped to {f_run_cmd['src_path']}")
+
+        # Test 2: without input_mapping, f_run_cmd should not be modified
+        f_run_cmd2 = {'src_path': '/home/user/repos/my-project'}
+        run_state2 = {
+            'input_mapping': {},
+            'file_path_env_keys': [],
+            'folder_path_env_keys': []
+        }
+        mounts2 = ['${{ MLC_SRC_REPO_PATH }}:${{ MLC_SRC_REPO_PATH }}']
+        result2 = process_mounts(mounts2, env, docker_settings, f_run_cmd2, run_state2)
+        assert result2['return'] == 0
+        assert f_run_cmd2['src_path'] == '/home/user/repos/my-project', \
+            f"FAIL: Without input_mapping, src_path should be unchanged, got: {f_run_cmd2['src_path']}"
+        print("PASS: Without input_mapping, src_path stays as host path")
+
+        print("\nAll process_mounts tests passed!")
+        PYTEST
+    - name: Test nested Docker opt-in mount handling
+      shell: bash
+      run: |
+        python - <<'PY'
+        import importlib.util
+        import sys
+        from types import SimpleNamespace
+        from unittest.mock import patch
+
+        sys.path.insert(0, 'automation')
+
+        spec = importlib.util.spec_from_file_location(
+            'run_docker_customize',
+            'script/run-docker-container/customize.py'
+        )
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+
+        logger_messages = []
+        logger = SimpleNamespace(
+            info=lambda *args, **kwargs: logger_messages.append(('info', args)),
+            error=lambda *args, **kwargs: logger_messages.append(('error', args))
+        )
+        DOCKER_ENV_MARKER = '/.dockerenv'
+        DOCKER_SOCKET = '/var/run/docker.sock'
+        DOCKER_BIN = '/usr/bin/docker'
+
+        def run_case(enable_nested, docker_exit_code=0):
+            captured = {'cmd': ''}
+
+            def fake_system(cmd):
+                captured['cmd'] = cmd
+                return docker_exit_code
+
+            def fake_exists(path):
+                if path in [DOCKER_ENV_MARKER, DOCKER_SOCKET, DOCKER_BIN]:
+                    return True
+                return False
+
+            env = {
+                'MLC_CONTAINER_TOOL': 'docker',
+                'MLC_DOCKER_RUN_SCRIPT_TAGS': 'run,docker,container',
+                'MLC_DOCKER_RUN_CMD': 'echo nested-docker-ci-check',
+                'MLC_DOCKER_ENABLE_NESTED': 'yes' if enable_nested else 'no'
+            }
+            i = {
+                'os_info': {'platform': 'linux'},
+                'env': env,
+                'automation': SimpleNamespace(logger=logger)
+            }
+
+            with patch.object(mod.os.path, 'exists', side_effect=fake_exists), \
+                    patch.object(mod.os, 'system', side_effect=fake_system), \
+                    patch.object(mod.shutil, 'which', return_value=DOCKER_BIN):
+                result = mod.postprocess(i)
+
+            return result, captured['cmd']
+
+        enabled_result, enabled_cmd = run_case(True, docker_exit_code=0)
+        disabled_result, disabled_cmd = run_case(False, docker_exit_code=0)
+        failed_result, _ = run_case(True, docker_exit_code=1)
+
+        assert enabled_result['return'] == 0, enabled_result
+        assert disabled_result['return'] == 0, disabled_result
+        error_msg = failed_result.get('error', '').lower()
+        assert failed_result['return'] == 1, failed_result
+        assert 'docker' in error_msg, failed_result
+        assert 'failed' in error_msg, failed_result
+
+        assert f'{DOCKER_SOCKET}:{DOCKER_SOCKET}' in enabled_cmd, enabled_cmd
+        assert f'{DOCKER_BIN}:{DOCKER_BIN}' in enabled_cmd, enabled_cmd
+        assert f'{DOCKER_SOCKET}:{DOCKER_SOCKET}' not in disabled_cmd, disabled_cmd
+        assert f'{DOCKER_BIN}:{DOCKER_BIN}' not in disabled_cmd, disabled_cmd
+        print('Nested Docker opt-in mount handling test passed')
+        PY
+
   test_experiment:
     runs-on: ${{ matrix.os }}
     strategy:

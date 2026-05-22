@@ -11,11 +11,15 @@ tags:
 - aocl
 - aocl-da
 cache: true
+default_env:
+  MLC_AOCL_ACCEPT_EULA: 'no'
 new_env_keys:
 - MLC_AOCL_DA_SRC_PATH
 - MLC_AOCL_DA_BUILD_PATH
 - MLC_AOCL_DA_INSTALL_PATH
 - MLC_AOCL_DA_LIB_PATH
+- MLC_AOCL_DA_VERSION
+- MLC_DEPENDENT_CACHED_PATH
 - +LD_LIBRARY_PATH
 - +LIBRARY_PATH
 - +C_INCLUDE_PATH
@@ -23,27 +27,51 @@ new_env_keys:
 - MLC_AOCL_BINARY_INSTALL_PATH
 - MLC_AOCL_DA_BINARY_PATH
 new_state_keys: []
+input_mapping:
+  accept_eula: MLC_AOCL_ACCEPT_EULA
+input_description:
+  accept_eula:
+    desc: Accept the AMD EULA for binary downloads (yes/no)
 deps:
 - tags: get,cmake
-  skip_if_env:
+  skip_if_any_env:
     MLC_AOCL_BINARY_DOWNLOAD:
+    - 'yes'
+    MLC_AOCL_LIB_PATH_PROVIDED:
+    - 'yes'
+- tags: get,generic,sys-util,_libboost-all-dev
+  skip_if_any_env:
+    MLC_AOCL_BINARY_DOWNLOAD:
+    - 'yes'
+    MLC_AOCL_LIB_PATH_PROVIDED:
     - 'yes'
 - tags: detect,cpu
-- tags: get,utils,aocl-utils
   skip_if_env:
+    MLC_AOCL_LIB_PATH_PROVIDED:
+    - 'yes'
+- tags: get,utils,aocl-utils
+  skip_if_any_env:
     MLC_AOCL_BINARY_DOWNLOAD:
+    - 'yes'
+    MLC_AOCL_LIB_PATH_PROVIDED:
     - 'yes'
 - tags: get,lib,aocl-blis
-  skip_if_env:
+  skip_if_any_env:
     MLC_AOCL_BINARY_DOWNLOAD:
+    - 'yes'
+    MLC_AOCL_LIB_PATH_PROVIDED:
     - 'yes'
 - tags: get,lib,aocl-libflame
-  skip_if_env:
+  skip_if_any_env:
     MLC_AOCL_BINARY_DOWNLOAD:
     - 'yes'
+    MLC_AOCL_LIB_PATH_PROVIDED:
+    - 'yes'
 - tags: get,lib,aocl-sparse
-  skip_if_env:
+  skip_if_any_env:
     MLC_AOCL_BINARY_DOWNLOAD:
+    - 'yes'
+    MLC_AOCL_LIB_PATH_PROVIDED:
     - 'yes'
 - tags: get,git,repo
   names:
@@ -51,8 +79,10 @@ deps:
   extra_cache_tags: aocl-da,repo,aocl-da-repo
   env:
     MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_AOCL_DA_SRC_PATH
+    MLC_GIT_REPO_VERSION_ENV_NAME: MLC_AOCL_DA_VERSION
   force_env_keys:
   - MLC_GIT_*
+  - MLC_OUTDIRNAME
   update_tags_from_env_with_prefix:
     _branch.:
     - MLC_GIT_CHECKOUT
@@ -60,17 +90,21 @@ deps:
     - MLC_GIT_REPO_URL
     _tag.:
     - MLC_GIT_CHECKOUT_TAG
-  skip_if_env:
+  skip_if_any_env:
     MLC_AOCL_BINARY_DOWNLOAD:
     - 'yes'
+    MLC_AOCL_LIB_PATH_PROVIDED:
+    - 'yes'
 variations:
-  branch.#:
+  binary.aocc:
     env:
-      MLC_GIT_CHECKOUT: '#'
-  tag.#:
+      MLC_AOCL_BINARY_COMPILER: aocc
+    group: binary-compiler
+    default: true
+  binary.gcc:
     env:
-      MLC_GIT_CHECKOUT_TAG: '#'
-    group: version
+      MLC_AOCL_BINARY_COMPILER: gcc
+    group: binary-compiler
   repo.#:
     env:
       MLC_GIT_REPO_URL: '#'
@@ -80,6 +114,23 @@ variations:
     env:
       MLC_GIT_REPO_URL: https://github.com/amd/aocl-data-analytics.git
     group: repo
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  version.5.2.0:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT: 5.2.2
+      MLC_AOCL_BINARY_VERSION: 5.2.0
+      MLC_AOCL_BINARY_VERSION_PATH: 5-2
+  version.5.2.2:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT: 5.2.2
+      MLC_AOCL_BINARY_VERSION: 5.2.0
+      MLC_AOCL_BINARY_VERSION_PATH: 5-2
   binary:
     default-variations:
       version: version.5.2.0
@@ -103,28 +154,9 @@ variations:
         - MLC_DAE_URL
       force_env_keys:
       - MLC_OUTDIRNAME
-  binary.aocc:
+  branch.#:
     env:
-      MLC_AOCL_BINARY_COMPILER: aocc
-    group: binary-compiler
-    default: true
-  binary.gcc:
-    env:
-      MLC_AOCL_BINARY_COMPILER: gcc
-    group: binary-compiler
-  version.5.2.2:
-    default: true
-    group: version
-    env:
-      MLC_GIT_CHECKOUT: 5.2.2
-      MLC_AOCL_BINARY_VERSION: 5.2.0
-      MLC_AOCL_BINARY_VERSION_PATH: 5-2
-  version.5.2.0:
-    group: version
-    env:
-      MLC_GIT_CHECKOUT: 5.2.2
-      MLC_AOCL_BINARY_VERSION: 5.2.0
-      MLC_AOCL_BINARY_VERSION_PATH: 5-2
+      MLC_GIT_CHECKOUT: '#'
   main:
     env:
       MLC_GIT_CHECKOUT: main
@@ -136,10 +168,3 @@ tests:
     - binary
     env:
       MLC_AOCL_ACCEPT_EULA: 'yes'
-default_env:
-  MLC_AOCL_ACCEPT_EULA: 'no'
-input_mapping:
-  accept_eula: MLC_AOCL_ACCEPT_EULA
-input_description:
-  accept_eula:
-    desc: Accept the AMD EULA for binary downloads (yes/no)

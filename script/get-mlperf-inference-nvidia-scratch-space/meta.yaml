@@ -57,6 +57,10 @@ variations:
     env:
       MLC_NVIDIA_SCRATCH_SPACE_VERSION: 5_0-dev
     group: version
+  version.6.0:
+    env:
+      MLC_NVIDIA_SCRATCH_SPACE_VERSION: '6.0'
+    group: version
 
 # Versions
 versions: {}

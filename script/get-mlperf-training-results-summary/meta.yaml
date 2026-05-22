@@ -1,0 +1,67 @@
+alias: get-mlperf-training-results-summary
+uid: 15f09cde10a74b9a
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: MLPerf Training
+tags:
+- get
+- mlperf
+- training
+- results
+- summary
+- summary-results
+- results-summary
+
+# Cache
+cache: false
+
+# Environment
+default_env:
+  MLC_MLPERF_TRAINING_RESULTS_REPO_BRANCH: main
+  MLC_MLPERF_TRAINING_RESULTS_REPO_URL: https://github.com/mlcommons/training_results_v4.1
+  MLC_MLPERF_TRAINING_RESULTS_RULESET: 4.1.0
+  MLC_MLPERF_TRAINING_RESULTS_SUMMARY_FILE: summary_results.json
+new_env_keys:
+- MLC_MLPERF_TRAINING_RESULTS_*
+
+# Input mapping
+input_mapping:
+  repo: MLC_MLPERF_TRAINING_RESULTS_REPO_URL
+  repo_branch: MLC_MLPERF_TRAINING_RESULTS_REPO_BRANCH
+  ruleset: MLC_MLPERF_TRAINING_RESULTS_RULESET
+  summary_file: MLC_MLPERF_TRAINING_RESULTS_SUMMARY_FILE
+
+# Dependencies
+deps:
+- names:
+  - python
+  - python3
+  tags: get,python3
+- tags: install,mlperf,logging,from.src
+- env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_MLPERF_TRAINING_RESULTS_PATH
+  extra_cache_tags: mlperf,training,results
+  names:
+  - mlperf-training-results
+  tags: get,git,repo
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_MLPERF_TRAINING_RESULTS_REPO_BRANCH
+    _repo.:
+    - MLC_MLPERF_TRAINING_RESULTS_REPO_URL
+
+# Variations
+variations: {}
+
+# Versions
+versions: {}
+
+# Tests
+tests:
+  run_inputs:
+  - env:
+      MLC_GIT_DEPTH: --depth 1
+      MLC_MLPERF_TRAINING_RESULTS_REPO_URL: https://github.com/mlcommons/training_results_v5.1
+      MLC_MLPERF_TRAINING_RESULTS_RULESET: 5.1.0

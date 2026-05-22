@@ -181,6 +181,7 @@ mlcr run-mlperf,inference
 - `r5.0-dev`
 - `r5.1`
 - `r5.1-dev`
+- `r6.0`
 - `r6.0-dev` (default)
 
 ### Mode

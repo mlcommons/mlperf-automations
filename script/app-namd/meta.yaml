@@ -2,18 +2,34 @@ alias: app-namd
 uid: c9d6e7f8a0b1234d
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: HPC Application
 tags:
 - app
 - namd
 - hpc
+
+# Cache
 cache: true
+
+# Environment
+default_env: {}
 new_env_keys:
 - MLC_NAMD_SRC_PATH
 - MLC_NAMD_INSTALL_PATH
 - MLC_NAMD_BIN_PATH
 - +PATH
 new_state_keys: []
+
+# Input mapping
+input_mapping:
+  namd_tarball_path: MLC_NAMD_TARBALL_PATH
+input_description:
+  namd_tarball_path:
+    desc: Path to a manually downloaded NAMD source tarball (NAMD requires registration at https://www.ks.uiuc.edu/Development/Download/download.cgi?PackageName=NAMD)
+
+# Dependencies
 deps:
 - tags: detect,cpu
 - tags: get,generic,sys-util,_libopenmpi-dev
@@ -37,7 +53,7 @@ deps:
     - MLC_GIT_CHECKOUT_TAG
   skip_if_env:
     MLC_NAMD_TARBALL_PATH:
-    - on
+    - true
 prehook_deps:
 - tags: extract,file
   names:
@@ -49,9 +65,11 @@ prehook_deps:
     MLC_EXTRACT_FINAL_ENV_NAME: MLC_NAMD_SRC_PATH
   enable_if_env:
     MLC_NAMD_TARBALL_PATH:
-    - on
+    - true
 posthook_deps: []
 post_deps: []
+
+# Variations
 variations:
   repo.#:
     env:
@@ -62,31 +80,27 @@ variations:
     env:
       MLC_GIT_REPO_URL: https://gitlab.com/tcbgUIUC/namd.git
     group: repo
-  branch.#:
-    env:
-      MLC_GIT_CHECKOUT: '#'
   tag.#:
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
     group: version
+  version.3.0:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: release-3-0
   version.3.0.1:
     default: true
     group: version
     env:
       MLC_GIT_CHECKOUT_TAG: release-3-0-1
-  version.3.0:
-    group: version
+  branch.#:
     env:
-      MLC_GIT_CHECKOUT_TAG: release-3-0
+      MLC_GIT_CHECKOUT: '#'
   master:
     env:
       MLC_GIT_CHECKOUT: master
-default_env: {}
-input_mapping:
-  namd_tarball_path: MLC_NAMD_TARBALL_PATH
-input_description:
-  namd_tarball_path:
-    desc: Path to a manually downloaded NAMD source tarball (NAMD requires registration at https://www.ks.uiuc.edu/Development/Download/download.cgi?PackageName=NAMD)
+
+# Tests
 tests:
   needs_pat: true
   run_inputs:

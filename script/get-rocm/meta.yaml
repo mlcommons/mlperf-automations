@@ -18,6 +18,7 @@ clean_files: []
 new_env_keys:
 - MLC_ROMLC_*
 - +PATH
+- MLC_ROCM_CPULIBS_PATH
 
 # Dependencies
 prehook_deps:
@@ -26,3 +27,36 @@ prehook_deps:
     - 'yes'
   reuse_version: true
   tags: install,rocm
+  names:
+  - install-rocm
+
+# Variations
+variations:
+  no-runtimes:
+    group: runtimes
+    adr:
+      install-rocm:
+        tags: _no-runtimes
+  with-runtimes:
+    default: true
+    group: runtimes
+    adr:
+      install-rocm:
+        tags: _with-runtimes
+  cpulibs:
+    env:
+      MLC_ROCM_INSTALL_CPULIBS: 'yes'
+    adr:
+      install-rocm:
+        tags: _cpulibs
+  src:
+    env:
+      MLC_ROCM_BUILD_FROM_SRC: 'yes'
+    adr:
+      install-rocm:
+        tags: _src
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list: []

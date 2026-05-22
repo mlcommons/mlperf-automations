@@ -1,10 +1,29 @@
 alias: detect-host-system-details
+uid: dcd80c5fa31d4172
 automation_alias: script
 automation_uid: 5b4e0237da074764
-cache: false
+
+# Metadata
 category: Platform information
+tags:
+- detect
+- host
+- system
+- details
+
+# Cache
+cache: false
 clean_files:
 - tmp-run.out
+
+# Environment
+new_env_keys:
+- MLC_HOST_MEMORY_CONFIGURATION
+- MLC_HOST_STORAGE_TYPE
+- MLC_HOST_NETWORK_CARD_COUNT
+- MLC_HOST_NETWORKING
+
+# Dependencies
 deps:
 - tags: detect,sudo
   skip_if_env:
@@ -14,16 +33,7 @@ deps:
   names:
   - python
   - python3
-new_env_keys:
-- MLC_HOST_MEMORY_CONFIGURATION
-- MLC_HOST_STORAGE_TYPE
-- MLC_HOST_NETWORK_CARD_COUNT
-- MLC_HOST_NETWORKING
+
+# Output / debugging
 print_files_if_script_error:
 - tmp-run.out
-tags:
-- detect
-- host
-- system
-- details
-uid: dcd80c5fa31d4172

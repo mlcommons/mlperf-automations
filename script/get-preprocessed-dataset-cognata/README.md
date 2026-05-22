@@ -74,8 +74,8 @@ No script specific inputs
 
 ### Download-tool
 
-- `r2-downloader`
-- `rclone` (default)
+- `r2-downloader` (default)
+- `rclone`
 
 ### Run-mode
 

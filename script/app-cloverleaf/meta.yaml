@@ -2,18 +2,27 @@ alias: app-cloverleaf
 uid: a7b4c5d6e8f9012b
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: HPC Application
 tags:
 - app
 - cloverleaf
 - hpc
+
+# Cache
 cache: true
+
+# Environment
+default_env: {}
 new_env_keys:
 - MLC_CLOVERLEAF_SRC_PATH
 - MLC_CLOVERLEAF_INSTALL_PATH
 - MLC_CLOVERLEAF_BIN_PATH
 - +PATH
 new_state_keys: []
+
+# Dependencies
 deps:
 - tags: detect,cpu
 - tags: get,generic,sys-util,_libopenmpi-dev
@@ -38,6 +47,8 @@ deps:
 prehook_deps: []
 posthook_deps: []
 post_deps: []
+
+# Variations
 variations:
   repo.#:
     env:
@@ -48,26 +59,27 @@ variations:
     env:
       MLC_GIT_REPO_URL: https://github.com/UK-MAC/CloverLeaf_ref.git
     group: repo
-  branch.#:
-    env:
-      MLC_GIT_CHECKOUT: '#'
   tag.#:
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
     group: version
+  version.1.1:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: v1.1
   version.1.3:
     default: true
     group: version
     env:
       MLC_GIT_CHECKOUT_TAG: v1.3
-  version.1.1:
-    group: version
+  branch.#:
     env:
-      MLC_GIT_CHECKOUT_TAG: v1.1
+      MLC_GIT_CHECKOUT: '#'
   master:
     env:
       MLC_GIT_CHECKOUT: master
-default_env: {}
+
+# Tests
 tests:
   run_inputs:
   - variations_list:

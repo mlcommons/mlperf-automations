@@ -1,0 +1,81 @@
+alias: benchmark-program-fio
+automation_alias: script
+automation_uid: 5b4e0237da074764
+category: Benchmarking
+cache: true
+default_env:
+  MLC_FIO_NUM_RUNS: '3'
+  MLC_FIO_RW: 'randread'
+  MLC_FIO_BS: '4k'
+  MLC_FIO_SIZE: '1G'
+  MLC_FIO_NUMJOBS: '1'
+  MLC_FIO_IODEPTH: '32'
+  MLC_FIO_RUNTIME: '60'
+  MLC_FIO_IOENGINE: 'libaio'
+  MLC_FIO_DIRECT: '1'
+  MLC_FIO_EXTRA_ARGS: ''
+deps:
+- tags: detect,os
+- tags: detect,cpu
+- tags: get,generic-sys-util,_fio
+input_mapping:
+  num_runs: MLC_FIO_NUM_RUNS
+  rw: MLC_FIO_RW
+  bs: MLC_FIO_BS
+  size: MLC_FIO_SIZE
+  numjobs: MLC_FIO_NUMJOBS
+  iodepth: MLC_FIO_IODEPTH
+  runtime: MLC_FIO_RUNTIME
+  ioengine: MLC_FIO_IOENGINE
+  direct: MLC_FIO_DIRECT
+  extra_args: MLC_FIO_EXTRA_ARGS
+  results_dir: MLC_FIO_RESULTS_DIR
+  test_file: MLC_FIO_TEST_FILE
+  reuse_logs: MLC_FIO_REUSE_LOGS
+new_env_keys:
+- MLC_FIO_*
+tags:
+- benchmark
+- fio
+- storage
+- io
+- benchmark-fio
+- benchmark-program-fio
+uid: a1b2c3d4e5f60005
+variations:
+  randread:
+    default: true
+    env:
+      MLC_FIO_RW: 'randread'
+    group: workload
+  randwrite:
+    env:
+      MLC_FIO_RW: 'randwrite'
+    group: workload
+  seqread:
+    env:
+      MLC_FIO_RW: 'read'
+    group: workload
+  seqwrite:
+    env:
+      MLC_FIO_RW: 'write'
+    group: workload
+  randrw:
+    env:
+      MLC_FIO_RW: 'randrw'
+    group: workload
+
+tests:
+  run_inputs:
+  - variations_list:
+    - randread
+    env:
+      MLC_FIO_NUM_RUNS: '1'
+      MLC_FIO_SIZE: '64M'
+      MLC_FIO_RUNTIME: '10'
+  - variations_list:
+    - seqread
+    env:
+      MLC_FIO_NUM_RUNS: '1'
+      MLC_FIO_SIZE: '64M'
+      MLC_FIO_RUNTIME: '10'

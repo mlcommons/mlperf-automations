@@ -2,12 +2,21 @@ alias: app-wrf
 uid: 6c8e5d3b2a1f4907
 automation_alias: script
 automation_uid: 5b4e0237da074764
+
+# Metadata
 category: HPC Application
 tags:
 - app
 - wrf
 - hpc
+
+# Cache
 cache: true
+
+# Environment
+default_env:
+  MLC_WRF_BUILD_TYPE: em_real
+  MLC_WRF_NESTING: '1'
 new_env_keys:
 - MLC_WRF_SRC_PATH
 - MLC_WRF_INSTALL_PATH
@@ -15,6 +24,18 @@ new_env_keys:
 - +PATH
 - +LD_LIBRARY_PATH
 new_state_keys: []
+
+# Input mapping
+input_mapping:
+  build_type: MLC_WRF_BUILD_TYPE
+  nesting: MLC_WRF_NESTING
+input_description:
+  build_type:
+    desc: WRF build type (default is em_real)
+  nesting:
+    desc: WRF nesting option (default is 1 for basic)
+
+# Dependencies
 deps:
 - tags: detect,cpu
 - tags: get,generic,sys-util,_libopenmpi-dev
@@ -44,6 +65,8 @@ deps:
 prehook_deps: []
 posthook_deps: []
 post_deps: []
+
+# Variations
 variations:
   repo.#:
     env:
@@ -54,13 +77,14 @@ variations:
     env:
       MLC_GIT_REPO_URL: https://github.com/wrf-model/WRF.git
     group: repo
-  branch.#:
-    env:
-      MLC_GIT_CHECKOUT: '#'
   tag.#:
     env:
       MLC_GIT_CHECKOUT_TAG: '#'
     group: version
+  version.4.4:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: v4.4
   version.4.6.1:
     default: true
     group: version
@@ -70,24 +94,14 @@ variations:
     group: version
     env:
       MLC_GIT_CHECKOUT_TAG: v4.7.1
-  version.4.4:
-    group: version
+  branch.#:
     env:
-      MLC_GIT_CHECKOUT_TAG: v4.4
+      MLC_GIT_CHECKOUT: '#'
   master:
     env:
       MLC_GIT_CHECKOUT: master
-default_env:
-  MLC_WRF_BUILD_TYPE: em_real
-  MLC_WRF_NESTING: '1'
-input_mapping:
-  build_type: MLC_WRF_BUILD_TYPE
-  nesting: MLC_WRF_NESTING
-input_description:
-  build_type:
-    desc: WRF build type (default is em_real)
-  nesting:
-    desc: WRF nesting option (default is 1 for basic)
+
+# Tests
 tests:
   run_inputs:
   - variations_list:
