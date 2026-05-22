@@ -37,10 +37,9 @@ jobs:
         cat ~/.ssh/id_ed25519.pub >> ~/.ssh/authorized_keys
         chmod 600 ~/.ssh/authorized_keys
         ssh-keyscan -H localhost >> ~/.ssh/known_hosts
-        # Verify SSH to localhost works
         ssh -o BatchMode=yes localhost "echo SSH_OK"
 
-    - name: Test remote pre_run_cmds and post_run_cmds
+    - name: Test pre_run_cmds and post_run_cmds (direct)
       run: |
         mlcr remote,run,cmds,ssh \
           --host=localhost \
@@ -49,19 +48,17 @@ jobs:
           --pre_run_cmds,="echo PRE_RUN_EXECUTED > /tmp/pre_run_test.txt" \
           --post_run_cmds,="echo POST_RUN_EXECUTED > /tmp/post_run_test.txt"
 
-        # Verify pre_run_cmds executed
         test -f /tmp/pre_run_test.txt
         grep -q "PRE_RUN_EXECUTED" /tmp/pre_run_test.txt
         echo "pre_run_cmds: PASSED"
 
-        # Verify post_run_cmds executed
         test -f /tmp/post_run_test.txt
         grep -q "POST_RUN_EXECUTED" /tmp/post_run_test.txt
         echo "post_run_cmds: PASSED"
 
-    - name: Test remote_pre_run_cmds via remote_run
+    - name: Test remote_pre_run_cmds and remote_post_run_cmds via mlcrr
       run: |
-        mlcr detect,os \
+        mlcrr detect,os \
           --remote_host=localhost \
           --remote_ssh_key_file=~/.ssh/id_ed25519 \
           --remote_pre_run_cmds,="echo REMOTE_PRE_RAN > /tmp/remote_pre_test.txt" \
@@ -69,23 +66,19 @@ jobs:
 
         test -f /tmp/remote_pre_test.txt
         grep -q "REMOTE_PRE_RAN" /tmp/remote_pre_test.txt
-        echo "remote_pre_run_cmds via remote_run: PASSED"
+        echo "remote_pre_run_cmds via mlcrr: PASSED"
 
         test -f /tmp/remote_post_test.txt
         grep -q "REMOTE_POST_RAN" /tmp/remote_post_test.txt
-        echo "remote_post_run_cmds via remote_run: PASSED"
+        echo "remote_post_run_cmds via mlcrr: PASSED"
 
-    - name: Test remote_copy_mlc_repos with custom MLC_REPOS path
+    - name: Test remote_copy_mlc_repos
       run: |
-        # Use a random-ish path for MLC_REPOS on the "remote"
-        export CUSTOM_REPOS_PATH="/tmp/custom-mlc-repos-$(date +%s)"
-        mkdir -p "$CUSTOM_REPOS_PATH"
-
         # Create a dummy repo to copy
         mkdir -p ~/MLC/repos/test-dummy-repo
         echo "DUMMY_CONTENT" > ~/MLC/repos/test-dummy-repo/marker.txt
 
-        mlcr detect,os \
+        mlcrr detect,os \
           --remote_host=localhost \
           --remote_ssh_key_file=~/.ssh/id_ed25519 \
           --remote_copy_mlc_repos,=test-dummy-repo
