@@ -45,9 +45,9 @@ deps:
 variations:
   default:
     group: numpy-patch
+    default: true
   patched:
     group: numpy-patch
-    default: true
     adr:
       nvidia-mitten-git-src:
         tags: _patch

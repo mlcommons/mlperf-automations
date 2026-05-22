@@ -162,6 +162,7 @@ def dockerfile(self_module, input_params):
     mlc_docker_input = {
         'action': 'run', 'automation': 'script', 'tags': 'build,dockerfile',
         'fake_run_option': " " if docker_inputs.get('real_run') else " --fake_run",
+        'system_site_packages': docker_inputs.get('system_site_packages', False),
         'comments': comments, 'run_cmd': f"{run_command_string} --quiet",
         'script_tags': input_params.get('tags'),
         'env': env,
@@ -206,7 +207,7 @@ def dockerfile(self_module, input_params):
     if dockerfile_result['return'] > 0:
         return dockerfile_result
 
-    logger.info(f"Dockerfile generated at {dockerfile_path}")
+    # logger.info(f"Dockerfile generated at {dockerfile_path}")
 
     return {'return': 0}
 
