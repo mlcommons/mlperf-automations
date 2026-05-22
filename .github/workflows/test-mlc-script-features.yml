@@ -1,7 +1,7 @@
 name: MLC script automation features test
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlc-script-features.yml'
@@ -58,7 +58,7 @@ jobs:
         mlcr get,wkhtmltopdf --quiet
 
     - name: Test versions
-      if: runner.os == 'linux' && matrix.python-version == '3.8'
+      if: runner.os == 'Linux' && matrix.python-version == '3.8'
       run: |
         mlcr get,generic-python-lib,_package.scipy --version=1.9.3 --quiet
         test $? -eq 0 || exit $?
@@ -596,7 +596,7 @@ jobs:
         mlc pull repo "$REPO" --branch="$BRANCH"
 
     - name: Test version_min option
-      if: runner.os == 'linux'
+      if: runner.os == 'Linux'
       shell: bash
       run: |
         # Install a specific version first
@@ -606,7 +606,7 @@ jobs:
         echo "PASS: version_min accepted a version above the minimum"
 
     - name: Test version_max option
-      if: runner.os == 'linux'
+      if: runner.os == 'Linux'
       shell: bash
       run: |
         # Using version_max should constrain the accepted version
