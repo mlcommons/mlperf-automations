@@ -37,6 +37,18 @@ def preprocess(i):
     env['+ FFLAGS'] = list(set(env['+ FFLAGS']))
     env['+ LDFLAGS'] = list(set(env['+ LDFLAGS']))
 
+    if os_info['platform'] == 'darwin' and env.get('MLC_COMPILER_FAMILY', '') == 'LLVM':
+        try:
+            sdkroot = subprocess.check_output(
+                ["xcrun", "--show-sdk-path"], text=True).strip()
+            if sdkroot:
+                env['SDKROOT'] = sdkroot
+                env['+ CFLAGS'] += ['-isysroot', sdkroot]
+                env['+ CXXFLAGS'] += ['-isysroot', sdkroot]
+                env['+ LDFLAGS'] += ['-isysroot', sdkroot]
+        except Exception:
+            pass
+
     sys_cmd = "cpp -v /dev/null -o /dev/null 2>&1"
     result = subprocess.check_output(sys_cmd, shell=True).decode("utf-8")
     start = False
