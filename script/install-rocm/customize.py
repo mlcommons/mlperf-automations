@@ -96,9 +96,11 @@ def preprocess(i):
                 env['MLC_ROCM_RUNFILE_NAME'] = runfile_name
                 env['MLC_ROCM_USE_RUNFILE'] = 'yes'
             else:
-                return {'return': 1, 'error': f'Could not find ROCm runfile installer at {runfile_base_url}'}
+                return {
+                    'return': 1, 'error': f'Could not find ROCm runfile installer at {runfile_base_url}'}
         except Exception as e:
-            return {'return': 1, 'error': f'Failed to fetch ROCm runfile listing from {runfile_base_url}: {e}'}
+            return {
+                'return': 1, 'error': f'Failed to fetch ROCm runfile listing from {runfile_base_url}: {e}'}
 
     return {'return': 0}
 
@@ -109,12 +111,15 @@ def postprocess(i):
 
     # Source build: look for clang in install dir, create amdclang symlinks
     if env.get('MLC_ROCM_BUILD_FROM_SRC', '') == 'yes':
-        install_dir = env.get('MLC_ROCM_INSTALL_PREFIX', os.path.join(os.getcwd(), 'install'))
+        install_dir = env.get(
+            'MLC_ROCM_INSTALL_PREFIX', os.path.join(
+                os.getcwd(), 'install'))
         bin_dir = os.path.join(install_dir, 'bin')
 
         clang_path = os.path.join(bin_dir, 'clang')
         if not os.path.isfile(clang_path):
-            return {'return': 1, 'error': f'ROCm LLVM build failed: clang not found at {clang_path}'}
+            return {
+                'return': 1, 'error': f'ROCm LLVM build failed: clang not found at {clang_path}'}
 
         # Create amdclang symlinks
         symlinks = {
@@ -130,7 +135,10 @@ def postprocess(i):
                 print(f'  Created symlink: {link_name} -> {target}')
 
         env['MLC_ROMLC_INSTALLED_PATH'] = bin_dir
-        env['MLC_ROMLC_BIN_WITH_PATH'] = os.path.join(bin_dir, 'rocminfo') if os.path.isfile(os.path.join(bin_dir, 'rocminfo')) else clang_path
+        env['MLC_ROMLC_BIN_WITH_PATH'] = os.path.join(
+            bin_dir, 'rocminfo') if os.path.isfile(
+            os.path.join(
+                bin_dir, 'rocminfo')) else clang_path
         env['+PATH'] = [bin_dir]
 
         # Install cpulibs if requested
@@ -156,11 +164,13 @@ def postprocess(i):
         # Standard package installs: /opt/rocm/bin, /opt/rocm-*/bin
         prefix_opt = os.path.join(prefix, 'opt')
         if os.path.isdir(prefix_opt):
-            for p in [os.path.join(prefix_opt, 'rocm', 'bin')] + sorted(glob.glob(os.path.join(prefix_opt, 'rocm-*', 'bin')), reverse=True):
+            for p in [os.path.join(prefix_opt, 'rocm', 'bin')] + sorted(
+                    glob.glob(os.path.join(prefix_opt, 'rocm-*', 'bin')), reverse=True):
                 if os.path.isdir(p) and p not in search_dirs:
                     search_dirs.append(p)
         # Untar installs: <prefix>/rocm-*/bin (no opt/ subdirectory)
-        for p in sorted(glob.glob(os.path.join(prefix, 'rocm-*', 'bin')), reverse=True):
+        for p in sorted(glob.glob(os.path.join(
+                prefix, 'rocm-*', 'bin')), reverse=True):
             if os.path.isdir(p) and p not in search_dirs:
                 search_dirs.append(p)
 
@@ -178,7 +188,8 @@ def postprocess(i):
 
     if not installed_path:
         # Last resort: find rocminfo anywhere under current dir
-        for p in sorted(glob.glob(os.path.join(cur_dir, '**', 'rocminfo'), recursive=True)):
+        for p in sorted(glob.glob(os.path.join(
+                cur_dir, '**', 'rocminfo'), recursive=True)):
             if os.path.isfile(p):
                 installed_path = os.path.dirname(p)
                 print(f"  Found rocminfo via recursive search at: {p}")
@@ -210,7 +221,8 @@ def _install_cpulibs(env, lib_dir):
     jemalloc_lib_path = env.get('MLC_JEMALLOC_LIB_PATH', '')
     if jemalloc_lib_path and os.path.isdir(jemalloc_lib_path):
         for f in os.listdir(jemalloc_lib_path):
-            if f.startswith('libjemalloc') and (f.endswith('.so') or f.endswith('.a') or '.so.' in f):
+            if f.startswith('libjemalloc') and (f.endswith(
+                    '.so') or f.endswith('.a') or '.so.' in f):
                 src = os.path.join(jemalloc_lib_path, f)
                 dst = os.path.join(lib_dir, f)
                 if os.path.isfile(src) and not os.path.islink(src):
@@ -228,7 +240,8 @@ def _install_cpulibs(env, lib_dir):
             amdalloc_name = f'libamdalloc{ext}'
             jemalloc_dst = os.path.join(lib_dir, jemalloc_name)
             amdalloc_dst = os.path.join(lib_dir, amdalloc_name)
-            if os.path.isfile(jemalloc_dst) and not os.path.exists(amdalloc_dst):
+            if os.path.isfile(
+                    jemalloc_dst) and not os.path.exists(amdalloc_dst):
                 os.symlink(jemalloc_name, amdalloc_dst)
                 copied.append(f'{amdalloc_name} -> {jemalloc_name}')
         print(f'  Installed jemalloc libs: {copied}')
@@ -240,7 +253,8 @@ def _install_cpulibs(env, lib_dir):
     amdlibm_lib_path = env.get('MLC_AOCL_LIBM_LIB_PATH', '')
     if amdlibm_lib_path and os.path.isdir(amdlibm_lib_path):
         for f in os.listdir(amdlibm_lib_path):
-            if (f.startswith('libalm') or f.startswith('libamdlibm')) and (f.endswith('.so') or f.endswith('.a') or '.so.' in f):
+            if (f.startswith('libalm') or f.startswith('libamdlibm')) and (
+                    f.endswith('.so') or f.endswith('.a') or '.so.' in f):
                 src = os.path.join(amdlibm_lib_path, f)
                 dst = os.path.join(lib_dir, f)
                 if os.path.isfile(src) and not os.path.islink(src):

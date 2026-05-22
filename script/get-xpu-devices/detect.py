@@ -22,35 +22,45 @@ def _run_xpu_smi_json(args, timeout_sec=30):
     try:
         return json.loads(result.stdout)
     except json.JSONDecodeError as exc:
-        raise RuntimeError(f"Invalid JSON from command: {' '.join(args)}") from exc
+        raise RuntimeError(
+            f"Invalid JSON from command: {' '.join(args)}") from exc
 
 
 def _require_keys(obj, keys, context):
     missing = [key for key in keys if key not in obj]
     if missing:
         missing_str = ", ".join(missing)
-        raise RuntimeError(f"Missing required fields in {context}: {missing_str}")
+        raise RuntimeError(
+            f"Missing required fields in {context}: {missing_str}")
 
 
 def get_xpu_info():
-    # Keep timeout disabled for sudo path: it may legitimately wait for password input.
-    xpus_json = _run_xpu_smi_json(["sudo", "xpu-smi", "discovery", "-j"], timeout_sec=None)
+    # Keep timeout disabled for sudo path: it may legitimately wait for
+    # password input.
+    xpus_json = _run_xpu_smi_json(
+        ["sudo", "xpu-smi", "discovery", "-j"], timeout_sec=None)
     xpu_devices = xpus_json.get("device_list")
     if not isinstance(xpu_devices, list):
-        raise RuntimeError("xpu-smi discovery output missing list field: device_list")
+        raise RuntimeError(
+            "xpu-smi discovery output missing list field: device_list")
 
     num_xpus = len(xpu_devices)
     all_xpu_info = []
 
     # Map device name variants
     pci_dID_name_map = {
-        "Intel(R) Graphics [0xe212]": "Intel(R) Arc(TM) Pro B50 Graphics", # B50 name variant
-        "Intel(R) Graphics [0xe211]": "Intel(R) Arc(TM) Pro B60 Graphics", # B60
-        "Intel(R) Graphics [0xe223]": "Intel(R) Arc(TM) Pro B70 Graphics", # B70 name variant
+        # B50 name variant
+        "Intel(R) Graphics [0xe212]": "Intel(R) Arc(TM) Pro B50 Graphics",
+        # B60
+        "Intel(R) Graphics [0xe211]": "Intel(R) Arc(TM) Pro B60 Graphics",
+        # B70 name variant
+        "Intel(R) Graphics [0xe223]": "Intel(R) Arc(TM) Pro B70 Graphics",
     }
 
     memory_type_map = {
-        # Arc Pro Series memory types based on publicly available information. xpu-smi apis not returning memory type info, so using device name to map to memory type.
+        # Arc Pro Series memory types based on publicly available information.
+        # xpu-smi apis not returning memory type info, so using device name to
+        # map to memory type.
         "Intel(R) Arc(TM) Pro B50 Graphics": "GDDR6",
         "Intel(R) Arc(TM) Pro B60 Graphics": "GDDR6",
         "Intel(R) Arc(TM) Pro B70 Graphics": "GDDR6",
@@ -88,7 +98,9 @@ def get_xpu_info():
             "GPU Name": device_name,
             "XPU driver version": f"{device_info_json['driver_version']}",
             "Memory Type": memory_type,
-            "Global memory": f"{round(int(device_info_json['memory_physical_size_byte']) / 1_073_741_824)} GiB",  # Convert bytes to GiB; key maps to MLC_XPU_DEVICE_PROP_GLOBAL_MEMORY
+            # Convert bytes to GiB; key maps to
+            # MLC_XPU_DEVICE_PROP_GLOBAL_MEMORY
+            "Global memory": f"{round(int(device_info_json['memory_physical_size_byte']) / 1_073_741_824)} GiB",
             "Max clock rate": f"{device_info_json['core_clock_rate_mhz']} MHz",
             "Number of EUs": device_info_json["number_of_eus"],
             "EU Threads per EU": device_info_json["number_of_threads_per_eu"],

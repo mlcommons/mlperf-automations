@@ -100,12 +100,14 @@ def postprocess(i):
         }
 
     # Compute geometric mean across all benchmarks
-    all_means = [v['mean_time_s'] for v in summary['benchmarks'].values() if v['mean_time_s'] > 0]
+    all_means = [v['mean_time_s']
+                 for v in summary['benchmarks'].values() if v['mean_time_s'] > 0]
     if all_means:
         geo_mean = _geometric_mean(all_means)
         summary['geometric_mean_s'] = round(geo_mean, 6)
         env['MLC_PYPERFORMANCE_GEOMETRIC_MEAN'] = str(round(geo_mean, 6))
-        logger.info(f"pyperformance geometric mean: {geo_mean:.6f}s ({len(all_means)} benchmarks)")
+        logger.info(
+            f"pyperformance geometric mean: {geo_mean:.6f}s ({len(all_means)} benchmarks)")
 
     summary['total_benchmarks'] = len(benchmark_times)
 

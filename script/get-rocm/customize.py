@@ -23,7 +23,8 @@ def preprocess(i):
 
     # Standard paths (always check these first)
     # Use os.path.exists to handle symlinks properly
-    for p in ["/opt/rocm/bin"] + sorted(glob.glob("/opt/rocm-*/bin"), reverse=True):
+    for p in ["/opt/rocm/bin"] + \
+            sorted(glob.glob("/opt/rocm-*/bin"), reverse=True):
         if os.path.exists(p) and p not in rocm_paths:
             rocm_paths.append(p)
 
@@ -31,7 +32,8 @@ def preprocess(i):
     install_prefix = env.get('MLC_ROCM_INSTALL_PREFIX', '')
     if install_prefix and install_prefix != '/':
         prefix_opt = os.path.join(install_prefix, 'opt')
-        for p in [os.path.join(prefix_opt, 'rocm', 'bin')] + sorted(glob.glob(os.path.join(prefix_opt, 'rocm-*', 'bin')), reverse=True):
+        for p in [os.path.join(prefix_opt, 'rocm', 'bin')] + sorted(
+                glob.glob(os.path.join(prefix_opt, 'rocm-*', 'bin')), reverse=True):
             if os.path.exists(p) and p not in rocm_paths:
                 rocm_paths.append(p)
         # Source build: also check <prefix>/bin directly

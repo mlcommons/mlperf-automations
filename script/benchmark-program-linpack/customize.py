@@ -32,7 +32,8 @@ def preprocess(i):
 
     env['MLC_LINPACK_RUN_CMD'] = run_cmd
     logger.info(f"Linpack variant: {variant}, run command: {run_cmd}")
-    logger.info(f"Problem size: {env.get('MLC_LINPACK_PROBLEM_SIZE', '20000')}")
+    logger.info(
+        f"Problem size: {env.get('MLC_LINPACK_PROBLEM_SIZE', '20000')}")
 
     return {'return': 0}
 
@@ -95,7 +96,8 @@ def _parse_hpl_output(filepath):
     """Parse HPL output to extract GFLOPS and timing."""
     result = {}
     # HPL output line format:
-    # WR11C2R4     20000   256     1     1             xxx.xx             yyy.yye+zz
+    # WR11C2R4     20000   256     1     1             xxx.xx
+    # yyy.yye+zz
     pattern = re.compile(
         r'WR\w+\s+(\d+)\s+(\d+)\s+\d+\s+\d+\s+([\d.]+)\s+([\d.eE+\-]+)'
     )

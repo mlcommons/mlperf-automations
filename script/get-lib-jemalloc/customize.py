@@ -72,7 +72,9 @@ def preprocess(i):
 
     # Determine install prefix
     if env.get('MLC_OUTDIRNAME', ''):
-        version = env.get('MLC_JEMALLOC_VERSION', env.get('MLC_GIT_CHECKOUT', 'unknown'))
+        version = env.get(
+            'MLC_JEMALLOC_VERSION', env.get(
+                'MLC_GIT_CHECKOUT', 'unknown'))
         version_dir = _build_version_dir(version, env)
         prefix = os.path.join(env['MLC_OUTDIRNAME'], version_dir)
     else:
@@ -96,18 +98,22 @@ def postprocess(i):
     if is_true(env.get('MLC_JEMALLOC_LIB_PATH_PROVIDED', '')):
         lib_path = env.get('MLC_JEMALLOC_LIB_PATH', '')
         if not lib_path or not os.path.isdir(lib_path):
-            return {'return': 1, 'error': 'Provided MLC_JEMALLOC_LIB_PATH does not exist: ' + str(lib_path)}
+            return {
+                'return': 1, 'error': 'Provided MLC_JEMALLOC_LIB_PATH does not exist: ' + str(lib_path)}
         env['MLC_JEMALLOC_LIB_PATH'] = lib_path
         env['MLC_JEMALLOC_PATH'] = os.path.dirname(lib_path)
         env['+LD_LIBRARY_PATH'] = [lib_path]
         env['MLC_DEPENDENT_CACHED_PATH'] = lib_path
         if not env.get('MLC_JEMALLOC_VERSION'):
-            env['MLC_JEMALLOC_VERSION'] = _detect_version_from_path(lib_path) or 'unknown'
+            env['MLC_JEMALLOC_VERSION'] = _detect_version_from_path(
+                lib_path) or 'unknown'
         return {'return': 0}
 
     # Case 2: source build
     if env.get('MLC_OUTDIRNAME', ''):
-        version = env.get('MLC_JEMALLOC_VERSION', env.get('MLC_GIT_CHECKOUT', 'unknown'))
+        version = env.get(
+            'MLC_JEMALLOC_VERSION', env.get(
+                'MLC_GIT_CHECKOUT', 'unknown'))
         version_dir = _build_version_dir(version, env)
         install_path = os.path.join(env['MLC_OUTDIRNAME'], version_dir)
     else:

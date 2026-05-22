@@ -321,7 +321,8 @@ def preprocess(i):
         venv_flags = ''
         if is_true(env.get('MLC_DOCKER_SYSTEM_SITE_PACKAGES', '')):
             venv_flags = ' --system-site-packages'
-        f.write('RUN {} -m venv{} $HOME/venv/mlcflow'.format(python, venv_flags) + " " + EOL)
+        f.write('RUN {} -m venv{} $HOME/venv/mlcflow'.format(python,
+                venv_flags) + " " + EOL)
         f.write('ENV PATH="$HOME/venv/mlcflow/bin:$PATH"' + EOL)
     # f.write('RUN . /opt/venv/mlc/bin/activate' + EOL)
 

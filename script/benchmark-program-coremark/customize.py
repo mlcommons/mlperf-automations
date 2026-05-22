@@ -72,7 +72,8 @@ def postprocess(i):
         logger.warning("No CoreMark results found.")
         return {'return': 0}
 
-    scores = [r['iterations_per_sec'] for r in all_results if 'iterations_per_sec' in r]
+    scores = [r['iterations_per_sec']
+              for r in all_results if 'iterations_per_sec' in r]
 
     summary = {
         'num_runs': num_runs,

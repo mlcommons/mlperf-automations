@@ -33,7 +33,8 @@ def preprocess(i):
         cc = env.get('MLC_C_COMPILER_WITH_PATH', 'clang')
         cxx = env.get('MLC_CXX_COMPILER_WITH_PATH', 'clang++')
         fc = env.get('MLC_FORTRAN_COMPILER_WITH_PATH', 'flang')
-        llvm_lib_path = os.path.join(env.get('MLC_LLVM_INSTALLED_PATH', ''), 'lib')
+        llvm_lib_path = os.path.join(
+            env.get('MLC_LLVM_INSTALLED_PATH', ''), 'lib')
         if os.path.isdir(llvm_lib_path):
             env['+LD_LIBRARY_PATH'].append(os.path.abspath(llvm_lib_path))
             env['+LIBRARY_PATH'].append(os.path.abspath(llvm_lib_path))
@@ -42,7 +43,8 @@ def preprocess(i):
         cc = env.get('MLC_ONEAPI_COMPILER_WITH_PATH', 'icx')
         cxx = cc.replace('icx', 'icpx') if 'icx' in cc else 'icpx'
         fc = cc.replace('icx', 'ifx') if 'icx' in cc else 'ifx'
-        oneapi_lib_path = os.path.join(env.get('MLC_ONEAPI_INSTALLED_PATH', ''), 'lib')
+        oneapi_lib_path = os.path.join(
+            env.get('MLC_ONEAPI_INSTALLED_PATH', ''), 'lib')
         if os.path.isdir(oneapi_lib_path):
             env['+LD_LIBRARY_PATH'].append(os.path.abspath(oneapi_lib_path))
             env['+LIBRARY_PATH'].append(os.path.abspath(oneapi_lib_path))
