@@ -46,7 +46,8 @@ def preprocess(i):
 
     if is_true(env.get('MLC_AOCL_BINARY_DOWNLOAD', '')):
         if not is_true(env.get('MLC_AOCL_ACCEPT_EULA', '')):
-            return {'return': 1, 'error': 'You must accept the AMD EULA to download binary packages. Use --accept_eula=yes to accept.'}
+            return {
+                'return': 1, 'error': 'You must accept the AMD EULA to download binary packages. Use --accept_eula=yes to accept.'}
 
     return {'return': 0}
 
@@ -59,13 +60,15 @@ def postprocess(i):
     if is_true(env.get('MLC_AOCL_LIB_PATH_PROVIDED', '')):
         lib_path = env.get('MLC_AOCL_LIBFLAME_LIB_PATH', '')
         if not lib_path or not os.path.isdir(lib_path):
-            return {'return': 1, 'error': 'Provided MLC_AOCL_LIBFLAME_LIB_PATH does not exist: ' + str(lib_path)}
+            return {
+                'return': 1, 'error': 'Provided MLC_AOCL_LIBFLAME_LIB_PATH does not exist: ' + str(lib_path)}
         env['MLC_AOCL_LIBFLAME_LIB_PATH'] = lib_path
         env['+LIBRARY_PATH'] = [lib_path]
         env['+LD_LIBRARY_PATH'] = [lib_path]
         env['MLC_DEPENDENT_CACHED_PATH'] = lib_path
         if not env.get('MLC_AOCL_LIBFLAME_VERSION'):
-            env['MLC_AOCL_LIBFLAME_VERSION'] = _detect_version_from_path(lib_path) or 'unknown'
+            env['MLC_AOCL_LIBFLAME_VERSION'] = _detect_version_from_path(
+                lib_path) or 'unknown'
         return {'return': 0}
 
     # Case 2: binary download
@@ -75,22 +78,31 @@ def postprocess(i):
             return {'return': 1, 'error': 'Binary download path not set'}
         for entry in os.listdir(install_path):
             entry_path = os.path.join(install_path, entry)
-            if os.path.isdir(entry_path) and (os.path.isdir(os.path.join(entry_path, 'lib')) or os.path.isdir(os.path.join(entry_path, 'lib64'))):
+            if os.path.isdir(entry_path) and (os.path.isdir(os.path.join(
+                    entry_path, 'lib')) or os.path.isdir(os.path.join(entry_path, 'lib64'))):
                 install_path = entry_path
                 break
-        env['MLC_AOCL_LIBFLAME_VERSION'] = env.get('MLC_AOCL_BINARY_VERSION', '')
+        env['MLC_AOCL_LIBFLAME_VERSION'] = env.get(
+            'MLC_AOCL_BINARY_VERSION', '')
     else:
         # Case 3: source build
-        src_path = env.get('MLC_AOCL_LIBFLAME_SRC_PATH', env.get('MLC_GIT_REPO_CHECKOUT_PATH', ''))
+        src_path = env.get(
+            'MLC_AOCL_LIBFLAME_SRC_PATH', env.get(
+                'MLC_GIT_REPO_CHECKOUT_PATH', ''))
         env['MLC_AOCL_LIBFLAME_SRC_PATH'] = src_path
         env['MLC_AOCL_LIBFLAME_BUILD_PATH'] = os.path.join(src_path, 'build')
         if env.get('MLC_OUTDIRNAME', ''):
-            version = env.get('MLC_AOCL_LIBFLAME_VERSION', env.get('MLC_GIT_CHECKOUT', 'unknown'))
-            install_path = os.path.join(env['MLC_OUTDIRNAME'], 'aocl-libflame', version)
+            version = env.get(
+                'MLC_AOCL_LIBFLAME_VERSION', env.get(
+                    'MLC_GIT_CHECKOUT', 'unknown'))
+            install_path = os.path.join(
+                env['MLC_OUTDIRNAME'], 'aocl-libflame', version)
         else:
             install_path = os.path.join(src_path, 'install')
         if not env.get('MLC_AOCL_LIBFLAME_VERSION'):
-            env['MLC_AOCL_LIBFLAME_VERSION'] = env.get('MLC_GIT_REPO_CURRENT_HASH', env.get('MLC_GIT_CHECKOUT', 'unknown'))
+            env['MLC_AOCL_LIBFLAME_VERSION'] = env.get(
+                'MLC_GIT_REPO_CURRENT_HASH', env.get(
+                    'MLC_GIT_CHECKOUT', 'unknown'))
 
     env['MLC_AOCL_LIBFLAME_INSTALL_PATH'] = install_path
     env['MLC_AOCL_BINARY_INSTALL_PATH'] = install_path
