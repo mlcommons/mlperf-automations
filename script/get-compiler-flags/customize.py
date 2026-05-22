@@ -38,7 +38,8 @@ def preprocess(i):
     env['+ FFLAGS'] = list(set(env['+ FFLAGS']))
     env['+ LDFLAGS'] = list(set(env['+ LDFLAGS']))
 
-    if os_info['platform'] == 'darwin' and env.get('MLC_COMPILER_FAMILY', '') == 'LLVM':
+    if os_info['platform'] == 'darwin' and env.get(
+            'MLC_COMPILER_FAMILY', '') == 'LLVM':
         try:
             sdkroot = subprocess.check_output(
                 ["xcrun", "--show-sdk-path"], text=True).strip()
@@ -48,7 +49,8 @@ def preprocess(i):
                 env['+ CXXFLAGS'] += ['-isysroot', sdkroot]
                 env['+ LDFLAGS'] += ['-isysroot', sdkroot]
         except (subprocess.CalledProcessError, FileNotFoundError):
-            logger.warning('Unable to detect macOS SDK path via xcrun; proceeding without explicit SDKROOT')
+            logger.warning(
+                'Unable to detect macOS SDK path via xcrun; proceeding without explicit SDKROOT')
 
     sys_cmd = "cpp -v /dev/null -o /dev/null 2>&1"
     result = subprocess.check_output(sys_cmd, shell=True).decode("utf-8")
