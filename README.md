@@ -2,8 +2,8 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-green)](LICENSE.md)
 [![Downloads](https://static.pepy.tech/badge/mlcflow)](https://pepy.tech/project/mlcflow)
-[![MLC script automation features test](https://github.com/mlcommons/mlperf-automations/actions/workflows/test-mlc-script-features.yml/badge.svg?cache-bust=1)](https://github.com/mlcommons/mlperf-automations/actions/workflows/test-mlc-script-features.yml)
-[![MLPerf® Inference ABTF POC Test](https://github.com/mlcommons/mlperf-automations/actions/workflows/test-mlperf-inference-abtf-poc.yml/badge.svg)](https://github.com/mlcommons/mlperf-automations/actions/workflows/test-mlperf-inference-abtf-poc.yml)
+[![MLC script automation features test](https://github.com/mlcommons/mlperf-automations/actions/workflows/test-mlc-script-features.yml/badge.svg?branch=dev)](https://github.com/mlcommons/mlperf-automations/actions/workflows/test-mlc-script-features.yml)
+[![MLPerf® Inference ABTF POC Test](https://github.com/mlcommons/mlperf-automations/actions/workflows/test-mlperf-inference-abtf-poc.yml/badge.svg?branch=dev)](https://github.com/mlcommons/mlperf-automations/actions/workflows/test-mlperf-inference-abtf-poc.yml)
 
 
 
