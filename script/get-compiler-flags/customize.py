@@ -7,6 +7,7 @@ def preprocess(i):
     os_info = i['os_info']
 
     env = i['env']
+    logger = i['automation'].logger
     env['+ CFLAGS'] = []
     env['+ CXXFLAGS'] = []
     env['+ FFLAGS'] = []
@@ -47,7 +48,7 @@ def preprocess(i):
                 env['+ CXXFLAGS'] += ['-isysroot', sdkroot]
                 env['+ LDFLAGS'] += ['-isysroot', sdkroot]
         except (subprocess.CalledProcessError, FileNotFoundError):
-            pass
+            logger.warning('Unable to detect macOS SDK path via xcrun; proceeding without explicit SDKROOT')
 
     sys_cmd = "cpp -v /dev/null -o /dev/null 2>&1"
     result = subprocess.check_output(sys_cmd, shell=True).decode("utf-8")
