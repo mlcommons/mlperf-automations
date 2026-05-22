@@ -1,5 +1,6 @@
 from mlc import utils
 import os
+import sys
 import subprocess
 import shutil
 from os.path import exists
@@ -368,7 +369,8 @@ def postprocess(i):
         x1 = ''
         x2 = ''
         run_cmd_prefix = ""
-        if is_true(env.get('MLC_DOCKER_INTERACTIVE_MODE', '')):
+        if is_true(env.get('MLC_DOCKER_INTERACTIVE_MODE', '')
+                   ) and sys.stdin.isatty():
             run_cmd_prefix = "("
             x1 = '-it'
             x2 = " && bash ) || bash"
