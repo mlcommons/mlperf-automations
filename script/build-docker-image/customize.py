@@ -85,10 +85,10 @@ def preprocess(i):
         ' .'
     ]
 
-    #with open(dockerfile_path + '.build.sh', 'w') as f:
+    # with open(dockerfile_path + '.build.sh', 'w') as f:
     #    f.write(' \\\n'.join(XCMD) + '\n')
 
-    #with open(dockerfile_path + '.build.bat', 'w') as f:
+    # with open(dockerfile_path + '.build.bat', 'w') as f:
     #    f.write(' ^\n'.join(XCMD) + '\n')
 
     CMD = ''.join(XCMD)
