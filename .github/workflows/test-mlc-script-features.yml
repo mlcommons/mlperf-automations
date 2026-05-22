@@ -123,7 +123,8 @@ jobs:
 
         # Test 1: input_mapping in run_state is used as fallback for docker path remapping
         docker_settings = {'user': 'mlcuser'}
-        mounts = ['${{ MLC_SRC_REPO_PATH }}:${{ MLC_SRC_REPO_PATH }}']
+        _expr = '$' + '{{ MLC_SRC_REPO_PATH }}'
+        mounts = [_expr + ':' + _expr]
         env = {'MLC_SRC_REPO_PATH': '/home/user/repos/my-project'}
         run_state = {
             'input_mapping': {'src_path': 'MLC_SRC_REPO_PATH'},
@@ -147,7 +148,8 @@ jobs:
             'file_path_env_keys': [],
             'folder_path_env_keys': []
         }
-        mounts2 = ['${{ MLC_SRC_REPO_PATH }}:${{ MLC_SRC_REPO_PATH }}']
+        _expr2 = '$' + '{{ MLC_SRC_REPO_PATH }}'
+        mounts2 = [_expr2 + ':' + _expr2]
         result2 = process_mounts(mounts2, env, docker_settings, f_run_cmd2, run_state2)
         assert result2['return'] == 0
         assert f_run_cmd2['src_path'] == '/home/user/repos/my-project', \
