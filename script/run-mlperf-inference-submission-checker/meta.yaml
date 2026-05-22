@@ -165,50 +165,15 @@ variations:
     adr:
       submission-checker-src:
         version: master
-  version.r3.0:
+  version.#:
+    group: version
     adr:
       submission-checker-src:
-        version: r3.0
-    group: version
-  version.r3.1:
-    adr:
-      submission-checker-src:
-        version: r3.1
-    group: version
-  version.r4.0:
-    adr:
-      submission-checker-src:
-        version: r4.0
-    group: version
-  version.r4.1:
-    adr:
-      submission-checker-src:
-        version: r4.1
-    group: version
-  version.r5.0:
-    adr:
-      submission-checker-src:
-        version: r5.0
-    group: version
-  version.r5.1:
-    adr:
-      submission-checker-src:
-        version: r5.1
-    group: version
+        version: '#'
   version.r6.0:
     adr:
       submission-checker-src:
         version: master
-    group: version
-  version.v0.5:
-    adr:
-      submission-checker-src:
-        version: v0.5
-    group: version
-  version.v1.0:
-    adr:
-      submission-checker-src:
-        version: v1.0
     group: version
 
 # Versions
