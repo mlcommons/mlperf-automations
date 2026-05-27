@@ -22,9 +22,29 @@ import sys
 _VLLM_PATTERNS: list[tuple[str, str]] = [
     ("tensor_parallel",   r"tensor_parallel_size\s*[=:]\s*'?(\d+)"),
     ("pipeline_parallel", r"pipeline_parallel_size\s*[=:]\s*'?(\d+)"),
-    ("expert_parallel",   r"expert_parallel_size\s*[=:]\s*'?(\d+)"),
-    ("batch",             r"max_num_seqs\s*[=:]\s*'?(\d+)"),
+    ("expert_parallel", r"expert_parallel_size\s*[=:]\s*'?(\d+)"),
+    ("batch", r"max_num_seqs\s*[=:]\s*'?(\d+)"),
 ]
+
+# SGLang patterns match the server_args=ServerArgs(...) startup line.
+# max_running_requests=None does not match \d+, so batch stays null when unlimited.
+_SGLANG_PATTERNS: list[tuple[str, str]] = [
+    ("tensor_parallel",   r"tp_size=(\d+)"),
+    ("pipeline_parallel", r"pp_size=(\d+)"),
+    ("expert_parallel",   r"ep_size=(\d+)"),
+    ("batch",             r"max_running_requests=(\d+)"),
+]
+
+
+def _choose_patterns(text: str, serving_framework: str) -> list[tuple[str, str]]:
+    if serving_framework == "vllm":
+        return _VLLM_PATTERNS
+    if serving_framework == "sglang":
+        return _SGLANG_PATTERNS
+    # auto: detect from log keywords
+    if re.search(r"(?i)sglang", text):
+        return _SGLANG_PATTERNS
+    return _VLLM_PATTERNS
 
 # SGLang patterns match the server_args=ServerArgs(...) startup line.
 # max_running_requests=None does not match \d+, so batch stays null when unlimited.
