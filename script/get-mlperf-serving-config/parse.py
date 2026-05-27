@@ -15,13 +15,15 @@ import os
 import re
 import sys
 
-# Patterns match dict-repr key:value pairs printed in the vLLM "non-default args" log line, e.g.:
-#   INFO ... [utils.py:233] non-default args: {'tensor_parallel_size': 2, 'max_num_seqs': 32, ...}
+# Patterns cover two vLLM log formats:
+#   <=0.19.x: non-default args: {'tensor_parallel_size': 2, 'max_num_seqs': 32, ...}
+#   >=0.20.x: Initializing a V1 LLM engine ... with config: ..., tensor_parallel_size=2, ...
+# [=:] matches either the '=' (new) or ':' (old dict-repr) separator.
 _PATTERNS: list[tuple[str, str]] = [
-    ("tensor_parallel",   r"'tensor_parallel_size'\s*:\s*(\d+)"),
-    ("pipeline_parallel", r"'pipeline_parallel_size'\s*:\s*(\d+)"),
-    ("expert_parallel",   r"'expert_parallel_size'\s*:\s*(\d+)"),
-    ("batch",             r"'max_num_seqs'\s*:\s*(\d+)"),
+    ("tensor_parallel",   r"tensor_parallel_size\s*[=:]\s*'?(\d+)"),
+    ("pipeline_parallel", r"pipeline_parallel_size\s*[=:]\s*'?(\d+)"),
+    ("expert_parallel",   r"expert_parallel_size\s*[=:]\s*'?(\d+)"),
+    ("batch",             r"max_num_seqs\s*[=:]\s*'?(\d+)"),
 ]
 
 # Read at most this many bytes from the start of the log file.
