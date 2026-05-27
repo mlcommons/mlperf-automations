@@ -91,7 +91,7 @@ def remote_run(self_module, i):
     }
 
     run_cmds = []
-    remote_mlc_python_venv = i.get('remote_python_venv', '~/.mlcflow_venv')
+    remote_mlc_python_venv = i.get('remote_python_venv', 'mlcflow')
 
     # Determine if the local system is Windows to adjust command formatting
     is_windows = platform.system() == 'Windows'
@@ -104,18 +104,6 @@ def remote_run(self_module, i):
     run_cmds.append(f". {remote_mlc_python_venv}/bin/activate")
     if i.get('remote_pull_mlc_repos', False):
         run_cmds.append("mlc pull repo")
-    remote_branch = i.get('remote_branch', '')
-    remote_branch_files = i.get('remote_branch_files', [])
-    if remote_branch:
-        if remote_branch_files:
-            files_str = ' '.join(remote_branch_files)
-            run_cmds.append(
-                f"cd ~/MLC/repos/mlcommons@mlperf-automations && git fetch origin && git checkout origin/{remote_branch} -- {files_str} ; cd -"
-            )
-        else:
-            run_cmds.append(
-                f"cd ~/MLC/repos/mlcommons@mlperf-automations && git fetch origin && git checkout {remote_branch} && git pull origin {remote_branch} ; cd -"
-            )
 
     env_keys_to_copy = remote_run_settings.get('env_keys_to_copy', [])
     input_mapping = meta.get('input_mapping', {})
