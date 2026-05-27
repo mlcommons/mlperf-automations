@@ -20,10 +20,10 @@ import sys
 #   >=0.20.x: Initializing a V1 LLM engine ... with config: ..., tensor_parallel_size=2, ...
 # [=:] matches either the '=' (new) or ':' (old dict-repr) separator.
 _PATTERNS: list[tuple[str, str]] = [
-    ("tensor_parallel",   r"tensor_parallel_size\s*[=:]\s*'?(\d+)"),
+    ("tensor_parallel", r"tensor_parallel_size\s*[=:]\s*'?(\d+)"),
     ("pipeline_parallel", r"pipeline_parallel_size\s*[=:]\s*'?(\d+)"),
-    ("expert_parallel",   r"expert_parallel_size\s*[=:]\s*'?(\d+)"),
-    ("batch",             r"max_num_seqs\s*[=:]\s*'?(\d+)"),
+    ("expert_parallel", r"expert_parallel_size\s*[=:]\s*'?(\d+)"),
+    ("batch", r"max_num_seqs\s*[=:]\s*'?(\d+)"),
 ]
 
 # Read at most this many bytes from the start of the log file.
