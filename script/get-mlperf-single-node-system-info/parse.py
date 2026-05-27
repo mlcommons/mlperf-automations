@@ -173,7 +173,6 @@ def _pip_version(package):
     return None
 
 
-
 def detect_inference_backend():
     """Build inference backend string from CUDA/ROCm + cuDNN versions."""
     parts = []
