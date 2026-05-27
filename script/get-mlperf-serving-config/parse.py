@@ -20,23 +20,25 @@ import sys
 #   >=0.20.x: Initializing a V1 LLM engine ... with config: ..., tensor_parallel_size=2, ...
 # [=:] matches either the '=' (new) or ':' (old dict-repr) separator.
 _VLLM_PATTERNS: list[tuple[str, str]] = [
-    ("tensor_parallel",   r"tensor_parallel_size\s*[=:]\s*'?(\d+)"),
+    ("tensor_parallel", r"tensor_parallel_size\s*[=:]\s*'?(\d+)"),
     ("pipeline_parallel", r"pipeline_parallel_size\s*[=:]\s*'?(\d+)"),
     ("expert_parallel", r"expert_parallel_size\s*[=:]\s*'?(\d+)"),
     ("batch", r"max_num_seqs\s*[=:]\s*'?(\d+)"),
 ]
 
 # SGLang patterns match the server_args=ServerArgs(...) startup line.
-# max_running_requests=None does not match \d+, so batch stays null when unlimited.
+# max_running_requests=None does not match \d+, so batch stays null when
+# unlimited.
 _SGLANG_PATTERNS: list[tuple[str, str]] = [
-    ("tensor_parallel",   r"tp_size=(\d+)"),
+    ("tensor_parallel", r"tp_size=(\d+)"),
     ("pipeline_parallel", r"pp_size=(\d+)"),
-    ("expert_parallel",   r"ep_size=(\d+)"),
-    ("batch",             r"max_running_requests=(\d+)"),
+    ("expert_parallel", r"ep_size=(\d+)"),
+    ("batch", r"max_running_requests=(\d+)"),
 ]
 
 
-def _choose_patterns(text: str, serving_framework: str) -> list[tuple[str, str]]:
+def _choose_patterns(
+        text: str, serving_framework: str) -> list[tuple[str, str]]:
     if serving_framework == "vllm":
         return _VLLM_PATTERNS
     if serving_framework == "sglang":
@@ -45,18 +47,21 @@ def _choose_patterns(text: str, serving_framework: str) -> list[tuple[str, str]]
     if re.search(r"(?i)sglang", text):
         return _SGLANG_PATTERNS
     return _VLLM_PATTERNS
+
 
 # SGLang patterns match the server_args=ServerArgs(...) startup line.
-# max_running_requests=None does not match \d+, so batch stays null when unlimited.
+# max_running_requests=None does not match \d+, so batch stays null when
+# unlimited.
 _SGLANG_PATTERNS: list[tuple[str, str]] = [
-    ("tensor_parallel",   r"tp_size=(\d+)"),
+    ("tensor_parallel", r"tp_size=(\d+)"),
     ("pipeline_parallel", r"pp_size=(\d+)"),
-    ("expert_parallel",   r"ep_size=(\d+)"),
-    ("batch",             r"max_running_requests=(\d+)"),
+    ("expert_parallel", r"ep_size=(\d+)"),
+    ("batch", r"max_running_requests=(\d+)"),
 ]
 
 
-def _choose_patterns(text: str, serving_framework: str) -> list[tuple[str, str]]:
+def _choose_patterns(
+        text: str, serving_framework: str) -> list[tuple[str, str]]:
     if serving_framework == "vllm":
         return _VLLM_PATTERNS
     if serving_framework == "sglang":
@@ -65,6 +70,7 @@ def _choose_patterns(text: str, serving_framework: str) -> list[tuple[str, str]]
     if re.search(r"(?i)sglang", text):
         return _SGLANG_PATTERNS
     return _VLLM_PATTERNS
+
 
 # Read at most this many bytes from the start of the log file.
 # vLLM prints its engine config (tensor_parallel_size, etc.) near the top
@@ -91,7 +97,8 @@ def _detect_framework(text: str) -> str:
 
 def parse_serving_log(log_path: str, serving_framework: str = "auto") -> dict:
     # Result keys are determined after reading the log (patterns depend on framework).
-    # Initialise with vLLM keys as a safe default; overwritten once text is available.
+    # Initialise with vLLM keys as a safe default; overwritten once text is
+    # available.
     result: dict = {k: None for k, _ in _VLLM_PATTERNS}
     result["framework"] = ""
 
