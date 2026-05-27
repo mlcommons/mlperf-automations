@@ -138,6 +138,7 @@ def preprocess(i):
             'files_to_copy_back': [f'{remote_out}/serving_config.json'],
             'path_to_copy_back_files': env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'],
             'skip_ssh_key_file': env.get('MLC_SKIP_SSH_KEY_FILE', ''),
+            'serving_framework_type': env.get('MLC_MLPERF_SERVING_FRAMEWORK_TYPE', 'auto'),
             'quiet': True,
         })
         if r_sc['return'] > 0:

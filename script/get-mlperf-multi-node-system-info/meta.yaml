@@ -57,6 +57,7 @@ input_mapping:
   serving_node: MLC_MLPERF_SERVING_NODE
   log_path: MLC_MLPERF_SERVING_LOG_PATH
   run_metadata_path: MLC_MLPERF_RUN_METADATA_PATH
+  serving_framework_type: MLC_MLPERF_SERVING_FRAMEWORK_TYPE
 
 # Dependencies
 deps:
