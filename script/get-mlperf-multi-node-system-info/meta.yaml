@@ -52,6 +52,11 @@ input_mapping:
   system_node_ensemble_count: MLC_MLPERF_SYSTEM_NODE_ENSEMBLE_COUNT
   system_node_ensemble_total: MLC_MLPERF_SYSTEM_NODE_ENSEMBLE_TOTAL
   system_size: MLC_MLPERF_SYSTEM_SIZE
+  serving_framework: MLC_MLPERF_SERVING_FRAMEWORK
+  endpoint_url: MLC_MLPERF_ENDPOINT_URL
+  serving_node: MLC_MLPERF_SERVING_NODE
+  log_path: MLC_MLPERF_SERVING_LOG_PATH
+  run_metadata_path: MLC_MLPERF_RUN_METADATA_PATH
 
 # Dependencies
 deps:

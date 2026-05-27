@@ -8,6 +8,42 @@ import json
 import yaml
 
 
+def _probe_serving_framework(url):
+    """HTTP probe to detect vLLM or SGLang from a running endpoint."""
+    import urllib.request
+    import json as _json
+    base = url.rstrip('/')
+    try:
+        with urllib.request.urlopen(f"{base}/version", timeout=5) as r:
+            d = _json.loads(r.read())
+            if isinstance(d, dict) and 'version' in d:
+                return f"vLLM {d['version']}"
+    except Exception:
+        pass
+    try:
+        with urllib.request.urlopen(f"{base}/get_server_info", timeout=5) as r:
+            d = _json.loads(r.read())
+            if isinstance(d, dict):
+                v = d.get('version') or d.get('server_version') or d.get('sglang_version') or ''
+                return f"SGLang {v}".rstrip() if v else 'SGLang'
+    except Exception:
+        pass
+    return ''
+
+
+def _parse_node(node_str):
+    """Parse 'user@host:port' into (user, host, port) with sensible defaults."""
+    parts = [p.strip() for p in node_str.split(':') if p.strip()]
+    port = parts[1] if len(parts) > 1 else '22'
+    at_parts = [p.strip() for p in parts[0].split('@') if p.strip()]
+    if len(at_parts) > 1:
+        user, host = at_parts[0], at_parts[1]
+    else:
+        host = parts[0]
+        user = 'user'
+    return user, host, port
+
+
 def preprocess(i):
 
     os_info = i['os_info']
@@ -56,21 +92,7 @@ def preprocess(i):
         remote_node_id_start = 0 if exclude_current else 1
 
         for index, sshid in enumerate(ssh_ids):
-            sshid_parts = [part.strip()
-                           for part in sshid.split(':') if part.strip()]
-            id = sshid_parts[0]
-            if len(sshid_parts) > 1:
-                port = sshid_parts[1]
-            else:
-                port = '22'  # default SSH port
-            sshid_parts = [part.strip()
-                           for part in sshid_parts[0].split('@') if part.strip()]
-            if len(sshid_parts) > 1:
-                user = sshid_parts[0]
-                host = sshid_parts[1]
-            else:
-                host = id
-                user = "user"
+            user, host, port = _parse_node(sshid)
             actual_node_id = remote_node_id_start + index
             r = mlc.access({
                 'action': 'remote_run',
@@ -87,7 +109,6 @@ def preprocess(i):
                 'path_to_copy_back_files': env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'],
                 'run_state': run_state,
                 'skip_ssh_key_file': env.get('MLC_SKIP_SSH_KEY_FILE', ''),
-                'remote_branch': 'sysinfov2',
                 'quiet': True,
             })
 
@@ -97,6 +118,40 @@ def preprocess(i):
             else:
                 logger.info(
                     f"Successfully obtained information from remote node {sshid}")
+
+    serving_node = env.get('MLC_MLPERF_SERVING_NODE', '')
+    if serving_node:
+        user, host, port = _parse_node(serving_node)
+        remote_out = '/tmp/mlperf-serving-config'
+        sc_tags = 'get,mlperf,serving-config'
+        r_sc = mlc.access({
+            'action': 'remote_run',
+            'automation': 'script',
+            'tags': sc_tags,
+            'mlc_run_cmd': f'mlcr {sc_tags}',
+            'remote_host': host,
+            'remote_user': user,
+            'remote_port': port,
+            'log_path': env.get('MLC_MLPERF_SERVING_LOG_PATH', ''),
+            'out_dir_path': remote_out,
+            'files_to_copy_back': [f'{remote_out}/serving_config.json'],
+            'path_to_copy_back_files': env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'],
+            'skip_ssh_key_file': env.get('MLC_SKIP_SSH_KEY_FILE', ''),
+            'quiet': True,
+        })
+        if r_sc['return'] > 0:
+            logger.error(f"Error obtaining serving config from {serving_node}")
+        else:
+            logger.info(f"Successfully obtained serving config from {serving_node}")
+
+    endpoint_url = env.get('MLC_MLPERF_ENDPOINT_URL', '')
+    if endpoint_url and not env.get('MLC_MLPERF_SERVING_FRAMEWORK', ''):
+        detected = _probe_serving_framework(endpoint_url)
+        if detected:
+            env['MLC_MLPERF_SERVING_FRAMEWORK'] = detected
+            logger.info("Detected serving framework via HTTP probe: %s", detected)
+        else:
+            logger.info("Could not detect serving framework from %s", endpoint_url)
 
     return {'return': 0}
 
@@ -375,7 +430,9 @@ def postprocess(i):
     for nt in node_types:
         nt.pop("system_node_name", None)
 
-    # Inject user-provided hardware/software metadata into each node type
+    # Inject user-provided hardware/software metadata into each node type.
+    # serving_framework is a system-level property and is lifted to system_under_test,
+    # so strip it from per-node software_ensemble to avoid duplication.
     other_hw = env.get("MLC_MLPERF_OTHER_HARDWARE", "")
     hw_notes = env.get("MLC_MLPERF_HARDWARE_NOTES", "")
     cooling = env.get("MLC_MLPERF_COOLING", "")
@@ -387,8 +444,12 @@ def postprocess(i):
             node_type["hardware_ensemble"]["cooling"] = cooling
         if "software_ensemble" in node_type:
             node_type["software_ensemble"]["container_link"] = container_link
+            node_type["software_ensemble"].pop("serving_framework", None)
 
     sut['node_types'] = node_types
+    serving_framework = env.get("MLC_MLPERF_SERVING_FRAMEWORK", "")
+    if serving_framework:
+        sut["serving_framework"] = serving_framework
     sut["system_metadata"]["system_size"] = env.get(
         "MLC_MLPERF_SYSTEM_SIZE", system_size)
     sut["system_metadata"]["system_node_ensemble_count"] = len(node_types)
@@ -419,5 +480,28 @@ def postprocess(i):
     except Exception as e:
         logger.error(
             f"Exception {e} occured when compiling the system information")
+
+    # Patch run_metadata.yml config_summary with serving config values if available.
+    run_md_path = env.get('MLC_MLPERF_RUN_METADATA_PATH', '')
+    serving_cfg_path = os.path.join(
+        env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'], 'serving_config.json')
+    if run_md_path and os.path.exists(serving_cfg_path) and os.path.exists(run_md_path):
+        try:
+            with open(serving_cfg_path) as f:
+                sc = json.load(f)
+            with open(run_md_path) as f:
+                run_md = yaml.safe_load(f)
+            cs = run_md.setdefault('config_summary', {})
+            for key in ('tensor_parallel', 'pipeline_parallel', 'expert_parallel', 'batch'):
+                if sc.get(key) is not None:
+                    cs[key] = sc[key]
+            with open(run_md_path, 'w') as f:
+                yaml.dump(run_md, f, default_flow_style=False, sort_keys=False, allow_unicode=True)
+            logger.info("Patched run_metadata.yml with serving config values")
+            if not env.get('MLC_MLPERF_SERVING_FRAMEWORK') and sc.get('framework'):
+                env['MLC_MLPERF_SERVING_FRAMEWORK'] = sc['framework']
+                logger.info("Detected serving framework from log: %s", sc['framework'])
+        except Exception as e:
+            logger.error(f"Failed to patch run_metadata.yml: {e}")
 
     return {'return': 0}
