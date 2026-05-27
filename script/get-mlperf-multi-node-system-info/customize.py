@@ -24,7 +24,8 @@ def _probe_serving_framework(url):
         with urllib.request.urlopen(f"{base}/get_server_info", timeout=5) as r:
             d = _json.loads(r.read())
             if isinstance(d, dict):
-                v = d.get('version') or d.get('server_version') or d.get('sglang_version') or ''
+                v = d.get('version') or d.get(
+                    'server_version') or d.get('sglang_version') or ''
                 return f"SGLang {v}".rstrip() if v else 'SGLang'
     except Exception:
         pass
@@ -142,16 +143,21 @@ def preprocess(i):
         if r_sc['return'] > 0:
             logger.error(f"Error obtaining serving config from {serving_node}")
         else:
-            logger.info(f"Successfully obtained serving config from {serving_node}")
+            logger.info(
+                f"Successfully obtained serving config from {serving_node}")
 
     endpoint_url = env.get('MLC_MLPERF_ENDPOINT_URL', '')
     if endpoint_url and not env.get('MLC_MLPERF_SERVING_FRAMEWORK', ''):
         detected = _probe_serving_framework(endpoint_url)
         if detected:
             env['MLC_MLPERF_SERVING_FRAMEWORK'] = detected
-            logger.info("Detected serving framework via HTTP probe: %s", detected)
+            logger.info(
+                "Detected serving framework via HTTP probe: %s",
+                detected)
         else:
-            logger.info("Could not detect serving framework from %s", endpoint_url)
+            logger.info(
+                "Could not detect serving framework from %s",
+                endpoint_url)
 
     return {'return': 0}
 
@@ -481,26 +487,33 @@ def postprocess(i):
         logger.error(
             f"Exception {e} occured when compiling the system information")
 
-    # Patch run_metadata.yml config_summary with serving config values if available.
+    # Patch run_metadata.yml config_summary with serving config values if
+    # available.
     run_md_path = env.get('MLC_MLPERF_RUN_METADATA_PATH', '')
     serving_cfg_path = os.path.join(
         env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'], 'serving_config.json')
-    if run_md_path and os.path.exists(serving_cfg_path) and os.path.exists(run_md_path):
+    if run_md_path and os.path.exists(
+            serving_cfg_path) and os.path.exists(run_md_path):
         try:
             with open(serving_cfg_path) as f:
                 sc = json.load(f)
             with open(run_md_path) as f:
                 run_md = yaml.safe_load(f)
             cs = run_md.setdefault('config_summary', {})
-            for key in ('tensor_parallel', 'pipeline_parallel', 'expert_parallel', 'batch'):
+            for key in ('tensor_parallel', 'pipeline_parallel',
+                        'expert_parallel', 'batch'):
                 if sc.get(key) is not None:
                     cs[key] = sc[key]
             with open(run_md_path, 'w') as f:
-                yaml.dump(run_md, f, default_flow_style=False, sort_keys=False, allow_unicode=True)
+                yaml.dump(run_md, f, default_flow_style=False,
+                          sort_keys=False, allow_unicode=True)
             logger.info("Patched run_metadata.yml with serving config values")
-            if not env.get('MLC_MLPERF_SERVING_FRAMEWORK') and sc.get('framework'):
+            if not env.get('MLC_MLPERF_SERVING_FRAMEWORK') and sc.get(
+                    'framework'):
                 env['MLC_MLPERF_SERVING_FRAMEWORK'] = sc['framework']
-                logger.info("Detected serving framework from log: %s", sc['framework'])
+                logger.info(
+                    "Detected serving framework from log: %s",
+                    sc['framework'])
         except Exception as e:
             logger.error(f"Failed to patch run_metadata.yml: {e}")
 
