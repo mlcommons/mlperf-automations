@@ -92,6 +92,13 @@ def preprocess(i):
         else:
             verify_ssl = True
 
+        # Support custom CA file via MLC_SSL_CA_FILE
+        ca_file = env.get('MLC_SSL_CA_FILE', '')
+        if ca_file and os.path.isfile(ca_file):
+            ssl_ca_file = ca_file
+        else:
+            ssl_ca_file = ''
+
         if env.get('MLC_DOWNLOAD_PATH', '') != '':
             download_path = env['MLC_DOWNLOAD_PATH']
             if os.path.isfile(download_path):
@@ -186,7 +193,8 @@ def preprocess(i):
                     for i in range(1, 5):
                         r = download_file({
                             'url': url,
-                            'verify': verify_ssl})
+                            'verify': verify_ssl,
+                            'ssl_ca_file': ssl_ca_file})
                         if r['return'] == 0:
                             download_success = True
                             break
@@ -213,7 +221,9 @@ def preprocess(i):
         elif tool == "wget":
             if env.get('MLC_DOWNLOAD_FILENAME', '') != '':
                 extra_download_options += f" --tries=3 -O {q}{env['MLC_DOWNLOAD_FILENAME']}{q} "
-                if not verify_ssl:
+                if ssl_ca_file:
+                    extra_download_options += f" --ca-certificate={q}{ssl_ca_file}{q} "
+                elif not verify_ssl:
                     extra_download_options += " --no-check-certificate "
             env['MLC_DOWNLOAD_CMD'] = f"wget -nc {extra_download_options} {url}"
             for i in range(1, 5):
@@ -238,6 +248,10 @@ def preprocess(i):
             env['MLC_DOWNLOAD_CMD'] += f" -d {q}{os.path.join(os.getcwd(), temp_download_file)}{q} {extra_download_options} {url}"
 
         elif tool == "curl":
+            if ssl_ca_file:
+                extra_download_options += f" --cacert {q}{ssl_ca_file}{q} "
+            elif not verify_ssl:
+                extra_download_options += " -k "
             if env.get('MLC_DOWNLOAD_FILENAME', '') != '':
                 extra_download_options += f" --output {q}{env['MLC_DOWNLOAD_FILENAME']}{q} "
 

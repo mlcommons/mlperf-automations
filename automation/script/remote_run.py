@@ -33,6 +33,7 @@ def remote_run(self_module, i):
     env = i.get('env', {})
     remote_host = i.get('remote_host', 'localhost')
     remote_port = i.get('remote_port', '22')
+    remote_action = i.get('remote_action', 'run')
 
     prune_result = prune_input(
         {'input': i, 'extra_keys_starts_with': ['remote_']})
@@ -87,7 +88,7 @@ def remote_run(self_module, i):
     remote_env = r.get('remote_env', {})
 
     mlc_script_input = {
-        'action': 'run', 'target': 'script'
+        'action': remote_action, 'target': 'script'
     }
 
     run_cmds = []
@@ -100,7 +101,11 @@ def remote_run(self_module, i):
     # Even if we're running from Windows locally, the remote commands execute
     # on the remote server
     run_cmds.append(
-        "curl -sSL https://raw.githubusercontent.com/mlcommons/mlcflow/refs/heads/dev/docs/install/mlcflow_linux.sh | bash -s -- --yes")
+        'if [ "$(uname)" = "Darwin" ]; then '
+        f'curl -sSL https://raw.githubusercontent.com/mlcommons/mlcflow/refs/heads/dev/docs/install/mlcflow_macos.sh | bash -s -- --yes --venv-dir {remote_mlc_python_venv}; '
+        'else '
+        f'curl -sSL https://raw.githubusercontent.com/mlcommons/mlcflow/refs/heads/dev/docs/install/mlcflow_linux.sh | bash -s -- --yes --venv-dir {remote_mlc_python_venv}; '
+        'fi')
     run_cmds.append(f". {remote_mlc_python_venv}/bin/activate")
     if i.get('remote_pull_mlc_repos', False):
         run_cmds.append("mlc pull repo")
@@ -134,6 +139,9 @@ def remote_run(self_module, i):
         for key in remote_env:
             script_run_cmd += f" --env.{key}={remote_env[key]}"
 
+    remote_pre_run_cmds = i.get('remote_pre_run_cmds', [])
+    remote_post_run_cmds = i.get('remote_post_run_cmds', [])
+
     run_cmds.append(f"{script_run_cmd}")
 
     remote_inputs = {}
@@ -150,6 +158,33 @@ def remote_run(self_module, i):
         remote_inputs['files_to_copy'] = files_to_copy
         remote_inputs['copy_directory'] = remote_copy_directory
 
+    # For repo copying, add a separate copy with MLC/repos target
+    if i.get('remote_copy_mlc_repos', False):
+        local_repos_path = os.path.join(os.path.expanduser("~"), "MLC", "repos")
+        repos_to_copy = i.get('remote_copy_mlc_repos', [])
+        if isinstance(repos_to_copy, bool) or repos_to_copy is True:
+            repos_to_copy = [
+                d for d in os.listdir(local_repos_path)
+                if os.path.isdir(os.path.join(local_repos_path, d))
+            ]
+        repo_files = [
+            os.path.join(local_repos_path, repo)
+            for repo in repos_to_copy
+            if os.path.isdir(os.path.join(local_repos_path, repo))
+        ]
+        if repo_files:
+            remote_inputs['files_to_copy'] = remote_inputs.get(
+                'files_to_copy', []) + repo_files
+            remote_mlc_repos_path = i.get("remote_mlc_repos_path", "MLC/repos")
+            remote_inputs['copy_directory'] = remote_mlc_repos_path
+            # On the remote, if MLC_REPOS is set and differs, symlink so
+            # mlcflow finds the copied repos
+            run_cmds.insert(0,
+                f'if [ -n "$MLC_REPOS" ] && [ "$MLC_REPOS" != "{remote_mlc_repos_path}" ]; then '
+                f'mkdir -p "{remote_mlc_repos_path}" && '
+                f'ln -sfn "$(realpath {remote_mlc_repos_path})"/* "$MLC_REPOS/"; '
+                f'fi')
+
     if files_to_copy_back:
         remote_inputs['files_to_copy_back'] = files_to_copy_back
 
@@ -163,6 +198,8 @@ def remote_run(self_module, i):
     mlc_remote_input = {
         'action': 'run', 'target': 'script', 'tags': 'remote,run,cmds,ssh',
         'script_tags': i.get('tags'), 'run_cmds': run_cmds,
+        'pre_run_cmds': remote_pre_run_cmds,
+        'post_run_cmds': remote_post_run_cmds,
         **remote_inputs
     }
 

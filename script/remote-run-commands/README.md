@@ -45,6 +45,8 @@ mlcr remote,run,cmds,remote-run,remote-run-cmds,ssh-run,ssh
 | `--files_to_copy` |  |  | `` |
 | `--files_to_copy_back` |  |  | `` |
 | `--host` |  |  | `localhost` |
+| `--post_run_cmds` |  |  | `` |
+| `--pre_run_cmds` |  |  | `` |
 | `--password` |  |  | `` |
 | `--path_to_copy_back_files` |  |  | `` |
 | `--port` |  |  | `22` |

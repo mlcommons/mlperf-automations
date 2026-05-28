@@ -29,6 +29,8 @@ input_mapping:
   files_to_copy: MLC_SSH_FILES_TO_COPY
   files_to_copy_back: MLC_SSH_FILES_TO_COPY_BACK
   host: MLC_SSH_HOST
+  post_run_cmds: MLC_SSH_POST_RUN_CMDS
+  pre_run_cmds: MLC_SSH_PRE_RUN_CMDS
   password: MLC_SSH_PASSWORD
   path_to_copy_back_files: MLC_SSH_PATH_TO_COPY_BACK_FILES
   port: MLC_SSH_PORT

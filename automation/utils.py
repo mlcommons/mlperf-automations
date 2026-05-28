@@ -188,40 +188,62 @@ def download_file(i):
     else:
         verify = is_true(i.get('verify_ssl', True))
 
+    # Support custom CA file via MLC_SSL_CA_FILE
+    ca_file = os.environ.get('MLC_SSL_CA_FILE', i.get('ssl_ca_file', ''))
+    if ca_file and os.path.isfile(ca_file):
+        verify = ca_file
+
     try:
-        with requests.get(url, stream=True, allow_redirects=True, verify=verify) as download:
+        try:
+            download = requests.get(
+                url,
+                stream=True,
+                allow_redirects=True,
+                verify=verify)
             download.raise_for_status()
+        except requests.exceptions.SSLError as ssl_err:
+            if verify is not False:
+                print(f"WARNING: SSL verification failed: {ssl_err}")
+                print("Retrying without SSL verification...")
+                download = requests.get(
+                    url, stream=True, allow_redirects=True, verify=False)
+                download.raise_for_status()
+            else:
+                raise
 
-            size_string = download.headers.get('Content-Length')
+        size_string = download.headers.get('Content-Length')
 
-            if size_string is None:
-                transfer_encoding = download.headers.get(
-                    'Transfer-Encoding', '')
-                if transfer_encoding != 'chunked':
-                    return {'return': 1, 'error': 'did not receive file'}
-                else:
-                    size_string = "0"
+        if size_string is None:
+            transfer_encoding = download.headers.get(
+                'Transfer-Encoding', '')
+            if transfer_encoding != 'chunked':
+                return {'return': 1, 'error': 'did not receive file'}
+            else:
+                size_string = "0"
 
-            size = int(size_string)
+        size = int(size_string)
 
-            with open(path_to_file, 'wb') as output:
-                for chunk in download.iter_content(chunk_size=chunk_size):
+        with open(path_to_file, 'wb') as output:
+            for chunk in download.iter_content(chunk_size=chunk_size):
 
-                    if chunk:
-                        output.write(chunk)
-                    if size == 0:
-                        continue
-                    downloaded += 1
-                    percent = downloaded * chunk_size * 100 / size
+                if chunk:
+                    output.write(chunk)
+                if size == 0:
+                    continue
+                downloaded += 1
+                percent = downloaded * chunk_size * 100 / size
 
-                    sys.stdout.write("\r{}{:3.0f}%".format(text, percent))
-                    sys.stdout.flush()
-
-                sys.stdout.write("\r{}{:3.0f}%".format(text, 100))
+                sys.stdout.write("\r{}{:3.0f}%".format(text, percent))
                 sys.stdout.flush()
+
+            sys.stdout.write("\r{}{:3.0f}%".format(text, 100))
+            sys.stdout.flush()
 
     except Exception as e:
         return {'return': 1, 'error': format(e)}
+    finally:
+        if 'download' in dir():
+            download.close()
 
     print('')
     if size == 0:

@@ -2,8 +2,12 @@
 
 set -e
 
-#Add your run commands here...
-# run "$MLC_RUN_CMD"
+# Skip when user-provided library path is supplied (path.# variation)
+if [[ "${MLC_JEMALLOC_LIB_PATH_PROVIDED}" == "yes" ]]; then
+    echo "User-provided library path mode - skipping build"
+    exit 0
+fi
+
 cd ${MLC_JEMALLOC_SRC_PATH}
 autoconf
 cd - 

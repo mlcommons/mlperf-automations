@@ -77,7 +77,9 @@ def preprocess(i):
 
     run_cmds = env.get('MLC_SSH_RUN_COMMANDS', [])
 
-    run_cmds = pre_run_cmds + run_cmds
+    post_run_cmds = env.get('MLC_SSH_POST_RUN_CMDS', [])
+
+    run_cmds = pre_run_cmds + run_cmds + post_run_cmds
 
     for i, cmd in enumerate(run_cmds):
         if 'cm ' in cmd:
@@ -87,6 +89,10 @@ def preprocess(i):
 
     # Use semicolon for Unix-like systems, the remote server will handle it
     cmd_string += " ; ".join(run_cmds)
+
+    # Escape single quotes so cmd_string survives SSH single-quote wrapping
+    if not is_windows:
+        cmd_string = cmd_string.replace("'", "'\\''")
 
     # Get username - on Windows, USERNAME is the env var, not USER
     user = env.get('MLC_SSH_USER', os.environ.get(
