@@ -498,17 +498,21 @@ def postprocess(i):
         try:
             with open(serving_cfg_path) as f:
                 sc = json.load(f)
+            use_json = run_md_path.endswith('.json')
             with open(run_md_path) as f:
-                run_md = yaml.safe_load(f)
+                run_md = json.load(f) if use_json else yaml.safe_load(f)
             cs = run_md.setdefault('config_summary', {})
             for key in ('tensor_parallel', 'pipeline_parallel',
                         'expert_parallel', 'batch'):
                 if sc.get(key) is not None:
                     cs[key] = sc[key]
             with open(run_md_path, 'w') as f:
-                yaml.dump(run_md, f, default_flow_style=False,
-                          sort_keys=False, allow_unicode=True)
-            logger.info("Patched run_metadata.yml with serving config values")
+                if use_json:
+                    json.dump(run_md, f, indent=2)
+                else:
+                    yaml.dump(run_md, f, default_flow_style=False,
+                              sort_keys=False, allow_unicode=True)
+            logger.info("Patched run_metadata with serving config values")
             if not env.get('MLC_MLPERF_SERVING_FRAMEWORK') and sc.get(
                     'framework'):
                 env['MLC_MLPERF_SERVING_FRAMEWORK'] = sc['framework']
