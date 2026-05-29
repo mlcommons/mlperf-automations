@@ -160,7 +160,8 @@ def remote_run(self_module, i):
 
     # For repo copying, add a separate copy with MLC/repos target
     if i.get('remote_copy_mlc_repos', False):
-        local_repos_path = os.path.join(os.path.expanduser("~"), "MLC", "repos")
+        local_repos_path = os.path.join(
+            os.path.expanduser("~"), "MLC", "repos")
         repos_to_copy = i.get('remote_copy_mlc_repos', [])
         if isinstance(repos_to_copy, bool) or repos_to_copy is True:
             repos_to_copy = [
@@ -180,10 +181,10 @@ def remote_run(self_module, i):
             # On the remote, if MLC_REPOS is set and differs, symlink so
             # mlcflow finds the copied repos
             run_cmds.insert(0,
-                f'if [ -n "$MLC_REPOS" ] && [ "$MLC_REPOS" != "{remote_mlc_repos_path}" ]; then '
-                f'mkdir -p "{remote_mlc_repos_path}" && '
-                f'ln -sfn "$(realpath {remote_mlc_repos_path})"/* "$MLC_REPOS/"; '
-                f'fi')
+                            f'if [ -n "$MLC_REPOS" ] && [ "$MLC_REPOS" != "{remote_mlc_repos_path}" ]; then '
+                            f'mkdir -p "{remote_mlc_repos_path}" && '
+                            f'ln -sfn "$(realpath {remote_mlc_repos_path})"/* "$MLC_REPOS/"; '
+                            f'fi')
 
     if files_to_copy_back:
         remote_inputs['files_to_copy_back'] = files_to_copy_back

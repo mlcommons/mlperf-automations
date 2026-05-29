@@ -244,22 +244,49 @@ def _parse_cpu_cache_table(text):
     return caches
 
 
+_KNOWN_TRAN = {'nvme', 'sata', 'ata', 'usb', 'scsi', 'ide', 'mmc', 'fc'}
+
+
 def _parse_disk_layout(text):
-    """Parse lsblk output into a list of disks."""
+    """Parse lsblk -d -n -o NAME,TYPE,SIZE,MODEL,TRAN,ROTA,VENDOR output.
+
+    TRAN can be empty on virtual disks, which collapses it when splitting by
+    whitespace and shifts ROTA into the TRAN slot.  Scan from the right for
+    ROTA ('0' or '1') to locate it reliably regardless of TRAN or VENDOR.
+    """
     disks = []
     for line in text.strip().splitlines():
-        parts = line.split(None, 6)
-        if len(parts) >= 3:
-            disk = {'name': parts[0], 'type': parts[1], 'size': parts[2]}
-            if len(parts) >= 4:
-                disk['model'] = parts[3]
-            if len(parts) >= 5:
-                disk['transport'] = parts[4]
-            if len(parts) >= 6:
-                disk['rotational'] = parts[5]
-            if len(parts) >= 7:
-                disk['vendor'] = parts[6]
+        parts = line.split()
+        if len(parts) < 3:
+            continue
+
+        disk = {'name': parts[0], 'type': parts[1], 'size': parts[2]}
+
+        # Find ROTA by scanning right-to-left for '0' or '1'
+        rota_idx = -1
+        for j in range(len(parts) - 1, 2, -1):
+            if parts[j] in ('0', '1'):
+                rota_idx = j
+                break
+
+        if rota_idx == -1:
             disks.append(disk)
+            continue
+
+        disk['rotational'] = parts[rota_idx]
+
+        if rota_idx + 1 < len(parts):
+            disk['vendor'] = ' '.join(parts[rota_idx + 1:])
+
+        tran_idx = rota_idx - 1
+        if tran_idx > 2 and parts[tran_idx].lower() in _KNOWN_TRAN:
+            disk['transport'] = parts[tran_idx]
+            disk['model'] = ' '.join(parts[3:tran_idx]) if tran_idx > 3 else ''
+        else:
+            disk['transport'] = ''
+            disk['model'] = ' '.join(parts[3:rota_idx]) if rota_idx > 3 else ''
+
+        disks.append(disk)
     return disks
 
 
