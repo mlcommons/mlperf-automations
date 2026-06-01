@@ -1,10 +1,10 @@
-"""Parse vLLM startup logs to extract serving configuration.
+"""Parse serving-framework startup logs to extract serving configuration.
 
-Reads a vLLM server log file and extracts parallelism and batch-size settings
-from the LLMEngine initialisation line. Writes a JSON file with the results.
+Reads a vLLM, SGLang, or TRT-LLM server log file and extracts parallelism and
+batch-size settings. Writes a JSON file with the results.
 
 Usage:
-    parse.py --log-path <path> --out-file <path>
+    parse.py --log-path <path> --out-file <path> [--serving-framework auto|vllm|sglang|trtllm]
 """
 
 from __future__ import annotations
@@ -36,27 +36,13 @@ _SGLANG_PATTERNS: list[tuple[str, str]] = [
     ("batch", r"max_running_requests=(\d+)"),
 ]
 
-
-def _choose_patterns(
-        text: str, serving_framework: str) -> list[tuple[str, str]]:
-    if serving_framework == "vllm":
-        return _VLLM_PATTERNS
-    if serving_framework == "sglang":
-        return _SGLANG_PATTERNS
-    # auto: detect from log keywords
-    if re.search(r"(?i)sglang", text):
-        return _SGLANG_PATTERNS
-    return _VLLM_PATTERNS
-
-
-# SGLang patterns match the server_args=ServerArgs(...) startup line.
-# max_running_requests=None does not match \d+, so batch stays null when
-# unlimited.
-_SGLANG_PATTERNS: list[tuple[str, str]] = [
-    ("tensor_parallel", r"tp_size=(\d+)"),
-    ("pipeline_parallel", r"pp_size=(\d+)"),
-    ("expert_parallel", r"ep_size=(\d+)"),
-    ("batch", r"max_running_requests=(\d+)"),
+# TRT-LLM patterns match the LLM Args dump line and the
+# "[TRT-LLM] [I] max_seq_len=..., max_num_tokens=..., max_batch_size=..." line.
+_TRTLLM_PATTERNS: list[tuple[str, str]] = [
+    ("tensor_parallel", r"tensor_parallel_size=(\d+)"),
+    ("pipeline_parallel", r"pipeline_parallel_size=(\d+)"),
+    ("batch", r"max_batch_size=(\d+)"),
+    ("max_num_tokens", r"max_num_tokens=(\d+)"),
 ]
 
 
@@ -66,15 +52,18 @@ def _choose_patterns(
         return _VLLM_PATTERNS
     if serving_framework == "sglang":
         return _SGLANG_PATTERNS
-    # auto: detect from log keywords
+    if serving_framework == "trtllm":
+        return _TRTLLM_PATTERNS
+    # auto: detect from log content
+    if re.search(r"\[TRT-LLM\]|\[TensorRT-LLM\]", text):
+        return _TRTLLM_PATTERNS
     if re.search(r"(?i)sglang", text):
         return _SGLANG_PATTERNS
     return _VLLM_PATTERNS
 
 
 # Read at most this many bytes from the start of the log file.
-# vLLM prints its engine config (tensor_parallel_size, etc.) near the top
-# during startup.
+# Serving frameworks print their config near the top during startup.
 _HEAD_BYTES = 2 * 1024 * 1024  # 2 MiB
 
 
@@ -86,6 +75,15 @@ def _read_log_head(path: str) -> str:
 
 def _detect_framework(text: str) -> str:
     """Identify serving framework and version from log text."""
+    # TRT-LLM: version banner is "[TensorRT-LLM] TensorRT LLM version: X.Y.Z"
+    m = re.search(
+        r"\[TensorRT-LLM\]\s+TensorRT LLM version:\s*(\d+\.\d+\.\d+)", text)
+    if m:
+        return f"TRT-LLM {m.group(1)}"
+    if re.search(r"\[TRT-LLM\]|\[TensorRT-LLM\]", text):
+        return "TRT-LLM"
+
+    # vLLM / SGLang: version number appears near the framework keyword
     version_m = re.search(r"version\s+(\d+\.\d+\.\d+)", text)
     version = version_m.group(1) if version_m else ""
     if re.search(r"(?i)vllm", text):
@@ -96,7 +94,6 @@ def _detect_framework(text: str) -> str:
 
 
 def parse_serving_log(log_path: str, serving_framework: str = "auto") -> dict:
-    # Result keys are determined after reading the log (patterns depend on framework).
     # Initialise with vLLM keys as a safe default; overwritten once text is
     # available.
     result: dict = {k: None for k, _ in _VLLM_PATTERNS}
@@ -142,7 +139,7 @@ def main() -> None:
     parser.add_argument(
         "--serving-framework",
         default="auto",
-        choices=["auto", "vllm", "sglang"],
+        choices=["auto", "vllm", "sglang", "trtllm"],
         help="Serving framework for log pattern selection (default: auto)")
     args = parser.parse_args()
 

@@ -9,10 +9,25 @@ import yaml
 
 
 def _probe_serving_framework(url):
-    """HTTP probe to detect vLLM or SGLang from a running endpoint."""
+    """HTTP probe to detect vLLM, SGLang, or TRT-LLM from a running endpoint."""
     import urllib.request
     import json as _json
     base = url.rstrip('/')
+    # TRT-LLM: /perf_metrics is unique to TRT-LLM (absent in vLLM and SGLang)
+    try:
+        with urllib.request.urlopen(f"{base}/perf_metrics", timeout=5) as _r:
+            _r.read()
+        try:
+            with urllib.request.urlopen(f"{base}/version", timeout=5) as r2:
+                vd = _json.loads(r2.read())
+                if isinstance(vd, dict) and 'version' in vd:
+                    return f"TRT-LLM {vd['version']}"
+        except Exception:
+            pass
+        return 'TRT-LLM'
+    except Exception:
+        pass
+    # vLLM: /version returns {"version": "x.y.z"}
     try:
         with urllib.request.urlopen(f"{base}/version", timeout=5) as r:
             d = _json.loads(r.read())
@@ -20,6 +35,7 @@ def _probe_serving_framework(url):
                 return f"vLLM {d['version']}"
     except Exception:
         pass
+    # SGLang: /get_server_info
     try:
         with urllib.request.urlopen(f"{base}/get_server_info", timeout=5) as r:
             d = _json.loads(r.read())
