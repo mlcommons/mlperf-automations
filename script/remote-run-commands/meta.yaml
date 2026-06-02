@@ -16,9 +16,13 @@ tags:
 
 # Dependencies
 deps:
+- tags: detect-os
 - tags: get,sys-util,generic,_rsync
   names:
   - rsync
+  skip_if_env:
+    MLC_HOST_OS_TYPE:
+    - windows
 
 # Environment
 default_env:
