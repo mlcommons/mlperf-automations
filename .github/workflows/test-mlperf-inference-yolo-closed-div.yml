@@ -3,10 +3,10 @@ permissions:
   contents: read
 
 on:
-  schedule:
-    - cron: '0 0 * * *'  # Runs daily at 12 AM UTC
+  #schedule:
+  #  - cron: '0 0 * * *'  # Runs daily at 12 AM UTC
   pull_request_target:
-    branches: [ "main", "dev" ]
+    branches: [ "main-off", "dev-off" ]
     paths:
       - '.github/workflows/test-mlperf-inference-yolo.yml'
       - '**'

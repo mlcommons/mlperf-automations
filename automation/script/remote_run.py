@@ -140,6 +140,7 @@ def remote_run(self_module, i):
             script_run_cmd += f" --env.{key}={remote_env[key]}"
 
     remote_pre_run_cmds = i.get('remote_pre_run_cmds', [])
+    remote_post_run_cmds = i.get('remote_post_run_cmds', [])
 
     run_cmds.append(f"{script_run_cmd}")
 
@@ -157,6 +158,34 @@ def remote_run(self_module, i):
         remote_inputs['files_to_copy'] = files_to_copy
         remote_inputs['copy_directory'] = remote_copy_directory
 
+    # For repo copying, add a separate copy with MLC/repos target
+    if i.get('remote_copy_mlc_repos', False):
+        local_repos_path = os.path.join(
+            os.path.expanduser("~"), "MLC", "repos")
+        repos_to_copy = i.get('remote_copy_mlc_repos', [])
+        if isinstance(repos_to_copy, bool) or repos_to_copy is True:
+            repos_to_copy = [
+                d for d in os.listdir(local_repos_path)
+                if os.path.isdir(os.path.join(local_repos_path, d))
+            ]
+        repo_files = [
+            os.path.join(local_repos_path, repo)
+            for repo in repos_to_copy
+            if os.path.isdir(os.path.join(local_repos_path, repo))
+        ]
+        if repo_files:
+            remote_inputs['files_to_copy'] = remote_inputs.get(
+                'files_to_copy', []) + repo_files
+            remote_mlc_repos_path = i.get("remote_mlc_repos_path", "MLC/repos")
+            remote_inputs['copy_directory'] = remote_mlc_repos_path
+            # On the remote, if MLC_REPOS is set and differs, symlink so
+            # mlcflow finds the copied repos
+            run_cmds.insert(0,
+                            f'if [ -n "$MLC_REPOS" ] && [ "$MLC_REPOS" != "{remote_mlc_repos_path}" ]; then '
+                            f'mkdir -p "{remote_mlc_repos_path}" && '
+                            f'ln -sfn "$(realpath {remote_mlc_repos_path})"/* "$MLC_REPOS/"; '
+                            f'fi')
+
     if files_to_copy_back:
         remote_inputs['files_to_copy_back'] = files_to_copy_back
 
@@ -171,6 +200,7 @@ def remote_run(self_module, i):
         'action': 'run', 'target': 'script', 'tags': 'remote,run,cmds,ssh',
         'script_tags': i.get('tags'), 'run_cmds': run_cmds,
         'pre_run_cmds': remote_pre_run_cmds,
+        'post_run_cmds': remote_post_run_cmds,
         **remote_inputs
     }
 
