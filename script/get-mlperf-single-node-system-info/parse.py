@@ -1,5 +1,7 @@
 import json
 import argparse
+import math
+import subprocess
 from pathlib import Path
 import sys
 import os
@@ -17,14 +19,17 @@ EXTRACT_RULES = {
     "host_processors_per_node": {
         "source": "env",
         "candidates": ["MLC_HOST_CPU_SOCKETS"],
+        "type": "int",
     },
     "host_processor_core_count": {
         "source": "env",
         "candidates": ["MLC_HOST_CPU_TOTAL_PHYSICAL_CORES"],
+        "type": "int",
     },
     "host_processor_vcpu_count": {
         "source": "env",
         "candidates": ["MLC_HOST_CPU_TOTAL_LOGICAL_CORES"],
+        "type": "int",
     },
 
     # ---------------- Memory ----------------
@@ -53,7 +58,7 @@ EXTRACT_RULES = {
     },
     "accelerator_memory_type": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_MEMORY_TYPE",  "MLC_XPU_DEVICE_PROP_MEMORY_TYPE"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_MEMORY_TYPE", "MLC_XPU_DEVICE_PROP_MEMORY_TYPE"],
     },
     "accelerator_interconnect": {
         "source": "env",
@@ -62,11 +67,6 @@ EXTRACT_RULES = {
     "accelerator_host_interconnect": {
         "source": "env",
         "candidates": ["MLC_CUDA_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_ROCM_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_XPU_DEVICE_PROP_HOST_INTERCONNECT_TYPE"],
-    },
-
-    "accelerator_frequency": {
-        "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_MAX_CLOCK_RATE", "MLC_ROCM_DEVICE_PROP_MAX_CLOCK_RATE", "MLC_XPU_DEVICE_PROP_MAX_CLOCK_RATE"],
     },
 
     # ---------------- Networking ----------------
@@ -89,10 +89,36 @@ EXTRACT_RULES = {
         "candidates": ["MLC_HOST_STORAGE_TYPE"],
     },
 
-    # ---------------- Software Ensemble ----------------
-    "framework": {
+    # ---------------- Other hardware metadata ----------------
+    "other_hardware": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_CUDA_DRIVER_VERSION", "MLC_CUDA_DEVICE_PROP_CUDA_RUNTIME_VERSION"],
+        "candidates": ["MLC_MLPERF_OTHER_HARDWARE"],
+        "optional": True,
+    },
+    "hw_notes": {
+        "source": "env",
+        "candidates": ["MLC_MLPERF_HARDWARE_NOTES"],
+        "optional": True,
+    },
+    "cooling": {
+        "source": "env",
+        "candidates": ["MLC_MLPERF_COOLING"],
+        "optional": True,
+    },
+
+    # ---------------- Software Ensemble ----------------
+    "serving_framework": {
+        "source": "env",
+        "candidates": ["MLC_MLPERF_SERVING_FRAMEWORK"],
+        "optional": True,
+    },
+    "inference_backend": {
+        "source": "detect",
+        "candidates": [],
+    },
+    "driver": {
+        "source": "env",
+        "candidates": ["MLC_HOST_GPU_DRIVER_VERSION"],
     },
     "operating_system": {
         "source": "env",
@@ -102,13 +128,20 @@ EXTRACT_RULES = {
         "source": "env",
         "candidates": ["MLC_HOST_FILESYSTEMS"],
     },
+    "container_link": {
+        "source": "env",
+        "candidates": ["MLC_MLPERF_CONTAINER_LINK"],
+        "optional": True,
+    },
     "other_software_stack": {
         "source": "env",
         "candidates": [],
+        "optional": True,
     },
     "sw_notes": {
         "source": "env",
         "candidates": [],
+        "optional": True,
     }
 }
 
@@ -123,42 +156,116 @@ def parse_args():
 # -------------------------------------------------------------------
 
 
+def _run(cmd, timeout=10):
+    try:
+        return subprocess.run(cmd, capture_output=True,
+                              text=True, timeout=timeout)
+    except Exception:
+        return None
+
+
+def _pip_version(package):
+    r = _run(["pip", "show", package])
+    if r and r.returncode == 0:
+        for line in r.stdout.splitlines():
+            if line.startswith("Version:"):
+                return line.split(":", 1)[1].strip()
+    return None
+
+
+def detect_inference_backend():
+    """Build inference backend string from CUDA/ROCm + cuDNN versions."""
+    parts = []
+
+    cuda_runtime = os.environ.get(
+        "MLC_CUDA_DEVICE_PROP_CUDA_RUNTIME_VERSION", "")
+    if cuda_runtime:
+        parts.append(f"CUDA {cuda_runtime}")
+
+    rocm_version = (os.environ.get("MLC_ROCM_VERSION", "")
+                    or os.environ.get("MLC_ROCM_DEVICE_PROP_ROCM_VERSION", ""))
+    if rocm_version:
+        parts.append(f"ROCm {rocm_version}")
+
+    cudnn_version = None
+    for pkg in ("nvidia-cudnn-cu12", "nvidia-cudnn-cu11", "cudnn"):
+        cudnn_version = _pip_version(pkg)
+        if cudnn_version:
+            break
+    if cudnn_version:
+        parts.append(f"cuDNN {cudnn_version}")
+
+    return ", ".join(parts)
+
+
+# -------------------------------------------------------------------
+
+
 def extract_value(rule, field_key):
-    value = ""
+    """Return the field value on success, or a human-readable reason string on failure.
+    Optional fields return None when empty (no reason string).
+    Int-typed fields return an int on success or a reason string on failure.
+    """
+    if rule.get("source") == "detect":
+        try:
+            if field_key == "inference_backend":
+                v = detect_inference_backend()
+                return v if v else "Not detected: CUDA/ROCm/XPU runtime not found"
+            else:
+                return "Not available"
+        except Exception as e:
+            return f"Not detected: {field_key} detection error ({e})"
 
-    if field_key == "framework":
-        for candidate in rule["candidates"]:
-            env_output = os.environ.get(candidate, "")
-            if env_output:
-                if "cuda_runtime" in candidate.lower():
-                    value += f"Cuda runtime version {env_output} ; "
-                elif "cuda_driver" in candidate.lower():
-                    value += f"Cuda driver version {env_output} ; "
-        return value
-
-    for candidate in rule["candidates"]:
-        value += f" {os.environ.get(candidate, '')}"
+    # Collect non-empty env var values
+    candidates = rule.get("candidates", [])
+    parts = [os.environ.get(c, "") for c in candidates]
+    value = " ".join(p for p in parts if p).strip()
 
     if field_key == "accelerators_per_node":
-        value = sum(int(elem) for elem in value.split() if elem.isdigit())
-        return str(value)
+        nums = [int(x) for x in value.split() if x.isdigit()]
+        return sum(nums) if nums else "Not available"
+
+    if field_key == "host_network_card_count":
+        networking = os.environ.get("MLC_HOST_NETWORKING", "").strip()
+        if value and networking:
+            return f"{value}x {networking}"
+        if value:
+            return f"{value}x"
+        return "Not available"
 
     if field_key == "accelerator_memory_capacity":
-        value = value.strip()
-        if len(value.split()) == 2:
-            value = value.split()[0]
         if not value:
-            return ""
-        value_bytes = float(value)
+            return "Not available"
+        raw = value.split()[0]
+        try:
+            value_bytes = float(raw)
+        except ValueError:
+            return "Not available"
         if value_bytes == 0:
-            return ""
-        # get as decimal gigabytes as marketed by the vendors
-        if value_bytes >= 1000**3:
-            return f"{int(value_bytes/(1000**3))}GB"
-        else:
-            return f"{int(value_bytes)}GB"
+            return "Not available"
+        # Report in GiB (binary) using ceil to align with GPU product marketing values.
+        # CUDA global memory is slightly below the marketed GiB due to driver reservation;
+        # ceil absorbs that gap so e.g. 31.37 GiB → 32 GiB (matching "32 GB" on
+        # the box).
+        if value_bytes >= 1024 ** 3:
+            return f"{math.ceil(value_bytes / (1024 ** 3))}GiB"
+        return f"{int(value_bytes)}GiB"
 
-    return value.strip()
+    if field_key == "host_storage_type" and value == "No disk layout data found":
+        return "Not available"
+
+    if rule.get("type") == "int":
+        if not value:
+            return "Not available"
+        try:
+            return int(value)
+        except (ValueError, TypeError):
+            return "Not available"
+
+    if rule.get("optional"):
+        return value if value else None
+
+    return value if value else "Not available"
 
 # -------------------------------------------------------------------
 
@@ -173,39 +280,34 @@ def main():
     for target_key, rule in EXTRACT_RULES.items():
         try:
             ensemble_type_subpart = ""
-            # get ensemble type subpart
             if target_key in ["host_processor_model_name", "host_processors_per_node",
                               "host_processor_core_count", "host_processor_vcpu_count"]:
                 ensemble_type_subpart = "processor"
             elif target_key in ["host_memory_capacity", "host_memory_configuration"]:
                 ensemble_type_subpart = "host_memory"
-            elif target_key in ["accelerator_model_name", "accelerators_per_node", "accelerator_memory_capacity", "accelerator_memory_type", "accelerator_interconnect", "accelerator_host_interconnect", "accelerator_frequency"]:
+            elif target_key in ["accelerator_model_name", "accelerators_per_node",
+                                "accelerator_memory_capacity", "accelerator_memory_type",
+                                "accelerator_interconnect", "accelerator_host_interconnect"]:
                 ensemble_type_subpart = "accelerator"
             elif target_key in ["host_network_card_count", "host_networking"]:
                 ensemble_type_subpart = "networking"
             elif target_key in ["host_storage_capacity", "host_storage_type"]:
                 ensemble_type_subpart = "storage"
-            elif target_key in ["other_hardware", "cooling", "hw_notes"]:
-                ensemble_type_subpart = "other"
 
-            # get ensemble type
-            if ensemble_type_subpart in [
-                    "processor", "host_memory", "accelerator", "networking", "storage", "other"]:
-                ensemble_type = "hardware_ensemble"
-                if ensemble_type not in parsed:
-                    parsed[ensemble_type] = {}
-                if ensemble_type_subpart not in parsed[ensemble_type]:
-                    parsed[ensemble_type][ensemble_type_subpart] = {}
-                parsed[ensemble_type][ensemble_type_subpart][target_key] = extract_value(
-                    rule, target_key)
-            elif target_key in ["framework", "operating_system", "filesystem", "other_software_stack", "sw_notes"]:
-                ensemble_type = "software_ensemble"
-                if ensemble_type not in parsed:
-                    parsed[ensemble_type] = {}
-                parsed[ensemble_type][target_key] = extract_value(
-                    rule, target_key)
+            value = extract_value(rule, target_key)
+
+            if target_key in ["other_hardware", "cooling", "hw_notes"]:
+                parsed.setdefault("hardware_ensemble", {})[target_key] = value
+            elif ensemble_type_subpart in [
+                    "processor", "host_memory", "accelerator", "networking", "storage"]:
+                parsed.setdefault("hardware_ensemble", {}).setdefault(
+                    ensemble_type_subpart, {})[target_key] = value
+            elif target_key in ["serving_framework", "inference_backend", "driver",
+                                "operating_system", "filesystem", "container_link",
+                                "other_software_stack", "sw_notes"]:
+                parsed.setdefault("software_ensemble", {})[target_key] = value
         except Exception as e:
-            parsed[target_key] = ""
+            parsed[target_key] = f"Not detected: extraction error ({e})"
             print(
                 f"[WARN] Failed to extract {target_key}: {e}",
                 file=sys.stderr)
