@@ -80,3 +80,16 @@ variation_tags_alias:
   force-logout: _force-logout
   no-network: _no-network
   no-undo: _no-undo
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - no-new-logins
+  - variations_list:
+    - force-logout
+  - variations_list:
+    - no-network
+  - variations_list:
+    - no-new-logins,no-undo
+
