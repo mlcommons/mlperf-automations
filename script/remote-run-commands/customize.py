@@ -36,7 +36,7 @@ def copy_over_ssh(file, ssh_cmd, user, host,
             file,
             f"{user}@{host}:{target_directory}/"
         ]
-    logger.info(f"Executing: {" ".join(cmd)}")
+    logger.info(f"Executing: {' '.join(cmd)}")
     result = subprocess.run(
         cmd,
         env=os.environ,

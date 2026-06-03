@@ -6,3 +6,4 @@ ${MLC_PYTHON_BIN_WITH_PATH} "${MLC_TMP_CURRENT_SCRIPT_PATH}/parse.py" \
     --log-path "${MLC_MLPERF_SERVING_LOG_PATH:-}" \
     --out-file "${MLC_MLPERF_SERVING_CONFIG_JSON}" \
     --serving-framework "${MLC_MLPERF_SERVING_FRAMEWORK_TYPE:-auto}"
+    # valid values: auto | vllm | sglang | trtllm
