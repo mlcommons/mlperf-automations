@@ -120,7 +120,8 @@ def preprocess(i):
                     logger.info(
                         f"Successfully obtained information from remote node {sshid}")
             except Exception as e:
-                logger.error(f"Exception during remote_run for node {sshid}: {e}")
+                logger.error(
+                    f"Exception during remote_run for node {sshid}: {e}")
 
     serving_node = env.get('MLC_MLPERF_SERVING_NODE', '')
     if serving_node:
@@ -146,12 +147,14 @@ def preprocess(i):
                 'quiet': True,
             })
             if r_sc['return'] > 0:
-                logger.error(f"Error obtaining serving config from {serving_node}")
+                logger.error(
+                    f"Error obtaining serving config from {serving_node}")
             else:
                 logger.info(
                     f"Successfully obtained serving config from {serving_node}")
         except Exception as e:
-            logger.error(f"Exception during serving config remote_run for {serving_node}: {e}")
+            logger.error(
+                f"Exception during serving config remote_run for {serving_node}: {e}")
 
     endpoint_url = env.get('MLC_MLPERF_ENDPOINT_URL', '')
     if endpoint_url and not env.get('MLC_MLPERF_SERVING_FRAMEWORK', ''):
