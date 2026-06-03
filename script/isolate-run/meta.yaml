@@ -1,0 +1,82 @@
+alias: isolate-run
+uid: 170630aeb0844ee1
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: DevOps automation
+tags:
+- isolate
+- isolate-run
+- isolate-user
+
+# Cache
+cache: false
+
+# Environment
+default_env:
+  MLC_ISOLATE_UNDO: 'yes'
+
+input_mapping:
+  user: MLC_ISOLATE_USER
+  network: MLC_ISOLATE_NETWORK
+  force_logout: MLC_ISOLATE_FORCE_LOGOUT
+  no_new_logins: MLC_ISOLATE_NO_NEW_LOGINS
+  undo: MLC_ISOLATE_UNDO
+  no_undo: MLC_ISOLATE_NO_UNDO
+
+new_env_keys:
+- MLC_ISOLATE_*
+
+# Dependencies
+deps:
+- tags: detect,os
+
+- enable_if_env:
+    MLC_ISOLATE_NO_NEW_LOGINS:
+    - 'yes'
+    - 'true'
+    - 'True'
+  tags: detect,sudo
+
+- enable_if_env:
+    MLC_ISOLATE_FORCE_LOGOUT:
+    - 'yes'
+    - 'true'
+    - 'True'
+  tags: detect,sudo
+
+- enable_if_env:
+    MLC_ISOLATE_NETWORK:
+    - 'yes'
+    - 'true'
+    - 'True'
+  tags: detect,sudo
+
+# Variations
+variations:
+  no-new-logins:
+    group: user-isolation
+    env:
+      MLC_ISOLATE_NO_NEW_LOGINS: 'yes'
+
+  force-logout:
+    group: user-isolation
+    env:
+      MLC_ISOLATE_FORCE_LOGOUT: 'yes'
+
+  no-network:
+    group: network-isolation
+    env:
+      MLC_ISOLATE_NETWORK: 'yes'
+
+  no-undo:
+    env:
+      MLC_ISOLATE_UNDO: 'no'
+      MLC_ISOLATE_NO_UNDO: 'yes'
+
+variation_tags_alias:
+  no-new-logins: _no-new-logins
+  force-logout: _force-logout
+  no-network: _no-network
+  no-undo: _no-undo

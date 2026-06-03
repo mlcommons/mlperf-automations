@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-05-23 04:34:02*
+*Last updated: 2026-06-03 17:54:54*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -657,6 +657,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-huggingface-cli](get-huggingface-cli/)**
   - get-huggingface-cli
   - Tags: `get`, `huggingface`, `hf-cli`, `huggingface-cli`, `cli`
+- **[isolate-run](isolate-run/)**
+  - isolate-run
+  - Tags: `isolate`, `isolate-run`, `isolate-user`
 - **[pull-git-repo](pull-git-repo/)**
   - pull-git-repo
   - Tags: `pull`, `git`, `repo`, `repository`
@@ -1238,7 +1241,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 363
+- **Total Scripts**: 364
 - **Categories**: 34
 
 ## Usage
