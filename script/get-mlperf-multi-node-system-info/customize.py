@@ -95,57 +95,63 @@ def preprocess(i):
         for index, sshid in enumerate(ssh_ids):
             user, host, port = _parse_node(sshid)
             actual_node_id = remote_node_id_start + index
-            r = mlc.access({
-                'action': 'remote_run',
-                'automation': 'script',
-                'tags': rr_tags,
-                'run_cmd': f"{rr_tags}",
-                'mlc_run_cmd': f"mlcr {rr_tags}",
-                'node_id': actual_node_id,
-                'out_dir_path': f"/tmp/mlperf-system-info-single-node",
-                'remote_host': host,
-                'remote_user': user,
-                'remote_port': port,
-                'files_to_copy_back': [f"/tmp/mlperf-system-info-single-node/mlperf-system-info-single-node-{actual_node_id}.json"],
-                'path_to_copy_back_files': env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'],
-                'run_state': run_state,
-                'skip_ssh_key_file': env.get('MLC_SKIP_SSH_KEY_FILE', ''),
-                'quiet': True,
-            })
-
-            if r['return'] > 0:
-                logger.error(
-                    f"Error obtaining information from remote node {sshid}!")
-            else:
-                logger.info(
-                    f"Successfully obtained information from remote node {sshid}")
+            try:
+                r = mlc.access({
+                    'action': 'remote_run',
+                    'automation': 'script',
+                    'tags': rr_tags,
+                    'run_cmd': f"{rr_tags}",
+                    'mlc_run_cmd': f"mlcr {rr_tags}",
+                    'node_id': actual_node_id,
+                    'out_dir_path': f"/tmp/mlperf-system-info-single-node",
+                    'remote_host': host,
+                    'remote_user': user,
+                    'remote_port': port,
+                    'files_to_copy_back': [f"/tmp/mlperf-system-info-single-node/mlperf-system-info-single-node-{actual_node_id}.json"],
+                    'path_to_copy_back_files': env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'],
+                    'run_state': run_state,
+                    'skip_ssh_key_file': env.get('MLC_SKIP_SSH_KEY_FILE', ''),
+                    'quiet': True,
+                })
+                if r['return'] > 0:
+                    logger.error(
+                        f"Error obtaining information from remote node {sshid}!")
+                else:
+                    logger.info(
+                        f"Successfully obtained information from remote node {sshid}")
+            except Exception as e:
+                logger.error(f"Exception during remote_run for node {sshid}: {e}")
 
     serving_node = env.get('MLC_MLPERF_SERVING_NODE', '')
     if serving_node:
         user, host, port = _parse_node(serving_node)
         remote_out = '/tmp/mlperf-serving-config'
         sc_tags = 'get,mlperf,serving-config'
-        r_sc = mlc.access({
-            'action': 'remote_run',
-            'automation': 'script',
-            'tags': sc_tags,
-            'mlc_run_cmd': f'mlcr {sc_tags}',
-            'remote_host': host,
-            'remote_user': user,
-            'remote_port': port,
-            'log_path': env.get('MLC_MLPERF_SERVING_LOG_PATH', ''),
-            'out_dir_path': remote_out,
-            'files_to_copy_back': [f'{remote_out}/serving_config.json'],
-            'path_to_copy_back_files': env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'],
-            'skip_ssh_key_file': env.get('MLC_SKIP_SSH_KEY_FILE', ''),
-            'serving_framework_type': env.get('MLC_MLPERF_SERVING_FRAMEWORK_TYPE', 'auto'),
-            'quiet': True,
-        })
-        if r_sc['return'] > 0:
-            logger.error(f"Error obtaining serving config from {serving_node}")
-        else:
-            logger.info(
-                f"Successfully obtained serving config from {serving_node}")
+        try:
+            r_sc = mlc.access({
+                'action': 'remote_run',
+                'automation': 'script',
+                'tags': sc_tags,
+                "run_cmd": f"{sc_tags}",
+                'mlc_run_cmd': f'mlcr {sc_tags}',
+                'remote_host': host,
+                'remote_user': user,
+                'remote_port': port,
+                'log_path': env.get('MLC_MLPERF_SERVING_LOG_PATH', ''),
+                'out_dir_path': remote_out,
+                'files_to_copy_back': [f'{remote_out}/serving_config.json'],
+                'path_to_copy_back_files': env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'],
+                'skip_ssh_key_file': env.get('MLC_SKIP_SSH_KEY_FILE', ''),
+                'serving_framework_type': env.get('MLC_MLPERF_SERVING_FRAMEWORK_TYPE', 'auto'),
+                'quiet': True,
+            })
+            if r_sc['return'] > 0:
+                logger.error(f"Error obtaining serving config from {serving_node}")
+            else:
+                logger.info(
+                    f"Successfully obtained serving config from {serving_node}")
+        except Exception as e:
+            logger.error(f"Exception during serving config remote_run for {serving_node}: {e}")
 
     endpoint_url = env.get('MLC_MLPERF_ENDPOINT_URL', '')
     if endpoint_url and not env.get('MLC_MLPERF_SERVING_FRAMEWORK', ''):
@@ -506,6 +512,7 @@ def postprocess(i):
                         'expert_parallel', 'batch'):
                 if sc.get(key) is not None:
                     cs[key] = sc[key]
+            run_md["config_summary"] = cs
             with open(run_md_path, 'w') as f:
                 if use_json:
                     json.dump(run_md, f, indent=2)
