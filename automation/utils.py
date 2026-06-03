@@ -195,13 +195,18 @@ def download_file(i):
 
     try:
         try:
-            download = requests.get(url, stream=True, allow_redirects=True, verify=verify)
+            download = requests.get(
+                url,
+                stream=True,
+                allow_redirects=True,
+                verify=verify)
             download.raise_for_status()
         except requests.exceptions.SSLError as ssl_err:
             if verify is not False:
                 print(f"WARNING: SSL verification failed: {ssl_err}")
                 print("Retrying without SSL verification...")
-                download = requests.get(url, stream=True, allow_redirects=True, verify=False)
+                download = requests.get(
+                    url, stream=True, allow_redirects=True, verify=False)
                 download.raise_for_status()
             else:
                 raise
