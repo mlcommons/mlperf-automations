@@ -44,8 +44,7 @@ mlcr isolate,isolate-run,isolate-user
 | `--network` |  |  | `` |
 | `--force_logout` |  |  | `` |
 | `--no_new_logins` |  |  | `` |
-| `--undo` |  |  | `yes` |
-| `--no_undo` |  |  | `` |
+| `--state_dir` |  |  | `/tmp/mlc-isolate-state` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -68,13 +67,14 @@ mlcr isolate,isolate-run,isolate-user
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
+### Action
+
+- `set`
+- `unset`
+
 ### Network-isolation
 
 - `no-network`
-
-### Ungrouped
-
-- `no-undo`
 
 ### User-isolation
 
