@@ -15,15 +15,14 @@ cache: false
 
 # Environment
 default_env:
-  MLC_ISOLATE_UNDO: 'yes'
+  MLC_ISOLATE_STATE_DIR: '/tmp/mlc-isolate-state'
 
 input_mapping:
   user: MLC_ISOLATE_USER
   network: MLC_ISOLATE_NETWORK
   force_logout: MLC_ISOLATE_FORCE_LOGOUT
   no_new_logins: MLC_ISOLATE_NO_NEW_LOGINS
-  undo: MLC_ISOLATE_UNDO
-  no_undo: MLC_ISOLATE_NO_UNDO
+  state_dir: MLC_ISOLATE_STATE_DIR
 
 new_env_keys:
 - MLC_ISOLATE_*
@@ -55,6 +54,16 @@ deps:
 
 # Variations
 variations:
+  set:
+    group: action
+    env:
+      MLC_ISOLATE_ACTION: 'set'
+
+  unset:
+    group: action
+    env:
+      MLC_ISOLATE_ACTION: 'unset'
+
   no-new-logins:
     group: user-isolation
     env:
@@ -70,26 +79,21 @@ variations:
     env:
       MLC_ISOLATE_NETWORK: 'yes'
 
-  no-undo:
-    env:
-      MLC_ISOLATE_UNDO: 'no'
-      MLC_ISOLATE_NO_UNDO: 'yes'
-
 variation_tags_alias:
+  set: _set
+  unset: _unset
   no-new-logins: _no-new-logins
   force-logout: _force-logout
   no-network: _no-network
-  no-undo: _no-undo
 
 # Tests
 tests:
   run_inputs:
   - variations_list:
-    - no-new-logins
+    - set,no-new-logins
   - variations_list:
-    - force-logout
+    - unset,no-new-logins
   - variations_list:
-    - no-network
+    - set,force-logout
   - variations_list:
-    - no-new-logins,no-undo
-
+    - unset,force-logout
