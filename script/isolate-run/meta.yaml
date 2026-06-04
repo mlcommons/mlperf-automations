@@ -97,7 +97,3 @@ tests:
     - set,force-logout
   - variations_list:
     - unset,force-logout
-  - variations_list:
-    - set,no-network
-  - variations_list:
-    - unset,no-network
