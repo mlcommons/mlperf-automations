@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-06-03 18:04:21*
+*Last updated: 2026-06-04 23:43:44*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -1008,6 +1008,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-mlperf-multi-node-system-info](get-mlperf-multi-node-system-info/)**
   - get-mlperf-multi-node-system-info
   - Tags: `get-mlperf-multi-node-system-info`
+- **[get-mlperf-serving-config](get-mlperf-serving-config/)**
+  - get-mlperf-serving-config
+  - Tags: `get`, `mlperf`, `serving-config`
 - **[get-mlperf-single-node-system-info](get-mlperf-single-node-system-info/)**
   - get-mlperf-single-node-system-info
   - Tags: `get`, `mlperf`, `single-node`, `system-info`
@@ -1241,7 +1244,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 364
+- **Total Scripts**: 365
 - **Categories**: 34
 
 ## Usage
