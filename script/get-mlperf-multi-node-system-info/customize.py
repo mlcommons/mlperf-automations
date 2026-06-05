@@ -98,8 +98,9 @@ def preprocess(i):
 
         # set remote run tags
         rr_tags = "get,mlperf,single-node,system-info"
-        if env.get('MLC_ACCELERATOR_BACKEND', '') == 'cuda':
-            rr_tags += ",_cuda"
+        backend = env.get('MLC_ACCELERATOR_BACKEND', '')
+        if backend in ('cuda', 'rocm', 'xpu'):
+            rr_tags += f",_{backend}"
         ssh_ids = [
             s.strip() for s in env['MLC_MULTINODE_SYSTEM_SSH_IDS'].split(',') if s.strip()]
 
