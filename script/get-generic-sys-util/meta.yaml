@@ -872,6 +872,7 @@ variations:
   psmisc:
     env:
       MLC_SYS_UTIL_NAME: psmisc
+      MLC_SYS_UTIL_VERSION_CMD_OVERRIDE: which pstree
     new_env_keys:
     - MLC_PSMISC_VERSION
     state:
