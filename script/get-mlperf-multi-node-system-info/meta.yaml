@@ -18,6 +18,7 @@ new_env_keys:
 
 # Input mapping
 input_mapping:
+  config_file: MLC_MLPERF_CONFIG_FILE
   category: MLC_MLPERF_SUBMISSION_SYSTEM_TYPE
   cooling: MLC_MLPERF_COOLING
   dataset_id: MLC_MLPERF_DATASET_ID
@@ -37,12 +38,9 @@ input_mapping:
   out_dir_path: MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH
   out_file_name: MLC_MULTI_NODE_SYSTEM_INFO_FILE_NAME
   output_token_average: MLC_MLPERF_DATASET_OUTPUT_TOKEN_AVERAGE
-  publish_date: MLC_MLPERF_PUBLISH_DATE
   skip_ssh_key_file: MLC_SKIP_SSH_KEY_FILE
   ssh_ids: MLC_MULTINODE_SYSTEM_SSH_IDS
   status: MLC_MLPERF_SUBMISSION_SYSTEM_STATUS
-  submission_date: MLC_MLPERF_SUBMISSION_DATE
-  submission_id: MLC_MLPERF_SUBMISSION_ID
   submitter_contact: MLC_MLPERF_SUBMITTER_CONTACT
   submitter_org_name: MLC_MLPERF_SUBMITTER
   node_config_file: MLC_NODE_CONFIG_FILE
@@ -56,6 +54,8 @@ input_mapping:
   endpoint_url: MLC_MLPERF_ENDPOINT_URL
   serving_node: MLC_MLPERF_SERVING_NODE
   log_path: MLC_MLPERF_SERVING_LOG_PATH
+default_env:
+  MLC_MLPERF_SERVING_LOG_PATH: /tmp/serving.log
   run_metadata_path: MLC_MLPERF_RUN_METADATA_PATH
   serving_framework_type: MLC_MLPERF_SERVING_FRAMEWORK_TYPE
 

@@ -57,25 +57,64 @@ mlcr get-mlperf-multi-node-system-info,_cuda,_exclude_current_node \
   --ssh_ids=user@node1:22,user@node2:22 \
   --out_dir_path=/tmp/sysinfo \
   --serving_node=user@node1:22 \
-  --log_path=/tmp/vllm.log \
   --endpoint_url=http://node1:8000
 ```
 
-`--endpoint_url` is probed via HTTP to detect the serving framework name and version (e.g. `vLLM 0.9.0`). `--serving_node` + `--log_path` is used to extract parallelism settings from the startup log. Both are optional and independent.
+`--endpoint_url` is probed via HTTP to detect the serving framework name and version (e.g. `vLLM 0.9.0`). `--serving_node` + `--log_path` is used to extract parallelism settings from the startup log. Both are optional and independent. If `--log_path` is not provided, it defaults to `/tmp/serving.log` on the serving node — redirect your server's stdout/stderr there before running:
+
+```bash
+python -m vllm.entrypoints.openai.api_server ... > /tmp/serving.log 2>&1 &
+```
 
 ## Parameters
 
+### Infrastructure
+
 | Parameter | Description | Default |
 |-----------|-------------|---------|
+| `--config_file` | Path to a JSON or YAML file supplying submission/model/dataset metadata (see [Config file](#config-file)). Individual CLI args take precedence over values in this file. | — |
 | `--ssh_ids` | **Required.** Comma-separated SSH targets. Format: `user@host` or `user@host:port`. | — |
 | `--out_dir_path` | Directory where the output JSON is written. | current directory |
-| `--out_file_name` | Output file name. | `system_desc.json` |
+| `--out_file_name` | Output file name. | `system-info-multi-node.json` |
 | `--skip_ssh_key_file` | Skip mlcflow's SSH key file lookup; use pre-configured key auth. | `False` |
 | `--node_config_file` | Path to a YAML file declaring function-based node groupings. | — |
 | `--serving_node` | SSH target of the inference server (`user@host:port`). When set, the script SSHes in to extract serving config from the startup log. | — |
-| `--log_path` | Path to the vLLM or SGLang server log **on the serving node**. Required when `--serving_node` is set and serving config extraction is desired. | — |
+| `--log_path` | Path to the serving framework log **on the serving node**. Used to extract parallelism config from the startup output. If not provided, defaults to `/tmp/serving.log`. | `/tmp/serving.log` |
 | `--endpoint_url` | Base URL of the running inference server. The script issues an HTTP probe to detect the serving framework and version. | — |
-| `--serving_framework_type` | Serving framework hint (`vllm`, `sglang`). Used when the framework cannot be detected automatically. | — |
+| `--serving_framework_type` | Serving framework hint (`vllm`, `sglang`, `trtllm`). Used when the framework cannot be detected automatically. | — |
+
+### Submission metadata
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `--submitter_org_name` | string | Submitting organization name. |
+| `--submitter_contact` | string | Contact email for submission queries. |
+| `--system_name` | string | **Required.** Human-readable name for the system under test (e.g. `"8x NVIDIA H100 80GB HBM3"`). |
+| `--category` | string | System category (e.g. `"datacenter"`). |
+| `--status` | string | System availability status (e.g. `"available"`). |
+| `--division` | string | Submission division (e.g. `"open"`, `"closed"`). |
+
+### Model metadata
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `--model_id` | string | Model identifier (e.g. `"llama2-70b"`). |
+| `--model_name` | string | Human-readable model name. |
+| `--model_precision` | string | Numerical precision used (e.g. `"fp8"`, `"int4"`). |
+| `--link_to_model` | string | URL pointing to the model weights or registry entry. |
+| `--link_to_model_transformation` | string | URL describing any model transformations applied (quantization, pruning, etc.). |
+| `--model_notes` | string | Free-form notes about the model. |
+
+### Dataset metadata
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `--dataset_id` | string | Dataset identifier. |
+| `--dataset_name` | string | Human-readable dataset name. |
+| `--dataset_type` | string | Dataset type (e.g. `"synthetic"`, `"real"`). |
+| `--input_token_average` | string | Average number of input tokens per sample. |
+| `--output_token_average` | string | Average number of output tokens per sample. |
+| `--link_to_dataset` | string | URL pointing to the dataset. |
 
 ## node_config Reference
 
@@ -101,266 +140,184 @@ system_info:
 
 ## Output
 
-The script writes `system_desc.json` to `--out_dir_path`. The full path is also returned in the `MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH` environment variable for downstream scripts.
-
-### system_desc.json Schema
-
-The file has five top-level sections. All string fields default to an empty string when not detected; fields marked **(auto)** are computed by the script and must not be set manually.
-
----
-
-#### `organization_metadata`
-
-Submitter identity and submission lifecycle dates.
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `submitter_org_name` | string | Full legal name of the submitting organization. CLI: `--submitter_org_name` |
-| `submitter_contact` | string | Contact email for submission queries. CLI: `--submitter_contact` |
-| `submission_id` | string | Unique identifier for this submission (e.g. `"v07_test"`). CLI: `--submission_id` |
-| `submission_date` | string | ISO-8601 date the submission was filed (e.g. `"2025-06-01"`). CLI: `--submission_date` |
-| `publish_date` | string | ISO-8601 date results are expected to be published. CLI: `--publish_date` |
-
----
-
-#### `system_under_test`
-
-Describes the inference cluster — its metadata, per-node hardware/software details, and the serving framework.
-
-##### `system_under_test.system_metadata`
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `system_name` | string | Human-readable name for the system (e.g. `"4x Intel Arc B70"`). CLI: `--system_name`. Falls back to the auto-computed `system_size` string if not provided. |
-| `system_category` | string | `"datacenter"` or `"edge"`. CLI: `--category` |
-| `system_availability_status` | string | `"available"`, `"preview"`, or `"rdi"`. CLI: `--status` |
-| `system_size` | string | **(auto)** Compact hardware summary, e.g. `"8x NVIDIA H100 80GB HBM3"`. Computed from probed node details; override with `--system_size`. |
-| `system_node_ensemble_count` | integer | **(auto)** Number of distinct node-type entries in `node_types`. |
-| `system_node_ensemble_total` | integer | **(auto)** Total number of physical nodes across all entries (sum of `number_of_nodes`). |
-
-##### `system_under_test.serving_framework`
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `serving_framework` | string | Serving framework name and version (e.g. `"vLLM 0.9.0"`). Auto-detected via HTTP probe (`--endpoint_url`) or startup log (`--serving_node` + `--log_path`). |
-
-##### `system_under_test.node_types`
-
-Array of node-type objects. Each entry represents one *type* of node in the cluster; homogeneous clusters have exactly one entry. When `--node_config_file` is used, entries are shaped by the declared function groups (e.g. Prefill / Decode). Without it, entries are grouped by detected hardware identity.
-
-Each entry has the following fields:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `system_node_ensemble_id` | integer | **(auto)** 0-based index (no YAML) or 1-based ensemble counter (with YAML). |
-| `number_of_nodes` | integer | **(auto)** Count of physical nodes of this type. |
-| `hardware_ensemble` | object | Hardware details for this node type — see below. |
-| `software_ensemble` | object | Software stack details for this node type — see below. |
-
-###### `hardware_ensemble.processor`
-
-CPU details, collected automatically via SSH.
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `host_processor_model_name` | string | CPU model string (e.g. `"Intel(R) Xeon(R) 698X"`). |
-| `host_processors_per_node` | integer | Number of CPU sockets per node. |
-| `host_processor_core_count` | integer | Total physical cores per node. |
-| `host_processor_vcpu_count` | integer | Total logical (hyper-threaded) cores per node. |
-
-###### `hardware_ensemble.host_memory`
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `host_memory_capacity` | string | Total RAM (e.g. `"134G"`). |
-| `host_memory_configuration` | string | DIMM layout (e.g. `"8 x 16GB DDR5-6400"`). |
-
-###### `hardware_ensemble.accelerator`
-
-GPU / accelerator details, collected automatically. Fields show `"Not available"` when no accelerator is detected.
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `accelerator_model_name` | string | GPU product name (e.g. `"NVIDIA H100 80GB HBM3"`). |
-| `accelerators_per_node` | integer | Number of GPUs per node. |
-| `accelerator_memory_capacity` | string | Per-GPU memory, rounded to marketed GiB (e.g. `"80GiB"`). |
-| `accelerator_memory_type` | string | Memory technology (e.g. `"HBM3"`, `"GDDR6"`). |
-| `accelerator_interconnect` | string | GPU-to-GPU interconnect (e.g. `"NVLink"`, `"Not available"`). |
-| `accelerator_host_interconnect` | string | GPU-to-CPU interconnect (e.g. `"PCIe 5.0 x16"`). |
-
-###### `hardware_ensemble.networking`
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `host_networking` | string | Primary network type (e.g. `"Ethernet"`, `"InfiniBand"`). |
-| `host_network_card_count` | string | NIC count and type (e.g. `"3x Ethernet"`). |
-
-###### `hardware_ensemble.storage`
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `host_storage_capacity` | string | Total disk capacity (e.g. `"1.8 TB NVMe SSD"`). |
-| `host_storage_type` | string | Storage technology (e.g. `"NVMe SSD"`). |
-
-###### `hardware_ensemble` — top-level optional fields
-
-These are injected from CLI flags and apply uniformly to every node type.
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `other_hardware` | string | Any additional hardware not captured above. CLI: `--other_hardware` |
-| `hw_notes` | string | Free-form hardware notes. CLI: `--hw_notes` |
-| `cooling` | string | Cooling solution description (e.g. `"air"`, `"liquid"`). CLI: `--cooling` |
-
-###### `software_ensemble`
-
-Software stack details per node type, collected automatically.
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `inference_backend` | string | Compute runtime (e.g. `"CUDA 12.4, cuDNN 9.1"`). Auto-detected. |
-| `driver` | string | GPU driver version. Auto-detected. |
-| `operating_system` | string | OS string (e.g. `"linux debian ubuntu 24.04"`). Auto-detected. |
-| `filesystem` | string | Filesystem types present (e.g. `"ext4 vfat"`). Auto-detected. |
-| `container_link` | string | URL to the inference container image (optional). CLI: via `--container_link` env. |
-| `other_software_stack` | string | Additional software not captured above (optional). |
-| `sw_notes` | string | Free-form software notes (optional). |
-
-> **Note:** `serving_framework` is a system-level property and is moved to `system_under_test.serving_framework`. It is removed from per-node `software_ensemble` during post-processing to avoid duplication.
-
----
-
-#### `model_metadata`
-
-Describes the model used in this submission.
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `division` | string | MLPerf division (e.g. `"datacenter"`). CLI: `--division` |
-| `model_id` | string | HuggingFace model ID (e.g. `"meta-llama/Llama-3.1-8b-instruct"`). CLI: `--model_id` |
-| `model_name` | string | Human-readable model name (e.g. `"Llama 3.1 8B Instruct"`). CLI: `--model_name` |
-| `model_precision` | string | Inference precision (e.g. `"FP16"`, `"W4A8"`). CLI: `--model_precision` |
-| `link_to_model` | string | URL to the model weights or card. CLI: `--link_to_model` |
-| `link_to_model_transformation` | string | URL describing any quantization or transformation applied. CLI: `--link_to_model_transformation` |
-| `model_notes` | string | Free-form notes about the model or transformations applied. CLI: `--model_notes` |
-
----
-
-#### `dataset_metadata`
-
-Describes the evaluation dataset.
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `dataset_id` | string | Dataset identifier (e.g. `"cnn_dailymail"`). CLI: `--dataset_id` |
-| `dataset_name` | string | Human-readable dataset name (e.g. `"CNN/DailyMail"`). CLI: `--dataset_name` |
-| `input_token_average` | string | Average input token count (e.g. `"870"`). CLI: `--input_token_average` |
-| `output_token_average` | string | Average output token count (e.g. `"128"`). CLI: `--output_token_average` |
-| `dataset_type` | string | `"performance"` or `"accuracy"`. CLI: `--dataset_type` |
-| `dataset_link` | string | URL to the dataset. CLI: `--link_to_dataset` |
-
----
-
-#### `accuracy`
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `measured_accuracy_score` | string | The measured accuracy value (e.g. `"38.7287"`). |
-
----
-
-### Template — fill in the fields marked "Insert …"
-
-The script auto-populates all hardware and software fields. Fields that still say `"Insert … here"` must be filled in manually before submitting.
+The script writes `system-info-multi-node.json` to `--out_dir_path`. All fields are at the top level — there are no nested section wrappers:
 
 ```json
 {
-  "organization_metadata": {
-    "submitter_org_name": "Insert your organization name here",
-    "submitter_contact": "Insert a contact email here",
-    "submission_id": "Insert submission ID here",
-    "submission_date": "",
-    "publish_date": ""
-  },
-  "system_under_test": {
-    "system_metadata": {
-      "system_category": "Insert system category here",
-      "system_availability_status": "Insert system availability status here",
-      "system_size": "8x NVIDIA H100 80GB HBM3",
-      "system_node_ensemble_count": 1,
-      "system_node_ensemble_total": 1,
-      "system_name": "8x NVIDIA H100 80GB HBM3"
-    },
-    "node_types": [
-      {
-        "system_node_ensemble_id": 0,
-        "number_of_nodes": 1,
-        "hardware_ensemble": {
-          "processor": {
-            "host_processor_model_name": "Intel(R) Xeon(R) Platinum 8480+",
-            "host_processors_per_node": 2,
-            "host_processor_core_count": 112,
-            "host_processor_vcpu_count": 224
-          },
-          "host_memory": {
-            "host_memory_capacity": "2.2T",
-            "host_memory_configuration": "Not available"
-          },
-          "accelerator": {
-            "accelerator_model_name": "NVIDIA H100 80GB HBM3",
-            "accelerators_per_node": 8,
-            "accelerator_memory_capacity": "80GiB",
-            "accelerator_memory_type": "HBM3",
-            "accelerator_interconnect": "NVLink",
-            "accelerator_host_interconnect": "PCIe Gen5 x16"
-          },
-          "networking": {
-            "host_network_card_count": "3x mlx5_0: native InfiniBand",
-            "host_networking": "mlx5_0: native InfiniBand"
-          },
-          "storage": {
-            "host_storage_capacity": "1.1 GB NVMe SSD, 1.8 TB SSD",
-            "host_storage_type": "NVMe SSD"
-          },
-          "other_hardware": "",
-          "hw_notes": "",
-          "cooling": ""
-        },
-        "software_ensemble": {
-          "inference_backend": "CUDA 12.9",
-          "driver": "Driver 575.57.08",
-          "operating_system": "linux debian ubuntu 24.04",
-          "filesystem": "ext4 vfat zfs",
-          "container_link": "",
-          "other_software_stack": null,
-          "sw_notes": null
-        }
-      }
-    ],
-    "serving_framework": "vLLM 0.22.0"
-  },
-  "model_metadata": {
-    "division": "Insert model division here",
-    "model_id": "Insert model id here",
-    "model_name": "Insert model name here",
-    "model_precision": "Insert model precision here",
-    "link_to_model": "Insert link to model here",
-    "link_to_model_transformation": "Insert link to model transformations here",
-    "model_notes": "Insert any relevant notes about the model here"
-  },
-  "dataset_metadata": {
-    "dataset_id": "Insert dataset name here",
-    "dataset_name": "Insert dataset name here",
-    "input_token_average": "Insert dataset input token average here",
-    "output_token_average": "Insert dataset output token average here",
-    "dataset_type": "Insert dataset type here",
-    "dataset_link": "Insert link to dataset here"
-  },
-  "accuracy": {
-    "measured_accuracy_score": ""
-  }
+  "submitter_org_names": "MLCommons",
+  "submitter_contact": "contact@example.com",
+  "submission_id": "",
+  "submission_date": "",
+  "publish_date": "",
+
+  "system_name": "8x NVIDIA H100 80GB HBM3",
+  "system_category": "datacenter",
+  "system_availability_status": "available",
+  "system_size": "8x NVIDIA H100 80GB HBM3",
+  "system_node_ensemble_count": 1,
+  "system_node_ensemble_total": 1,
+  "serving_framework": "vLLM 0.9.0",
+
+  "node_types": [
+    {
+      "system_node_ensemble_id": 0,
+      "number_of_nodes": 1,
+      "host_processor_model_name": "Intel(R) Xeon(R) Platinum 8480+",
+      "host_processors_per_node": 2,
+      "host_processor_core_count": 112,
+      "host_processor_vcpu_count": 224,
+      "host_memory_capacity": "2.2T",
+      "host_memory_configuration": "Not available",
+      "accelerator_model_name": "NVIDIA H100 80GB HBM3",
+      "accelerators_per_node": 8,
+      "accelerator_memory_capacity": "80GiB",
+      "accelerator_memory_type": "HBM3",
+      "accelerator_interconnect": "NVLink",
+      "accelerator_host_interconnect": "PCIe Gen5 x16",
+      "host_network_card_count": "3x mlx5_0",
+      "host_networking": "mlx5_0: native InfiniBand",
+      "host_storage_capacity": "1.1 GB NVMe SSD, 1.8 TB SSD",
+      "host_storage_type": "NVMe SSD",
+      "other_hardware": "",
+      "hw_notes": "",
+      "cooling": "",
+      "inference_backend": "CUDA 12.9",
+      "driver": "Driver 575.57.08",
+      "operating_system": "ubuntu 24.04",
+      "filesystem": "ext4 vfat zfs",
+      "container_link": "",
+      "other_software_stack": "CUDA 12.9, Driver 575.57.08",
+      "sw_notes": null
+    }
+  ],
+
+  "division": "open",
+  "model_id": "llama2-70b",
+  "model_name": "Llama 2 70B",
+  "model_precision": "fp8",
+  "link_to_model": "...",
+  "link_to_model_transformation": "...",
+  "model_notes": "",
+
+  "dataset_id": "openorca",
+  "dataset_name": "Open Orca",
+  "input_token_average": "128",
+  "output_token_average": "256",
+  "dataset_type": "real",
+  "dataset_link": "...",
+
+  "measured_accuracy_score": ""
 }
 ```
+
+The full path to the generated file is also returned in the `MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH` environment variable, which downstream scripts can consume.
+
+### Output fields
+
+**Manual** fields must be supplied via `--config_file` or CLI args. **Auto** fields are detected or computed by the script and do not need user input. Manual fields are listed first in each table since those require user attention.
+
+#### Top-level fields
+
+| Field | Type | Source | Description |
+|-------|------|--------|-------------|
+| `submitter_org_names` | string | **manual** | Submitting organization name. |
+| `submitter_contact` | string | **manual** | Contact email for submission queries. |
+| `system_name` | string | **manual** (required) | Human-readable system name (e.g. `"8x NVIDIA H100 80GB HBM3"`). Script exits with an error if not provided. |
+| `system_category` | string | **manual** | System category (e.g. `"datacenter"`, `"edge"`). |
+| `system_availability_status` | string | **manual** | Availability status (e.g. `"available"`, `"preview"`). |
+| `division` | string | **manual** | Submission division (`"open"` or `"closed"`). |
+| `model_id` | string | **manual** | Model identifier (e.g. `"llama2-70b"`). |
+| `model_name` | string | **manual** | Human-readable model name. |
+| `model_precision` | string | **manual** | Numerical precision (e.g. `"fp8"`, `"int4"`). |
+| `link_to_model` | string | **manual** | URL to model weights or registry entry. |
+| `link_to_model_transformation` | string | **manual** | URL describing quantization or other transformations applied. |
+| `model_notes` | string | **manual** | Free-form notes about the model. |
+| `dataset_id` | string | **manual** | Dataset identifier. |
+| `dataset_name` | string | **manual** | Human-readable dataset name. |
+| `dataset_type` | string | **manual** | Dataset type (`"real"` or `"synthetic"`). |
+| `input_token_average` | string | **manual** | Average input tokens per sample. |
+| `output_token_average` | string | **manual** | Average output tokens per sample. |
+| `dataset_link` | string | **manual** | URL to the dataset. |
+| `measured_accuracy_score` | string | **manual** | Measured accuracy result (populated post-run). |
+| `submission_id` | string | auto (infra) | Populated by submission infrastructure; left empty by this script. |
+| `submission_date` | string | auto (infra) | Populated by submission infrastructure; left empty by this script. |
+| `publish_date` | string | auto (infra) | Populated by submission infrastructure; left empty by this script. |
+| `system_size` | string | auto | Computed as `(nodes × accelerators_per_node)x accelerator_model_name` per node type, joined with ` + `. |
+| `system_node_ensemble_count` | int | auto | Number of distinct node types in the system. |
+| `system_node_ensemble_total` | int | auto | Total number of nodes across all node types. |
+| `serving_framework` | string | auto | Detected serving framework name and version. Auto-detected via HTTP probe (`--endpoint_url`) or startup log (`--serving_node` + `--log_path`). Supported frameworks: **vLLM**, **SGLang**, **TRT-LLM**. Can also be set manually via `--serving_framework`. |
+
+#### Per-node fields (`node_types` entries)
+
+| Field | Type | Source | Description |
+|-------|------|--------|-------------|
+| `other_hardware` | string | **manual** | Any additional hardware not captured above. |
+| `hw_notes` | string | **manual** | Free-form hardware notes. |
+| `cooling` | string | **manual** | Cooling solution description. |
+| `container_link` | string | **manual** | URL to the container image used. |
+| `other_software_stack` | string | auto | Compute software stack combining the inference backend (CUDA/ROCm + cuDNN) and GPU driver (e.g. `"CUDA 12.9, Driver 575.57.08"`). `null` if nothing is detected. |
+| `sw_notes` | string | **manual** | Free-form software notes. |
+| `system_node_ensemble_id` | int | auto | Zero-based index for this node type entry. |
+| `number_of_nodes` | int | auto | Number of identical nodes of this type. |
+| `host_processor_model_name` | string | auto | CPU model name. |
+| `host_processors_per_node` | int | auto | Number of CPU sockets per node. |
+| `host_processor_core_count` | int | auto | Total physical CPU cores per node. |
+| `host_processor_vcpu_count` | int | auto | Total logical CPU threads per node. |
+| `host_memory_capacity` | string | auto | Total host DRAM capacity. |
+| `host_memory_configuration` | string | auto | Memory configuration details. |
+| `accelerator_model_name` | string | auto | GPU/accelerator model name. |
+| `accelerators_per_node` | int | auto | Number of accelerators per node. |
+| `accelerator_memory_capacity` | string | auto | Accelerator memory per device (e.g. `"80GiB"`). |
+| `accelerator_memory_type` | string | **manual** | Accelerator memory type (e.g. `"HBM3"`). |
+| `accelerator_interconnect` | string | auto | Accelerator-to-accelerator interconnect (e.g. `"NVLink"`). |
+| `accelerator_host_interconnect` | string | auto | Accelerator-to-host interconnect (e.g. `"PCIe Gen5 x16"`). |
+| `host_network_card_count` | string | auto | Network interface summary (e.g. `"3x mlx5_0"`). |
+| `host_networking` | string | auto | Network interface type and protocol. |
+| `host_storage_capacity` | string | auto | Storage capacity summary. |
+| `host_storage_type` | string | auto | Storage type (e.g. `"NVMe SSD"`). |
+| `inference_backend` | string | auto | CUDA/ROCm runtime version, plus cuDNN version if installed. |
+| `driver` | string | auto | GPU driver version. |
+| `operating_system` | string | auto | OS distribution and version (e.g. `"ubuntu 24.04"`). |
+| `filesystem` | string | auto | Detected filesystem types. |
+
+## Config file
+
+Instead of passing every metadata field on the command line, you can supply a single JSON or YAML file via `--config_file`. The file uses the same key names as the output JSON. Any field already provided as a CLI arg takes precedence over the value in the file.
+
+```json
+{
+  "submitter_org_names": "MLCommons",
+  "submitter_contact": "contact@example.com",
+
+  "system_name": "8x NVIDIA H100 80GB HBM3",
+  "system_category": "datacenter",
+  "system_availability_status": "available",
+  "serving_framework": "vLLM 0.9.0",
+
+  "division": "open",
+  "model_id": "llama2-70b",
+  "model_name": "Llama 2 70B",
+  "model_precision": "fp8",
+  "link_to_model": "",
+  "link_to_model_transformation": "",
+  "model_notes": "",
+
+  "dataset_id": "openorca",
+  "dataset_name": "Open Orca",
+  "dataset_type": "real",
+  "input_token_average": "128",
+  "output_token_average": "256",
+  "dataset_link": "",
+
+  "other_hardware": "",
+  "hw_notes": "",
+  "cooling": "",
+  "container_link": "",
+  "measured_accuracy_score": ""
+}
+```
+
+Fields not present in the file and not supplied as CLI args will fall back to the placeholder defaults in the output.
 
 ## Variations
 

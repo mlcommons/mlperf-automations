@@ -122,7 +122,7 @@ EXTRACT_RULES = {
     },
     "operating_system": {
         "source": "env",
-        "candidates": ["MLC_HOST_OS_TYPE", "MLC_HOST_OS_FLAVOR_LIKE", "MLC_HOST_OS_FLAVOR", "MLC_HOST_OS_VERSION"],
+        "candidates": ["MLC_HOST_OS_FLAVOR", "MLC_HOST_OS_VERSION"],
     },
     "filesystem": {
         "source": "env",
@@ -134,7 +134,7 @@ EXTRACT_RULES = {
         "optional": True,
     },
     "other_software_stack": {
-        "source": "env",
+        "source": "detect",
         "candidates": [],
         "optional": True,
     },
@@ -211,6 +211,15 @@ def extract_value(rule, field_key):
             if field_key == "inference_backend":
                 v = detect_inference_backend()
                 return v if v else "Not detected: CUDA/ROCm/XPU runtime not found"
+            elif field_key == "other_software_stack":
+                stack_parts = []
+                backend = detect_inference_backend()
+                if backend:
+                    stack_parts.append(backend)
+                driver = os.environ.get("MLC_HOST_GPU_DRIVER_VERSION", "").strip()
+                if driver:
+                    stack_parts.append(driver)
+                return ", ".join(stack_parts) if stack_parts else None
             else:
                 return "Not available"
         except Exception as e:
