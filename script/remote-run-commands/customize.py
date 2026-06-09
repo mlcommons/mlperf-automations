@@ -122,14 +122,12 @@ def preprocess(i):
 
     ssh_cmd_str = " ".join(ssh_cmd)
 
-
     if is_windows:
         safe_cmd_string = subprocess.list2cmdline([cmd_string])
     else:
         safe_cmd_string = shlex.quote(cmd_string)
 
     ssh_run_command = f"{ssh_cmd_str} {user}@{host} {password_string} {safe_cmd_string}"
-
 
     env['MLC_SSH_CMD'] = ssh_run_command
 
