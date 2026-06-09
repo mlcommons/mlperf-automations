@@ -122,11 +122,15 @@ def preprocess(i):
 
     ssh_cmd_str = " ".join(ssh_cmd)
 
-    # Use double quotes on Windows, single quotes on Unix for better
-    # compatibility
-    quote_char = '"' if is_windows else "'"
-    ssh_run_command = ssh_cmd_str + " " + user + "@" + host + \
-        password_string + " " + quote_char + cmd_string + quote_char
+
+    if is_windows:
+        safe_cmd_string = subprocess.list2cmdline([cmd_string])
+    else:
+        safe_cmd_string = shlex.quote(cmd_string)
+
+    ssh_run_command = f"{ssh_cmd_str} {user}@{host} {password_string} {safe_cmd_string}"
+
+
     env['MLC_SSH_CMD'] = ssh_run_command
 
     # ---- Use sshpass if password is provided (only on Unix-like systems) ----
