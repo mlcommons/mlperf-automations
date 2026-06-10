@@ -153,28 +153,21 @@ def download_file(i):
     import sys
     from urllib import parse
 
+    import re as _re
+
     # Get URL
     url = i['url']
 
-    # Check file name
-    file_name = i.get('filename', '')
-    if file_name == '':
-        parsed_url = parse.urlparse(url)
-        file_name = os.path.basename(parsed_url.path)
+    # Explicit file name always wins. We defer URL/header-based resolution until
+    # after the response is received so we can honour Content-Disposition like a
+    # browser does.
+    explicit_file_name = i.get('filename', '')
+    file_name = explicit_file_name
 
     # Check path
     path = i.get('path', '')
     if path is None or path == '':
         path = os.getcwd()
-
-    # Output file
-    path_to_file = os.path.join(path, file_name)
-
-    if os.path.isfile(path_to_file):
-        os.remove(path_to_file)
-
-    print('Downloading to {}'.format(path_to_file))
-    print('')
 
     # Download
     size = -1
@@ -210,6 +203,38 @@ def download_file(i):
                 download.raise_for_status()
             else:
                 raise
+
+        # Browser-like filename resolution: prefer the server's
+        # Content-Disposition header, then the basename of the final
+        # (post-redirect) URL. Only when an explicit filename was not supplied.
+        if explicit_file_name == '':
+            cd = download.headers.get('Content-Disposition', '') or ''
+            resolved = ''
+            if cd:
+                m = _re.search(
+                    r"filename\*\s*=\s*[^']*''([^;\r\n]+)", cd, _re.IGNORECASE)
+                if m:
+                    resolved = os.path.basename(
+                        parse.unquote(m.group(1).strip().strip('"')))
+                if resolved == '':
+                    m = _re.search(
+                        r'filename\s*=\s*"([^"]+)"', cd, _re.IGNORECASE)
+                    if not m:
+                        m = _re.search(
+                            r'filename\s*=\s*([^;\r\n]+)', cd, _re.IGNORECASE)
+                    if m:
+                        resolved = os.path.basename(m.group(1).strip().strip('"'))
+            if resolved == '':
+                parsed_url = parse.urlparse(download.url or url)
+                resolved = os.path.basename(parsed_url.path)
+            file_name = resolved
+
+        # Now that the final file name is known, compute the output path.
+        path_to_file = os.path.join(path, file_name)
+        if os.path.isfile(path_to_file):
+            os.remove(path_to_file)
+        print('Downloading to {}'.format(path_to_file))
+        print('')
 
         size_string = download.headers.get('Content-Length')
 
