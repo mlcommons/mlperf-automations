@@ -265,6 +265,7 @@ def preprocess(i):
                     for i in range(1, 5):
                         r = download_file({
                             'url': url,
+                            'filename': env.get('MLC_DOWNLOAD_FILENAME', ''),
                             'verify': verify_ssl,
                             'ssl_ca_file': ssl_ca_file})
                         if r['return'] == 0:
