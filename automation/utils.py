@@ -223,7 +223,8 @@ def download_file(i):
                         m = _re.search(
                             r'filename\s*=\s*([^;\r\n]+)', cd, _re.IGNORECASE)
                     if m:
-                        resolved = os.path.basename(m.group(1).strip().strip('"'))
+                        resolved = os.path.basename(
+                            m.group(1).strip().strip('"'))
             if resolved == '':
                 parsed_url = parse.urlparse(download.url or url)
                 resolved = os.path.basename(parsed_url.path)
