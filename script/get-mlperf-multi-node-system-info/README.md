@@ -1,5 +1,5 @@
 # README for get-mlperf-multi-node-system-info
-This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
+This README is automatically generated. Edit [info.md](info.md) to add custom contents. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
 ```
@@ -40,6 +40,7 @@ mlcr get-mlperf-multi-node-system-info
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
+| `--config_file` |  |  | `` |
 | `--category` |  |  | `` |
 | `--cooling` |  |  | `` |
 | `--dataset_id` |  |  | `` |
@@ -59,19 +60,24 @@ mlcr get-mlperf-multi-node-system-info
 | `--out_dir_path` |  |  | `` |
 | `--out_file_name` |  |  | `` |
 | `--output_token_average` |  |  | `` |
-| `--publish_date` |  |  | `` |
 | `--skip_ssh_key_file` |  |  | `` |
 | `--ssh_ids` |  |  | `` |
 | `--status` |  |  | `` |
-| `--submission_date` |  |  | `` |
-| `--submission_id` |  |  | `` |
 | `--submitter_contact` |  |  | `` |
 | `--submitter_org_name` |  |  | `` |
+| `--node_config_file` |  |  | `` |
 | `--system_name` |  |  | `` |
+| `--container_link` |  |  | `` |
+| `--measured_accuracy_score` |  |  | `` |
 | `--system_node_ensemble_count` |  |  | `` |
 | `--system_node_ensemble_total` |  |  | `` |
 | `--system_size` |  |  | `` |
-| `--system_type_detail` |  |  | `` |
+| `--serving_framework` |  |  | `` |
+| `--endpoint_url` |  |  | `` |
+| `--serving_node` |  |  | `` |
+| `--log_path` |  |  | `/tmp/serving.log` |
+| `--run_metadata_path` |  |  | `` |
+| `--serving_framework_type` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -94,8 +100,12 @@ mlcr get-mlperf-multi-node-system-info
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
-### Ungrouped
+### Accelerator-backend
 
 - `cuda`
-- `exclude_current_node`
 - `rocm`
+- `xpu`
+
+### Ungrouped
+
+- `exclude_current_node`
