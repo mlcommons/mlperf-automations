@@ -101,11 +101,7 @@ def remote_run(self_module, i):
     # Even if we're running from Windows locally, the remote commands execute
     # on the remote server
     run_cmds.append(
-        'if [ "$(uname)" = "Darwin" ]; then '
-        f'curl -sSL https://raw.githubusercontent.com/mlcommons/mlcflow/refs/heads/dev/docs/install/mlcflow_macos.sh | bash -s -- --yes --venv-dir {remote_mlc_python_venv}; '
-        'else '
-        f'curl -sSL https://raw.githubusercontent.com/mlcommons/mlcflow/refs/heads/dev/docs/install/mlcflow_linux.sh | bash -s -- --yes --venv-dir {remote_mlc_python_venv}; '
-        'fi')
+        f'curl -sSL https://raw.githubusercontent.com/mlcommons/mlcflow/refs/heads/dev/docs/install/mlcflow_unix_installer.sh | bash -s -- --yes --venv-dir {remote_mlc_python_venv}')
     run_cmds.append(f". {remote_mlc_python_venv}/bin/activate")
     if i.get('remote_pull_mlc_repos', False):
         run_cmds.append("mlc pull repo")
