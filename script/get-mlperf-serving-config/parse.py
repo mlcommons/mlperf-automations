@@ -42,8 +42,8 @@ _SGLANG_PATTERNS: list[tuple[str, str]] = [
 
 # TRT-LLM patterns.
 # 1.2.x (latest stable): LLM Args dump contains tensor/pipeline_parallel_size
-#   and orchestrator_type.
-# 1.0.x (NGC 'latest' tag, stale): no LLM Args dump; only the
+#   and orchestrator_type
+# 1.0.x:
 #   "[TRT-LLM] [I] max_seq_len=..., max_num_tokens=..., max_batch_size=..." line
 #   is present, so tensor/pipeline_parallel and disaggregated return null on 1.0.x.
 _TRTLLM_PATTERNS: list[tuple[str, str]] = [
