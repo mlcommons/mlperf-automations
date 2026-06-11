@@ -12,31 +12,31 @@ import yaml
 # CLI args (already resolved into env vars by MLC) take precedence:
 # a key from the config file is only applied when the env var is still empty.
 _CONFIG_KEY_TO_ENV = {
-    "submitter_org_names":          "MLC_MLPERF_SUBMITTER",
-    "submitter_contact":            "MLC_MLPERF_SUBMITTER_CONTACT",
-    "system_name":                  "MLC_MLPERF_SYSTEM_NAME",
-    "system_category":              "MLC_MLPERF_SUBMISSION_SYSTEM_TYPE",
-    "system_availability_status":   "MLC_MLPERF_SUBMISSION_SYSTEM_STATUS",
-    "system_size":                  "MLC_MLPERF_SYSTEM_SIZE",
-    "serving_framework":            "MLC_MLPERF_SERVING_FRAMEWORK",
-    "division":                     "MLC_MLPERF_SUBMISSION_DIVISION",
-    "model_id":                     "MLC_MLPERF_MODEL_ID",
-    "model_name":                   "MLC_MLPERF_MODEL",
-    "model_precision":              "MLC_MLPERF_MODEL_PRECISION",
-    "link_to_model":                "MLC_MLPERF_MODEL_LINK",
+    "submitter_org_names": "MLC_MLPERF_SUBMITTER",
+    "submitter_contact": "MLC_MLPERF_SUBMITTER_CONTACT",
+    "system_name": "MLC_MLPERF_SYSTEM_NAME",
+    "system_category": "MLC_MLPERF_SUBMISSION_SYSTEM_TYPE",
+    "system_availability_status": "MLC_MLPERF_SUBMISSION_SYSTEM_STATUS",
+    "system_size": "MLC_MLPERF_SYSTEM_SIZE",
+    "serving_framework": "MLC_MLPERF_SERVING_FRAMEWORK",
+    "division": "MLC_MLPERF_SUBMISSION_DIVISION",
+    "model_id": "MLC_MLPERF_MODEL_ID",
+    "model_name": "MLC_MLPERF_MODEL",
+    "model_precision": "MLC_MLPERF_MODEL_PRECISION",
+    "link_to_model": "MLC_MLPERF_MODEL_LINK",
     "link_to_model_transformation": "MLC_MLPERF_MODEL_TRANSFORMATION_LINK",
-    "model_notes":                  "MLC_MLPERF_MODEL_NOTES",
-    "dataset_id":                   "MLC_MLPERF_DATASET_ID",
-    "dataset_name":                 "MLC_MLPERF_DATASET_NAME",
-    "dataset_type":                 "MLC_MLPERF_DATASET_TYPE",
-    "input_token_average":          "MLC_MLPERF_DATASET_INPUT_TOKEN_AVERAGE",
-    "output_token_average":         "MLC_MLPERF_DATASET_OUTPUT_TOKEN_AVERAGE",
-    "dataset_link":                 "MLC_MLPERF_DATASET_LINK",
-    "other_hardware":               "MLC_MLPERF_OTHER_HARDWARE",
-    "hw_notes":                     "MLC_MLPERF_HARDWARE_NOTES",
-    "cooling":                      "MLC_MLPERF_COOLING",
-    "container_link":               "MLC_MLPERF_CONTAINER_LINK",
-    "measured_accuracy_score":      "MLC_MLPERF_MEASURED_ACCURACY_SCORE",
+    "model_notes": "MLC_MLPERF_MODEL_NOTES",
+    "dataset_id": "MLC_MLPERF_DATASET_ID",
+    "dataset_name": "MLC_MLPERF_DATASET_NAME",
+    "dataset_type": "MLC_MLPERF_DATASET_TYPE",
+    "input_token_average": "MLC_MLPERF_DATASET_INPUT_TOKEN_AVERAGE",
+    "output_token_average": "MLC_MLPERF_DATASET_OUTPUT_TOKEN_AVERAGE",
+    "dataset_link": "MLC_MLPERF_DATASET_LINK",
+    "other_hardware": "MLC_MLPERF_OTHER_HARDWARE",
+    "hw_notes": "MLC_MLPERF_HARDWARE_NOTES",
+    "cooling": "MLC_MLPERF_COOLING",
+    "container_link": "MLC_MLPERF_CONTAINER_LINK",
+    "measured_accuracy_score": "MLC_MLPERF_MEASURED_ACCURACY_SCORE",
 }
 
 
@@ -387,7 +387,8 @@ def _compute_system_size(node_entries):
         accel_name = entry.get("accelerator_model_name", "")
         accel_per_node = entry.get("accelerators_per_node", 0)
 
-        if not _is_not_detected(accel_name) and not _is_not_detected(accel_per_node):
+        if not _is_not_detected(
+                accel_name) and not _is_not_detected(accel_per_node):
             try:
                 qty = n_nodes * int(accel_per_node)
             except (ValueError, TypeError):

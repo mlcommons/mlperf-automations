@@ -216,7 +216,8 @@ def extract_value(rule, field_key):
                 backend = detect_inference_backend()
                 if backend:
                     stack_parts.append(backend)
-                driver = os.environ.get("MLC_HOST_GPU_DRIVER_VERSION", "").strip()
+                driver = os.environ.get(
+                    "MLC_HOST_GPU_DRIVER_VERSION", "").strip()
                 if driver:
                     stack_parts.append(driver)
                 return ", ".join(stack_parts) if stack_parts else None
@@ -291,7 +292,9 @@ def main():
             parsed[target_key] = extract_value(rule, target_key)
         except Exception as e:
             parsed[target_key] = f"Not detected: extraction error ({e})"
-            print(f"[WARN] Failed to extract {target_key}: {e}", file=sys.stderr)
+            print(
+                f"[WARN] Failed to extract {target_key}: {e}",
+                file=sys.stderr)
 
     with open(output_path, "w") as f:
         json.dump(parsed, f, indent=2)
