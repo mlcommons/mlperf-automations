@@ -288,38 +288,10 @@ def main():
 
     for target_key, rule in EXTRACT_RULES.items():
         try:
-            ensemble_type_subpart = ""
-            if target_key in ["host_processor_model_name", "host_processors_per_node",
-                              "host_processor_core_count", "host_processor_vcpu_count"]:
-                ensemble_type_subpart = "processor"
-            elif target_key in ["host_memory_capacity", "host_memory_configuration"]:
-                ensemble_type_subpart = "host_memory"
-            elif target_key in ["accelerator_model_name", "accelerators_per_node",
-                                "accelerator_memory_capacity", "accelerator_memory_type",
-                                "accelerator_interconnect", "accelerator_host_interconnect"]:
-                ensemble_type_subpart = "accelerator"
-            elif target_key in ["host_network_card_count", "host_networking"]:
-                ensemble_type_subpart = "networking"
-            elif target_key in ["host_storage_capacity", "host_storage_type"]:
-                ensemble_type_subpart = "storage"
-
-            value = extract_value(rule, target_key)
-
-            if target_key in ["other_hardware", "cooling", "hw_notes"]:
-                parsed.setdefault("hardware_ensemble", {})[target_key] = value
-            elif ensemble_type_subpart in [
-                    "processor", "host_memory", "accelerator", "networking", "storage"]:
-                parsed.setdefault("hardware_ensemble", {}).setdefault(
-                    ensemble_type_subpart, {})[target_key] = value
-            elif target_key in ["serving_framework", "inference_backend", "driver",
-                                "operating_system", "filesystem", "container_link",
-                                "other_software_stack", "sw_notes"]:
-                parsed.setdefault("software_ensemble", {})[target_key] = value
+            parsed[target_key] = extract_value(rule, target_key)
         except Exception as e:
             parsed[target_key] = f"Not detected: extraction error ({e})"
-            print(
-                f"[WARN] Failed to extract {target_key}: {e}",
-                file=sys.stderr)
+            print(f"[WARN] Failed to extract {target_key}: {e}", file=sys.stderr)
 
     with open(output_path, "w") as f:
         json.dump(parsed, f, indent=2)

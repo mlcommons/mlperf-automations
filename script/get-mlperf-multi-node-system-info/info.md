@@ -79,7 +79,7 @@ python -m vllm.entrypoints.openai.api_server ... > /tmp/serving.log 2>&1 &
 | `--skip_ssh_key_file` | Skip mlcflow's SSH key file lookup; use pre-configured key auth. | `False` |
 | `--node_config_file` | Path to a YAML file declaring function-based node groupings. | — |
 | `--serving_node` | SSH target of the inference server (`user@host:port`). When set, the script SSHes in to extract serving config from the startup log. | — |
-| `--log_path` | Path to the serving framework log **on the serving node**. Used to extract parallelism config from the startup output. If not provided, defaults to `/tmp/serving.log`. | `/tmp/serving.log` |
+| `--log_path` | Path to the serving framework log **on the serving node**. Used to extract parallelism config (tensor/pipeline/expert/data parallelism, batch size) from the startup output. Supported frameworks: **vLLM**, **SGLang**, **TRT-LLM**. If not provided, defaults to `/tmp/serving.log`. | `/tmp/serving.log` |
 | `--endpoint_url` | Base URL of the running inference server. The script issues an HTTP probe to detect the serving framework and version. | — |
 | `--serving_framework_type` | Serving framework hint (`vllm`, `sglang`, `trtllm`). Used when the framework cannot be detected automatically. | — |
 

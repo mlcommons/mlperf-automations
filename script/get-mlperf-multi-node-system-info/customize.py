@@ -291,10 +291,7 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
     yaml_name_to_details = {}
     yaml_name_to_probed_count = {}
     for node_detail in parsed_node_details:
-        accel_name = (node_detail
-                      .get("hardware_ensemble", {})
-                      .get("accelerator", {})
-                      .get("accelerator_model_name", ""))
+        accel_name = node_detail.get("accelerator_model_name", "")
         matched = _match_node_name(accel_name, all_yaml_node_names)
         if matched and matched not in yaml_name_to_details:
             yaml_name_to_details[matched] = node_detail
@@ -349,10 +346,10 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
                 "system_node_ensemble_id": ensemble_id,
                 "number_of_nodes": no_of_nodes,
             }
-            node_type["hardware_ensemble"] = details.get(
-                "hardware_ensemble", {})
-            node_type["software_ensemble"] = details.get(
-                "software_ensemble", {})
+            node_type.update(
+                {k: v for k, v in details.items()
+                 if k not in {"system_node_ensemble_id", "number_of_nodes", "system_node_name"}}
+            )
 
             node_types.append(node_type)
             node_type_totals[combined_name] = node_type_totals.get(
@@ -387,23 +384,18 @@ def _compute_system_size(node_entries):
     parts = []
     for entry in node_entries:
         n_nodes = entry.get("number_of_nodes", 1)
-        hw = entry.get("hardware_ensemble", {})
-        accel = hw.get("accelerator", {})
-        accel_name = accel.get("accelerator_model_name", "")
-        accel_per_node = accel.get("accelerators_per_node", 0)
+        accel_name = entry.get("accelerator_model_name", "")
+        accel_per_node = entry.get("accelerators_per_node", 0)
 
-        if not _is_not_detected(
-                accel_name) and not _is_not_detected(accel_per_node):
+        if not _is_not_detected(accel_name) and not _is_not_detected(accel_per_node):
             try:
                 qty = n_nodes * int(accel_per_node)
             except (ValueError, TypeError):
                 qty = n_nodes
             parts.append(f"{qty}x {accel_name}")
         else:
-            cpu_name = hw.get("processor", {}).get(
-                "host_processor_model_name", "")
-            cpu_per_node = hw.get("processor", {}).get(
-                "host_processors_per_node", 1)
+            cpu_name = entry.get("host_processor_model_name", "")
+            cpu_per_node = entry.get("host_processors_per_node", 1)
             if not _is_not_detected(cpu_name):
                 try:
                     qty = n_nodes * int(cpu_per_node)
@@ -414,7 +406,6 @@ def _compute_system_size(node_entries):
 
 
 def _build_system_size_from_nodes(parsed_node_details):
-    """Compute system_size from detected node types when no YAML is provided."""
     return _compute_system_size(parsed_node_details)
 
 
@@ -431,7 +422,6 @@ def postprocess(i):
     parsed_node_details = []
 
     def update_parsed_node_details(node_id):
-        node_details = {}
         single_node_system_info_path = os.path.join(
             env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'], f"mlperf-system-info-single-node-{node_id}.json")
         if not os.path.exists(single_node_system_info_path):
@@ -440,20 +430,25 @@ def postprocess(i):
             return
         with open(single_node_system_info_path) as f:
             single_node_system_info = json.load(f)
-        node_details['system_node_ensemble_id'] = node_id
-        node_details['number_of_nodes'] = 1
-        node_details['system_node_name'] = f"{single_node_system_info['hardware_ensemble']['processor'].get('host_processor_model_name', '')}-{single_node_system_info['hardware_ensemble']['accelerator'].get('accelerators_per_node', '')}x{single_node_system_info['hardware_ensemble']['accelerator'].get('accelerator_model_name', '')}"
-        node_details['hardware_ensemble'] = single_node_system_info['hardware_ensemble']
-        node_details['software_ensemble'] = single_node_system_info['software_ensemble']
-
+        system_node_name = (
+            f"{single_node_system_info.get('host_processor_model_name', '')}"
+            f"-{single_node_system_info.get('accelerators_per_node', '')}"
+            f"x{single_node_system_info.get('accelerator_model_name', '')}"
+        )
         existing_entry = next(
             (entry for entry in parsed_node_details
-             if entry['system_node_name'] == node_details['system_node_name']),
+             if entry['system_node_name'] == system_node_name),
             None
         )
         if existing_entry:
             existing_entry['number_of_nodes'] += 1
         else:
+            node_details = {
+                'system_node_ensemble_id': node_id,
+                'number_of_nodes': 1,
+                'system_node_name': system_node_name,
+            }
+            node_details.update(single_node_system_info)
             parsed_node_details.append(node_details)
 
     exclude_current = is_true(env.get('MLC_EXCLUDE_CURRENT_NODE', False))
@@ -487,47 +482,24 @@ def postprocess(i):
         nt.pop("system_node_name", None)
 
     # Inject user-provided hardware/software metadata into each node type.
-    # serving_framework is a system-level property and is lifted to top level,
-    # so strip it from per-node software_ensemble to avoid duplication.
+    # serving_framework is a system-level property lifted to the top of the
+    # output, so strip it from each node entry to avoid duplication.
     other_hw = env.get("MLC_MLPERF_OTHER_HARDWARE", "")
     hw_notes = env.get("MLC_MLPERF_HARDWARE_NOTES", "")
     cooling = env.get("MLC_MLPERF_COOLING", "")
     container_link = env.get("MLC_MLPERF_CONTAINER_LINK", "")
     for node_type in node_types:
-        if "hardware_ensemble" in node_type:
-            node_type["hardware_ensemble"]["other_hardware"] = other_hw
-            node_type["hardware_ensemble"]["hw_notes"] = hw_notes
-            node_type["hardware_ensemble"]["cooling"] = cooling
-        if "software_ensemble" in node_type:
-            node_type["software_ensemble"]["container_link"] = container_link
-            node_type["software_ensemble"].pop("serving_framework", None)
+        node_type["other_hardware"] = other_hw
+        node_type["hw_notes"] = hw_notes
+        node_type["cooling"] = cooling
+        node_type["container_link"] = container_link
+        node_type.pop("serving_framework", None)
 
     serving_framework = env.get("MLC_MLPERF_SERVING_FRAMEWORK", "")
     user_system_name = env.get("MLC_MLPERF_SYSTEM_NAME", "")
 
     if not user_system_name:
         return {'return': 1, 'error': 'system_name is required. Set it via --system_name, the config file, or MLC_MLPERF_SYSTEM_NAME.'}
-
-    # Flatten node_types: merge hardware_ensemble sub-groups and software_ensemble
-    # into direct fields on each node type entry.
-    flat_node_types = []
-    for node_type in node_types:
-        flat = {
-            "system_node_ensemble_id": node_type.get("system_node_ensemble_id"),
-            "number_of_nodes": node_type.get("number_of_nodes", 1),
-        }
-        hw = node_type.get("hardware_ensemble", {})
-        for sub_key in ("processor", "host_memory", "accelerator", "networking", "storage"):
-            sub = hw.get(sub_key, {})
-            if isinstance(sub, dict):
-                flat.update(sub)
-        for key in ("other_hardware", "hw_notes", "cooling"):
-            flat[key] = hw.get(key, "")
-        sw = node_type.get("software_ensemble", {})
-        for key in ("inference_backend", "driver", "operating_system", "filesystem",
-                    "container_link", "other_software_stack", "sw_notes"):
-            flat[key] = sw.get(key)
-        flat_node_types.append(flat)
 
     parsed_multinode_system_info = {
         "submitter_org_names": env.get("MLC_MLPERF_SUBMITTER", "Insert your organization name here"),
@@ -542,7 +514,7 @@ def postprocess(i):
         "system_node_ensemble_count": len(node_types),
         "system_node_ensemble_total": sum(entry['number_of_nodes'] for entry in node_types),
         "serving_framework": serving_framework,
-        "node_types": flat_node_types,
+        "node_types": node_types,
         "division": env.get("MLC_MLPERF_SUBMISSION_DIVISION", "Insert model division here"),
         "model_id": env.get("MLC_MLPERF_MODEL_ID", "Insert model id here"),
         "model_name": env.get("MLC_MLPERF_MODEL", "Insert model name here"),
@@ -580,12 +552,13 @@ def postprocess(i):
             use_json = run_md_path.endswith('.json')
             with open(run_md_path) as f:
                 run_md = json.load(f) if use_json else yaml.safe_load(f)
-            cs = run_md.setdefault('config_summary', {})
             for key in ('tensor_parallel', 'pipeline_parallel',
-                        'expert_parallel', 'batch'):
+                        'expert_parallel', 'data_parallel', 'batch',
+                        'disaggregated'):
                 if sc.get(key) is not None:
-                    cs[key] = sc[key]
-            run_md["config_summary"] = cs
+                    run_md[key] = sc[key]
+            if sc.get('config_summary'):
+                run_md['config_summary'] = sc['config_summary']
             with open(run_md_path, 'w') as f:
                 if use_json:
                     json.dump(run_md, f, indent=2)

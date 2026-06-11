@@ -54,10 +54,10 @@ input_mapping:
   endpoint_url: MLC_MLPERF_ENDPOINT_URL
   serving_node: MLC_MLPERF_SERVING_NODE
   log_path: MLC_MLPERF_SERVING_LOG_PATH
-default_env:
-  MLC_MLPERF_SERVING_LOG_PATH: /tmp/serving.log
   run_metadata_path: MLC_MLPERF_RUN_METADATA_PATH
   serving_framework_type: MLC_MLPERF_SERVING_FRAMEWORK_TYPE
+default_env:
+  MLC_MLPERF_SERVING_LOG_PATH: /tmp/serving.log
 
 # Dependencies
 deps:
