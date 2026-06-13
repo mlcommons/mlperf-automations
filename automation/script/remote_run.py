@@ -252,6 +252,7 @@ def regenerate_script_cmd(i):
 
     remote_run_settings = i.get('remote_run_settings', {})
     fake_run = i.get('fake_run', False)
+    remote_action = i.get('remote_action', 'run')
 
     i_run_cmd = i['run_cmd']
 
@@ -300,7 +301,7 @@ def regenerate_script_cmd(i):
     # docker_run_cmd_prefix = i.get('docker_run_cmd_prefix', '')
 
     # Regenerate command from dictionary input
-    run_cmd = 'mlcd' if i.get('docker') else 'mlcr'
+    run_cmd = 'mlcd' if remote_action == 'docker' else ('mlce' if remote_action == 'experiment' else 'mlcr')
 
     skip_input_for_fake_run = remote_run_settings.get(
         'skip_input_for_fake_run', [])
