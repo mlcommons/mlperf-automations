@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "${MLC_GH_INSTALL_WITHOUT_SUDO}" == "yes" ]; then
-    bash ${MLC_SOURCE}/run-nosudo.sh
+    bash ${MLC_TMP_CURRENT_SCRIPT_PATH}/run-nosudo.sh
     exit $?
 fi
 
