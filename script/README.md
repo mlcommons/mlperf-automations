@@ -34,7 +34,6 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [ROCm automation](#rocm-automation)
 - [Remote automation](#remote-automation)
 - [Reproducibility and artifact evaluation](#reproducibility-and-artifact-evaluation)
-- [SPEC Utils](#spec-utils)
 - [Testing](#testing)
 - [Tests](#tests)
 - [TinyML automation](#tinyml-automation)
@@ -1060,12 +1059,6 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-ipol-src](get-ipol-src/)**
   - get-ipol-src
   - Tags: `get`, `ipol`, `journal`, `src`, `ipol-src`
-
-## SPEC Utils
-
-- **[run-spec-cpu](run-spec-cpu/)**
-  - run-spec-cpu
-  - Tags: `cpu`, `run`, `spec`
 
 ## Testing
 
