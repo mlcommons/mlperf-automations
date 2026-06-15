@@ -16,6 +16,20 @@ tags:
 cache: true
 clean_files: []
 
+# Environment
+default_env:
+  MLC_SUDO: sudo
+
 # Dependencies
 deps:
 - tags: detect,os
+
+# Tests
+tests:
+  run_inputs:
+  - env: {}
+  - env:
+      MLC_SUDO: 'no'
+  - env:
+      MLC_SUDO: 'no'
+      MLC_GH_INSTALL_PATH: /tmp/gh-cli-test
