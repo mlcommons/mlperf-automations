@@ -33,7 +33,8 @@ def preprocess(i):
     if sudo:
         # Check if sudo is actually available
         try:
-            subprocess.run(['sudo', '-n', 'true'], capture_output=True, timeout=5)
+            subprocess.run(['sudo', '-n', 'true'],
+                           capture_output=True, timeout=5)
         except (FileNotFoundError, subprocess.TimeoutExpired):
             sudo = ''
             env['MLC_SUDO'] = ''
