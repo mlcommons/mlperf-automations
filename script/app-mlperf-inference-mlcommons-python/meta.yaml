@@ -1287,13 +1287,13 @@ variations:
         MLC_ML_MODEL_COLBERTV2_PATH:
         - 'on'
     # LLM models for vLLM servers (downloaded once; user starts vLLM pointing at these paths)
-    - tags: get-ml-model-gpt-oss-20b,_r2-downloader,_mlc
+    - tags: get-ml-model-gpt-oss,_20b,_r2-downloader,_mlc
       names:
       - gpt-oss-20b-model
       skip_if_env:
         MLC_ML_MODEL_GPT_OSS_20B_PATH:
         - 'on'
-    - tags: get-ml-model-gpt-oss-120b,_r2-downloader,_mlc
+    - tags: get-ml-model-gpt-oss,_120b,_r2-downloader,_mlc
       names:
       - gpt-oss-120b-model
       skip_if_env:
