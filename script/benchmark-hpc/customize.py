@@ -31,7 +31,8 @@ def preprocess_cp2k(env, state):
 
     install_path = env.get('MLC_CP2K_INSTALL_PATH', '')
     if not install_path:
-        return {'return': 1, 'error': 'MLC_CP2K_INSTALL_PATH not set. Build CP2K first.'}
+        return {'return': 1,
+                'error': 'MLC_CP2K_INSTALL_PATH not set. Build CP2K first.'}
 
     # Ensure library paths are set for runtime
     for key in ['+LD_LIBRARY_PATH', '+PATH']:
@@ -67,7 +68,11 @@ def preprocess_cp2k(env, state):
     # Find benchmark input file
     src_path = env.get('MLC_CP2K_SRC_PATH', '')
     bench_input = env.get('MLC_HPC_BENCH_INPUT', 'H2O-64')
-    input_file = os.path.join(src_path, 'benchmarks', 'QS', f'{bench_input}.inp')
+    input_file = os.path.join(
+        src_path,
+        'benchmarks',
+        'QS',
+        f'{bench_input}.inp')
 
     if not os.path.isfile(input_file):
         return {'return': 1, 'error': f'Benchmark input not found: {input_file}'}
@@ -112,7 +117,8 @@ def postprocess_cp2k(env, state):
                 break
 
     if timing:
-        env['MLC_HPC_BENCH_CP2K_TOTAL_TIME'] = str(timing.get('cp2k_total_time', ''))
+        env['MLC_HPC_BENCH_CP2K_TOTAL_TIME'] = str(
+            timing.get('cp2k_total_time', ''))
 
     # Save results as JSON
     results = {

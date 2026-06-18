@@ -16,7 +16,11 @@ def postprocess(i):
 
     os_info = i['os_info']
 
-    tmp_run_out = os.path.join(env.get('MLC_TMP_CURRENT_PATH', '.'), 'tmp-run.out')
+    tmp_run_out = os.path.join(
+        env.get(
+            'MLC_TMP_CURRENT_PATH',
+            '.'),
+        'tmp-run.out')
 
     r = utils.load_txt(file_name=tmp_run_out,
                        check_if_exists=True,
@@ -95,9 +99,11 @@ def postprocess(i):
         elif topo_out.strip():
             env['MLC_XPU_DEVICE_PROP_GPU_INTERCONNECT_TYPE'] = ''
     except subprocess.TimeoutExpired:
-        # Topology probing is optional; keep script successful if command hangs.
+        # Topology probing is optional; keep script successful if command
+        # hangs.
         env['MLC_XPU_DEVICE_PROP_GPU_INTERCONNECT_TYPE'] = ''
     except Exception:
-        # Topology probing is best-effort and should not fail device enumeration.
+        # Topology probing is best-effort and should not fail device
+        # enumeration.
         env['MLC_XPU_DEVICE_PROP_GPU_INTERCONNECT_TYPE'] = ''
     return {'return': 0}
