@@ -14,7 +14,11 @@ def preprocess(i):
     size = env.get('MLC_ML_MODEL_SIZE', '120b')
     path_env_key = f'MLC_ML_MODEL_GPT_OSS_{size.upper()}_PATH'
 
-    path = env.get(path_env_key, env.get('MLC_ML_MODEL_GPT_OSS_PATH', '')).strip()
+    path = env.get(
+        path_env_key,
+        env.get(
+            'MLC_ML_MODEL_GPT_OSS_PATH',
+            '')).strip()
     if path == '' or not os.path.exists(path):
         env['MLC_TMP_REQUIRE_DOWNLOAD'] = 'yes'
 
