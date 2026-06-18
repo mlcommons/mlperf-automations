@@ -1,0 +1,40 @@
+alias: build-mlperf-inference-e2e-rag-index
+uid: b1e2f3a4c5d67890
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: MLPerf Inference
+tags:
+- build-mlperf-inference-e2e-rag-index
+- build
+- mlperf
+- inference
+- e2e-rag
+- vectordb
+- index
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_E2E_RAG_DATABASE
+
+default_env:
+  MLC_E2E_INGEST_CHUNK_LEN: '768'
+  MLC_E2E_INGEST_CHUNK_OVERLAP: '32'
+  MLC_E2E_INGEST_DEVICE: cpu
+  MLC_E2E_INGEST_NUM_DEVICES: '1'
+
+# Input mapping
+input_mapping:
+  e2e_rag_database: MLC_E2E_RAG_DATABASE
+  e2e_ingest_device: MLC_E2E_INGEST_DEVICE
+  e2e_ingest_num_devices: MLC_E2E_INGEST_NUM_DEVICES
+  e2e_ingest_chunk_len: MLC_E2E_INGEST_CHUNK_LEN
+  e2e_ingest_chunk_overlap: MLC_E2E_INGEST_CHUNK_OVERLAP
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_E2E_RAG_DATABASE: E2E RAG FAISS vector database path

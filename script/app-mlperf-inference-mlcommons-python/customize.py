@@ -77,10 +77,49 @@ def preprocess(i):
         env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS'] += " --count " + \
             env['MLC_MLPERF_LOADGEN_QUERY_COUNT']
 
-    print("Using MLCommons Inference source from '" +
-          env['MLC_MLPERF_INFERENCE_SOURCE'] + "'")
+    # For e2e-rag, override mlperf.conf to use the e2e inference source
+    if env.get('MLC_MODEL', '') == 'e2e-rag':
+        if 'MLC_MLPERF_INFERENCE_E2E_SOURCE' in env and 'MLC_MLPERF_CONF' not in env:
+            env['MLC_MLPERF_CONF'] = os.path.join(
+                env['MLC_MLPERF_INFERENCE_E2E_SOURCE'], 'mlperf.conf')
+        # Resolve frames_dataset.tsv path from MLC_DATASET_FRAMES_PATH.
+        # The FRAMES dataset download extracts to a directory; the TSV lives at
+        # data/frames_dataset.tsv inside it. If the env var already points to the
+        # TSV file directly, leave it as-is.
+        frames_path = env.get('MLC_DATASET_FRAMES_PATH', '')
+        if frames_path and os.path.isdir(frames_path):
+            # Try common locations for the TSV inside the dataset directory
+            for candidate in [
+                os.path.join(frames_path, 'data', 'frames_dataset.tsv'),
+                os.path.join(frames_path, 'frames_dataset.tsv'),
+            ]:
+                if os.path.isfile(candidate):
+                    env['MLC_DATASET_FRAMES_PATH'] = candidate
+                    break
+        # Use downloaded GPT-OSS paths as defaults for llm/query/judge model names
+        # when the user hasn't explicitly set them. vLLM is started separately with
+        # these paths; the benchmark needs the model name to send in API requests.
+        if env.get('MLC_E2E_RAG_LLM_MODEL', 'auto') == 'auto':
+            if 'MLC_ML_MODEL_GPT_OSS_120B_PATH' in env:
+                env['MLC_E2E_RAG_LLM_MODEL'] = env['MLC_ML_MODEL_GPT_OSS_120B_PATH']
+            elif 'MLC_ML_MODEL_GPT_OSS_20B_PATH' in env:
+                env['MLC_E2E_RAG_LLM_MODEL'] = env['MLC_ML_MODEL_GPT_OSS_20B_PATH']
+        if env.get('MLC_E2E_RAG_QUERY_MODEL', 'auto') == 'auto':
+            if 'MLC_ML_MODEL_GPT_OSS_20B_PATH' in env:
+                env['MLC_E2E_RAG_QUERY_MODEL'] = env['MLC_ML_MODEL_GPT_OSS_20B_PATH']
+        if env.get('MLC_E2E_RAG_JUDGE_MODEL', 'auto') == 'auto':
+            if 'MLC_ML_MODEL_GPT_OSS_120B_PATH' in env:
+                env['MLC_E2E_RAG_JUDGE_MODEL'] = env['MLC_ML_MODEL_GPT_OSS_120B_PATH']
+            elif 'MLC_ML_MODEL_GPT_OSS_20B_PATH' in env:
+                env['MLC_E2E_RAG_JUDGE_MODEL'] = env['MLC_ML_MODEL_GPT_OSS_20B_PATH']
+
+    if 'MLC_MLPERF_INFERENCE_SOURCE' in env:
+        print("Using MLCommons Inference source from '" +
+              env['MLC_MLPERF_INFERENCE_SOURCE'] + "'")
 
     if 'MLC_MLPERF_CONF' not in env:
+        if 'MLC_MLPERF_INFERENCE_SOURCE' not in env:
+            return {'return': 1, 'error': "MLC_MLPERF_INFERENCE_SOURCE is not set and MLC_MLPERF_CONF was not provided"}
         env['MLC_MLPERF_CONF'] = os.path.join(
             env['MLC_MLPERF_INFERENCE_SOURCE'], "mlperf.conf")
 
@@ -651,6 +690,40 @@ def get_run_cmd_reference(
             cmd = cmd.replace("--accuracy", "--AccuracyOnly")
         else:
             cmd += " --PerformanceOnly "
+
+    elif "e2e-rag" in env['MLC_MODEL']:
+        env['RUN_DIR'] = os.path.join(
+            env['MLC_MLPERF_INFERENCE_E2E_SOURCE'], "e2e")
+
+        device = "cuda" if env['MLC_MLPERF_DEVICE'] == "gpu" else "cpu"
+
+        perf_count_opt = ""
+        if env.get('MLC_MLPERF_LOADGEN_QUERY_COUNT', '') != '':
+            perf_count_opt = f"--perf_count {env['MLC_MLPERF_LOADGEN_QUERY_COUNT']}"
+
+        cmd = f"""{x}{env['MLC_PYTHON_BIN_WITH_PATH']}{x} reference_mlperf.py \
+            --dataset_path {x}{env['MLC_DATASET_FRAMES_PATH']}{x} \
+            --database {x}{env.get('MLC_E2E_RAG_DATABASE', 'vector_html_hnsw_len768_ov32_word.db')}{x} \
+            --scenario {env['MLC_MLPERF_LOADGEN_SCENARIO']} \
+            --log_dir {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
+            --output_dir {x}{env['MLC_MLPERF_OUTPUT_DIR']}{x} \
+            --retriever_model {x}{env['MLC_ML_MODEL_E5_BASE_V2_PATH']}{x} \
+            --reranker_model {x}{env['MLC_ML_MODEL_COLBERTV2_PATH']}{x} \
+            --device {device} \
+            --llm_service_url {env.get('MLC_E2E_RAG_LLM_SERVICE_URL', 'http://127.0.0.1:8123/v1/chat/completions')} \
+            --llm_model {env.get('MLC_E2E_RAG_LLM_MODEL', 'auto')} \
+            --query_service_url {env.get('MLC_E2E_RAG_QUERY_SERVICE_URL', 'http://127.0.0.1:8124/v1/chat/completions')} \
+            --query_model {env.get('MLC_E2E_RAG_QUERY_MODEL', 'auto')} \
+            --judge_service_url {env.get('MLC_E2E_RAG_JUDGE_SERVICE_URL', 'http://127.0.0.1:8125/v1/chat/completions')} \
+            --judge_model {env.get('MLC_E2E_RAG_JUDGE_MODEL', 'auto')} \
+            --max-iterations {env.get('MLC_E2E_RAG_MAX_ITERATIONS', '5')} \
+            --max-sub-queries {env.get('MLC_E2E_RAG_MAX_SUB_QUERIES', '3')} \
+            --top_k_retriever {env.get('MLC_E2E_RAG_TOP_K_RETRIEVER', '10')} \
+            --max_workers {env.get('MLC_E2E_RAG_MAX_WORKERS', '10')} \
+            {perf_count_opt} \
+            {env['MLC_MLPERF_LOADGEN_EXTRA_OPTIONS']} {scenario_extra_options} {mode_extra_options}"""
+
+        env['LOG_PATH'] = env['MLC_MLPERF_OUTPUT_DIR']
 
     elif "wan-2.2-t2v-a14b" in env['MLC_MODEL']:
         env['RUN_DIR'] = os.path.join(

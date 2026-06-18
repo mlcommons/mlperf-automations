@@ -1,0 +1,86 @@
+alias: get-mlperf-inference-e2e-src
+uid: f67890123456789a
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: MLPerf Inference E2E
+tags:
+- get
+- mlperf
+- inference
+- e2e
+- src
+- source
+- inference-e2e-src
+- inference-e2e-source
+
+# Cache
+cache: true
+
+# Environment
+default_env:
+  MLC_GIT_CHECKOUT_FOLDER: inference_e2e
+  MLC_GIT_DEPTH: --depth 10
+  MLC_GIT_CHECKOUT: perf_test_with_cached_output
+  MLC_GIT_URL: https://github.com/hans-intel/inference
+
+new_env_keys:
+- MLC_MLPERF_INFERENCE_E2E_SOURCE
+- MLC_MLPERF_INFERENCE_E2E_SOURCE_VERSION
+- +PYTHONPATH
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: get,python3
+  names:
+  - python
+  - python3
+
+prehook_deps:
+- env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_MLPERF_INFERENCE_E2E_SOURCE
+  extra_cache_tags: inference,e2e,src
+  force_env_keys:
+  - MLC_GIT_*
+  names:
+  - inference-e2e-git-repo
+  tags: get,git,repo,_no-recurse-submodules
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_URL
+    _sha.:
+    - MLC_GIT_SHA
+
+# Variations
+variations:
+  branch.#:
+    default_version: custom
+    env:
+      MLC_GIT_CHECKOUT: '#'
+    group: checkout
+  sha.#:
+    env:
+      MLC_GIT_SHA: '#'
+    group: checkout
+  repo.#:
+    env:
+      MLC_GIT_URL: '#'
+      MLC_TMP_GIT_URL: '#'
+    group: repo
+  full-history:
+    env:
+      MLC_GIT_DEPTH: ''
+    group: git-history
+  short-history:
+    default: true
+    env:
+      MLC_GIT_DEPTH: --depth 10
+    group: git-history
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_MLPERF_INFERENCE_E2E_SOURCE: MLPerf inference E2E source path
