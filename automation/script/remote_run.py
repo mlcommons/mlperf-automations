@@ -192,14 +192,9 @@ def remote_run(self_module, i):
     if skip_ssh_key_file:
         remote_inputs['skip_ssh_key_file'] = skip_ssh_key_file
 
-    # If a remote shell is specified, wrap all commands to execute inside it
+    # If a remote shell is specified, pass it to the remote-run-commands script
     if remote_shell:
-        all_cmds = remote_pre_run_cmds + run_cmds + remote_post_run_cmds
-        combined = " ; ".join(all_cmds)
-        escaped = combined.replace('\\', '\\\\').replace('"', '\\"')
-        run_cmds = [f'{remote_shell} -c "{escaped}"']
-        remote_pre_run_cmds = []
-        remote_post_run_cmds = []
+        remote_inputs["shell"] = remote_shell
 
     # Execute the remote command
     mlc_remote_input = {
