@@ -34,6 +34,7 @@ def remote_run(self_module, i):
     remote_host = i.get('remote_host', 'localhost')
     remote_port = i.get('remote_port', '22')
     remote_action = i.get('remote_action', 'run')
+    remote_shell = i.get('remote_shell', '')
 
     prune_result = prune_input(
         {'input': i, 'extra_keys_starts_with': ['remote_']})
@@ -191,6 +192,15 @@ def remote_run(self_module, i):
     if skip_ssh_key_file:
         remote_inputs['skip_ssh_key_file'] = skip_ssh_key_file
 
+    # If a remote shell is specified, wrap all commands to execute inside it
+    if remote_shell:
+        all_cmds = remote_pre_run_cmds + run_cmds + remote_post_run_cmds
+        combined = " ; ".join(all_cmds)
+        escaped = combined.replace('\\', '\\\\').replace('"', '\\"')
+        run_cmds = [f'{remote_shell} -c "{escaped}"']
+        remote_pre_run_cmds = []
+        remote_post_run_cmds = []
+
     # Execute the remote command
     mlc_remote_input = {
         'action': 'run', 'target': 'script', 'tags': 'remote,run,cmds,ssh',
@@ -253,6 +263,7 @@ def regenerate_script_cmd(i):
     remote_run_settings = i.get('remote_run_settings', {})
     fake_run = i.get('fake_run', False)
     remote_action = i.get('remote_action', 'run')
+    remote_shell = i.get('remote_shell', '')
 
     i_run_cmd = i['run_cmd']
 
