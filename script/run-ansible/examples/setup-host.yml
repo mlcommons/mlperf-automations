@@ -1,0 +1,43 @@
+---
+# Example playbook: Setup a remote host with basic packages
+- name: Setup remote host
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Install common packages
+      apt:
+        name:
+          - python3
+          - python3-pip
+          - git
+          - curl
+          - wget
+          - build-essential
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Install common packages (RHEL)
+      yum:
+        name:
+          - python3
+          - python3-pip
+          - git
+          - curl
+          - wget
+          - gcc
+          - make
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Install MLCFlow
+      shell: |
+        curl -sSL https://raw.githubusercontent.com/mlcommons/mlcflow/refs/heads/dev/docs/install/mlcflow_unix_installer.sh | bash -s -- --yes
+      args:
+        creates: ~/mlcflow/bin/activate
+      become: no
