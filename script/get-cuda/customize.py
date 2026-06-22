@@ -76,6 +76,9 @@ def preprocess(i):
 
             if r['return'] == 16 and is_true(
                     env['MLC_CUDA_FULL_TOOLKIT_INSTALL']):
+                if is_true(env.get('MLC_CUDA_SKIP_AUTO_INSTALL', 'no')):
+                    # Caller requested detection-only (no install on miss)
+                    return r
                 env['MLC_REQUIRE_INSTALL'] = "yes"
                 return {'return': 0}
             else:

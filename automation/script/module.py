@@ -9,6 +9,7 @@
 
 import re
 import os
+import sys
 import logging
 
 from mlc.main import Automation
@@ -3864,7 +3865,11 @@ pip install mlcflow
 
             # Continue with selection
             if len(found_files) > 1:
-                if len(found_files) == 1 or select_default:
+                if len(found_files) == 1 or select_default or not sys.stdin.isatty():
+                    if not select_default and not sys.stdin.isatty():
+                        logger.warning(
+                            self.recursion_spaces +
+                            '  Non-interactive terminal — selecting default path')
                     selection = 0
                 else:
                     # Select 1 and proceed

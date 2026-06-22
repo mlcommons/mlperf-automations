@@ -201,10 +201,16 @@ def select_script_item(lst, text, recursion_spaces,
     if not logger:
         return {'return': 1, 'error': 'No logger provided'}
 
-    # If quiet, select 0 (can be sorted for determinism)
-    if quiet:
+    # If quiet or running in a non-interactive terminal (e.g. SSH), select 0
+    if quiet or not sys.stdin.isatty():
         logger.debug(string1)
-        logger.debug('Selected default due to "quiet" mode')
+        if not quiet:
+            logger.warning(
+                'Non-interactive terminal detected — selecting default for "%s"',
+                script_tags_string,
+            )
+        else:
+            logger.debug('Selected default due to "quiet" mode')
 
         return 0
 
