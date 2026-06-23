@@ -1076,6 +1076,10 @@ variations:
       update_tags_from_env_with_prefix:
         _find_links_url.:
         - MLC_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL
+    - tags: get,generic-python-lib,_package.scipy
+      version_max: 1.17.1
+      names:
+        - scipy
     - tags: get,generic-python-lib,_package.torch-sparse
       update_tags_from_env_with_prefix:
         _find_links_url.:
