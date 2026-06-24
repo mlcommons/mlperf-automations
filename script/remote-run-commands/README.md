@@ -55,6 +55,7 @@ mlcr remote,run,cmds,remote-run,remote-run-cmds,ssh-run,ssh
 | `--skip_ssh_key_file` |  |  | `` |
 | `--ssh_key_file` |  |  | `<<<HOME>>>/.ssh/id_rsa` |
 | `--user` |  |  | `` |
+| `--shell` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |

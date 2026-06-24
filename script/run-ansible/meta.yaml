@@ -1,0 +1,63 @@
+alias: run-ansible
+uid: f596e26aa8e8475c
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: Cloud automation
+tags:
+- run
+- ansible
+- remote
+- configuration-management
+
+# Environment
+default_env:
+  MLC_ANSIBLE_VERBOSITY: ''
+  MLC_ANSIBLE_FORKS: '5'
+
+new_env_keys:
+- MLC_ANSIBLE_RUN_DIR
+- MLC_ANSIBLE_PLAYBOOK_PATH
+
+# Input mapping
+input_mapping:
+  playbook: MLC_ANSIBLE_PLAYBOOK
+  inventory: MLC_ANSIBLE_INVENTORY
+  extra_vars: MLC_ANSIBLE_EXTRA_VARS
+  limit: MLC_ANSIBLE_LIMIT
+  tags: MLC_ANSIBLE_TAGS
+  skip_tags: MLC_ANSIBLE_SKIP_TAGS
+  forks: MLC_ANSIBLE_FORKS
+  verbosity: MLC_ANSIBLE_VERBOSITY
+  private_key: MLC_ANSIBLE_PRIVATE_KEY
+  user: MLC_ANSIBLE_USER
+  become: MLC_ANSIBLE_BECOME
+  vault_password_file: MLC_ANSIBLE_VAULT_PASSWORD_FILE
+  config_file: MLC_ANSIBLE_CONFIG_FILE
+  roles_path: MLC_ANSIBLE_ROLES_PATH
+  galaxy_requirements: MLC_ANSIBLE_GALAXY_REQUIREMENTS
+
+# Dependencies
+deps:
+- tags: get,ansible
+
+# Variations
+variations:
+  aws:
+    env:
+      MLC_ANSIBLE_CLOUD_PROVIDER: aws
+    group: cloud-provider
+  gcp:
+    env:
+      MLC_ANSIBLE_CLOUD_PROVIDER: gcp
+    group: cloud-provider
+  azure:
+    env:
+      MLC_ANSIBLE_CLOUD_PROVIDER: azure
+    group: cloud-provider
+  local:
+    default: true
+    env:
+      MLC_ANSIBLE_CLOUD_PROVIDER: local
+    group: cloud-provider

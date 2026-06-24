@@ -89,6 +89,9 @@ variations:
     group: version
     env:
       MLC_GIT_CHECKOUT: releases/gcc-#
+  sha.#:
+    env:
+      MLC_GIT_CHECKOUT_SHA: '#'
   enable-multilib:
     deps:
     - tags: get,multilib

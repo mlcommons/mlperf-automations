@@ -77,6 +77,7 @@ mlcr install,src,gcc,src-gcc
 - `enable-multilib`
 - `extra.#` _(# can be substituted dynamically)_
 - `lang.#` _(# can be substituted dynamically)_
+- `sha.#` _(# can be substituted dynamically)_
 
 ### Version
 

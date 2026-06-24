@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-06-05 03:03:14*
+*Last updated: 2026-06-22 04:52:55*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -348,6 +348,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[install-terraform-from-src](install-terraform-from-src/)**
   - install-terraform-from-src
   - Tags: `install`, `terraform`, `from-src`
+- **[run-ansible](run-ansible/)**
+  - run-ansible
+  - Tags: `run`, `ansible`, `remote`, `configuration-management`
 - **[run-terraform](run-terraform/)**
   - run-terraform
   - Tags: `run`, `terraform`
@@ -456,6 +459,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-android-sdk](get-android-sdk/)**
   - get-android-sdk
   - Tags: `get`, `android`, `sdk`, `android-sdk`
+- **[get-ansible](get-ansible/)**
+  - get-ansible
+  - Tags: `get`, `ansible`, `get-ansible`
 - **[get-apptainer](get-apptainer/)**
   - get-apptainer
   - Tags: `get-apptainer`
@@ -582,6 +588,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-zendnn](get-zendnn/)**
   - get-zendnn
   - Tags: `get`, `zendnn`, `amd`, `from.src`
+- **[install-ansible-via-pip](install-ansible-via-pip/)**
+  - install-ansible-via-pip
+  - Tags: `install`, `ansible`, `via-pip`
 - **[install-apt-package](install-apt-package/)**
   - install-apt-package
   - Tags: `get`, `install`, `apt-package`, `package`
@@ -1244,7 +1253,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 365
+- **Total Scripts**: 368
 - **Categories**: 34
 
 ## Usage

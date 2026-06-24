@@ -1086,6 +1086,10 @@ variations:
       update_tags_from_env_with_prefix:
         _find_links_url.:
         - MLC_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL_DGL
+    - tags: get,generic-python-lib,_package.scipy
+      version_min: 1.14.0
+      names:
+      - scipy
   rnnt:
     group: models
     env:

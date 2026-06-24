@@ -23,7 +23,9 @@ _VLLM_PATTERNS: list[tuple[str, str]] = [
     ("tensor_parallel", r"tensor_parallel_size\s*[=:]\s*'?(\d+)"),
     ("pipeline_parallel", r"pipeline_parallel_size\s*[=:]\s*'?(\d+)"),
     ("expert_parallel", r"expert_parallel_size\s*[=:]\s*'?(\d+)"),
+    ("data_parallel", r"data_parallel_size\s*[=:]\s*'?(\d+)"),
     ("batch", r"max_num_seqs\s*[=:]\s*'?(\d+)"),
+    ("disaggregated", r"enable_disagg_prefill\s*[=:]\s*'?True"),
 ]
 
 # SGLang patterns match the server_args=ServerArgs(...) startup line.
@@ -33,16 +35,26 @@ _SGLANG_PATTERNS: list[tuple[str, str]] = [
     ("tensor_parallel", r"tp_size=(\d+)"),
     ("pipeline_parallel", r"pp_size=(\d+)"),
     ("expert_parallel", r"ep_size=(\d+)"),
+    ("data_parallel", r"dp_size=(\d+)"),
     ("batch", r"max_running_requests=(\d+)"),
+    ("disaggregated", r"disaggregation_mode='(?!null)[^']+"),
 ]
 
-# TRT-LLM patterns match the LLM Args dump line and the
-# "[TRT-LLM] [I] max_seq_len=..., max_num_tokens=..., max_batch_size=..." line.
+# TRT-LLM patterns.
+# 1.2.x (latest stable): LLM Args dump contains tensor/pipeline_parallel_size
+#   and orchestrator_type
+# 1.0.x:
+#   "[TRT-LLM] [I] max_seq_len=..., max_num_tokens=..., max_batch_size=..." line
+# is present, so tensor/pipeline_parallel and disaggregated return null on
+# 1.0.x.
 _TRTLLM_PATTERNS: list[tuple[str, str]] = [
     ("tensor_parallel", r"tensor_parallel_size=(\d+)"),
     ("pipeline_parallel", r"pipeline_parallel_size=(\d+)"),
     ("batch", r"max_batch_size=(\d+)"),
     ("max_num_tokens", r"max_num_tokens=(\d+)"),
+    # orchestrator_type=None → standard; non-None → disaggregated (1.2.x+
+    # only).
+    ("disaggregated", r"orchestrator_type=(?!None)\S+"),
 ]
 
 
@@ -93,11 +105,30 @@ def _detect_framework(text: str) -> str:
     return ""
 
 
+def _build_config_summary(result: dict) -> str:
+    """Build a human-readable summary string from non-null, non-zero parallel fields."""
+    parts = []
+    if result.get("disaggregated"):
+        parts.append("Disaggregated")
+    for key, label in (("expert_parallel", "EP"), ("pipeline_parallel", "PP"),
+                       ("tensor_parallel", "TP"), ("data_parallel", "DP")):
+        v = result.get(key)
+        if v:
+            parts.append(f"{label} {v}")
+    notes = result.get("config_summary_notes") or ""
+    if notes:
+        parts.append(notes)
+    return ", ".join(parts)
+
+
 def parse_serving_log(log_path: str, serving_framework: str = "auto") -> dict:
     # Initialise with vLLM keys as a safe default; overwritten once text is
     # available.
-    result: dict = {k: None for k, _ in _VLLM_PATTERNS}
-    result["framework"] = ""
+    result: dict = {k: (0 if k == "disaggregated" else None)
+                    for k, _ in _VLLM_PATTERNS}
+    result.update({"framework": "",
+                   "config_summary_notes": "",
+                   "config_summary": ""})
 
     if not log_path:
         print("No log path provided; writing all-null output.", flush=True)
@@ -111,17 +142,21 @@ def parse_serving_log(log_path: str, serving_framework: str = "auto") -> dict:
     text = _read_log_head(log_path)
     patterns = _choose_patterns(text, serving_framework)
 
-    result = {k: None for k, _ in patterns}
-    result["framework"] = ""
+    result = {k: (0 if k == "disaggregated" else None) for k, _ in patterns}
+    result.update({"framework": "",
+                   "config_summary_notes": "",
+                   "config_summary": ""})
 
     for field, pattern in patterns:
         matches = re.findall(pattern, text)
         if matches:
-            # Take the last match — handles duplicate keys in the dict repr
-            # (last value wins).
-            result[field] = int(matches[-1])
+            val = matches[-1]
+            # Numeric fields have a (\d+) capture group; disaggregated has none
+            # so findall returns the full match string — treat any match as 1.
+            result[field] = int(val) if val.isdigit() else 1
 
     result["framework"] = _detect_framework(text)
+    result["config_summary"] = _build_config_summary(result)
 
     return result
 

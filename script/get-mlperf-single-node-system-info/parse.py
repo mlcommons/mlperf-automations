@@ -122,7 +122,7 @@ EXTRACT_RULES = {
     },
     "operating_system": {
         "source": "env",
-        "candidates": ["MLC_HOST_OS_TYPE", "MLC_HOST_OS_FLAVOR_LIKE", "MLC_HOST_OS_FLAVOR", "MLC_HOST_OS_VERSION"],
+        "candidates": ["MLC_HOST_OS_FLAVOR", "MLC_HOST_OS_VERSION"],
     },
     "filesystem": {
         "source": "env",
@@ -134,7 +134,7 @@ EXTRACT_RULES = {
         "optional": True,
     },
     "other_software_stack": {
-        "source": "env",
+        "source": "detect",
         "candidates": [],
         "optional": True,
     },
@@ -211,6 +211,16 @@ def extract_value(rule, field_key):
             if field_key == "inference_backend":
                 v = detect_inference_backend()
                 return v if v else "Not detected: CUDA/ROCm/XPU runtime not found"
+            elif field_key == "other_software_stack":
+                stack_parts = []
+                backend = detect_inference_backend()
+                if backend:
+                    stack_parts.append(backend)
+                driver = os.environ.get(
+                    "MLC_HOST_GPU_DRIVER_VERSION", "").strip()
+                if driver:
+                    stack_parts.append(driver)
+                return ", ".join(stack_parts) if stack_parts else None
             else:
                 return "Not available"
         except Exception as e:
@@ -279,33 +289,7 @@ def main():
 
     for target_key, rule in EXTRACT_RULES.items():
         try:
-            ensemble_type_subpart = ""
-            if target_key in ["host_processor_model_name", "host_processors_per_node",
-                              "host_processor_core_count", "host_processor_vcpu_count"]:
-                ensemble_type_subpart = "processor"
-            elif target_key in ["host_memory_capacity", "host_memory_configuration"]:
-                ensemble_type_subpart = "host_memory"
-            elif target_key in ["accelerator_model_name", "accelerators_per_node",
-                                "accelerator_memory_capacity", "accelerator_memory_type",
-                                "accelerator_interconnect", "accelerator_host_interconnect"]:
-                ensemble_type_subpart = "accelerator"
-            elif target_key in ["host_network_card_count", "host_networking"]:
-                ensemble_type_subpart = "networking"
-            elif target_key in ["host_storage_capacity", "host_storage_type"]:
-                ensemble_type_subpart = "storage"
-
-            value = extract_value(rule, target_key)
-
-            if target_key in ["other_hardware", "cooling", "hw_notes"]:
-                parsed.setdefault("hardware_ensemble", {})[target_key] = value
-            elif ensemble_type_subpart in [
-                    "processor", "host_memory", "accelerator", "networking", "storage"]:
-                parsed.setdefault("hardware_ensemble", {}).setdefault(
-                    ensemble_type_subpart, {})[target_key] = value
-            elif target_key in ["serving_framework", "inference_backend", "driver",
-                                "operating_system", "filesystem", "container_link",
-                                "other_software_stack", "sw_notes"]:
-                parsed.setdefault("software_ensemble", {})[target_key] = value
+            parsed[target_key] = extract_value(rule, target_key)
         except Exception as e:
             parsed[target_key] = f"Not detected: extraction error ({e})"
             print(
