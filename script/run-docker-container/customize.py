@@ -12,6 +12,14 @@ DOCKER_SOCKET_PATH = "/var/run/docker.sock"
 NESTED_DOCKER_ENV_KEY = "MLC_DOCKER_ENABLE_NESTED"
 
 
+def _get_container_cmd(env):
+    tool = env.get('MLC_CONTAINER_TOOL', 'docker')
+    storage_root = env.get('MLC_PODMAN_STORAGE_ROOT', '')
+    if tool == 'podman' and storage_root:
+        return f"{tool} --root {storage_root}/storage --runroot {storage_root}/run"
+    return tool
+
+
 def is_valid_docker_binary(path):
     if not path:
         return False
@@ -73,7 +81,7 @@ def preprocess(i):
     logger.info('Checking existing Docker container:')
     logger.info('')
     # CMD = f"""{env['MLC_CONTAINER_TOOL']} ps --format=json  --filter "ancestor={DOCKER_CONTAINER}" """
-    CMD = f"""{env['MLC_CONTAINER_TOOL']} ps --format """ + \
+    CMD = f"""{_get_container_cmd(env)} ps --format """ + \
         '"{{ .ID }},"' + f"""  --filter "ancestor={DOCKER_CONTAINER}" """
     if os_info['platform'] == 'windows':
         CMD += " 2> nul"
@@ -112,7 +120,7 @@ def preprocess(i):
         if env.get('MLC_DOCKER_CONTAINER_ID', '') != '':
             del (env['MLC_DOCKER_CONTAINER_ID'])  # not valid ID
 
-        CMD = f"""{env['MLC_CONTAINER_TOOL']} images -q """ + DOCKER_CONTAINER
+        CMD = f"""{_get_container_cmd(env)} images -q """ + DOCKER_CONTAINER
 
         if os_info['platform'] == 'windows':
             CMD += " 2> nul"
@@ -306,14 +314,14 @@ def postprocess(i):
         # Escape single quotes inside run_cmd for bash -c '...' wrapping
         escaped_run_cmd = run_cmd.replace("'", "'\\''")
         if existing_container_id:
-            CMD = f"""ID={existing_container_id} && {env['MLC_CONTAINER_TOOL']} exec $ID bash -c '""" + \
+            CMD = f"""ID={existing_container_id} && {_get_container_cmd(env)} exec $ID bash -c '""" + \
                 escaped_run_cmd + "'"
         else:
-            CONTAINER = f"""{env['MLC_CONTAINER_TOOL']} run -dt {run_opts} --rm  {docker_image_repo}/{docker_image_name}:{docker_image_tag} bash"""
-            CMD = f"""ID=`{CONTAINER}` && {env['MLC_CONTAINER_TOOL']} exec $ID bash -c '{escaped_run_cmd}'"""
+            CONTAINER = f"""{_get_container_cmd(env)} run -dt {run_opts} --rm  {docker_image_repo}/{docker_image_name}:{docker_image_tag} bash"""
+            CMD = f"""ID=`{CONTAINER}` && {_get_container_cmd(env)} exec $ID bash -c '{escaped_run_cmd}'"""
 
             if is_true(env.get('MLC_KILL_DETACHED_CONTAINER', False)):
-                CMD += f""" && {env['MLC_CONTAINER_TOOL']} kill $ID >/dev/null"""
+                CMD += f""" && {_get_container_cmd(env)} kill $ID >/dev/null"""
 
         CMD += ' && echo "ID=$ID"'
 
@@ -375,7 +383,7 @@ def postprocess(i):
             x1 = '-it'
             x2 = " && bash ) || bash"
 
-        CONTAINER = f"{env['MLC_CONTAINER_TOOL']} run " + x1 + " --entrypoint " + x + x + " " + run_opts + \
+        CONTAINER = f"{_get_container_cmd(env)} run " + x1 + " --entrypoint " + x + x + " " + run_opts + \
             " " + docker_image_repo + "/" + docker_image_name + ":" + docker_image_tag
         # Escape quotes inside run_cmd for bash -c wrapping
         if x == "'":
