@@ -39,24 +39,30 @@ Key fields to read in meta.yaml: `tags`, `deps`, `variations`, `input_mapping`,
 
 ### "I need to add a new script"
 
-1. `python -c "import secrets; print(secrets.token_hex(8))"` → get UID
-2. `grep -r "uid: <uid>" script/ automation/` → verify no collision
-3. Create `script/<alias>/meta.yaml` — copy nearest equivalent and change:
-   - `alias`, `uid`, `tags`, `category`
+1. Scaffold with `mlc add script`:
+   ```bash
+   # Basic skeleton (copies template,generic)
+   mlc add script mlcommons@mlperf-automations:<alias> --tags=<tags>
+
+   # Copy nearest existing script as the template instead
+   mlc add script mlcommons@mlperf-automations:<alias> --tags=<tags> \
+       --template_tags=app,mlperf,inference,reference
+   ```
+   This creates `script/<alias>/` with `meta.yaml`, `customize.py`, and `run.sh`.
+   If multiple scripts match `--template_tags`, it prompts you to pick one.
+
+2. Edit `meta.yaml` — update at minimum:
+   - `alias`, `uid` (already generated), `tags`, `category`
    - `input_mapping` (CLI args → env vars)
    - `new_env_keys` (what this script promises to export)
-   - `deps` chain (detect-os → get,python3 → whatever your script needs)
-4. Create `customize.py` with `preprocess(i)` that:
-   - Guards required env vars (return `{'return':1,'error':'...'}` if missing)
-   - Builds a shell command string in `env['MY_CMD']`
-5. Create `run.sh`:
-   ```bash
-   eval "${MY_CMD}"
-   test $? -eq 0 || exit $?
-   ```
-6. `mlc lint script --tags=<alias>` — fix key order
-7. `mlct <alias>` — run built-in tests
-8. PR → `dev` branch (never push to `main` directly)
+   - `deps` chain
+3. Edit `customize.py` — implement `preprocess(i)`:
+   - Guard required env vars (return `{'return':1,'error':'...'}` if missing)
+   - Build the shell command string in `env['MY_CMD']`
+4. Edit `run.sh` — ensure it evals the command and exits non-zero on failure.
+5. `mlc lint script --tags=<alias>` — fix key order
+6. `mlct <alias>` — run built-in tests
+7. PR → `main` branch
 
 ### "I need to add a variation"
 
@@ -111,24 +117,34 @@ Env propagation rules:
 4. `MLC_TMP_*` never cached, never passed to deps automatically
 5. If a parent caches, only declared `new_env_keys` are replayed on cache hit
 
-### "I need to run the endpoint benchmark locally for testing"
+### "I need to run the inference benchmark locally for testing"
 
 ```bash
-# Quickest (echo server, offline, no model needed)
-mlcr app,mlperf,inference,endpoints,_offline,_echo-server \
-     --num_samples=50 --quiet
+# Quickest smoke test — resnet50, onnxruntime, CPU, 500 samples
+mlcr run-mlperf,inference,_submission,_short,_r6.0-dev \
+     --model=resnet50 --implementation=mlcommons-python \
+     --backend=onnxruntime --device=cpu \
+     --scenario=Offline --test_query_count=500 --target_qps=1 \
+     --hw_name=my_machine --quiet
 
-# With local source checkout (skips git clone)
-mlcr app,mlperf,inference,endpoints,_echo-server \
-     --src=/path/to/inference-endpoint \
-     --num_samples=50
+# Find performance (tunes target QPS before a real run)
+mlcr run-mlperf,inference,_find-performance,_short,_r6.0-dev \
+     --model=resnet50 --implementation=mlcommons-python \
+     --backend=onnxruntime --device=cpu \
+     --scenario=Offline --hw_name=my_machine --quiet
 
-# Against a real endpoint
-mlcr app,mlperf,inference,endpoints,_offline \
-     --endpoints=http://localhost:8000 \
-     --model=llama-3-8b \
-     --num_samples=200 \
-     --dataset=/data/prompts.jsonl
+# Accuracy-only run
+mlcr run-mlperf,inference,_accuracy-only,_short,_r6.0-dev \
+     --model=resnet50 --implementation=mlcommons-python \
+     --backend=onnxruntime --device=cpu \
+     --scenario=Offline --hw_name=my_machine --quiet
+
+# Full submission run (both modes + compliance + checker + tar)
+mlcr run-mlperf,inference,_submission,_full,_r6.0-dev \
+     --model=resnet50 --implementation=mlcommons-python \
+     --backend=onnxruntime --device=cpu \
+     --scenario=Offline --execution_mode=valid \
+     --submitter=MLCommons --hw_name=my_machine --quiet
 ```
 
 ### "I need to inspect or clear cache"
@@ -157,7 +173,7 @@ mlcd app,mlperf,inference,endpoints --docker_rebuild
 |---|---|
 | `alias` | Script directory name and lookup key |
 | `uid` | 16-hex unique ID; never change after first commit |
-| `automation_uid` | Always `5b4e0237da074764`; identifies this as a `script` automation |
+| `automation_uid` | UID of the `script` automation type (`5b4e0237da074764`); the only automation type currently in this repo |
 | `tags` | Comma-separated discovery tags; must be a superset of what callers request |
 | `category` | Grouping label in docs |
 | `default_env` | Env vars set before variation env (lowest priority) |
@@ -197,16 +213,15 @@ All must return `{'return': 0}` or `{'return': 1, 'error': 'reason'}`.
 
 ---
 
-## Env variable naming rules
+## Env variable naming conventions
 
-| Prefix | Semantics |
-|---|---|
-| `MLC_HOST_*` | Set by detect-os / detect-cpu; read-only in your scripts |
-| `MLC_TMP_*` | Transient; not cached, not passed to deps |
-| `MLC_GIT_*` | Git-related; not passed to deps unless `force_env_keys` |
-| `MLC_MLPERF_ENDPOINT_*` | app-mlperf-inference-endpoints outputs |
-| `MLC_MLPERF_ENDPOINTS_*` | get-mlperf-endpoints install outputs (package) |
-| `+PATH` in new_env_keys | Prepend to existing PATH (engine handles concatenation) |
+No rigid rules — just two hard constraints and a naming guideline:
+
+- **`MLC_` prefix** — use on all env vars set by MLC scripts so they are clearly distinguishable from the surrounding environment.
+- **`MLC_TMP_*`** — reserved for transient vars: never cached, never passed to deps. Use this when a value is only needed within the current script's run.
+- **`+VAR` in `new_env_keys`** — prepend to an existing env var (e.g. `+PATH`); the engine handles concatenation.
+
+Everything else: name vars to reflect the script they come from and what they hold. Keep names reasonably short and meaningful — no other convention is enforced.
 
 ---
 
@@ -214,8 +229,8 @@ All must return `{'return': 0}` or `{'return': 1, 'error': 'reason'}`.
 
 | Task | Read these first |
 |---|---|
-| Understand endpoint benchmark | `script/app-mlperf-inference-endpoints/meta.yaml`, `customize.py` |
-| Understand package install | `script/get-mlperf-endpoints/meta.yaml`, `customize.py` |
+| Understand the inference benchmark | `script/run-mlperf-inference-app/meta.yaml`, `customize.py` |
+| Reference for a new MLPerf benchmark (dep chain, variations, dispatch pattern) | `script/app-mlperf-inference-mlcommons-python/meta.yaml`, `script/run-mlperf-inference-app/meta.yaml` |
 | Debug env propagation | `automation/script/module.py` (search: `new_env_keys`, `clean_env_keys`) |
 | Debug caching | `automation/script/cache_utils.py` |
 | Add a script | Nearest similar script + `automation/script/meta_schema.py` |
@@ -230,9 +245,8 @@ All must return `{'return': 0}` or `{'return': 1, 'error': 'reason'}`.
 - Don't use `print()` in `customize.py` — use `i['automation'].logger`
 - Don't raise exceptions for recoverable errors — return `{'return': 1, 'error': '...'}`
 - Don't edit `mlc-cached-state.json` or `tmp-env.sh` by hand
-- Don't push to `main` — PR to `dev`
+- Don't push directly to `main` — always open a PR; use `dev` only for urgent merges without approval
 - Don't hard-code paths in `run.sh` — use env vars set by `preprocess`
-- Don't declare another script's env vars in your `new_env_keys`
-- Don't change `automation_uid: 5b4e0237da074764`
+- Don't change `automation_uid: 5b4e0237da074764` — it's the UID of the `script` automation type, not a script-specific value
 - Don't commit API keys — pass via `--api_key=...` only
 - Don't set `MLC_TMP_*` in `new_env_keys` (it's a transient namespace)
