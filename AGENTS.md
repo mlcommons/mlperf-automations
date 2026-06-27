@@ -154,173 +154,465 @@ Every script lives in `script/<alias>/` with these files:
 
 ### meta.yaml — full key reference
 
-**Evidence:** `automation/script/meta_schema.py`, `script/app-mlperf-inference-endpoints/meta.yaml`
+**Evidence:** `automation/script/meta_schema.py`, `script/app-mlperf-inference-mlcommons-python/meta.yaml`
+
+All examples below are taken verbatim from `script/app-mlperf-inference-mlcommons-python`, the canonical multi-backend MLPerf reference implementation script. It exercises every key the schema supports.
 
 ```yaml
 # ── Identity (all four required) ──────────────────────────────────────────────
-alias: app-mlperf-inference-endpoints   # kebab-case; unique across repo
-uid: 22926c07f46c4e31                   # 16 lowercase hex chars; unique across repo
-automation_alias: script                # always "script"
-automation_uid: 5b4e0237da074764        # FIXED CONSTANT — never change
+alias: app-mlperf-inference-mlcommons-python   # kebab-case; unique across repo
+uid: ff149e9781fc4b65                          # 16 lowercase hex chars; never change
+automation_alias: script                       # always "script"
+automation_uid: 5b4e0237da074764               # UID of the 'script' automation type; same for all scripts
 
 # ── Discovery ─────────────────────────────────────────────────────────────────
 category: MLPerf Inference
-tags: [app, mlperf, inference, endpoints, endpoint, benchmark]
-tags_help: "app mlperf inference endpoints"   # shown in --help
+tags:
+- app
+- vision
+- language
+- mlcommons
+- mlperf
+- inference
+- reference
+- ref
 
 # ── Environment ───────────────────────────────────────────────────────────────
-default_env:                            # applied before variation env
-  MLC_MLPERF_ENDPOINT_MODE: offline
-  MLC_MLPERF_ENDPOINT_API_TYPE: openai
+default_env:                            # lowest-priority; variation env overrides these
+  MLC_MLPERF_LOADGEN_MODE: accuracy
+  MLC_MLPERF_LOADGEN_SCENARIO: Offline
+  MLC_OUTPUT_FOLDER_NAME: test_results
+  MLC_MLPERF_RUN_STYLE: test
+  MLC_TEST_QUERY_COUNT: '10'
+  MLC_MLPERF_QUANTIZATION: false
+  MLC_MLPERF_SUT_NAME_IMPLEMENTATION_PREFIX: reference
+  MLC_MLPERF_SUT_NAME_RUN_CONFIG_SUFFIX: ''
 
-new_env_keys:                           # ONLY these keys propagate to callers
-  - MLC_MLPERF_ENDPOINT_QPS
-  - MLC_MLPERF_ENDPOINT_SAMPLES_*      # wildcard: matches any suffix
-  - MLC_MLPERF_ENDPOINT_LATENCY_*
-  - +PATH                              # + prefix: append to existing env var
+new_env_keys:                           # ONLY keys matching these patterns propagate to callers
+  - MLC_MLPERF_*
+  - MLC_DATASET_*
+  - MLC_HW_NAME
+  - MLC_ML_MODEL_*
+  - MLC_MAX_EXAMPLES
+  - MLC_VLLM_*
 
-new_state_keys:                         # persistent state (not in env)
+new_state_keys:                         # persistent state written into the MLC state dict (not env)
   - mlperf-inference-implementation
+  - MLC_SUT_*
+
+env_key_mappings:                       # strip a prefix before passing env to the subprocess
+  MLC_HOST_: HOST_                      # MLC_HOST_OS_TYPE → HOST_OS_TYPE in run.sh
+  MLC_ML_: ML_
+  MLC_MLPERF_TVM: MLPERF_TVM
+  MLC_MLPERF_DELETE: MLPERF_DELETE
 
 # ── Input mapping ─────────────────────────────────────────────────────────────
+# CLI: mlcr app,mlperf,inference,reference --mode=performance --scenario=Offline
+# Each --key=val is translated to the corresponding env var before preprocess runs.
 input_mapping:
-  endpoints: MLC_MLPERF_ENDPOINT_URL   # --endpoints=http://... → env var
-  model:     MLC_MLPERF_ENDPOINT_MODEL
-  api_key:   MLC_MLPERF_ENDPOINT_API_KEY
-
-input_description:                      # shown in mlcr --help
-  model:
-    desc: Model name advertised by the endpoint
-    required: true                      # validated in preprocess
-
-# ── Caching ───────────────────────────────────────────────────────────────────
-cache: true                             # persist new_env to disk
-can_force_cache: true                   # allow --force_cache override
-cache_expiration: 1h                    # 1h | 1d | 1w; prune with mlc prune cache
-clean_files:                            # delete these from cache dir after run
-  - tmp-run.out
-  - tmp-env.out
+  clean: MLC_MLPERF_CLEAN_SUBMISSION_DIR
+  count: MLC_MLPERF_LOADGEN_QUERY_COUNT
+  dataset: MLC_MLPERF_VISION_DATASET_OPTION
+  hw_name: MLC_HW_NAME
+  max_batchsize: MLC_MLPERF_LOADGEN_MAX_BATCHSIZE
+  mode: MLC_MLPERF_LOADGEN_MODE
+  network: MLC_NETWORK_LOADGEN
+  num_threads: MLC_NUM_THREADS
+  offline_target_qps: MLC_MLPERF_LOADGEN_OFFLINE_TARGET_QPS
+  output_dir: OUTPUT_BASE_DIR
+  power: MLC_MLPERF_POWER
+  rerun: MLC_RERUN
+  scenario: MLC_MLPERF_LOADGEN_SCENARIO
+  server_target_qps: MLC_MLPERF_LOADGEN_SERVER_TARGET_QPS
+  target_qps: MLC_MLPERF_LOADGEN_TARGET_QPS
+  test_query_count: MLC_TEST_QUERY_COUNT
+  threads: MLC_NUM_THREADS
 
 # ── Dependencies ─────────────────────────────────────────────────────────────
-deps:                                   # run before preprocess
+# deps: run BEFORE preprocess(). Evaluated top-to-bottom; conditions checked at runtime.
+deps:
+  # Unconditional — always run regardless of variations
   - tags: detect,os
-    names: [detect-os]                  # stable handle for adr overrides
-  - tags: get,python3
-    names: [python, python3]
-    version_min: "3.9"
-    version_max: "3.12.999"
-  - tags: get,mlperf,endpoints
-    names: [mlperf-endpoints]
-    skip_if_env:                        # skip if env[KEY] in listed values
-      MLC_USE_SYSTEM_PYTHON:
-        - 'yes'
-    enable_if_env:                      # only run if env[KEY] in listed values
-      MLC_MLPERF_ENDPOINT_MODE:
-        - offline
-        - online
-    enable_if_any_env:                  # run if ANY key matches (OR logic)
-      MLC_GPU_AVAILABLE:
-        - 'yes'
-    force_env_keys:                     # pass these keys even if normally filtered
-      - MLC_CUDA_HOME
-    clean_env_keys:                     # strip these before passing to this dep
-      - MLC_TMP_*
-    dynamic: true                       # re-run this dep even when parent is cached
+  - tags: detect,cpu
+  - tags: get,sys-utils-mlc
+  - tags: get,python
+    names:
+    - python                            # stable handles used by add_deps_recursive
+    - python3
 
-prehook_deps:                           # run AFTER preprocess, before run.sh
-  - tags: setup,mlperf,env
-    dynamic: true
+  # Conditional on env — only install CUDA if device=gpu AND backend needs it
+  - tags: get,cuda,_cudnn
+    names:
+    - cuda
+    enable_if_env:                      # ALL keys must match (AND logic)
+      MLC_MLPERF_DEVICE:
+      - gpu
+      MLC_MLPERF_BACKEND:
+      - onnxruntime
+      - tf
+      - tflite
+      - pytorch
 
-posthook_deps:                          # run AFTER run.sh, before postprocess
-  - tags: cleanup,tmp
-
-post_deps:                              # run AFTER postprocess
-  - tags: draw,graph,from-json
+  # GPU onnxruntime — skip for models that use CPU onnxruntime even on GPU hosts
+  - tags: get,generic-python-lib,_onnxruntime_gpu
+    names:
+    - ml-engine-onnxruntime-cuda
     enable_if_env:
-      MLC_RUN_JSON_VERSION_INFO_FILE:
-        - true
+      MLC_MLPERF_BACKEND:
+      - onnxruntime
+      - tvm-onnx
+      MLC_MLPERF_DEVICE:
+      - gpu
+    skip_if_env:                        # skip if env[KEY] matches any listed value
+      MLC_MODEL:
+      - 3d-unet-99
+      - 3d-unet-99.9
+      - resnet50
+
+  # skip_if_any_env: skip if ANY of the listed vars matches (OR logic across keys)
+  - tags: get,ml-model,stable-diffusion,text-to-image,sdxl
+    names:
+    - ml-model
+    - sdxl-model
+    enable_if_env:
+      MLC_MODEL:
+      - stable-diffusion-xl
+    skip_if_any_env:                    # skip if MLC_MLPERF_CUSTOM_MODEL_PATH OR docker state is set
+      MLC_MLPERF_CUSTOM_MODEL_PATH:
+      - 'on'
+    skip_if_env:
+      MLC_RUN_STATE_DOCKER:
+      - 'yes'
+      MLC_MLPERF_MODEL_SDXL_DOWNLOAD_TO_HOST:
+      - 'yes'
+
+  # update_tags_from_env_with_prefix — inject env value into dep tag at runtime
+  # e.g. MLC_MODEL=resnet50 → adds tag "_model.resnet50" to the tvm-model dep
+  - tags: get,tvm-model,_onnx
+    names:
+    - tvm-model
+    update_tags_from_env_with_prefix:
+      _model.:                          # prefix
+      - MLC_MODEL                       # env var whose value is appended
+
+  # env: — set extra env vars just for this one dep (not inherited by others)
+  - tags: get,generic-python-lib,_onnxruntime_gpu
+    env:
+      MLC_GENERIC_PYTHON_PIP_UNINSTALL_DEPS: ''
+    enable_if_env:
+      MLC_MLPERF_BACKEND:
+      - onnxruntime
+      MLC_MLPERF_DEVICE:
+      - gpu
+      MLC_MODEL:
+      - 3d-unet-99
+      - resnet50
+
+  # Model deps — each guarded by enable_if_env on MLC_MODEL
+  - tags: get,ml-model,image-classification,resnet50
+    names: [ml-model, resnet50-model]
+    enable_if_env:
+      MLC_MODEL: [resnet50]
+    skip_if_env:
+      MLC_MLPERF_CUSTOM_MODEL_PATH: ['on']
+
+  - tags: get,ml-model,language-processing,bert-large
+    names: [ml-model, bert-model]
+    enable_if_env:
+      MLC_MODEL: [bert-99, bert-99.9]
+
+  # LoadGen and inference source — always required
+  - tags: get,loadgen,_wg-inference
+    names: [loadgen, mlperf-inference-loadgen]
+  - tags: get,mlcommons,inference,src
+    names: [inference-src]
+
+  # Two deps sharing the same name — second overrides env for that copy
+  - tags: get,mlcommons,inference,src
+    env:
+      MLC_GET_MLPERF_IMPLEMENTATION_ONLY: 'yes'
+    names: [mlperf-implementation]
+
+# run AFTER preprocess(), before run.sh
+prehook_deps:
+  - names: [remote-run-cmds]
+    tags: remote,run,cmds
+    enable_if_env:
+      MLC_ASSH_RUN_COMMANDS: ['on']
+
+# run AFTER run.sh, before postprocess()
+posthook_deps:
+  - names: [mlperf-runner]
+    tags: benchmark-mlperf
+    skip_if_env:
+      MLC_MLPERF_SKIP_RUN: ['on']
+
+# run AFTER postprocess()
+post_deps:
+  - tags: save,mlperf,inference,state
+    names: [save-mlperf-inference-state]
 
 # ── Variations ────────────────────────────────────────────────────────────────
 variations:
-  offline:
-    group: mode                         # mutually exclusive within group
-    default: true                       # auto-selected if no mode variation given
-    env:
-      MLC_MLPERF_ENDPOINT_MODE: offline
-    deps: []                            # extra deps activated by this variation
 
-  online:
-    group: mode
+  # ── device group (mutually exclusive) ─────────────────────────────────────
+  cpu:
+    group: device
+    default: true                       # selected when no device variation is given
     env:
-      MLC_MLPERF_ENDPOINT_MODE: online
-
-  echo-server:                          # no group → free-standing, stackable
-    env:
-      MLC_MLPERF_ENDPOINT_USE_ECHO_SERVER: 'yes'
+      MLC_MLPERF_DEVICE: cpu
+      CUDA_VISIBLE_DEVICES: ''
+      USE_CUDA: false
+      USE_GPU: false
 
   cuda:
     group: device
-    base: [gpu]                         # apply 'gpu' variation first, then this
     env:
-      MLC_MLPERF_DEVICE: cuda
+      MLC_MLPERF_DEVICE: gpu
+      USE_CUDA: true
+      USE_GPU: true
 
-  # Combined variation: only active when BOTH "cuda" and "fp16" are requested
-  cuda,fp16:
+  rocm:
+    group: device
     env:
-      MLC_CUDA_FP16: 'yes'
+      MLC_MLPERF_DEVICE: rocm
+      USE_GPU: true
 
-  # Dynamic variation: _batch_size.64 → MLC_BATCH_SIZE=64
-  "batch_size.#":
+  # ── framework group ────────────────────────────────────────────────────────
+  onnxruntime:
+    group: framework
+    default: true
+    add_deps_recursive:                 # propagate tag overrides to named deps deep in the subtree
+      imagenet-preprocessed:
+        tags: _NCHW
+      openimages-preprocessed:
+        tags: _NCHW
+      ml-model:
+        tags: raw,_onnx
+      numpy:
+        version_max: 1.26.4
+        version_max_usable: 1.26.4
     env:
-      MLC_BATCH_SIZE: "#"              # # substituted with the value from the tag
+      MLC_MLPERF_BACKEND: onnxruntime
 
-# ── Recursive dep override (ADR) ──────────────────────────────────────────────
-add_deps_recursive:                     # override tags on named deps inside subtree
-  mlperf-endpoints:
-    tags: _online
-  python:
-    version_max: "3.11.999"
-
-# Shorthand alias
-adr:
-  mlperf-endpoints:
-    tags: _online
-
-# ── Version matrix ────────────────────────────────────────────────────────────
-default_version: "1.0"
-versions:
-  "1.0":
+  pytorch:
+    group: framework
+    add_deps_recursive:
+      imagenet-preprocessed:
+        tags: _NCHW
+      ml-model:
+        tags: raw,_pytorch
     env:
-      MLC_GIT_CHECKOUT: v1.0
+      MLC_MLPERF_BACKEND: pytorch
+      MLC_MLPERF_BACKEND_VERSION: <<<MLC_TORCH_VERSION>>>   # template: resolved at runtime from env
+
+  vllm:
+    group: framework
+    env:
+      MLC_MLPERF_BACKEND: vllm
+
+  tvm-onnx:
+    group: framework
+    env:
+      MLC_MLPERF_BACKEND: tvm-onnx
+      MLC_MLPERF_BACKEND_VERSION: <<<MLC_ONNXRUNTIME_VERSION>>>
+    deps:                               # extra deps active only when this variation is selected
+    - tags: get,generic-python-lib,_onnx
+    - tags: get,tvm
+      names: [tvm]
+    - tags: get,tvm-model,_onnx
+      names: [tvm-model]
+      update_tags_from_env_with_prefix:
+        _model.:
+        - MLC_MODEL
+
+  # ── model group ────────────────────────────────────────────────────────────
+  resnet50:
+    group: models
+    default: true
+    env:
+      MLC_MODEL: resnet50
+      MLC_MLPERF_USE_MLCOMMONS_RUN_SCRIPT: 'yes'
     deps:
-      - tags: get,python3
-        version_min: "3.9"
-  "2.0":
+    - tags: get,generic-python-lib,_opencv-python
+      version_max: 4.10.0.82
+    - tags: get,generic-sys-util,_libgl
+    - tags: get,generic-python-lib,_numpy
+      names: [numpy]
+      version_max: 1.26.4
+    - tags: get,generic-python-lib,_pycocotools
+    prehook_deps:                       # variation-level prehook_deps, merged with script-level
+    - tags: get,generic-python-lib,_protobuf
+      names: [protobuf]
+      version_min: 3.20.3
+      enable_if_env:
+        MLC_MLPERF_BACKEND: [tf, tflite]
+
+  bert-99:
+    group: models
+    base:                               # apply the 'bert' (non-group) variation first, then this
+    - bert
     env:
-      MLC_GIT_CHECKOUT: v2.0
+      MLC_MODEL: bert-99
+
+  bert-99.9:
+    group: models
+    base:
+    - bert
+    env:
+      MLC_MODEL: bert-99.9
+
+  llama2-70b-99:
+    group: models
+    base:
+    - llama2-70b_
+    env:
+      MLC_MODEL: llama2-70b-99
+
+  llama3_1-405b:
+    group: models
+    env:
+      MLC_MODEL: llama3_1-405b
+    adr:                                # adr inside a variation: overrides specific named deps
+      pytorch:
+        version_max: 2.5.1
+      vllm:
+        env:
+          MLC_GENERIC_PYTHON_PIP_EXTRA: --upgrade
     deps:
-      - tags: get,python3
-        version_min: "3.11"
+    - tags: get,generic-python-lib,_package.transformers
+    - tags: get,generic-python-lib,_package.sentencepiece
+    - tags: get,generic-python-lib,_package.accelerate
+    - tags: get,generic-python-lib,_package.pandas
+      version_max: 2.2.1
+
+  # ── base (non-group) variations — apply shared config, referenced via base: ──
+  # These have no group: so they cannot be selected directly on the CLI.
+  bert:
+    env:
+      MLC_MLPERF_MODEL_SKIP_BATCHING: true
+    deps:
+    - tags: get,generic-python-lib,_tokenization
+    - tags: get,generic-python-lib,_boto3
+      enable_if_env:
+        MLC_MLPERF_BACKEND: [pytorch]
+    add_deps_recursive:
+      inference-src:
+        tags: _deeplearningexamples
+
+  llama2-70b_:
+    env:
+      MLC_MLPERF_MODEL_SKIP_BATCHING: false
+    deps:
+    - tags: get,generic-python-lib,_package.transformers
+      names: [transformers]
+    - tags: get,generic-python-lib,_package.sentencepiece
+      names: [sentencepiece]
+    - tags: get,generic-python-lib,_package.nltk
+      names: [nltk]
+      version_max: 3.8.1
+      version_max_usable: 3.8.1
+
+  # ── precision group ────────────────────────────────────────────────────────
+  fp32:
+    group: precision
+    default: true
+    add_deps_recursive:
+      ml-model:
+        tags: _fp32
+    env:
+      MLC_MLPERF_QUANTIZATION: false
+      MLC_MLPERF_MODEL_PRECISION: float32
+
+  int8:
+    group: precision
+    env:
+      MLC_MLPERF_QUANTIZATION: true
+      MLC_MLPERF_MODEL_PRECISION: int8
+    add_deps_recursive:
+      ml-model:
+        tags: _int8
+
+  float16:
+    group: precision
+    add_deps_recursive:
+      ml-model-float16:
+        tags: _fp16
+    env:
+      MLC_MLPERF_QUANTIZATION: false
+      MLC_MLPERF_MODEL_PRECISION: float16
+
+  # ── alias — redirect one name to another variation ─────────────────────────
+  quantized:
+    alias: int8                         # mlcr ...,_quantized is identical to ...,_int8
+
+  tensorflow:
+    alias: tf
+
+  # ── scenario group ─────────────────────────────────────────────────────────
+  offline:
+    env:
+      MLC_MLPERF_LOADGEN_SCENARIO: Offline
+  server:
+    env:
+      MLC_MLPERF_LOADGEN_SCENARIO: Server
+  singlestream:
+    env:
+      MLC_MLPERF_LOADGEN_SCENARIO: SingleStream
+  multistream:
+    env:
+      MLC_MLPERF_LOADGEN_SCENARIO: MultiStream
+
+  # ── dynamic variation — _batch_size.64 sets MLC_MLPERF_LOADGEN_MAX_BATCHSIZE=64 ─
+  batch_size.#:
+    group: batch-size
+    env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: '#'   # '#' is substituted with the suffix from the tag
+    add_deps_recursive:
+      ml-model:
+        tags: _batch_size.#
+      tvm-model:
+        tags: _batch_size.#
+
+  # ── combined variations — only active when BOTH named variations are selected ─
+  # Key is comma-separated; order matches the CLI invocation order.
+  onnxruntime,cpu:
+    env:
+      MLC_MLPERF_BACKEND_VERSION: <<<MLC_ONNXRUNTIME_VERSION>>>
+
+  onnxruntime,cuda:
+    env:
+      MLC_MLPERF_BACKEND_VERSION: <<<MLC_ONNXRUNTIME_GPU_VERSION>>>
+      ONNXRUNTIME_PREFERRED_EXECUTION_PROVIDER: CUDAExecutionProvider
+
+  onnxruntime,rocm:
+    add_deps_recursive:
+      onnxruntime:
+        tags: _rocm
+    env:
+      ONNXRUNTIME_PREFERRED_EXECUTION_PROVIDER: ROCMExecutionProvider
+
+  llama2-70b_,cuda:
+    default_env:
+      MLC_MLPERF_LOADGEN_MAX_BATCHSIZE: 8
+
+  deepseek-r1,pytorch:
+    deps:
+    - tags: get,generic-python-lib,_package.triton
+    - tags: get,generic-python-lib,_package.transformers
+    - tags: get,generic-python-lib,_package.accelerate
+
+  llama3_1-405b,cpu:
+    env:
+      MLC_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: https://data.pyg.org/whl/torch-<<<MLC_TORCH_VERSION>>>+cpu.html
+
+  llama3_1-405b,cuda:
+    env:
+      MLC_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL: https://data.pyg.org/whl/torch-<<<MLC_TORCH_VERSION>>>.html
 
 # ── Docker-specific ───────────────────────────────────────────────────────────
 docker:
-  base_image: nvcr.io/nvidia/pytorch:24.08-py3
-  all_gpus: 'yes'
-  system_site_packages: 'yes'
-  mounts:
-    - ${{MLC_DATASET_PATH}}:${{MLC_DATASET_PATH}}   # ← template substitution
-  deps:
-    - tags: get,nvidia-docker
-
-# ── Built-in tests ────────────────────────────────────────────────────────────
-tests:
-  run_inputs:
-    - variations_list: [offline, echo-server]
-      env:
-        MLC_MLPERF_ENDPOINT_NUM_SAMPLES: '50'
-    - variations_list: [online, poisson, echo-server]
-      env:
-        MLC_MLPERF_ENDPOINT_TARGET_QPS: '50'
+  real_run: false                       # don't run the benchmark inside Docker; only set up env
 ```
 
 ### Template substitution
@@ -480,17 +772,84 @@ existing PATH". The `+` prefix triggers concatenation logic in the engine.
 | `run-*` | ~3 | Thin execution wrappers |
 | `reproduce-*` | ~2 | Reproducibility scripts |
 
-### Endpoint script family (reference implementations)
+### MLPerf Inference script family
 
-| Script alias | Tags | Role |
+The benchmark is a layered call chain. The user invokes `run-mlperf-inference-app`; its `preprocess()` dynamically constructs a tag string and calls `app-mlperf-inference` programmatically for each (scenario, mode) pair; `app-mlperf-inference` dispatches to the right implementation script; that script's `posthook_deps` invoke `benchmark-any-mlperf-inference-implementation` to actually run LoadGen.
+
+```
+run-mlperf-inference-app          # user entry point (uid: 4a5d5b13fd7e4ac8)
+  └─ preprocess() builds tags:
+       app,mlperf,inference,generic,_reference,_resnet50,_onnxruntime,_cpu,_test,_r6.0-dev,_offline
+  └─ calls app-mlperf-inference   # implementation dispatcher (uid: d775cac873ee4231)
+       └─ deps dispatch based on MLC_MLPERF_IMPLEMENTATION:
+            _mlcommons-python → app-mlperf-inference-mlcommons-python  (uid: ff149e9781fc4b65)
+            _nvidia            → app-mlperf-inference-nvidia
+            _intel             → app-mlperf-inference-intel
+            _qualcomm          → app-mlperf-inference-qualcomm
+            _mlcommons-cpp     → app-mlperf-inference-mlcommons-cpp
+       └─ posthook_deps:
+            benchmark-any-mlperf-inference-implementation  # LoadGen runner (uid: 8d3cd46f54464810)
+  └─ post_deps (submission variation only):
+       generate-mlperf-inference-submission               # packages submission tree (uid: 5f8ab2d0b5874d53)
+```
+
+**Key scripts in the family:**
+
+| Script alias | UID | Tags | Role |
+|---|---|---|---|
+| `run-mlperf-inference-app` | `4a5d5b13fd7e4ac8` | `run,run-mlperf,run-mlperf-inference` | User entry point; orchestrates scenarios × modes loop |
+| `app-mlperf-inference` | `d775cac873ee4231` | `app,mlperf,inference,reference` | Dispatches to a named implementation via variations |
+| `app-mlperf-inference-mlcommons-python` | `ff149e9781fc4b65` | `app,mlperf,inference,reference,ref` | Reference Python implementation; 40+ model/framework/device variations |
+| `app-mlperf-inference-nvidia` | — | `app,mlperf,inference,nvidia` | NVIDIA TensorRT-LLM / custom harness |
+| `app-mlperf-inference-intel` | — | `app,mlperf,inference,intel` | Intel-optimised implementation |
+| `benchmark-any-mlperf-inference-implementation` | `8d3cd46f54464810` | `benchmark,run,natively,all,inference` | Actual LoadGen runner; called as `posthook_dep` of implementation scripts |
+| `generate-mlperf-inference-user-conf` | `3af4475745964b93` | `generate,mlperf,inference,user-conf` | Produces `user.conf` fed to LoadGen |
+| `get-mlperf-inference-src` | `4b57186581024797` | `get,src,inference,inference-src` | Clones/caches the MLPerf inference source tree |
+| `get-mlperf-inference-loadgen` | `64c3d98d0ba04950` | `get,loadgen,mlperf,mlcommons` | Builds and installs the LoadGen Python bindings |
+| `get-mlperf-inference-results-dir` | `84f3c5aad5e1444b` | `get,mlperf,inference,local,results,dir` | Creates versioned results directory; versioned via `_version.r*` tags via adr |
+| `save-mlperf-inference-implementation-state` | `b14b813229c444f8` | `save,mlperf,inference,implementation,state` | Persists benchmark state after a run |
+| `generate-mlperf-inference-submission` | `5f8ab2d0b5874d53` | `generate,submission,mlperf,mlperf-inference` | Packages logs + system desc into a submission tree |
+| `run-mlperf-inference-submission-checker` | `15d03ec2c1af4297` | `run,mlc,mlcommons,mlperf,inference` | Runs the official MLPerf submission checker |
+| `preprocess-mlperf-inference-submission` | `c23068394a314266` | `run,mlc,mlcommons,mlperf,inference,submission` | Truncates accuracy logs, normalises structure pre-submission |
+
+**How `run-mlperf-inference-app` picks the right implementation script:**
+
+`preprocess()` reads `MLC_MLPERF_IMPLEMENTATION` (set via `--implementation=mlcommons-python`) and builds a tag string like `app,mlperf,inference,generic,_mlcommons-python,_resnet50,_onnxruntime,_cpu,_test,_r6.0-dev,_offline`. That tag string is passed to `automation.run_script(tags=...)` in a loop over each (scenario, mode) pair. The result maps to `app-mlperf-inference` because that script's tags are a superset of `app,mlperf,inference,generic`.
+
+**Benchmark-version variations in `run-mlperf-inference-app`:**
+
+Each MLPerf round has a named variation (`r4.1`, `r5.0`, `r5.1`, `r6.0-dev`, …). Each sets `MLC_MLPERF_INFERENCE_VERSION` and uses `adr` to point the results-dir, submission-dir, and nvidia-scratch-space deps to the correct versioned cache:
+
+```yaml
+  r5.1:
+    group: benchmark-version
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: '5.1'
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v5.1
+    adr:
+      get-mlperf-inference-results-dir:
+        tags: _version.r5.1
+      get-mlperf-inference-submission-dir:
+        tags: _version.r5.1
+      mlperf-inference-nvidia-scratch-space:
+        tags: _version.r5.1
+```
+
+`r6.0-dev` is the current `default: true` variation.
+
+**Submission generation variations:**
+
+The `submission-generation` group controls what modes are run and whether the submission checker fires:
+
+| Variation | Group | What it does |
 |---|---|---|
-| `app-mlperf-inference-endpoints` | `app,mlperf,inference,endpoints` | Top-level benchmark runner |
-| `get-mlperf-endpoints` | `get,mlperf,endpoints` | Installs package into dedicated venv |
-| `get-mlperf-endpoints-src` | `get,mlperf,endpoints,src` | Clones the endpoints source repo |
-| `generate-mlperf-endpoints-conf` | `generate,mlperf,endpoints-conf` | Produces benchmark YAML config |
-| `generate-mlperf-endpoints-system-desc` | `generate,mlperf,endpoints,system-desc` | Generates submission system description |
-| `run-mlperf-endpoints-submission` | `run,mlperf,endpoints,submission` | Packages a full submission |
-| `get-mlperf-endpoints-submission-cli` | `get,mlperf,endpoints,submission-cli` | Installs submission CLI tools |
+| `find-performance` | submission-generation | Performance mode only; no submission packaging |
+| `accuracy-only` | submission-generation | Accuracy mode only |
+| `performance-only` | submission-generation | Performance mode only |
+| `performance-and-accuracy` *(default)* | submission-generation | Both modes via `all-modes` base |
+| `submission` | submission-generation | Both modes + compliance + checker + tar |
+| `full` | submission-generation-style | Full dataset (for official submission) |
+| `short` *(default)* | submission-generation-style | Reduced dataset, open division |
 
 ---
 
@@ -504,7 +863,7 @@ existing PATH". The `+` prefix triggers concatenation logic in the engine.
 pip install mlcflow                      # installs mlcr/mlcd/mlca/mlct/mlcp/mlce/mlcrr CLI
 pip install mlc-scripts                  # registers this repo's scripts as Python package
 # OR (preferred for development):
-mlc pull repo mlcommons@mlperf-automations --branch=dev
+mlc pull repo mlcommons@mlperf-automations --branch=main
 ```
 
 ### Run a script
@@ -564,7 +923,7 @@ mlc rm cache -f                                           # remove ALL caches
 mlc prune cache                                           # remove expired entries
 
 # Repo management
-mlc pull repo mlcommons@mlperf-automations --branch=dev
+mlc pull repo mlcommons@mlperf-automations --branch=main
 mlcp mlcommons@mlperf-automations                         # shorthand
 mlc list repo
 mlc rm repo mlcommons@mlperf-automations
@@ -614,19 +973,27 @@ mlcflow's index finds it automatically.
 
 ### Step-by-step
 
-1. **Choose alias** following naming conventions.
-2. **Generate UID** — 16 lowercase hex chars. Generate with:
-   ```python
-   import secrets; print(secrets.token_hex(8))
+1. **Scaffold** with `mlc add script`:
+   ```bash
+   # Basic skeleton (copies the template,generic script)
+   mlc add script mlcommons@mlperf-automations:<alias> --tags=<tags>
+
+   # Copy nearest existing script as template instead
+   mlc add script mlcommons@mlperf-automations:<alias> --tags=<tags> \
+       --template_tags=app,mlperf,inference,reference
    ```
-   Then verify uniqueness: `grep -r "uid: <your-uid>" script/ automation/`
-3. **Create `meta.yaml`** — four required keys + tags, input_mapping, default_env, new_env_keys, deps.
-4. **Create `customize.py`** — at minimum `preprocess(i)` returning `{'return': 0}`.
-5. **Create `run.sh`** — reads env vars, executes tool, exits non-zero on failure.
-6. **Create `README.md`** — auto-published to docs by CI `document-scripts.yml`.
-7. **Add tests** in `script/<alias>/tests/` using real `mlcr` CLI calls.
-8. **Add CI workflow** in `.github/workflows/` gating PRs on your script.
-9. **Lint**: `mlc lint script --tags=<your-alias>` before committing.
+   Creates `script/<alias>/` with `meta.yaml`, `customize.py`, and `run.sh`.
+   If `--template_tags` matches multiple scripts, it prompts to pick one.
+   The UID is auto-generated; verify uniqueness with:
+   `grep -r "uid: <generated-uid>" script/ automation/`
+
+2. **Edit `meta.yaml`** — update `alias`, `uid`, `tags`, `category`, `input_mapping`, `new_env_keys`, and `deps`.
+3. **Edit `customize.py`** — implement `preprocess(i)` (guard required env vars, build shell command).
+4. **Edit `run.sh`** — ensure it evals the command and exits non-zero on failure.
+5. **Create `README.md`** — auto-published to docs by CI `document-scripts.yml`.
+6. **Add tests** in `script/<alias>/tests/` using real `mlcr` CLI calls.
+7. **Add CI workflow** in `.github/workflows/` gating PRs on your script.
+8. **Lint**: `mlc lint script --tags=<your-alias>` before committing.
 
 ### Dependency chain patterns
 
@@ -754,66 +1121,28 @@ deps:
 
 ## Common pitfalls
 
-**Evidence:** `script/app-mlperf-inference-endpoints/customize.py`,
-`script/app-mlperf-inference-endpoints/tests/test_endpoints_workflow.py`
+**Evidence:** `automation/script/module.py`, `script/app-mlperf-inference-mlcommons-python/customize.py`
 
-### 1. `MLC_MLPERF_ENDPOINTS_PYTHON_BIN` not set
-
-`get,mlperf,endpoints` sets this. If missing or failed silently, `preprocess`
-returns `return 1`. Fix: ensure `get,mlperf,endpoints` dep is listed in meta.yaml
-and its cache is valid. Run `mlc find cache --tags=get,mlperf,endpoints` to inspect.
-
-### 2. echo-server: no dummy dataset found
-
-The `_echo-server` variation falls back to
-`<endpoints-src>/tests/assets/datasets/dummy_1k.jsonl`. If `get-mlperf-endpoints-src`
-was not run or the source tree is incomplete, the file is absent and `preprocess`
-fails. Fix: ensure `get,mlperf,endpoints,src` ran successfully; or pass `--src=<path>`
-to use a local checkout.
-
-### 3. Online mode without a load pattern / QPS
-
-`_online,_poisson` requires `--target_qps`. `_online,_concurrency` requires
-`--concurrency`. Omitting these causes `return 1` from `preprocess`.
-
-### 4. CPU affinity on non-Linux
-
-`_cpu-affinity` silently falls back to `--no-cpu-affinity` on macOS/Windows.
-Do not rely on affinity in cross-platform tests.
-
-### 5. Port exhaustion (echo-server back-to-back tests)
-
-The test suite uses `ECHO_WORKERS = "2"` explicitly. Running many benchmarks in
-quick succession exhausts `TIME_WAIT` ephemeral ports. Add `sleep(2)` between
-echo-server test cases.
-
-### 6. `from-config` mode: report_dir mismatch
-
-When using `_from-config`, the YAML file's `report_dir` takes precedence over
-`MLC_MLPERF_ENDPOINT_REPORT_DIR`. If they conflict, `postprocess` looks in the
-wrong place for `results.json`. Ensure the YAML's `report_dir` matches or is
-absent (script injects it automatically).
-
-### 7. UID collisions
+### 1. UID collisions
 
 UIDs have no enforced uniqueness check at PR time. Before adding a script, verify:
 ```bash
 grep -r "uid: <your-new-uid>" script/ automation/
 ```
 
-### 8. Undeclared `new_env_keys`
+### 2. Undeclared `new_env_keys`
 
 Any env key set in `postprocess` but not declared in `meta.yaml new_env_keys`
 is silently dropped — it will not reach the caller. Symptoms: parent script
 receives `None`/empty for a key. Fix: add the key (or a wildcard) to `new_env_keys`.
 
-### 9. `skip_if_env` value semantics
+### 3. `skip_if_env` value semantics
 
 `skip_if_env: {KEY: ['on']}` means "skip if KEY is set to any truthy value"
 (not literally the string `'on'`). The engine interprets common truthy strings
 (`'yes'`, `'true'`, `'1'`, `'on'`) uniformly. See `automation/script/module.py`.
 
-### 10. ADR tag format
+### 4. ADR tag format
 
 `add_deps_recursive` targets deps by their `names:` handle, not their tags.
 A dep without `names:` cannot be overridden by ADR.
@@ -839,13 +1168,14 @@ A dep without `names:` cannot be overridden by ADR.
 | `automation/script/cache_utils.py` | 18,555 lines; wrong change silently skips or re-runs steps |
 | `automation/script/docker.py` / `apptainer.py` | Container launch + teardown; side effects outside the process |
 | `automation/script/meta_schema.py` | Adding a key requires updating `lint.py`; removing silently accepts invalid YAML |
-| `automation_uid: 5b4e0237da074764` | Must appear verbatim in every `meta.yaml`. Do not change. |
+| `automation_uid: 5b4e0237da074764` | UID of the `script` automation type. All scripts share this value because the repo currently has only one automation type. Do not change. |
 | `.github/workflows/` | 45 workflow files; modifying trigger paths can silence CI for entire vendor families |
 
 ### Branch policy
 
-All changes go through a PR against the `dev` branch. `main` is the release
-branch. `dev` is the default branch mlcflow pulls (`branch: dev`).
+All changes go through a PR against the `main` branch. `dev` is kept in sync
+with `main` and is only used when changes need to be merged without approval
+(e.g. for urgent testing).
 
 ### API key handling
 
@@ -866,7 +1196,3 @@ Do not log env var values that may contain keys.
 3. **`predeps: bool`** — Setting `predeps: true` at the top level is a legacy flag that forces
    the deps list to be treated as pre-hook deps (run before preprocess). The modern equivalent
    is `prehook_deps:`. Prefer `prehook_deps:` in new scripts.
-
-4. **Submission validation** — `run-mlperf-endpoints-submission` packages results into the
-   MLPerf submission directory structure. The validation checklist is external to this repo
-   (mlcommons/submission-checker). No in-repo validation guide exists yet.
