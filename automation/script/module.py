@@ -9,6 +9,7 @@
 
 import re
 import os
+import sys
 import logging
 
 from mlc.main import Automation
@@ -503,13 +504,21 @@ class ScriptAutomation(Automation):
         if r['return'] > 0:
             return r
 
-        # Check if quiet/non-interactive mode
-        quiet = i.get(
-            'quiet',
-            False) if 'quiet' in i else (
-            str(env.get(
-                'MLC_QUIET',
-                '')).lower() in ["1", "true", "yes", "on"])
+        # Determine quiet mode.
+        # Priority:
+        #   1. Explicit quiet=<value> in the call input — always honoured,
+        #      even quiet=False overrides TTY auto-detection.
+        #   2. MLC_QUIET env var (set by a parent script or the user).
+        #   3. Auto-detect: if the terminal is non-interactive (e.g. SSH,
+        #      pipe, subprocess) and quiet was not explicitly set to False,
+        #      enable quiet mode so no blocking input() prompts are hit.
+        if 'quiet' in i:
+            quiet = bool(i['quiet'])
+        else:
+            env_quiet = str(env.get('MLC_QUIET', '')).lower() in [
+                "1", "true", "yes", "on"]
+            non_interactive = not sys.stdin.isatty()
+            quiet = env_quiet or non_interactive
         if quiet:
             env['MLC_QUIET'] = 'yes'
 
