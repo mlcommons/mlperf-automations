@@ -67,6 +67,7 @@ input_mapping:
   use_google_dns: MLC_DOCKER_USE_GOOGLE_DNS
   use_host_group_id: MLC_DOCKER_USE_HOST_GROUP_ID
   use_host_user_id: MLC_DOCKER_USE_HOST_USER_ID
+  podman_storage_root: MLC_PODMAN_STORAGE_ROOT
 
 # Dependencies
 deps:
