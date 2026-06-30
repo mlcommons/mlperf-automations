@@ -49,3 +49,4 @@ input_mapping:
   skip_ssh_key_file: MLC_SKIP_SSH_KEY_FILE
   ssh_key_file: MLC_SSH_KEY_FILE
   user: MLC_SSH_USER
+  shell: MLC_SSH_REMOTE_SHELL

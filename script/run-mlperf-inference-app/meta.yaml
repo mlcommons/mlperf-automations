@@ -134,6 +134,7 @@ input_mapping:
   vllm_model_name: MLC_VLLM_SERVER_MODEL_NAME
   vllm_tp_size: MLC_MLPERF_INFERENCE_TP_SIZE
   waymo_path: MLC_DATASET_WAYMO_PATH
+  podman_storage_root: MLC_PODMAN_STORAGE_ROOT
 input_description:
   division:
     choices:
