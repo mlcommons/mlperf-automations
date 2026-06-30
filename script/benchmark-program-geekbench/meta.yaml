@@ -16,7 +16,7 @@ cache: false
 
 # Environment
 default_env:
-  MLC_GEEKBENCH_WORKLOAD: ''
+  MLC_GEEKBENCH_WORKLOAD: --cpu
   MLC_GEEKBENCH_NUM_RUNS: '1'
   MLC_GEEKBENCH_CORE_PINNING: 'no'
   MLC_GEEKBENCH_PINNED_CORE: '0'
@@ -45,7 +45,12 @@ input_mapping:
   reuse_logs: MLC_GEEKBENCH_REUSE_LOGS
   save: MLC_GEEKBENCH_SAVE_FILE
   section: MLC_GEEKBENCH_SECTION
+  sections: MLC_GEEKBENCH_SECTIONS
   skip_platform_details: MLC_GEEKBENCH_SKIP_PLATFORM_DETAILS
+  single-core: MLC_GEEKBENCH_SINGLE_CORE
+  single_core: MLC_GEEKBENCH_SINGLE_CORE
+  multi-core: MLC_GEEKBENCH_MULTI_CORE
+  multi_core: MLC_GEEKBENCH_MULTI_CORE
   workload: MLC_GEEKBENCH_WORKLOAD
   workload_gap: MLC_GEEKBENCH_WORKLOAD_GAP
   workload_ids: MLC_GEEKBENCH_WORKLOAD_IDS
@@ -70,9 +75,6 @@ deps:
 variations:
   all-cores:
     default: true
-    env:
-      MLC_GEEKBENCH_SINGLE_CORE: ''
-      MLC_GEEKBENCH_MULTI_CORE: ''
     group: core-mode
   multi-core:
     env:
@@ -115,8 +117,6 @@ variations:
     group: workload
   cpu:
     default: true
-    env:
-      MLC_GEEKBENCH_WORKLOAD: --cpu
     group: workload
   gpu:
     env:

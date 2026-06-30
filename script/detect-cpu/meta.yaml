@@ -18,17 +18,49 @@ clean_files:
 - tmp-lscpu.out
 - tmp-systeminfo.csv
 - tmp-wmic-cpu.csv
+- cpu-freq-capture.raw
+- cpu-freq-capture.pid
 
 # Environment
+default_env:
+  MLC_CPU_FREQ_CAPTURE_INTERVAL_MS: '500'
 new_env_keys:
 - MLC_HOST_CPU_*
 - MLC_HOST_MEMORY_CAPACITY
 - MLC_HOST_DISK_CAPACITY
+- MLC_CPU_FREQ_CAPTURE_MODE
+- MLC_CPU_FREQ_CAPTURE_OUTPUT_FILE
+- MLC_CPU_FREQ_CAPTURE_PID_FILE
+- MLC_CPU_FREQ_CAPTURE_INTERVAL_MS
+- MLC_CPU_FREQ_CAPTURE_DIR
 new_state_keys:
 - host_device_raw_info
+
+# Input mapping
+input_mapping:
+  cpu_freq_capture_mode: MLC_CPU_FREQ_CAPTURE_MODE
+  cpu_freq_interval_ms: MLC_CPU_FREQ_CAPTURE_INTERVAL_MS
+  cpu_freq_capture_dir: MLC_CPU_FREQ_CAPTURE_DIR
+
+update_meta_if_env:
+- enable_if_any_env:
+    MLC_CPU_FREQ_CAPTURE_MODE:
+    - start
+    - stop
+    - sample
+  cache: false
 
 # Dependencies
 deps:
 - tags: detect,os
   names:
   - detect-os
+- enable_if_any_env:
+    MLC_CPU_FREQ_CAPTURE_MODE:
+    - start
+    - stop
+    - sample
+  enable_if_env:
+    MLC_HOST_OS_TYPE:
+    - darwin
+  tags: detect,sudo
