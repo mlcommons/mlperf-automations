@@ -1,4 +1,4 @@
-# README for remote-run-commands
+# README for run-ansible
 This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,29 +33,28 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr remote,run,cmds,remote-run,remote-run-cmds,ssh-run,ssh
+mlcr run,ansible,remote,configuration-management
 ```
 
 ### Script Inputs
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
-| `--client_refresh` |  |  | `10` |
-| `--copy_directory` |  |  | `.` |
-| `--files_to_copy` |  |  | `` |
-| `--files_to_copy_back` |  |  | `` |
-| `--host` |  |  | `localhost` |
-| `--post_run_cmds` |  |  | `` |
-| `--pre_run_cmds` |  |  | `` |
-| `--password` |  |  | `` |
-| `--path_to_copy_back_files` |  |  | `` |
-| `--port` |  |  | `22` |
-| `--run_cmds` |  |  | `` |
-| `--skip_host_verify` |  |  | `` |
-| `--skip_ssh_key_file` |  |  | `` |
-| `--ssh_key_file` |  |  | `<<<HOME>>>/.ssh/id_rsa` |
+| `--playbook` |  |  | `` |
+| `--inventory` |  |  | `` |
+| `--extra_vars` |  |  | `` |
+| `--limit` |  |  | `` |
+| `--tags` |  |  | `` |
+| `--skip_tags` |  |  | `` |
+| `--forks` |  |  | `5` |
+| `--verbosity` |  |  | `` |
+| `--private_key` |  |  | `` |
 | `--user` |  |  | `` |
-| `--shell` |  |  | `` |
+| `--become` |  |  | `` |
+| `--vault_password_file` |  |  | `` |
+| `--config_file` |  |  | `` |
+| `--roles_path` |  |  | `` |
+| `--galaxy_requirements` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -77,3 +76,10 @@ mlcr remote,run,cmds,remote-run,remote-run-cmds,ssh-run,ssh
 | `--hf_token` | Huggingface Token |  | `` |
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
+
+### Cloud-provider
+
+- `aws`
+- `azure`
+- `gcp`
+- `local` (default)
