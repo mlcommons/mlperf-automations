@@ -56,7 +56,11 @@ echo "***********************************************************************"
 echo "Running Geekbench benchmark"
 echo "  Number of runs: ${NUM_RUNS}"
 if [ "${SPLIT_SC_MC}" == "yes" ]; then
-  echo "  Mode: Split SC (pinned) + MC (unpinned)"
+  if [ "${MLC_GEEKBENCH_CORE_PINNING}" == "yes" ] || [ "${MLC_GEEKBENCH_CORE_PINNING}" == "True" ] || [ "${MLC_GEEKBENCH_CORE_PINNING}" == "on" ] || [ "${MLC_GEEKBENCH_CORE_PINNING}" == "1" ]; then
+    echo "  Mode: Split SC (pinned) + MC (unpinned)"
+  else
+    echo "  Mode: Split SC + MC (single-core and multi-core)"
+  fi
   echo "  SC command: ${MLC_GEEKBENCH_BASE_CMD_SC}"
   echo "  MC command: ${MLC_GEEKBENCH_BASE_CMD_MC}"
 else
@@ -86,7 +90,11 @@ for run in $(seq 1 ${NUM_RUNS}); do
     SC_FULL="${MLC_GEEKBENCH_BASE_CMD_SC}${SC_EXPORT}"
 
     echo ""
-    echo "--- Single-Core (pinned) ---"
+    if [ "${MLC_GEEKBENCH_CORE_PINNING}" == "yes" ] || [ "${MLC_GEEKBENCH_CORE_PINNING}" == "True" ] || [ "${MLC_GEEKBENCH_CORE_PINNING}" == "on" ] || [ "${MLC_GEEKBENCH_CORE_PINNING}" == "1" ]; then
+      echo "--- Single-Core (pinned) ---"
+    else
+      echo "--- Single-Core ---"
+    fi
     echo "Command: ${SC_FULL}"
 
     sc_start=$(date +%s%3N)
