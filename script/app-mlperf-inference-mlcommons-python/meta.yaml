@@ -33,6 +33,8 @@ new_env_keys:
 - MLC_ML_MODEL_*
 - MLC_MAX_EXAMPLES
 - MLC_VLLM_*
+- MLC_E2E_RAG_*
+- MLC_MLPERF_INFERENCE_E2E_*
 new_state_keys:
 - mlperf-inference-implementation
 - MLC_SUT_*
@@ -77,6 +79,18 @@ input_mapping:
   test_query_count: MLC_TEST_QUERY_COUNT
   threads: MLC_NUM_THREADS
   waymo_path: MLC_DATASET_WAYMO_PATH
+  e2e_rag_database: MLC_E2E_RAG_DATABASE
+  e2e_rag_llm_service_url: MLC_E2E_RAG_LLM_SERVICE_URL
+  e2e_rag_llm_model: MLC_E2E_RAG_LLM_MODEL
+  e2e_rag_query_service_url: MLC_E2E_RAG_QUERY_SERVICE_URL
+  e2e_rag_query_model: MLC_E2E_RAG_QUERY_MODEL
+  e2e_rag_judge_service_url: MLC_E2E_RAG_JUDGE_SERVICE_URL
+  e2e_rag_judge_model: MLC_E2E_RAG_JUDGE_MODEL
+  e2e_rag_max_iterations: MLC_E2E_RAG_MAX_ITERATIONS
+  e2e_rag_max_sub_queries: MLC_E2E_RAG_MAX_SUB_QUERIES
+  e2e_rag_top_k_retriever: MLC_E2E_RAG_TOP_K_RETRIEVER
+  e2e_rag_max_workers: MLC_E2E_RAG_MAX_WORKERS
+  e2e_rag_max_async_queries: MLC_E2E_RAG_MAX_ASYNC_QUERIES
 
 # Dependencies
 deps:
@@ -597,6 +611,9 @@ deps:
   skip_if_env:
     MLC_RUN_STATE_DOCKER:
     - 'yes'
+  skip_if_any_env:
+    MLC_MODEL:
+    - e2e-rag
 - tags: get,loadgen,_wg-inference
   names:
   - loadgen
@@ -604,11 +621,17 @@ deps:
 - tags: get,mlcommons,inference,src
   names:
   - inference-src
+  skip_if_any_env:
+    MLC_MODEL:
+    - e2e-rag
 - tags: get,mlcommons,inference,src
   env:
     MLC_GET_MLPERF_IMPLEMENTATION_ONLY: 'yes'
   names:
   - mlperf-implementation
+  skip_if_any_env:
+    MLC_MODEL:
+    - e2e-rag
 - tags: get,generic-python-lib,_package.psutil
 prehook_deps:
 - names:
@@ -1225,6 +1248,118 @@ variations:
     - yolo_
     env:
       MLC_MODEL: yolo-99
+  e2e-rag:
+    group: models
+    env:
+      MLC_MODEL: e2e-rag
+      MLC_TMP_IGNORE_MLPERF_QUERY_COUNT: true
+      MLC_MLPERF_MODEL_SKIP_BATCHING: true
+      MLC_MLPERF_BACKEND: e2e-rag
+    adr:
+      e2e-inference-src:
+        tags: _branch.perf_test_with_cached_output,_repo.https://github.com/hans-intel/inference
+      loadgen:
+        tags: _from-pip
+    default_env:
+      MLC_E2E_RAG_MAX_ITERATIONS: '5'
+      MLC_E2E_RAG_MAX_SUB_QUERIES: '3'
+      MLC_E2E_RAG_TOP_K_RETRIEVER: '10'
+      MLC_E2E_RAG_MAX_WORKERS: '10'
+      MLC_E2E_RAG_MAX_ASYNC_QUERIES: '10'
+      MLC_E2E_RAG_LLM_SERVICE_URL: 'http://127.0.0.1:8123/v1/chat/completions'
+      MLC_E2E_RAG_LLM_MODEL: 'auto'
+      MLC_E2E_RAG_QUERY_SERVICE_URL: 'http://127.0.0.1:8124/v1/chat/completions'
+      MLC_E2E_RAG_QUERY_MODEL: 'auto'
+      MLC_E2E_RAG_JUDGE_SERVICE_URL: 'http://127.0.0.1:8125/v1/chat/completions'
+      MLC_E2E_RAG_JUDGE_MODEL: 'auto'
+    deps:
+    # E2E inference source code
+    - tags: get,mlperf,inference,e2e,src
+      names:
+      - e2e-inference-src
+    # Embedding model (e5-base-v2)
+    - tags: get-ml-model-e5-base-v2,_r2-downloader,_mlc
+      names:
+      - e5-base-v2-model
+      skip_if_env:
+        MLC_ML_MODEL_E5_BASE_V2_PATH:
+        - 'on'
+    # Reranker model (colbertv2)
+    - tags: get-ml-model-colbertv2,_r2-downloader,_mlc
+      names:
+      - colbertv2-model
+      skip_if_env:
+        MLC_ML_MODEL_COLBERTV2_PATH:
+        - 'on'
+    # LLM models for vLLM servers (downloaded once; user starts vLLM pointing at these paths)
+    - tags: get-ml-model-gpt-oss,_20b,_r2-downloader,_mlc
+      names:
+      - gpt-oss-20b-model
+      skip_if_env:
+        MLC_ML_MODEL_GPT_OSS_20B_PATH:
+        - 'on'
+    - tags: get-ml-model-gpt-oss,_120b,_r2-downloader,_mlc
+      names:
+      - gpt-oss-120b-model
+      skip_if_env:
+        MLC_ML_MODEL_GPT_OSS_120B_PATH:
+        - 'on'
+    # FRAMES benchmark dataset
+    - tags: get-dataset-frames,_r2-downloader,_mlc
+      names:
+      - frames-dataset
+      skip_if_env:
+        MLC_DATASET_FRAMES_PATH:
+        - 'on'
+    # Build FAISS vector database from FRAMES HTML documents (~25 min one-time step)
+    - tags: build-mlperf-inference-e2e-rag-index
+      names:
+      - e2e-rag-vectordb
+      skip_if_env:
+        MLC_E2E_RAG_DATABASE:
+        - 'on'
+    # Python requirements
+    - tags: get,generic-python-lib,_package.pandas
+      names:
+      - pandas
+    - tags: get,generic-python-lib,_package.datasets
+      names:
+      - datasets
+    - tags: get,generic-python-lib,_package.tqdm
+      names:
+      - tqdm
+    - tags: get,generic-python-lib,_package.PyMuPDF
+      names:
+      - pymupdf
+    - tags: get,generic-python-lib,_package.sentence-transformers
+      names:
+      - sentence-transformers
+    - tags: get,generic-python-lib,_package.faiss-cpu
+      skip_if_env:
+        MLC_MLPERF_DEVICE:
+        - gpu
+    - tags: get,generic-python-lib,_package.faiss-gpu
+      enable_if_env:
+        MLC_MLPERF_DEVICE:
+        - gpu
+    - tags: get,generic-python-lib,_package.langchain
+      names:
+      - langchain
+    - tags: get,generic-python-lib,_package.langchain-community
+      names:
+      - langchain-community
+    - tags: get,generic-python-lib,_package.langchain-huggingface
+      names:
+      - langchain-huggingface
+    - tags: get,generic-python-lib,_package.bm25s
+      names:
+      - bm25s
+    - tags: get,generic-python-lib,_package.beautifulsoup4
+      names:
+      - beautifulsoup4
+    - tags: get,generic-python-lib,_package.requests
+      names:
+      - requests
   network-lon:
     group: network
     env:

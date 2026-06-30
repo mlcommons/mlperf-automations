@@ -23,7 +23,8 @@ def preprocess(i):
     # Resolve playbook path
     playbook = env.get('MLC_ANSIBLE_PLAYBOOK', '')
     if not playbook:
-        return {'return': 1, 'error': 'Please specify --playbook=<path_to_playbook.yml>'}
+        return {'return': 1,
+                'error': 'Please specify --playbook=<path_to_playbook.yml>'}
 
     if not os.path.isabs(playbook):
         # Check relative to script dir first, then current dir
