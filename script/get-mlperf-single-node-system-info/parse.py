@@ -35,16 +35,21 @@ EXTRACT_RULES = {
         "type": "int",
     },
     "host_processor_frequency": {
+        # detect-cpu exposes the max clock as MLC_HOST_CPU_MAX_MHZ.
         "source": "env",
-        "candidates": ["MLC_HOST_CPU_FREQUENCY"],
+        "candidates": ["MLC_HOST_CPU_MAX_MHZ"],
     },
     "host_processor_caches": {
-        "source": "env",
-        "candidates": ["MLC_HOST_CPU_CACHES"],
+        # Composed from the per-level cache size vars emitted by detect-cpu.
+        "source": "detect",
+        "candidates": [],
     },
     "host_processor_interconnect": {
+        # No script currently probes CPU-socket interconnect (e.g. UPI/Infinity
+        # Fabric); left optional so it is omitted rather than "Not available".
         "source": "env",
         "candidates": ["MLC_HOST_CPU_INTERCONNECT"],
+        "optional": True,
     },
 
     # ---------------- Memory ----------------
@@ -271,6 +276,19 @@ def extract_value(rule, field_key):
                         and "not in lookup" not in mem_type.lower():
                     parts.append(mem_type)
                 return " ".join(parts) if parts else "Not available"
+            elif field_key == "host_processor_caches":
+                cache_levels = [
+                    ("L1d", "MLC_HOST_CPU_L1D_CACHE_SIZE"),
+                    ("L1i", "MLC_HOST_CPU_L1I_CACHE_SIZE"),
+                    ("L2", "MLC_HOST_CPU_L2_CACHE_SIZE"),
+                    ("L3", "MLC_HOST_CPU_L3_CACHE_SIZE"),
+                ]
+                parts = []
+                for label, key in cache_levels:
+                    v = os.environ.get(key, "").strip()
+                    if v:
+                        parts.append(f"{label}: {v}")
+                return "; ".join(parts) if parts else "Not available"
             elif field_key == "accelerator_on-chip_memories":
                 shared_str = os.environ.get(
                     "MLC_CUDA_DEVICE_PROP_TOTAL_AMOUNT_OF_SHARED_MEMORY_PER_BLOCK",
@@ -297,6 +315,18 @@ def extract_value(rule, field_key):
     candidates = rule.get("candidates", [])
     parts = [os.environ.get(c, "") for c in candidates]
     value = _ANSI_RE.sub('', " ".join(p for p in parts if p)).strip()
+
+    if field_key == "host_processor_frequency":
+        if not value:
+            return "Not available"
+        # MLC_HOST_CPU_MAX_MHZ is a bare MHz figure (e.g. "5137.0000").
+        try:
+            mhz = float(value.split()[0])
+        except (ValueError, IndexError):
+            return value
+        if mhz >= 1000:
+            return f"{mhz / 1000:.2f} GHz"
+        return f"{int(round(mhz))} MHz"
 
     if field_key == "accelerators_per_node":
         nums = [int(x) for x in value.split() if x.isdigit()]
