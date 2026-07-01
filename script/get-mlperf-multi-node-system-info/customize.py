@@ -438,7 +438,7 @@ _NETWORK_EXTRA_FIELDS = [
 
 # Extra fields added when the 'power' variation is active alongside 'inference'.
 # Matches SYSTEM_DESC_REQUIRED_FIELDS_POWER in submission_checker/constants.py.
-# power_management and other_hardware are already in the base flat output.
+# other_hardware is already in the base flat output.
 _POWER_EXTRA_FIELDS = [
     "filesystem",
     "boot_firmware_version",
@@ -576,7 +576,6 @@ def _flatten_for_inference(nested_info, env):
         "sw_notes": _hw("sw_notes"),
         "other_hardware": _hw("other_hardware"),
         "cooling": _hw("cooling"),
-        "power_management": "",     # requires manual input
         "system_type_detail": "",   # requires manual input
     }
 

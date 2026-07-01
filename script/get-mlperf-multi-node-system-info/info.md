@@ -376,7 +376,6 @@ Fields that cannot be auto-detected and require manual input are present in the 
 | Field | Why manual |
 |---|---|
 | `host_networking_topology` | Physical topology (ring, fat-tree, etc.) requires human knowledge. |
-| `power_management` | Power management settings are not exposed via OS APIs. |
 | `system_type_detail` | Subcategory (cloud, on-premise, edge-server, etc.) requires human knowledge. |
 
 The `accelerator_interconnect_topology` field is auto-derived from `nvidia-smi topo -m`:
@@ -420,7 +419,6 @@ The `accelerator_interconnect_topology` field is auto-derived from `nvidia-smi t
   "operating_system": "ubuntu 24.04",
   "other_software_stack": "CUDA 12.9, Driver 575.57.08",
   "cooling": "",
-  "power_management": "",
   "hw_notes": "",
   "sw_notes": "",
   "other_hardware": "",
