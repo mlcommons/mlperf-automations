@@ -103,6 +103,20 @@ variations:
   exclude_current_node:
     env:
       MLC_EXCLUDE_CURRENT_NODE: 'True'
+  inference:
+    group: mlperf-benchmark
+    env:
+      MLC_MLPERF_BENCHMARK: inference
+  endpoints:
+    group: mlperf-benchmark
+    env:
+      MLC_MLPERF_BENCHMARK: endpoints
+  network:
+    env:
+      MLC_MLPERF_NETWORK_VARIATION: 'True'
+  power:
+    env:
+      MLC_MLPERF_POWER_VARIATION: 'True'
 
 # Output / debugging
 print_env_at_the_end:

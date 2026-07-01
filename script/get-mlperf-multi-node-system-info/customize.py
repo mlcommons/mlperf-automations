@@ -410,6 +410,187 @@ def _build_system_size_from_nodes(parsed_node_details):
     return _compute_system_size(parsed_node_details)
 
 
+# ── Inference flat-format helpers ─────────────────────────────────────────────
+
+# Fields that are node-type metadata, not hardware fields to lift.
+_NODE_METADATA_FIELDS = {"system_node_ensemble_id", "number_of_nodes", "system_node_name"}
+
+# No node-level field renames needed — the checker uses the same names.
+_NODE_FIELD_RENAMES = {}
+
+# Extra fields added when the 'network' variation is active alongside 'inference'.
+# Matches SYSTEM_DESC_REQUIRED_FIELDS_NETWORK_MODE in submission_checker/constants.py.
+_NETWORK_EXTRA_FIELDS = [
+    "is_network",
+    "network_type",
+    "network_media",
+    "network_rate",
+    "nic_loadgen",
+    "number_nic_loadgen",
+    "net_software_stack_loadgen",
+    "network_protocol",
+    "number_connections",
+    "nic_sut",
+    "number_nic_sut",
+    "net_software_stack_sut",
+    "network_topology",
+]
+
+# Extra fields added when the 'power' variation is active alongside 'inference'.
+# Matches SYSTEM_DESC_REQUIRED_FIELDS_POWER in submission_checker/constants.py.
+# power_management and other_hardware are already in the base flat output.
+_POWER_EXTRA_FIELDS = [
+    "filesystem",
+    "boot_firmware_version",
+    "management_firmware_version",
+    "number_of_type_nics_installed",
+    "nics_enabled_firmware",
+    "nics_enabled_os",
+    "nics_enabled_connected",
+    "network_speed_mbit",
+    "power_supply_quantity_and_rating_watts",
+    "power_supply_details",
+    "disk_drives",
+    "disk_controllers",
+    "system_power_only",
+]
+
+
+def _is_homogeneous(node_types):
+    """Return True if all node entries share the same hardware fingerprint."""
+    if len(node_types) <= 1:
+        return True
+    ref_accel = node_types[0].get("accelerator_model_name", "")
+    ref_cpu = node_types[0].get("host_processor_model_name", "")
+    return all(
+        nt.get("accelerator_model_name", "") == ref_accel and
+        nt.get("host_processor_model_name", "") == ref_cpu
+        for nt in node_types[1:]
+    )
+
+
+def _merge_heterogeneous_nodes(node_types):
+    """Merge heterogeneous node types by comma-separating unique values per field."""
+    all_fields = []
+    for nt in node_types:
+        for k in nt:
+            if k not in _NODE_METADATA_FIELDS and k not in all_fields:
+                all_fields.append(k)
+
+    merged = {}
+    for field in all_fields:
+        seen = []
+        for nt in node_types:
+            raw = nt.get(field, "")
+            val = "" if raw is None else str(raw)
+            if val and val not in seen:
+                seen.append(val)
+        out_key = _NODE_FIELD_RENAMES.get(field, field)
+        merged[out_key] = ", ".join(seen)
+    return merged
+
+
+def _flatten_for_inference(nested_info, env):
+    """
+    Convert the nested node_types format to a flat dict compatible with the
+    MLPerf Inference submission checker.
+
+    Field name remappings applied at the top level:
+      submitter_org_names        -> submitter
+      system_availability_status -> status
+      system_category            -> system_type
+      serving_framework          -> framework
+
+    Node-level hardware fields are lifted verbatim (no renames).
+    All fields required by SYSTEM_DESC_REQUIRED_FIELDS in constants.py are present;
+    those not auto-captured are set to empty string.
+    """
+    node_types = nested_info.get("node_types", [])
+    total_nodes = nested_info.get(
+        "system_node_ensemble_total",
+        sum(nt.get("number_of_nodes", 1) for nt in node_types),
+    )
+
+    if not node_types:
+        hw = {}
+    elif _is_homogeneous(node_types):
+        hw = {}
+        for k, v in node_types[0].items():
+            if k in _NODE_METADATA_FIELDS:
+                continue
+            hw[_NODE_FIELD_RENAMES.get(k, k)] = v
+    else:
+        hw = _merge_heterogeneous_nodes(node_types)
+
+    def _hw(key):
+        """Return hw[key] as str, or '' when the key is absent, None, or 'Not available'."""
+        v = hw.get(key)
+        if v is None or v == "Not available":
+            return ""
+        return v
+
+    flat = {
+        # Identity / submitter
+        "submitter": nested_info.get("submitter_org_names", ""),
+        "submitter_contact": nested_info.get("submitter_contact", ""),
+        "system_name": nested_info.get("system_name", ""),
+        "status": nested_info.get("system_availability_status", ""),
+        "system_type": nested_info.get("system_category", ""),
+        "division": nested_info.get("division", ""),
+        "system_size": nested_info.get("system_size", ""),
+        # Multi-node count
+        "number_of_nodes": total_nodes,
+        # Host CPU
+        "host_processor_model_name": _hw("host_processor_model_name"),
+        "host_processors_per_node": _hw("host_processors_per_node"),
+        "host_processor_core_count": _hw("host_processor_core_count"),
+        "host_processor_vcpu_count": _hw("host_processor_vcpu_count"),
+        "host_processor_frequency": _hw("host_processor_frequency"),
+        "host_processor_caches": _hw("host_processor_caches"),
+        "host_processor_interconnect": _hw("host_processor_interconnect"),
+        # Host memory / storage
+        "host_memory_capacity": _hw("host_memory_capacity"),
+        "host_storage_type": _hw("host_storage_type"),
+        "host_storage_capacity": _hw("host_storage_capacity"),
+        "host_memory_configuration": _hw("host_memory_configuration"),
+        # Host networking
+        "host_networking": _hw("host_networking"),
+        "host_networking_topology": "",  # requires manual input
+        "host_network_card_count": _hw("host_network_card_count"),
+        # Accelerator
+        "accelerator_model_name": _hw("accelerator_model_name"),
+        "accelerators_per_node": _hw("accelerators_per_node"),
+        "accelerator_memory_capacity": _hw("accelerator_memory_capacity"),
+        "accelerator_memory_configuration": _hw("accelerator_memory_configuration"),
+        "accelerator_host_interconnect": _hw("accelerator_host_interconnect"),
+        "accelerator_interconnect": _hw("accelerator_interconnect"),
+        "accelerator_interconnect_topology": _hw("accelerator_interconnect_topology"),
+        "accelerator_frequency": _hw("accelerator_frequency"),
+        "accelerator_on-chip_memories": _hw("accelerator_on-chip_memories"),
+        # Software
+        "framework": nested_info.get("serving_framework", ""),
+        "operating_system": _hw("operating_system"),
+        "other_software_stack": _hw("other_software_stack"),
+        # Notes / other
+        "hw_notes": _hw("hw_notes"),
+        "sw_notes": _hw("sw_notes"),
+        "other_hardware": _hw("other_hardware"),
+        "cooling": _hw("cooling"),
+        "power_management": "",     # requires manual input
+        "system_type_detail": "",   # requires manual input
+    }
+
+    if is_true(env.get("MLC_MLPERF_NETWORK_VARIATION", False)):
+        for f in _NETWORK_EXTRA_FIELDS:
+            flat.setdefault(f, "")
+
+    if is_true(env.get("MLC_MLPERF_POWER_VARIATION", False)):
+        for f in _POWER_EXTRA_FIELDS:
+            flat.setdefault(f, "")
+
+    return flat
+
+
 def postprocess(i):
 
     state = i['state']
@@ -532,9 +713,16 @@ def postprocess(i):
         "measured_accuracy_score": env.get("MLC_MLPERF_MEASURED_ACCURACY_SCORE", ""),
     }
 
+    benchmark = env.get("MLC_MLPERF_BENCHMARK", "")
+    if benchmark == "inference":
+        output_info = _flatten_for_inference(parsed_multinode_system_info, env)
+        logger.info("Using flat inference format for system_info.json")
+    else:
+        output_info = parsed_multinode_system_info
+
     try:
         with open(env['MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH'], 'w') as f:
-            json.dump(parsed_multinode_system_info, f, indent=2)
+            json.dump(output_info, f, indent=2)
         logger.info("Successfully compiled the system informtion")
     except Exception as e:
         logger.error(

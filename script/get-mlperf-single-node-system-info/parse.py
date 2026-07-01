@@ -1,10 +1,13 @@
 import json
 import argparse
 import math
+import re
 import subprocess
 from pathlib import Path
 import sys
 import os
+
+_ANSI_RE = re.compile(r'\x1b\[[0-9;]*m')
 
 # -------------------------------------------------------------------
 # Extraction rules: all data comes from environment variables.
@@ -30,6 +33,18 @@ EXTRACT_RULES = {
         "source": "env",
         "candidates": ["MLC_HOST_CPU_TOTAL_LOGICAL_CORES"],
         "type": "int",
+    },
+    "host_processor_frequency": {
+        "source": "env",
+        "candidates": ["MLC_HOST_CPU_FREQUENCY"],
+    },
+    "host_processor_caches": {
+        "source": "env",
+        "candidates": ["MLC_HOST_CPU_CACHES"],
+    },
+    "host_processor_interconnect": {
+        "source": "env",
+        "candidates": ["MLC_HOST_CPU_INTERCONNECT"],
     },
 
     # ---------------- Memory ----------------
@@ -67,6 +82,23 @@ EXTRACT_RULES = {
     "accelerator_host_interconnect": {
         "source": "env",
         "candidates": ["MLC_CUDA_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_ROCM_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_XPU_DEVICE_PROP_HOST_INTERCONNECT_TYPE"],
+    },
+    "accelerator_frequency": {
+        "source": "env",
+        "candidates": ["MLC_CUDA_DEVICE_PROP_MAX_CLOCK_RATE", "MLC_ROCM_DEVICE_PROP_MAX_CLOCK_RATE"],
+    },
+    "accelerator_memory_configuration": {
+        "source": "detect",
+        "candidates": [],
+    },
+    "accelerator_on-chip_memories": {
+        "source": "detect",
+        "candidates": [],
+    },
+    "accelerator_interconnect_topology": {
+        "source": "env",
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_TOPOLOGY_DESC"],
+        "optional": True,
     },
 
     # ---------------- Networking ----------------
@@ -221,15 +253,50 @@ def extract_value(rule, field_key):
                 if driver:
                     stack_parts.append(driver)
                 return ", ".join(stack_parts) if stack_parts else None
+            elif field_key == "accelerator_memory_configuration":
+                mem_bytes_str = os.environ.get(
+                    "MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "").strip()
+                mem_type = os.environ.get(
+                    "MLC_CUDA_DEVICE_PROP_MEMORY_TYPE", "").strip()
+                parts = []
+                if mem_bytes_str:
+                    try:
+                        mem_bytes = float(mem_bytes_str.split()[0])
+                        if mem_bytes >= 1024 ** 3:
+                            parts.append(
+                                f"{math.ceil(mem_bytes / (1024 ** 3))} GiB")
+                    except (ValueError, IndexError):
+                        pass
+                if mem_type and "unknown" not in mem_type.lower() \
+                        and "not in lookup" not in mem_type.lower():
+                    parts.append(mem_type)
+                return " ".join(parts) if parts else "Not available"
+            elif field_key == "accelerator_on-chip_memories":
+                shared_str = os.environ.get(
+                    "MLC_CUDA_DEVICE_PROP_TOTAL_AMOUNT_OF_SHARED_MEMORY_PER_BLOCK",
+                    "").strip()
+                if shared_str:
+                    try:
+                        kb = int(shared_str) // 1024
+                        return f"Shared Memory: {kb} KB/block"
+                    except (ValueError, TypeError):
+                        pass
+                return "Not available"
             else:
                 return "Not available"
         except Exception as e:
             return f"Not detected: {field_key} detection error ({e})"
 
-    # Collect non-empty env var values
+    # Collect non-empty env var values.
+    # Strip ANSI escape codes defensively: some tools (e.g. nvidia-smi topo -m)
+    # emit colour sequences when run in an interactive terminal. Those codes can
+    # end up stored in the mlcflow cache and resurface here as literal garbage
+    # characters in the output JSON. The primary stripping happens at capture
+    # time in get-cuda-devices/customize.py; this call handles any stale cached
+    # values that predate that fix.
     candidates = rule.get("candidates", [])
     parts = [os.environ.get(c, "") for c in candidates]
-    value = " ".join(p for p in parts if p).strip()
+    value = _ANSI_RE.sub('', " ".join(p for p in parts if p)).strip()
 
     if field_key == "accelerators_per_node":
         nums = [int(x) for x in value.split() if x.isdigit()]
