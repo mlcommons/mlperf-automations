@@ -23,6 +23,9 @@ on:
       - 'script/get-generic-sys-util/**'
       - 'script/get-cache-dir/**'
       - 'script/detect-sudo/**'
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch: {}
 
 jobs:     
   run-mlperf-inference-resnet50-cpp:

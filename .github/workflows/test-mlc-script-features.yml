@@ -21,6 +21,9 @@ on:
       - 'script/get-generic-python-lib/**'
       - 'script/run-docker-container/**'
       - 'script/download-file/**'
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch: {}
 
 permissions:
   contents: read
