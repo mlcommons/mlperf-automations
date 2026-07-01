@@ -25,26 +25,31 @@ def get_gpu_info():
 
     for i in range(num_gpus):
 
+        gpu_name = ""
+        host_interconnect_result = ""
+        gpu_interconnect_result = ""
         try:
             gpu_result = subprocess.run(
                 ["amd-smi", "static", "--gpu", str(i), "--json"], capture_output=True, text=True)
             interconnect_result = subprocess.run(
                 ["amd-smi", "xgmi", "--gpu", str(i), "--json"], capture_output=True, text=True)
-            host_interconnect_result = json.loads(
-                gpu_result.stdout)["gpu_data"][0]["bus"]["pcie_interface_version"]
+            gpu_static = json.loads(gpu_result.stdout)["gpu_data"][0]
+            host_interconnect_result = gpu_static["bus"]["pcie_interface_version"]
+            # Marketing model name, e.g. "AMD Radeon RX 7700S". Strip the
+            # trademark/registered glyphs so the submission string stays ASCII.
+            gpu_name = (gpu_static.get("asic", {}).get("market_name", "") or "")
+            gpu_name = gpu_name.replace("™", "").replace("®", "").strip()
             gpu_interconnect_result = json.loads(interconnect_result.stdout)[
                 "xgmi_metric"][0][0]["link_metrics"]["link_type"]
-        except subprocess.CalledProcessError:
-            print(f"Error occurred while fetching info for GPU {i}")
+        except Exception as e:
+            print(f"Error occurred while fetching info for GPU {i}: {str(e)}")
 
-        except exception as e:
-            print(f"Some other error occurred: {str(e)}")
-            host_interconnect_result = ""
-            gpu_interconnect_result = ""
+        if not gpu_name:
+            gpu_name = f"AMD GPU {i}"
 
         gpu_info = {
             "GPU Device ID": hip.hipDeviceGetPCIBusId(STRINGLENGTH, i)[1],
-            "GPU Name": i,
+            "GPU Name": gpu_name,
             "GPU compute capability": f"{hip.hipDeviceComputeCapability(i)[1]}.{hip.hipDeviceComputeCapability(i)[2]}",
             "ROCM driver version": f"{hip.hipDriverGetVersion()[1]}",
             "ROCM runtime version": hip.hipRuntimeGetVersion()[1],
