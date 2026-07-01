@@ -52,8 +52,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -106,8 +106,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -272,8 +272,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -304,8 +304,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -429,8 +429,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -500,8 +500,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -541,8 +541,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -608,8 +608,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -653,8 +653,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -755,8 +755,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -823,8 +823,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"

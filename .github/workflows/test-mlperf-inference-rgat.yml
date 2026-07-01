@@ -54,8 +54,8 @@ jobs:
         pip install tabulate
     - name: Pull MLOps repository
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         mlc pull repo "$REPO" --branch="$BRANCH"
     - name: Test MLPerf Inference R-GAT using ${{ matrix.backend }} on ${{ matrix.os }}

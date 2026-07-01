@@ -56,8 +56,8 @@ jobs:
         pip install mlcflow
     - name: Pull MLOps repository
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}  
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         mlc pull repo "$REPO" --branch="$BRANCH"
         mlcr --quiet --tags=get,sys-utils-mlc
