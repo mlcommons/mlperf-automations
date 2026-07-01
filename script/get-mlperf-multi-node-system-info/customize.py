@@ -533,9 +533,9 @@ def _flatten_for_inference(nested_info, env):
         hw = _merge_heterogeneous_nodes(node_types)
 
     def _hw(key):
-        """Return hw[key] as str, or '' when the key is absent, None, or 'Not available'."""
+        """Return hw[key] as str, or '' when the key is absent, None, 'Not available', or 'N/A'."""
         v = hw.get(key)
-        if v is None or v == "Not available":
+        if v is None or v in ("Not available", "N/A"):
             return ""
         return v
 
