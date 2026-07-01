@@ -270,6 +270,7 @@ The full path to the generated file is also returned in the `MLC_MULTI_NODE_SYST
 | `accelerator_memory_capacity` | string | auto | Accelerator memory per device (e.g. `"80GiB"`). |
 | `accelerator_memory_type` | string | **manual** | Accelerator memory type (e.g. `"HBM3"`). |
 | `accelerator_interconnect` | string | auto | Accelerator-to-accelerator interconnect (e.g. `"NVLink"`). |
+| `accelerator_interconnect_topology` | string | auto | Topology of the accelerator interconnect: `"Mesh"` (all pairs NVLink), `"Direct"` (PCIe-only or partial), or omitted for single GPU. Derived from `nvidia-smi topo -m`. |
 | `accelerator_host_interconnect` | string | auto | Accelerator-to-host interconnect (e.g. `"PCIe Gen5 x16"`). |
 | `host_network_card_count` | string | auto | Network interface summary (e.g. `"3x mlx5_0"`). |
 | `host_networking` | string | auto | Network interface type and protocol. |
@@ -321,11 +322,108 @@ Fields not present in the file and not supplied as CLI args will fall back to th
 
 ## Variations
 
+### Accelerator backend (mutually exclusive)
+
 | Tag | Effect |
 |-----|--------|
 | `_cuda` | Selects CUDA as the accelerator backend (NVIDIA GPUs). |
 | `_rocm` | Selects ROCm as the accelerator backend (AMD GPUs). |
 | `_xpu` | Selects XPU as the accelerator backend (Intel GPUs). |
-| `_exclude_current_node` | Skips collecting info from the machine running this command. Use when the orchestrator is not part of the inference cluster. |
 
-Specify `_cuda`, `_rocm`, or `_xpu` to match your hardware. If none is given, no backend-specific collection is performed.
+Specify one of `_cuda`, `_rocm`, or `_xpu` to match your hardware. If none is given, no backend-specific collection is performed.
+
+### MLPerf benchmark (mutually exclusive)
+
+| Tag | Effect |
+|-----|--------|
+| `_inference` | Produces a flat `system_desc_id.json`-compatible output for MLPerf Inference submissions (see [Inference submission format](#inference-submission-format)). |
+| `_endpoints` | Produces the nested format used for MLPerf Inference Endpoints submissions. |
+
+### Stackable modifiers
+
+| Tag | Effect |
+|-----|--------|
+| `_exclude_current_node` | Skips collecting info from the machine running this command. Use when the orchestrator is not part of the inference cluster. |
+| `_network` | Adds the Network division extra fields (`is_network`, `network_type`, `network_media`, etc.) to the output. Stack with `_inference`. |
+| `_power` | Adds the power submission extra fields (`power_supply_quantity_and_rating_watts`, `power_supply_details`, `boot_firmware_version`, etc.) to the output. Stack with `_inference`. |
+
+### Example: inference submission with power fields
+
+```bash
+mlcr get-mlperf-multi-node-system-info,_cuda,_inference,_power \
+  --ssh_ids=user@node1:22,user@node2:22 \
+  --out_dir_path=/tmp/sysinfo \
+  --system_name="My System"
+```
+
+## Inference submission format
+
+When the `_inference` variation is active, the script produces a flat JSON that matches the `system_desc_id.json` schema required by the MLPerf Inference submission checker, instead of the default nested format.
+
+Field name remappings applied at this stage:
+
+| Nested field | Flat field |
+|---|---|
+| `submitter_org_names` | `submitter` |
+| `system_availability_status` | `status` |
+| `system_category` | `system_type` |
+| `serving_framework` | `framework` |
+
+Hardware fields from `node_types` entries are lifted to the top level. For heterogeneous multi-node systems (different GPU or CPU types across nodes), unique values are comma-separated within each field.
+
+Fields that cannot be auto-detected and require manual input are present in the output as empty strings:
+
+| Field | Why manual |
+|---|---|
+| `host_networking_topology` | Physical topology (ring, fat-tree, etc.) requires human knowledge. |
+| `power_management` | Power management settings are not exposed via OS APIs. |
+| `system_type_detail` | Subcategory (cloud, on-premise, edge-server, etc.) requires human knowledge. |
+
+The `accelerator_interconnect_topology` field is auto-derived from `nvidia-smi topo -m`:
+
+| Value | Meaning |
+|---|---|
+| `"Mesh"` | All GPU pairs connected via NVLink (fully connected). |
+| `"Direct"` | PCIe-only or partial NVLink connections. |
+| omitted | Single GPU — no inter-GPU topology to describe. |
+
+### Example flat output (`_inference`)
+
+```json
+{
+  "submitter": "MLCommons",
+  "system_name": "8x NVIDIA H100 80GB HBM3",
+  "status": "available",
+  "system_type": "datacenter",
+  "division": "open",
+  "number_of_nodes": 2,
+  "host_processor_model_name": "Intel(R) Xeon(R) Platinum 8480+",
+  "host_processors_per_node": "2",
+  "host_processor_core_count": "112",
+  "host_processor_vcpu_count": "224",
+  "host_memory_capacity": "2.2T",
+  "host_storage_type": "NVMe SSD",
+  "host_storage_capacity": "1.8 TB NVMe SSD",
+  "host_networking": "mlx5_0: native InfiniBand",
+  "host_network_card_count": "3x mlx5_0",
+  "host_networking_topology": "",
+  "accelerator_model_name": "NVIDIA H100 80GB HBM3",
+  "accelerators_per_node": "8",
+  "accelerator_memory_capacity": "80GiB",
+  "accelerator_memory_configuration": "80 GiB HBM3",
+  "accelerator_host_interconnect": "PCIe Gen5 x16",
+  "accelerator_interconnect": "NVLink",
+  "accelerator_interconnect_topology": "Mesh",
+  "accelerator_frequency": "",
+  "accelerator_on-chip_memories": "Shared Memory: 228 KB/block",
+  "framework": "vLLM 0.9.0",
+  "operating_system": "ubuntu 24.04",
+  "other_software_stack": "CUDA 12.9, Driver 575.57.08",
+  "cooling": "",
+  "power_management": "",
+  "hw_notes": "",
+  "sw_notes": "",
+  "other_hardware": "",
+  "system_type_detail": ""
+}
+```
