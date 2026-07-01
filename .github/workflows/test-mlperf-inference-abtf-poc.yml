@@ -5,8 +5,22 @@ on:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlperf-inference-abtf-poc.yml'
-      - '**'
-      - '!**.md'
+      - 'automation/script/**'
+      - 'script/run-mlperf-automotive-app/**'
+      - 'script/app-mlperf-automotive/**'
+      - 'script/app-mlperf-automotive-mlcommons-python/**'
+      - 'script/get-mlperf-automotive-src/**'
+      - 'script/get-mlperf-automotive-utils/**'
+      - 'script/get-ml-model-abtf-ssd-pytorch/**'
+      - 'script/get-dataset-cognata-mlcommons/**'
+      - 'script/get-mlperf-inference-sut-description/**'
+      - 'script/get-mlperf-inference-results-dir/**'
+      - 'script/get-git-repo/**'
+      - 'script/get-gcc/**'
+      - 'script/get-llvm/**'
+      - 'script/get-generic-sys-util/**'
+      - 'script/get-cache-dir/**'
+      - 'script/detect-sudo/**'
 
 jobs:
   build:

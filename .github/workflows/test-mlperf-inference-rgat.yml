@@ -5,8 +5,26 @@ on:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlperf-inference-rgat.yml'
-      - '**'
-      - '!**.md'
+      - 'automation/script/**'
+      - 'script/run-mlperf-inference-app/**'
+      - 'script/app-mlperf-inference/**'
+      - 'script/app-mlperf-inference-mlcommons-python/**'
+      - 'script/get-ml-model-rgat/**'
+      - 'script/get-mlperf-inference-src/**'
+      - 'script/get-mlperf-inference-utils/**'
+      - 'script/get-mlperf-inference-loadgen/**'
+      - 'script/get-mlperf-inference-sut-description/**'
+      - 'script/get-mlperf-inference-results-dir/**'
+      - 'script/benchmark-any-mlperf-inference-implementation/**'
+      - 'script/generate-mlperf-inference-user-conf/**'
+      - 'script/pull-git-repo/**'
+      - 'script/get-git-repo/**'
+      - 'script/get-generic-python-lib/**'
+      - 'script/get-gcc/**'
+      - 'script/get-llvm/**'
+      - 'script/get-generic-sys-util/**'
+      - 'script/get-cache-dir/**'
+      - 'script/detect-sudo/**'
 
 jobs:
 

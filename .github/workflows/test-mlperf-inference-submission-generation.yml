@@ -8,8 +8,14 @@ on:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlperf-inference-submission-generation.yml'
-      - '**'
-      - '!**.md'
+      - 'automation/script/**'
+      - 'script/run-mlperf-inference-app/**'
+      - 'script/generate-mlperf-inference-submission/**'
+      - 'script/run-mlperf-inference-submission-checker/**'
+      - 'script/get-mlperf-inference-src/**'
+      - 'script/get-mlperf-inference-results-dir/**'
+      - 'script/get-mlperf-inference-submission-dir/**'
+      - 'script/get-git-repo/**'
   workflow_call:
     inputs:
       inf-branch:

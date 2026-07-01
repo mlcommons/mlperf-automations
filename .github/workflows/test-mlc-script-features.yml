@@ -5,8 +5,22 @@ on:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlc-script-features.yml'
-      - '**'
-      - '!**.md'
+      - 'automation/script/module.py'
+      - 'automation/script/cache_utils.py'
+      - 'automation/script/docker.py'
+      - 'automation/script/docker_utils.py'
+      - 'automation/script/script_utils.py'
+      - 'automation/script/meta_schema.py'
+      - 'automation/script/apptainer.py'
+      - 'automation/script/experiment.py'
+      - 'automation/script/remote_run.py'
+      - 'automation/script/lint.py'
+      - 'automation/script/doc.py'
+      - 'script/detect-os/**'
+      - 'script/detect-cpu/**'
+      - 'script/get-generic-python-lib/**'
+      - 'script/run-docker-container/**'
+      - 'script/download-file/**'
 
 permissions:
   contents: read
