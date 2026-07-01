@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -58,13 +58,13 @@ jobs:
         mlcr get,wkhtmltopdf --quiet
 
     - name: Test versions
-      if: runner.os == 'Linux' && matrix.python-version == '3.8'
+      if: runner.os == 'Linux'
       run: |
-        mlcr get,generic-python-lib,_package.scipy --version=1.9.3 --quiet
+        mlcr get,generic-python-lib,_package.scipy --version=1.11.4 --quiet
         test $? -eq 0 || exit $?
-        mlcr get,generic-python-lib,_package.scipy --version=1.9.2 --quiet
+        mlcr get,generic-python-lib,_package.scipy --version=1.11.3 --quiet
         test $? -eq 0 || exit $?
-        mlc find cache --tags=get,generic-python-lib,_package.scipy,version-1.9.2
+        mlc find cache --tags=get,generic-python-lib,_package.scipy,version-1.11.3
         test $? -eq 0 || exit $?
        
 
@@ -78,7 +78,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
 
     steps:
     - uses: actions/checkout@v4
@@ -239,7 +239,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -271,7 +271,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -396,7 +396,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -467,7 +467,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -508,7 +508,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -575,7 +575,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.13", "3.12"]
+        python-version: ["3.13"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -620,7 +620,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -722,7 +722,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -790,7 +790,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
