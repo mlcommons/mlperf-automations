@@ -370,7 +370,17 @@ def _is_not_detected(val):
     """Return True if val is a detection-failure reason string or empty/zero."""
     if val is None or val == "" or val == 0:
         return True
-    return isinstance(val, str) and val.lower().startswith("not detected")
+    if isinstance(val, str):
+        if val.lower().startswith("not detected"):
+            return True
+        # "N/A" and legacy "Not available" both signal auto-detection failure.
+        if val in ("N/A", "Not available"):
+            return True
+        # A numeric-only string (e.g. "0") means the driver returned a device
+        # index instead of a real name — treat as not detected.
+        if val.strip().lstrip('-').isdigit():
+            return True
+    return False
 
 
 def _compute_system_size(node_entries):

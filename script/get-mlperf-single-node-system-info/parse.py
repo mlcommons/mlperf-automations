@@ -46,7 +46,7 @@ EXTRACT_RULES = {
     },
     "host_processor_interconnect": {
         # No script currently probes CPU-socket interconnect (e.g. UPI/Infinity
-        # Fabric); left optional so it is omitted rather than "Not available".
+        # Fabric); left optional so it returns "" (manual field) rather than "N/A".
         "source": "env",
         "candidates": ["MLC_HOST_CPU_INTERCONNECT"],
         "optional": True,
@@ -257,7 +257,7 @@ def extract_value(rule, field_key):
                     "MLC_HOST_GPU_DRIVER_VERSION", "").strip()
                 if driver:
                     stack_parts.append(driver)
-                return ", ".join(stack_parts) if stack_parts else None
+                return ", ".join(stack_parts) if stack_parts else ""
             elif field_key == "accelerator_memory_configuration":
                 mem_bytes_str = os.environ.get(
                     "MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "").strip()
@@ -275,7 +275,7 @@ def extract_value(rule, field_key):
                 if mem_type and "unknown" not in mem_type.lower() \
                         and "not in lookup" not in mem_type.lower():
                     parts.append(mem_type)
-                return " ".join(parts) if parts else "Not available"
+                return " ".join(parts) if parts else "N/A"
             elif field_key == "host_processor_caches":
                 cache_levels = [
                     ("L1d", "MLC_HOST_CPU_L1D_CACHE_SIZE"),
@@ -288,7 +288,7 @@ def extract_value(rule, field_key):
                     v = os.environ.get(key, "").strip()
                     if v:
                         parts.append(f"{label}: {v}")
-                return "; ".join(parts) if parts else "Not available"
+                return "; ".join(parts) if parts else "N/A"
             elif field_key == "accelerator_on-chip_memories":
                 shared_str = os.environ.get(
                     "MLC_CUDA_DEVICE_PROP_TOTAL_AMOUNT_OF_SHARED_MEMORY_PER_BLOCK",
@@ -299,9 +299,9 @@ def extract_value(rule, field_key):
                         return f"Shared Memory: {kb} KB/block"
                     except (ValueError, TypeError):
                         pass
-                return "Not available"
+                return "N/A"
             else:
-                return "Not available"
+                return "N/A"
         except Exception as e:
             return f"Not detected: {field_key} detection error ({e})"
 
@@ -318,7 +318,7 @@ def extract_value(rule, field_key):
 
     if field_key == "host_processor_frequency":
         if not value:
-            return "Not available"
+            return "N/A"
         # MLC_HOST_CPU_MAX_MHZ is a bare MHz figure (e.g. "5137.0000").
         try:
             mhz = float(value.split()[0])
@@ -330,7 +330,7 @@ def extract_value(rule, field_key):
 
     if field_key == "accelerators_per_node":
         nums = [int(x) for x in value.split() if x.isdigit()]
-        return sum(nums) if nums else "Not available"
+        return sum(nums) if nums else "N/A"
 
     if field_key == "host_network_card_count":
         networking = os.environ.get("MLC_HOST_NETWORKING", "").strip()
@@ -338,18 +338,18 @@ def extract_value(rule, field_key):
             return f"{value}x {networking}"
         if value:
             return f"{value}x"
-        return "Not available"
+        return "N/A"
 
     if field_key == "accelerator_memory_capacity":
         if not value:
-            return "Not available"
+            return "N/A"
         raw = value.split()[0]
         try:
             value_bytes = float(raw)
         except ValueError:
-            return "Not available"
+            return "N/A"
         if value_bytes == 0:
-            return "Not available"
+            return "N/A"
         # Report in GiB (binary) using ceil to align with GPU product marketing values.
         # CUDA global memory is slightly below the marketed GiB due to driver reservation;
         # ceil absorbs that gap so e.g. 31.37 GiB → 32 GiB (matching "32 GB" on
@@ -359,20 +359,20 @@ def extract_value(rule, field_key):
         return f"{int(value_bytes)}GiB"
 
     if field_key == "host_storage_type" and value == "No disk layout data found":
-        return "Not available"
+        return "N/A"
 
     if rule.get("type") == "int":
         if not value:
-            return "Not available"
+            return "N/A"
         try:
             return int(value)
         except (ValueError, TypeError):
-            return "Not available"
+            return "N/A"
 
     if rule.get("optional"):
-        return value if value else None
+        return value if value else ""
 
-    return value if value else "Not available"
+    return value if value else "N/A"
 
 # -------------------------------------------------------------------
 
