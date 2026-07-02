@@ -14,10 +14,12 @@ def preprocess(i):
     source = env.get('MLC_PASS_SOURCE', 'file')
 
     if not env_key:
-        return {'return': 1, 'error': 'MLC_PASS_ENV_KEY is not set. Please provide --env_key (e.g., MLC_UPLOAD_API_TOKEN)'}
+        return {
+            'return': 1, 'error': 'MLC_PASS_ENV_KEY is not set. Please provide --env_key (e.g., MLC_UPLOAD_API_TOKEN)'}
 
     if not secret_name:
-        return {'return': 1, 'error': 'MLC_PASS_SECRET_NAME is not set. Please provide --secret_name'}
+        return {
+            'return': 1, 'error': 'MLC_PASS_SECRET_NAME is not set. Please provide --secret_name'}
 
     secret_value = ''
 
@@ -30,10 +32,12 @@ def preprocess(i):
     elif source == 'keyring':
         secret_value = _read_from_keyring(secret_name)
     else:
-        return {'return': 1, 'error': f'Unknown source: {source}. Use file, env, pass, or keyring.'}
+        return {
+            'return': 1, 'error': f'Unknown source: {source}. Use file, env, pass, or keyring.'}
 
     if not secret_value:
-        return {'return': 1, 'error': f'Secret "{secret_name}" not found via source "{source}"'}
+        return {
+            'return': 1, 'error': f'Secret "{secret_name}" not found via source "{source}"'}
 
     env[env_key] = secret_value
 
@@ -45,7 +49,10 @@ def preprocess(i):
 
 def _read_from_file(env, secret_name):
     """Read a secret from a credentials file (KEY=VALUE format)."""
-    creds_file = os.path.expanduser(env.get('MLC_PASS_CREDENTIALS_FILE', '~/.mlc_credentials'))
+    creds_file = os.path.expanduser(
+        env.get(
+            'MLC_PASS_CREDENTIALS_FILE',
+            '~/.mlc_credentials'))
 
     if not os.path.exists(creds_file):
         return ''
@@ -54,7 +61,8 @@ def _read_from_file(env, secret_name):
     file_stat = os.stat(creds_file)
     file_mode = stat.S_IMODE(file_stat.st_mode)
     if file_mode & (stat.S_IRGRP | stat.S_IROTH):
-        print(f'WARNING: {creds_file} has group/other read permissions. Run: chmod 600 {creds_file}')
+        print(
+            f'WARNING: {creds_file} has group/other read permissions. Run: chmod 600 {creds_file}')
 
     with open(creds_file, 'r') as f:
         for line in f:
