@@ -5775,8 +5775,8 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
 
     update_meta_if_env = meta.get('update_meta_if_env', [])
     update_meta_if_env_from_state = run_state.get('update_meta_if_env', [])
-    run_state['update_meta_if_env'] = update_meta_if_env + \
-        update_meta_if_env_from_state
+    run_state['update_meta_if_env'] = update_meta_if_env_from_state + \
+        update_meta_if_env
 
     add_deps_info = meta.get('ad', {})
     if not add_deps_info:
