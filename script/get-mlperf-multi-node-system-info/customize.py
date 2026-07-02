@@ -1,14 +1,13 @@
-from mlc import utils
 from utils import *
 import os
 import re
 import mlc
-import subprocess
 import json
 import yaml
+import urllib.request
 
 
-# Maps JSON config file keys to the env vars they populate.
+# Maps JSON/YAML config file keys to the env vars they populate.
 # CLI args (already resolved into env vars by MLC) take precedence:
 # a key from the config file is only applied when the env var is still empty.
 _CONFIG_KEY_TO_ENV = {
@@ -65,8 +64,6 @@ def _load_config_file(config_file, env, logger):
 
 def _probe_serving_framework(url):
     """HTTP probe to detect vLLM, SGLang, or TRT-LLM from a running endpoint."""
-    import urllib.request
-    import json as _json
     base = url.rstrip('/')
     # TRT-LLM: /perf_metrics is unique to TRT-LLM (absent in vLLM and SGLang)
     try:
@@ -74,7 +71,7 @@ def _probe_serving_framework(url):
             _r.read()
         try:
             with urllib.request.urlopen(f"{base}/version", timeout=5) as r2:
-                vd = _json.loads(r2.read())
+                vd = json.loads(r2.read())
                 if isinstance(vd, dict) and 'version' in vd:
                     return f"TRT-LLM {vd['version']}"
         except Exception:
@@ -85,7 +82,7 @@ def _probe_serving_framework(url):
     # vLLM: /version returns {"version": "x.y.z"}
     try:
         with urllib.request.urlopen(f"{base}/version", timeout=5) as r:
-            d = _json.loads(r.read())
+            d = json.loads(r.read())
             if isinstance(d, dict) and 'version' in d:
                 return f"vLLM {d['version']}"
     except Exception:
@@ -93,7 +90,7 @@ def _probe_serving_framework(url):
     # SGLang: /get_server_info
     try:
         with urllib.request.urlopen(f"{base}/get_server_info", timeout=5) as r:
-            d = _json.loads(r.read())
+            d = json.loads(r.read())
             if isinstance(d, dict):
                 v = d.get('version') or d.get(
                     'server_version') or d.get('sglang_version') or ''
@@ -118,22 +115,18 @@ def _parse_node(node_str):
 
 def preprocess(i):
 
-    os_info = i['os_info']
     env = i['env']
-
     logger = i['automation'].logger
 
     if env.get('MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH', '') == '':
         if env.get('MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH', '') == '':
             env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'] = os.getcwd()
         if env.get('MLC_MULTI_NODE_SYSTEM_INFO_FILE_NAME', '') == '':
-            env['MLC_MULTI_NODE_SYSTEM_INFO_FILE_NAME'] = f"system-info-multi-node.json"
+            env['MLC_MULTI_NODE_SYSTEM_INFO_FILE_NAME'] = "system-info-multi-node.json"
         env['MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH'] = os.path.join(
             env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'], env['MLC_MULTI_NODE_SYSTEM_INFO_FILE_NAME'])
 
-    # create the directory if not present
-    if not os.path.exists(env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH']):
-        os.makedirs(env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'], exist_ok=True)
+    os.makedirs(env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'], exist_ok=True)
 
     _load_config_file(env.get('MLC_MLPERF_CONFIG_FILE', ''), env, logger)
 
@@ -141,19 +134,10 @@ def preprocess(i):
             env.get('MLC_EXCLUDE_CURRENT_NODE', False)):
         return {'return': 1, 'error': 'Either MLC_EXCLUDE_CURRENT_NODE should be False or MLC_MULTINODE_SYSTEM_SSH_IDS should be provided'}
     elif env.get('MLC_MULTINODE_SYSTEM_SSH_IDS', '') != '':
-        # set the run state dictionary to copy back the single node system info
-        # to all nodes after remote runs are done
-        if not 'run_state' in i:
-            i['run_state'] = {}
-        run_state = i['run_state']
-        if not 'remote_run' in run_state:
-            run_state['remote_run'] = {}
-        run_state['remote_run']['env_keys_to_copy_back'] = []
-        run_state['remote_run']['env_keys_to_copy_back'].append(
-            'MLC_SINGLE_NODE_SYSTEM_INFO_FILE_PATH')
-        i['run_state'] = run_state
+        run_state = i.setdefault('run_state', {})
+        run_state.setdefault('remote_run', {})['env_keys_to_copy_back'] = [
+            'MLC_SINGLE_NODE_SYSTEM_INFO_FILE_PATH']
 
-        # set remote run tags
         rr_tags = "get,mlperf,single-node,system-info"
         backend = env.get('MLC_ACCELERATOR_BACKEND', '')
         if backend in ('cuda', 'rocm', 'xpu'):
@@ -174,10 +158,10 @@ def preprocess(i):
                     'action': 'remote_run',
                     'automation': 'script',
                     'tags': rr_tags,
-                    'run_cmd': f"{rr_tags}",
+                    'run_cmd': rr_tags,
                     'mlc_run_cmd': f"mlcr {rr_tags}",
                     'node_id': actual_node_id,
-                    'out_dir_path': f"/tmp/mlperf-system-info-single-node",
+                    'out_dir_path': "/tmp/mlperf-system-info-single-node",
                     'remote_host': host,
                     'remote_user': user,
                     'remote_port': port,
@@ -207,7 +191,7 @@ def preprocess(i):
                 'action': 'remote_run',
                 'automation': 'script',
                 'tags': sc_tags,
-                "run_cmd": f"{sc_tags}",
+                'run_cmd': sc_tags,
                 'mlc_run_cmd': f'mlcr {sc_tags}',
                 'remote_host': host,
                 'remote_user': user,
@@ -277,15 +261,15 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
     Match detected single-node hardware to YAML node names and build the
     node_types list with function groupings and authoritative node counts.
 
-    Returns (node_types, system_size, system_name, errors). On validation failure,
-    all three output values are None and errors is a non-empty list.
+    Returns (node_types, system_size, errors). On validation failure,
+    both output values are None and errors is a non-empty list.
     """
-    all_yaml_node_names = []
-    for func_nodes in node_config.values():
-        for entry in func_nodes:
-            name = entry.get("node_name", "")
-            if name and name not in all_yaml_node_names:
-                all_yaml_node_names.append(name)
+    all_yaml_node_names = list(dict.fromkeys(
+        entry.get("node_name", "")
+        for func_nodes in node_config.values()
+        for entry in func_nodes
+        if entry.get("node_name", "")
+    ))
 
     # Map YAML node_name → hardware/software details and probed count
     yaml_name_to_details = {}
@@ -328,7 +312,7 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
                 )
 
     if errors:
-        return None, None, None, errors
+        return None, None, errors
 
     node_types = []
     ensemble_id = 1
@@ -356,21 +340,26 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
                 combined_name, 0) + no_of_nodes
             ensemble_id += 1
 
-    # system_name: config-derived labels with function (e.g. "1x
-    # L40S(Prefill)")
-    system_name = " + ".join(
-        f"{count}x {name}" for name, count in node_type_totals.items())
-
     system_size = _compute_system_size(node_types)
 
-    return node_types, system_size, system_name, []
+    return node_types, system_size, []
 
 
 def _is_not_detected(val):
     """Return True if val is a detection-failure reason string or empty/zero."""
     if val is None or val == "" or val == 0:
         return True
-    return isinstance(val, str) and val.lower().startswith("not detected")
+    if isinstance(val, str):
+        if val.lower().startswith("not detected"):
+            return True
+        # "N/A" and legacy "Not available" both signal auto-detection failure.
+        if val in ("N/A", "Not available"):
+            return True
+        # A numeric-only string (e.g. "0") means the driver returned a device
+        # index instead of a real name — treat as not detected.
+        if val.strip().lstrip('-').isdigit():
+            return True
+    return False
 
 
 def _compute_system_size(node_entries):
@@ -406,69 +395,238 @@ def _compute_system_size(node_entries):
     return " + ".join(parts)
 
 
-def _build_system_size_from_nodes(parsed_node_details):
-    return _compute_system_size(parsed_node_details)
+# ── Inference flat-format helpers ───────────────────────────────────────
+
+# Fields that are node-type metadata, not hardware fields to lift.
+_NODE_METADATA_FIELDS = {
+    "system_node_ensemble_id",
+    "number_of_nodes",
+    "system_node_name",
+}
+
+# Extra fields added when the 'network' variation is active alongside 'inference'.
+# Matches SYSTEM_DESC_REQUIRED_FIELDS_NETWORK_MODE in
+# submission_checker/constants.py.
+_NETWORK_EXTRA_FIELDS = [
+    "is_network",
+    "network_type",
+    "network_media",
+    "network_rate",
+    "nic_loadgen",
+    "number_nic_loadgen",
+    "net_software_stack_loadgen",
+    "network_protocol",
+    "number_connections",
+    "nic_sut",
+    "number_nic_sut",
+    "net_software_stack_sut",
+    "network_topology",
+]
+
+# Extra fields added when the 'power' variation is active alongside 'inference'.
+# Matches SYSTEM_DESC_REQUIRED_FIELDS_POWER in submission_checker/constants.py.
+# other_hardware is already in the base flat output.
+_POWER_EXTRA_FIELDS = [
+    "filesystem",
+    "boot_firmware_version",
+    "management_firmware_version",
+    "number_of_type_nics_installed",
+    "nics_enabled_firmware",
+    "nics_enabled_os",
+    "nics_enabled_connected",
+    "network_speed_mbit",
+    "power_supply_quantity_and_rating_watts",
+    "power_supply_details",
+    "disk_drives",
+    "disk_controllers",
+    "system_power_only",
+]
+
+
+def _is_homogeneous(node_types):
+    """Return True if all node entries share the same hardware fingerprint."""
+    if len(node_types) <= 1:
+        return True
+    ref_accel = node_types[0].get("accelerator_model_name", "")
+    ref_cpu = node_types[0].get("host_processor_model_name", "")
+    return all(
+        nt.get("accelerator_model_name", "") == ref_accel and
+        nt.get("host_processor_model_name", "") == ref_cpu
+        for nt in node_types[1:]
+    )
+
+
+def _merge_heterogeneous_nodes(node_types):
+    """Merge heterogeneous node types by comma-separating unique values per field."""
+    all_fields = list(dict.fromkeys(
+        k for nt in node_types for k in nt if k not in _NODE_METADATA_FIELDS
+    ))
+
+    merged = {}
+    for field in all_fields:
+        seen = []
+        for nt in node_types:
+            raw = nt.get(field, "")
+            val = "" if raw is None else str(raw)
+            if val and val not in seen:
+                seen.append(val)
+        merged[field] = ", ".join(seen)
+    return merged
+
+
+def _flatten_for_inference(nested_info, env):
+    """
+    Convert the nested node_types format to a flat dict compatible with the
+    MLPerf Inference submission checker.
+
+    Field name remappings applied at the top level:
+      submitter_org_names        -> submitter
+      system_availability_status -> status
+      system_category            -> system_type
+      serving_framework          -> framework
+
+    Node-level hardware fields are lifted verbatim (no renames).
+    All fields required by SYSTEM_DESC_REQUIRED_FIELDS in constants.py are present;
+    those not auto-captured are set to empty string.
+    """
+    node_types = nested_info.get("node_types", [])
+    total_nodes = nested_info.get(
+        "system_node_ensemble_total",
+        sum(nt.get("number_of_nodes", 1) for nt in node_types),
+    )
+
+    if not node_types:
+        hw = {}
+    elif _is_homogeneous(node_types):
+        hw = {k: v for k, v in node_types[0].items(
+        ) if k not in _NODE_METADATA_FIELDS}
+    else:
+        hw = _merge_heterogeneous_nodes(node_types)
+
+    def _hw(key):
+        """Return hw[key] as str, or '' when absent, None, 'Not available', or 'N/A'."""
+        v = hw.get(key)
+        if v is None or v in ("Not available", "N/A"):
+            return ""
+        return v
+
+    flat = {
+        # Identity / submitter
+        "submitter": nested_info.get("submitter_org_names", ""),
+        "submitter_contact": nested_info.get("submitter_contact", ""),
+        "system_name": nested_info.get("system_name", ""),
+        "status": nested_info.get("system_availability_status", ""),
+        "system_type": nested_info.get("system_category", ""),
+        "division": nested_info.get("division", ""),
+        "system_size": nested_info.get("system_size", ""),
+        # Multi-node count
+        "number_of_nodes": total_nodes,
+        # Host CPU
+        "host_processor_model_name": _hw("host_processor_model_name"),
+        "host_processors_per_node": _hw("host_processors_per_node"),
+        "host_processor_core_count": _hw("host_processor_core_count"),
+        "host_processor_vcpu_count": _hw("host_processor_vcpu_count"),
+        "host_processor_frequency": _hw("host_processor_frequency"),
+        "host_processor_caches": _hw("host_processor_caches"),
+        "host_processor_interconnect": _hw("host_processor_interconnect"),
+        # Host memory / storage
+        "host_memory_capacity": _hw("host_memory_capacity"),
+        "host_storage_type": _hw("host_storage_type"),
+        "host_storage_capacity": _hw("host_storage_capacity"),
+        "host_memory_configuration": _hw("host_memory_configuration"),
+        # Host networking
+        "host_networking": _hw("host_networking"),
+        "host_networking_topology": "",  # requires manual input
+        "host_network_card_count": _hw("host_network_card_count"),
+        # Accelerator
+        "accelerator_model_name": _hw("accelerator_model_name"),
+        "accelerators_per_node": _hw("accelerators_per_node"),
+        "accelerator_memory_capacity": _hw("accelerator_memory_capacity"),
+        "accelerator_memory_configuration": _hw("accelerator_memory_configuration"),
+        "accelerator_host_interconnect": _hw("accelerator_host_interconnect"),
+        "accelerator_interconnect": _hw("accelerator_interconnect"),
+        "accelerator_interconnect_topology": _hw("accelerator_interconnect_topology"),
+        "accelerator_frequency": _hw("accelerator_frequency"),
+        "accelerator_on-chip_memories": _hw("accelerator_on-chip_memories"),
+        # Software
+        "framework": nested_info.get("serving_framework", ""),
+        "operating_system": _hw("operating_system"),
+        "other_software_stack": _hw("other_software_stack"),
+        # Notes / other
+        "hw_notes": _hw("hw_notes"),
+        "sw_notes": _hw("sw_notes"),
+        "other_hardware": _hw("other_hardware"),
+        "cooling": _hw("cooling"),
+        "system_type_detail": "",  # requires manual input
+    }
+
+    if is_true(env.get("MLC_MLPERF_NETWORK_VARIATION", False)):
+        flat.update({f: "" for f in _NETWORK_EXTRA_FIELDS if f not in flat})
+
+    if is_true(env.get("MLC_MLPERF_POWER_VARIATION", False)):
+        flat.update({f: "" for f in _POWER_EXTRA_FIELDS if f not in flat})
+
+    return flat
+
+
+def _update_parsed_node_details(
+        node_id, dir_path, parsed_node_details, logger):
+    """Load a single-node JSON file and merge it into parsed_node_details."""
+    path = os.path.join(
+        dir_path,
+        f"mlperf-system-info-single-node-{node_id}.json")
+    if not os.path.exists(path):
+        logger.warning(f"Single-node info file not found: {path}")
+        return
+    with open(path) as f:
+        info = json.load(f)
+    node_name = (
+        f"{info.get('host_processor_model_name', '')}"
+        f"-{info.get('accelerators_per_node', '')}"
+        f"x{info.get('accelerator_model_name', '')}"
+    )
+    existing = next(
+        (e for e in parsed_node_details if e['system_node_name'] == node_name),
+        None)
+    if existing:
+        existing['number_of_nodes'] += 1
+    else:
+        entry = {
+            'system_node_ensemble_id': node_id,
+            'number_of_nodes': 1,
+            'system_node_name': node_name}
+        entry.update(info)
+        parsed_node_details.append(entry)
 
 
 def postprocess(i):
 
-    state = i['state']
-
     env = i['env']
-
-    os_info = i['os_info']
-
     logger = i['automation'].logger
 
+    dir_path = env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH']
     parsed_node_details = []
-
-    def update_parsed_node_details(node_id):
-        single_node_system_info_path = os.path.join(
-            env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'], f"mlperf-system-info-single-node-{node_id}.json")
-        if not os.path.exists(single_node_system_info_path):
-            logger.warning(
-                f"Single-node info file not found: {single_node_system_info_path}")
-            return
-        with open(single_node_system_info_path) as f:
-            single_node_system_info = json.load(f)
-        system_node_name = (
-            f"{single_node_system_info.get('host_processor_model_name', '')}"
-            f"-{single_node_system_info.get('accelerators_per_node', '')}"
-            f"x{single_node_system_info.get('accelerator_model_name', '')}"
-        )
-        existing_entry = next(
-            (entry for entry in parsed_node_details
-             if entry['system_node_name'] == system_node_name),
-            None
-        )
-        if existing_entry:
-            existing_entry['number_of_nodes'] += 1
-        else:
-            node_details = {
-                'system_node_ensemble_id': node_id,
-                'number_of_nodes': 1,
-                'system_node_name': system_node_name,
-            }
-            node_details.update(single_node_system_info)
-            parsed_node_details.append(node_details)
 
     exclude_current = is_true(env.get('MLC_EXCLUDE_CURRENT_NODE', False))
     remote_node_id_start = 0 if exclude_current else 1
 
     if not exclude_current:
         logger.info("Obtaining system information from the host system")
-        update_parsed_node_details(node_id=0)
+        _update_parsed_node_details(0, dir_path, parsed_node_details, logger)
 
     logger.info("Obtaining system information from the remote systems")
     for idx in range(int(env.get('MLC_REMOTE_RUN_SSH_ID_COUNT', 0))):
-        update_parsed_node_details(node_id=remote_node_id_start + idx)
+        _update_parsed_node_details(
+            remote_node_id_start + idx,
+            dir_path,
+            parsed_node_details,
+            logger)
 
-    # Apply node_config YAML if provided
-    node_config_file = env.get("MLC_NODE_CONFIG_FILE", "")
-    node_config = _load_node_config(node_config_file, logger)
+    node_config = _load_node_config(
+        env.get("MLC_NODE_CONFIG_FILE", ""), logger)
 
     if node_config:
-        node_types, system_size, system_name_from_config, errors = _build_node_types_from_yaml(
+        node_types, system_size, errors = _build_node_types_from_yaml(
             node_config, parsed_node_details, logger)
         if errors:
             for err in errors:
@@ -476,33 +634,29 @@ def postprocess(i):
             return {'return': 1, 'error': '; '.join(errors)}
     else:
         node_types = parsed_node_details
-        system_size = _build_system_size_from_nodes(parsed_node_details)
-        system_name_from_config = system_size
+        system_size = _compute_system_size(parsed_node_details)
 
     for nt in node_types:
         nt.pop("system_node_name", None)
 
-    # Inject user-provided hardware/software metadata into each node type.
-    # serving_framework is a system-level property lifted to the top of the
-    # output, so strip it from each node entry to avoid duplication.
-    other_hw = env.get("MLC_MLPERF_OTHER_HARDWARE", "")
-    hw_notes = env.get("MLC_MLPERF_HARDWARE_NOTES", "")
-    cooling = env.get("MLC_MLPERF_COOLING", "")
-    container_link = env.get("MLC_MLPERF_CONTAINER_LINK", "")
+    # Inject user-provided metadata into each node type.
+    # serving_framework is a system-level property, so strip it from node
+    # entries.
+    node_meta = {
+        "other_hardware": env.get("MLC_MLPERF_OTHER_HARDWARE", ""),
+        "hw_notes": env.get("MLC_MLPERF_HARDWARE_NOTES", ""),
+        "cooling": env.get("MLC_MLPERF_COOLING", ""),
+        "container_link": env.get("MLC_MLPERF_CONTAINER_LINK", ""),
+    }
     for node_type in node_types:
-        node_type["other_hardware"] = other_hw
-        node_type["hw_notes"] = hw_notes
-        node_type["cooling"] = cooling
-        node_type["container_link"] = container_link
+        node_type.update(node_meta)
         node_type.pop("serving_framework", None)
 
-    serving_framework = env.get("MLC_MLPERF_SERVING_FRAMEWORK", "")
     user_system_name = env.get("MLC_MLPERF_SYSTEM_NAME", "")
-
     if not user_system_name:
         return {'return': 1, 'error': 'system_name is required. Set it via --system_name, the config file, or MLC_MLPERF_SYSTEM_NAME.'}
 
-    parsed_multinode_system_info = {
+    output_info = {
         "submitter_org_names": env.get("MLC_MLPERF_SUBMITTER", "Insert your organization name here"),
         "submitter_contact": env.get("MLC_MLPERF_SUBMITTER_CONTACT", "Insert a contact email here"),
         "submission_id": "",
@@ -513,8 +667,8 @@ def postprocess(i):
         "system_availability_status": env.get("MLC_MLPERF_SUBMISSION_SYSTEM_STATUS", "Insert system availability status here"),
         "system_size": env.get("MLC_MLPERF_SYSTEM_SIZE", system_size),
         "system_node_ensemble_count": len(node_types),
-        "system_node_ensemble_total": sum(entry['number_of_nodes'] for entry in node_types),
-        "serving_framework": serving_framework,
+        "system_node_ensemble_total": sum(e['number_of_nodes'] for e in node_types),
+        "serving_framework": env.get("MLC_MLPERF_SERVING_FRAMEWORK", ""),
         "node_types": node_types,
         "division": env.get("MLC_MLPERF_SUBMISSION_DIVISION", "Insert model division here"),
         "model_id": env.get("MLC_MLPERF_MODEL_ID", "Insert model id here"),
@@ -532,19 +686,22 @@ def postprocess(i):
         "measured_accuracy_score": env.get("MLC_MLPERF_MEASURED_ACCURACY_SCORE", ""),
     }
 
+    if env.get("MLC_MLPERF_BENCHMARK", "") == "inference":
+        output_info = _flatten_for_inference(output_info, env)
+        logger.info("Using flat inference format for system_info.json")
+
     try:
         with open(env['MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH'], 'w') as f:
-            json.dump(parsed_multinode_system_info, f, indent=2)
-        logger.info("Successfully compiled the system informtion")
+            json.dump(output_info, f, indent=2)
+        logger.info("Successfully compiled the system information")
     except Exception as e:
         logger.error(
-            f"Exception {e} occured when compiling the system information")
+            f"Exception {e} occurred when compiling the system information")
 
-    # Patch run_metadata.yml config_summary with serving config values if
+    # Patch run_metadata (JSON or YAML) with serving config values if
     # available.
     run_md_path = env.get('MLC_MLPERF_RUN_METADATA_PATH', '')
-    serving_cfg_path = os.path.join(
-        env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'], 'serving_config.json')
+    serving_cfg_path = os.path.join(dir_path, 'serving_config.json')
     if run_md_path and os.path.exists(
             serving_cfg_path) and os.path.exists(run_md_path):
         try:
@@ -554,8 +711,7 @@ def postprocess(i):
             with open(run_md_path) as f:
                 run_md = json.load(f) if use_json else yaml.safe_load(f)
             for key in ('tensor_parallel', 'pipeline_parallel',
-                        'expert_parallel', 'data_parallel', 'batch',
-                        'disaggregated'):
+                        'expert_parallel', 'data_parallel', 'batch', 'disaggregated'):
                 if sc.get(key) is not None:
                     run_md[key] = sc[key]
             if sc.get('config_summary'):
@@ -574,6 +730,6 @@ def postprocess(i):
                     "Detected serving framework from log: %s",
                     sc['framework'])
         except Exception as e:
-            logger.error(f"Failed to patch run_metadata.yml: {e}")
+            logger.error(f"Failed to patch {run_md_path}: {e}")
 
     return {'return': 0}
