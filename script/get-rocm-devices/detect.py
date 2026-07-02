@@ -31,10 +31,16 @@ def get_gpu_info():
         try:
             gpu_result = subprocess.run(
                 ["amd-smi", "static", "--gpu", str(i), "--json"], capture_output=True, text=True)
-            interconnect_result = subprocess.run(
-                ["amd-smi", "xgmi", "--gpu", str(i), "--json"], capture_output=True, text=True)
-            gpu_static = json.loads(gpu_result.stdout)["gpu_data"][0]
-            host_interconnect_result = gpu_static["bus"]["pcie_interface_version"]
+            parsed = json.loads(gpu_result.stdout)
+            # amd-smi static returns a flat dict in newer versions, a list in
+            # older ones, and some versions wrap it under "gpu_data"
+            if isinstance(parsed, list):
+                gpu_static = parsed[0]
+            elif "gpu_data" in parsed:
+                gpu_static = parsed["gpu_data"][0]
+            else:
+                gpu_static = parsed
+            host_interconnect_result = gpu_static.get("bus", {}).get("pcie_interface_version", "")
             # Marketing model name, e.g. "AMD Radeon RX 7700S". Strip the
             # trademark/registered glyphs so the submission string stays ASCII.
             gpu_name = (
@@ -44,10 +50,16 @@ def get_gpu_info():
                     "market_name",
                     "") or "")
             gpu_name = gpu_name.replace("™", "").replace("®", "").strip()
-            gpu_interconnect_result = json.loads(interconnect_result.stdout)[
-                "xgmi_metric"][0][0]["link_metrics"]["link_type"]
         except Exception as e:
             print(f"Error occurred while fetching info for GPU {i}: {str(e)}")
+
+        try:
+            interconnect_result = subprocess.run(
+                ["amd-smi", "xgmi", "--gpu", str(i), "--json"], capture_output=True, text=True)
+            xgmi_data = json.loads(interconnect_result.stdout)
+            gpu_interconnect_result = xgmi_data["xgmi_metric"][0][0]["link_metrics"]["link_type"]
+        except Exception:
+            gpu_interconnect_result = ""
 
         if not gpu_name:
             gpu_name = f"AMD GPU {i}"

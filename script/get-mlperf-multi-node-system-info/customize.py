@@ -1,14 +1,13 @@
-from mlc import utils
 from utils import *
 import os
 import re
 import mlc
-import subprocess
 import json
 import yaml
+import urllib.request
 
 
-# Maps JSON config file keys to the env vars they populate.
+# Maps JSON/YAML config file keys to the env vars they populate.
 # CLI args (already resolved into env vars by MLC) take precedence:
 # a key from the config file is only applied when the env var is still empty.
 _CONFIG_KEY_TO_ENV = {
@@ -65,8 +64,6 @@ def _load_config_file(config_file, env, logger):
 
 def _probe_serving_framework(url):
     """HTTP probe to detect vLLM, SGLang, or TRT-LLM from a running endpoint."""
-    import urllib.request
-    import json as _json
     base = url.rstrip('/')
     # TRT-LLM: /perf_metrics is unique to TRT-LLM (absent in vLLM and SGLang)
     try:
@@ -74,7 +71,7 @@ def _probe_serving_framework(url):
             _r.read()
         try:
             with urllib.request.urlopen(f"{base}/version", timeout=5) as r2:
-                vd = _json.loads(r2.read())
+                vd = json.loads(r2.read())
                 if isinstance(vd, dict) and 'version' in vd:
                     return f"TRT-LLM {vd['version']}"
         except Exception:
@@ -85,7 +82,7 @@ def _probe_serving_framework(url):
     # vLLM: /version returns {"version": "x.y.z"}
     try:
         with urllib.request.urlopen(f"{base}/version", timeout=5) as r:
-            d = _json.loads(r.read())
+            d = json.loads(r.read())
             if isinstance(d, dict) and 'version' in d:
                 return f"vLLM {d['version']}"
     except Exception:
@@ -93,10 +90,9 @@ def _probe_serving_framework(url):
     # SGLang: /get_server_info
     try:
         with urllib.request.urlopen(f"{base}/get_server_info", timeout=5) as r:
-            d = _json.loads(r.read())
+            d = json.loads(r.read())
             if isinstance(d, dict):
-                v = d.get('version') or d.get(
-                    'server_version') or d.get('sglang_version') or ''
+                v = d.get('version') or d.get('server_version') or d.get('sglang_version') or ''
                 return f"SGLang {v}".rstrip() if v else 'SGLang'
     except Exception:
         pass
@@ -118,22 +114,18 @@ def _parse_node(node_str):
 
 def preprocess(i):
 
-    os_info = i['os_info']
     env = i['env']
-
     logger = i['automation'].logger
 
     if env.get('MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH', '') == '':
         if env.get('MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH', '') == '':
             env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'] = os.getcwd()
         if env.get('MLC_MULTI_NODE_SYSTEM_INFO_FILE_NAME', '') == '':
-            env['MLC_MULTI_NODE_SYSTEM_INFO_FILE_NAME'] = f"system-info-multi-node.json"
+            env['MLC_MULTI_NODE_SYSTEM_INFO_FILE_NAME'] = "system-info-multi-node.json"
         env['MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH'] = os.path.join(
             env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'], env['MLC_MULTI_NODE_SYSTEM_INFO_FILE_NAME'])
 
-    # create the directory if not present
-    if not os.path.exists(env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH']):
-        os.makedirs(env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'], exist_ok=True)
+    os.makedirs(env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'], exist_ok=True)
 
     _load_config_file(env.get('MLC_MLPERF_CONFIG_FILE', ''), env, logger)
 
@@ -141,25 +133,15 @@ def preprocess(i):
             env.get('MLC_EXCLUDE_CURRENT_NODE', False)):
         return {'return': 1, 'error': 'Either MLC_EXCLUDE_CURRENT_NODE should be False or MLC_MULTINODE_SYSTEM_SSH_IDS should be provided'}
     elif env.get('MLC_MULTINODE_SYSTEM_SSH_IDS', '') != '':
-        # set the run state dictionary to copy back the single node system info
-        # to all nodes after remote runs are done
-        if not 'run_state' in i:
-            i['run_state'] = {}
-        run_state = i['run_state']
-        if not 'remote_run' in run_state:
-            run_state['remote_run'] = {}
-        run_state['remote_run']['env_keys_to_copy_back'] = []
-        run_state['remote_run']['env_keys_to_copy_back'].append(
-            'MLC_SINGLE_NODE_SYSTEM_INFO_FILE_PATH')
-        i['run_state'] = run_state
+        run_state = i.setdefault('run_state', {})
+        run_state.setdefault('remote_run', {})['env_keys_to_copy_back'] = [
+            'MLC_SINGLE_NODE_SYSTEM_INFO_FILE_PATH']
 
-        # set remote run tags
         rr_tags = "get,mlperf,single-node,system-info"
         backend = env.get('MLC_ACCELERATOR_BACKEND', '')
         if backend in ('cuda', 'rocm', 'xpu'):
             rr_tags += f",_{backend}"
-        ssh_ids = [
-            s.strip() for s in env['MLC_MULTINODE_SYSTEM_SSH_IDS'].split(',') if s.strip()]
+        ssh_ids = [s.strip() for s in env['MLC_MULTINODE_SYSTEM_SSH_IDS'].split(',') if s.strip()]
 
         env['MLC_REMOTE_RUN_SSH_ID_COUNT'] = len(ssh_ids)
 
@@ -174,10 +156,10 @@ def preprocess(i):
                     'action': 'remote_run',
                     'automation': 'script',
                     'tags': rr_tags,
-                    'run_cmd': f"{rr_tags}",
+                    'run_cmd': rr_tags,
                     'mlc_run_cmd': f"mlcr {rr_tags}",
                     'node_id': actual_node_id,
-                    'out_dir_path': f"/tmp/mlperf-system-info-single-node",
+                    'out_dir_path': "/tmp/mlperf-system-info-single-node",
                     'remote_host': host,
                     'remote_user': user,
                     'remote_port': port,
@@ -188,14 +170,11 @@ def preprocess(i):
                     'quiet': True,
                 })
                 if r['return'] > 0:
-                    logger.error(
-                        f"Error obtaining information from remote node {sshid}!")
+                    logger.error(f"Error obtaining information from remote node {sshid}!")
                 else:
-                    logger.info(
-                        f"Successfully obtained information from remote node {sshid}")
+                    logger.info(f"Successfully obtained information from remote node {sshid}")
             except Exception as e:
-                logger.error(
-                    f"Exception during remote_run for node {sshid}: {e}")
+                logger.error(f"Exception during remote_run for node {sshid}: {e}")
 
     serving_node = env.get('MLC_MLPERF_SERVING_NODE', '')
     if serving_node:
@@ -207,7 +186,7 @@ def preprocess(i):
                 'action': 'remote_run',
                 'automation': 'script',
                 'tags': sc_tags,
-                "run_cmd": f"{sc_tags}",
+                'run_cmd': sc_tags,
                 'mlc_run_cmd': f'mlcr {sc_tags}',
                 'remote_host': host,
                 'remote_user': user,
@@ -221,27 +200,20 @@ def preprocess(i):
                 'quiet': True,
             })
             if r_sc['return'] > 0:
-                logger.error(
-                    f"Error obtaining serving config from {serving_node}")
+                logger.error(f"Error obtaining serving config from {serving_node}")
             else:
-                logger.info(
-                    f"Successfully obtained serving config from {serving_node}")
+                logger.info(f"Successfully obtained serving config from {serving_node}")
         except Exception as e:
-            logger.error(
-                f"Exception during serving config remote_run for {serving_node}: {e}")
+            logger.error(f"Exception during serving config remote_run for {serving_node}: {e}")
 
     endpoint_url = env.get('MLC_MLPERF_ENDPOINT_URL', '')
     if endpoint_url and not env.get('MLC_MLPERF_SERVING_FRAMEWORK', ''):
         detected = _probe_serving_framework(endpoint_url)
         if detected:
             env['MLC_MLPERF_SERVING_FRAMEWORK'] = detected
-            logger.info(
-                "Detected serving framework via HTTP probe: %s",
-                detected)
+            logger.info("Detected serving framework via HTTP probe: %s", detected)
         else:
-            logger.info(
-                "Could not detect serving framework from %s",
-                endpoint_url)
+            logger.info("Could not detect serving framework from %s", endpoint_url)
 
     return {'return': 0}
 
@@ -252,8 +224,7 @@ def _match_node_name(accelerator_model_name, yaml_node_names):
     for node_name in yaml_node_names:
         if node_name.lower() in accel_lower:
             return node_name
-        if re.search(r'\b' + re.escape(node_name) + r'\b',
-                     accelerator_model_name, re.IGNORECASE):
+        if re.search(r'\b' + re.escape(node_name) + r'\b', accelerator_model_name, re.IGNORECASE):
             return node_name
     return None
 
@@ -267,8 +238,7 @@ def _load_node_config(node_config_file, logger):
             data = yaml.safe_load(f)
         return data.get("system_info", {}).get("node_config", {})
     except Exception as e:
-        logger.error(
-            f"Failed to load node_config file {node_config_file}: {e}")
+        logger.error(f"Failed to load node_config file {node_config_file}: {e}")
         return None
 
 
@@ -277,15 +247,15 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
     Match detected single-node hardware to YAML node names and build the
     node_types list with function groupings and authoritative node counts.
 
-    Returns (node_types, system_size, system_name, errors). On validation failure,
-    all three output values are None and errors is a non-empty list.
+    Returns (node_types, system_size, errors). On validation failure,
+    both output values are None and errors is a non-empty list.
     """
-    all_yaml_node_names = []
-    for func_nodes in node_config.values():
-        for entry in func_nodes:
-            name = entry.get("node_name", "")
-            if name and name not in all_yaml_node_names:
-                all_yaml_node_names.append(name)
+    all_yaml_node_names = list(dict.fromkeys(
+        entry.get("node_name", "")
+        for func_nodes in node_config.values()
+        for entry in func_nodes
+        if entry.get("node_name", "")
+    ))
 
     # Map YAML node_name → hardware/software details and probed count
     yaml_name_to_details = {}
@@ -295,19 +265,15 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
         matched = _match_node_name(accel_name, all_yaml_node_names)
         if matched and matched not in yaml_name_to_details:
             yaml_name_to_details[matched] = node_detail
-            yaml_name_to_probed_count[matched] = node_detail.get(
-                "number_of_nodes", 1)
-            logger.info(
-                f"Matched single-node result ('{accel_name}') → YAML node '{matched}'")
+            yaml_name_to_probed_count[matched] = node_detail.get("number_of_nodes", 1)
+            logger.info(f"Matched single-node result ('{accel_name}') → YAML node '{matched}'")
 
-    # Aggregate total declared no_of_nodes per unique node_name across all
-    # functions
+    # Aggregate total declared no_of_nodes per unique node_name across all functions
     declared_per_name = {}
     for func_nodes in node_config.values():
         for entry in func_nodes:
             name = entry.get("node_name", "")
-            declared_per_name[name] = declared_per_name.get(
-                name, 0) + int(entry.get("no_of_nodes", 1))
+            declared_per_name[name] = declared_per_name.get(name, 0) + int(entry.get("no_of_nodes", 1))
 
     # Validate declared counts against probed counts
     errors = []
@@ -328,7 +294,7 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
                 )
 
     if errors:
-        return None, None, None, errors
+        return None, None, errors
 
     node_types = []
     ensemble_id = 1
@@ -352,18 +318,12 @@ def _build_node_types_from_yaml(node_config, parsed_node_details, logger):
             )
 
             node_types.append(node_type)
-            node_type_totals[combined_name] = node_type_totals.get(
-                combined_name, 0) + no_of_nodes
+            node_type_totals[combined_name] = node_type_totals.get(combined_name, 0) + no_of_nodes
             ensemble_id += 1
-
-    # system_name: config-derived labels with function (e.g. "1x
-    # L40S(Prefill)")
-    system_name = " + ".join(
-        f"{count}x {name}" for name, count in node_type_totals.items())
 
     system_size = _compute_system_size(node_types)
 
-    return node_types, system_size, system_name, []
+    return node_types, system_size, []
 
 
 def _is_not_detected(val):
@@ -397,8 +357,7 @@ def _compute_system_size(node_entries):
         accel_name = entry.get("accelerator_model_name", "")
         accel_per_node = entry.get("accelerators_per_node", 0)
 
-        if not _is_not_detected(
-                accel_name) and not _is_not_detected(accel_per_node):
+        if not _is_not_detected(accel_name) and not _is_not_detected(accel_per_node):
             try:
                 qty = n_nodes * int(accel_per_node)
             except (ValueError, TypeError):
@@ -416,24 +375,17 @@ def _compute_system_size(node_entries):
     return " + ".join(parts)
 
 
-def _build_system_size_from_nodes(parsed_node_details):
-    return _compute_system_size(parsed_node_details)
-
-
 # ── Inference flat-format helpers ───────────────────────────────────────
 
 # Fields that are node-type metadata, not hardware fields to lift.
 _NODE_METADATA_FIELDS = {
     "system_node_ensemble_id",
     "number_of_nodes",
-    "system_node_name"}
-
-# No node-level field renames needed — the checker uses the same names.
-_NODE_FIELD_RENAMES = {}
+    "system_node_name",
+}
 
 # Extra fields added when the 'network' variation is active alongside 'inference'.
-# Matches SYSTEM_DESC_REQUIRED_FIELDS_NETWORK_MODE in
-# submission_checker/constants.py.
+# Matches SYSTEM_DESC_REQUIRED_FIELDS_NETWORK_MODE in submission_checker/constants.py.
 _NETWORK_EXTRA_FIELDS = [
     "is_network",
     "network_type",
@@ -485,11 +437,9 @@ def _is_homogeneous(node_types):
 
 def _merge_heterogeneous_nodes(node_types):
     """Merge heterogeneous node types by comma-separating unique values per field."""
-    all_fields = []
-    for nt in node_types:
-        for k in nt:
-            if k not in _NODE_METADATA_FIELDS and k not in all_fields:
-                all_fields.append(k)
+    all_fields = list(dict.fromkeys(
+        k for nt in node_types for k in nt if k not in _NODE_METADATA_FIELDS
+    ))
 
     merged = {}
     for field in all_fields:
@@ -499,8 +449,7 @@ def _merge_heterogeneous_nodes(node_types):
             val = "" if raw is None else str(raw)
             if val and val not in seen:
                 seen.append(val)
-        out_key = _NODE_FIELD_RENAMES.get(field, field)
-        merged[out_key] = ", ".join(seen)
+        merged[field] = ", ".join(seen)
     return merged
 
 
@@ -528,16 +477,12 @@ def _flatten_for_inference(nested_info, env):
     if not node_types:
         hw = {}
     elif _is_homogeneous(node_types):
-        hw = {}
-        for k, v in node_types[0].items():
-            if k in _NODE_METADATA_FIELDS:
-                continue
-            hw[_NODE_FIELD_RENAMES.get(k, k)] = v
+        hw = {k: v for k, v in node_types[0].items() if k not in _NODE_METADATA_FIELDS}
     else:
         hw = _merge_heterogeneous_nodes(node_types)
 
     def _hw(key):
-        """Return hw[key] as str, or '' when the key is absent, None, 'Not available', or 'N/A'."""
+        """Return hw[key] as str, or '' when absent, None, 'Not available', or 'N/A'."""
         v = hw.get(key)
         if v is None or v in ("Not available", "N/A"):
             return ""
@@ -590,79 +535,63 @@ def _flatten_for_inference(nested_info, env):
         "sw_notes": _hw("sw_notes"),
         "other_hardware": _hw("other_hardware"),
         "cooling": _hw("cooling"),
-        "system_type_detail": "",   # requires manual input
+        "system_type_detail": "",  # requires manual input
     }
 
     if is_true(env.get("MLC_MLPERF_NETWORK_VARIATION", False)):
-        for f in _NETWORK_EXTRA_FIELDS:
-            flat.setdefault(f, "")
+        flat.update({f: "" for f in _NETWORK_EXTRA_FIELDS if f not in flat})
 
     if is_true(env.get("MLC_MLPERF_POWER_VARIATION", False)):
-        for f in _POWER_EXTRA_FIELDS:
-            flat.setdefault(f, "")
+        flat.update({f: "" for f in _POWER_EXTRA_FIELDS if f not in flat})
 
     return flat
 
 
+def _update_parsed_node_details(node_id, dir_path, parsed_node_details, logger):
+    """Load a single-node JSON file and merge it into parsed_node_details."""
+    path = os.path.join(dir_path, f"mlperf-system-info-single-node-{node_id}.json")
+    if not os.path.exists(path):
+        logger.warning(f"Single-node info file not found: {path}")
+        return
+    with open(path) as f:
+        info = json.load(f)
+    node_name = (
+        f"{info.get('host_processor_model_name', '')}"
+        f"-{info.get('accelerators_per_node', '')}"
+        f"x{info.get('accelerator_model_name', '')}"
+    )
+    existing = next((e for e in parsed_node_details if e['system_node_name'] == node_name), None)
+    if existing:
+        existing['number_of_nodes'] += 1
+    else:
+        entry = {'system_node_ensemble_id': node_id, 'number_of_nodes': 1, 'system_node_name': node_name}
+        entry.update(info)
+        parsed_node_details.append(entry)
+
+
 def postprocess(i):
 
-    state = i['state']
-
     env = i['env']
-
-    os_info = i['os_info']
-
     logger = i['automation'].logger
 
+    dir_path = env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH']
     parsed_node_details = []
-
-    def update_parsed_node_details(node_id):
-        single_node_system_info_path = os.path.join(
-            env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'], f"mlperf-system-info-single-node-{node_id}.json")
-        if not os.path.exists(single_node_system_info_path):
-            logger.warning(
-                f"Single-node info file not found: {single_node_system_info_path}")
-            return
-        with open(single_node_system_info_path) as f:
-            single_node_system_info = json.load(f)
-        system_node_name = (
-            f"{single_node_system_info.get('host_processor_model_name', '')}"
-            f"-{single_node_system_info.get('accelerators_per_node', '')}"
-            f"x{single_node_system_info.get('accelerator_model_name', '')}"
-        )
-        existing_entry = next(
-            (entry for entry in parsed_node_details
-             if entry['system_node_name'] == system_node_name),
-            None
-        )
-        if existing_entry:
-            existing_entry['number_of_nodes'] += 1
-        else:
-            node_details = {
-                'system_node_ensemble_id': node_id,
-                'number_of_nodes': 1,
-                'system_node_name': system_node_name,
-            }
-            node_details.update(single_node_system_info)
-            parsed_node_details.append(node_details)
 
     exclude_current = is_true(env.get('MLC_EXCLUDE_CURRENT_NODE', False))
     remote_node_id_start = 0 if exclude_current else 1
 
     if not exclude_current:
         logger.info("Obtaining system information from the host system")
-        update_parsed_node_details(node_id=0)
+        _update_parsed_node_details(0, dir_path, parsed_node_details, logger)
 
     logger.info("Obtaining system information from the remote systems")
     for idx in range(int(env.get('MLC_REMOTE_RUN_SSH_ID_COUNT', 0))):
-        update_parsed_node_details(node_id=remote_node_id_start + idx)
+        _update_parsed_node_details(remote_node_id_start + idx, dir_path, parsed_node_details, logger)
 
-    # Apply node_config YAML if provided
-    node_config_file = env.get("MLC_NODE_CONFIG_FILE", "")
-    node_config = _load_node_config(node_config_file, logger)
+    node_config = _load_node_config(env.get("MLC_NODE_CONFIG_FILE", ""), logger)
 
     if node_config:
-        node_types, system_size, system_name_from_config, errors = _build_node_types_from_yaml(
+        node_types, system_size, errors = _build_node_types_from_yaml(
             node_config, parsed_node_details, logger)
         if errors:
             for err in errors:
@@ -670,33 +599,28 @@ def postprocess(i):
             return {'return': 1, 'error': '; '.join(errors)}
     else:
         node_types = parsed_node_details
-        system_size = _build_system_size_from_nodes(parsed_node_details)
-        system_name_from_config = system_size
+        system_size = _compute_system_size(parsed_node_details)
 
     for nt in node_types:
         nt.pop("system_node_name", None)
 
-    # Inject user-provided hardware/software metadata into each node type.
-    # serving_framework is a system-level property lifted to the top of the
-    # output, so strip it from each node entry to avoid duplication.
-    other_hw = env.get("MLC_MLPERF_OTHER_HARDWARE", "")
-    hw_notes = env.get("MLC_MLPERF_HARDWARE_NOTES", "")
-    cooling = env.get("MLC_MLPERF_COOLING", "")
-    container_link = env.get("MLC_MLPERF_CONTAINER_LINK", "")
+    # Inject user-provided metadata into each node type.
+    # serving_framework is a system-level property, so strip it from node entries.
+    node_meta = {
+        "other_hardware": env.get("MLC_MLPERF_OTHER_HARDWARE", ""),
+        "hw_notes": env.get("MLC_MLPERF_HARDWARE_NOTES", ""),
+        "cooling": env.get("MLC_MLPERF_COOLING", ""),
+        "container_link": env.get("MLC_MLPERF_CONTAINER_LINK", ""),
+    }
     for node_type in node_types:
-        node_type["other_hardware"] = other_hw
-        node_type["hw_notes"] = hw_notes
-        node_type["cooling"] = cooling
-        node_type["container_link"] = container_link
+        node_type.update(node_meta)
         node_type.pop("serving_framework", None)
 
-    serving_framework = env.get("MLC_MLPERF_SERVING_FRAMEWORK", "")
     user_system_name = env.get("MLC_MLPERF_SYSTEM_NAME", "")
-
     if not user_system_name:
         return {'return': 1, 'error': 'system_name is required. Set it via --system_name, the config file, or MLC_MLPERF_SYSTEM_NAME.'}
 
-    parsed_multinode_system_info = {
+    output_info = {
         "submitter_org_names": env.get("MLC_MLPERF_SUBMITTER", "Insert your organization name here"),
         "submitter_contact": env.get("MLC_MLPERF_SUBMITTER_CONTACT", "Insert a contact email here"),
         "submission_id": "",
@@ -707,8 +631,8 @@ def postprocess(i):
         "system_availability_status": env.get("MLC_MLPERF_SUBMISSION_SYSTEM_STATUS", "Insert system availability status here"),
         "system_size": env.get("MLC_MLPERF_SYSTEM_SIZE", system_size),
         "system_node_ensemble_count": len(node_types),
-        "system_node_ensemble_total": sum(entry['number_of_nodes'] for entry in node_types),
-        "serving_framework": serving_framework,
+        "system_node_ensemble_total": sum(e['number_of_nodes'] for e in node_types),
+        "serving_framework": env.get("MLC_MLPERF_SERVING_FRAMEWORK", ""),
         "node_types": node_types,
         "division": env.get("MLC_MLPERF_SUBMISSION_DIVISION", "Insert model division here"),
         "model_id": env.get("MLC_MLPERF_MODEL_ID", "Insert model id here"),
@@ -726,28 +650,21 @@ def postprocess(i):
         "measured_accuracy_score": env.get("MLC_MLPERF_MEASURED_ACCURACY_SCORE", ""),
     }
 
-    benchmark = env.get("MLC_MLPERF_BENCHMARK", "")
-    if benchmark == "inference":
-        output_info = _flatten_for_inference(parsed_multinode_system_info, env)
+    if env.get("MLC_MLPERF_BENCHMARK", "") == "inference":
+        output_info = _flatten_for_inference(output_info, env)
         logger.info("Using flat inference format for system_info.json")
-    else:
-        output_info = parsed_multinode_system_info
 
     try:
         with open(env['MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH'], 'w') as f:
             json.dump(output_info, f, indent=2)
-        logger.info("Successfully compiled the system informtion")
+        logger.info("Successfully compiled the system information")
     except Exception as e:
-        logger.error(
-            f"Exception {e} occured when compiling the system information")
+        logger.error(f"Exception {e} occurred when compiling the system information")
 
-    # Patch run_metadata.yml config_summary with serving config values if
-    # available.
+    # Patch run_metadata (JSON or YAML) with serving config values if available.
     run_md_path = env.get('MLC_MLPERF_RUN_METADATA_PATH', '')
-    serving_cfg_path = os.path.join(
-        env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'], 'serving_config.json')
-    if run_md_path and os.path.exists(
-            serving_cfg_path) and os.path.exists(run_md_path):
+    serving_cfg_path = os.path.join(dir_path, 'serving_config.json')
+    if run_md_path and os.path.exists(serving_cfg_path) and os.path.exists(run_md_path):
         try:
             with open(serving_cfg_path) as f:
                 sc = json.load(f)
@@ -755,8 +672,7 @@ def postprocess(i):
             with open(run_md_path) as f:
                 run_md = json.load(f) if use_json else yaml.safe_load(f)
             for key in ('tensor_parallel', 'pipeline_parallel',
-                        'expert_parallel', 'data_parallel', 'batch',
-                        'disaggregated'):
+                        'expert_parallel', 'data_parallel', 'batch', 'disaggregated'):
                 if sc.get(key) is not None:
                     run_md[key] = sc[key]
             if sc.get('config_summary'):
@@ -765,16 +681,12 @@ def postprocess(i):
                 if use_json:
                     json.dump(run_md, f, indent=2)
                 else:
-                    yaml.dump(run_md, f, default_flow_style=False,
-                              sort_keys=False, allow_unicode=True)
+                    yaml.dump(run_md, f, default_flow_style=False, sort_keys=False, allow_unicode=True)
             logger.info("Patched run_metadata with serving config values")
-            if not env.get('MLC_MLPERF_SERVING_FRAMEWORK') and sc.get(
-                    'framework'):
+            if not env.get('MLC_MLPERF_SERVING_FRAMEWORK') and sc.get('framework'):
                 env['MLC_MLPERF_SERVING_FRAMEWORK'] = sc['framework']
-                logger.info(
-                    "Detected serving framework from log: %s",
-                    sc['framework'])
+                logger.info("Detected serving framework from log: %s", sc['framework'])
         except Exception as e:
-            logger.error(f"Failed to patch run_metadata.yml: {e}")
+            logger.error(f"Failed to patch {run_md_path}: {e}")
 
     return {'return': 0}

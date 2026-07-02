@@ -357,7 +357,8 @@ def extract_value(rule, field_key):
         # the box).
         if value_bytes >= 1024 ** 3:
             return f"{math.ceil(value_bytes / (1024 ** 3))}GiB"
-        return f"{int(value_bytes)}GiB"
+        # Value is already in GiB (e.g. from MLC_ROCM_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB)
+        return f"{math.ceil(value_bytes)}GiB"
 
     if field_key == "host_storage_type" and value == "No disk layout data found":
         return "N/A"
