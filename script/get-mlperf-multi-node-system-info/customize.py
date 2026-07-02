@@ -420,16 +420,20 @@ def _build_system_size_from_nodes(parsed_node_details):
     return _compute_system_size(parsed_node_details)
 
 
-# ── Inference flat-format helpers ─────────────────────────────────────────────
+# ── Inference flat-format helpers ───────────────────────────────────────
 
 # Fields that are node-type metadata, not hardware fields to lift.
-_NODE_METADATA_FIELDS = {"system_node_ensemble_id", "number_of_nodes", "system_node_name"}
+_NODE_METADATA_FIELDS = {
+    "system_node_ensemble_id",
+    "number_of_nodes",
+    "system_node_name"}
 
 # No node-level field renames needed — the checker uses the same names.
 _NODE_FIELD_RENAMES = {}
 
 # Extra fields added when the 'network' variation is active alongside 'inference'.
-# Matches SYSTEM_DESC_REQUIRED_FIELDS_NETWORK_MODE in submission_checker/constants.py.
+# Matches SYSTEM_DESC_REQUIRED_FIELDS_NETWORK_MODE in
+# submission_checker/constants.py.
 _NETWORK_EXTRA_FIELDS = [
     "is_network",
     "network_type",

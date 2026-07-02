@@ -46,7 +46,8 @@ EXTRACT_RULES = {
     },
     "host_processor_interconnect": {
         # No script currently probes CPU-socket interconnect (e.g. UPI/Infinity
-        # Fabric); left optional so it returns "" (manual field) rather than "N/A".
+        # Fabric); left optional so it returns "" (manual field) rather than
+        # "N/A".
         "source": "env",
         "candidates": ["MLC_HOST_CPU_INTERCONNECT"],
         "optional": True,
