@@ -8,8 +8,17 @@ on:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlperf-inference-submission-generation.yml'
-      - '**'
-      - '!**.md'
+      - 'automation/script/**'
+      - 'script/run-mlperf-inference-app/**'
+      - 'script/generate-mlperf-inference-submission/**'
+      - 'script/run-mlperf-inference-submission-checker/**'
+      - 'script/get-mlperf-inference-src/**'
+      - 'script/get-mlperf-inference-results-dir/**'
+      - 'script/get-mlperf-inference-submission-dir/**'
+      - 'script/get-git-repo/**'
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch: {}
   workflow_call:
     inputs:
       inf-branch:
@@ -55,8 +64,8 @@ jobs:
         pip install tabulate
     - name: Pull MLOps repository
       env:
-        PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        PR_HEAD_REF: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         if [ -n "${{ inputs.inf-repo-url }}" ]; then
           if [ -n "${{ inputs.automation-repo }}" ]; then
@@ -76,8 +85,8 @@ jobs:
         git clone -b submission-generation-examples https://github.com/mlcommons/inference.git submission_generation_examples
     - name: Run Submission Generation - round-${{ matrix.round }}${{ matrix.folder_name }} ${{ matrix.action }} ${{ matrix.category }} ${{ matrix.division }} 
       env:
-        PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        PR_HEAD_REF: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         if [ "${{ matrix.folder_name }}" == "closed" ]; then
           description="Test submission - contains closed edge and datacenter"

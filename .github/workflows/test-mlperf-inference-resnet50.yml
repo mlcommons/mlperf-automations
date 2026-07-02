@@ -8,8 +8,29 @@ on:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlperf-inference-resnet50.yml'
-      - '**'
-      - '!**.md'
+      - 'automation/script/**'
+      - 'script/run-mlperf-inference-app/**'
+      - 'script/app-mlperf-inference/**'
+      - 'script/app-mlperf-inference-mlcommons-python/**'
+      - 'script/get-ml-model-resnet50/**'
+      - 'script/get-mlperf-inference-src/**'
+      - 'script/get-mlperf-inference-utils/**'
+      - 'script/get-mlperf-inference-loadgen/**'
+      - 'script/get-mlperf-inference-sut-description/**'
+      - 'script/get-mlperf-inference-results-dir/**'
+      - 'script/benchmark-any-mlperf-inference-implementation/**'
+      - 'script/generate-mlperf-inference-user-conf/**'
+      - 'script/pull-git-repo/**'
+      - 'script/get-git-repo/**'
+      - 'script/get-generic-python-lib/**'
+      - 'script/get-gcc/**'
+      - 'script/get-llvm/**'
+      - 'script/get-generic-sys-util/**'
+      - 'script/get-cache-dir/**'
+      - 'script/detect-sudo/**'
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch: {}
 
 jobs:
   mlc-run-with-results-upload:
@@ -20,7 +41,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: [ "3.13", "3.12" ]
+        python-version: [ "3.13" ]
         backend: [ "onnxruntime", "tf" ]
         implementation: [ "python", "cpp" ]
         exclude:
@@ -30,8 +51,6 @@ jobs:
             backend: tf
           - os: windows-latest
             implementation: cpp
-          - os: windows-latest
-            python-version: 3.13 
   
     steps:
     - uses: actions/checkout@v4
@@ -54,8 +73,8 @@ jobs:
     - name: Pull MLOps repo
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         mlc pull repo "$REPO" --branch="$BRANCH"
 
@@ -119,10 +138,10 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Set up Python 3.12
+    - name: Set up Python 3.13
       uses: actions/setup-python@v3
       with:
-        python-version: "3.12"
+        python-version: "3.13"
     - name: Install mlcflow
       run: |
         pip install mlcflow
@@ -130,8 +149,8 @@ jobs:
     - name: Pull MLOps repo
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         mlc pull repo "$REPO" --branch="$BRANCH"
     - name: Test MLPerf Inference ResNet50 (RHEL Docker)
