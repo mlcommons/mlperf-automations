@@ -56,6 +56,9 @@ def preprocess(i):
     if is_true(env.get('MLC_APPTAINER_BUILD_NOTEST', '')):
         build_opts += ' --notest'
 
+    if is_true(env.get('MLC_APPTAINER_IGNORE_FAKEROOT_CMD', '')):
+        build_opts += ' --ignore-fakeroot-command'
+
     if build_def_file:
         def_file_ref = "${MLC_APPTAINERFILE_WITH_PATH}"
     else:
@@ -63,7 +66,8 @@ def preprocess(i):
 
     output_path = env['MLC_APPTAINER_SIF_PATH']
 
-    CMD = f"apptainer build{build_opts} {output_path} {def_file_ref}"
+    cmd_prefix = "sudo " if is_true(env.get("MLC_APPTAINER_BUILD_WITH_SUDO", "")) else ""
+    CMD = f"{cmd_prefix}apptainer build{build_opts} {output_path} {def_file_ref}"
 
     logger.info('')
     logger.info(f'Apptainer build command:')
