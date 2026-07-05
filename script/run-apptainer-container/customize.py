@@ -17,14 +17,14 @@ def preprocess(i):
             'error': 'Apptainer is not natively supported on Windows. '
                      'Please use WSL2 or a Linux VM.'}
 
-    if 'MLC_APPTAINER_RUN_SCRIPT_TAGS' not in env:
-        env['MLC_APPTAINER_RUN_SCRIPT_TAGS'] = "run,apptainer,container"
-        MLC_RUN_CMD = "mlcr --help"
-    else:
-        MLC_RUN_CMD = "mlcr " + \
-            env['MLC_APPTAINER_RUN_SCRIPT_TAGS'] + ' --quiet'
-
-    env['MLC_APPTAINER_RUN_CMD'] = MLC_RUN_CMD
+    if env.get('MLC_APPTAINER_RUN_CMD', '') == '':
+        if 'MLC_APPTAINER_RUN_SCRIPT_TAGS' not in env:
+            env['MLC_APPTAINER_RUN_SCRIPT_TAGS'] = "run,apptainer,container"
+            MLC_RUN_CMD = "mlcr --help"
+        else:
+            MLC_RUN_CMD = "mlcr " + \
+                env['MLC_APPTAINER_RUN_SCRIPT_TAGS'] + ' --quiet'
+        env['MLC_APPTAINER_RUN_CMD'] = MLC_RUN_CMD
 
     # Compute image naming (like run-docker-container's update_docker_info)
     update_apptainer_info(env)
