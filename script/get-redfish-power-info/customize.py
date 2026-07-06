@@ -7,7 +7,8 @@ def preprocess(i):
 
     python_bin = env.get('MLC_PYTHON_BIN_WITH_PATH', '').strip()
     if not python_bin:
-        return {'return': 1, 'error': 'MLC_PYTHON_BIN_WITH_PATH not set — get,python dependency failed'}
+        return {
+            'return': 1, 'error': 'MLC_PYTHON_BIN_WITH_PATH not set — get,python dependency failed'}
 
     script_path = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
@@ -40,7 +41,8 @@ def preprocess(i):
     else:
         cmd_parts.append('--no-insecure')
 
-    env['MLC_REDFISH_CMD'] = ' '.join(f'"{p}"' if ' ' in p else p for p in cmd_parts)
+    env['MLC_REDFISH_CMD'] = ' '.join(
+        f'"{p}"' if ' ' in p else p for p in cmd_parts)
     logger.info(f'Redfish capture command: {env["MLC_REDFISH_CMD"]}')
 
     return {'return': 0}
