@@ -17,6 +17,7 @@ cache: false
 
 # Environment
 new_env_keys:
+- MLC_OUTDIRNAME
 - MLC_REDFISH_OUTPUT_FILE_PATH
 
 # Input mapping

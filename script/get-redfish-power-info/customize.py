@@ -14,9 +14,12 @@ def preprocess(i):
         'get_redfish_power_info.py'
     )
 
+    # MLC_OUTDIRNAME is set and chdir'd to by the engine before preprocess() runs.
+    # Fall back to cwd for standalone / non-mlcr invocations.
+    outdir = env.get('MLC_OUTDIRNAME', '') or os.getcwd()
     output_file = env.get('MLC_REDFISH_OUTPUT_FILE', 'redfish_capture.yaml')
     if not os.path.isabs(output_file):
-        output_file = os.path.join(os.getcwd(), output_file)
+        output_file = os.path.join(outdir, output_file)
     env['MLC_REDFISH_OUTPUT_FILE'] = output_file
 
     endpoint = env.get('MLC_REDFISH_ENDPOINT', 'http://localhost:8000')
