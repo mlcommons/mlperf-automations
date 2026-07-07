@@ -5,8 +5,27 @@ on:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlperf-inference-mlcommons-cpp-resnet50.yml'
-      - '**'
-      - '!**.md'
+      - 'automation/script/**'
+      - 'script/run-mlperf-inference-app/**'
+      - 'script/app-mlperf-inference/**'
+      - 'script/app-mlperf-inference-mlcommons-cpp/**'
+      - 'script/get-ml-model-resnet50/**'
+      - 'script/get-mlperf-inference-src/**'
+      - 'script/get-mlperf-inference-loadgen/**'
+      - 'script/get-mlperf-inference-sut-description/**'
+      - 'script/get-mlperf-inference-results-dir/**'
+      - 'script/benchmark-any-mlperf-inference-implementation/**'
+      - 'script/generate-mlperf-inference-user-conf/**'
+      - 'script/get-git-repo/**'
+      - 'script/get-generic-python-lib/**'
+      - 'script/get-gcc/**'
+      - 'script/get-llvm/**'
+      - 'script/get-generic-sys-util/**'
+      - 'script/get-cache-dir/**'
+      - 'script/detect-sudo/**'
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch: {}
 
 jobs:     
   run-mlperf-inference-resnet50-cpp:
@@ -37,8 +56,8 @@ jobs:
         pip install mlcflow
     - name: Pull MLOps repository
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}  
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         mlc pull repo "$REPO" --branch="$BRANCH"
         mlcr --quiet --tags=get,sys-utils-mlc
