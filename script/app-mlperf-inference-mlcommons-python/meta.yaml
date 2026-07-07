@@ -168,6 +168,7 @@ deps:
 - tags: get,generic-python-lib,_package.vllm
   names:
   - vllm
+  version_max: "0.6.3"
   enable_if_env:
     MLC_MLPERF_BACKEND:
     - vllm
@@ -921,6 +922,10 @@ variations:
     group: models
     deps:
     - tags: get,generic-python-lib,_package.transformers
+      version_max: "4.46.2"
+    - tags: get,generic-python-lib,_package.tokenizers
+      version_min: "0.20"
+      version_max: "0.20.99"
     - tags: get,generic-python-lib,_package.sentencepiece
     - tags: get,generic-python-lib,_package.accelerate
     - tags: get,generic-python-lib,_package.pybind11
@@ -1136,6 +1141,8 @@ variations:
     - tags: get,generic-python-lib,_package.opencv-python
       names:
       - opencv-python
+      version_max: 4.10.0.82
+      version_max_usable: 4.10.0.82
     - tags: get,generic-python-lib,_package.scipy
       names:
       - scipy

@@ -26,6 +26,7 @@ default_env:
   MLC_RUN_MLPERF_ACCURACY: 'on'
 new_env_keys:
 - MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER
+- MLC_MLPERF_SKIP_COMPLIANCE
 
 # Input mapping
 input_mapping:
@@ -48,6 +49,7 @@ input_mapping:
   results_dir: MLC_MLPERF_INFERENCE_RESULTS_DIR_
   run_checker: MLC_RUN_SUBMISSION_CHECKER
   run_style: MLC_MLPERF_RUN_STYLE
+  skip_compliance: MLC_MLPERF_SKIP_COMPLIANCE
   skip_truncation: MLC_SKIP_TRUNCATE_ACCURACY
   status: MLC_MLPERF_SUBMISSION_SYSTEM_STATUS
   submission_base_dir: MLC_MLPERF_INFERENCE_SUBMISSION_BASE_DIR
