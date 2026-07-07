@@ -168,7 +168,6 @@ deps:
 - tags: get,generic-python-lib,_package.vllm
   names:
   - vllm
-  version: "0.6.3"
   version_max: "0.6.3"
   enable_if_env:
     MLC_MLPERF_BACKEND:
@@ -923,7 +922,6 @@ variations:
     group: models
     deps:
     - tags: get,generic-python-lib,_package.transformers
-      version: "4.46.2"
       version_max: "4.46.2"
     - tags: get,generic-python-lib,_package.tokenizers
       version_min: "0.20"
