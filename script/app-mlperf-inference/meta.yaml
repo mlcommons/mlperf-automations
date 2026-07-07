@@ -2364,7 +2364,6 @@ docker:
   - ${{ MLC_DATASET_WAYMO_PATH }}:${{ MLC_DATASET_WAYMO_PATH }}
   - ${{ MLC_ML_MODEL_POINT_PAINTING_PATH }}:${{ MLC_ML_MODEL_POINT_PAINTING_PATH }}
   - ${{ MLC_ML_MODEL_DPLAB_RESNET50_PATH }}:${{ MLC_ML_MODEL_DPLAB_RESNET50_PATH }}
-  - ${{ MLC_HOST_AUTOMATIONS_REPO_PATH }}:/root/MLC/repos/mlcommons@mlperf-automations
   skip_run_cmd: 'no'
   shm_size: 32gb
   interactive: true
