@@ -36,6 +36,7 @@ _CONFIG_KEY_TO_ENV = {
     "cooling": "MLC_MLPERF_COOLING",
     "container_link": "MLC_MLPERF_CONTAINER_LINK",
     "measured_accuracy_score": "MLC_MLPERF_MEASURED_ACCURACY_SCORE",
+    "system_type_detail": "MLC_MLPERF_SYSTEM_TYPE_DETAIL",
 }
 
 
@@ -427,6 +428,7 @@ _NETWORK_EXTRA_FIELDS = [
 # Matches SYSTEM_DESC_REQUIRED_FIELDS_POWER in submission_checker/constants.py.
 # other_hardware is already in the base flat output.
 _POWER_EXTRA_FIELDS = [
+    "power_management",
     "filesystem",
     "boot_firmware_version",
     "management_firmware_version",
@@ -557,7 +559,7 @@ def _flatten_for_inference(nested_info, env):
         "sw_notes": _hw("sw_notes"),
         "other_hardware": _hw("other_hardware"),
         "cooling": _hw("cooling"),
-        "system_type_detail": "",  # requires manual input
+        "system_type_detail": env.get("MLC_MLPERF_SYSTEM_TYPE_DETAIL", ""),
     }
 
     if is_true(env.get("MLC_MLPERF_NETWORK_VARIATION", False)):

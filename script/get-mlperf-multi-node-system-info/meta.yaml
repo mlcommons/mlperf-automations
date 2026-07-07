@@ -40,7 +40,7 @@ input_mapping:
   output_token_average: MLC_MLPERF_DATASET_OUTPUT_TOKEN_AVERAGE
   skip_ssh_key_file: MLC_SKIP_SSH_KEY_FILE
   ssh_ids: MLC_MULTINODE_SYSTEM_SSH_IDS
-  status: MLC_MLPERF_SUBMISSION_SYSTEM_STATUS
+  system_availability_status: MLC_MLPERF_SUBMISSION_SYSTEM_STATUS
   submitter_contact: MLC_MLPERF_SUBMITTER_CONTACT
   submitter_org_name: MLC_MLPERF_SUBMITTER
   node_config_file: MLC_NODE_CONFIG_FILE
@@ -56,6 +56,7 @@ input_mapping:
   log_path: MLC_MLPERF_SERVING_LOG_PATH
   run_metadata_path: MLC_MLPERF_RUN_METADATA_PATH
   serving_framework_type: MLC_MLPERF_SERVING_FRAMEWORK_TYPE
+  system_type_detail: MLC_MLPERF_SYSTEM_TYPE_DETAIL
 default_env:
   MLC_MLPERF_SERVING_LOG_PATH: /tmp/serving.log
 
