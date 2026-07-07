@@ -40,7 +40,8 @@ def get_gpu_info():
                 gpu_static = parsed["gpu_data"][0]
             else:
                 gpu_static = parsed
-            host_interconnect_result = gpu_static.get("bus", {}).get("pcie_interface_version", "")
+            host_interconnect_result = gpu_static.get(
+                "bus", {}).get("pcie_interface_version", "")
             # Marketing model name, e.g. "AMD Radeon RX 7700S". Strip the
             # trademark/registered glyphs so the submission string stays ASCII.
             gpu_name = (
