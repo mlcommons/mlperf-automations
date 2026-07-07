@@ -582,7 +582,7 @@ variations:
     group: implementation
     default: true
     default_variations:
-      reproducibility: r6.0-dev_default
+      reproducibility: r6.1-dev_default
     add_deps_recursive:
       imagenet-accuracy-script:
         tags: _float32
@@ -1456,7 +1456,6 @@ variations:
       MLC_REGENERATE_MEASURE_FILES: 'yes'
       MLC_MLPERF_INFERENCE_VERSION: '6.0'
   r6.0-dev_default:
-    default: true
     group: reproducibility
     add_deps_recursive:
       nvidia-inference-common-code:
@@ -1472,6 +1471,23 @@ variations:
       MLC_SKIP_SYS_UTILS: 'yes'
       MLC_REGENERATE_MEASURE_FILES: 'yes'
       MLC_MLPERF_INFERENCE_VERSION: '6.0'
+  r6.1-dev_default:
+    default: true
+    group: reproducibility
+    add_deps_recursive:
+      nvidia-inference-common-code:
+        tags: _mlcommons,_v6.1-dev
+      nvidia-inference-server:
+        version: r6.0
+        tags: _mlcommons
+      nvidia-harness:
+        tags: _v6.0
+      pycuda:
+        version_min: '2024.1'
+    default_env:
+      MLC_SKIP_SYS_UTILS: 'yes'
+      MLC_REGENERATE_MEASURE_FILES: 'yes'
+      MLC_MLPERF_INFERENCE_VERSION: '6.1'
   3d-unet_:
     default_env:
       MLC_MLPERF_INFERENCE_TEST_QPS: '0.01'
@@ -2114,6 +2130,34 @@ variations:
         - x86_64
       docker:
         base_image: nvcr.io/nvidia/mlperf/mlperf-inference:mlpinf-v5.0-cuda12.8-pytorch25.01-ubuntu24.04-aarch64-Grace-release
+  nvidia-original,r6.1-dev_default:
+    env:
+      MLC_NVIDIA_MITTEN_FROM_SRC: 'yes'
+    docker:
+      os_version: '24.04'
+      user: ubuntu
+      build_deps:
+      - tags: detect,os
+      image_name: mlperf-inference-nvidia-v6.0-common
+      build_env:
+        ENV: release
+    deps:
+    - names:
+      - numpy
+      tags: get,generic-python-lib,_package.numpy
+      version_max: 1.26.999
+      version_max_usable: 1.26.4
+    update_meta_if_env:
+    - enable_if_env:
+        MLC_HOST_PLATFORM_FLAVOR:
+        - x86_64
+      docker:
+        base_image: nvcr.io/nvidia/mlperf/mlperf-inference:mlpinf-v6.0-cuda12.8-pytorch25.01-ubuntu24.04-x86_64-release
+    - skip_if_env:
+        MLC_HOST_PLATFORM_FLAVOR:
+        - x86_64
+      docker:
+        base_image: nvcr.io/nvidia/mlperf/mlperf-inference:mlpinf-v6.0-cuda12.8-pytorch25.01-ubuntu24.04-aarch64-Grace-release
   power:
     env:
       MLC_MLPERF_POWER: 'yes'
@@ -2320,6 +2364,7 @@ docker:
   - ${{ MLC_DATASET_WAYMO_PATH }}:${{ MLC_DATASET_WAYMO_PATH }}
   - ${{ MLC_ML_MODEL_POINT_PAINTING_PATH }}:${{ MLC_ML_MODEL_POINT_PAINTING_PATH }}
   - ${{ MLC_ML_MODEL_DPLAB_RESNET50_PATH }}:${{ MLC_ML_MODEL_DPLAB_RESNET50_PATH }}
+  - ${{ MLC_HOST_AUTOMATIONS_REPO_PATH }}:/root/MLC/repos/mlcommons@mlperf-automations
   skip_run_cmd: 'no'
   shm_size: 32gb
   interactive: true

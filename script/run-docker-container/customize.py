@@ -244,7 +244,7 @@ def postprocess(i):
         run_opts += " --shm-size={}".format(env['MLC_DOCKER_SHM_SIZE'])
 
     if env.get('MLC_DOCKER_EXTRA_RUN_ARGS', '') != '':
-        run_opts += env['MLC_DOCKER_EXTRA_RUN_ARGS']
+        run_opts += " " + env['MLC_DOCKER_EXTRA_RUN_ARGS']
 
     if is_true(env.get('MLC_DOCKER_USE_GOOGLE_DNS', '')):
         run_opts += ' --dns 8.8.8.8 --dns 8.8.4.4 '
@@ -313,12 +313,28 @@ def postprocess(i):
         existing_container_id = env.get('MLC_DOCKER_CONTAINER_ID', '')
         # Escape single quotes inside run_cmd for bash -c '...' wrapping
         escaped_run_cmd = run_cmd.replace("'", "'\\''")
+
+        # In Podman rootless, only uid 0 in the container maps to the actual
+        # host user running podman. Non-zero UIDs are remapped via subuid,
+        # which breaks writes to host-mounted volumes. Run exec as root and
+        # preserve HOME so mlcr finds repos in the right place.
+        exec_user_opts = ''
+        if env.get('MLC_CONTAINER_TOOL', '') == 'podman':
+            docker_user = env.get('MLC_DOCKER_USER', 'ubuntu')
+            home_dir = '/root' if docker_user == 'root' else f'/home/{docker_user}'
+            exec_user_opts = f'-u 0 -e HOME={home_dir} '
+            if docker_user != 'root':
+                # git refuses to operate on repos owned by a different user.
+                # Mark the automation repo as safe before mlc pull repo runs.
+                safe_dir = f'{home_dir}/MLC/repos/mlcommons@mlperf-automations'
+                escaped_run_cmd = f'git config --global --add safe.directory {safe_dir} && ' + escaped_run_cmd
+
         if existing_container_id:
-            CMD = f"""ID={existing_container_id} && {_get_container_cmd(env)} exec $ID bash -c '""" + \
+            CMD = f"""ID={existing_container_id} && {_get_container_cmd(env)} exec {exec_user_opts}$ID bash -c '""" + \
                 escaped_run_cmd + "'"
         else:
             CONTAINER = f"""{_get_container_cmd(env)} run -dt {run_opts} --rm  {docker_image_repo}/{docker_image_name}:{docker_image_tag} bash"""
-            CMD = f"""ID=`{CONTAINER}` && {_get_container_cmd(env)} exec $ID bash -c '{escaped_run_cmd}'"""
+            CMD = f"""ID=`{CONTAINER}` && {_get_container_cmd(env)} exec {exec_user_opts}$ID bash -c '{escaped_run_cmd}'"""
 
             if is_true(env.get('MLC_KILL_DETACHED_CONTAINER', False)):
                 CMD += f""" && {_get_container_cmd(env)} kill $ID >/dev/null"""

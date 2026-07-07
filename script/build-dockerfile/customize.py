@@ -106,7 +106,7 @@ def preprocess(i):
         try:
             print(
                 f"Copying repository from {mlc_repo_path} to {repo_build_context_path}")
-            shutil.copytree(mlc_repo_path, repo_build_context_path)
+            shutil.copytree(mlc_repo_path, repo_build_context_path, ignore_dangling_symlinks=True)
         except Exception as e:
             return {
                 'return': 1, 'error': f"Failed to copy repository to build context: {str(e)}"}
@@ -269,7 +269,7 @@ def preprocess(i):
     docker_group = get_value(env, config, 'GROUP', 'MLC_DOCKER_GROUP')
 
     if env.get('MLC_CONTAINER_TOOL', '') == 'podman' and env.get(
-            'MLC_DOCKER_USE_DEFAULT_USER', '') == '':
+            'MLC_DOCKER_USE_DEFAULT_USER', '') == '' and not docker_user:
         env['MLC_DOCKER_USE_DEFAULT_USER'] = 'yes'
 
     if docker_user and not is_true(

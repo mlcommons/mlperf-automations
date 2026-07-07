@@ -9,10 +9,11 @@ def preprocess(i):
 
     env = i['env']
     if 'MLC_IMAGENET_PREPROCESSED_PATH' in env:
+        filename_pattern = "*." + env.get('MLC_DATASET_PREPROCESSED_EXTENSION', 'npy')
         files = glob.glob(
             env['MLC_IMAGENET_PREPROCESSED_PATH'] +
             "/**/" +
-            env['MLC_IMAGENET_PREPROCESSED_FILENAME'],
+            filename_pattern,
             recursive=True)
         if files:
             env['MLC_DATASET_PREPROCESSED_PATH'] = env['MLC_IMAGENET_PREPROCESSED_PATH']
