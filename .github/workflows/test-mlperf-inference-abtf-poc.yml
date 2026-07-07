@@ -5,8 +5,25 @@ on:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlperf-inference-abtf-poc.yml'
-      - '**'
-      - '!**.md'
+      - 'automation/script/**'
+      - 'script/run-mlperf-automotive-app/**'
+      - 'script/app-mlperf-automotive/**'
+      - 'script/app-mlperf-automotive-mlcommons-python/**'
+      - 'script/get-mlperf-automotive-src/**'
+      - 'script/get-mlperf-automotive-utils/**'
+      - 'script/get-ml-model-abtf-ssd-pytorch/**'
+      - 'script/get-dataset-cognata-mlcommons/**'
+      - 'script/get-mlperf-inference-sut-description/**'
+      - 'script/get-mlperf-inference-results-dir/**'
+      - 'script/get-git-repo/**'
+      - 'script/get-gcc/**'
+      - 'script/get-llvm/**'
+      - 'script/get-generic-sys-util/**'
+      - 'script/get-cache-dir/**'
+      - 'script/detect-sudo/**'
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch: {}
 
 jobs:
   build:
@@ -48,8 +65,8 @@ jobs:
         pip install tabulate
     - name: Pull MLOps repository
       env:
-        PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        PR_HEAD_REF: ${{ github.event.pull_request.head.ref || github.ref_name }}
       shell: bash
       run: |
         mlc pull repo "$PR_HEAD_REPO" --branch="$PR_HEAD_REF"
@@ -111,8 +128,8 @@ jobs:
     - name: Test MLPerf Inference ABTF POC using ${{ matrix.backend }} on ${{ matrix.os }}
       shell: bash
       env:
-        PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        PR_HEAD_REF: ${{ github.event.pull_request.head.ref || github.ref_name }}
         MATRIX_DOCKER: ${{ matrix.docker }}
         MATRIX_EXTRA_ARGS: ${{ matrix.extra-args }}
       run: |

@@ -5,8 +5,25 @@ on:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlc-script-features.yml'
-      - '**'
-      - '!**.md'
+      - 'automation/script/module.py'
+      - 'automation/script/cache_utils.py'
+      - 'automation/script/docker.py'
+      - 'automation/script/docker_utils.py'
+      - 'automation/script/script_utils.py'
+      - 'automation/script/meta_schema.py'
+      - 'automation/script/apptainer.py'
+      - 'automation/script/experiment.py'
+      - 'automation/script/remote_run.py'
+      - 'automation/script/lint.py'
+      - 'automation/script/doc.py'
+      - 'script/detect-os/**'
+      - 'script/detect-cpu/**'
+      - 'script/get-generic-python-lib/**'
+      - 'script/run-docker-container/**'
+      - 'script/download-file/**'
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch: {}
 
 permissions:
   contents: read
@@ -19,7 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -35,8 +52,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -58,13 +75,13 @@ jobs:
         mlcr get,wkhtmltopdf --quiet
 
     - name: Test versions
-      if: runner.os == 'Linux' && matrix.python-version == '3.8'
+      if: runner.os == 'Linux'
       run: |
-        mlcr get,generic-python-lib,_package.scipy --version=1.9.3 --quiet
+        mlcr get,generic-python-lib,_package.scipy --version=1.11.4 --quiet
         test $? -eq 0 || exit $?
-        mlcr get,generic-python-lib,_package.scipy --version=1.9.2 --quiet
+        mlcr get,generic-python-lib,_package.scipy --version=1.11.3 --quiet
         test $? -eq 0 || exit $?
-        mlc find cache --tags=get,generic-python-lib,_package.scipy,version-1.9.2
+        mlc find cache --tags=get,generic-python-lib,_package.scipy,version-1.11.3
         test $? -eq 0 || exit $?
        
 
@@ -78,7 +95,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
 
     steps:
     - uses: actions/checkout@v4
@@ -89,8 +106,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -239,7 +256,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -255,8 +272,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -271,7 +288,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -287,8 +304,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -396,7 +413,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -412,8 +429,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -467,7 +484,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -483,8 +500,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -508,7 +525,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -524,8 +541,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -575,7 +592,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.13", "3.12"]
+        python-version: ["3.13"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -591,8 +608,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -620,7 +637,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -636,8 +653,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -722,7 +739,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -738,8 +755,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
@@ -790,7 +807,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.8"]
+        python-version: ["3.12"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
 
     steps:
@@ -806,8 +823,8 @@ jobs:
     - name: Pull MLOps repository
       shell: bash
       env:
-        REPO: ${{ github.event.pull_request.head.repo.html_url }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
+        REPO: ${{ github.event.pull_request.head.repo.html_url || format('{0}/{1}', github.server_url, github.repository) }}
+        BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         pip install mlcflow
         mlc pull repo "$REPO" --branch="$BRANCH"
