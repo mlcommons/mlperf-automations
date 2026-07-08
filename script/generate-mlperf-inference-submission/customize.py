@@ -102,7 +102,8 @@ def is_endpoints_run(result_scenario_path):
     return os.path.exists(os.path.join(perf_run_dir, "config.yaml"))
 
 
-def get_endpoints_result_string(model, scenario, result_scenario_path, sub_res):
+def get_endpoints_result_string(
+        model, scenario, result_scenario_path, sub_res):
     """Build a result summary string for endpoint harness runs."""
     result = {}
     perf_run_dir = os.path.join(result_scenario_path, "performance", "run_1")
@@ -124,7 +125,8 @@ def get_endpoints_result_string(model, scenario, result_scenario_path, sub_res):
             score = info.get("score", "N/A")
             result_string += f"`{dataset}`: `{score}`\n"
         scores = [str(info.get("score", "N/A")) for info in acc_data.values()]
-        result['accuracy'] = scores[0] if len(scores) == 1 else "(" + ", ".join(scores) + ")"
+        result['accuracy'] = scores[0] if len(
+            scores) == 1 else "(" + ", ".join(scores) + ")"
     return result_string, result
 
 
@@ -144,7 +146,9 @@ def generate_submission(env, state, inp, submission_division, logger):
     submission_checker_dir = os.path.join(mlperf_path, "tools", "submission")
     # Remove any stale submission_checker.py that would shadow the
     # submission_checker package directory in newer inference versions
-    stale_checker = os.path.join(submission_checker_dir, "submission_checker.py")
+    stale_checker = os.path.join(
+        submission_checker_dir,
+        "submission_checker.py")
     if os.path.isfile(stale_checker) and os.path.isdir(
             os.path.join(submission_checker_dir, "submission_checker")):
         os.remove(stale_checker)
@@ -466,13 +470,15 @@ def generate_submission(env, state, inp, submission_division, logger):
                 power_run = False
 
                 # Determine the performance run directory and whether this is an endpoints run.
-                # Endpoints runs have run_metadata.json instead of mlperf_log_*.txt files.
+                # Endpoints runs have run_metadata.json instead of
+                # mlperf_log_*.txt files.
                 perf_run_dir = os.path.join(
                     result_scenario_path, "performance", "run_1")
                 endpoints_run = is_endpoints_run(result_scenario_path)
 
                 if endpoints_run:
-                    if not os.path.exists(os.path.join(perf_run_dir, "run_metadata.json")):
+                    if not os.path.exists(os.path.join(
+                            perf_run_dir, "run_metadata.json")):
                         logger.warning(
                             f"""Missing run_metadata.json in {perf_run_dir}. Skipping directory: {result_scenario_path}""")
                         continue
@@ -751,7 +757,9 @@ def generate_submission(env, state, inp, submission_division, logger):
                             for fname in ENDPOINTS_FILES:
                                 src = os.path.join(result_mode_path, fname)
                                 if os.path.exists(src):
-                                    shutil.copy(src, os.path.join(submission_results_path, fname))
+                                    shutil.copy(
+                                        src, os.path.join(
+                                            submission_results_path, fname))
                     else:
                         if mode == "accuracy":
                             if os.path.exists(os.path.join(
