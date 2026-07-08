@@ -51,23 +51,27 @@ def main():
     service.set_graph(infra)
 
     annotation = Annotation()
-    hardware_ensemble_attrs = sysinfo.get("hardware_ensemble", {})
-    processor_attrs = hardware_ensemble_attrs.get("processor", {})
-    accelerator_attrs = hardware_ensemble_attrs.get("accelerator", {})
-    
+    # The single-node sysinfo JSON is now a flat dict of prefixed keys
+    # (previously nested under hardware_ensemble.{processor,accelerator}).
+    # Group by prefix to recover the processor / accelerator attribute sets.
+    processor_attrs = {k: v for k, v in sysinfo.items()
+                       if k.startswith("host_processor")}
+    accelerator_attrs = {k: v for k, v in sysinfo.items()
+                         if k.startswith("accelerator")}
+
     cpu_response = service.query_graph(build_type_query("cpu"))
     xpu_response = service.query_graph(build_type_query("xpu"))
 
     for match in cpu_response.node_matches:
         node = annotation.nodes.add(name=match.id)
         for key, value in processor_attrs.items():
-            node.attributes.add(attribute=key, value=value)
+            node.attributes.add(attribute=key, value=str(value))
     
     for match in xpu_response.node_matches:
         if accelerator_attrs.get("accelerator_model_name", "") in match.id:
             node = annotation.nodes.add(name=match.id)
             for key, value in accelerator_attrs.items():
-                node.attributes.add(attribute=key, value=value)
+                node.attributes.add(attribute=key, value=str(value))
 
     service.annotate_graph(annotation)
     get_graph_req = GraphRequest()
