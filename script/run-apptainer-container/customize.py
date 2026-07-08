@@ -92,14 +92,17 @@ def postprocess(i):
     if is_true(env.get('MLC_APPTAINER_NO_HOME', '')):
         run_opts += ' --no-home'
 
-    # Auto-enable fakeroot when overlay is specified (required for writable overlay mounts)
-    if env.get('MLC_APPTAINER_OVERLAY', '') and not is_true(env.get('MLC_APPTAINER_FAKEROOT', '')):
+    # Auto-enable fakeroot when overlay is specified (required for writable
+    # overlay mounts)
+    if env.get('MLC_APPTAINER_OVERLAY', '') and not is_true(
+            env.get('MLC_APPTAINER_FAKEROOT', '')):
         env['MLC_APPTAINER_FAKEROOT'] = 'yes'
 
     if is_true(env.get('MLC_APPTAINER_FAKEROOT', '')):
         run_opts += ' --fakeroot'
         # With fakeroot, HOME becomes /root inside the container.
-        # Ensure MLC_REPOS points to a writable location so mlcr can initialize.
+        # Ensure MLC_REPOS points to a writable location so mlcr can
+        # initialize.
         run_opts += ' --env MLC_REPOS=/tmp/mlc-repos'
 
     # Home directory

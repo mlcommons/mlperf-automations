@@ -64,7 +64,8 @@ def apptainerfile(self_module, input_params):
     if not apptainer_settings.get('run', True) and not input_params.get(
             'apptainer_run_override', False):
         logger.info("Apptainer 'run' is set to False in meta.yaml")
-        return {'return': 0, 'warning': 'Apptainer run is set to false in script meta'}
+        return {'return': 0,
+                'warning': 'Apptainer run is set to false in script meta'}
 
     # Handle build dependencies
     show_time = input_params.get('show_time', False)
@@ -298,7 +299,8 @@ def apptainer_run(self_module, i):
     if not apptainer_settings.get('run', True) and not i.get(
             'apptainer_run_override', False):
         logger.info("apptainer.run set to False in meta.yaml")
-        return {'return': 0, 'warning': 'Apptainer run is set to false in script meta'}
+        return {'return': 0,
+                'warning': 'Apptainer run is set to false in script meta'}
 
     # Regenerate definition file if required
     if regenerate_def_file:
@@ -331,7 +333,8 @@ def apptainer_run(self_module, i):
                     for key in apptainer_input_mapping if key in i})
 
     # Handle bind mounts from environment variables
-    bind_mounts = process_apptainer_mounts(mounts, env, apptainer_settings, run_state)
+    bind_mounts = process_apptainer_mounts(
+        mounts, env, apptainer_settings, run_state)
     container_env_string = bind_mounts.get('container_env_string', '')
 
     # Forward input-mapped env vars to the container's mlcr command
@@ -344,7 +347,8 @@ def apptainer_run(self_module, i):
     # Forward framework-level env keys (MLC_OUTDIRNAME, MLC_INPUT, MLC_OUTPUT, etc.)
     # These are skipped in regenerate_script_cmd (docker_utils.py) and must be
     # passed as --env.KEY=val so host->container path fixes are applied.
-    framework_input_mapping = getattr(self_module, 'input_flags_converted_to_env', {})
+    framework_input_mapping = getattr(
+        self_module, 'input_flags_converted_to_env', {})
     for input_key in framework_input_mapping:
         env_key = 'MLC_' + input_key.upper().replace('-', '_').replace(' ', '_')
         val = env.get(env_key, '')
@@ -382,14 +386,16 @@ def apptainer_run(self_module, i):
     if apptainer_inputs.get('sudo'):
         build_image_extras['sudo'] = apptainer_inputs['sudo']
     if build_image_extras:
-        mlc_apptainer_input['add_deps_recursive']['build-apptainer-image'].update(build_image_extras)
+        mlc_apptainer_input['add_deps_recursive']['build-apptainer-image'].update(
+            build_image_extras)
     # Wire resolved docker.mounts to apptainer bind mounts
     resolved_mounts = bind_mounts.get('mounts', [])
     if resolved_mounts:
         mlc_apptainer_input['bind'] = resolved_mounts
 
     # Ensure apptainer_inputs bind is a list (CLI may pass it as a string)
-    if 'bind' in apptainer_inputs and isinstance(apptainer_inputs['bind'], str):
+    if 'bind' in apptainer_inputs and isinstance(
+            apptainer_inputs['bind'], str):
         apptainer_inputs['bind'] = [apptainer_inputs['bind']]
 
     utils.merge_dicts({'dict1': mlc_apptainer_input,
@@ -516,7 +522,8 @@ def process_apptainer_mounts(mounts, env, apptainer_settings, run_state):
         placeholders = re.findall(r'\${{ (.*?) }}', mount)
         for placeholder in placeholders:
             if placeholder in env and isinstance(env[placeholder], str):
-                mount = mount.replace(f"${{{{ {placeholder} }}}}", env[placeholder])
+                mount = mount.replace(
+                    f"${{{{ {placeholder} }}}}", env[placeholder])
             else:
                 mounts[index] = None
                 break
