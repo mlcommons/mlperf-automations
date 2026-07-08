@@ -341,6 +341,16 @@ def apptainer_run(self_module, i):
         if val and isinstance(val, str):
             container_env_string += f' --env.{env_key}={val}'
 
+    # Forward framework-level env keys (MLC_OUTDIRNAME, MLC_INPUT, MLC_OUTPUT, etc.)
+    # These are skipped in regenerate_script_cmd (docker_utils.py) and must be
+    # passed as --env.KEY=val so host->container path fixes are applied.
+    framework_input_mapping = getattr(self_module, 'input_flags_converted_to_env', {})
+    for input_key in framework_input_mapping:
+        env_key = 'MLC_' + input_key.upper().replace('-', '_').replace(' ', '_')
+        val = env.get(env_key, '')
+        if val and isinstance(val, str):
+            container_env_string += f' --env.{env_key}={val}'
+
     # Forward proxy env vars (matching Docker behavior)
     for proxy_key in self_module.host_env_keys:
         proxy_value = os.environ.get(proxy_key)
