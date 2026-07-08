@@ -1,0 +1,48 @@
+alias: get-lstopo
+uid: b8e4d0c29f5a73fb
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+tags:
+  - get
+  - lstopo
+
+cache: true
+can_force_cache: true
+
+category: lstopo topology automation
+
+new_env_keys:
+- MLC_LSTOPO_XML_FILE_PATH
+
+# Overridable hwloc Windows prebuilt version
+default_env:
+  MLC_HWLOC_WIN_VERSION: '2.13.0'
+  MLC_HWLOC_WIN_MAJOR_MINOR: '2.13'
+
+clean_files:
+- topo.xml
+- tmp-run-env.out
+
+deps:
+- tags: detect,os
+- enable_if_env:
+    MLC_HOST_OS_TYPE:
+    - linux
+    - darwin
+  tags: get,generic-sys-util,_hwloc
+- enable_if_env:
+    MLC_HOST_OS_TYPE:
+    - windows
+  names:
+  - hwloc-win-download
+  tags: download-and-extract,file
+  force_cache: true
+  env:
+    MLC_DAE_URL: https://download.open-mpi.org/release/hwloc/v<<<MLC_HWLOC_WIN_MAJOR_MINOR>>>/hwloc-win64-build-<<<MLC_HWLOC_WIN_VERSION>>>.zip
+    MLC_DAE_EXTRACT_DOWNLOADED: 'yes'
+    MLC_EXTRACT_FINAL_ENV_NAME: MLC_HWLOC_WIN_PATH
+    MLC_EXTRACT_USE_SUBDIR_PATH: 'yes'
+  update_tags_from_env_with_prefix:
+    _url.:
+    - MLC_DAE_URL

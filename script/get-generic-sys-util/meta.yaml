@@ -320,6 +320,19 @@ variations:
         brew: glog
         dnf: glog-devel
         yum: glog-devel
+  hwloc:
+    env:
+      MLC_SYS_UTIL_NAME: hwloc
+      MLC_SYS_UTIL_VERSION_CMD: lstopo --version
+      MLC_SYS_UTIL_VERSION_RE: lstopo ([\d.]+)
+    new_env_keys:
+    - MLC_HWLOC_VERSION
+    state:
+      hwloc:
+        apt: hwloc
+        brew: hwloc
+        dnf: hwloc
+        yum: hwloc
   ipmitool:
     env:
       MLC_SYS_UTIL_NAME: ipmitool
@@ -872,7 +885,6 @@ variations:
   psmisc:
     env:
       MLC_SYS_UTIL_NAME: psmisc
-      MLC_SYS_UTIL_VERSION_CMD_OVERRIDE: which pstree
     new_env_keys:
     - MLC_PSMISC_VERSION
     state:
