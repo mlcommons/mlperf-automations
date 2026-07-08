@@ -87,22 +87,24 @@ def model_in_valid_models(model, mlperf_version,
         return (True, model)
 
 
-# Endpoint harness produces results_summary.json; submission checker expects result_summary.json.
-# Copy both so the tree has the canonical checker-expected name while preserving the original.
-# results.json and config.yaml are also required by the checker's EndpointsParser.
+# Files the checker's EndpointsParser expects in the performance/run_1 directory.
 ENDPOINTS_PERF_FILES = ["run_metadata.json", "results_summary.json", "results.json", "config.yaml"]
-ENDPOINTS_PERF_RENAME = {"results_summary.json": "result_summary.json"}
 
 # Files the checker's EndpointsParser expects in the accuracy run directory.
-ENDPOINTS_ACC_FILES = ["result_summary.json", "results.json", "config.yaml"]
+ENDPOINTS_ACC_FILES = ["results_summary.json", "results.json", "config.yaml"]
 
 
 def is_endpoints_run(result_scenario_path):
-    """Return True if this scenario folder contains endpoint harness output (no mlperf_log files)."""
+    """Return True if this scenario folder contains endpoint harness output.
+
+    Detected by the presence of config.yaml, results_summary.json, and results.json
+    in performance/run_1 — all three are written by the endpoints harness and
+    absent from standard loadgen runs.
+    """
     perf_run_dir = os.path.join(result_scenario_path, "performance", "run_1")
-    return (
-        os.path.exists(os.path.join(perf_run_dir, "run_metadata.json")) and
-        not os.path.exists(os.path.join(perf_run_dir, "mlperf_log_summary.txt"))
+    return all(
+        os.path.exists(os.path.join(perf_run_dir, f))
+        for f in ("config.yaml", "results_summary.json", "results.json")
     )
 
 
