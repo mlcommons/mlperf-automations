@@ -99,10 +99,8 @@ def postprocess(i):
     if is_true(env.get('MLC_APPTAINER_FAKEROOT', '')):
         run_opts += ' --fakeroot'
         # With fakeroot, HOME becomes /root inside the container.
-        # Ensure MLC_REPOS points to a writable location so mlcr can
-        # initialize.
-        if env.get('MLC_APPTAINER_OVERLAY', ''):
-            run_opts += ' --env MLC_REPOS=/tmp/mlc-repos'
+        # Ensure MLC_REPOS points to a writable location so mlcr can initialize.
+        run_opts += ' --env MLC_REPOS=/tmp/mlc-repos'
 
     # Home directory
     if env.get('MLC_APPTAINER_HOME', '') != '':
