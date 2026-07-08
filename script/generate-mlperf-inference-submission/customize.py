@@ -89,7 +89,11 @@ def model_in_valid_models(model, mlperf_version,
 
 # Files copied from the endpoints harness output for both performance and accuracy modes.
 # run_metadata.json is optional and copied only if present.
-ENDPOINTS_FILES = ["results_summary.json", "results.json", "config.yaml", "run_metadata.json"]
+ENDPOINTS_FILES = [
+    "results_summary.json",
+    "results.json",
+    "config.yaml",
+    "run_metadata.json"]
 
 
 def is_endpoints_run(result_scenario_path):
