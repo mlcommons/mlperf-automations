@@ -87,25 +87,19 @@ def model_in_valid_models(model, mlperf_version,
         return (True, model)
 
 
-# Files the checker's EndpointsParser expects in the performance/run_1 directory.
-ENDPOINTS_PERF_FILES = ["run_metadata.json", "results_summary.json", "results.json", "config.yaml"]
-
-# Files the checker's EndpointsParser expects in the accuracy run directory.
-ENDPOINTS_ACC_FILES = ["results_summary.json", "results.json", "config.yaml"]
+# Files copied from the endpoints harness output for both performance and accuracy modes.
+# run_metadata.json is optional and copied only if present.
+ENDPOINTS_FILES = ["results_summary.json", "results.json", "config.yaml", "run_metadata.json"]
 
 
 def is_endpoints_run(result_scenario_path):
     """Return True if this scenario folder contains endpoint harness output.
 
-    Detected by the presence of config.yaml, results_summary.json, and results.json
-    in performance/run_1 — all three are written by the endpoints harness and
-    absent from standard loadgen runs.
+    config.yaml is written by the endpoints harness and absent from standard
+    loadgen runs, making it a reliable discriminator.
     """
     perf_run_dir = os.path.join(result_scenario_path, "performance", "run_1")
-    return all(
-        os.path.exists(os.path.join(perf_run_dir, f))
-        for f in ("config.yaml", "results_summary.json", "results.json")
-    )
+    return os.path.exists(os.path.join(perf_run_dir, "config.yaml"))
 
 
 def get_endpoints_result_string(model, scenario, result_scenario_path, sub_res):
@@ -753,17 +747,8 @@ def generate_submission(env, state, inp, submission_division, logger):
 
                     if endpoints_run and not mode.startswith("TEST"):
                         # Copy endpoint-specific files for this mode
-                        if mode == "performance":
-                            for fname in ENDPOINTS_PERF_FILES:
-                                src = os.path.join(result_mode_path, fname)
-                                if os.path.exists(src):
-                                    shutil.copy(src, os.path.join(submission_results_path, fname))
-                                    # Also write under the checker-expected name if different
-                                    renamed = ENDPOINTS_PERF_RENAME.get(fname)
-                                    if renamed:
-                                        shutil.copy(src, os.path.join(submission_results_path, renamed))
-                        elif mode == "accuracy":
-                            for fname in ENDPOINTS_ACC_FILES:
+                        if mode in ("performance", "accuracy"):
+                            for fname in ENDPOINTS_FILES:
                                 src = os.path.join(result_mode_path, fname)
                                 if os.path.exists(src):
                                     shutil.copy(src, os.path.join(submission_results_path, fname))
