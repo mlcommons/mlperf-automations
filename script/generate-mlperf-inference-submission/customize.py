@@ -474,17 +474,20 @@ def generate_submission(env, state, inp, submission_division, logger):
                 power_run = False
 
                 # Determine the performance run directory and whether this is an endpoints run.
-                # Endpoints runs have run_metadata.json instead of
-                # mlperf_log_*.txt files.
+                # Endpoints runs have results_summary.json and results.json
+                # instead of mlperf_log_*.txt files.
                 perf_run_dir = os.path.join(
                     result_scenario_path, "performance", "run_1")
                 endpoints_run = is_endpoints_run(result_scenario_path)
 
                 if endpoints_run:
-                    if not os.path.exists(os.path.join(
-                            perf_run_dir, "run_metadata.json")):
+                    missing = [
+                        f for f in ("results_summary.json", "results.json")
+                        if not os.path.exists(os.path.join(perf_run_dir, f))
+                    ]
+                    if missing:
                         logger.warning(
-                            f"""Missing run_metadata.json in {perf_run_dir}. Skipping directory: {result_scenario_path}""")
+                            f"""Missing {missing} in {perf_run_dir}. Skipping directory: {result_scenario_path}""")
                         continue
                 else:
                     # Standard inference: check for mlperf_log files
