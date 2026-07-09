@@ -4,8 +4,10 @@ automation_alias: script
 automation_uid: 5b4e0237da074764
 
 # Metadata
+category: AI/ML models
 tags:
 - get-ml-model-gpt-oss
+- llm
 
 # Cache
 cache: true
@@ -13,6 +15,8 @@ cache: true
 # Environment
 new_env_keys:
 - MLC_ML_MODEL_GPT_OSS_PATH
+- MLC_ML_MODEL_GPT_OSS_120B_PATH
+- MLC_ML_MODEL_GPT_OSS_20B_PATH
 - MLC_ML_MODEL_FILE_WITH_PATH
 
 # Input mapping
@@ -109,6 +113,11 @@ variations:
       gpt-oss-model-dae:
         env:
           MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/gpt-oss-model.uri
+  r2-downloader,mlc,20b:
+    adr:
+      gpt-oss-model-dae:
+        env:
+          MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/gpt-oss-20B.uri
 
 # Output / debugging
 print_env_at_the_end:

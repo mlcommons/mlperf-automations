@@ -1,0 +1,104 @@
+alias: get-ml-model-colbertv2
+uid: b2c3d4e5f6789012
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: AI/ML models
+tags:
+- get-ml-model-colbertv2
+- get
+- ml-model
+- colbertv2
+- reranker
+- retrieval
+
+# Cache
+cache: true
+
+# Environment
+new_env_keys:
+- MLC_ML_MODEL_COLBERTV2_PATH
+- MLC_ML_MODEL_FILE_WITH_PATH
+
+# Input mapping
+input_mapping:
+  checkpoint: MLC_ML_MODEL_COLBERTV2_PATH
+
+# Dependencies
+prehook_deps:
+- enable_if_env:
+    MLC_TMP_REQUIRE_DOWNLOAD:
+    - 'yes'
+    MLC_DOWNLOAD_SRC:
+    - huggingface
+  env: {}
+  extra_cache_tags: colbertv2
+  force_env_keys:
+  - MLC_GIT_CHECKOUT_FOLDER
+  names:
+  - hf-zoo
+  tags: get,ml-model,huggingface,zoo,_clone-repo
+
+# Variations
+variations:
+  huggingface:
+    group: download-src
+    env:
+      MLC_DOWNLOAD_SRC: huggingface
+  mlc:
+    default: true
+    env:
+      MLC_DOWNLOAD_SRC: mlcommons
+    group: download-src
+    prehook_deps:
+    - enable_if_env:
+        MLC_TMP_REQUIRE_DOWNLOAD:
+        - 'yes'
+      env:
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_ML_MODEL_COLBERTV2_PATH
+        MLC_EXTRACT_FINAL_ENV_NAME: MLC_ML_MODEL_COLBERTV2_PATH
+      extra_cache_tags: ml,model,colbertv2
+      force_cache: true
+      force_env_keys:
+      - MLC_OUTDIRNAME
+      names:
+      - colbertv2-model-dae
+      tags: download-and-extract
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_DOWNLOAD_URL
+  r2-downloader:
+    adr:
+      colbertv2-model-dae:
+        tags: _r2-downloader
+        env:
+          MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/colbert-ir_colbertv2.0.uri
+    default: true
+    group: download-tool
+  colbert-ir/colbertv2.0:
+    adr:
+      hf-zoo:
+        tags: _model-stub.colbert-ir/colbertv2.0
+    env:
+      MLC_GIT_CHECKOUT_FOLDER: colbertv2.0
+      MLC_MODEL_ZOO_ENV_KEY: COLBERTV2
+    group: huggingface-stub
+    default: true
+  dry-run:
+    env:
+      MLC_DOWNLOAD_MODE: dry
+    group: run-mode
+  dry-run,r2-downloader:
+    env:
+      MLC_DOWNLOAD_EXTRA_OPTIONS: -x
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_ML_MODEL_COLBERTV2_PATH: ColBERTv2 reranker model path
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - r2-downloader,mlc,dry-run
