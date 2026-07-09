@@ -142,7 +142,10 @@ variations:
       MLC_TMP_MODEL_ADDITIONAL_NAME: ''
   pytorch,fp32,weight_sharded,r2-downloader:
     env:
-      MLC_PACKAGE_URL: https://inference.mlcommons-storage.org/metadata/dlrm-v2-model-weights.uri
+      MLC_DAE_EXTRACT_DOWNLOADED: 'yes'
+      MLC_DOWNLOAD_FILENAME: download
+      MLC_EXTRACT_UNZIP: 'yes'
+      MLC_PACKAGE_URL: https://cloud.mlcommons.org/index.php/s/XzfSeLgW8FYfR3S/download
   pytorch,fp32,weight_sharded,rclone:
     env:
       MLC_PACKAGE_URL: mlc-inference:mlcommons-inference-wg-public/model_weights
