@@ -26,6 +26,7 @@ new_state_keys:
 deps:
 - inherit_variation_tags: true
   reuse_version: true
+  skip_add_deps_recursive: true
   tags: get,python,-virtual
 post_deps:
 - names:
