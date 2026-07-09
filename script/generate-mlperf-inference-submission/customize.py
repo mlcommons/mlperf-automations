@@ -125,10 +125,11 @@ def get_endpoints_result_string(
         with open(acc_path) as f:
             acc_data = json.load(f)
         result_string += "\n### Accuracy Results (Endpoints)\n"
-        for dataset, info in acc_data.items():
+        score_data = acc_data.get("accuracy_scores", acc_data)
+        for dataset, info in score_data.items():
             score = info.get("score", "N/A")
             result_string += f"`{dataset}`: `{score}`\n"
-        scores = [str(info.get("score", "N/A")) for info in acc_data.values()]
+        scores = [str(info.get("score", "N/A")) for info in score_data.values()]
         result['accuracy'] = scores[0] if len(
             scores) == 1 else "(" + ", ".join(scores) + ")"
     return result_string, result
