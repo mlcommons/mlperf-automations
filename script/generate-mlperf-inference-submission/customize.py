@@ -129,7 +129,8 @@ def get_endpoints_result_string(
         for dataset, info in score_data.items():
             score = info.get("score", "N/A")
             result_string += f"`{dataset}`: `{score}`\n"
-        scores = [str(info.get("score", "N/A")) for info in score_data.values()]
+        scores = [str(info.get("score", "N/A"))
+                  for info in score_data.values()]
         result['accuracy'] = scores[0] if len(
             scores) == 1 else "(" + ", ".join(scores) + ")"
     return result_string, result
