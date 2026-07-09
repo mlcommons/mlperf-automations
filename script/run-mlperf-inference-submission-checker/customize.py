@@ -156,10 +156,19 @@ def preprocess(i):
 
     x_version = ' --version ' + version + ' ' if version != '' else ''
 
-    CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + ' ' + q + submission_checker_file + q + ' --input ' + q + submission_dir + q + \
-        x_submitter + \
-        x_version + \
-        skip_compliance + extra_map + power_check + extra_args
+    if is_true(env.get('MLC_MLPERF_MODULARISED_INFERENCE_SUBMISSION_CHECKER', '')):
+        submission_tools_dir = os.path.join(
+            env['MLC_MLPERF_INFERENCE_SOURCE'], "tools", "submission")
+        module_name = os.path.relpath(
+            submission_checker_file, submission_tools_dir).replace(os.sep, '.')[:-3]
+        CMD = 'cd ' + q + submission_tools_dir + q + ' && ' + \
+            env['MLC_PYTHON_BIN_WITH_PATH'] + ' -m ' + module_name + \
+            ' --input ' + q + submission_dir + q + \
+            x_submitter + x_version + skip_compliance + extra_map + power_check + extra_args
+    else:
+        CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + ' ' + q + submission_checker_file + q + \
+            ' --input ' + q + submission_dir + q + \
+            x_submitter + x_version + skip_compliance + extra_map + power_check + extra_args
 
     x_version = ' --version ' + version[1:] + ' ' if version != '' else ''
 
