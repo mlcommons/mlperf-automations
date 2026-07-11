@@ -345,6 +345,9 @@ versions: {}
 # Docker / container
 docker:
   skip_run_cmd: true
+  default_env:
+    MLC_LLVM_SRC_REPO_PATH: /skip-during-build
+  extra_sys_deps: "apt-get install -y cmake ninja-build lld"
   pre_run_cmds:
   - mlc pull repo
   mounts:
