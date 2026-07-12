@@ -21,6 +21,7 @@ INSTALL_DIR="${CUR_DIR}/install"
 
 echo "******************************************************"
 cd src
+export TAR_OPTIONS="--no-same-owner"
 ./contrib/download_prerequisites
 cd ../build
 
