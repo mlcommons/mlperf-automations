@@ -87,7 +87,7 @@ def preprocess(i):
                     repo_name = match.group(5)
                 mlc_mlops_repo = f"{repo_owner}@{repo_name}"
         else:
-            mlc_mlops_repo = "mlcommons@mlperf-automations"
+            mlc_mlops_repo = "amd@mlperf-automations"
 
     mlc_mlops_repo_branch_string = f" --branch={env.get('MLC_MLOPS_REPO_BRANCH', 'dev')}"
 
