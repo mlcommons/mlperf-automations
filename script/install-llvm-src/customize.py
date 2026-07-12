@@ -27,7 +27,7 @@ def preprocess(i):
         cmake_options += " -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF "
 
     extra_cmake_options = cmake_options + \
-        env.get('MLC_LLVM_EXTRA_CMAKE_OPTIONS', '')
+        env.get('MLC_LLVM_EXTRA_CMAKE_OPTIONS', '').replace('@@@', ' ')
 
     if env.get('MLC_LLVM_INSTALLED_PATH', '') != '' and os.path.exists(
             env.get('MLC_LLVM_INSTALLED_PATH')):
