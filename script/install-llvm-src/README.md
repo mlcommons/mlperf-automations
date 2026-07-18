@@ -44,9 +44,9 @@ mlcr install,src,llvm,from.src,src-llvm
 | `--extra_options` |  |  | `` |
 | `--per_target_runtime_dir` |  |  | `` |
 | `--pull_changes` |  |  | `` |
+| `--src_path` |  |  | `` |
 | `--target_triple` |  |  | `` |
 | `--targets` |  |  | `` |
-| `--src_path` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |

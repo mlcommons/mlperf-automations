@@ -18,6 +18,8 @@ tags:
 deps:
 - tags: detect-os
 - tags: get,sys-util,generic,_rsync
+  env:
+    MLC_QUIET: true
   names:
   - rsync
   skip_if_env:

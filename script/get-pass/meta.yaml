@@ -1,0 +1,75 @@
+alias: get-pass
+uid: 49c29f1d71594f1b
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: DevOps automation
+tags:
+- get
+- pass
+- secret
+- token
+- credential
+
+# Environment
+default_env:
+  MLC_PASS_CREDENTIALS_FILE: ~/.mlc_credentials
+new_env_keys:
+- <<<MLC_PASS_ENV_KEY>>>
+new_state_keys: []
+
+# Input mapping
+input_mapping:
+  env_key: MLC_PASS_ENV_KEY
+  secret_name: MLC_PASS_SECRET_NAME
+  credentials_file: MLC_PASS_CREDENTIALS_FILE
+  source: MLC_PASS_SOURCE
+
+# Input descriptions
+input_description:
+  env_key: "Environment variable name to export the secret value into (e.g., MLC_UPLOAD_API_TOKEN)"
+  secret_name: "Name/key of the secret to retrieve (used as key in credentials file or pass store path)"
+  credentials_file: "Path to the credentials file (default: ~/.mlc_credentials)"
+  source: "Source backend to retrieve secret from: file, env, pass, keyring"
+
+# Variations
+variations:
+  file:
+    group: source
+    default: true
+    env:
+      MLC_PASS_SOURCE: file
+    adr:
+      file-description: "Read secret from a credentials file (key=value format, mode 600)"
+  env:
+    group: source
+    env:
+      MLC_PASS_SOURCE: env
+    adr:
+      env-description: "Read secret from an existing environment variable"
+  pass:
+    group: source
+    env:
+      MLC_PASS_SOURCE: pass
+    adr:
+      pass-description: "Read secret from the 'pass' password store (GPG-based)"
+  keyring:
+    group: source
+    env:
+      MLC_PASS_SOURCE: keyring
+    adr:
+      keyring-description: "Read secret from the system keyring via Python keyring module"
+    deps:
+    - tags: get,generic-python-lib,_package.keyring
+
+# Dependencies
+deps:
+- tags: detect,os
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Output
+print_env_at_the_end:
+  MLC_PASS_ENV_KEY: "The env key that was populated with the secret"

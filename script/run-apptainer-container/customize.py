@@ -17,14 +17,14 @@ def preprocess(i):
             'error': 'Apptainer is not natively supported on Windows. '
                      'Please use WSL2 or a Linux VM.'}
 
-    if 'MLC_APPTAINER_RUN_SCRIPT_TAGS' not in env:
-        env['MLC_APPTAINER_RUN_SCRIPT_TAGS'] = "run,apptainer,container"
-        MLC_RUN_CMD = "mlcr --help"
-    else:
-        MLC_RUN_CMD = "mlcr " + \
-            env['MLC_APPTAINER_RUN_SCRIPT_TAGS'] + ' --quiet'
-
-    env['MLC_APPTAINER_RUN_CMD'] = MLC_RUN_CMD
+    if env.get('MLC_APPTAINER_RUN_CMD', '') == '':
+        if 'MLC_APPTAINER_RUN_SCRIPT_TAGS' not in env:
+            env['MLC_APPTAINER_RUN_SCRIPT_TAGS'] = "run,apptainer,container"
+            MLC_RUN_CMD = "mlcr --help"
+        else:
+            MLC_RUN_CMD = "mlcr " + \
+                env['MLC_APPTAINER_RUN_SCRIPT_TAGS'] + ' --quiet'
+        env['MLC_APPTAINER_RUN_CMD'] = MLC_RUN_CMD
 
     # Compute image naming (like run-docker-container's update_docker_info)
     update_apptainer_info(env)
@@ -76,7 +76,7 @@ def postprocess(i):
     # Filesystem options
     if is_true(env.get('MLC_APPTAINER_WRITABLE', '')):
         run_opts += ' --writable'
-    elif is_true(env.get('MLC_APPTAINER_WRITABLE_TMPFS', '')):
+    elif is_true(env.get('MLC_APPTAINER_WRITABLE_TMPFS', '')) and not env.get('MLC_APPTAINER_OVERLAY', ''):
         run_opts += ' --writable-tmpfs'
 
     # Environment isolation
@@ -92,8 +92,18 @@ def postprocess(i):
     if is_true(env.get('MLC_APPTAINER_NO_HOME', '')):
         run_opts += ' --no-home'
 
+    # Auto-enable fakeroot when overlay is specified (required for writable
+    # overlay mounts)
+    if env.get('MLC_APPTAINER_OVERLAY', '') and not is_true(
+            env.get('MLC_APPTAINER_FAKEROOT', '')):
+        env['MLC_APPTAINER_FAKEROOT'] = 'yes'
+
     if is_true(env.get('MLC_APPTAINER_FAKEROOT', '')):
         run_opts += ' --fakeroot'
+        # With fakeroot, HOME becomes /root inside the container.
+        # Ensure MLC_REPOS points to a writable location so mlcr can
+        # initialize.
+        run_opts += ' --env MLC_REPOS=/tmp/mlc-repos'
 
     # Home directory
     if env.get('MLC_APPTAINER_HOME', '') != '':
