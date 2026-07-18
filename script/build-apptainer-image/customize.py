@@ -66,7 +66,20 @@ def preprocess(i):
 
     output_path = env['MLC_APPTAINER_SIF_PATH']
 
-    cmd_prefix = "sudo " if is_true(env.get("MLC_APPTAINER_BUILD_WITH_SUDO", "")) else ""
+    # Use APPTAINER_TMPDIR for build temp space (large repos need more than
+    # default)
+    tmpdir = env.get(
+        'MLC_APPTAINER_TMPDIR',
+        os.environ.get(
+            'APPTAINER_TMPDIR',
+            ''))
+    if tmpdir:
+        build_opts += f' --tmpdir {tmpdir}'
+
+    cmd_prefix = "sudo " if is_true(
+        env.get(
+            "MLC_APPTAINER_BUILD_WITH_SUDO",
+            "")) else ""
     CMD = f"{cmd_prefix}apptainer build{build_opts} {output_path} {def_file_ref}"
 
     logger.info('')

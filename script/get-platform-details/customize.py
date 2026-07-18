@@ -63,7 +63,41 @@ def postprocess(i):
     with open(parsed_path, 'w') as f:
         json.dump(structured, f, indent=2)
 
+    _export_cpu_env_vars(structured, env)
+
     return {'return': 0}
+
+
+def _export_cpu_env_vars(structured, env):
+    """Export CPU frequency, cache, and interconnect info as env vars."""
+    # CPU frequency: prefer boost max, then nominal, then hardware limits
+    cpu_freq = structured.get('cpu_frequency', {})
+    boost = cpu_freq.get('boost', {})
+    freq_str = (boost.get('max_frequency', '')
+                or boost.get('nominal_frequency', '')
+                or cpu_freq.get('hardware_limits', '')
+                or cpu_freq.get('policy_max', ''))
+    if freq_str:
+        env['MLC_HOST_CPU_FREQUENCY'] = freq_str
+
+    # CPU caches: from lscpu inline cache dict (L1d, L1i, L2, L3)
+    cpu = structured.get('cpu', {})
+    caches = cpu.get('caches', {})
+    if caches:
+        parts = []
+        for k, v in caches.items():
+            label = k.upper().replace('_CACHE', '').replace('_', ' ')
+            parts.append(f"{label} {v}")
+        env['MLC_HOST_CPU_CACHES'] = ', '.join(parts)
+
+    # CPU interconnect: infer from NUMA topology
+    numa_from_numactl = structured.get('numa', {}).get('available_nodes', 0)
+    numa_from_lscpu = cpu.get('numa_nodes', 0)
+    num_numa = max(numa_from_numactl, numa_from_lscpu)
+    if num_numa > 1:
+        env['MLC_HOST_CPU_INTERCONNECT'] = f'UPI ({num_numa} NUMA nodes)'
+    elif num_numa == 1:
+        env['MLC_HOST_CPU_INTERCONNECT'] = 'Single NUMA node'
 
 
 # =====================================================================

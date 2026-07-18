@@ -1,7 +1,7 @@
 # This file was originally created for CM Script automations and is now
 # modified to make it work for MLCFlow automation.
 
-# This file contains the CM/MLC script execution logic which includes processing the script meta,
+# This file contains the MLC script execution logic which includes processing the script meta,
 # running the dependencies and finally preparing the required environment and running the specified script.
 #
 # Developed by Grigori Fursin and Arjun Suresh for CM and modified for MLCFlow by Arjun Suresh and Anandhu Sooraj
