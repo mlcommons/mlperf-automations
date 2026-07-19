@@ -1,5 +1,19 @@
 # AGENTS.md — mlperf-automations
 
+> **⚠️ ARCHITECTURE MIGRATION (Option B, mlc-scripts 2.0.0) — READ FIRST.**
+> This repo is now **content-only**. The execution engine that used to live in
+> `automation/script/` has **moved into mlcflow** (`mlc/engine/`) and the
+> `automation/` directory has been **removed**. Scripts now live under
+> **`mlc_scripts/script/<alias>/`** and ship as pip **package data**
+> (`pip install mlc-scripts` → importable `mlc_scripts`, path in
+> `mlc_scripts.SCRIPTS_DIR`). `setup.py`/`CustomInstallCommand` were removed —
+> **no git clone at install time**. `pyproject.toml`: `packages=["mlc_scripts"]`,
+> `package-data mlc_scripts=["script/**/*"]`, dep `mlcflow>=2.0.0,<3`. Existing
+> scripts run **unmodified** (a compat shim in mlcflow re-exposes `utils`).
+> Paths in the sections below that say `automation/script/...` or `script/<alias>`
+> now map to `mlc_scripts/script/<alias>`. See `migration-modification-plan.md`
+> and `MIGRATION-REMOTE-TESTS-README.md` in the parent `MLC/repos/` directory.
+
 Authoritative reference for AI agents and contributors working in this repository.
 Every claim is marked with its evidence source or noted as inferred.
 

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel", "toml", "mlcflow"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -22,7 +22,7 @@ classifiers = [
 dependencies = [
     "requests",
     "pyyaml",
-    "mlcflow",
+    "mlcflow>=2.0.0,<3",
     "giturlparse"
 ]
 
@@ -33,11 +33,14 @@ Repository = "https://github.com/mlcommons/mlperf-automations"
 Issues = "https://github.com/mlcommons/mlperf-automations/issues"
 
 [tool.setuptools]
-packages = []
+packages = ["mlc_scripts"]
 include-package-data = true
 
 [tool.setuptools.dynamic]
 version = {file = "VERSION"}
 
 [tool.setuptools.package-data]
-"mlcr" = ["README.md", "VERSION", "git_commit_hash.txt"]
+# Bundle the entire script/ tree (meta.yaml, customize.py, run.sh, README.md,
+# tests/, etc.) as read-only package data so `import mlc_scripts` exposes all
+# ~378 scripts via mlc_scripts.SCRIPTS_DIR after a plain `pip install`.
+"mlc_scripts" = ["script/**/*"]

@@ -1,0 +1,50 @@
+alias: get-mlperf-endpoints
+uid: 41ff67a71cf34c24
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: MLPerf Inference
+tags:
+- get
+- mlperf
+- endpoints
+- inference-endpoint
+- inference-endpoints
+tags_help: get mlperf endpoints
+
+# Cache
+cache: true
+
+# Environment
+default_env:
+  MLC_MLPERF_ENDPOINTS_VENV_NAME: mlperf-endpoints-venv
+new_env_keys:
+- MLC_MLPERF_ENDPOINTS_*
+- MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE
+
+# Input mapping
+input_mapping:
+  endpoints_src: MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE
+  src: MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE
+input_description:
+  endpoints_src:
+    desc: Path to a local inference-endpoint source checkout. When set, the git
+      clone (get,mlperf,endpoints,src) is skipped and this path is installed instead.
+
+# Dependencies
+deps:
+- tags: detect,os
+- names:
+  - python
+  - python3
+  tags: get,python3
+# Clone the endpoints source from git only when a local source path was not
+# supplied. skip_if_env with value 'on' means "skip if the key is set to any
+# non-empty / non-false value" (see automation/script/module.py).
+- tags: get,mlperf,endpoints-src
+  names:
+  - endpoints-src
+  skip_if_env:
+    MLC_MLPERF_INFERENCE_ENDPOINTS_SOURCE:
+    - 'on'

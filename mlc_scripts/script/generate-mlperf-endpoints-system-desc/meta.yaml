@@ -1,0 +1,72 @@
+alias: generate-mlperf-endpoints-system-desc
+uid: 9b5675d95efd493b
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: MLPerf Inference
+tags:
+- generate
+- mlperf
+- endpoints-system-desc
+- system-desc
+- system-description
+tags_help: generate mlperf endpoints-system-desc
+
+# Environment
+default_env:
+  MLC_MLPERF_ENDPOINTS_SD_SYSTEM_CATEGORY: datacenter
+  MLC_MLPERF_ENDPOINTS_SD_AVAILABILITY: available
+  MLC_MLPERF_ENDPOINTS_SD_DIVISION: standardized
+new_env_keys:
+- MLC_MLPERF_ENDPOINTS_SYSTEM_DESC_PATH
+
+# Input mapping
+input_mapping:
+  org: MLC_MLPERF_ENDPOINTS_SD_ORG
+  submitter_org: MLC_MLPERF_ENDPOINTS_SD_ORG
+  submitter_contact: MLC_MLPERF_ENDPOINTS_SD_CONTACT
+  system_name: MLC_MLPERF_ENDPOINTS_SD_SYSTEM_NAME
+  system_category: MLC_MLPERF_ENDPOINTS_SD_SYSTEM_CATEGORY
+  availability: MLC_MLPERF_ENDPOINTS_SD_AVAILABILITY
+  division: MLC_MLPERF_ENDPOINTS_SD_DIVISION
+  max_supported_concurrency: MLC_MLPERF_ENDPOINTS_SD_MAX_CONCURRENCY
+  max_concurrency: MLC_MLPERF_ENDPOINTS_SD_MAX_CONCURRENCY
+  serving_framework: MLC_MLPERF_ENDPOINTS_SD_SERVING_FRAMEWORK
+  model_name: MLC_MLPERF_ENDPOINTS_SD_MODEL_NAME
+  model_precision: MLC_MLPERF_ENDPOINTS_SD_MODEL_PRECISION
+  dataset_name: MLC_MLPERF_ENDPOINTS_SD_DATASET_NAME
+  # Per-node hardware/software (single node_type entry)
+  number_of_nodes: MLC_MLPERF_ENDPOINTS_SD_NUMBER_OF_NODES
+  accelerator_model_name: MLC_MLPERF_ENDPOINTS_SD_ACCELERATOR_MODEL
+  accelerators_per_node: MLC_MLPERF_ENDPOINTS_SD_ACCELERATORS_PER_NODE
+  host_processor_model_name: MLC_MLPERF_ENDPOINTS_SD_HOST_PROCESSOR
+  inference_backend: MLC_MLPERF_ENDPOINTS_SD_INFERENCE_BACKEND
+  operating_system: MLC_MLPERF_ENDPOINTS_SD_OS
+  driver: MLC_MLPERF_ENDPOINTS_SD_DRIVER
+  # Output
+  system_desc_path: MLC_MLPERF_ENDPOINTS_SYSTEM_DESC_PATH
+  output: MLC_MLPERF_ENDPOINTS_SYSTEM_DESC_PATH
+
+input_description:
+  org:
+    desc: Submitter organization name (required)
+  system_name:
+    desc: System / SUT name (required; becomes the submission system id)
+  max_supported_concurrency:
+    desc: Maximum Supported Concurrency M (required, must be > 32). Defines the
+      concurrency regions for the submission.
+  availability:
+    desc: System availability status
+    choices: [available, preview, rdi]
+  division:
+    desc: Submission division
+    choices: [standardized, serviced, rdi]
+
+# Dependencies
+deps:
+- tags: detect,os
+- names:
+  - python
+  - python3
+  tags: get,python3

@@ -1,0 +1,108 @@
+alias: run-mlperf-endpoints-submission
+uid: a1c500e68aa04e14
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: MLPerf Inference
+tags:
+- run
+- mlperf
+- endpoints-submission
+- endpoints
+- submission
+tags_help: run mlperf endpoints-submission
+
+# Environment
+default_env:
+  MLC_MLPERF_ENDPOINTS_SUB_DIVISION: standardized
+  MLC_MLPERF_ENDPOINTS_SUB_SCENARIO: con
+  MLC_MLPERF_ENDPOINTS_SUB_AVAILABILITY: available
+  MLC_MLPERF_ENDPOINTS_SUB_NUM_POINTS: '7'
+  MLC_MLPERF_ENDPOINTS_SUB_ECHO_PORT: '8765'
+new_env_keys:
+- MLC_MLPERF_ENDPOINTS_SUB_RUN_IDS_FILE
+
+# Input mapping
+input_mapping:
+  # Benchmark target
+  api_endpoint: MLC_MLPERF_ENDPOINTS_SUB_URL
+  endpoints: MLC_MLPERF_ENDPOINTS_SUB_URL
+  model: MLC_MLPERF_ENDPOINTS_SUB_MODEL
+  dataset: MLC_MLPERF_ENDPOINTS_SUB_DATASET_PATH
+  prompt_column: MLC_MLPERF_ENDPOINTS_SUB_PROMPT_COLUMN
+  # Accuracy (measured once, on the lowest-concurrency point, via --mode both)
+  accuracy_dataset: MLC_MLPERF_ENDPOINTS_SUB_ACC_DATASET_PATH
+  accuracy_dataset_path: MLC_MLPERF_ENDPOINTS_SUB_ACC_DATASET_PATH
+  accuracy_prompt_column: MLC_MLPERF_ENDPOINTS_SUB_ACC_PROMPT_COLUMN
+  accuracy_samples: MLC_MLPERF_ENDPOINTS_SUB_ACC_NUM_SAMPLES
+  eval_method: MLC_MLPERF_ENDPOINTS_SUB_EVAL_METHOD
+  ground_truth: MLC_MLPERF_ENDPOINTS_SUB_GROUND_TRUTH
+  extractor: MLC_MLPERF_ENDPOINTS_SUB_EXTRACTOR
+  num_samples: MLC_MLPERF_ENDPOINTS_SUB_NUM_SAMPLES
+  num_workers: MLC_MLPERF_ENDPOINTS_SUB_NUM_WORKERS
+  max_connections: MLC_MLPERF_ENDPOINTS_SUB_MAX_CONNECTIONS
+  settle_seconds: MLC_MLPERF_ENDPOINTS_SUB_SETTLE_SECONDS
+  tokenizer: MLC_MLPERF_ENDPOINTS_SUB_TOKENIZER
+  duration: MLC_MLPERF_ENDPOINTS_SUB_DURATION
+  # Concurrency points
+  concurrencies: MLC_MLPERF_ENDPOINTS_SUB_CONCURRENCIES
+  num_points: MLC_MLPERF_ENDPOINTS_SUB_NUM_POINTS
+  # Submission metadata
+  division: MLC_MLPERF_ENDPOINTS_SUB_DIVISION
+  scenario: MLC_MLPERF_ENDPOINTS_SUB_SCENARIO
+  availability: MLC_MLPERF_ENDPOINTS_SUB_AVAILABILITY
+  # System description (forwarded to generate-mlperf-endpoints-system-desc, or
+  # pass --system_desc=<path> to use an existing one)
+  system_desc: MLC_MLPERF_ENDPOINTS_SYSTEM_DESC_PATH
+  org: MLC_MLPERF_ENDPOINTS_SD_ORG
+  system_name: MLC_MLPERF_ENDPOINTS_SD_SYSTEM_NAME
+  max_supported_concurrency: MLC_MLPERF_ENDPOINTS_SD_MAX_CONCURRENCY
+  # Output / control
+  output_dir: MLC_MLPERF_ENDPOINTS_SUB_OUTPUT_DIR
+
+input_description:
+  num_points:
+    desc: Number of concurrency measurement points (7-32 for a valid submission)
+    default: '7'
+  concurrencies:
+    desc: Explicit comma-separated concurrency points (overrides auto-selection)
+  scenario:
+    desc: 'Scenario: con (Client-over-Network) or cop (Client-on-Premises)'
+    choices: [con, cop]
+
+# Dependencies
+deps:
+- tags: detect,os
+- names:
+  - python
+  - python3
+  tags: get,python3
+- tags: get,mlperf,endpoints
+  names:
+  - mlperf-endpoints
+- tags: get,mlperf,endpoints-submission-cli
+  names:
+  - endpoints-submission-cli
+# Generate system_desc.json unless the user supplied one with --system_desc
+- tags: generate,mlperf,endpoints-system-desc
+  names:
+  - endpoints-system-desc
+  skip_if_env:
+    MLC_MLPERF_ENDPOINTS_SYSTEM_DESC_PATH:
+    - 'on'
+
+# Variations
+variations:
+  short-run:
+    env:
+      MLC_MLPERF_ENDPOINTS_SUB_SHORT_RUN: 'yes'
+  runs-dry-run:
+    env:
+      MLC_MLPERF_ENDPOINTS_SUB_RUNS_DRY_RUN: 'yes'
+  with-accuracy:
+    env:
+      MLC_MLPERF_ENDPOINTS_SUB_WITH_ACCURACY: 'yes'
+  echo-server:
+    env:
+      MLC_MLPERF_ENDPOINTS_SUB_USE_ECHO_SERVER: 'yes'

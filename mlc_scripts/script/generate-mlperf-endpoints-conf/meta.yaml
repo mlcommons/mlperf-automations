@@ -1,0 +1,100 @@
+alias: generate-mlperf-endpoints-conf
+uid: 34d1d0ea20424c6c
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: MLPerf Inference
+tags:
+- generate
+- mlperf
+- endpoints-conf
+- endpoints-config
+- inference-endpoints-conf
+- user-conf
+tags_help: generate mlperf endpoints-conf
+
+# Environment
+default_env:
+  MLC_MLPERF_ENDPOINTS_CONF_TYPE: offline
+  MLC_MLPERF_ENDPOINTS_CONF_API_TYPE: openai
+  MLC_MLPERF_ENDPOINTS_CONF_RULESET: mlperf-inference-v5.1
+new_env_keys:
+- MLC_MLPERF_ENDPOINTS_CONF_PATH
+
+# Input mapping
+input_mapping:
+  conf_type: MLC_MLPERF_ENDPOINTS_CONF_TYPE
+  type: MLC_MLPERF_ENDPOINTS_CONF_TYPE
+  name: MLC_MLPERF_ENDPOINTS_CONF_NAME
+  model: MLC_MLPERF_ENDPOINTS_CONF_MODEL
+  api_endpoint: MLC_MLPERF_ENDPOINTS_CONF_URL
+  endpoint: MLC_MLPERF_ENDPOINTS_CONF_URL
+  endpoints: MLC_MLPERF_ENDPOINTS_CONF_URL
+  api_key: MLC_MLPERF_ENDPOINTS_CONF_API_KEY
+  api_type: MLC_MLPERF_ENDPOINTS_CONF_API_TYPE
+  # Performance dataset: predefined NAME (optionally name::preset) or custom PATH
+  dataset: MLC_MLPERF_ENDPOINTS_CONF_DATASET_PATH
+  dataset_path: MLC_MLPERF_ENDPOINTS_CONF_DATASET_PATH
+  dataset_name: MLC_MLPERF_ENDPOINTS_CONF_DATASET_NAME
+  dataset_preset: MLC_MLPERF_ENDPOINTS_CONF_DATASET_PRESET
+  prompt_column: MLC_MLPERF_ENDPOINTS_CONF_PROMPT_COLUMN
+  num_samples: MLC_MLPERF_ENDPOINTS_CONF_NUM_SAMPLES
+  samples: MLC_MLPERF_ENDPOINTS_CONF_NUM_SAMPLES
+  # Load pattern / runtime
+  load_pattern: MLC_MLPERF_ENDPOINTS_CONF_LOAD_PATTERN
+  target_qps: MLC_MLPERF_ENDPOINTS_CONF_TARGET_QPS
+  concurrency: MLC_MLPERF_ENDPOINTS_CONF_CONCURRENCY
+  min_duration: MLC_MLPERF_ENDPOINTS_CONF_MIN_DURATION_MS
+  max_duration: MLC_MLPERF_ENDPOINTS_CONF_MAX_DURATION_MS
+  num_workers: MLC_MLPERF_ENDPOINTS_CONF_NUM_WORKERS
+  # Model params
+  max_output_tokens: MLC_MLPERF_ENDPOINTS_CONF_MAX_OUTPUT_TOKENS
+  temperature: MLC_MLPERF_ENDPOINTS_CONF_TEMPERATURE
+  top_p: MLC_MLPERF_ENDPOINTS_CONF_TOP_P
+  top_k: MLC_MLPERF_ENDPOINTS_CONF_TOP_K
+  streaming: MLC_MLPERF_ENDPOINTS_CONF_STREAMING
+  # Accuracy dataset
+  accuracy_dataset: MLC_MLPERF_ENDPOINTS_CONF_ACC_DATASET_PATH
+  accuracy_dataset_name: MLC_MLPERF_ENDPOINTS_CONF_ACC_DATASET_NAME
+  accuracy_samples: MLC_MLPERF_ENDPOINTS_CONF_ACC_NUM_SAMPLES
+  eval_method: MLC_MLPERF_ENDPOINTS_CONF_EVAL_METHOD
+  ground_truth: MLC_MLPERF_ENDPOINTS_CONF_GROUND_TRUTH
+  extractor: MLC_MLPERF_ENDPOINTS_CONF_EXTRACTOR
+  # Submission
+  submission_model: MLC_MLPERF_ENDPOINTS_CONF_SUBMISSION_MODEL
+  ruleset: MLC_MLPERF_ENDPOINTS_CONF_RULESET
+  benchmark_mode: MLC_MLPERF_ENDPOINTS_CONF_BENCHMARK_MODE
+  # Output
+  report_dir: MLC_MLPERF_ENDPOINTS_CONF_REPORT_DIR
+  conf_path: MLC_MLPERF_ENDPOINTS_CONF_PATH
+  output: MLC_MLPERF_ENDPOINTS_CONF_PATH
+
+input_description:
+  conf_type:
+    desc: 'Config type'
+    choices: [offline, online, eval, submission]
+    default: offline
+  dataset_name:
+    desc: 'Predefined dataset name (no path needed): open_orca, cnn_dailymail,
+      gpqa, aime25, livecodebench, random, shopify_product_catalogue[_8k];
+      optionally a model preset via --dataset_preset'
+  dataset:
+    desc: Custom dataset file path (used when --dataset_name is not a predefined dataset)
+  load_pattern:
+    desc: 'Load pattern'
+    choices: [max_throughput, poisson, concurrency, multi_turn]
+  submission_model:
+    desc: 'Ruleset model id (submission): llama3-1-8b, llama2-70b, deepseek-r1,
+      llama3.1-405b, mixtral-8x7b'
+  ruleset:
+    desc: Ruleset name for submission
+    default: mlperf-inference-v5.1
+
+# Dependencies
+deps:
+- tags: detect,os
+- names:
+  - python
+  - python3
+  tags: get,python3
