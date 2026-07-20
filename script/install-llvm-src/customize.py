@@ -27,7 +27,7 @@ def preprocess(i):
         cmake_options += " -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF "
 
     extra_cmake_options = cmake_options + \
-        env.get('MLC_LLVM_EXTRA_CMAKE_OPTIONS', '')
+        env.get('MLC_LLVM_EXTRA_CMAKE_OPTIONS', '').replace('@@@', ' ')
 
     if env.get('MLC_LLVM_INSTALLED_PATH', '') != '' and os.path.exists(
             env.get('MLC_LLVM_INSTALLED_PATH')):
@@ -96,7 +96,7 @@ def preprocess(i):
                 if linker:
                     extra_cmake_options += f" -DLLVM_USE_LINKER={linker}"
 
-            cmake_cmd = f"""cmake {os.path.join(env["MLC_LLVM_SRC_REPO_PATH"], "llvm")} -GNinja -DCMAKE_BUILD_TYPE={llvm_build_type} -DLLVM_ENABLE_PROJECTS={q}{enable_projects}{q} -DLLVM_ENABLE_RUNTIMES={q}{enable_runtimes}{q} -DCMAKE_INSTALL_PREFIX={q}{install_prefix}{q} -DLLVM_ENABLE_RTTI=ON  -DLLVM_INSTALL_UTILS=ON -DLLVM_TARGETS_TO_BUILD={targets_to_build} {cross_compile_options} {target_triple_string} {compiler_rt_target_triple_string} {extra_cmake_options}"""
+            cmake_cmd = f"""cmake {os.path.join(env["MLC_LLVM_SRC_REPO_PATH"], "llvm")} -GNinja -DCMAKE_BUILD_TYPE={llvm_build_type} -DLLVM_ENABLE_PROJECTS={q}{enable_projects}{q} -DLLVM_ENABLE_RUNTIMES={q}{enable_runtimes}{q} -DCMAKE_INSTALL_PREFIX={q}{install_prefix}{q} -DLLVM_ENABLE_RTTI=ON -DLLVM_ENABLE_EH=ON -DLLVM_INSTALL_UTILS=ON -DLLVM_TARGETS_TO_BUILD={targets_to_build} {cross_compile_options} {target_triple_string} {compiler_rt_target_triple_string} {extra_cmake_options}"""
 
             # Append custom C/CXX flags if specified via _custom-flags.# variation
             custom_flags = env.get('MLC_LLVM_CUSTOM_FLAGS', '').strip()
