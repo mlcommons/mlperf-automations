@@ -106,7 +106,10 @@ def preprocess(i):
         try:
             print(
                 f"Copying repository from {mlc_repo_path} to {repo_build_context_path}")
-            shutil.copytree(mlc_repo_path, repo_build_context_path, ignore_dangling_symlinks=True)
+            shutil.copytree(
+                mlc_repo_path,
+                repo_build_context_path,
+                ignore_dangling_symlinks=True)
         except Exception as e:
             return {
                 'return': 1, 'error': f"Failed to copy repository to build context: {str(e)}"}
@@ -354,7 +357,8 @@ def preprocess(i):
         if not os.path.isdir(local_wheels_path):
             return {'return': 1,
                     'error': f"MLC_DOCKER_MLC_LOCAL_WHEELS_PATH not found: {local_wheels_path}"}
-        wheels = [w for w in os.listdir(local_wheels_path) if w.endswith('.whl')]
+        wheels = [w for w in os.listdir(
+            local_wheels_path) if w.endswith('.whl')]
         if not wheels:
             return {'return': 1,
                     'error': f"No .whl files found in MLC_DOCKER_MLC_LOCAL_WHEELS_PATH: {local_wheels_path}"}
