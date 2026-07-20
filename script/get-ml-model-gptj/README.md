@@ -94,6 +94,10 @@ mlcr get,raw,ml-model,gptj,gpt-j,large-language-model
 
 - `dry-run`
 
+### Tp-size
+
+- `tp-size.#` _(# can be substituted dynamically)_
+
 ### Ungrouped
 
 - `batch_size.#` _(# can be substituted dynamically)_

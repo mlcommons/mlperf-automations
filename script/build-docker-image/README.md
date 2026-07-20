@@ -52,9 +52,10 @@ mlcr build,docker,image,docker-image,dockerimage
 | `--post_run_cmds` |  |  | `` |
 | `--pre_run_cmds` |  |  | `` |
 | `--push_image` |  |  | `` |
-| `--upload` | Alias for push_image |  | `` |
 | `--real_run` |  |  | `` |
 | `--script_tags` |  |  | `` |
+| `--upload` | Alias for push_image |  | `` |
+| `--podman_storage_root` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
