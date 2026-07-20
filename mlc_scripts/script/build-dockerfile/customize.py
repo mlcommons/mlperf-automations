@@ -338,6 +338,11 @@ def preprocess(i):
     # Optionally install mlcflow / mlc-scripts from local wheels instead of
     # PyPI (used to test an unreleased build, e.g. the Option B migration).
     local_wheels_path = env.get('MLC_DOCKER_MLC_LOCAL_WHEELS_PATH', '').strip()
+    if local_wheels_path:
+        # Scripts ship in the mlc-scripts wheel, so neither the build-time nor
+        # the runtime `mlc pull repo` is needed (the latter is gated by
+        # MLC_DOCKER_NOT_PULL_UPDATE further below).
+        env['MLC_DOCKER_NOT_PULL_UPDATE'] = 'True'
 
     python_packages = list(get_value(env, config, 'python-packages'))
     if local_wheels_path:
