@@ -332,17 +332,48 @@ def preprocess(i):
         'RUN {} -m pip install --upgrade pip setuptools'.format(python) +
         ' ' + pip_extra_flags + ' ' + EOL)
 
+    # Optionally install mlcflow / mlc-scripts from local wheels instead of
+    # PyPI (used to test an unreleased build, e.g. the Option B migration).
+    local_wheels_path = env.get('MLC_DOCKER_MLC_LOCAL_WHEELS_PATH', '').strip()
+
+    python_packages = list(get_value(env, config, 'python-packages'))
+    if local_wheels_path:
+        python_packages = [
+            p for p in python_packages
+            if p not in ('mlcflow', 'mlc-scripts', 'mlc_scripts')]
+
     f.write(
         'RUN {} -m pip install '.format(python) +
-        " ".join(
-            get_value(
-                env,
-                config,
-                'python-packages')) +
+        " ".join(python_packages) +
         ' ' +
         pip_extra_flags +
         ' ' +
         EOL)
+
+    if local_wheels_path:
+        if not os.path.isdir(local_wheels_path):
+            return {'return': 1,
+                    'error': f"MLC_DOCKER_MLC_LOCAL_WHEELS_PATH not found: {local_wheels_path}"}
+        wheels = [w for w in os.listdir(local_wheels_path) if w.endswith('.whl')]
+        if not wheels:
+            return {'return': 1,
+                    'error': f"No .whl files found in MLC_DOCKER_MLC_LOCAL_WHEELS_PATH: {local_wheels_path}"}
+        build_context_dir = os.path.dirname(
+            env.get('MLC_DOCKERFILE_WITH_PATH',
+                    os.path.join(os.getcwd(), "Dockerfile")))
+        wheels_context = os.path.join(build_context_dir, "mlc_wheels")
+        if os.path.exists(wheels_context):
+            shutil.rmtree(wheels_context)
+        os.makedirs(wheels_context, exist_ok=True)
+        for w in wheels:
+            shutil.copy2(os.path.join(local_wheels_path, w),
+                         os.path.join(wheels_context, w))
+        logger.info(f"Bundling local wheels into build context: {wheels}")
+        f.write(
+            EOL + '# Install local mlcflow / mlc-scripts wheels (migration test build)' + EOL)
+        f.write('COPY mlc_wheels /tmp/mlc_wheels' + EOL)
+        f.write('RUN {} -m pip install /tmp/mlc_wheels/*.whl '.format(python) +
+                pip_extra_flags + ' ' + EOL)
 
     f.write(EOL + '# Download MLC repo for scripts' + EOL)
     pat = env.get('MLC_GH_TOKEN', '')
@@ -408,6 +439,13 @@ def preprocess(i):
         #    'RUN mlc pull repo --url={} {} --quiet'.format(docker_repo_dest, token_string) +
         #    EOL)
         f.write(EOL)
+
+    elif local_wheels_path:
+        # Scripts are bundled in the mlc-scripts wheel installed above; no
+        # git clone / mlc pull repo is needed after the migration.
+        f.write(
+            '# Scripts provided by the mlc-scripts wheel; skipping mlc pull repo' +
+            EOL + EOL)
 
     else:
         # Use mlc pull repo as before
