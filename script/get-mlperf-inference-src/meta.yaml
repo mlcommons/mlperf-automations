@@ -208,7 +208,6 @@ versions:
   r6.1:
     env:
       MLC_MLPERF_LAST_RELEASE: v6.1
-      MLC_TMP_GIT_CHECKOUT: submission_checker_constants_update
   tvm:
     env:
       MLC_MLPERF_LAST_RELEASE: v3.1
