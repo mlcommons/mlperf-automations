@@ -26,12 +26,6 @@ input_mapping:
   credentials_file: MLC_PASS_CREDENTIALS_FILE
   source: MLC_PASS_SOURCE
 
-# Input descriptions
-input_description:
-  env_key: "Environment variable name to export the secret value into (e.g., MLC_UPLOAD_API_TOKEN)"
-  secret_name: "Name/key of the secret to retrieve (used as key in credentials file or pass store path)"
-  credentials_file: "Path to the credentials file (default: ~/.mlc_credentials)"
-  source: "Source backend to retrieve secret from: file, env, pass, keyring"
 
 # Variations
 variations:

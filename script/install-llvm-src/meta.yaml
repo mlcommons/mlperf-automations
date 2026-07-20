@@ -43,6 +43,7 @@ deps:
     MLC_LLVM_CONDA_ENV:
     - 'yes'
   tags: get,cmake
+  version_min: '3.31.0'
 - skip_if_env:
     MLC_LLVM_CONDA_ENV:
     - 'yes'
