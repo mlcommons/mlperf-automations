@@ -207,7 +207,8 @@ def preprocess(i):
                 f.write(f"    {post_cmd}\n")
             f.write("\n")
 
-        # Copy section for local repo (use %setup with tar to handle symlinks gracefully)
+        # Copy section for local repo (use %setup with tar to handle symlinks
+        # gracefully)
         if use_copy_repo:
             repo_name = os.path.basename(mlc_repo_path)
             f.write("%setup\n")
