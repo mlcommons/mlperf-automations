@@ -202,6 +202,7 @@ def remote_run(self_module, i):
         'script_tags': i.get('tags'), 'run_cmds': run_cmds,
         'pre_run_cmds': remote_pre_run_cmds,
         'post_run_cmds': remote_post_run_cmds,
+        'quiet': quiet,
         **remote_inputs
     }
 

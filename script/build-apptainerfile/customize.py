@@ -213,6 +213,7 @@ def preprocess(i):
             f.write("%setup\n")
             f.write(f"    mkdir -p ${{APPTAINER_ROOTFS}}/opt/mlc_repo\n")
             f.write(f"    tar -C {mlc_repo_path}/.. --exclude=.git -cf - {repo_name} | tar -xf - -C ${{APPTAINER_ROOTFS}}/opt/mlc_repo/\n")
+            f.write(f"    chmod -R 777 ${{APPTAINER_ROOTFS}}/opt/mlc_repo\n")
             f.write("\n")
 
         # Runscript
