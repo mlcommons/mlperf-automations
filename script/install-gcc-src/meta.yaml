@@ -39,6 +39,9 @@ deps:
   names:
   - gcc-src-repo
   tags: get,git,repo
+  skip_if_any_env:
+    MLC_GCC_SRC_REPO_PATH:
+    - true
   update_tags_from_env_with_prefix:
     _branch.:
     - MLC_GIT_CHECKOUT
@@ -117,8 +120,13 @@ update_meta_if_env:
 # Docker / container
 docker:
   skip_run_cmd: true
+  default_env:
+    MLC_GCC_SRC_REPO_PATH: /skip-during-build
+  extra_sys_deps: "apt-get install -y cmake ninja-build build-essential flex texinfo"
   pre_run_cmds:
   - mlc pull repo
+  mounts:
+  - ${{ MLC_GCC_SRC_REPO_PATH }}:${{ MLC_GCC_SRC_REPO_PATH }}
 
 # Tests
 tests:

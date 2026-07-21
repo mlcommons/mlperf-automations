@@ -2,6 +2,7 @@ from mlc import utils
 from utils import is_true
 import platform
 import os
+import shutil
 
 
 def preprocess(i):
@@ -78,14 +79,22 @@ def preprocess(i):
 
             if target_triple != '':
                 target_triple_string = f""" -DLLVM_DEFAULT_TARGET_TRIPLE="{target_triple}" """
+                compiler_rt_target_triple_string = f""" -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="{target_triple}" """
             else:
-                if env.get('MLC_HOST_OS_TYPE',
-                           '') == 'darwin' and 'flang' in enable_projects:
+                # Auto-detect target triple when building with flang or runtimes
+                # (needed for compiler-rt to find the correct builtins arch)
+                if 'flang' in enable_projects or enable_runtimes:
                     target_triple = get_target_triple()
                     target_triple_string = f""" -DLLVM_DEFAULT_TARGET_TRIPLE="{target_triple}" """
                     compiler_rt_target_triple_string = f""" -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="{target_triple}" """
                 else:
                     target_triple_string = ""
+
+            # Auto-select linker: prefer lld > gold > default
+            if '-DLLVM_USE_LINKER=' not in extra_cmake_options:
+                linker = detect_linker()
+                if linker:
+                    extra_cmake_options += f" -DLLVM_USE_LINKER={linker}"
 
             cmake_cmd = f"""cmake {os.path.join(env["MLC_LLVM_SRC_REPO_PATH"], "llvm")} -GNinja -DCMAKE_BUILD_TYPE={llvm_build_type} -DLLVM_ENABLE_PROJECTS={q}{enable_projects}{q} -DLLVM_ENABLE_RUNTIMES={q}{enable_runtimes}{q} -DCMAKE_INSTALL_PREFIX={q}{install_prefix}{q} -DLLVM_ENABLE_RTTI=ON  -DLLVM_INSTALL_UTILS=ON -DLLVM_TARGETS_TO_BUILD={targets_to_build} {cross_compile_options} {target_triple_string} {compiler_rt_target_triple_string} {extra_cmake_options}"""
 
@@ -123,6 +132,14 @@ def get_target_triple():
         return f"{machine}-pc-windows-msvc"
     else:
         return f"{machine}-{system}-{release}"
+
+
+def detect_linker():
+    """Auto-detect the best available linker: lld > gold > None (default ld)."""
+    for linker in ['lld', 'gold']:
+        if shutil.which(linker) or shutil.which(f'ld.{linker}'):
+            return linker
+    return None
 
 
 def postprocess(i):
