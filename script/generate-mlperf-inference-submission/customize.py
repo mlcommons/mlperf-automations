@@ -87,52 +87,66 @@ def model_in_valid_models(model, mlperf_version,
         return (True, model)
 
 
-# Files copied from the endpoints harness output for both performance and accuracy modes.
-# run_metadata.json is optional and copied only if present.
-ENDPOINTS_FILES = [
-    "results_summary.json",
-    "results.json",
-    "config.yaml",
-    "run_metadata.json"]
+# Files copied from the endpoints harness output. config.yaml lives at the
+# scenario root; result_summary.json/accuracy_results.json live under their
+# respective mode directories (no run_1 subfolder for endpoints runs).
+ENDPOINTS_CONFIG_FILES = ("config.yaml", "config.yml")
+ENDPOINTS_PERF_FILE = "result_summary.json"
+ENDPOINTS_ACC_FILE = "accuracy_results.json"
 
 
 def is_endpoints_run(result_scenario_path):
     """Return True if this scenario folder contains endpoint harness output.
 
-    config.yaml is written by the endpoints harness and absent from standard
-    loadgen runs, making it a reliable discriminator.
+    config.yaml (or config.yml) is written by the endpoints harness at the
+    scenario root and is absent from standard loadgen runs, making it a
+    reliable discriminator.
     """
-    perf_run_dir = os.path.join(result_scenario_path, "performance", "run_1")
-    return os.path.exists(os.path.join(perf_run_dir, "config.yaml"))
+    return any(
+        os.path.exists(os.path.join(result_scenario_path, f))
+        for f in ENDPOINTS_CONFIG_FILES
+    )
+
+
+def find_endpoints_config_file(result_scenario_path):
+    """Return the path to the endpoints config.yaml/config.yml, or None."""
+    for f in ENDPOINTS_CONFIG_FILES:
+        candidate = os.path.join(result_scenario_path, f)
+        if os.path.exists(candidate):
+            return candidate
+    return None
 
 
 def get_endpoints_result_string(
         model, scenario, result_scenario_path, sub_res):
     """Build a result summary string for endpoint harness runs."""
     result = {}
-    perf_run_dir = os.path.join(result_scenario_path, "performance", "run_1")
     result_string = f"\n\n## Results\n\nPlatform: {sub_res}\n\n### Performance Results (Endpoints)\n"
-    run_metadata_path = os.path.join(perf_run_dir, "run_metadata.json")
-    if os.path.exists(run_metadata_path):
-        with open(run_metadata_path) as f:
-            metadata = json.load(f)
-        qps = metadata.get("qps", "N/A")
-        ttft_p99 = metadata.get("measured_latency_ttft_p99", "N/A")
+    perf_summary_path = os.path.join(
+        result_scenario_path, "performance", ENDPOINTS_PERF_FILE)
+    if os.path.exists(perf_summary_path):
+        with open(perf_summary_path) as f:
+            summary = json.load(f)
+        qps = summary.get("qps", "N/A")
+        ttft_p99 = summary.get("ttft", {}).get(
+            "percentiles", {}).get("99.0", "N/A")
         result_string += f"`QPS`: `{qps}`\n`TTFT P99 (ms)`: `{ttft_p99}`\n"
         result['performance'] = str(qps)
-    acc_path = os.path.join(result_scenario_path, "accuracy", "results.json")
+    acc_path = os.path.join(
+        result_scenario_path, "accuracy", ENDPOINTS_ACC_FILE)
     if os.path.exists(acc_path):
         with open(acc_path) as f:
             acc_data = json.load(f)
         result_string += "\n### Accuracy Results (Endpoints)\n"
-        score_data = acc_data.get("accuracy_scores", acc_data)
-        for dataset, info in score_data.items():
-            score = info.get("score", "N/A")
+        scores = []
+        for entry in acc_data.get("accuracy_scores", []):
+            dataset = entry.get("dataset_name", "unknown")
+            score = entry.get("score", "N/A")
             result_string += f"`{dataset}`: `{score}`\n"
-        scores = [str(info.get("score", "N/A"))
-                  for info in score_data.values()]
-        result['accuracy'] = scores[0] if len(
-            scores) == 1 else "(" + ", ".join(scores) + ")"
+            scores.append(str(score))
+        if scores:
+            result['accuracy'] = scores[0] if len(
+                scores) == 1 else "(" + ", ".join(scores) + ")"
     return result_string, result
 
 
@@ -476,20 +490,20 @@ def generate_submission(env, state, inp, submission_division, logger):
                 power_run = False
 
                 # Determine the performance run directory and whether this is an endpoints run.
-                # Endpoints runs have results_summary.json and results.json
-                # instead of mlperf_log_*.txt files.
+                # Endpoints runs have result_summary.json and
+                # accuracy_results.json instead of mlperf_log_*.txt files,
+                # and no run_1 subfolder under performance/.
                 perf_run_dir = os.path.join(
                     result_scenario_path, "performance", "run_1")
                 endpoints_run = is_endpoints_run(result_scenario_path)
 
                 if endpoints_run:
-                    missing = [
-                        f for f in ("results_summary.json", "results.json")
-                        if not os.path.exists(os.path.join(perf_run_dir, f))
-                    ]
-                    if missing:
+                    endpoints_perf_dir = os.path.join(
+                        result_scenario_path, "performance")
+                    if not os.path.exists(os.path.join(
+                            endpoints_perf_dir, ENDPOINTS_PERF_FILE)):
                         logger.warning(
-                            f"""Missing {missing} in {perf_run_dir}. Skipping directory: {result_scenario_path}""")
+                            f"""Missing {ENDPOINTS_PERF_FILE} in {endpoints_perf_dir}. Skipping directory: {result_scenario_path}""")
                         continue
                 else:
                     # Standard inference: check for mlperf_log files
@@ -594,10 +608,11 @@ def generate_submission(env, state, inp, submission_division, logger):
                                         result_ranging_path, f), os.path.join(
                                         submission_ranging_path, f))
 
-                        result_mode_path = os.path.join(
-                            result_mode_path, 'run_1')
-                        submission_results_path = os.path.join(
-                            submission_mode_path, 'run_1')
+                        if not endpoints_run:
+                            result_mode_path = os.path.join(
+                                result_mode_path, 'run_1')
+                            submission_results_path = os.path.join(
+                                submission_mode_path, 'run_1')
 
                         if not os.path.exists(saved_system_meta_file_path):
                             if os.path.exists(os.path.join(
@@ -761,14 +776,19 @@ def generate_submission(env, state, inp, submission_division, logger):
                                         submission_scenario_path, mode + "_" + f))
 
                     if endpoints_run and not mode.startswith("TEST"):
-                        # Copy endpoint-specific files for this mode
-                        if mode in ("performance", "accuracy"):
-                            for fname in ENDPOINTS_FILES:
-                                src = os.path.join(result_mode_path, fname)
-                                if os.path.exists(src):
-                                    shutil.copy(
-                                        src, os.path.join(
-                                            submission_results_path, fname))
+                        # Copy the endpoint-specific result file for this mode
+                        if mode == "performance":
+                            endpoints_mode_files = [ENDPOINTS_PERF_FILE]
+                        elif mode == "accuracy":
+                            endpoints_mode_files = [ENDPOINTS_ACC_FILE]
+                        else:
+                            endpoints_mode_files = []
+                        for fname in endpoints_mode_files:
+                            src = os.path.join(result_mode_path, fname)
+                            if os.path.exists(src):
+                                shutil.copy(
+                                    src, os.path.join(
+                                        submission_results_path, fname))
                     else:
                         if mode == "accuracy":
                             if os.path.exists(os.path.join(
@@ -797,6 +817,14 @@ def generate_submission(env, state, inp, submission_division, logger):
                             result_scenario_path, "system_info.txt"), submission_scenario_path)
                     platform_info_file = os.path.join(
                         result_scenario_path, "system_info.txt")
+
+                if endpoints_run:
+                    config_src = find_endpoints_config_file(
+                        result_scenario_path)
+                    if config_src:
+                        shutil.copy(
+                            config_src, os.path.join(
+                                submission_scenario_path, os.path.basename(config_src)))
 
                 readme_file = os.path.join(
                     submission_scenario_path, "README.md")
