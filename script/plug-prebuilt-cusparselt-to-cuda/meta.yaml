@@ -15,13 +15,12 @@ cache: true
 
 # Environment
 default_env:
-  MLC_SUDO: sudo
 new_env_keys:
 - MLC_CUSPARSELT_*
 
 # Input mapping
 input_mapping:
-  skip_sudo: CUDA_SKIP_SUDO
+  skip_sudo: MLC_SKIP_SUDO
   tar_file: MLC_CUSPARSELT_TAR_FILE_PATH
 input_description:
   tar_file:
@@ -30,6 +29,7 @@ input_description:
 # Dependencies
 deps:
 - tags: detect,os
+- tags: detect,sudo
 - tags: detect,cpu
 - tags: get,cuda
 prehook_deps:

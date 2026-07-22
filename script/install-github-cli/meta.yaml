@@ -17,12 +17,12 @@ cache: true
 clean_files: []
 
 # Environment
-default_env:
-  MLC_SUDO: sudo
+default_env: {}
 
 # Dependencies
 deps:
 - tags: detect,os
+- tags: detect,sudo
 
 # Tests
 tests:

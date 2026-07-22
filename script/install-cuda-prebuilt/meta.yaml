@@ -24,10 +24,10 @@ new_env_keys:
 
 # Input mapping
 input_mapping:
+  skip_sudo: MLC_SKIP_SUDO
   install_prefix: MLC_CUDA_INSTALL_PREFIX
   local_run_file_path: CUDA_RUN_FILE_LOCAL_PATH
   override-driver-check: MLC_CUDA_DRIVER_INSTALL_OVERRIDE
-  skip_sudo: CUDA_SKIP_SUDO
 
 # Dependencies
 deps:
@@ -127,4 +127,4 @@ tests:
   - env:
       MLC_SUDO: 'true'
   - env:
-      CUDA_SKIP_SUDO: 'yes'
+      MLC_SKIP_SUDO: 'yes'
