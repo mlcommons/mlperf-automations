@@ -57,6 +57,7 @@ def experiment_run(self_module, i):
 
     cur_dir = os.getcwd()
 
+    i['quiet'] = quiet
     r = self_module._select_script(i)
     if r['return'] > 0:
         return r
