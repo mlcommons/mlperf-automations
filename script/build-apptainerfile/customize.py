@@ -161,10 +161,16 @@ def preprocess(i):
         f.write("    # Download MLC repo for scripts\n")
         if use_copy_repo:
             repo_name = os.path.basename(mlc_repo_path)
+            # Set MLC_REPOS to match the runtime path so repos.json is created
+            # at the correct location for the container's runtime env.
+            f.write(f"    export MLC_REPOS=/opt/mlc_repo/{repo_name}\n")
             # Register each subdirectory as an individual repo (the parent
             # dir is a MLC_REPOS directory, not a single repo).
-            f.write(
-                f"    for d in /opt/mlc_repo/{repo_name}/*/; do mlc add repo \"$d\" --quiet 2>/dev/null || true; done\n")
+            f.write(f"    for d in /opt/mlc_repo/{repo_name}/*/; do mlc add repo \"$d\" --quiet 2>/dev/null || true; done\n")
+            # Refresh git index stat cache — tar copy into SIF changes timestamps,
+            # making git see all files as modified. Without this, mlc pull repo
+            # fails with "local changes" inside the container.
+            f.write(f"    for d in /opt/mlc_repo/{repo_name}/*/; do [ -d \"$d/.git\" ] && git -C \"$d\" update-index --refresh 2>/dev/null || true; done\n")
         else:
             x = env.get('MLC_APPTAINER_ADD_FLAG_TO_MLC_MLOPS_REPO', '')
             if x != '':
