@@ -14,7 +14,7 @@ tags:
 cache: true
 
 # Environment
-default_env:
+default_env: {}
 new_env_keys:
 - MLC_CUSPARSELT_*
 
