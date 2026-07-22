@@ -161,7 +161,9 @@ def preprocess(i):
         f.write("    # Download MLC repo for scripts\n")
         if use_copy_repo:
             repo_name = os.path.basename(mlc_repo_path)
-            f.write(f"    mlc add repo /opt/mlc_repo/{repo_name} --quiet\n")
+            # Register each subdirectory as an individual repo (the parent
+            # dir is a MLC_REPOS directory, not a single repo).
+            f.write(f"    for d in /opt/mlc_repo/{repo_name}/*/; do mlc add repo \"$d\" --quiet 2>/dev/null || true; done\n")
         else:
             x = env.get('MLC_APPTAINER_ADD_FLAG_TO_MLC_MLOPS_REPO', '')
             if x != '':
