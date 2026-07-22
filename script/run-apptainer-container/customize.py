@@ -135,9 +135,13 @@ def postprocess(i):
     if env.get('MLC_APPTAINER_EXTRA_ARGS', '') != '':
         run_opts += ' ' + env['MLC_APPTAINER_EXTRA_ARGS']
 
-    # Pre-run commands
+    # Pre-run commands (skip 'mlc pull repo' when repos are pre-copied
+    # via --apptainer_mlc_repo_path, as pull can destroy the working tree)
+    use_copy_repo = bool(env.get('MLC_REPO_PATH', ''))
     if env.get('MLC_APPTAINER_PRE_RUN_COMMANDS', []):
         for pre_cmd in env['MLC_APPTAINER_PRE_RUN_COMMANDS']:
+            if use_copy_repo and 'mlc pull repo' in pre_cmd:
+                continue
             run_cmds.append(pre_cmd)
 
     # Main run command — activate the venv first, then run the MLC command

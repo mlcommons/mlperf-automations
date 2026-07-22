@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-07-21 02:45:32*
+*Last updated: 2026-07-22 19:39:18*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -1029,6 +1029,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-platform-details](get-platform-details/)**
   - get-platform-details
   - Tags: `get`, `platform`, `details`, `platform-details`
+- **[get-redfish-power-info](get-redfish-power-info/)**
+  - get-redfish-power-info
+  - Tags: `get`, `redfish`, `power`, `info`, `bmc`
 - **[save-machine-state](save-machine-state/)**
   - save-machine-state
   - Tags: `machine-state`, `save`, `machine`, `system`, `system-state`, `state`
@@ -1256,7 +1259,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 369
+- **Total Scripts**: 370
 - **Categories**: 34
 
 ## Usage

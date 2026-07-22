@@ -37,6 +37,7 @@ input_mapping:
   home: MLC_APPTAINER_HOME
   image: MLC_APPTAINER_IMAGE
   image_name: MLC_APPTAINER_IMAGE_NAME
+  mlc_repo_path: MLC_REPO_PATH
   image_tag: MLC_APPTAINER_IMAGE_TAG
   image_url: MLC_APPTAINER_IMAGE_URL
   no_home: MLC_APPTAINER_NO_HOME
