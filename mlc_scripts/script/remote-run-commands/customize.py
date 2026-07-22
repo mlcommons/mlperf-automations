@@ -129,7 +129,8 @@ def preprocess(i):
 
     remote_shell = env.get('MLC_SSH_REMOTE_SHELL', '')
     if remote_shell:
-        # Pipe commands to the specified shell on the remote to avoid nested quoting issues
+        # Pipe commands to the specified shell on the remote to avoid nested
+        # quoting issues
         ssh_run_command = f"printf '%s\\n' {safe_cmd_string} | {ssh_cmd_str} {user}@{host} {password_string} {remote_shell}"
     else:
         ssh_run_command = f"{ssh_cmd_str} {user}@{host} {password_string} {safe_cmd_string}"
