@@ -338,13 +338,31 @@ def preprocess(i):
     # Optionally install mlcflow / mlc-scripts from local wheels instead of
     # PyPI (used to test an unreleased build, e.g. the Option B migration).
     local_wheels_path = env.get('MLC_DOCKER_MLC_LOCAL_WHEELS_PATH', '').strip()
-    if local_wheels_path:
-        # Scripts ship in the mlc-scripts wheel, so neither the build-time nor
-        # the runtime `mlc pull repo` is needed (the latter is gated by
-        # MLC_DOCKER_NOT_PULL_UPDATE further below).
-        env['MLC_DOCKER_NOT_PULL_UPDATE'] = 'True'
 
     python_packages = list(get_value(env, config, 'python-packages'))
+    # After the migration, mlc-scripts (installed via pip below, either from
+    # PyPI by default or from local wheels above) already provides script
+    # content, so the build-time and runtime `mlc pull repo` steps further
+    # below are redundant and should be skipped by default in that case too
+    # (not only under the local-wheels test flag) — the latter is gated by
+    # MLC_DOCKER_NOT_PULL_UPDATE further below.
+    scripts_from_pip = any(
+        p in ('mlc-scripts', 'mlc_scripts') for p in python_packages)
+    if local_wheels_path or scripts_from_pip:
+        # meta.yaml's default_env sets this to false; override it here since
+        # that default predates scripts-from-pip being the normal case.
+        #
+        # NOTE: this unconditionally overrides an explicit
+        # --docker_not_pull_update=False from the caller too — by the time
+        # this hook runs, module.py has already merged CLI input into `env`
+        # before `i['input']` is captured, so an explicit `false` here is
+        # indistinguishable from meta.yaml's own default `false`; there's no
+        # reliable way at this layer to tell them apart without deeper engine
+        # changes. Anyone who genuinely wants the automation repo pulled at
+        # runtime despite mlc-scripts being installed should use
+        # MLC_DOCKER_HOST_MLC_REPOS or MLC_REPO_PATH instead, which are
+        # unaffected by this and remain fully functional.
+        env['MLC_DOCKER_NOT_PULL_UPDATE'] = 'True'
     if local_wheels_path:
         python_packages = [
             p for p in python_packages
@@ -449,9 +467,10 @@ def preprocess(i):
         #    EOL)
         f.write(EOL)
 
-    elif local_wheels_path:
-        # Scripts are bundled in the mlc-scripts wheel installed above; no
-        # git clone / mlc pull repo is needed after the migration.
+    elif local_wheels_path or scripts_from_pip:
+        # Scripts are bundled in the mlc-scripts wheel installed above (from
+        # local wheels or, by default, from PyPI); no git clone / mlc pull
+        # repo is needed after the migration.
         f.write(
             '# Scripts provided by the mlc-scripts wheel; skipping mlc pull repo' +
             EOL + EOL)
