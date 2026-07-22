@@ -60,6 +60,9 @@ deps:
 - skip_if_env:
     MLC_SUDO_USER:
     - 'no'
+  enable_if_env:
+    MLC_HOST_OS_TYPE:
+    - linux
   tags: get,sys-util,generic,_dmidecode
 - env:
     MLC_CACHE_DIR_ENV_NAME: MLC_MLPERF_INFERENCE_SUT_DESC_PATH
