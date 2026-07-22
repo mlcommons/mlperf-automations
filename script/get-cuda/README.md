@@ -40,10 +40,10 @@ mlcr get,cuda,cuda-compiler,cuda-lib,toolkit,lib,nvcc,get-nvcc,get-cuda,46d133d9
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
+| `--skip_sudo` |  |  | `` |
 | `--cudnn_tar_file` |  |  | `` |
 | `--cudnn_tar_path` | Alias for cudnn_tar_file |  | `` |
 | `--skip_cudnn_install` |  |  | `` |
-| `--skip_sudo` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
