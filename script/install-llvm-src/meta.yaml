@@ -350,7 +350,7 @@ docker:
     MLC_LLVM_SRC_REPO_PATH: /skip-during-build
   extra_sys_deps: "apt-get install -y cmake ninja-build lld"
   pre_run_cmds:
-  - for d in /opt/mlc_repo/*/*/; do [ -d "$d/.git" ] && git -C "$d" update-index --refresh 2>/dev/null; done; mlc pull repo
+  - mlc pull repo
   mounts:
   - ${{ MLC_LLVM_SRC_REPO_PATH }}:${{ MLC_LLVM_SRC_REPO_PATH }}
   - ${{ MLC_LLVM_INSTALLED_PATH }}:${{ MLC_LLVM_INSTALLED_PATH }}
