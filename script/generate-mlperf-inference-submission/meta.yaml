@@ -142,7 +142,7 @@ variations:
       mlperf-inference-submission-checker:
         tags: _wg-inference
     default_env:
-      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v5.1
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v6.1
     deps:
     - names:
       - inference-src
