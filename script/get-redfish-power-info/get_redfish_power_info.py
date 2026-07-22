@@ -38,7 +38,8 @@ def _make_opener(insecure: bool, username: str, password: str):
 
 def _get(opener, url: str, timeout: int = 15) -> Optional[dict]:
     try:
-        req = urllib.request.Request(url, headers={'Accept': 'application/json'})
+        req = urllib.request.Request(
+            url, headers={'Accept': 'application/json'})
         with opener.open(req, timeout=timeout) as resp:
             raw = resp.read()
             return json.loads(raw)
@@ -56,7 +57,8 @@ def _members(data: Optional[dict]) -> list[str]:
     """Extract @odata.id hrefs from a Members array."""
     if not data:
         return []
-    return [m.get('@odata.id', '') for m in data.get('Members', []) if m.get('@odata.id')]
+    return [m.get('@odata.id', '')
+            for m in data.get('Members', []) if m.get('@odata.id')]
 
 
 def _id_from_url(url: str) -> str:
@@ -70,7 +72,7 @@ def _id_from_url(url: str) -> str:
 def _extract_power_control(entry: dict) -> dict:
     out = {}
     for k in ('Name', 'PowerConsumedWatts', 'PowerCapacityWatts',
-               'PowerAvailableWatts', 'PowerAllocatedWatts', 'PowerRequestedWatts'):
+              'PowerAvailableWatts', 'PowerAllocatedWatts', 'PowerRequestedWatts'):
         if k in entry:
             out[_to_snake(k)] = entry[k]
     metrics = entry.get('PowerMetrics', {}) or {}
@@ -111,7 +113,8 @@ def _extract_psu(entry: dict) -> dict:
     ):
         if k in entry:
             out[ok] = entry[k]
-    # InputRanges: rated output wattage per input voltage range — the nameplate data
+    # InputRanges: rated output wattage per input voltage range — the
+    # nameplate data
     input_ranges = entry.get('InputRanges') or []
     if input_ranges:
         _ir_map = (('InputType', 'input_type'), ('MinimumVoltage', 'minimum_voltage'),
@@ -153,7 +156,8 @@ def _extract_fan(entry: dict) -> dict:
         ('FanName', 'name'),
         ('Name', 'name'),
         ('PhysicalContext', 'physical_context'),
-        # ReadingRPM (older Redfish) takes precedence; fallback to Reading+ReadingUnits (newer)
+        # ReadingRPM (older Redfish) takes precedence; fallback to
+        # Reading+ReadingUnits (newer)
         ('ReadingRPM', 'reading_rpm'),
         ('Reading', 'reading'),
         ('ReadingUnits', 'reading_units'),
@@ -213,8 +217,8 @@ def collect_chassis(opener, base: str, chassis_url: str) -> dict:
 
         entry: dict = {'id': chassis_id}
         for k, ok in (('Name', 'name'), ('ChassisType', 'chassis_type'),
-                       ('Manufacturer', 'manufacturer'), ('Model', 'model'),
-                       ('SerialNumber', 'serial_number'), ('SKU', 'sku')):
+                      ('Manufacturer', 'manufacturer'), ('Model', 'model'),
+                      ('SerialNumber', 'serial_number'), ('SKU', 'sku')):
             if k in chassis_data:
                 entry[ok] = chassis_data[k]
         status = chassis_data.get('Status', {}) or {}
@@ -251,7 +255,12 @@ def collect_chassis(opener, base: str, chassis_url: str) -> dict:
                 entry['power'] = power_block
 
         # Thermal
-        thermal_href = (chassis_data.get('Thermal', {}) or {}).get('@odata.id', '')
+        thermal_href = (
+            chassis_data.get(
+                'Thermal',
+                {}) or {}).get(
+            '@odata.id',
+            '')
         if not thermal_href:
             thermal_href = f'{chassis_url}/{chassis_id}/Thermal'
         thermal_data = _get(opener, base + thermal_href)
@@ -348,7 +357,9 @@ def main():
     output_path = args.output
     output_dir = os.path.dirname(os.path.abspath(output_path))
     if not os.path.isdir(output_dir):
-        print(f'ERROR: Output directory does not exist: {output_dir}', file=sys.stderr)
+        print(
+            f'ERROR: Output directory does not exist: {output_dir}',
+            file=sys.stderr)
         sys.exit(1)
 
     base = args.endpoint.rstrip('/')
@@ -357,11 +368,23 @@ def main():
     print(f'Connecting to Redfish endpoint: {base}', flush=True)
     service_root = _get(opener, base + '/redfish/v1/')
     if not service_root:
-        print('ERROR: Could not reach Redfish service root at /redfish/v1/', file=sys.stderr)
+        print(
+            'ERROR: Could not reach Redfish service root at /redfish/v1/',
+            file=sys.stderr)
         sys.exit(1)
 
-    chassis_url = (service_root.get('Chassis', {}) or {}).get('@odata.id', '/redfish/v1/Chassis')
-    systems_url = (service_root.get('Systems', {}) or {}).get('@odata.id', '/redfish/v1/Systems')
+    chassis_url = (
+        service_root.get(
+            'Chassis',
+            {}) or {}).get(
+        '@odata.id',
+        '/redfish/v1/Chassis')
+    systems_url = (
+        service_root.get(
+            'Systems',
+            {}) or {}).get(
+        '@odata.id',
+        '/redfish/v1/Systems')
 
     print(f'Discovering Chassis from {chassis_url}', flush=True)
     chassis_results = collect_chassis(opener, base, chassis_url)
@@ -381,7 +404,12 @@ def main():
         output['systems'] = systems_results
 
     with open(output_path, 'w') as f:
-        yaml.dump(output, f, default_flow_style=False, sort_keys=False, allow_unicode=True)
+        yaml.dump(
+            output,
+            f,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True)
 
     print(f'Output written to: {output_path}')
 
