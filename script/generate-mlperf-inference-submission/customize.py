@@ -87,6 +87,69 @@ def model_in_valid_models(model, mlperf_version,
         return (True, model)
 
 
+# Files copied from the endpoints harness output. config.yaml lives at the
+# scenario root; result_summary.json/accuracy_results.json live under their
+# respective mode directories (no run_1 subfolder for endpoints runs).
+ENDPOINTS_CONFIG_FILES = ("config.yaml", "config.yml")
+ENDPOINTS_PERF_FILE = "result_summary.json"
+ENDPOINTS_ACC_FILE = "accuracy_results.json"
+
+
+def is_endpoints_run(result_scenario_path):
+    """Return True if this scenario folder contains endpoint harness output.
+
+    config.yaml (or config.yml) is written by the endpoints harness at the
+    scenario root and is absent from standard loadgen runs, making it a
+    reliable discriminator.
+    """
+    return any(
+        os.path.exists(os.path.join(result_scenario_path, f))
+        for f in ENDPOINTS_CONFIG_FILES
+    )
+
+
+def find_endpoints_config_file(result_scenario_path):
+    """Return the path to the endpoints config.yaml/config.yml, or None."""
+    for f in ENDPOINTS_CONFIG_FILES:
+        candidate = os.path.join(result_scenario_path, f)
+        if os.path.exists(candidate):
+            return candidate
+    return None
+
+
+def get_endpoints_result_string(
+        model, scenario, result_scenario_path, sub_res):
+    """Build a result summary string for endpoint harness runs."""
+    result = {}
+    result_string = f"\n\n## Results\n\nPlatform: {sub_res}\n\n### Performance Results (Endpoints)\n"
+    perf_summary_path = os.path.join(
+        result_scenario_path, "performance", ENDPOINTS_PERF_FILE)
+    if os.path.exists(perf_summary_path):
+        with open(perf_summary_path) as f:
+            summary = json.load(f)
+        qps = summary.get("qps", "N/A")
+        ttft_p99 = summary.get("ttft", {}).get(
+            "percentiles", {}).get("99.0", "N/A")
+        result_string += f"`QPS`: `{qps}`\n`TTFT P99 (ms)`: `{ttft_p99}`\n"
+        result['performance'] = str(qps)
+    acc_path = os.path.join(
+        result_scenario_path, "accuracy", ENDPOINTS_ACC_FILE)
+    if os.path.exists(acc_path):
+        with open(acc_path) as f:
+            acc_data = json.load(f)
+        result_string += "\n### Accuracy Results (Endpoints)\n"
+        scores = []
+        for entry in acc_data.get("accuracy_scores", []):
+            dataset = entry.get("dataset_name", "unknown")
+            score = entry.get("score", "N/A")
+            result_string += f"`{dataset}`: `{score}`\n"
+            scores.append(str(score))
+        if scores:
+            result['accuracy'] = scores[0] if len(
+                scores) == 1 else "(" + ", ".join(scores) + ")"
+    return result_string, result
+
+
 def generate_submission(env, state, inp, submission_division, logger):
 
     # Save current user directory
@@ -103,7 +166,9 @@ def generate_submission(env, state, inp, submission_division, logger):
     submission_checker_dir = os.path.join(mlperf_path, "tools", "submission")
     # Remove any stale submission_checker.py that would shadow the
     # submission_checker package directory in newer inference versions
-    stale_checker = os.path.join(submission_checker_dir, "submission_checker.py")
+    stale_checker = os.path.join(
+        submission_checker_dir,
+        "submission_checker.py")
     if os.path.isfile(stale_checker) and os.path.isdir(
             os.path.join(submission_checker_dir, "submission_checker")):
         os.remove(stale_checker)
@@ -424,45 +489,58 @@ def generate_submission(env, state, inp, submission_division, logger):
                             result_scenario_path, f))]
                 power_run = False
 
-                # we check for the existance of mlperf_log_summary.txt
-                # mlperf_log_detail.txt to consider a result folder as valid.
-                # Rest of the checks are done later by the submission checker
-                files_to_check_in_perf_dir = [
-                    "mlperf_log_summary.txt",
-                    "mlperf_log_detail.txt"]
+                # Determine the performance run directory and whether this is an endpoints run.
+                # Endpoints runs have result_summary.json and
+                # accuracy_results.json instead of mlperf_log_*.txt files,
+                # and no run_1 subfolder under performance/.
                 perf_run_dir = os.path.join(
                     result_scenario_path, "performance", "run_1")
-                missing = [
-                    f for f in files_to_check_in_perf_dir
-                    if not os.path.exists(os.path.join(perf_run_dir, f))
-                ]
-                if missing:
-                    logger.warning(
-                        f"""Missing file(s) in {perf_run_dir}: {', '.join(missing)}, Skipping directory: {result_scenario_path}""")
-                    continue
+                endpoints_run = is_endpoints_run(result_scenario_path)
 
-                files_to_check_in_acc_dir = [
-                    "mlperf_log_summary.txt",
-                    "mlperf_log_detail.txt",
-                    "mlperf_log_accuracy.json",
-                    "accuracy.txt"]
-                acc_run_dir = os.path.join(
-                    result_scenario_path, "accuracy")
-                missing = [
-                    f for f in files_to_check_in_acc_dir
-                    if not os.path.exists(os.path.join(acc_run_dir, f))
-                ]
-                if missing:
-                    logger.warning(
-                        f"""Missing file(s) in {acc_run_dir}: {', '.join(missing)}, Skipping directory: {result_scenario_path}""")
-                    continue
+                if endpoints_run:
+                    endpoints_perf_dir = os.path.join(
+                        result_scenario_path, "performance")
+                    if not os.path.exists(os.path.join(
+                            endpoints_perf_dir, ENDPOINTS_PERF_FILE)):
+                        logger.warning(
+                            f"""Missing {ENDPOINTS_PERF_FILE} in {endpoints_perf_dir}. Skipping directory: {result_scenario_path}""")
+                        continue
+                else:
+                    # Standard inference: check for mlperf_log files
+                    files_to_check_in_perf_dir = [
+                        "mlperf_log_summary.txt",
+                        "mlperf_log_detail.txt"]
+                    missing = [
+                        f for f in files_to_check_in_perf_dir
+                        if not os.path.exists(os.path.join(perf_run_dir, f))
+                    ]
+                    if missing:
+                        logger.warning(
+                            f"""Missing file(s) in {perf_run_dir}: {', '.join(missing)}, Skipping directory: {result_scenario_path}""")
+                        continue
 
-                if not os.path.exists(os.path.join(perf_run_dir, "user.conf")) and not os.path.exists(
-                        os.path.join(result_scenario_path, "user.conf")):
-                    logger.warning(
-                        f"""Missing user.conf in both {os.path.join(perf_run_dir, "user.conf")} and {os.path.join(result_scenario_path, "user.conf")}. Skipping directory: {result_scenario_path}"""
-                    )
-                    continue
+                    files_to_check_in_acc_dir = [
+                        "mlperf_log_summary.txt",
+                        "mlperf_log_detail.txt",
+                        "mlperf_log_accuracy.json",
+                        "accuracy.txt"]
+                    acc_run_dir = os.path.join(
+                        result_scenario_path, "accuracy")
+                    missing = [
+                        f for f in files_to_check_in_acc_dir
+                        if not os.path.exists(os.path.join(acc_run_dir, f))
+                    ]
+                    if missing:
+                        logger.warning(
+                            f"""Missing file(s) in {acc_run_dir}: {', '.join(missing)}, Skipping directory: {result_scenario_path}""")
+                        continue
+
+                    if not os.path.exists(os.path.join(perf_run_dir, "user.conf")) and not os.path.exists(
+                            os.path.join(result_scenario_path, "user.conf")):
+                        logger.warning(
+                            f"""Missing user.conf in both {os.path.join(perf_run_dir, "user.conf")} and {os.path.join(result_scenario_path, "user.conf")}. Skipping directory: {result_scenario_path}"""
+                        )
+                        continue
 
                 if not os.path.exists(os.path.join(perf_run_dir, "measurements.json")) and not os.path.exists(
                         os.path.join(result_scenario_path, "measurements.json")):
@@ -481,7 +559,7 @@ def generate_submission(env, state, inp, submission_division, logger):
 
                     if mode == 'performance':
 
-                        if os.path.exists(os.path.join(
+                        if not endpoints_run and os.path.exists(os.path.join(
                                 result_mode_path, "power")):
                             power_run = True
                             result_power_path = os.path.join(
@@ -530,10 +608,11 @@ def generate_submission(env, state, inp, submission_division, logger):
                                         result_ranging_path, f), os.path.join(
                                         submission_ranging_path, f))
 
-                        result_mode_path = os.path.join(
-                            result_mode_path, 'run_1')
-                        submission_results_path = os.path.join(
-                            submission_mode_path, 'run_1')
+                        if not endpoints_run:
+                            result_mode_path = os.path.join(
+                                result_mode_path, 'run_1')
+                            submission_results_path = os.path.join(
+                                submission_mode_path, 'run_1')
 
                         if not os.path.exists(saved_system_meta_file_path):
                             if os.path.exists(os.path.join(
@@ -572,23 +651,24 @@ def generate_submission(env, state, inp, submission_division, logger):
                     # if division == "closed" and not os.path.isdir(submission_compliance_path):
                     #    os.makedirs(submission_compliance_path)
 
-                    user_conf_path = os.path.join(
-                        result_scenario_path, "user.conf")
-                    if os.path.exists(user_conf_path):
-                        shutil.copy(
-                            user_conf_path, os.path.join(
-                                submission_scenario_path, 'user.conf'))
-                    else:
+                    if not endpoints_run:
                         user_conf_path = os.path.join(
-                            result_mode_path, "user.conf")
+                            result_scenario_path, "user.conf")
                         if os.path.exists(user_conf_path):
                             shutil.copy(
                                 user_conf_path, os.path.join(
                                     submission_scenario_path, 'user.conf'))
                         else:
-                            if mode.lower() == "performance":
-                                return {
-                                    "return": 1, "error": f"user.conf missing in both paths: {user_conf_path} and {os.path.join(result_scenario_path, 'user.conf')}"}
+                            user_conf_path = os.path.join(
+                                result_mode_path, "user.conf")
+                            if os.path.exists(user_conf_path):
+                                shutil.copy(
+                                    user_conf_path, os.path.join(
+                                        submission_scenario_path, 'user.conf'))
+                            else:
+                                if mode.lower() == "performance":
+                                    return {
+                                        "return": 1, "error": f"user.conf missing in both paths: {user_conf_path} and {os.path.join(result_scenario_path, 'user.conf')}"}
 
                     # First check for measurements directory in scenario folder
                     measurements_json_path = os.path.join(
@@ -672,7 +752,7 @@ def generate_submission(env, state, inp, submission_division, logger):
                                                 os.path.join(
                                                     compliance_accuracy_run_path, log_file), os.path.join(
                                                     target, log_file))
-                        else:
+                        elif not endpoints_run:
                             if f.startswith('mlperf_') and not f.endswith(
                                     'trace.json'):
                                 files.append(f)
@@ -695,25 +775,40 @@ def generate_submission(env, state, inp, submission_division, logger):
                                         result_mode_path, f), os.path.join(
                                         submission_scenario_path, mode + "_" + f))
 
-                    if mode == "accuracy":
-                        if os.path.exists(os.path.join(
-                                result_mode_path, "accuracy.txt")):
-                            files.append("accuracy.txt")
-                        if model == "stable-diffusion-xl" and os.path.exists(
-                                os.path.join(result_mode_path, "images")):
-                            shutil.copytree(
-                                os.path.join(
-                                    result_mode_path, "images"), os.path.join(
-                                    submission_results_path, "images"))
+                    if endpoints_run and not mode.startswith("TEST"):
+                        # Copy the endpoint-specific result file for this mode
+                        if mode == "performance":
+                            endpoints_mode_files = [ENDPOINTS_PERF_FILE]
+                        elif mode == "accuracy":
+                            endpoints_mode_files = [ENDPOINTS_ACC_FILE]
+                        else:
+                            endpoints_mode_files = []
+                        for fname in endpoints_mode_files:
+                            src = os.path.join(result_mode_path, fname)
+                            if os.path.exists(src):
+                                shutil.copy(
+                                    src, os.path.join(
+                                        submission_results_path, fname))
+                    else:
+                        if mode == "accuracy":
+                            if os.path.exists(os.path.join(
+                                    result_mode_path, "accuracy.txt")):
+                                files.append("accuracy.txt")
+                            if model == "stable-diffusion-xl" and os.path.exists(
+                                    os.path.join(result_mode_path, "images")):
+                                shutil.copytree(
+                                    os.path.join(
+                                        result_mode_path, "images"), os.path.join(
+                                        submission_results_path, "images"))
 
-                    for f in files:
-                        logger.info(' * ' + f)
-                        p_target = os.path.join(submission_results_path, f)
-                        shutil.copy(
-                            os.path.join(
-                                result_mode_path,
-                                f),
-                            p_target)
+                        for f in files:
+                            logger.info(' * ' + f)
+                            p_target = os.path.join(submission_results_path, f)
+                            shutil.copy(
+                                os.path.join(
+                                    result_mode_path,
+                                    f),
+                                p_target)
 
                 if os.path.exists(os.path.join(
                         result_scenario_path, "system_info.txt")):
@@ -723,6 +818,14 @@ def generate_submission(env, state, inp, submission_division, logger):
                     platform_info_file = os.path.join(
                         result_scenario_path, "system_info.txt")
 
+                if endpoints_run:
+                    config_src = find_endpoints_config_file(
+                        result_scenario_path)
+                    if config_src:
+                        shutil.copy(
+                            config_src, os.path.join(
+                                submission_scenario_path, os.path.basename(config_src)))
+
                 readme_file = os.path.join(
                     submission_scenario_path, "README.md")
                 if not os.path.exists(readme_file):
@@ -730,8 +833,12 @@ def generate_submission(env, state, inp, submission_division, logger):
                         f.write("TBD")  # create an empty README
 
                 readme_suffix = ""
-                result_string, result = mlperf_utils.get_result_string(
-                    env['MLC_MLPERF_LAST_RELEASE'], model, scenario, result_scenario_path, power_run, sub_res, division, system_file, model_precision, env.get('MLC_MLPERF_INFERENCE_SOURCE_VERSION'))
+                if endpoints_run:
+                    result_string, result = get_endpoints_result_string(
+                        model, scenario, result_scenario_path, sub_res)
+                else:
+                    result_string, result = mlperf_utils.get_result_string(
+                        env['MLC_MLPERF_LAST_RELEASE'], model, scenario, result_scenario_path, power_run, sub_res, division, system_file, model_precision, env.get('MLC_MLPERF_INFERENCE_SOURCE_VERSION'))
 
                 for key in result:
                     results[model][scenario][key] = result[key]
