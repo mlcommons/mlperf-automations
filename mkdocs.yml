@@ -22,6 +22,7 @@ theme:
 nav:
   - HOME: index.md
   - Getting Started: getting-started.md
+  - Migration (Option B): migration.md
 
 markdown_extensions:
   - pymdownx.tasklist:

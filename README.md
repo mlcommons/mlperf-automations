@@ -26,6 +26,10 @@ Building upon the robust foundation of its predecessor, the Collective Mind (CM)
 
 At its core, MLCFlow relies on a single powerful automation, the Script, which is extended by two actions: CacheAction and DockerAction. Together, these components provide streamlined functionality to optimize and enhance your ML workflow automation experience.
 
+**Note:** as of `mlc-scripts` 2.0.0, this repo is content-only — the execution
+engine lives in [mlcflow](https://github.com/mlcommons/mlcflow). See
+[this repo is now content-only](docs/migration.md) for what changed.
+
 ---
 
 ## 🤝 Contributing

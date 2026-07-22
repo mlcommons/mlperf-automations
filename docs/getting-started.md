@@ -5,6 +5,11 @@
 pip install mlc-scripts
 ```
 
+`mlc-scripts` bundles the script content; it depends on `mlcflow` (the CLI and
+execution engine) automatically, so this single command is all you need — no
+`mlc pull repo` step required. See
+[this repo is now content-only](migration.md) for what changed and why.
+
 For more customized installation you can see [here](https://docs.mlcommons.org/mlcflow/install/)
 
 ## Running MLC Scripts
@@ -19,15 +24,10 @@ mlcr detect,os -j
 This command gathers details about the system on which it's run, such as:
 
 ```json
-[2025-02-03 04:57:23,449 main.py:694 INFO] - Repos path for Index: /home/arjun/MLC/repos
-[2025-02-03 04:57:24,167 main.py:837 INFO] - Shared index for script saved to /home/arjun/MLC/repos/index_script.json.
-[2025-02-03 04:57:24,167 main.py:837 INFO] - Shared index for cache saved to /home/arjun/MLC/repos/index_cache.json.
-[2025-02-03 04:57:24,167 main.py:837 INFO] - Shared index for experiment saved to /home/arjun/MLC/repos/index_experiment.json.
-[2025-02-03 04:57:24,210 module.py:574 INFO] - * mlcr detect,os
-[2025-02-03 04:57:24,213 module.py:5354 INFO] -        ! cd /mnt/arjun/MLC/repos/gateoverflow@mlperf-automations
-[2025-02-03 04:57:24,213 module.py:5355 INFO] -        ! call /home/arjun/MLC/repos/gateoverflow@mlperf-automations/script/detect-os/run.sh from tmp-run.sh
-[2025-02-03 04:57:24,245 module.py:5501 INFO] -        ! call "postprocess" from /home/arjun/MLC/repos/gateoverflow@mlperf-automations/script/detect-os/customize.py
-[2025-02-03 04:57:24,254 module.py:2195 INFO] - {
+[.... index.py:335 WARN] - Missing index files: script, cache, experiment. Forcing full index rebuild...
+[.... script_utils.py:88 INFO] - * mlcr detect,os
+[.... module.py:1881 INFO] -   - cache UID: c31147a2fc454878
+[.... module.py:1912 INFO] - {
   "return": 0,
   "env": {
     "MLC_HOST_OS_TYPE": "linux",
