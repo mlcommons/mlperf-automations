@@ -162,6 +162,8 @@ def postprocess(i):
     is_windows = os_info['platform'] == 'windows'
 
     files_to_copy_back = env.get('MLC_SSH_FILES_TO_COPY_BACK', [])
+    if isinstance(files_to_copy_back, str):
+        files_to_copy_back = [files_to_copy_back]
 
     user = env.get('MLC_SSH_USER', os.environ.get(
         'USER') or os.environ.get('USERNAME'))
@@ -188,7 +190,7 @@ def postprocess(i):
     if password and not is_windows:
         rsync_base = ["sshpass", "-p", password] + rsync_base
 
-    target_directory = env.get('MLC_SSH_PATH_TO_COPY_BACK_FILES', '')
+    target_directory = env.get('MLC_SSH_PATH_TO_COPY_BACK_FILES', '') or '.'
     # ---- Execute copy commands ----
     for file in files_to_copy_back:
         r = copy_over_ssh(
