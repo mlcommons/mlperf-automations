@@ -35,10 +35,8 @@
         "sudo",
         "wget",
         "python3-venv",
-        "systemctl",
         "unzip",
         "ca-certificates",
-        "ssl-cert",
         "binutils"
       ],
       "versions": {
