@@ -17,7 +17,6 @@ cache: true
 env:
   MLC_CLEAN_DIRS: bin
   MLC_PACKAGE_WIN_URL: https://zenodo.org/records/13868077/files/mlc-artifact-os-windows-32.zip?download=1
-  MLC_SUDO: sudo
 new_env_keys:
 - +PATH
 
@@ -28,6 +27,7 @@ input_mapping:
 # Dependencies
 deps:
 - tags: detect,os
+- tags: detect,sudo
 
 # Variations
 variations:

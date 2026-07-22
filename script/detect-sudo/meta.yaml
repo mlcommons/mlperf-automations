@@ -16,3 +16,6 @@ cache: false
 # Environment
 new_env_keys:
 - MLC_SUDO*
+
+input_mapping:
+  skip_sudo: MLC_SKIP_SUDO
