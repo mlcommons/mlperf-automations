@@ -7,7 +7,8 @@ import shlex
 
 
 def copy_over_ssh(file, ssh_cmd, user, host,
-                  target_directory, logger, copy_back=False):
+                  target_directory, logger, copy_back=False,
+                  password=None, is_windows=False):
     # Check if rsync is available
     rsync_available = True
     try:
@@ -36,10 +37,16 @@ def copy_over_ssh(file, ssh_cmd, user, host,
             file,
             f"{user}@{host}:{target_directory}/"
         ]
+    subprocess_env = os.environ
+    if password and not is_windows:
+        # sshpass -e (reads SSHPASS from the environment) instead of -p
+        # <password>, so the password never appears in argv/logged command.
+        cmd = ["sshpass", "-e"] + cmd
+        subprocess_env = {**os.environ, "SSHPASS": password}
     logger.info(f"Executing: {' '.join(cmd)}")
     result = subprocess.run(
         cmd,
-        env=os.environ,
+        env=subprocess_env,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
@@ -101,11 +108,6 @@ def preprocess(i):
     host = env.get('MLC_SSH_HOST')
     port = env.get('MLC_SSH_PORT', '22')
 
-    if password:
-        password_string = " -p " + password
-    else:
-        password_string = ""
-
     ssh_cmd = ["ssh", "-p", port]
 
     if env.get("MLC_SSH_SKIP_HOST_VERIFY"):
@@ -127,26 +129,32 @@ def preprocess(i):
     else:
         safe_cmd_string = shlex.quote(cmd_string)
 
+    # sshpass -e (reads SSHPASS from the environment) instead of -p
+    # <password>: run.sh/run.bat unconditionally echo MLC_SSH_CMD before
+    # eval'ing it, so the password must never appear inside the command
+    # string itself. SSHPASS is exported into run.sh's shell below since
+    # run.sh exports every key in this env dict.
+    if password and not is_windows:
+        ssh_prefix = "sshpass -e "
+        env['SSHPASS'] = password
+    else:
+        ssh_prefix = ""
+
     remote_shell = env.get('MLC_SSH_REMOTE_SHELL', '')
     if remote_shell:
         # Pipe commands to the specified shell on the remote to avoid nested quoting issues
-        ssh_run_command = f"printf '%s\\n' {safe_cmd_string} | {ssh_cmd_str} {user}@{host} {password_string} {remote_shell}"
+        ssh_run_command = f"printf '%s\\n' {safe_cmd_string} | {ssh_prefix}{ssh_cmd_str} {user}@{host} {remote_shell}"
     else:
-        ssh_run_command = f"{ssh_cmd_str} {user}@{host} {password_string} {safe_cmd_string}"
+        ssh_run_command = f"{ssh_prefix}{ssh_cmd_str} {user}@{host} {safe_cmd_string}"
 
     env['MLC_SSH_CMD'] = ssh_run_command
-
-    # ---- Use sshpass if password is provided (only on Unix-like systems) ----
-    rsync_base = ["rsync", "-avz"]
-
-    if password and not is_windows:
-        rsync_base = ["sshpass", "-p", password] + rsync_base
 
     target_directory = env.get('MLC_SSH_TARGET_COPY_DIRECTORY', '')
 
     # ---- Execute copy commands ----
     for file in files_to_copy:
-        r = copy_over_ssh(file, ssh_cmd, user, host, target_directory, logger)
+        r = copy_over_ssh(file, ssh_cmd, user, host, target_directory, logger,
+                          password=password, is_windows=is_windows)
 
     return {'return': 0}
 
@@ -184,12 +192,6 @@ def postprocess(i):
         if key_file:
             ssh_cmd += ["-i", key_file]
 
-    # ---- Use sshpass if password is provided (only on Unix-like systems) ----
-    rsync_base = ["rsync", "-avz"]
-
-    if password and not is_windows:
-        rsync_base = ["sshpass", "-p", password] + rsync_base
-
     target_directory = env.get('MLC_SSH_PATH_TO_COPY_BACK_FILES', '') or '.'
     # ---- Execute copy commands ----
     for file in files_to_copy_back:
@@ -200,6 +202,8 @@ def postprocess(i):
             host,
             target_directory,
             logger,
-            copy_back=True)
+            copy_back=True,
+            password=password,
+            is_windows=is_windows)
 
     return {'return': 0}

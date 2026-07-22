@@ -7,6 +7,27 @@ import shutil
 from utils import *
 
 
+def _stage_and_replace_dir(final_path, populate):
+    """
+    Populate a uniquely-named (per-process) staging directory next to
+    `final_path` via `populate(staging_path)`, then swap it into place.
+
+    build_context_dir (and therefore final_path) is typically CWD-relative,
+    so two concurrent build-dockerfile invocations can share the exact same
+    destination. A plain rmtree(final_path) + populate(final_path) leaves
+    final_path missing or half-populated for however long populate() takes —
+    doing the slow work in a staging dir first and only then swapping
+    shrinks that window down to a fast rmtree+rename.
+    """
+    staging_path = f"{final_path}.staging-{os.getpid()}"
+    if os.path.exists(staging_path):
+        shutil.rmtree(staging_path)
+    populate(staging_path)
+    if os.path.exists(final_path):
+        shutil.rmtree(final_path)
+    os.rename(staging_path, final_path)
+
+
 def preprocess(i):
 
     os_info = i['os_info']
@@ -99,17 +120,13 @@ def preprocess(i):
         repo_build_context_path = os.path.join(
             build_context_dir, "mlc_repo", repo_name)
 
-        # Remove existing directory if it exists
-        if os.path.exists(repo_build_context_path):
-            shutil.rmtree(repo_build_context_path)
-
         try:
             print(
                 f"Copying repository from {mlc_repo_path} to {repo_build_context_path}")
-            shutil.copytree(
-                mlc_repo_path,
+            _stage_and_replace_dir(
                 repo_build_context_path,
-                ignore_dangling_symlinks=True)
+                lambda staging_path: shutil.copytree(
+                    mlc_repo_path, staging_path, ignore_dangling_symlinks=True))
         except Exception as e:
             return {
                 'return': 1, 'error': f"Failed to copy repository to build context: {str(e)}"}
@@ -389,12 +406,13 @@ def preprocess(i):
             env.get('MLC_DOCKERFILE_WITH_PATH',
                     os.path.join(os.getcwd(), "Dockerfile")))
         wheels_context = os.path.join(build_context_dir, "mlc_wheels")
-        if os.path.exists(wheels_context):
-            shutil.rmtree(wheels_context)
-        os.makedirs(wheels_context, exist_ok=True)
-        for w in wheels:
-            shutil.copy2(os.path.join(local_wheels_path, w),
-                         os.path.join(wheels_context, w))
+
+        def _populate_wheels_context(staging_path, wheels=wheels):
+            os.makedirs(staging_path, exist_ok=True)
+            for w in wheels:
+                shutil.copy2(os.path.join(local_wheels_path, w),
+                             os.path.join(staging_path, w))
+        _stage_and_replace_dir(wheels_context, _populate_wheels_context)
         logger.info(f"Bundling local wheels into build context: {wheels}")
         f.write(
             EOL + '# Install local mlcflow / mlc-scripts wheels (migration test build)' + EOL)
@@ -414,23 +432,25 @@ def preprocess(i):
                         os.path.join(os.getcwd(), "Dockerfile")))
             host_repos_context = os.path.join(
                 build_context_dir, "mlc_host_repos")
-            if os.path.exists(host_repos_context):
-                shutil.rmtree(host_repos_context)
-            os.makedirs(host_repos_context, exist_ok=True)
 
             copied_repos = []
-            for item in os.listdir(host_repos_path):
-                item_path = os.path.join(host_repos_path, item)
-                if not os.path.isdir(item_path):
-                    continue
-                # Skip local cache, index files, etc.
-                if item in ['local']:
-                    continue
-                dest = os.path.join(host_repos_context, item)
-                logger.info(f"Copying host repo {item} to build context")
-                shutil.copytree(item_path, dest, symlinks=True,
-                                ignore_dangling_symlinks=True)
-                copied_repos.append(item)
+
+            def _populate_host_repos_context(staging_path):
+                os.makedirs(staging_path, exist_ok=True)
+                for item in os.listdir(host_repos_path):
+                    item_path = os.path.join(host_repos_path, item)
+                    if not os.path.isdir(item_path):
+                        continue
+                    # Skip local cache, index files, etc.
+                    if item in ['local']:
+                        continue
+                    dest = os.path.join(staging_path, item)
+                    logger.info(f"Copying host repo {item} to build context")
+                    shutil.copytree(item_path, dest, symlinks=True,
+                                    ignore_dangling_symlinks=True)
+                    copied_repos.append(item)
+            _stage_and_replace_dir(
+                host_repos_context, _populate_host_repos_context)
 
             if copied_repos:
                 docker_repos_dest = "$HOME/MLC/repos"
