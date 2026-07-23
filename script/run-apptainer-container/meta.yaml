@@ -34,7 +34,6 @@ input_mapping:
   env_vars: MLC_APPTAINER_ENV_VARS
   extra_args: MLC_APPTAINER_EXTRA_ARGS
   fakeroot: MLC_APPTAINER_FAKEROOT
-  no_fakeroot: MLC_APPTAINER_NO_FAKEROOT
   home: MLC_APPTAINER_HOME
   image: MLC_APPTAINER_IMAGE
   image_name: MLC_APPTAINER_IMAGE_NAME
