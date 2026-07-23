@@ -199,7 +199,7 @@ def remote_run(self_module, i):
 
     # If a remote shell is specified, pass it to the remote-run-commands script
     if remote_shell:
-        remote_inputs["shell"] = remote_shell
+        remote_inputs["remote_shell"] = remote_shell
 
     # Execute the remote command
     mlc_remote_input = {
