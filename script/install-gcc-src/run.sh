@@ -6,6 +6,12 @@ echo "******************************************************"
 
 echo ${MLC_GCC_SRC_REPO_PATH}
 
+# Clean source if requested (stale src/ from cancelled builds can break configure)
+if [ "${MLC_CLEAN_BUILD}" = "yes" ] && [ -d "src" ]; then
+  echo "[install-gcc-src] Clean build: removing stale src/"
+  rm -rf src
+fi
+
 if [ ! -d "src" ]; then
   cp -r ${MLC_GCC_SRC_REPO_PATH} src
   test $? -eq 0 || exit $?
