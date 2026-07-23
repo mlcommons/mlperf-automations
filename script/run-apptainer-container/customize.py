@@ -93,8 +93,10 @@ def postprocess(i):
         run_opts += ' --no-home'
 
     # Auto-enable fakeroot when overlay is specified (required for writable
-    # overlay mounts) — but only when fakeroot is not explicitly set.
-    if env.get('MLC_APPTAINER_OVERLAY', '') and not env.get('MLC_APPTAINER_FAKEROOT', ''):
+    # overlay mounts) — unless explicitly set to yes or no.
+    if env.get('MLC_APPTAINER_OVERLAY', '') and not is_true(
+            env.get('MLC_APPTAINER_FAKEROOT', '')) and not is_false(
+            env.get('MLC_APPTAINER_FAKEROOT', '')):
         env['MLC_APPTAINER_FAKEROOT'] = 'yes'
 
     if is_true(env.get('MLC_APPTAINER_FAKEROOT', '')):
