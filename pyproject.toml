@@ -32,8 +32,16 @@ Documentation = "https://docs.mlcommons.org/mlperf-automations"
 Repository = "https://github.com/mlcommons/mlperf-automations"
 Issues = "https://github.com/mlcommons/mlperf-automations/issues"
 
+# Phase-1 prototype: advertises a small demo script-content package to
+# mlcflow's pip-package discovery mechanism (see
+# mlcflow-pip-script-packages-proposal.pptx). NOT the real 377-script
+# tree - that migration is a separate, later phase. mlc_scripts_content/
+# is a new, minimal package distinct from automation/ (left untouched).
+[project.entry-points."mlc.script_packages"]
+mlc-scripts = "mlc_scripts_content"
+
 [tool.setuptools]
-packages = []
+packages = ["mlc_scripts_content"]
 include-package-data = true
 
 [tool.setuptools.dynamic]
@@ -41,3 +49,4 @@ version = {file = "VERSION"}
 
 [tool.setuptools.package-data]
 "mlcr" = ["README.md", "VERSION", "git_commit_hash.txt"]
+"mlc_scripts_content" = ["script/**/*"]
