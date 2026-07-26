@@ -207,11 +207,17 @@ def preprocess(i):
                 f.write(f"    {post_cmd}\n")
             f.write("\n")
 
-        # Copy section for local repo
+        # Copy section for local repo — skip 'local' cache dir (same as Docker)
         if use_copy_repo:
-            f.write("%files\n")
             repo_name = os.path.basename(mlc_repo_path)
-            f.write(f"    {mlc_repo_path} /opt/mlc_repo/{repo_name}\n")
+            f.write("%setup\n")
+            f.write(f"    mkdir -p ${{APPTAINER_ROOTFS}}/opt/mlc_repo\n")
+            f.write(
+                f"    tar -C {mlc_repo_path}/.. --exclude=local --exclude=.git"
+                f" --exclude=repos.json --exclude='index_*.json'"
+                f" --exclude=modified_times.json --exclude='*.lock'"
+                f" -cf - {repo_name} | tar -xf - -C ${{APPTAINER_ROOTFS}}/opt/mlc_repo/\n")
+            f.write(f"    chmod -R 777 ${{APPTAINER_ROOTFS}}/opt/mlc_repo\n")
             f.write("\n")
 
         # Runscript
