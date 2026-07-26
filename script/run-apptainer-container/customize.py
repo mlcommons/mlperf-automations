@@ -118,9 +118,12 @@ def postprocess(i):
     if env.get('MLC_APPTAINER_PWD', '') != '':
         run_opts += f" --pwd {env['MLC_APPTAINER_PWD']}"
 
-    # Bind mounts
-    if env.get('MLC_APPTAINER_BIND_MOUNTS', []):
-        for mount in env['MLC_APPTAINER_BIND_MOUNTS']:
+    # Bind mounts (handle both list and string)
+    bind_mounts = env.get('MLC_APPTAINER_BIND_MOUNTS', [])
+    if isinstance(bind_mounts, str):
+        bind_mounts = [bind_mounts]
+    for mount in bind_mounts:
+        if mount:
             run_opts += f' --bind {mount}'
 
     # Overlay
@@ -136,6 +139,15 @@ def postprocess(i):
     if env.get('MLC_APPTAINER_EXTRA_ARGS', '') != '':
         run_opts += ' ' + env['MLC_APPTAINER_EXTRA_ARGS']
 
+    # Network mode
+    if env.get('MLC_APPTAINER_NETWORK', '') != '':
+        run_opts += f" --net --network {env['MLC_APPTAINER_NETWORK']}"
+
+    # Security options
+    if env.get('MLC_APPTAINER_SECURITY_OPT', '') != '':
+        run_opts += f" --security {env['MLC_APPTAINER_SECURITY_OPT']}"
+
+    # Pre-run commands
     # Pre-run commands (skip 'mlc pull repo' when repos are pre-copied
     # via --apptainer_mlc_repo_path, as pull can destroy the working tree)
     use_copy_repo = bool(env.get('MLC_REPO_PATH', ''))

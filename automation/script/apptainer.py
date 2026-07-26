@@ -439,7 +439,8 @@ def prepare_apptainer_inputs(input_params, apptainer_settings,
             "skip_run_cmd", "pre_run_cmds", "run_cmd_prefix",
             "nv", "rocm", "bind", "writable", "writable_tmpfs",
             "cleanenv", "fakeroot", "no_home", "contain", "containall",
-            "overlay", "extra_args", "sandbox"
+            "overlay", "extra_args", "sandbox",
+            "network", "security_opt"
         ]
 
     # Collect inputs
@@ -450,6 +451,11 @@ def prepare_apptainer_inputs(input_params, apptainer_settings,
         for key in keys
         if (value := input_params.get(f"apptainer_{key}", apptainer_settings.get(key, get_apptainer_default(key)))) is not None
     }
+
+    # Convert boolean values to 'yes'/'no' strings for MLC input mapping
+    for key in list(apptainer_inputs.keys()):
+        if isinstance(apptainer_inputs[key], bool):
+            apptainer_inputs[key] = 'yes' if apptainer_inputs[key] else 'no'
 
     # Resolve default os_version from apptainerinfo.json if not specified
     if not apptainer_inputs.get('os_version', ''):
