@@ -15,8 +15,6 @@ cache: false
 
 # Environment
 default_env:
-  MLC_APPTAINER_WRITABLE_TMPFS: 'yes'
-  MLC_APPTAINER_CLEANENV: 'yes'
   MLC_APPTAINER_OS: ubuntu
   MLC_APPTAINER_OS_VERSION: '24.04'
 new_env_keys:
@@ -58,6 +56,8 @@ input_mapping:
   script_tags: MLC_APPTAINER_RUN_SCRIPT_TAGS
   writable: MLC_APPTAINER_WRITABLE
   writable_tmpfs: MLC_APPTAINER_WRITABLE_TMPFS
+  network: MLC_APPTAINER_NETWORK
+  security_opt: MLC_APPTAINER_SECURITY_OPT
 
 # Dependencies
 deps:
