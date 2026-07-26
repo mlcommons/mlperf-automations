@@ -41,7 +41,7 @@ mlcr run,apptainer,container
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
 | `--bind` |  |  | `` |
-| `--cleanenv` |  |  | `yes` |
+| `--cleanenv` |  |  | `` |
 | `--contain` |  |  | `` |
 | `--containall` |  |  | `` |
 | `--docker_image` |  |  | `` |
@@ -74,7 +74,9 @@ mlcr run,apptainer,container
 | `--save_script` |  |  | `` |
 | `--script_tags` |  |  | `` |
 | `--writable` |  |  | `` |
-| `--writable_tmpfs` |  |  | `yes` |
+| `--writable_tmpfs` |  |  | `` |
+| `--network` |  |  | `` |
+| `--security_opt` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
