@@ -19,13 +19,15 @@ if [[ ${MLC_CLEAN_BUILD} == "yes" ]]; then
     eval "$cmd"
 fi
 
-mkdir -p build
+# Build directory: override with MLC_LLVM_BUILD_DIR for local builds (e.g. /tmp)
+BUILD_DIR="${MLC_LLVM_BUILD_DIR:-build}"
+mkdir -p "${BUILD_DIR}"
 
 # If install exist, then configure was done 
 if [ ! -d "${INSTALL_DIR}" ] || [ ${MLC_LLVM_CONDA_ENV} == "yes" ]; then
     echo "******************************************************"
 
-    cd build
+    cd "${BUILD_DIR}"
     test $? -eq 0 || exit $?
 
     echo "${MLC_LLVM_CMAKE_CMD}"
@@ -61,7 +63,7 @@ fi
 
 # Clean build directory (too large)
 cd ${CUR_DIR}
-rm -rf build
+rm -rf "${BUILD_DIR}" build
 
 echo "******************************************************"
 echo "LLVM is built and installed to ${INSTALL_DIR} ..."
