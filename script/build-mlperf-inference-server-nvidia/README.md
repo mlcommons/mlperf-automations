@@ -81,6 +81,7 @@ mlcr build,mlcommons,mlperf,inference,inference-server,server,nvidia-harness,nvi
 
 - `r5.0`
 - `r5.1`
+- `r6.0`
 
 ### Version
 

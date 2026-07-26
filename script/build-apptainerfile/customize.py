@@ -161,7 +161,18 @@ def preprocess(i):
         f.write("    # Download MLC repo for scripts\n")
         if use_copy_repo:
             repo_name = os.path.basename(mlc_repo_path)
-            f.write(f"    mlc add repo /opt/mlc_repo/{repo_name} --quiet\n")
+            # Set MLC_REPOS to match the runtime path so repos.json is created
+            # at the correct location for the container's runtime env.
+            f.write(f"    export MLC_REPOS=/opt/mlc_repo/{repo_name}\n")
+            # Register each subdirectory as an individual repo (the parent
+            # dir is a MLC_REPOS directory, not a single repo).
+            f.write(
+                f"    for d in /opt/mlc_repo/{repo_name}/*/; do mlc add repo \"$d\" --quiet 2>/dev/null || true; done\n")
+            # Refresh git index stat cache — tar copy into SIF changes timestamps,
+            # making git see all files as modified. Without this, mlc pull repo
+            # fails with "local changes" inside the container.
+            f.write(
+                f"    for d in /opt/mlc_repo/{repo_name}/*/; do [ -d \"$d/.git\" ] && git -C \"$d\" update-index --refresh 2>/dev/null || true; done\n")
         else:
             x = env.get('MLC_APPTAINER_ADD_FLAG_TO_MLC_MLOPS_REPO', '')
             if x != '':
@@ -207,16 +218,14 @@ def preprocess(i):
                 f.write(f"    {post_cmd}\n")
             f.write("\n")
 
-        # Copy section for local repo — skip 'local' cache dir (same as Docker)
+        # Copy section for local repo (use %setup with tar to handle symlinks
+        # gracefully)
         if use_copy_repo:
             repo_name = os.path.basename(mlc_repo_path)
             f.write("%setup\n")
             f.write(f"    mkdir -p ${{APPTAINER_ROOTFS}}/opt/mlc_repo\n")
             f.write(
-                f"    tar -C {mlc_repo_path}/.. --exclude=local --exclude=.git"
-                f" --exclude=repos.json --exclude='index_*.json'"
-                f" --exclude=modified_times.json --exclude='*.lock'"
-                f" -cf - {repo_name} | tar -xf - -C ${{APPTAINER_ROOTFS}}/opt/mlc_repo/\n")
+                f"    tar -C {mlc_repo_path}/.. --exclude=repos.json --exclude='index_*.json' --exclude=local --exclude=modified_times.json -cf - {repo_name} | tar -xf - -C ${{APPTAINER_ROOTFS}}/opt/mlc_repo/\n")
             f.write(f"    chmod -R 777 ${{APPTAINER_ROOTFS}}/opt/mlc_repo\n")
             f.write("\n")
 

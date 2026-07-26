@@ -1,10 +1,13 @@
 import json
 import argparse
 import math
+import re
 import subprocess
 from pathlib import Path
 import sys
 import os
+
+_ANSI_RE = re.compile(r'\x1b\[[0-9;]*m')
 
 # -------------------------------------------------------------------
 # Extraction rules: all data comes from environment variables.
@@ -30,6 +33,24 @@ EXTRACT_RULES = {
         "source": "env",
         "candidates": ["MLC_HOST_CPU_TOTAL_LOGICAL_CORES"],
         "type": "int",
+    },
+    "host_processor_frequency": {
+        # detect-cpu exposes the max clock as MLC_HOST_CPU_MAX_MHZ.
+        "source": "env",
+        "candidates": ["MLC_HOST_CPU_MAX_MHZ"],
+    },
+    "host_processor_caches": {
+        # Composed from the per-level cache size vars emitted by detect-cpu.
+        "source": "detect",
+        "candidates": [],
+    },
+    "host_processor_interconnect": {
+        # No script currently probes CPU-socket interconnect (e.g. UPI/Infinity
+        # Fabric); left optional so it returns "" (manual field) rather than
+        # "N/A".
+        "source": "env",
+        "candidates": ["MLC_HOST_CPU_INTERCONNECT"],
+        "optional": True,
     },
 
     # ---------------- Memory ----------------
@@ -67,6 +88,23 @@ EXTRACT_RULES = {
     "accelerator_host_interconnect": {
         "source": "env",
         "candidates": ["MLC_CUDA_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_ROCM_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_XPU_DEVICE_PROP_HOST_INTERCONNECT_TYPE"],
+    },
+    "accelerator_frequency": {
+        "source": "env",
+        "candidates": ["MLC_CUDA_DEVICE_PROP_MAX_CLOCK_RATE", "MLC_ROCM_DEVICE_PROP_MAX_CLOCK_RATE"],
+    },
+    "accelerator_memory_configuration": {
+        "source": "detect",
+        "candidates": [],
+    },
+    "accelerator_on-chip_memories": {
+        "source": "detect",
+        "candidates": [],
+    },
+    "accelerator_interconnect_topology": {
+        "source": "env",
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_TOPOLOGY_DESC"],
+        "optional": True,
     },
 
     # ---------------- Networking ----------------
@@ -220,20 +258,80 @@ def extract_value(rule, field_key):
                     "MLC_HOST_GPU_DRIVER_VERSION", "").strip()
                 if driver:
                     stack_parts.append(driver)
-                return ", ".join(stack_parts) if stack_parts else None
+                return ", ".join(stack_parts) if stack_parts else ""
+            elif field_key == "accelerator_memory_configuration":
+                mem_bytes_str = os.environ.get(
+                    "MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "").strip()
+                mem_type = os.environ.get(
+                    "MLC_CUDA_DEVICE_PROP_MEMORY_TYPE", "").strip()
+                parts = []
+                if mem_bytes_str:
+                    try:
+                        mem_bytes = float(mem_bytes_str.split()[0])
+                        if mem_bytes >= 1024 ** 3:
+                            parts.append(
+                                f"{math.ceil(mem_bytes / (1024 ** 3))} GiB")
+                    except (ValueError, IndexError):
+                        pass
+                if mem_type and "unknown" not in mem_type.lower() \
+                        and "not in lookup" not in mem_type.lower():
+                    parts.append(mem_type)
+                return " ".join(parts) if parts else "N/A"
+            elif field_key == "host_processor_caches":
+                cache_levels = [
+                    ("L1d", "MLC_HOST_CPU_L1D_CACHE_SIZE"),
+                    ("L1i", "MLC_HOST_CPU_L1I_CACHE_SIZE"),
+                    ("L2", "MLC_HOST_CPU_L2_CACHE_SIZE"),
+                    ("L3", "MLC_HOST_CPU_L3_CACHE_SIZE"),
+                ]
+                parts = []
+                for label, key in cache_levels:
+                    v = os.environ.get(key, "").strip()
+                    if v:
+                        parts.append(f"{label}: {v}")
+                return "; ".join(parts) if parts else "N/A"
+            elif field_key == "accelerator_on-chip_memories":
+                shared_str = os.environ.get(
+                    "MLC_CUDA_DEVICE_PROP_TOTAL_AMOUNT_OF_SHARED_MEMORY_PER_BLOCK",
+                    "").strip()
+                if shared_str:
+                    try:
+                        kb = int(shared_str) // 1024
+                        return f"Shared Memory: {kb} KB/block"
+                    except (ValueError, TypeError):
+                        pass
+                return "N/A"
             else:
-                return "Not available"
+                return "N/A"
         except Exception as e:
             return f"Not detected: {field_key} detection error ({e})"
 
-    # Collect non-empty env var values
+    # Collect non-empty env var values.
+    # Strip ANSI escape codes defensively: some tools (e.g. nvidia-smi topo -m)
+    # emit colour sequences when run in an interactive terminal. Those codes can
+    # end up stored in the mlcflow cache and resurface here as literal garbage
+    # characters in the output JSON. The primary stripping happens at capture
+    # time in get-cuda-devices/customize.py; this call handles any stale cached
+    # values that predate that fix.
     candidates = rule.get("candidates", [])
     parts = [os.environ.get(c, "") for c in candidates]
-    value = " ".join(p for p in parts if p).strip()
+    value = _ANSI_RE.sub('', " ".join(p for p in parts if p)).strip()
+
+    if field_key == "host_processor_frequency":
+        if not value:
+            return "N/A"
+        # MLC_HOST_CPU_MAX_MHZ is a bare MHz figure (e.g. "5137.0000").
+        try:
+            mhz = float(value.split()[0])
+        except (ValueError, IndexError):
+            return value
+        if mhz >= 1000:
+            return f"{mhz / 1000:.2f} GHz"
+        return f"{int(round(mhz))} MHz"
 
     if field_key == "accelerators_per_node":
         nums = [int(x) for x in value.split() if x.isdigit()]
-        return sum(nums) if nums else "Not available"
+        return sum(nums) if nums else "N/A"
 
     if field_key == "host_network_card_count":
         networking = os.environ.get("MLC_HOST_NETWORKING", "").strip()
@@ -241,41 +339,43 @@ def extract_value(rule, field_key):
             return f"{value}x {networking}"
         if value:
             return f"{value}x"
-        return "Not available"
+        return "N/A"
 
     if field_key == "accelerator_memory_capacity":
         if not value:
-            return "Not available"
+            return "N/A"
         raw = value.split()[0]
         try:
             value_bytes = float(raw)
         except ValueError:
-            return "Not available"
+            return "N/A"
         if value_bytes == 0:
-            return "Not available"
+            return "N/A"
         # Report in GiB (binary) using ceil to align with GPU product marketing values.
         # CUDA global memory is slightly below the marketed GiB due to driver reservation;
         # ceil absorbs that gap so e.g. 31.37 GiB → 32 GiB (matching "32 GB" on
         # the box).
         if value_bytes >= 1024 ** 3:
             return f"{math.ceil(value_bytes / (1024 ** 3))}GiB"
-        return f"{int(value_bytes)}GiB"
+        # Value is already in GiB (e.g. from
+        # MLC_ROCM_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB)
+        return f"{math.ceil(value_bytes)}GiB"
 
     if field_key == "host_storage_type" and value == "No disk layout data found":
-        return "Not available"
+        return "N/A"
 
     if rule.get("type") == "int":
         if not value:
-            return "Not available"
+            return "N/A"
         try:
             return int(value)
         except (ValueError, TypeError):
-            return "Not available"
+            return "N/A"
 
     if rule.get("optional"):
-        return value if value else None
+        return value if value else ""
 
-    return value if value else "Not available"
+    return value if value else "N/A"
 
 # -------------------------------------------------------------------
 

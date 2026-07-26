@@ -53,6 +53,7 @@ mlcr run,apptainer,container
 | `--home` |  |  | `` |
 | `--image` |  |  | `` |
 | `--image_name` |  |  | `` |
+| `--mlc_repo_path` |  |  | `` |
 | `--image_tag` |  |  | `` |
 | `--image_url` |  |  | `` |
 | `--no_home` |  |  | `` |

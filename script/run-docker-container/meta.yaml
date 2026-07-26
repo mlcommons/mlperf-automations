@@ -36,7 +36,7 @@ input_mapping:
   extra_run_args: MLC_DOCKER_EXTRA_RUN_ARGS
   fake_run_option: MLC_DOCKER_FAKE_RUN_OPTION
   gh_token: MLC_GH_TOKEN
-  gpu_devices: MLC_DOCKER_GPU_DEVICE_IDS
+  gpu_devices: MLC_DOCKER_GPU_DEVICES
   image_name: MLC_DOCKER_IMAGE_NAME
   image_repo: MLC_DOCKER_IMAGE_REPO
   image_tag: MLC_DOCKER_IMAGE_TAG

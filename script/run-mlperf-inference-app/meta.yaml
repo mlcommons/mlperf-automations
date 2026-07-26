@@ -71,6 +71,7 @@ input_mapping:
   hw_name: MLC_HW_NAME
   hw_notes_extra: MLC_MLPERF_SUT_SW_NOTES_EXTRA
   imagenet_path: IMAGENET_PATH
+  imagenet_preprocessed_path: MLC_IMAGENET_PREPROCESSED_PATH
   implementation: MLC_MLPERF_IMPLEMENTATION
   lang: MLC_MLPERF_IMPLEMENTATION
   max_query_count: MLC_MLPERF_INFERENCE_MAX_QUERY_COUNT
@@ -506,7 +507,6 @@ variations:
       mlperf-inference-nvidia-scratch-space:
         tags: _version.r6.0
   r6.0-dev:
-    default: true
     env:
       MLC_MLPERF_INFERENCE_VERSION: 6.0-dev
       MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r6.0-dev_default
@@ -517,6 +517,22 @@ variations:
         tags: _version.r6.0-dev
       get-mlperf-inference-submission-dir:
         tags: _version.r6.0-dev
+  r6.1-dev:
+    default: true
+    env:
+      MLC_MLPERF_INFERENCE_VERSION: 6.1-dev
+      MLC_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r6.1-dev_default
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v6.1
+    group: benchmark-version
+    adr:
+      get-mlperf-inference-results-dir:
+        tags: _version.r6.1-dev
+      get-mlperf-inference-submission-dir:
+        tags: _version.r6.1-dev
+      inference-src:
+        version: r6.1
+      inference-src-loadgen:
+        version: r6.1
   all-modes:
     env:
       MLC_MLPERF_LOADGEN_ALL_MODES: 'yes'

@@ -455,7 +455,7 @@ def get_host_path(value, extract_parent_folder=False):
     path_split = value.split(os.sep)
 
     new_value = ''
-    if "cache" in path_split and "local":
+    if "cache" in path_split and "local" in path_split:
         repo_entry_index = path_split.index("local")
         if len(path_split) >= repo_entry_index + 3:
             return os.sep.join(path_split[0:repo_entry_index + 3])

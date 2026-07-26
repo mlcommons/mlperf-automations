@@ -176,21 +176,27 @@ def detect_storage_type(system_info):
 
 def detect_network_card_count():
     """Scans /sys/class/net for physical (non-virtual, non-loopback) NICs.
+    Falls back to /sys/class/infiniband for RDMA-only hosts (e.g. containers
+    where mlx5 devices are not exposed via /sys/class/net).
     Returns count as a string.
     """
     net_dir = "/sys/class/net"
-    if not os.path.isdir(net_dir):
-        return "0"
-
     count = 0
-    for ifname in os.listdir(net_dir):
-        if ifname == "lo":
-            continue
-        device_link = f"{net_dir}/{ifname}/device"
-        if os.path.islink(device_link):
-            target = os.readlink(device_link)
-            if "/virtual/" not in target:
-                count += 1
+    if os.path.isdir(net_dir):
+        for ifname in os.listdir(net_dir):
+            if ifname == "lo":
+                continue
+            device_link = f"{net_dir}/{ifname}/device"
+            if os.path.islink(device_link):
+                target = os.readlink(device_link)
+                if "/virtual/" not in target:
+                    count += 1
+
+    if count == 0:
+        ib_dir = "/sys/class/infiniband"
+        if os.path.isdir(ib_dir):
+            count = len(os.listdir(ib_dir))
+
     return str(count)
 
 

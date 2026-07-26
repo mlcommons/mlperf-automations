@@ -132,6 +132,11 @@ def remote_run(self_module, i):
     # " ".join(mlc_run_cmd.split(" ")[1:])
     script_run_cmd = r['run_cmd_string']
 
+    # Propagate --quiet to the remote mlcr command so MLC skips interactive
+    # prompts (e.g. file selection) that cause EOFError in CI/non-interactive.
+    if quiet:
+        script_run_cmd += ' --quiet'
+
     if remote_env:
         for key in remote_env:
             script_run_cmd += f" --env.{key}={remote_env[key]}"
@@ -194,7 +199,7 @@ def remote_run(self_module, i):
 
     # If a remote shell is specified, pass it to the remote-run-commands script
     if remote_shell:
-        remote_inputs["shell"] = remote_shell
+        remote_inputs["remote_shell"] = remote_shell
 
     # Execute the remote command
     mlc_remote_input = {
@@ -202,6 +207,7 @@ def remote_run(self_module, i):
         'script_tags': i.get('tags'), 'run_cmds': run_cmds,
         'pre_run_cmds': remote_pre_run_cmds,
         'post_run_cmds': remote_post_run_cmds,
+        'quiet': quiet,
         **remote_inputs
     }
 

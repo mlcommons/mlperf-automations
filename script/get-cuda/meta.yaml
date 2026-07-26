@@ -39,10 +39,10 @@ new_env_keys:
 
 # Input mapping
 input_mapping:
+  skip_sudo: MLC_SKIP_SUDO
   cudnn_tar_file: MLC_CUDNN_TAR_FILE_PATH
   cudnn_tar_path: MLC_CUDNN_TAR_FILE_PATH
   skip_cudnn_install: MLC_CUDA_SKIP_CUDNN_INSTALL
-  skip_sudo: CUDA_SKIP_SUDO
 
 # Dependencies
 deps:

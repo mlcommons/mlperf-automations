@@ -1,0 +1,49 @@
+alias: get-redfish-power-info
+uid: 9a257ca2de162d08
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: Platform information
+tags:
+- get
+- redfish
+- power
+- info
+- bmc
+
+# Cache
+cache: false
+
+# Environment
+new_env_keys:
+- MLC_OUTDIRNAME
+- MLC_REDFISH_OUTPUT_FILE_PATH
+
+# Input mapping
+input_mapping:
+  endpoint: MLC_REDFISH_ENDPOINT
+  username: MLC_REDFISH_USERNAME
+  password: MLC_REDFISH_PASSWORD
+  output: MLC_REDFISH_OUTPUT_FILE
+  insecure: MLC_REDFISH_INSECURE
+
+default_env:
+  MLC_REDFISH_ENDPOINT: http://localhost:8000
+  MLC_REDFISH_USERNAME: ''
+  MLC_REDFISH_PASSWORD: ''
+  MLC_REDFISH_OUTPUT_FILE: redfish_capture.yaml
+  MLC_REDFISH_INSECURE: 'yes'
+
+# Dependencies
+deps:
+- tags: detect,os
+- names:
+  - python
+  - python3
+  tags: get,python
+- tags: get,generic-python-lib,_package.PyYAML
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_REDFISH_OUTPUT_FILE_PATH: Path to the generated Redfish power info YAML file.

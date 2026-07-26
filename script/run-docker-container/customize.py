@@ -244,7 +244,7 @@ def postprocess(i):
         run_opts += " --shm-size={}".format(env['MLC_DOCKER_SHM_SIZE'])
 
     if env.get('MLC_DOCKER_EXTRA_RUN_ARGS', '') != '':
-        run_opts += env['MLC_DOCKER_EXTRA_RUN_ARGS']
+        run_opts += " " + env['MLC_DOCKER_EXTRA_RUN_ARGS']
 
     if is_true(env.get('MLC_DOCKER_USE_GOOGLE_DNS', '')):
         run_opts += ' --dns 8.8.8.8 --dns 8.8.4.4 '
@@ -313,6 +313,7 @@ def postprocess(i):
         existing_container_id = env.get('MLC_DOCKER_CONTAINER_ID', '')
         # Escape single quotes inside run_cmd for bash -c '...' wrapping
         escaped_run_cmd = run_cmd.replace("'", "'\\''")
+
         if existing_container_id:
             CMD = f"""ID={existing_container_id} && {_get_container_cmd(env)} exec $ID bash -c '""" + \
                 escaped_run_cmd + "'"

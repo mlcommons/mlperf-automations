@@ -70,3 +70,4 @@ mlcr get,mlperf,inference,nvidia,scratch,space
 - `version.4_1`
 - `version.4_1-dev`
 - `version.5_0-dev` (default)
+- `version.6.0`

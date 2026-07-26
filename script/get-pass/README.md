@@ -1,4 +1,4 @@
-# README for get-lib-aocl-blis
+# README for get-pass
 This README is automatically generated. Create and add custom content in info.md. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,14 +33,17 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr get,lib,lib-aocl-blis,aocl-blis,aocl,blis
+mlcr get,pass,secret,token,credential
 ```
 
 ### Script Inputs
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
-| `--accept_eula` | Accept the AMD EULA for binary downloads (yes/no) |  | `no` |
+| `--env_key` |  |  | `` |
+| `--secret_name` |  |  | `` |
+| `--credentials_file` |  |  | `~/.mlc_credentials` |
+| `--source` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -63,28 +66,9 @@ mlcr get,lib,lib-aocl-blis,aocl-blis,aocl,blis
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
-### Binary-compiler
+### Source
 
-- `binary.aocc` (default)
-- `binary.gcc`
-
-### Install-mode
-
-- `path.#` _(# can be substituted dynamically)_
-
-### Repo
-
-- `repo.#` _(# can be substituted dynamically)_
-- `repo.amd` (default)
-
-### Ungrouped
-
-- `binary`
-- `branch.#` _(# can be substituted dynamically)_
-
-### Version
-
-- `master`
-- `tag.#` _(# can be substituted dynamically)_
-- `version.5.1.0`
-- `version.5.2.2` (default)
+- `env`
+- `file` (default)
+- `keyring`
+- `pass`
