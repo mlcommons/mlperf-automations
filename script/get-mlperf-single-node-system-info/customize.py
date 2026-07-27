@@ -1,5 +1,6 @@
 from mlc import utils
 import os
+import json
 import subprocess
 
 
@@ -34,5 +35,24 @@ def postprocess(i):
     os_info = i['os_info']
 
     automation = i['automation']
+
+    # Stamp the output with the git version of the automations repo that
+    # produced it (traceability, since mlc-scripts has no tagged release).
+    output_path = env.get('MLC_SINGLE_NODE_SYSTEM_INFO_FILE_PATH', '')
+    repo_path = env.get('MLC_TMP_CURRENT_SCRIPT_REPO_PATH', '')
+    if output_path and os.path.exists(output_path):
+        try:
+            from mlc.utils import get_repo_version
+            version = get_repo_version(repo_path)
+            if version:
+                with open(output_path) as f:
+                    data = json.load(f)
+                data['mlc_scripts_version'] = {
+                    'repo': os.path.basename(repo_path), **version}
+                with open(output_path, 'w') as f:
+                    json.dump(data, f, indent=2)
+        except Exception as e:
+            automation.logger.warning(
+                f"Could not add version info to {output_path}: {e}")
 
     return {'return': 0}

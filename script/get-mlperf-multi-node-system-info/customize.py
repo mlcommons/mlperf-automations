@@ -582,6 +582,9 @@ def _update_parsed_node_details(
         return
     with open(path) as f:
         info = json.load(f)
+    # The per-node provenance block is not a hardware field; drop it so it
+    # never leaks into node_types. The aggregated output carries its own.
+    info.pop('mlc_scripts_version', None)
     node_name = (
         f"{info.get('host_processor_model_name', '')}"
         f"-{info.get('accelerators_per_node', '')}"
@@ -691,6 +694,18 @@ def postprocess(i):
     if env.get("MLC_MLPERF_BENCHMARK", "") == "inference":
         output_info = _flatten_for_inference(output_info, env)
         logger.info("Using flat inference format for system_info.json")
+
+    # Stamp the aggregated output with the git version of the automations repo
+    # (the orchestrating node's checkout) that produced it.
+    repo_path = env.get('MLC_TMP_CURRENT_SCRIPT_REPO_PATH', '')
+    try:
+        from mlc.utils import get_repo_version
+        version = get_repo_version(repo_path)
+        if version:
+            output_info['mlc_scripts_version'] = {
+                'repo': os.path.basename(repo_path), **version}
+    except Exception as e:
+        logger.warning(f"Could not add version info: {e}")
 
     try:
         with open(env['MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH'], 'w') as f:
