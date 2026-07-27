@@ -641,7 +641,7 @@ class ScriptAutomation(Automation):
         # MLC_TMP_ prefix (in local_env_keys) so each script gets its OWN repo's
         # version and dependency scripts never overwrite the parent's.
         try:
-            from script.repo_version import get_repo_version
+            from mlc.repo_version import get_repo_version
             repos_path = getattr(
                 self.action_object, 'repos_path',
                 os.path.dirname(script_repo_path))
