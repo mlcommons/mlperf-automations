@@ -636,6 +636,30 @@ class ScriptAutomation(Automation):
         env['MLC_TMP_CURRENT_SCRIPT_REPO_PATH'] = script_repo_path
         env['MLC_TMP_CURRENT_SCRIPT_REPO_PATH_WITH_PREFIX'] = script_repo_path_with_prefix
 
+        # Stamp the env with the version (git commit) of the repo this script
+        # came from, so scripts can record provenance in their outputs. Uses the
+        # MLC_TMP_ prefix (in local_env_keys) so each script gets its OWN repo's
+        # version and dependency scripts never overwrite the parent's.
+        try:
+            from script.repo_version import get_repo_version
+            repos_path = getattr(
+                self.action_object, 'repos_path',
+                os.path.dirname(script_repo_path))
+            repo_ver = get_repo_version(script_repo_path, repos_path)
+            env['MLC_TMP_SCRIPTS_GIT_REPO'] = script_item.repo.meta.get(
+                'alias', '')
+            env['MLC_TMP_SCRIPTS_GIT_COMMIT'] = repo_ver.get('commit', '')
+            env['MLC_TMP_SCRIPTS_GIT_BRANCH'] = repo_ver.get('branch', '')
+            env['MLC_TMP_SCRIPTS_GIT_DIRTY'] = 'true' if repo_ver.get(
+                'dirty') else 'false'
+            env['MLC_TMP_SCRIPTS_GIT_VERSION_SOURCE'] = repo_ver.get(
+                'source', '')
+            if repo_ver.get('version'):
+                env['MLC_TMP_SCRIPTS_PACKAGE_VERSION'] = repo_ver['version']
+        except Exception as e:
+            self.logger.debug(
+                f"Could not resolve repo version for {script_repo_path}: {e}")
+
         run_state['script_id'] = meta['alias'] + "," + meta['uid']
         run_state['script_tags'] = script_tags
         run_state['script_variation_tags'] = variation_tags

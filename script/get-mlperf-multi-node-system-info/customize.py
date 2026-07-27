@@ -7,6 +7,26 @@ import yaml
 import urllib.request
 
 
+def scripts_version_block(env):
+    """Assemble a provenance block from the MLC_TMP_SCRIPTS_GIT_* env vars set
+    by the engine, identifying the automations repo commit that produced this
+    output. Returns an empty dict when the engine did not provide version info."""
+    source = env.get('MLC_TMP_SCRIPTS_GIT_VERSION_SOURCE', '')
+    if not source:
+        return {}
+    block = {
+        "repo": env.get('MLC_TMP_SCRIPTS_GIT_REPO', ''),
+        "commit": env.get('MLC_TMP_SCRIPTS_GIT_COMMIT', ''),
+        "branch": env.get('MLC_TMP_SCRIPTS_GIT_BRANCH', ''),
+        "dirty": env.get('MLC_TMP_SCRIPTS_GIT_DIRTY', '') == 'true',
+        "source": source,
+    }
+    package_version = env.get('MLC_TMP_SCRIPTS_PACKAGE_VERSION', '')
+    if package_version:
+        block["package_version"] = package_version
+    return block
+
+
 # Maps JSON/YAML config file keys to the env vars they populate.
 # CLI args (already resolved into env vars by MLC) take precedence:
 # a key from the config file is only applied when the env var is still empty.
@@ -582,6 +602,9 @@ def _update_parsed_node_details(
         return
     with open(path) as f:
         info = json.load(f)
+    # The single-node provenance block is not a hardware field; drop it so it
+    # never leaks into node_types. The aggregated output carries its own block.
+    info.pop('mlc_scripts_version', None)
     node_name = (
         f"{info.get('host_processor_model_name', '')}"
         f"-{info.get('accelerators_per_node', '')}"
@@ -691,6 +714,12 @@ def postprocess(i):
     if env.get("MLC_MLPERF_BENCHMARK", "") == "inference":
         output_info = _flatten_for_inference(output_info, env)
         logger.info("Using flat inference format for system_info.json")
+
+    # Stamp the aggregated output with the automations repo version (the
+    # orchestrating node's checkout) that produced it.
+    version_block = scripts_version_block(env)
+    if version_block:
+        output_info['mlc_scripts_version'] = version_block
 
     try:
         with open(env['MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH'], 'w') as f:
