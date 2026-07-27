@@ -134,6 +134,15 @@ def get_target_triple():
         # Darwin = macOS, append apple-darwin
         return f"{machine}-apple-darwin{release}"
     elif system == "linux":
+        # Use gcc -dumpmachine to get the real system triple (e.g. aarch64-linux-gnu
+        # vs aarch64-pc-linux-gnu) so the stage-2 clang finds C++ headers correctly.
+        import subprocess
+        try:
+            triple = subprocess.check_output(["gcc", "-dumpmachine"], text=True).strip()
+            if triple:
+                return triple
+        except (FileNotFoundError, subprocess.CalledProcessError):
+            pass
         return f"{machine}-pc-linux-gnu"
     elif system == "windows":
         return f"{machine}-pc-windows-msvc"
