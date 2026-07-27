@@ -199,8 +199,16 @@ def get_repo_version(repo_path, repos_path):
                 return _strip_cache_keys(entry)
 
             info = _resolve()
-            cache[repo_path] = {**info, "head_mtime": head_mtime,
-                                "index_mtime": index_mtime}
+            # Re-read the mtimes AFTER computing. `git status` refreshes
+            # .git/index (bumping its mtime), so storing the pre-compute mtimes
+            # would invalidate this very entry on the next call and the cache
+            # would never hit. Capturing the settled post-compute mtimes lets an
+            # unchanged repo take the cheap path next time.
+            cache[repo_path] = {
+                **info,
+                "head_mtime": _mtime(os.path.join(git_dir, "HEAD")),
+                "index_mtime": _mtime(os.path.join(git_dir, "index")),
+            }
             try:
                 with open(sidecar, "w") as f:
                     json.dump(cache, f, indent=2)
