@@ -15,6 +15,7 @@ cache: false
 new_env_keys:
 - MLC_REMOTE_RUN_SSH_ID_COUNT
 - MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH
+- MLC_NAMEPLATE_POWER_YAML_FILE_PATH
 
 # Input mapping
 input_mapping:
@@ -57,6 +58,9 @@ input_mapping:
   run_metadata_path: MLC_MLPERF_RUN_METADATA_PATH
   serving_framework_type: MLC_MLPERF_SERVING_FRAMEWORK_TYPE
   system_type_detail: MLC_MLPERF_SYSTEM_TYPE_DETAIL
+  redfish_endpoint: MLC_REDFISH_ENDPOINT
+  redfish_username: MLC_REDFISH_USERNAME
+  redfish_password: MLC_REDFISH_PASSWORD
 default_env:
   MLC_MLPERF_SERVING_LOG_PATH: /tmp/serving.log
 
@@ -77,6 +81,42 @@ prehook_deps:
   env:
     MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH: <<<MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH>>>
     MLC_SINGLE_NODE_SYSTEM_INFO_FILE_NAME: mlperf-system-info-single-node-0.json
+  # Two mutually exclusive get-redfish-power-info invocations, selected by
+  # whether _inference_optional_nameplate is also active. Only one of these
+  # two ever runs: _redfish + _inference_optional_nameplate together use the
+  # lean scope (PSU-only walk, no Thermal/Systems); _redfish alone uses the
+  # full general-purpose capture. If _inference_optional_nameplate is set
+  # WITHOUT _redfish, neither of these deps runs at all -- postprocess()
+  # writes the generic skeleton template instead (no BMC contact).
+- tags: get,redfish,power,info,_inference_optional_nameplate
+  names:
+  - get-redfish-power-info
+  enable_if_env:
+    MLC_MLPERF_REDFISH_ENABLED:
+    - 'True'
+    MLC_MLPERF_INFERENCE_OPTIONAL_NAMEPLATE_ENABLED:
+    - 'True'
+  env:
+    # MLC_REDFISH_ENDPOINT/USERNAME/PASSWORD are NOT re-templated here: the
+    # template engine can't resolve <<<X>>> when the destination key is the
+    # same name as the source (self-referential templates resolve to a
+    # literal string, not the value) -- these pass through via ordinary env
+    # inheritance instead, since both scripts use the identical var names.
+    MLC_REDFISH_NAMEPLATE_OUTPUT_FILE: <<<MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH>>>/redfish_nameplate_power.yaml
+    MLC_REDFISH_SYSTEM_NAME: <<<MLC_MLPERF_SYSTEM_NAME>>>
+- tags: get,redfish,power,info,_full
+  names:
+  - get-redfish-power-info
+  enable_if_env:
+    MLC_MLPERF_REDFISH_ENABLED:
+    - 'True'
+  skip_if_env:
+    MLC_MLPERF_INFERENCE_OPTIONAL_NAMEPLATE_ENABLED:
+    - 'True'
+  env:
+    # See note above: MLC_REDFISH_ENDPOINT/USERNAME/PASSWORD pass through via
+    # ordinary env inheritance, not self-referential templates.
+    MLC_REDFISH_OUTPUT_FILE: <<<MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH>>>/redfish_capture.yaml
 
 # Variations
 variations:
@@ -118,7 +158,14 @@ variations:
   power:
     env:
       MLC_MLPERF_POWER_VARIATION: 'True'
+  redfish:
+    env:
+      MLC_MLPERF_REDFISH_ENABLED: 'True'
+  inference_optional_nameplate:
+    env:
+      MLC_MLPERF_INFERENCE_OPTIONAL_NAMEPLATE_ENABLED: 'True'
 
 # Output / debugging
 print_env_at_the_end:
   MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH: Path to the generated multi-node system info file.
+  MLC_NAMEPLATE_POWER_YAML_FILE_PATH: Path to the generated nameplate power YAML file (populated from Redfish with _redfish,_inference_optional_nameplate; a generic skeleton template with _inference_optional_nameplate alone).

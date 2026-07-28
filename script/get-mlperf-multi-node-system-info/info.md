@@ -345,7 +345,9 @@ Specify one of `_cuda`, `_rocm`, or `_xpu` to match your hardware. If none is gi
 |-----|--------|
 | `_exclude_current_node` | Skips collecting info from the machine running this command. Use when the orchestrator is not part of the inference cluster. |
 | `_network` | Adds the Network division extra fields (`is_network`, `network_type`, `network_media`, etc.) to the output. Stack with `_inference`. |
-| `_power` | Adds the power submission extra fields (`power_supply_quantity_and_rating_watts`, `power_supply_details`, `boot_firmware_version`, etc.) to the output. Stack with `_inference`. |
+| `_power` | Adds the power submission extra fields (`power_supply_quantity_and_rating_watts`, `power_supply_details`, `boot_firmware_version`, etc.) to the output as blank strings for manual entry. Stack with `_inference`. |
+| `_redfish` | Runs [`get-redfish-power-info`](../get-redfish-power-info/README.md) as a `prehook_dep` to capture live PSU data from a Redfish BMC/mockup endpoint. On its own, just produces a raw capture YAML in the output dir for reference. |
+| `_inference_optional_nameplate` | Produces the nameplate power YAML the MLPerf Inference submission_checker optionally accepts (see [Nameplate power YAML](#nameplate-power-yaml-_redfish_inference_optional_nameplate)). Stacked with `_redfish`, it's populated with real PSU data from the BMC; used **alone**, it writes the generic fill-in-the-blanks skeleton template instead — no BMC is contacted. |
 
 ### Example: inference submission with power fields
 
@@ -355,6 +357,106 @@ mlcr get-mlperf-multi-node-system-info,_cuda,_inference,_power \
   --out_dir_path=/tmp/sysinfo \
   --system_name="My System"
 ```
+
+### Example: skeleton nameplate power template (no BMC)
+
+```bash
+mlcr get-mlperf-multi-node-system-info,_inference,_inference_optional_nameplate \
+  --out_dir_path=/tmp/sysinfo \
+  --system_name="My System"
+```
+
+### Example: nameplate power YAML populated from a Redfish BMC
+
+```bash
+mlcr get-mlperf-multi-node-system-info,_inference,_redfish,_inference_optional_nameplate \
+  --out_dir_path=/tmp/sysinfo \
+  --system_name="My System" \
+  --redfish_endpoint=https://bmc.example.com \
+  --redfish_username=admin \
+  --redfish_password=secret
+```
+
+## Nameplate power YAML (`_redfish`,`_inference_optional_nameplate`)
+
+`_inference_optional_nameplate` is unrelated to the `_power` variation above
+— `_power` only adds blank text fields to `system_desc.json` for manual
+entry, whereas `_inference_optional_nameplate` produces a real, separate
+YAML file: the PSU nameplate/design-power declaration consumed by
+`nameplate_power_check` in the MLPerf Inference `submission_checker`
+(`tools/submission/submission_checker/checks/system_check.py` in the
+`inference` repo). That checker sums `PowerCapacityWatts` across the
+`Min PSUs Needed` largest PSUs per leaf node and expects the file at
+`systems/<system_desc_id>_power.yaml` (`NAMEPLATE_POWER_PATH` in
+`submission_checker/constants.py`, required starting `v6.1`).
+
+**Two modes, depending on whether `_redfish` is also active:**
+
+| Your tags | What gets written |
+|---|---|
+| `_inference_optional_nameplate` alone | The **generic skeleton template** verbatim from the optional power template in `tools/submission/submission_structure.md` — placeholder `My Rack 1` / `My Server 1` / `My Switch 1` labels, `PSU 1`/`PSU 2` at 1200W each, `Description: 'Optional Description'`. No BMC is contacted at all — the `get-redfish-power-info` dependency doesn't even run. Fill in the real numbers by hand. |
+| `_redfish,_inference_optional_nameplate` | The **real** PSU data captured live from the Redfish BMC (see mapping below) |
+
+**Data source and mapping (when `_redfish` is also active):**
+
+| Nameplate field | Redfish source |
+|---|---|
+| `PSUs[].Name` / `PowerCapacityWatts` | `Chassis/<id>/PowerSubsystem/PowerSupplies/<bay>` (preferred) or the legacy `Chassis/<id>/Power` → `PowerSupplies[]` (fallback, when a BMC only implements the older schema) |
+| `Min PSUs Needed` | `Chassis/<id>/PowerSubsystem` → `PowerSupplyRedundancy[].MinNeededInGroup`, when the BMC reports it; otherwise conservatively defaults to the number of installed PSUs (no redundancy credit) |
+
+**What this does NOT give you automatically, even with real BMC data:**
+Redfish has no concept of rack/system grouping above a chassis — each
+chassis becomes one flat leaf under `<system_name>`. If you want an
+explicit rack layer in between (as shown in the skeleton template), edit
+the generated YAML by hand after generation.
+
+**Output:** written to `<out_dir_path>/<system_name with spaces replaced
+by _>_power.yaml`, and its path is reported via
+`MLC_NAMEPLATE_POWER_YAML_FILE_PATH`. This script has no concept of the
+submission's actual `<system_desc_id>` (only the human-readable
+`--system_name`), so you still need to copy/rename the file into your
+submission's `systems/` directory to match whatever `hw_name` that
+submission uses — the same manual step already required for the main
+`system_desc.json` output.
+
+**Which `get-redfish-power-info` scope actually runs:** the dependency is
+wired as two mutually exclusive `prehook_deps` entries, gated so that
+neither runs unless `_redfish` is active:
+
+| Your tags | `get-redfish-power-info` invocation |
+|---|---|
+| `_inference_optional_nameplate` alone | Neither — no BMC contact, skeleton template written directly by `postprocess()` |
+| `_redfish` alone | `_full` scope — complete chassis+systems+thermal capture, no nameplate file |
+| `_redfish,_inference_optional_nameplate` | `_inference_optional_nameplate` scope — lean PSU-only walk (no Thermal, no Systems), only produces the nameplate YAML |
+
+Output paths (`MLC_REDFISH_OUTPUT_FILE`/`MLC_REDFISH_NAMEPLATE_OUTPUT_FILE`/
+`MLC_REDFISH_SYSTEM_NAME`) are passed explicitly via `env:` templating in
+`meta.yaml`, since they need to be derived from this script's own paths.
+Connection args (`redfish_endpoint`/`username`/`password`) are **not**
+re-templated — both scripts use the identical env var names
+(`MLC_REDFISH_ENDPOINT`/`USERNAME`/`PASSWORD`), so they pass through via
+ordinary env inheritance instead. (Self-referential templates like
+`MLC_REDFISH_ENDPOINT: <<<MLC_REDFISH_ENDPOINT>>>` don't resolve in this
+engine — they're left as a literal string — so don't add those.)
+
+**Additional inputs (all optional; only relevant with `_redfish`):**
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `--redfish_endpoint` | Redfish base URL. | `http://localhost:8000` |
+| `--redfish_username` | BMC username. Leave unset for an unauthenticated mockup. | — |
+| `--redfish_password` | BMC password. | — |
+
+Every actual HTTP request to the BMC is made through the DMTF `redfishtool`
+CLI (installed automatically as a pip dependency), not direct HTTP calls —
+see [get-redfish-power-info's README](../get-redfish-power-info/README.md)
+for details. `redfishtool` always skips TLS certificate verification
+internally, so there is no separate "insecure" option to configure here.
+
+For local testing without real hardware, point `--redfish_endpoint` at a
+[DMTF Redfish-Mockup-Server](https://github.com/DMTF/Redfish-Mockup-Server)
+instance — see the "Local testing" section in
+[get-redfish-power-info's README](../get-redfish-power-info/README.md).
 
 ## Inference submission format
 
