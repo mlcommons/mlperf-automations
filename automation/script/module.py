@@ -621,7 +621,8 @@ class ScriptAutomation(Automation):
 
             compat_entries = meta.get('mlc_compat')
             if compat_entries:
-                unmet_warnings, unmet_blockers = check_mlc_compat(compat_entries, current_mlc_version)
+                unmet_warnings, unmet_blockers = check_mlc_compat(
+                    compat_entries, current_mlc_version)
                 notice, is_blocking = format_compat_notice(
                     script_alias, unmet_warnings, unmet_blockers, current_mlc_version)
                 if notice:
@@ -629,15 +630,18 @@ class ScriptAutomation(Automation):
                         self.logger.error(notice)
                         return {'return': 1, 'error': (
                             "Script '{}' requires a newer mlcflow version. "
-                            "Run `pip install --upgrade mlcflow` and retry.".format(script_alias)
+                            "Run `pip install --upgrade mlcflow` and retry.".format(
+                                script_alias)
                         )}
                     else:
                         self.logger.warning(notice)
             else:
-                # Fall back to legacy min_mlc_version (single threshold, always blocks)
+                # Fall back to legacy min_mlc_version (single threshold, always
+                # blocks)
                 min_mlc_version = meta.get('min_mlc_version', '').strip()
                 if min_mlc_version and current_mlc_version:
-                    if utils.compare_versions(current_mlc_version, min_mlc_version) < 0:
+                    if utils.compare_versions(
+                            current_mlc_version, min_mlc_version) < 0:
                         return {'return': 1, 'error': (
                             'This script requires mlcflow >= {} (installed: {}) '
                             '— please upgrade: pip install --upgrade mlcflow'.format(
