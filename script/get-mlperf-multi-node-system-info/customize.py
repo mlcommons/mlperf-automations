@@ -4,6 +4,7 @@ import re
 import mlc
 import json
 import yaml
+import shutil
 import urllib.request
 
 
@@ -613,6 +614,102 @@ def _update_parsed_node_details(
     return True
 
 
+def _skeleton_nameplate_power(system_name):
+    """Generic fill-in-the-blanks nameplate power template, matching the
+    optional power template in tools/submission/submission_structure.md
+    verbatim (System/Rack/Server-and-Switch labels, placeholder PSU values).
+
+    Used when _inference_optional_nameplate is requested without _redfish:
+    there is no BMC to query, so no real PSU data can be populated -- this
+    just hands the submitter the same fill-in-the-blanks shape from the
+    spec, with the actual system name substituted at the top level.
+    """
+    def _leaf():
+        return [{
+            'Description': 'Optional Description',
+            'Min PSUs Needed': 1,
+            'PSUs': [
+                {'Name': 'PSU 1', 'PowerCapacityWatts': 1200},
+                {'Name': 'PSU 2', 'PowerCapacityWatts': 1200},
+            ],
+        }]
+
+    return {
+        system_name: [
+            {
+                'My Rack 1': [
+                    {'My Server 1': _leaf()},
+                    {'My Switch 1': _leaf()},
+                ]
+            }
+        ]
+    }
+
+
+def _finalize_nameplate_power(env, dir_path, logger):
+    """Produce '<system>_power.yaml', the name the MLPerf Inference
+    submission_checker looks for (NAMEPLATE_POWER_PATH in
+    submission_checker/constants.py), and surface its path via
+    MLC_NAMEPLATE_POWER_YAML_FILE_PATH.
+
+    Two paths depending on whether _redfish is also active:
+      - _inference_optional_nameplate + _redfish: rename the real capture
+        produced by the get-redfish-power-info prehook_dep (real PSU data).
+      - _inference_optional_nameplate alone: no BMC to query, so write the
+        generic skeleton template instead (see _skeleton_nameplate_power).
+
+    Either way, the resulting file still needs to be copied into the
+    submission's systems/ directory and renamed to match whatever
+    <system_desc_id> that submission actually uses, since this script has
+    no concept of that identifier (only MLC_MLPERF_SYSTEM_NAME, the
+    human-readable name, which may differ from the submission's hw_name).
+    """
+    if not is_true(
+            env.get('MLC_MLPERF_INFERENCE_OPTIONAL_NAMEPLATE_ENABLED', False)):
+        return
+
+    system_name = (env.get('MLC_MLPERF_SYSTEM_NAME', '') or 'system').strip()
+    safe_name = system_name.replace(' ', '_')
+    dest = os.path.join(dir_path, f"{safe_name}_power.yaml")
+
+    if not is_true(env.get('MLC_MLPERF_REDFISH_ENABLED', False)):
+        try:
+            with open(dest, 'w') as f:
+                yaml.dump(
+                    _skeleton_nameplate_power(system_name),
+                    f,
+                    default_flow_style=False,
+                    sort_keys=False,
+                    allow_unicode=True)
+            env['MLC_NAMEPLATE_POWER_YAML_FILE_PATH'] = dest
+            logger.info(
+                f"_inference_optional_nameplate used without _redfish -- "
+                f"wrote the generic skeleton power template to {dest}. "
+                f"Fill in real PSU data by hand, or re-run with _redfish "
+                f"to populate it from a live BMC instead.")
+        except Exception as e:
+            logger.error(f"Failed to write skeleton nameplate power YAML: {e}")
+        return
+
+    src = env.get('MLC_REDFISH_NAMEPLATE_OUTPUT_FILE_PATH', '')
+    if not src or not os.path.exists(src):
+        logger.warning(
+            "Nameplate power YAML was requested but no PSU data was "
+            "captured from the Redfish endpoint (BMC may not expose "
+            "Chassis/<id>/Power or PowerSubsystem). Skipping.")
+        return
+
+    try:
+        shutil.copyfile(src, dest)
+        env['MLC_NAMEPLATE_POWER_YAML_FILE_PATH'] = dest
+        logger.info(
+            f"Nameplate power YAML ready at {dest} -- copy it into your "
+            f"submission's systems/ directory, renamed to match your "
+            f"<system_desc_id>_power.yaml")
+    except Exception as e:
+        logger.error(f"Failed to finalize nameplate power YAML: {e}")
+
+
 def postprocess(i):
 
     env = i['env']
@@ -780,5 +877,7 @@ def postprocess(i):
                     sc['framework'])
         except Exception as e:
             logger.error(f"Failed to patch {run_md_path}: {e}")
+
+    _finalize_nameplate_power(env, dir_path, logger)
 
     return {'return': 0}
