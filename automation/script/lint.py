@@ -99,6 +99,7 @@ TOP_LEVEL_KEY_ORDER = [
     "tags_help",
     "private",
     "min_mlc_version",
+    "mlc_compat",
 
     # Cache
     "cache",
@@ -164,7 +165,7 @@ TOP_LEVEL_KEY_ORDER = [
 # A comment is inserted before the first key from each group that appears in the file.
 SECTION_GROUPS = [
     # Identity keys (alias, uid, etc.) get no header - they're always first
-    ("# Metadata",                ["name", "category", "category_sort", "developers", "tags", "tags_help", "private", "min_mlc_version"]),
+    ("# Metadata",                ["name", "category", "category_sort", "developers", "tags", "tags_help", "private", "min_mlc_version", "mlc_compat"]),
     ("# Cache",                   ["cache", "can_force_cache", "cache_expiration", "extra_cache_tags_from_env", "clean_files", "clean_output_files"]),
     ("# Environment",             ["default_env", "env", "new_env_keys", "new_state_keys", "local_env_keys", "file_path_env_keys", "folder_path_env_keys", "env_key_mappings"]),
     ("# Input mapping",           ["input_mapping", "input_description"]),
