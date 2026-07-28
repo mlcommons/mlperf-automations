@@ -616,7 +616,7 @@ class ScriptAutomation(Automation):
         # min_mlc_version (legacy): single threshold, always blocks
         script_alias = meta.get('alias', '')
         try:
-            from mlc.compat import get_installed_version, check_mlc_compat, format_compat_notice
+            from script.compat import get_installed_version, check_mlc_compat, format_compat_notice
             current_mlc_version = get_installed_version()
 
             compat_entries = meta.get('mlc_compat')
