@@ -20,7 +20,9 @@ def get_installed_version():
     # Fallback: read the VERSION file bundled with the mlcflow package
     try:
         import mlc
-        version_file = os.path.join(os.path.dirname(mlc.__file__), "..", "VERSION")
+        version_file = os.path.join(
+            os.path.dirname(
+                mlc.__file__), "..", "VERSION")
         with open(version_file) as f:
             return f.read().strip()
     except Exception:
@@ -53,7 +55,8 @@ def check_mlc_compat(compat_entries, installed_version_str):
         if not min_version_str:
             continue
         try:
-            if utils.compare_versions(installed_version_str, min_version_str) < 0:
+            if utils.compare_versions(
+                    installed_version_str, min_version_str) < 0:
                 item = {"min_version": min_version_str, "message": message}
                 if fail:
                     unmet_blockers.append(item)
@@ -65,7 +68,8 @@ def check_mlc_compat(compat_entries, installed_version_str):
     return unmet_warnings, unmet_blockers
 
 
-def format_compat_notice(script_name, unmet_warnings, unmet_blockers, installed_version_str):
+def format_compat_notice(script_name, unmet_warnings,
+                         unmet_blockers, installed_version_str):
     """
     Build a consolidated human-readable notice for unmet mlc_compat requirements.
 
@@ -80,15 +84,24 @@ def format_compat_notice(script_name, unmet_warnings, unmet_blockers, installed_
     is_blocking = bool(unmet_blockers)
     lines = [
         "mlc_compat: script '{}' has version requirements not met by "
-        "the installed mlcflow {}:".format(script_name, installed_version_str or "(unknown)")
+        "the installed mlcflow {}:".format(
+            script_name, installed_version_str or "(unknown)")
     ]
     for entry in unmet_warnings:
-        lines.append("  [warn ] min_version {}: {}".format(entry["min_version"], entry["message"]))
+        lines.append(
+            "  [warn ] min_version {}: {}".format(
+                entry["min_version"],
+                entry["message"]))
     for entry in unmet_blockers:
-        lines.append("  [ERROR] min_version {}: {}".format(entry["min_version"], entry["message"]))
+        lines.append(
+            "  [ERROR] min_version {}: {}".format(
+                entry["min_version"],
+                entry["message"]))
     if is_blocking:
-        lines.append("  -> Run `pip install --upgrade mlcflow` to satisfy blocking requirements.")
+        lines.append(
+            "  -> Run `pip install --upgrade mlcflow` to satisfy blocking requirements.")
     else:
-        lines.append("  -> Consider upgrading: `pip install --upgrade mlcflow`")
+        lines.append(
+            "  -> Consider upgrading: `pip install --upgrade mlcflow`")
 
     return "\n".join(lines), is_blocking
