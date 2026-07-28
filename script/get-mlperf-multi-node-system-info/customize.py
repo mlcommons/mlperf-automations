@@ -572,16 +572,27 @@ def _flatten_for_inference(nested_info, env):
 
 
 def _update_parsed_node_details(
-        node_id, dir_path, parsed_node_details, logger):
-    """Load a single-node JSON file and merge it into parsed_node_details."""
+        node_id, dir_path, parsed_node_details, node_versions, logger):
+    """Load a single-node JSON file and merge it into parsed_node_details.
+
+    Returns True if the node's file was found and processed, else False.
+    Captures the node's mlc_scripts_version into node_versions (keyed by
+    node_id) before dropping it, so version divergence across nodes can be
+    surfaced in the aggregated output."""
     path = os.path.join(
         dir_path,
         f"mlperf-system-info-single-node-{node_id}.json")
     if not os.path.exists(path):
         logger.warning(f"Single-node info file not found: {path}")
-        return
+        return False
     with open(path) as f:
         info = json.load(f)
+    # Capture the per-node provenance block, then drop it: it is not a hardware
+    # field and must not leak into node_types. The aggregated output records
+    # per-node versions separately so divergence stays visible.
+    node_version = info.pop('mlc_scripts_version', None)
+    if node_version:
+        node_versions[str(node_id)] = node_version
     node_name = (
         f"{info.get('host_processor_model_name', '')}"
         f"-{info.get('accelerators_per_node', '')}"
@@ -599,6 +610,7 @@ def _update_parsed_node_details(
             'system_node_name': node_name}
         entry.update(info)
         parsed_node_details.append(entry)
+    return True
 
 
 def postprocess(i):
@@ -608,21 +620,24 @@ def postprocess(i):
 
     dir_path = env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH']
     parsed_node_details = []
+    node_versions = {}       # node_id -> that node's mlc_scripts_version block
+    processed_node_ids = []  # node_ids whose single-node file was found
 
     exclude_current = is_true(env.get('MLC_EXCLUDE_CURRENT_NODE', False))
     remote_node_id_start = 0 if exclude_current else 1
 
     if not exclude_current:
         logger.info("Obtaining system information from the host system")
-        _update_parsed_node_details(0, dir_path, parsed_node_details, logger)
+        if _update_parsed_node_details(
+                0, dir_path, parsed_node_details, node_versions, logger):
+            processed_node_ids.append('0')
 
     logger.info("Obtaining system information from the remote systems")
     for idx in range(int(env.get('MLC_REMOTE_RUN_SSH_ID_COUNT', 0))):
-        _update_parsed_node_details(
-            remote_node_id_start + idx,
-            dir_path,
-            parsed_node_details,
-            logger)
+        nid = remote_node_id_start + idx
+        if _update_parsed_node_details(
+                nid, dir_path, parsed_node_details, node_versions, logger):
+            processed_node_ids.append(str(nid))
 
     node_config = _load_node_config(
         env.get("MLC_NODE_CONFIG_FILE", ""), logger)
@@ -691,6 +706,38 @@ def postprocess(i):
     if env.get("MLC_MLPERF_BENCHMARK", "") == "inference":
         output_info = _flatten_for_inference(output_info, env)
         logger.info("Using flat inference format for system_info.json")
+
+    # Stamp the aggregated output with the git version of the automations repo
+    # (the orchestrating node's checkout), plus each node's version so that a
+    # mixed-version run stays visible rather than hidden behind one version.
+    repo_path = env.get('MLC_TMP_CURRENT_SCRIPT_REPO_PATH', '')
+    try:
+        from mlc.utils import get_repo_version
+        version = get_repo_version(repo_path)
+        if version:
+            block = {'repo': os.path.basename(repo_path), **version}
+            if processed_node_ids:
+                agg_commit = version.get('commit')
+                # Consistent only if every processed node reported a version
+                # AND all of them match the aggregator's commit. A node that
+                # produced a file but no version block (e.g. its mlcflow lacked
+                # the helper) counts as not-confirmed -> not consistent.
+                all_reported = all(
+                    nid in node_versions for nid in processed_node_ids)
+                commits_match = all(
+                    nv.get('commit') == agg_commit
+                    for nv in node_versions.values())
+                block['consistent'] = bool(all_reported and commits_match)
+                block['nodes'] = node_versions
+                if not block['consistent']:
+                    detail = {nid: node_versions.get(nid, {}).get(
+                        'commit', 'unknown') for nid in processed_node_ids}
+                    logger.warning(
+                        "mlc-scripts version differs across nodes: "
+                        "aggregator=%s nodes=%s", agg_commit, detail)
+            output_info['mlc_scripts_version'] = block
+    except Exception as e:
+        logger.warning(f"Could not add version info: {e}")
 
     try:
         with open(env['MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH'], 'w') as f:
