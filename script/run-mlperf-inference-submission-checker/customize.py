@@ -163,7 +163,8 @@ def preprocess(i):
 
     CMD = env['MLC_PYTHON_BIN_WITH_PATH'] + ' ' + q + submission_checker_file + q + \
         ' --input ' + q + submission_dir + q + \
-        x_submitter + x_version + skip_compliance + extra_map + power_check + private_ids + extra_args
+        x_submitter + x_version + skip_compliance + \
+        extra_map + power_check + private_ids + extra_args
 
     x_version = ' --version ' + version[1:] + ' ' if version != '' else ''
 
