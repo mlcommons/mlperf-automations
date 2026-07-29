@@ -47,6 +47,7 @@ mlcr run,mlc,mlcommons,mlperf,inference,mlperf-inference,submission,checker,subm
 | `--power` |  |  | `` |
 | `--preprocess` |  |  | `` |
 | `--preprocess_submission` | Alias for preprocess |  | `` |
+| `--private_ids` |  |  | `` |
 | `--pull_changes` |  |  | `` |
 | `--pull_inference_changes` | Alias for pull_changes |  | `` |
 | `--push_to_github` |  |  | `` |
