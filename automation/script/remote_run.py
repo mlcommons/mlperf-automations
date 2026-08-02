@@ -144,6 +144,11 @@ def remote_run(self_module, i):
     remote_pre_run_cmds = i.get('remote_pre_run_cmds', [])
     remote_post_run_cmds = i.get('remote_post_run_cmds', [])
 
+    # Insert pre_run_cmds into run_cmds (after install+activate) so they
+    # execute with mlcflow available, rather than passing them separately
+    # which would place them before the mlcflow bootstrap.
+    run_cmds.extend(remote_pre_run_cmds)
+
     run_cmds.append(f"{script_run_cmd}")
 
     remote_inputs = {}
@@ -205,7 +210,6 @@ def remote_run(self_module, i):
     mlc_remote_input = {
         'action': 'run', 'target': 'script', 'tags': 'remote,run,cmds,ssh',
         'script_tags': i.get('tags'), 'run_cmds': run_cmds,
-        'pre_run_cmds': remote_pre_run_cmds,
         'post_run_cmds': remote_post_run_cmds,
         'quiet': quiet,
         **remote_inputs
