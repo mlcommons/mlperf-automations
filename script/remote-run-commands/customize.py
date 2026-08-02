@@ -108,8 +108,9 @@ def preprocess(i):
 
     ssh_cmd = ["ssh", "-p", port]
 
-    if env.get("MLC_SSH_SKIP_HOST_VERIFY"):
+    if env.get("MLC_SSH_SKIP_HOST_VERIFY") or password:
         # Use NUL on Windows, /dev/null on Unix
+        # Always skip host verify when using password auth (sshpass can't handle host key prompts)
         null_device = "NUL" if is_windows else "/dev/null"
         ssh_cmd += ["-o", "StrictHostKeyChecking=no",
                     "-o", f"UserKnownHostsFile={null_device}"]
@@ -172,8 +173,9 @@ def postprocess(i):
 
     ssh_cmd = ["ssh", "-p", port]
 
-    if env.get("MLC_SSH_SKIP_HOST_VERIFY"):
+    if env.get("MLC_SSH_SKIP_HOST_VERIFY") or password:
         # Use NUL on Windows, /dev/null on Unix
+        # Always skip host verify when using password auth (sshpass can't handle host key prompts)
         null_device = "NUL" if is_windows else "/dev/null"
         ssh_cmd += ["-o", "StrictHostKeyChecking=no",
                     "-o", f"UserKnownHostsFile={null_device}"]

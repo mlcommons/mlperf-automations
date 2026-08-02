@@ -104,7 +104,7 @@ def remote_run(self_module, i):
     run_cmds.append(
         f'curl -sSL https://raw.githubusercontent.com/mlcommons/mlcflow/refs/heads/dev/docs/install/mlcflow_unix_installer.sh | bash -s -- --yes --venv-dir {remote_mlc_python_venv}')
     run_cmds.append(f". {remote_mlc_python_venv}/bin/activate")
-    if i.get('remote_pull_mlc_repos', False):
+    if i.get('remote_pull_mlc_repos', False) and str(i.get('remote_pull_mlc_repos', '')).lower() not in ('no', 'false', '0', ''):
         run_cmds.append("mlc pull repo")
 
     env_keys_to_copy = remote_run_settings.get('env_keys_to_copy', [])
