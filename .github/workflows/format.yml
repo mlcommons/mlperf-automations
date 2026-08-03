@@ -75,5 +75,5 @@ jobs:
             git config --global user.email "3246381+mlc-automations@users.noreply.github.com"
             # Commit changes
             git commit -m '[Automated Commit] Format Codebase'
-            git push 
+            git push
           fi
