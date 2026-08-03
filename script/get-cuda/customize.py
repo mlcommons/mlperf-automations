@@ -10,7 +10,7 @@ def preprocess(i):
 
     env = i['env']
 
-    if is_true(env.get('CUDA_SKIP_SUDO', '')):
+    if is_true(env.get('MLC_SKIP_SUDO', '')):
         env['MLC_SUDO'] = ''
 
     recursion_spaces = i['recursion_spaces']

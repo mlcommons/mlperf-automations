@@ -275,7 +275,7 @@ class ScriptAutomation(Automation):
 
           (skip_sys_utils) (bool): if True, set env['MLC_SKIP_SYS_UTILS']='yes'
                                    to skip MLC sys installation
-          (skip_sudo) (bool): if True, set env['MLC_TMP_SKIP_SUDO']='yes'
+          (skip_sudo) (bool): if True, set env['MLC_SKIP_SUDO']='yes'
                               to let scripts deal with that
 
           (silent) (bool): if True, attempt to suppress all info if supported
@@ -430,7 +430,7 @@ class ScriptAutomation(Automation):
         if is_true(i.get('skip_sys_utils', '')):
             env['MLC_SKIP_SYS_UTILS'] = 'yes'
         if is_true(i.get('skip_sudo', '')):
-            env['MLC_TMP_SKIP_SUDO'] = 'yes'
+            env['MLC_SKIP_SUDO'] = 'yes'
 
         run_state = self.init_run_state(i.get('run_state'))
 

@@ -146,6 +146,7 @@ mlcr run-mlperf,inference
 | `--vllm_model_name` |  |  | `` |
 | `--vllm_tp_size` |  |  | `1` |
 | `--waymo_path` |  |  | `` |
+| `--podman_storage_root` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |

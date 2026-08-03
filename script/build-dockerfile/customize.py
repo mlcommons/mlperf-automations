@@ -106,7 +106,10 @@ def preprocess(i):
         try:
             print(
                 f"Copying repository from {mlc_repo_path} to {repo_build_context_path}")
-            shutil.copytree(mlc_repo_path, repo_build_context_path, ignore_dangling_symlinks=True)
+            shutil.copytree(
+                mlc_repo_path,
+                repo_build_context_path,
+                ignore_dangling_symlinks=True)
         except Exception as e:
             return {
                 'return': 1, 'error': f"Failed to copy repository to build context: {str(e)}"}
