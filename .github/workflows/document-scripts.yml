@@ -29,7 +29,7 @@ jobs:
       run: |
         pip install pyyaml
 
-        
+
     - name: Get changed files
       id: modified-files
       env:
@@ -56,7 +56,7 @@ jobs:
         with:
           fetch-depth: 0
           path: automation-scripts
- 
+
       - name: Document meta.yaml file
         run: |
           echo "Documenting ${{ matrix.modified_metas.file }}"
@@ -72,6 +72,3 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           # Commit changes
           git diff-index --quiet HEAD || (git commit -am "[Automated Commit] Document ${{ matrix.modified_metas.file}}  [skip ci]" && git push)
-          
-
-  

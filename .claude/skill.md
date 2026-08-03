@@ -13,11 +13,17 @@ mlcflow CLI  →  finds script by tags  →  resolves variations & deps  →
 ```
 
 **Two repos, two roles:**
-- `mlperf-automations` (this repo) = content: 377 script directories + `automation/` engine
-- `mlcflow` = driver CLI: installs via pip, dynamically loads the engine above
+- `mlperf-automations` (this repo) = content only: 350+ script directories
+- `mlcflow` = driver CLI **and** the `automation/` engine, bundled together and
+  installed via pip
+
+The engine used to live here in `automation/` and has moved to mlcflow (see
+`automation/README.md`). Engine changes go in PRs against mlcflow, not here.
+`from utils import …` in a `customize.py` still works — mlcflow puts its
+bundled `automation/` on `sys.path` before loading any script.
 
 **Three key files per script:**
-- `meta.yaml` — identity, tags, deps, variations, env mapping (schema in `automation/script/meta_schema.py`)
+- `meta.yaml` — identity, tags, deps, variations, env mapping (schema in `mlcflow/automation/script/meta_schema.py`)
 - `customize.py` — Python hooks: `preprocess()` builds the shell command; `postprocess()` reads results
 - `run.sh` — executes `eval "${MLC_MLPERF_ENDPOINT_CMD}"` and exits non-zero on failure
 
@@ -231,12 +237,12 @@ Everything else: name vars to reflect the script they come from and what they ho
 |---|---|
 | Understand the inference benchmark | `script/run-mlperf-inference-app/meta.yaml`, `customize.py` |
 | Reference for a new MLPerf benchmark (dep chain, variations, dispatch pattern) | `script/app-mlperf-inference-mlcommons-python/meta.yaml`, `script/run-mlperf-inference-app/meta.yaml` |
-| Debug env propagation | `automation/script/module.py` (search: `new_env_keys`, `clean_env_keys`) |
-| Debug caching | `automation/script/cache_utils.py` |
-| Add a script | Nearest similar script + `automation/script/meta_schema.py` |
-| Fix meta.yaml format | `automation/script/lint.py` |
+| Debug env propagation | `mlcflow/automation/script/module.py` (search: `new_env_keys`, `clean_env_keys`) |
+| Debug caching | `mlcflow/automation/script/cache_utils.py` |
+| Add a script | Nearest similar script + `mlcflow/automation/script/meta_schema.py` |
+| Fix meta.yaml format | `mlcflow/automation/script/lint.py` |
 | Run CI locally | `.github/workflows/test-mlc-script-features.yml` |
-| Understand Docker path | `automation/script/docker.py` |
+| Understand Docker path | `mlcflow/automation/script/docker.py` |
 
 ---
 

@@ -8,7 +8,6 @@ on:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlperf-inference-submission-generation.yml'
-      - 'automation/script/**'
       - 'script/run-mlperf-inference-app/**'
       - 'script/generate-mlperf-inference-submission/**'
       - 'script/run-mlperf-inference-submission-checker/**'

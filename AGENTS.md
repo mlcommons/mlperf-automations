@@ -7,7 +7,7 @@ Every claim is marked with its evidence source or noted as inferred.
 
 ## Project overview
 
-**Evidence:** `README.md`, `pyproject.toml`, `automation/script/meta.json`
+**Evidence:** `README.md`, `pyproject.toml`, `mlcflow/automation/script/meta.json`
 
 `mlperf-automations` (PyPI: `mlc-scripts` v1.1.0) is the **content layer** — 377+ portable
 automation scripts for MLPerf benchmarking. It is not a standalone tool. A separate CLI
@@ -24,36 +24,44 @@ driver, `mlcflow` (v1.2.4), discovers and executes scripts from this repo.
 
 ## Architecture
 
-**Evidence:** `flow.md`, `automation/script/module.py`, `mlcflow/mlc/script_action.py`
+**Evidence:** `flow.md`, `mlcflow/automation/script/module.py`, `mlcflow/mlc/script_action.py`
 
 ### Component map
 
 ```
-mlcflow CLI  (mlcr / mlcd / mlca / mlct / mlcp / mlce / mlcrr)
+mlcflow  (pip install mlcflow) — the CLI *and* the execution engine
     │
-    ├── action.py          — base Action, repo registry, item index
-    ├── script_action.py   — auto-pulls mlperf-automations if missing;
-    │                        dynamically loads automation/script/module.py
-    └── repo_action.py     — git clone / pull repos into ~/MLC/repos/
+    ├── mlc/action.py         — base Action, repo registry, item index
+    ├── mlc/script_action.py  — auto-pulls mlperf-automations if missing;
+    │                           dynamically loads the bundled engine below
+    ├── mlc/repo_action.py    — git clone / pull repos into ~/MLC/repos/
+    │
+    └── automation/                  — the ENGINE, bundled with mlcflow
+        ├── utils.py                 — imported by ~188 customize.py files
+        │                              in this repo as bare `from utils import …`
+        └── script/
+            ├── module.py            — ScriptAutomation (6,207 lines)
+            ├── cache_utils.py       — cache lookup / store
+            ├── docker.py            — Docker container execution
+            ├── apptainer.py         — Apptainer/Singularity execution
+            ├── remote_run.py        — SSH remote execution
+            ├── experiment.py        — experiment/hyperparameter exploration
+            ├── meta_schema.py       — YAML schema validator
+            ├── lint.py              — meta.yaml key-order fixer
+            └── script_utils.py      — script search & selection
          │
-         └──▶ ~/MLC/repos/mlcommons@mlperf-automations/
-                  ├── automation/script/
-                  │   ├── module.py          — ScriptAutomation (6,207 lines)
-                  │   ├── cache_utils.py     — cache lookup / store (18,555 lines)
-                  │   ├── docker.py          — Docker container execution
-                  │   ├── apptainer.py       — Apptainer/Singularity execution
-                  │   ├── remote_run.py      — SSH remote execution
-                  │   ├── experiment.py      — experiment/hyperparameter exploration
-                  │   ├── meta_schema.py     — YAML schema validator
-                  │   ├── lint.py            — meta.yaml key-order fixer
-                  │   └── script_utils.py    — script search & selection
-                  │
-                  └── script/                — 377+ individual automation scripts
+         └──▶ ~/MLC/repos/mlcommons@mlperf-automations/   ← THIS REPO
+                  └── script/                — 350+ individual automation scripts
                       ├── app-mlperf-inference-endpoints/
                       ├── get-mlperf-endpoints/
                       ├── detect-os/
                       └── … (app-*, get-*, benchmark-*, detect-*, build-*, …)
 ```
+
+> **The engine is not in this repo.** `automation/` used to live here and was
+> moved to [mlcflow](https://github.com/mlcommons/mlcflow); see
+> `automation/README.md` for the redirect. Engine changes go in PRs against
+> mlcflow. This repo is content only.
 
 ### Key environmental paths
 
@@ -69,7 +77,7 @@ mlcflow CLI  (mlcr / mlcd / mlca / mlct / mlcp / mlce / mlcrr)
 
 ## Execution lifecycle (one script run)
 
-**Evidence:** `automation/script/module.py` (full `_run` method)
+**Evidence:** `mlcflow/automation/script/module.py` (full `_run` method)
 
 When `mlcr app,mlperf,inference,endpoints,_offline,_echo-server --num_samples=50` runs:
 
@@ -138,7 +146,7 @@ When `mlcr app,mlperf,inference,endpoints,_offline,_echo-server --num_samples=50
 
 ## Script anatomy
 
-**Evidence:** All scripts in `script/`; `automation/script/meta_schema.py`
+**Evidence:** All scripts in `script/`; `mlcflow/automation/script/meta_schema.py`
 
 Every script lives in `script/<alias>/` with these files:
 
@@ -154,7 +162,7 @@ Every script lives in `script/<alias>/` with these files:
 
 ### meta.yaml — full key reference
 
-**Evidence:** `automation/script/meta_schema.py`, `script/app-mlperf-inference-mlcommons-python/meta.yaml`
+**Evidence:** `mlcflow/automation/script/meta_schema.py`, `script/app-mlperf-inference-mlcommons-python/meta.yaml`
 
 All examples below are taken verbatim from `script/app-mlperf-inference-mlcommons-python`, the canonical multi-backend MLPerf reference implementation script. It exercises every key the schema supports.
 
@@ -711,7 +719,7 @@ test ${EXIT_CODE} -eq 0 || exit ${EXIT_CODE}
 
 ## Environment variable system
 
-**Evidence:** `automation/script/module.py` (env propagation logic)
+**Evidence:** `mlcflow/automation/script/module.py` (env propagation logic)
 
 ### Namespace conventions
 
@@ -964,7 +972,7 @@ pytest -q script/app-mlperf-inference-endpoints/tests/
 
 ## Integration model — adding a new script
 
-**Evidence:** `automation/script/meta_schema.py`,
+**Evidence:** `mlcflow/automation/script/meta_schema.py`,
 `script/app-mlperf-inference-endpoints/`
 
 There is **no plugin registry, no decorator, no base class**. Registration is
@@ -985,7 +993,7 @@ mlcflow's index finds it automatically.
    Creates `script/<alias>/` with `meta.yaml`, `customize.py`, and `run.sh`.
    If `--template_tags` matches multiple scripts, it prompts to pick one.
    The UID is auto-generated; verify uniqueness with:
-   `grep -r "uid: <generated-uid>" script/ automation/`
+   `grep -r "uid: <generated-uid>" script/`
 
 2. **Edit `meta.yaml`** — update `alias`, `uid`, `tags`, `category`, `input_mapping`, `new_env_keys`, and `deps`.
 3. **Edit `customize.py`** — implement `preprocess(i)` (guard required env vars, build shell command).
@@ -1049,7 +1057,7 @@ versions:
 ## Conventions
 
 **Evidence:** `script/app-mlperf-inference-endpoints/meta.yaml`,
-`automation/script/module.py`, `automation/script/meta_schema.py`
+`mlcflow/automation/script/module.py`, `mlcflow/automation/script/meta_schema.py`
 
 ### Naming
 
@@ -1121,13 +1129,13 @@ deps:
 
 ## Common pitfalls
 
-**Evidence:** `automation/script/module.py`, `script/app-mlperf-inference-mlcommons-python/customize.py`
+**Evidence:** `mlcflow/automation/script/module.py`, `script/app-mlperf-inference-mlcommons-python/customize.py`
 
 ### 1. UID collisions
 
 UIDs have no enforced uniqueness check at PR time. Before adding a script, verify:
 ```bash
-grep -r "uid: <your-new-uid>" script/ automation/
+grep -r "uid: <your-new-uid>" script/
 ```
 
 ### 2. Undeclared `new_env_keys`
@@ -1140,7 +1148,7 @@ receives `None`/empty for a key. Fix: add the key (or a wildcard) to `new_env_ke
 
 `skip_if_env: {KEY: ['on']}` means "skip if KEY is set to any truthy value"
 (not literally the string `'on'`). The engine interprets common truthy strings
-(`'yes'`, `'true'`, `'1'`, `'on'`) uniformly. See `automation/script/module.py`.
+(`'yes'`, `'true'`, `'1'`, `'on'`) uniformly. See `mlcflow/automation/script/module.py`.
 
 ### 4. ADR tag format
 
@@ -1164,12 +1172,13 @@ A dep without `names:` cannot be overridden by ADR.
 
 | Area | Notes |
 |---|---|
-| `automation/script/module.py` | 6,207-line engine; changes affect every script. Test on Linux, macOS, Windows. |
-| `automation/script/cache_utils.py` | 18,555 lines; wrong change silently skips or re-runs steps |
-| `automation/script/docker.py` / `apptainer.py` | Container launch + teardown; side effects outside the process |
-| `automation/script/meta_schema.py` | Adding a key requires updating `lint.py`; removing silently accepts invalid YAML |
 | `automation_uid: 5b4e0237da074764` | UID of the `script` automation type. All scripts share this value because the repo currently has only one automation type. Do not change. |
 | `.github/workflows/` | 45 workflow files; modifying trigger paths can silence CI for entire vendor families |
+| `from utils import …` in any `customize.py` | ~188 scripts rely on this resolving against mlcflow's bundled `automation/utils.py`. Don't convert these to absolute imports. |
+
+The engine files that used to be listed here (`module.py`, `cache_utils.py`,
+`docker.py`/`apptainer.py`, `meta_schema.py`) now live in mlcflow. They are
+still the most fragile code in the system — see mlcflow's own `AGENTS.md`.
 
 ### Branch policy
 

@@ -6,6 +6,9 @@ on:
     paths:
       - 'script/**meta.yaml'
 
+permissions:
+  contents: read
+
 jobs:
   run-mlperf:
     runs-on: ubuntu-latest

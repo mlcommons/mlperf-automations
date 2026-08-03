@@ -5,7 +5,6 @@ on:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlc-based-submission-generation.yml'
-      - 'automation/script/**'
       - 'script/run-mlperf-inference-app/**'
       - 'script/generate-mlperf-inference-submission/**'
       - 'script/run-mlperf-inference-submission-checker/**'
@@ -45,7 +44,7 @@ jobs:
             division: closed
           - case: case-6
             division: closed-open
-            
+
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -64,8 +63,8 @@ jobs:
     - name: Pull repo where test cases are uploaded
       run: |
         git clone -b submission-generation-tests https://github.com/mlcommons/inference.git submission_generation_tests
-    
-    - name: Run Submission Generation - ${{ matrix.case }} ${{ matrix.action }} ${{ matrix.category }} ${{ matrix.division }} 
+
+    - name: Run Submission Generation - ${{ matrix.case }} ${{ matrix.action }} ${{ matrix.category }} ${{ matrix.division }}
       continue-on-error: true
       run: |
         if [ "${{ matrix.case }}" == "case-3" ]; then
@@ -115,4 +114,3 @@ jobs:
       run: |
         echo "Manually failing the workflow because the step failed."
         exit 1
-  
