@@ -36,7 +36,11 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 mlcr app,cp2k
 ```
 
-No script specific inputs
+### Script Inputs
+
+| Name | Description | Choices | Default |
+|------|-------------|---------|------|
+| `--clean` | Set to 'true' to do a clean build (removes build and toolchain install dirs) |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -59,12 +63,18 @@ No script specific inputs
 | `--verify_ssl` | Verify SSL |  | `False` |
 ## Variations
 
+### Compiler
+
+- `aocc`
+- `gcc` (default)
+- `llvm`
+- `oneapi`
+
 ### Ungrouped
 
 - `branch.#` _(# can be substituted dynamically)_
 - `sha.#` _(# can be substituted dynamically)_
 - `version.official` (base: url.official)
-- `with-amd`
 
 ### Version
 

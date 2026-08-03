@@ -101,15 +101,17 @@ def preprocess(i):
     host = env.get('MLC_SSH_HOST')
     port = env.get('MLC_SSH_PORT', '22')
 
+    ssh_prefix = ""
     if password:
-        password_string = " -p " + password
-    else:
-        password_string = ""
+        # Use sshpass for password-based SSH (not -p which is port in SSH)
+        ssh_prefix = f"sshpass -p {shlex.quote(password)} "
 
     ssh_cmd = ["ssh", "-p", port]
 
-    if env.get("MLC_SSH_SKIP_HOST_VERIFY"):
+    if env.get("MLC_SSH_SKIP_HOST_VERIFY") or password:
         # Use NUL on Windows, /dev/null on Unix
+        # Always skip host verify when using password auth (sshpass can't
+        # handle host key prompts)
         null_device = "NUL" if is_windows else "/dev/null"
         ssh_cmd += ["-o", "StrictHostKeyChecking=no",
                     "-o", f"UserKnownHostsFile={null_device}"]
@@ -129,10 +131,11 @@ def preprocess(i):
 
     remote_shell = env.get('MLC_SSH_REMOTE_SHELL', '')
     if remote_shell:
-        # Pipe commands to the specified shell on the remote to avoid nested quoting issues
-        ssh_run_command = f"printf '%s\\n' {safe_cmd_string} | {ssh_cmd_str} {user}@{host} {password_string} {remote_shell}"
+        # Pipe commands to the specified shell on the remote to avoid nested
+        # quoting issues
+        ssh_run_command = f"printf '%s\\n' {safe_cmd_string} | {ssh_prefix}{ssh_cmd_str} {user}@{host} {remote_shell}"
     else:
-        ssh_run_command = f"{ssh_cmd_str} {user}@{host} {password_string} {safe_cmd_string}"
+        ssh_run_command = f"{ssh_prefix}{ssh_cmd_str} {user}@{host} {safe_cmd_string}"
 
     env['MLC_SSH_CMD'] = ssh_run_command
 
@@ -171,8 +174,10 @@ def postprocess(i):
 
     ssh_cmd = ["ssh", "-p", port]
 
-    if env.get("MLC_SSH_SKIP_HOST_VERIFY"):
+    if env.get("MLC_SSH_SKIP_HOST_VERIFY") or password:
         # Use NUL on Windows, /dev/null on Unix
+        # Always skip host verify when using password auth (sshpass can't
+        # handle host key prompts)
         null_device = "NUL" if is_windows else "/dev/null"
         ssh_cmd += ["-o", "StrictHostKeyChecking=no",
                     "-o", f"UserKnownHostsFile={null_device}"]

@@ -93,17 +93,22 @@ def postprocess(i):
         run_opts += ' --no-home'
 
     # Auto-enable fakeroot when overlay is specified (required for writable
-    # overlay mounts)
+    # overlay mounts) — unless explicitly set to yes or no.
     if env.get('MLC_APPTAINER_OVERLAY', '') and not is_true(
+            env.get('MLC_APPTAINER_FAKEROOT', '')) and not is_false(
             env.get('MLC_APPTAINER_FAKEROOT', '')):
         env['MLC_APPTAINER_FAKEROOT'] = 'yes'
 
     if is_true(env.get('MLC_APPTAINER_FAKEROOT', '')):
         run_opts += ' --fakeroot'
         # With fakeroot, HOME becomes /root inside the container.
-        # Ensure MLC_REPOS points to a writable location so mlcr can
-        # initialize.
-        run_opts += ' --env MLC_REPOS=/tmp/mlc-repos'
+        # Use /opt/mlc_repo if repos were pre-copied via --apptainer_mlc_repo_path,
+        # else fall back to /tmp/mlc-repos.
+        if env.get('MLC_REPO_PATH', ''):
+            repo_name = os.path.basename(env['MLC_REPO_PATH'])
+            run_opts += f' --env MLC_REPOS=/opt/mlc_repo/{repo_name}'
+        else:
+            run_opts += ' --env MLC_REPOS=/tmp/mlc-repos'
 
     # Home directory
     if env.get('MLC_APPTAINER_HOME', '') != '':
@@ -113,9 +118,12 @@ def postprocess(i):
     if env.get('MLC_APPTAINER_PWD', '') != '':
         run_opts += f" --pwd {env['MLC_APPTAINER_PWD']}"
 
-    # Bind mounts
-    if env.get('MLC_APPTAINER_BIND_MOUNTS', []):
-        for mount in env['MLC_APPTAINER_BIND_MOUNTS']:
+    # Bind mounts (handle both list and string)
+    bind_mounts = env.get('MLC_APPTAINER_BIND_MOUNTS', [])
+    if isinstance(bind_mounts, str):
+        bind_mounts = [bind_mounts]
+    for mount in bind_mounts:
+        if mount:
             run_opts += f' --bind {mount}'
 
     # Overlay
@@ -131,9 +139,22 @@ def postprocess(i):
     if env.get('MLC_APPTAINER_EXTRA_ARGS', '') != '':
         run_opts += ' ' + env['MLC_APPTAINER_EXTRA_ARGS']
 
+    # Network mode
+    if env.get('MLC_APPTAINER_NETWORK', '') != '':
+        run_opts += f" --net --network {env['MLC_APPTAINER_NETWORK']}"
+
+    # Security options
+    if env.get('MLC_APPTAINER_SECURITY_OPT', '') != '':
+        run_opts += f" --security {env['MLC_APPTAINER_SECURITY_OPT']}"
+
     # Pre-run commands
+    # Pre-run commands (skip 'mlc pull repo' when repos are pre-copied
+    # via --apptainer_mlc_repo_path, as pull can destroy the working tree)
+    use_copy_repo = bool(env.get('MLC_REPO_PATH', ''))
     if env.get('MLC_APPTAINER_PRE_RUN_COMMANDS', []):
         for pre_cmd in env['MLC_APPTAINER_PRE_RUN_COMMANDS']:
+            if use_copy_repo and 'mlc pull repo' in pre_cmd:
+                continue
             run_cmds.append(pre_cmd)
 
     # Main run command — activate the venv first, then run the MLC command

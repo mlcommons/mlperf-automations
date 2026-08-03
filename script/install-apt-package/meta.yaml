@@ -17,12 +17,15 @@ cache: true
 # Environment
 default_env:
   MLC_CLEAN_DIRS: bin
-  MLC_SUDO: sudo
 new_env_keys: []
 
 # Dependencies
+input_mapping:
+  skip_sudo: MLC_SKIP_SUDO
+
 deps:
 - tags: detect,os
+- tags: detect,sudo
 
 # Variations
 variations:
