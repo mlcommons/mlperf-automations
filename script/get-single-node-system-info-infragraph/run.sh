@@ -8,3 +8,6 @@ echo "dev.yaml written to $(pwd)/dev.yaml"
 "${MLC_PYTHON_BIN_WITH_PATH}" "${MLC_TMP_CURRENT_SCRIPT_PATH}/annotate_sysinfo.py" \
     --sysinfo "${MLC_SINGLE_NODE_SYSTEM_INFO_FILE_PATH}" \
     --infragraph "$(pwd)/dev.yaml"
+
+echo "Generating visualizer files"
+infragraph visualize --input "$(pwd)/infragraph_sys_info.json" --output "$(pwd)/visuals/"
