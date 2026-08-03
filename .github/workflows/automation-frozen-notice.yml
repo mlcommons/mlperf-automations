@@ -1,0 +1,59 @@
+# Warns (never blocks) when a PR modifies the frozen automation/ engine copy.
+#
+# Uses pull_request_target so the job has a write token for PRs from forks -
+# which is exactly the case this notice is aimed at. This is safe here only
+# because the job never checks out or executes PR-authored code; it reads the
+# event payload and calls the API, nothing else. Do not add actions/checkout.
+name: Notice - automation engine is frozen
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'automation/**'
+
+permissions:
+  pull-requests: write
+
+jobs:
+  notice:
+    if: github.repository_owner == 'mlcommons'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post or update the frozen-engine notice
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const marker = '<!-- automation-frozen-notice -->';
+            const body = [
+              marker,
+              '### :warning: This PR modifies `automation/` — the frozen engine copy',
+              '',
+              'The MLC script automation engine now lives in ' +
+              '[mlcflow](https://github.com/mlcommons/mlcflow) and ships bundled with it. ' +
+              'The copy in this repo is kept **only** as a fallback for `mlcflow <= 1.2.9`, ' +
+              'and is ignored entirely by `mlcflow >= 1.3.0`.',
+              '',
+              '**A change here will not reach anyone running a current mlcflow.** ' +
+              'Engine changes belong in a PR against mlcflow — see `automation/README.md`.',
+              '',
+              'This is a warning, not a block: fixes aimed at the fallback copy are ' +
+              'still legitimate while it ships.',
+            ].join('\n');
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+
+            const comments = await github.paginate(
+              github.rest.issues.listComments,
+              { owner, repo, issue_number }
+            );
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment(
+                { owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment(
+                { owner, repo, issue_number, body });
+            }
