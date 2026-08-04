@@ -64,11 +64,11 @@ def notify_if_deprecated(logger):
         os.environ[_ENV_SENTINEL] = 'yes'
 
         logger.warning(
-            'Your mlcflow version ({}) is deprecated and will stop being supported soon.\n'
-            '  The MLC script automation engine has moved into mlcflow itself and now ships with it.\n'
-            '  This run is using the older fallback copy kept in mlcommons@mlperf-automations,\n'
-            '  which will be removed once the migration is complete.\n'
-            '  Please upgrade to mlcflow >= {}:  pip install --upgrade mlcflow'.format(
+            '''Your mlcflow version ({}) is deprecated and will stop being supported soon.
+  The MLC script automation engine has moved into mlcflow itself and now ships with it.
+  This run is using the older fallback copy kept in mlcommons@mlperf-automations,
+  which will be removed once the migration is complete.
+  Please upgrade to mlcflow >= {}:  pip install --upgrade mlcflow'''.format(
                 current_version, MIN_MLCFLOW_VERSION))
 
     except Exception:

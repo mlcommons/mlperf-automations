@@ -17,7 +17,6 @@ permissions:
 
 jobs:
   notice:
-    if: github.repository_owner == 'mlcommons'
     runs-on: ubuntu-latest
     steps:
       - name: Post or update the frozen-engine notice
