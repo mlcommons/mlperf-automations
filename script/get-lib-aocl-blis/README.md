@@ -68,6 +68,10 @@ mlcr get,lib,lib-aocl-blis,aocl-blis,aocl,blis
 - `binary.aocc` (default)
 - `binary.gcc`
 
+### Install-mode
+
+- `path.#` _(# can be substituted dynamically)_
+
 ### Repo
 
 - `repo.#` _(# can be substituted dynamically)_
@@ -77,10 +81,10 @@ mlcr get,lib,lib-aocl-blis,aocl-blis,aocl,blis
 
 - `binary`
 - `branch.#` _(# can be substituted dynamically)_
-- `master`
 
 ### Version
 
+- `master`
 - `tag.#` _(# can be substituted dynamically)_
 - `version.5.1.0`
 - `version.5.2.2` (default)

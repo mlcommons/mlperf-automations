@@ -57,6 +57,7 @@ def experiment_run(self_module, i):
 
     cur_dir = os.getcwd()
 
+    i['quiet'] = quiet
     r = self_module._select_script(i)
     if r['return'] > 0:
         return r
@@ -126,6 +127,7 @@ def run_script_and_tag_experiment(
            'tags': ','.join(exp_tags),
            'extra_tags': ",".join(extra_exp_tags),
            'meta': experiment_meta,
+           'quiet': ii.get('quiet', False),
            'force': True}
 
     r = experiment_action.access(ssi)

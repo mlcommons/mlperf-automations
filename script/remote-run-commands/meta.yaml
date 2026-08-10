@@ -18,6 +18,8 @@ tags:
 deps:
 - tags: detect-os
 - tags: get,sys-util,generic,_rsync
+  env:
+    MLC_QUIET: true
   names:
   - rsync
   skip_if_env:
@@ -49,4 +51,4 @@ input_mapping:
   skip_ssh_key_file: MLC_SKIP_SSH_KEY_FILE
   ssh_key_file: MLC_SSH_KEY_FILE
   user: MLC_SSH_USER
-  shell: MLC_SSH_REMOTE_SHELL
+  remote_shell: MLC_SSH_REMOTE_SHELL
