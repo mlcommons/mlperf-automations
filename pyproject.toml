@@ -27,7 +27,14 @@ dependencies = [
     # 1.4.0 is the first release that discovers the packaged script content
     # from the running interpreter. Older mlcflow expects the post-install
     # git clone that no longer happens, and would find no scripts at all.
-    "mlcflow>=1.4.0",
+    #
+    # Pinned to the 1.4.0 alpha rather than >=1.4.0 because PEP 440 sorts a
+    # prerelease *before* its final: 1.4.0a1 does not satisfy >=1.4.0, so
+    # that form would refuse the very build this is being tested against.
+    # Naming a prerelease in the specifier is also what allows pip to
+    # consider prereleases for it at all. Tighten to >=1.4.0 once mlcflow
+    # 1.4.0 final is on PyPI.
+    "mlcflow>=1.4.0a1",
     "giturlparse"
 ]
 
