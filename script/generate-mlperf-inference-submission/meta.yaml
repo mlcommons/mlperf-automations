@@ -46,6 +46,7 @@ input_mapping:
   power_settings_file: MLC_MLPERF_POWER_SETTINGS_FILE_PATH
   preprocess: MLC_RUN_MLPERF_SUBMISSION_PREPROCESSOR
   preprocess_submission: MLC_RUN_MLPERF_SUBMISSION_PREPROCESSOR
+  private_ids: MLC_MLPERF_SUBMISSION_PRIVATE_IDS
   results_dir: MLC_MLPERF_INFERENCE_RESULTS_DIR_
   run_checker: MLC_RUN_SUBMISSION_CHECKER
   run_style: MLC_MLPERF_RUN_STYLE
@@ -142,7 +143,7 @@ variations:
       mlperf-inference-submission-checker:
         tags: _wg-inference
     default_env:
-      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v5.1
+      MLC_MLPERF_SUBMISSION_CHECKER_VERSION: v6.1
     deps:
     - names:
       - inference-src

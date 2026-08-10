@@ -18,6 +18,7 @@ import mlc.utils as utils
 from utils import *
 from script.script_utils import *
 from script.cache_utils import *
+from script.deprecation import notify_if_deprecated
 
 
 class ScriptAutomation(Automation):
@@ -34,6 +35,10 @@ class ScriptAutomation(Automation):
         self.file_with_cached_state = 'mlc-cached-state.json'
         self.logger = self.action_object.logger
         self.logger.propagate = False
+
+        # This engine copy is only loaded by mlcflow versions that predate the
+        # migration of the engine into mlcflow itself - tell the user once.
+        notify_if_deprecated(self.logger)
 
         # Create CacheAction using the same parent as the Script
         self.cache_action = CacheAction(self.action_object.parent)
@@ -275,7 +280,7 @@ class ScriptAutomation(Automation):
 
           (skip_sys_utils) (bool): if True, set env['MLC_SKIP_SYS_UTILS']='yes'
                                    to skip MLC sys installation
-          (skip_sudo) (bool): if True, set env['MLC_TMP_SKIP_SUDO']='yes'
+          (skip_sudo) (bool): if True, set env['MLC_SKIP_SUDO']='yes'
                               to let scripts deal with that
 
           (silent) (bool): if True, attempt to suppress all info if supported
@@ -430,7 +435,7 @@ class ScriptAutomation(Automation):
         if is_true(i.get('skip_sys_utils', '')):
             env['MLC_SKIP_SYS_UTILS'] = 'yes'
         if is_true(i.get('skip_sudo', '')):
-            env['MLC_TMP_SKIP_SUDO'] = 'yes'
+            env['MLC_SKIP_SUDO'] = 'yes'
 
         run_state = self.init_run_state(i.get('run_state'))
 
@@ -5784,8 +5789,8 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
 
     update_meta_if_env = meta.get('update_meta_if_env', [])
     update_meta_if_env_from_state = run_state.get('update_meta_if_env', [])
-    run_state['update_meta_if_env'] = update_meta_if_env + \
-        update_meta_if_env_from_state
+    run_state['update_meta_if_env'] = update_meta_if_env_from_state + \
+        update_meta_if_env
 
     add_deps_info = meta.get('ad', {})
     if not add_deps_info:

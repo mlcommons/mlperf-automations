@@ -29,7 +29,7 @@ def preprocess(i):
         env['MLC_SUDO'] = ''  # root user does not need sudo
         env['MLC_SUDO_USER'] = "yes"
     else:
-        if not is_true(env.get('MLC_SKIP_SUDO')) and (can_execute_sudo_without_password(
+        if not is_true(env.get('MLC_SKIP_SUDO', '')) and (can_execute_sudo_without_password(
                 logger) or prompt_sudo(logger) == 0):
             env['MLC_SUDO_USER'] = "yes"
             env['MLC_SUDO'] = 'sudo'

@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-06-22 04:52:55*
+*Last updated: 2026-07-24 00:26:01*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -666,6 +666,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-huggingface-cli](get-huggingface-cli/)**
   - get-huggingface-cli
   - Tags: `get`, `huggingface`, `hf-cli`, `huggingface-cli`, `cli`
+- **[get-pass](get-pass/)**
+  - get-pass
+  - Tags: `get`, `pass`, `secret`, `token`, `credential`
 - **[isolate-run](isolate-run/)**
   - isolate-run
   - Tags: `isolate`, `isolate-run`, `isolate-user`
@@ -1026,6 +1029,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-platform-details](get-platform-details/)**
   - get-platform-details
   - Tags: `get`, `platform`, `details`, `platform-details`
+- **[get-redfish-power-info](get-redfish-power-info/)**
+  - get-redfish-power-info
+  - Tags: `get`, `redfish`, `power`, `info`, `bmc`
 - **[save-machine-state](save-machine-state/)**
   - save-machine-state
   - Tags: `machine-state`, `save`, `machine`, `system`, `system-state`, `state`
@@ -1253,7 +1259,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 368
+- **Total Scripts**: 370
 - **Categories**: 34
 
 ## Usage

@@ -4,6 +4,7 @@ import re
 import mlc
 import json
 import yaml
+import shutil
 import urllib.request
 
 
@@ -572,16 +573,27 @@ def _flatten_for_inference(nested_info, env):
 
 
 def _update_parsed_node_details(
-        node_id, dir_path, parsed_node_details, logger):
-    """Load a single-node JSON file and merge it into parsed_node_details."""
+        node_id, dir_path, parsed_node_details, node_versions, logger):
+    """Load a single-node JSON file and merge it into parsed_node_details.
+
+    Returns True if the node's file was found and processed, else False.
+    Captures the node's mlc_scripts_version into node_versions (keyed by
+    node_id) before dropping it, so version divergence across nodes can be
+    surfaced in the aggregated output."""
     path = os.path.join(
         dir_path,
         f"mlperf-system-info-single-node-{node_id}.json")
     if not os.path.exists(path):
         logger.warning(f"Single-node info file not found: {path}")
-        return
+        return False
     with open(path) as f:
         info = json.load(f)
+    # Capture the per-node provenance block, then drop it: it is not a hardware
+    # field and must not leak into node_types. The aggregated output records
+    # per-node versions separately so divergence stays visible.
+    node_version = info.pop('mlc_scripts_version', None)
+    if node_version:
+        node_versions[str(node_id)] = node_version
     node_name = (
         f"{info.get('host_processor_model_name', '')}"
         f"-{info.get('accelerators_per_node', '')}"
@@ -599,6 +611,103 @@ def _update_parsed_node_details(
             'system_node_name': node_name}
         entry.update(info)
         parsed_node_details.append(entry)
+    return True
+
+
+def _skeleton_nameplate_power(system_name):
+    """Generic fill-in-the-blanks nameplate power template, matching the
+    optional power template in tools/submission/submission_structure.md
+    verbatim (System/Rack/Server-and-Switch labels, placeholder PSU values).
+
+    Used when _inference_optional_nameplate is requested without _redfish:
+    there is no BMC to query, so no real PSU data can be populated -- this
+    just hands the submitter the same fill-in-the-blanks shape from the
+    spec, with the actual system name substituted at the top level.
+    """
+    def _leaf():
+        return [{
+            'Description': 'Optional Description',
+            'Min PSUs Needed': 1,
+            'PSUs': [
+                {'Name': 'PSU 1', 'PowerCapacityWatts': 1200},
+                {'Name': 'PSU 2', 'PowerCapacityWatts': 1200},
+            ],
+        }]
+
+    return {
+        system_name: [
+            {
+                'My Rack 1': [
+                    {'My Server 1': _leaf()},
+                    {'My Switch 1': _leaf()},
+                ]
+            }
+        ]
+    }
+
+
+def _finalize_nameplate_power(env, dir_path, logger):
+    """Produce '<system>_power.yaml', the name the MLPerf Inference
+    submission_checker looks for (NAMEPLATE_POWER_PATH in
+    submission_checker/constants.py), and surface its path via
+    MLC_NAMEPLATE_POWER_YAML_FILE_PATH.
+
+    Two paths depending on whether _redfish is also active:
+      - _inference_optional_nameplate + _redfish: rename the real capture
+        produced by the get-redfish-power-info prehook_dep (real PSU data).
+      - _inference_optional_nameplate alone: no BMC to query, so write the
+        generic skeleton template instead (see _skeleton_nameplate_power).
+
+    Either way, the resulting file still needs to be copied into the
+    submission's systems/ directory and renamed to match whatever
+    <system_desc_id> that submission actually uses, since this script has
+    no concept of that identifier (only MLC_MLPERF_SYSTEM_NAME, the
+    human-readable name, which may differ from the submission's hw_name).
+    """
+    if not is_true(
+            env.get('MLC_MLPERF_INFERENCE_OPTIONAL_NAMEPLATE_ENABLED', False)):
+        return
+
+    system_name = (env.get('MLC_MLPERF_SYSTEM_NAME', '') or 'system').strip()
+    safe_name = system_name.replace(' ', '_')
+    dest = os.path.join(dir_path, f"{safe_name}_power.yaml")
+
+    if not is_true(env.get('MLC_MLPERF_REDFISH_ENABLED', False)):
+        try:
+            with open(dest, 'w') as f:
+                yaml.dump(
+                    _skeleton_nameplate_power(system_name),
+                    f,
+                    default_flow_style=False,
+                    sort_keys=False,
+                    allow_unicode=True)
+            env['MLC_NAMEPLATE_POWER_YAML_FILE_PATH'] = dest
+            logger.info(
+                f"_inference_optional_nameplate used without _redfish -- "
+                f"wrote the generic skeleton power template to {dest}. "
+                f"Fill in real PSU data by hand, or re-run with _redfish "
+                f"to populate it from a live BMC instead.")
+        except Exception as e:
+            logger.error(f"Failed to write skeleton nameplate power YAML: {e}")
+        return
+
+    src = env.get('MLC_REDFISH_NAMEPLATE_OUTPUT_FILE_PATH', '')
+    if not src or not os.path.exists(src):
+        logger.warning(
+            "Nameplate power YAML was requested but no PSU data was "
+            "captured from the Redfish endpoint (BMC may not expose "
+            "Chassis/<id>/Power or PowerSubsystem). Skipping.")
+        return
+
+    try:
+        shutil.copyfile(src, dest)
+        env['MLC_NAMEPLATE_POWER_YAML_FILE_PATH'] = dest
+        logger.info(
+            f"Nameplate power YAML ready at {dest} -- copy it into your "
+            f"submission's systems/ directory, renamed to match your "
+            f"<system_desc_id>_power.yaml")
+    except Exception as e:
+        logger.error(f"Failed to finalize nameplate power YAML: {e}")
 
 
 def postprocess(i):
@@ -608,21 +717,24 @@ def postprocess(i):
 
     dir_path = env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH']
     parsed_node_details = []
+    node_versions = {}       # node_id -> that node's mlc_scripts_version block
+    processed_node_ids = []  # node_ids whose single-node file was found
 
     exclude_current = is_true(env.get('MLC_EXCLUDE_CURRENT_NODE', False))
     remote_node_id_start = 0 if exclude_current else 1
 
     if not exclude_current:
         logger.info("Obtaining system information from the host system")
-        _update_parsed_node_details(0, dir_path, parsed_node_details, logger)
+        if _update_parsed_node_details(
+                0, dir_path, parsed_node_details, node_versions, logger):
+            processed_node_ids.append('0')
 
     logger.info("Obtaining system information from the remote systems")
     for idx in range(int(env.get('MLC_REMOTE_RUN_SSH_ID_COUNT', 0))):
-        _update_parsed_node_details(
-            remote_node_id_start + idx,
-            dir_path,
-            parsed_node_details,
-            logger)
+        nid = remote_node_id_start + idx
+        if _update_parsed_node_details(
+                nid, dir_path, parsed_node_details, node_versions, logger):
+            processed_node_ids.append(str(nid))
 
     node_config = _load_node_config(
         env.get("MLC_NODE_CONFIG_FILE", ""), logger)
@@ -692,6 +804,38 @@ def postprocess(i):
         output_info = _flatten_for_inference(output_info, env)
         logger.info("Using flat inference format for system_info.json")
 
+    # Stamp the aggregated output with the git version of the automations repo
+    # (the orchestrating node's checkout), plus each node's version so that a
+    # mixed-version run stays visible rather than hidden behind one version.
+    repo_path = env.get('MLC_TMP_CURRENT_SCRIPT_REPO_PATH', '')
+    try:
+        from mlc.utils import get_repo_version
+        version = get_repo_version(repo_path)
+        if version:
+            block = {'repo': os.path.basename(repo_path), **version}
+            if processed_node_ids:
+                agg_commit = version.get('commit')
+                # Consistent only if every processed node reported a version
+                # AND all of them match the aggregator's commit. A node that
+                # produced a file but no version block (e.g. its mlcflow lacked
+                # the helper) counts as not-confirmed -> not consistent.
+                all_reported = all(
+                    nid in node_versions for nid in processed_node_ids)
+                commits_match = all(
+                    nv.get('commit') == agg_commit
+                    for nv in node_versions.values())
+                block['consistent'] = bool(all_reported and commits_match)
+                block['nodes'] = node_versions
+                if not block['consistent']:
+                    detail = {nid: node_versions.get(nid, {}).get(
+                        'commit', 'unknown') for nid in processed_node_ids}
+                    logger.warning(
+                        "mlc-scripts version differs across nodes: "
+                        "aggregator=%s nodes=%s", agg_commit, detail)
+            output_info['mlc_scripts_version'] = block
+    except Exception as e:
+        logger.warning(f"Could not add version info: {e}")
+
     try:
         with open(env['MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH'], 'w') as f:
             json.dump(output_info, f, indent=2)
@@ -733,5 +877,7 @@ def postprocess(i):
                     sc['framework'])
         except Exception as e:
             logger.error(f"Failed to patch {run_md_path}: {e}")
+
+    _finalize_nameplate_power(env, dir_path, logger)
 
     return {'return': 0}

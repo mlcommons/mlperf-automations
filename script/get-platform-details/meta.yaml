@@ -13,6 +13,7 @@ tags:
 
 # Cache
 cache: false
+can_force_cache: true
 
 # Environment
 new_env_keys:
