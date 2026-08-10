@@ -1,13 +1,21 @@
-from setuptools import setup, find_packages
-from setuptools.command.install import install
-import subprocess
-import sys
+from setuptools import setup
+from setuptools.command.build_py import build_py
+import json
 import os
+import shutil
 
 try:
     import tomllib  # For Python 3.11+
 except ImportError:
     import toml  # For older Python versions (requires `pip install toml`)
+
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+
+# Directory the script content is shipped under inside the wheel. mlcflow
+# resolves this from the running interpreter and registers it as an ordinary
+# non-git repo, so the name is a contract between the two projects.
+PACKAGE_REPO_MODULE = "mlc_scripts"
 
 
 def get_project_meta(file_path="pyproject.toml"):
@@ -41,55 +49,6 @@ def get_project_meta(file_path="pyproject.toml"):
     return {}
 
 
-def check_prerequisites():
-    """Check if Git and python-venv are installed on the system. """
-    try:
-        # Check for Git
-        subprocess.run(["git", "--version"], check=True,
-                       stdout=subprocess.DEVNULL)
-    except FileNotFoundError:
-        sys.exit(
-            "Error: Git is not installed on the system. Please install Git and try again.")
-
-    try:
-        # Check for python-venv
-        subprocess.run([sys.executable, "-m", "venv", "--help"],
-                       check=True, stdout=subprocess.DEVNULL)
-    except subprocess.CalledProcessError:
-        sys.exit(
-            "Error: python-venv module is not available. Please install it and try again.")
-
-
-class CustomInstallCommand(install):
-    """Custom install command to run a custom command after installation."""
-
-    def run(self):
-        # Run the standard install process
-        install.run(self)
-
-        # Run custom post-install command
-        try:
-            print("Running custom post-install command...")
-            commit_hash = get_commit_hash()
-            import mlc
-            branch = os.environ.get('MLC_REPO_BRANCH', 'dev')
-
-            res = mlc.access({'action': 'pull',
-                              'target': 'repo',
-                              'repo': 'mlcommons@mlperf-automations',
-                              'branch': branch,
-                              # 'checkout': commit_hash
-                              })
-
-            if res['return'] > 0:
-                raise Exception(
-                    f"Return code:{res['return']} with error:{res.get('error')}")
-
-            # subprocess.run(["echo", "Custom command executed!"], check=True)
-        except Exception as e:
-            sys.exit(f"Error running post-install command: {e}")
-
-
 def read_file(file_name, default=""):
     if os.path.isfile(file_name):
         with open(file_name, "r", encoding="utf-8") as f:
@@ -99,14 +58,88 @@ def read_file(file_name, default=""):
 
 def get_commit_hash():
     try:
-        with open(os.path.join(os.path.dirname(__file__), 'git_commit_hash.txt'), 'r') as f:
+        with open(os.path.join(HERE, 'git_commit_hash.txt'), 'r') as f:
             return f.read().strip()
     except FileNotFoundError:
         return "unknown"
 
 
-# Check prerequisites before setup
-check_prerequisites()
+class BuildPyWithScriptContent(build_py):
+    """Copy the script content into the wheel.
+
+    The scripts used to arrive through a post-install `git clone` hooked onto
+    setup.py's install command. Modern pip never runs that command - it builds
+    a wheel and installs the wheel - so the hook fired at most once per
+    machine, into the *builder's* home, and never at all once pip had cached
+    the wheel. Shipping the content as the package payload removes the second
+    step entirely.
+
+    meta.yaml is rewritten with `git: false`: once installed there is no
+    checkout, and recording otherwise would make `mlc pull repo` try to
+    git-pull inside site-packages.
+    """
+
+    def run(self):
+        super().run()
+
+        target = os.path.join(self.build_lib, PACKAGE_REPO_MODULE)
+        os.makedirs(target, exist_ok=True)
+
+        self._write_meta(target)
+        self._copy_scripts(target)
+        self._write_provenance(target)
+
+    def _write_meta(self, target):
+        src = os.path.join(HERE, "meta.yaml")
+        if not os.path.isfile(src):
+            raise RuntimeError(
+                "meta.yaml not found at the repo root; the wheel would have no repo identity.")
+
+        with open(src, "r", encoding="utf-8") as f:
+            lines = f.read().splitlines()
+
+        out, replaced = [], False
+        for line in lines:
+            if line.strip().startswith("git:"):
+                out.append("git: false")
+                replaced = True
+            else:
+                out.append(line)
+        if not replaced:
+            out.append("git: false")
+
+        with open(os.path.join(target, "meta.yaml"), "w", encoding="utf-8") as f:
+            f.write("\n".join(out) + "\n")
+
+    def _copy_scripts(self, target):
+        src = os.path.join(HERE, "script")
+        if not os.path.isdir(src):
+            raise RuntimeError(
+                "script/ not found at the repo root; the wheel would ship no content.")
+
+        dst = os.path.join(target, "script")
+        if os.path.isdir(dst):
+            shutil.rmtree(dst)
+        # by-category/ is a presentational tree of relative symlinks into the
+        # real script directories. mlcflow never indexes it - _index_single_repo
+        # walks script/*/ and skips anything without a meta file - so copying
+        # it would only duplicate every script in the wheel, and one of its
+        # links is already dangling.
+        shutil.copytree(
+            src, dst,
+            symlinks=False,
+            ignore_dangling_symlinks=True,
+            ignore=shutil.ignore_patterns(
+                "by-category", "__pycache__", "*.pyc", ".git", ".pytest_cache"))
+
+    def _write_provenance(self, target):
+        provenance = {
+            "version": read_file(os.path.join(HERE, "VERSION"), default="0.0.1"),
+            "commit": get_commit_hash(),
+            "source": "https://github.com/mlcommons/mlperf-automations",
+        }
+        with open(os.path.join(target, ".mlc-provenance.json"), "w", encoding="utf-8") as f:
+            json.dump(provenance, f, indent=2)
 
 
 # Get project metadata from pyproject.toml
@@ -124,10 +157,18 @@ setup(
                      for a in project_meta.get("authors", [])),
     author_email=", ".join(a.get("email", "")
                            for a in project_meta.get("authors", [])),
-    packages=find_packages(),
+    # ONLY the script payload. find_packages() would also sweep this repo's
+    # automation/ directory into a generic top-level `automation` package -
+    # the exact path mlcflow installs its own bundled engine to. mlc-scripts
+    # installs after mlcflow (dependency ordering), so it would overwrite the
+    # engine, and `pip uninstall mlc-scripts` would then delete files
+    # mlcflow's RECORD also claims and leave mlcflow unable to start.
+    # automation/ stays in the git checkout for pre-bundling mlcflow
+    # releases; it has never belonged in the wheel.
+    packages=[PACKAGE_REPO_MODULE],
     install_requires=project_meta.get("dependencies", []),
     python_requires=project_meta.get("python-requires", ">=3.8"),
     cmdclass={
-        'install': CustomInstallCommand,
+        'build_py': BuildPyWithScriptContent,
     },
 )

@@ -90,7 +90,7 @@ jobs:
       # Step 8: Build the Python wheel
       - name: Build wheels
         working-directory: ./
-        run: python3 -m build && rm dist/*.whl
+        run: python3 -m build
 
       # Step 9: Publish to PyPI
       - name: Publish to PyPI

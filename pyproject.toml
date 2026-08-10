@@ -1,5 +1,7 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel", "toml", "mlcflow"]
+# mlcflow used to be a build requirement so setup.py could `import mlc` for
+# the post-install clone. That hook is gone, so the build no longer needs it.
+requires = ["setuptools>=61.0", "wheel", "toml"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -22,7 +24,10 @@ classifiers = [
 dependencies = [
     "requests",
     "pyyaml",
-    "mlcflow",
+    # 1.4.0 is the first release that discovers the packaged script content
+    # from the running interpreter. Older mlcflow expects the post-install
+    # git clone that no longer happens, and would find no scripts at all.
+    "mlcflow>=1.4.0",
     "giturlparse"
 ]
 
@@ -33,7 +38,8 @@ Repository = "https://github.com/mlcommons/mlperf-automations"
 Issues = "https://github.com/mlcommons/mlperf-automations/issues"
 
 [tool.setuptools]
-packages = []
+# packages are declared in setup.py, which also assembles the mlc_scripts
+# payload at build time.
 include-package-data = true
 
 [tool.setuptools.dynamic]
