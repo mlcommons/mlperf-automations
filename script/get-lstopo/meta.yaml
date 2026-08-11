@@ -7,7 +7,7 @@ tags:
   - get
   - lstopo
 
-cache: true
+cache: false
 can_force_cache: true
 
 category: lstopo topology automation
@@ -16,7 +16,6 @@ new_env_keys:
 - MLC_LSTOPO_XML_FILE_PATH
 
 clean_files:
-- topo.xml
 - tmp-run-env.out
 
 deps:

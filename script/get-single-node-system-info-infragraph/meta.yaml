@@ -37,14 +37,11 @@ variations:
     group: accelerator-backend
     env:
       MLC_ACCELERATOR_BACKEND: cuda
-      MLC_GPU_PLATFORM: cuda
   rocm:
     group: accelerator-backend
     env:
       MLC_ACCELERATOR_BACKEND: rocm
-      MLC_GPU_PLATFORM: rocm
   xpu:
     group: accelerator-backend
     env:
       MLC_ACCELERATOR_BACKEND: xpu
-      MLC_GPU_PLATFORM: xpu

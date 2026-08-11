@@ -18,14 +18,25 @@ def parse_args():
     return p.parse_args()
 
 
-def build_type_query(node_type):
+def build_type_query(*node_types):
+    """One attribute query carrying a named node_filter per component type."""
     request = QueryRequest()
-    node_filter = request.node_filters.add(name=f"{node_type} filter")
-    node_filter.choice = QueryNodeFilter.ATTRIBUTE_FILTER
-    node_filter.attribute_filter.name = "type"
-    node_filter.attribute_filter.operator = QueryNodeId.EQ
-    node_filter.attribute_filter.value = node_type
+    for node_type in node_types:
+        node_filter = request.attribute_query.node_filters.add(name=f"{node_type} filter")
+        node_filter.attribute_filters.attributes.add(attribute="type", value=node_type)
     return request
+
+
+def matched_nodes(response, node_type):
+    """Nodes matched by the `<node_type> filter`. attribute_filters matching is
+    substring based, so keep only the exact `type` hits."""
+    for result in response.attribute_query.nodes:
+        if result.name != f"{node_type} filter":
+            continue
+        return [node for node in result.nodes
+                if any(a.attribute == "type" and a.value == node_type
+                       for a in node.attributes)]
+    return []
 
 
 def main():
@@ -59,17 +70,16 @@ def main():
     accelerator_attrs = {k: v for k, v in sysinfo.items()
                          if k.startswith("accelerator")}
 
-    cpu_response = service.query_graph(build_type_query("cpu"))
-    xpu_response = service.query_graph(build_type_query("xpu"))
+    response = service.query_graph(build_type_query("cpu", "xpu"))
 
-    for match in cpu_response.node_matches:
-        node = annotation.nodes.add(name=match.id)
+    for match in matched_nodes(response, "cpu"):
+        node = annotation.nodes.add(name=match.name)
         for key, value in processor_attrs.items():
             node.attributes.add(attribute=key, value=str(value))
-    
-    for match in xpu_response.node_matches:
-        if accelerator_attrs.get("accelerator_model_name", "") in match.id:
-            node = annotation.nodes.add(name=match.id)
+
+    for match in matched_nodes(response, "xpu"):
+        if accelerator_attrs.get("accelerator_model_name", "") in match.name:
+            node = annotation.nodes.add(name=match.name)
             for key, value in accelerator_attrs.items():
                 node.attributes.add(attribute=key, value=str(value))
 
@@ -88,4 +98,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
