@@ -76,6 +76,7 @@ def preprocess(i):
                                            'os_info': os_info,
                                            'default_path_env_key': 'PATH',
                                            'detect_version': True,
+                                           'force_given_path': env.get('MLC_TMP_AMDCLANG_FORCE_GIVEN_PATH', False),
                                            'env_path_key': 'MLC_AMDCLANG_BIN_WITH_PATH',
                                            'run_script_input': i['run_script_input'],
                                            'recursion_spaces': recursion_spaces})
