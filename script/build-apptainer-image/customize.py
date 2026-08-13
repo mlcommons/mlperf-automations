@@ -27,7 +27,8 @@ def preprocess(i):
     if image_name == '':
         image_name = "mlc-script-" + \
             env.get('MLC_APPTAINER_RUN_SCRIPT_TAGS', 'default').replace(
-                ',', '-').replace('_', '-')
+                '://', '-').replace(',', '-').replace('_', '-').replace(
+                '+', 'plus').replace(':', '-').replace('/', '-').replace('@', '-')
     env['MLC_APPTAINER_IMAGE_NAME'] = image_name.lower()
 
     image_tag = env.get('MLC_APPTAINER_IMAGE_TAG', 'latest')
