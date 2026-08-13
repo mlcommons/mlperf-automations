@@ -34,6 +34,9 @@ deps:
 - tags: get,rocm
   names:
   - get-rocm
+  skip_if_env:
+    MLC_TMP_AMDCLANG_FORCE_GIVEN_PATH:
+    - 'yes'
 post_deps:
 - tags: get,compiler-flags
 

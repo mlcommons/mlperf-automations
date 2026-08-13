@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-08-13 20:21:22*
+*Last updated: 2026-08-13 20:41:49*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -40,6 +40,8 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [Uncategorized](#uncategorized)
 - [Utilities](#utilities)
 - [XPU automation](#xpu-automation)
+- [lstopo infragraph automation](#lstopo-infragraph-automation)
+- [lstopo topology automation](#lstopo-topology-automation)
 
 ---
 
@@ -1255,12 +1257,24 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - get-xpu-devices
   - Tags: `get`, `xpu-devices`
 
+## lstopo infragraph automation
+
+- **[get-single-node-system-info-infragraph](get-single-node-system-info-infragraph/)**
+  - get-single-node-system-info-infragraph
+  - Tags: `get`, `single-node`, `system-info`, `infragraph`
+
+## lstopo topology automation
+
+- **[get-lstopo](get-lstopo/)**
+  - get-lstopo
+  - Tags: `get`, `lstopo`
+
 ---
 
 ## Statistics
 
-- **Total Scripts**: 370
-- **Categories**: 34
+- **Total Scripts**: 372
+- **Categories**: 36
 
 ## Usage
 
