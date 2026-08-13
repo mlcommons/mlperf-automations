@@ -56,7 +56,8 @@ def preprocess(i):
     if docker_image_name == '':
         docker_image_name = "mlc-script-" + \
             env.get('MLC_DOCKER_RUN_SCRIPT_TAGS', '').replace(
-                ',', '-').replace('_', '-')
+                '://', '-').replace(',', '-').replace('_', '-').replace(
+                '+', 'plus').replace(':', '-').replace('/', '-').replace('@', '-')
 
     env['MLC_DOCKER_IMAGE_NAME'] = docker_image_name.lower()
 
