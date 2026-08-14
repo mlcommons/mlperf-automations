@@ -165,6 +165,53 @@ mlcd app,mlperf,inference,endpoints,_echo-server --num_samples=50
 mlcd app,mlperf,inference,endpoints --docker_rebuild
 ```
 
+### "I need to review a PR"
+
+Full spec — required structure, severity definitions, evidence rules,
+repo-specific checks — is in **AGENTS.md → "PR review format"**. Follow it
+exactly; the short version:
+
+```
+> attribution block: AI-performed, on whose request, what was inspected
+## Verdict                  ← 2-3 sentences + merge recommendation
+## 🔴 High severity         ← omit any tier with no findings
+## 🟠 Medium severity
+## 🟡 Low severity
+## Suggested path to merge  ← numbered, ordered, concrete
+```
+
+Investigate before writing:
+```bash
+gh pr diff <N> --repo mlcommons/mlperf-automations
+SHA=$(gh pr view <N> --repo mlcommons/mlperf-automations --json headRefOid -q .headRefOid)
+git fetch --depth 1 https://github.com/mlcommons/mlperf-automations.git refs/pull/<N>/head
+git checkout FETCH_HEAD
+```
+
+The checks that catch what the diff alone hides:
+
+- **Touches `automation/`?** It needs a companion mlcflow PR. The bundled copy
+  in mlcflow always wins, so the engine change is invisible to bundled users —
+  and if the PR also adds script content depending on it, that content silently
+  stops working with no error. Verify the `mlc_compat` guard in `meta.yaml`.
+- **Does CI actually run?** Compare touched paths against every workflow's
+  `paths:` filter — ~45 workflow files, and a wrong filter silences an entire
+  vendor family while still showing green.
+- **New `meta.yaml` key?** `lint.py` must be updated alongside
+  `meta_schema.py`, or invalid YAML is accepted silently.
+- **New script?** No `run.bat` means it fails on Windows.
+- **Env vars:** does `new_env_keys` actually export what `run.sh` reads? Is
+  anything in the transient `MLC_TMP_*` namespace being exported?
+- **Secrets:** any new logging near `--api_key` / `MLC_MLPERF_ENDPOINT_API_KEY`.
+- Read **callers and callees** of changed code, not just the diff. A comment
+  claiming "we now read X" is only true if some caller reads X — grep for
+  readers before believing it.
+
+Post as a plain comment so no required review slot is consumed:
+```bash
+gh pr comment <N> --repo mlcommons/mlperf-automations --body-file review.md
+```
+
 ---
 
 ## Quick reference: meta.yaml field cheat-sheet
