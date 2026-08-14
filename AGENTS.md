@@ -1185,6 +1185,92 @@ Do not log env var values that may contain keys.
 
 ---
 
+## PR review format
+
+When an agent is asked to review a pull request, the posted review must follow
+the structure below. The goal is that a maintainer can triage by severity
+without reading the whole comment, and that every claim is checkable.
+
+### Required structure
+
+1. **Attribution block** (blockquote, first thing in the comment) — state that
+   the review was performed by an AI agent, on whose request, what was
+   inspected, and that it is input to human review rather than a substitute.
+   Reviews posted from a human's account without this block are not acceptable.
+2. **Verdict** — two or three sentences: what the PR is trying to do, whether
+   it does it, and a merge recommendation.
+3. **Findings grouped under severity headings**, highest first. Omit a heading
+   entirely if it has no findings — never emit an empty section.
+   - `## 🔴 High severity`
+   - `## 🟠 Medium severity`
+   - `## 🟡 Low severity`
+4. **Suggested path to merge** — a numbered, ordered list of concrete actions.
+
+### Severity definitions
+
+| Level | Use when |
+|---|---|
+| 🔴 High | Incorrect behaviour, data loss or unintended filesystem/network mutation, a leaked credential, or code whose comments/docs contradict what it actually does. Also: an `automation/` change with no companion mlcflow PR, and any change that silently produces wrong benchmark numbers rather than failing. |
+| 🟠 Medium | Works, but is wrong on a platform or configuration the script claims to support; CI that does not actually run for the changed paths; a new script with no `run.bat` on a Windows-tested path; missing `mlc_compat` guard; env vars that escape their intended scope. |
+| 🟡 Low | Style, dead code, redundancy, naming, `meta.yaml` formatting that `lint.py` would fix, PR hygiene (title/description/docs), pre-existing gaps the PR merely surfaces. |
+
+### Rules for individual findings
+
+- Give each finding a `###` heading that states the defect as a claim, not a
+  topic — "`new_env_keys` does not export the variable `run.sh` reads", not
+  "env vars".
+- Cite `path:line` (or a permalink at the PR head SHA) for every claim.
+- Prefer evidence over assertion. Paste the grep, the failing command, or the
+  observed output that demonstrates the problem. If a claim was verified by
+  running code, say so; if it is reasoned-but-unverified, say that too.
+- Mark pre-existing issues as pre-existing. Do not charge them against the PR,
+  but do flag them when the PR makes them easier to reach.
+- End each High/Medium finding with a concrete **Fix:** line.
+- Do not pad. No praise sections, no restating the diff, no findings invented to
+  fill a severity tier.
+
+### Repo-specific checks a reviewer must perform
+
+These catch the failure modes that are specific to this repo and are easy to
+miss by reading the diff alone:
+
+- **`automation/` changes need a companion mlcflow PR.** The `automation/`
+  tree is bundled into mlcflow releases, and the bundled copy always wins over
+  this repo's copy. An engine change here is invisible to anyone on a bundled
+  mlcflow. If the PR pairs an engine change with script content that depends on
+  it (the common pattern), the content will silently stop working with **no
+  error** — verify a companion mlcflow PR exists and that the script's
+  `meta.yaml` carries an `mlc_compat` guard.
+- **Check that CI actually runs for the change.** `.github/workflows/` holds
+  ~45 files, and a wrong `paths:` filter silences CI for entire vendor
+  families. Compare the touched paths against the filters rather than assuming
+  a green check means coverage.
+- **`meta_schema.py` and `lint.py` are coupled.** Adding a `meta.yaml` key
+  without updating `lint.py` means invalid YAML is silently accepted.
+- **Cross-platform.** A new script with no `run.bat` fails on Windows.
+  Changes to `module.py` / `cache_utils.py` affect every script — ask whether
+  Linux, macOS and Windows were considered.
+- **Secrets.** Any new logging near `--api_key` / `MLC_MLPERF_ENDPOINT_API_KEY`
+  is a High finding.
+- **`customize.py` contract.** No `print()` (use `i['automation'].logger`), no
+  exceptions for recoverable errors (return `{'return': 1, 'error': '...'}`),
+  and no `MLC_TMP_*` in `new_env_keys`.
+
+### Mechanics
+
+```bash
+gh pr diff <N> --repo mlcommons/mlperf-automations       # the change
+gh pr view <N> --repo mlcommons/mlperf-automations --json headRefOid -q .headRefOid
+# read the *callers and callees* of changed code, not just the diff —
+# most real findings live in the gap between the two
+gh pr comment <N> --repo mlcommons/mlperf-automations --body-file review.md
+```
+
+Post as a regular comment (`gh pr comment`), not as a formal approval or
+change-request review — an agent should not consume a required review slot.
+
+---
+
 ## Answered questions (previously open)
 
 1. **UID generation** — use `python -c "import secrets; print(secrets.token_hex(8))"`.
