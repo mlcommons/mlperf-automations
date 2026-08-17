@@ -1,9 +1,5 @@
 ### 🧾 PR Checklist
 
-- [ ] Target branch is `dev`
-
-📌 Note: PRs must be raised against `dev`. Do not commit directly to `main`.
-
 ### 📁 File Hygiene & Output Handling
 - [ ] No unintended files (e.g., logs, cache, temp files, __pycache__, output folders) are committed
 
