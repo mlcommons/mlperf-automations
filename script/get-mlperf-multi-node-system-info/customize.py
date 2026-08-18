@@ -378,20 +378,17 @@ def _compute_system_size(node_entries):
     """
     parts = []
     for entry in node_entries:
-        n_nodes = entry.get("number_of_nodes", 1)
+        node_count = _parse_count(entry.get("number_of_nodes", 1)) or 1
+
         # A node type may host more than one accelerator model, so each model
         # contributes its own "<qty>x <model>" part rather than the node type
         # contributing a single one.
-        accel_models = [m for m in _split_multi_values(
-            entry.get("accelerator_model_name")) if not _is_not_detected(m)]
-        accel_counts = _split_multi_values(entry.get("accelerators_per_node"))
-
-        node_count = _parse_count(n_nodes) or 1
-
         counted_any = False
-        for idx, accel_name in enumerate(accel_models):
-            per_node = _parse_count(
-                _pick_multi_value(accel_counts, idx, len(accel_models)))
+        for accel in _node_accelerators(entry):
+            accel_name = accel.get("accelerator_model_name", "")
+            if _is_not_detected(accel_name):
+                continue
+            per_node = _parse_count(accel.get("accelerators_per_node"))
             if per_node is None:
                 continue
             parts.append(f"{node_count * per_node}x {accel_name}")
@@ -450,14 +447,6 @@ _ENDPOINTS_NODE_FIELDS = [
     "sw_notes",
 ]
 
-# Accelerator fields whose value belongs to one model only, so reusing a single
-# value across several models in a node type is a data error worth reporting.
-_ENDPOINTS_PER_MODEL_FIELDS = [
-    "accelerators_per_node",
-    "accelerator_memory_capacity",
-    "accelerator_memory_type",
-]
-
 # Fields the template shows as integers.
 _ENDPOINTS_INT_FIELDS = {
     "system_node_ensemble_id",
@@ -479,32 +468,28 @@ _ENDPOINTS_RUN_CONFIG_FIELDS = [
 ]
 
 
-def _split_multi_values(raw):
-    """Split a possibly multi-valued extracted field into its parts.
+def _node_accelerators(node, logger=None):
+    """Return a node type's accelerators as a list of per-model dicts.
 
-    Values covering several accelerators arrive comma-separated (that is how
-    heterogeneous node details are merged upstream), so a plain split is
-    enough to recover them."""
-    if raw is None:
+    The single-node probe publishes `accelerators`, one entry per accelerator
+    model, built from the detection script's state. A node probed by an older
+    checkout has only the flat accelerator_* fields, which describe a single
+    model, so fall back to reading those as one entry."""
+    accelerators = node.get("accelerators")
+    if isinstance(accelerators, list):
+        return [a for a in accelerators if isinstance(a, dict)]
+
+    model_name = node.get("accelerator_model_name", "")
+    if _is_not_detected(model_name):
         return []
-    if isinstance(raw, (list, tuple)):
-        return [str(v).strip() for v in raw if str(v).strip()]
-    text = str(raw).strip()
-    if not text:
-        return []
-    return [part.strip() for part in text.split(',') if part.strip()]
-
-
-def _pick_multi_value(values, idx, count):
-    """Pick the value for accelerator `idx` out of `values`.
-
-    One value per accelerator is used positionally. A single value shared by a
-    multi-accelerator node type applies to every accelerator."""
-    if len(values) == count:
-        return values[idx]
-    if len(values) == 1:
-        return values[0]
-    return values[idx] if idx < len(values) else ""
+    if logger is not None:
+        logger.warning(
+            "Node '%s' reported no accelerators list — it was probed by an "
+            "older checkout. Only one accelerator model is described; "
+            "re-probe the node if it hosts more than one.",
+            node.get("system_node_name", "?"))
+    return [{field: node.get(field, "")
+             for field in _ENDPOINTS_ACCELERATOR_FIELDS}]
 
 
 def _parse_count(value):
@@ -534,48 +519,19 @@ def _coerce_int(value):
 
 
 def _build_accelerator_info(node, logger):
-    """Nest a node type's flat accelerator_* fields into accelerator_info.
+    """Nest a node type's accelerators into accelerator_info, in 8.2 order.
 
     One entry per accelerator model. A node type with no accelerator gets an
     empty list."""
-    model_names = [m for m in _split_multi_values(
-        node.get("accelerator_model_name")) if not _is_not_detected(m)]
-    if not model_names:
-        return []
-
-    count = len(model_names)
-    columns = {
-        field: _split_multi_values(node.get(field))
-        for field in _ENDPOINTS_ACCELERATOR_FIELDS
-        if field != "accelerator_model_name"
-    }
-
-    if count > 1:
-        # A shared interconnect across models is plausible; a shared count,
-        # memory size or memory type almost never is, so name those.
-        broadcast = [f for f in _ENDPOINTS_PER_MODEL_FIELDS
-                     if len(columns.get(f, [])) == 1]
-        if broadcast:
-            logger.warning(
-                "Node type reports %d accelerator models but a single value "
-                "for %s. That value was applied to every model — correct it by "
-                "hand if the models differ.", count, ", ".join(broadcast))
-        ragged = [f for f, vals in columns.items()
-                  if len(vals) not in (0, 1, count)]
-        if ragged:
-            logger.warning(
-                "Node type has %d accelerator models but a differing number "
-                "of values for %s. Values were matched positionally where "
-                "possible; review these fields.", count, ", ".join(ragged))
-
     entries = []
-    for idx, model_name in enumerate(model_names):
+    for accel in _node_accelerators(node, logger):
+        if _is_not_detected(accel.get("accelerator_model_name", "")):
+            continue
         entry = {}
         for field in _ENDPOINTS_ACCELERATOR_FIELDS:
-            if field == "accelerator_model_name":
-                entry[field] = model_name
-                continue
-            value = _pick_multi_value(columns[field], idx, count)
+            value = accel.get(field, "")
+            if value is None:
+                value = ""
             entry[field] = _coerce_int(
                 value) if field in _ENDPOINTS_INT_FIELDS else value
         entries.append(entry)
@@ -701,6 +657,9 @@ _NODE_METADATA_FIELDS = {
     "system_node_ensemble_id",
     "number_of_nodes",
     "system_node_name",
+    # The structured per-model accelerator list. The flat format lifts the
+    # flat accelerator_* fields instead, so this would only be dead weight.
+    "accelerators",
 }
 
 # Extra fields added when the 'network' variation is active alongside 'inference'.

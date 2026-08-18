@@ -189,9 +189,102 @@ EXTRACT_RULES = {
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--output", required=True)
+    p.add_argument(
+        "--device-props",
+        default="",
+        help="JSON file of per-device accelerator property records, written "
+             "from the detection script's state. Without it only the "
+             "environment is read, which describes one accelerator model.")
     return p.parse_args()
 
 # -------------------------------------------------------------------
+
+
+def format_memory_capacity(value):
+    """Format an accelerator memory size as GiB, or 'N/A' when unusable.
+
+    Accepts either a raw byte count (CUDA reports total global memory in
+    bytes) or a figure already expressed in GiB (ROCm and XPU do)."""
+    value = str(value or "").strip()
+    if not value:
+        return "N/A"
+    raw = value.split()[0]
+    try:
+        value_bytes = float(raw)
+    except ValueError:
+        return "N/A"
+    if value_bytes == 0:
+        return "N/A"
+    # Report in GiB (binary) using ceil to align with GPU product marketing values.
+    # CUDA global memory is slightly below the marketed GiB due to driver reservation;
+    # ceil absorbs that gap so e.g. 31.37 GiB → 32 GiB (matching "32 GB" on
+    # the box).
+    if value_bytes >= 1024 ** 3:
+        return f"{math.ceil(value_bytes / (1024 ** 3))}GiB"
+    # Value is already in GiB (e.g. from
+    # MLC_ROCM_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB)
+    return f"{math.ceil(value_bytes)}GiB"
+
+
+# Accelerator field ← per-device property key published by the detection
+# scripts. CUDA, ROCm and XPU all use these same record keys.
+_ACCELERATOR_FIELD_FROM_PROP = [
+    ("accelerator_model_name", "GPU Name"),
+    ("accelerator_memory_capacity", "Global memory"),
+    ("accelerator_memory_type", "Memory Type"),
+    ("accelerator_interconnect", "GPU interconnect"),
+    ("accelerator_host_interconnect", "Host interconnect"),
+]
+
+
+def build_accelerators(device_props_path):
+    """Group the per-device records into one entry per accelerator model.
+
+    Returns the accelerator_info list of endpoints_rules.md 8.2.1: one dict
+    per distinct model, in the order the models were first enumerated, each
+    carrying its own count. An empty list means no accelerator was detected,
+    which is a valid answer for a CPU-only node."""
+    if not device_props_path or not os.path.exists(device_props_path):
+        return []
+    try:
+        with open(device_props_path) as f:
+            devices = json.load(f)
+    except Exception as e:
+        print(f"[WARN] Could not read {device_props_path}: {e}",
+              file=sys.stderr)
+        return []
+    if not isinstance(devices, list):
+        return []
+
+    models = []
+    first_seen = {}
+    counts = {}
+    for device in devices:
+        if not isinstance(device, dict):
+            continue
+        model_name = str(device.get("GPU Name", "")).strip()
+        if not model_name:
+            continue
+        if model_name not in first_seen:
+            models.append(model_name)
+            first_seen[model_name] = device
+            counts[model_name] = 0
+        counts[model_name] += 1
+
+    accelerators = []
+    for model_name in models:
+        device = first_seen[model_name]
+        entry = {"accelerator_model_name": model_name,
+                 "accelerators_per_node": counts[model_name]}
+        for field, prop_key in _ACCELERATOR_FIELD_FROM_PROP:
+            if field == "accelerator_model_name":
+                continue
+            value = str(device.get(prop_key, "") or "").strip()
+            if field == "accelerator_memory_capacity":
+                value = format_memory_capacity(value)
+            entry[field] = value or "N/A"
+        accelerators.append(entry)
+    return accelerators
 
 
 def _run(cmd, timeout=10):
@@ -342,24 +435,7 @@ def extract_value(rule, field_key):
         return "N/A"
 
     if field_key == "accelerator_memory_capacity":
-        if not value:
-            return "N/A"
-        raw = value.split()[0]
-        try:
-            value_bytes = float(raw)
-        except ValueError:
-            return "N/A"
-        if value_bytes == 0:
-            return "N/A"
-        # Report in GiB (binary) using ceil to align with GPU product marketing values.
-        # CUDA global memory is slightly below the marketed GiB due to driver reservation;
-        # ceil absorbs that gap so e.g. 31.37 GiB → 32 GiB (matching "32 GB" on
-        # the box).
-        if value_bytes >= 1024 ** 3:
-            return f"{math.ceil(value_bytes / (1024 ** 3))}GiB"
-        # Value is already in GiB (e.g. from
-        # MLC_ROCM_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB)
-        return f"{math.ceil(value_bytes)}GiB"
+        return format_memory_capacity(value)
 
     if field_key == "host_storage_type" and value == "No disk layout data found":
         return "N/A"
@@ -395,6 +471,11 @@ def main():
             print(
                 f"[WARN] Failed to extract {target_key}: {e}",
                 file=sys.stderr)
+
+    # One entry per accelerator model, from the detection script's state. The
+    # flat accelerator_* fields above stay as they are — they describe a single
+    # model and the inference submission format still expects them.
+    parsed["accelerators"] = build_accelerators(args.device_props)
 
     with open(output_path, "w") as f:
         json.dump(parsed, f, indent=2)
