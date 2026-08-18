@@ -26,6 +26,7 @@ new_env_keys:
 new_state_keys:
 - mlc_cuda_device_prop
 - mlc_cuda_devices_prop
+- mlc_cuda_devices_prop_per_model
 - mlc_cuda_num_devices
 
 # Dependencies
