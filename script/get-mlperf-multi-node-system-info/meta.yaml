@@ -58,6 +58,9 @@ input_mapping:
   run_metadata_path: MLC_MLPERF_RUN_METADATA_PATH
   serving_framework_type: MLC_MLPERF_SERVING_FRAMEWORK_TYPE
   system_type_detail: MLC_MLPERF_SYSTEM_TYPE_DETAIL
+  node_config: MLC_MLPERF_NODE_CONFIG
+  config_summary_notes: MLC_MLPERF_CONFIG_SUMMARY_NOTES
+  link_config: MLC_MLPERF_LINK_CONFIG
   redfish_endpoint: MLC_REDFISH_ENDPOINT
   redfish_username: MLC_REDFISH_USERNAME
   redfish_password: MLC_REDFISH_PASSWORD
