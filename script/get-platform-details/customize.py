@@ -416,7 +416,7 @@ def _parse_dmidecode_memory(text):
             continue
         dimm = {}
         for key in ['Size', 'Form Factor', 'Locator', 'Bank Locator', 'Type',
-                    'Speed', 'Manufacturer', 'Part Number', 'Rank',
+                    'Type Detail', 'Speed', 'Manufacturer', 'Part Number', 'Rank',
                     'Configured Memory Speed', 'Minimum Voltage', 'Maximum Voltage',
                     'Configured Voltage', 'Memory Technology', 'Total Width', 'Data Width',
                     'Serial Number']:

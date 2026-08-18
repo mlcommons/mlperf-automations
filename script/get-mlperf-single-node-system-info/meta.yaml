@@ -14,6 +14,12 @@ tags:
 # Cache
 cache: false
 
+# Environment
+new_env_keys:
+- MLC_SINGLE_NODE_SYSTEM_INFO_FILE_PATH
+- MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH
+- MLC_SINGLE_NODE_SYSTEM_INFO_FILE_NAME
+
 # Input mapping
 input_mapping:
   node_id: MLC_SINGLE_NODE_SYSTEM_ID
