@@ -124,6 +124,12 @@ def postprocess(i):
         bind_mounts = [bind_mounts]
     for mount in bind_mounts:
         if mount:
+            # Apptainer (unlike Docker) does not auto-create missing bind sources.
+            bind_src = mount.split(':', 1)[0]
+            if not os.path.exists(bind_src):
+                logger.info(
+                    f'Skipping apptainer bind (source missing): {bind_src}')
+                continue
             run_opts += f' --bind {mount}'
 
     # Overlay
