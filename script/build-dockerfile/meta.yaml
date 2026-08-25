@@ -32,6 +32,8 @@ input_mapping:
   comments: MLC_DOCKER_RUN_COMMENTS
   copy_files: MLC_DOCKER_COPY_FILES
   docker_base_image: MLC_DOCKER_IMAGE_BASE
+  docker_force_pull_update: MLC_DOCKER_FORCE_PULL_UPDATE
+  force_pull_update: MLC_DOCKER_FORCE_PULL_UPDATE
   docker_not_pull_update: MLC_DOCKER_NOT_PULL_UPDATE
   docker_os: MLC_DOCKER_OS
   docker_os_version: MLC_DOCKER_OS_VERSION
