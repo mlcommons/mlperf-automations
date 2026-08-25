@@ -14,7 +14,11 @@ add_entry () {
     tmpfile=$(mktemp)
 
     if [[ "$needs_sudo" == "yes" ]]; then
-      if [[ ${MLC_SUDO_USER} == "yes" ]]; then
+      # A user/group may have an exemption to run these commands without sudo.
+      # Try without sudo first, and fall back to sudo only if it fails.
+      if bash -c "$cmd" > "$tmpfile" 2>&1; then
+        :
+      elif [[ ${MLC_SUDO_USER} == "yes" ]]; then
         ${MLC_SUDO} bash -c "$cmd" > "$tmpfile" 2>&1 || echo "FAILED (sudo): $cmd" > "$tmpfile"
       else
         echo "sudo not available" > "$tmpfile"
