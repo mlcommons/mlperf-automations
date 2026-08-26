@@ -34,11 +34,24 @@ def preprocess(i):
             'return': 1,
             'error': f"Specified OS: {apptainer_os}. Supported: {', '.join(supported_distros)}"}
 
+    distro_config = config['distros'][apptainer_os]
+    known_versions = distro_config.get('versions', {})
+
     if not env.get("MLC_APPTAINER_OS_VERSION", ""):
         env["MLC_APPTAINER_OS_VERSION"] = env.get(
             'MLC_DOCKER_OS_VERSION',
-            config['distros'][apptainer_os].get(
-                'default_version', '24.04'))
+            distro_config.get('default_version', '24.04'))
+
+    # Gracefully handle unlisted host versions (e.g. release candidates or
+    # not-yet-added releases) by falling back to the distro's default version.
+    if not env.get('MLC_APPTAINER_IMAGE_BASE', '') and known_versions and \
+            env['MLC_APPTAINER_OS_VERSION'] not in known_versions:
+        fallback_version = distro_config.get(
+            'default_version', list(known_versions.keys())[-1])
+        logger.warning(
+            f"Version \"{env['MLC_APPTAINER_OS_VERSION']}\" not listed for "
+            f"\"{apptainer_os}\"; falling back to \"{fallback_version}\".")
+        env['MLC_APPTAINER_OS_VERSION'] = fallback_version
 
     apptainer_os_version = env['MLC_APPTAINER_OS_VERSION']
 
