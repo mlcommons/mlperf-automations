@@ -735,6 +735,17 @@ variations:
         brew: ''
         dnf: libudev-devl
         yum: libudev-devel
+  libxcrypt-compat:
+    env:
+      MLC_SYS_UTIL_NAME: libxcrypt-compat
+    new_env_keys:
+    - MLC_LIBXCRYPT_COMPAT_VERSION
+    state:
+      libxcrypt-compat:
+        apt: ''
+        brew: ''
+        dnf: libxcrypt-compat
+        yum: libxcrypt-compat
   libxext6:
     env:
       MLC_SYS_UTIL_NAME: libxext6
