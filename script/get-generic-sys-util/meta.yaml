@@ -353,6 +353,8 @@ variations:
       MLC_SYS_UTIL_VERSION_CMD: jq --version
       MLC_SYS_UTIL_VERSION_RE: jq-([\d.]+)
       MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+      # el10 ships a jq 1.7.1 build that prints "jq-" with no version string
+      MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE: 'yes'
     new_env_keys:
     - MLC_JQ_VERSION
     state:
