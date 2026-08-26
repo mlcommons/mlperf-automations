@@ -61,10 +61,23 @@ def preprocess(i):
                 # build_args.append(arg)
                 # input_args.append("--"+input_+"="+"$"+env_)
 
+    distro_config = config['distros'].get(env['MLC_DOCKER_OS'], {})
+    known_versions = distro_config.get('versions', {})
+
     if not env.get("MLC_DOCKER_OS_VERSION", ""):
-        distro_config = config['distros'].get(env['MLC_DOCKER_OS'], {})
         env["MLC_DOCKER_OS_VERSION"] = distro_config.get('default_version', list(
-            distro_config.get('versions', {}).keys())[-1] if distro_config.get('versions') else '24.04')
+            known_versions.keys())[-1] if known_versions else '24.04')
+
+    # Gracefully handle unlisted host versions (e.g. release candidates or
+    # not-yet-added releases) by falling back to the distro's default version.
+    if not env.get('MLC_DOCKER_IMAGE_BASE', '') and known_versions and \
+            env['MLC_DOCKER_OS_VERSION'] not in known_versions:
+        fallback_version = distro_config.get(
+            'default_version', list(known_versions.keys())[-1])
+        logger.warning(
+            f"Version \"{env['MLC_DOCKER_OS_VERSION']}\" not listed for "
+            f"\"{env['MLC_DOCKER_OS']}\"; falling back to \"{fallback_version}\".")
+        env['MLC_DOCKER_OS_VERSION'] = fallback_version
 
     docker_image_base = get_value(env, config, 'FROM', 'MLC_DOCKER_IMAGE_BASE')
     if not docker_image_base:
