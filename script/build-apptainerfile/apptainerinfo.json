@@ -34,6 +34,15 @@
         },
         "25.04": {
           "FROM": "docker://ubuntu:25.04"
+        },
+        "25.10": {
+          "FROM": "docker://ubuntu:25.10"
+        },
+        "26.04": {
+          "FROM": "docker://ubuntu:26.04"
+        },
+        "26.10": {
+          "FROM": "docker://ubuntu:26.10"
         }
       },
       "default_version": "24.04"
@@ -63,7 +72,10 @@
           ],
           "PYTHON": "python3.9"
         },
-        "9": {}
+        "9": {},
+        "10": {
+          "FROM": "docker://registry.access.redhat.com/ubi10"
+        }
       },
       "default_version": "9"
     },
@@ -94,6 +106,9 @@
         },
         "9": {
           "FROM": "docker://rockylinux:9"
+        },
+        "10": {
+          "FROM": "docker://rockylinux/rockylinux:10"
         }
       },
       "default_version": "9"
@@ -119,6 +134,12 @@
         },
         "12": {
           "FROM": "docker://debian:12"
+        },
+        "13": {
+          "FROM": "docker://debian:13"
+        },
+        "forky": {
+          "FROM": "docker://debian:forky"
         }
       },
       "default_version": "12"
@@ -163,6 +184,43 @@
         },
         "15.6": {
           "FROM": "docker://registry.suse.com/bci/bci-base:15.6"
+        },
+        "15.7": {
+          "FROM": "docker://registry.suse.com/bci/bci-base:15.7"
+        },
+        "16.0": {
+          "FROM": "docker://registry.suse.com/bci/bci-base:16.0",
+          "packages": [
+            "python313",
+            "python313-pip",
+            "git",
+            "wget",
+            "sudo",
+            "unzip",
+            "ca-certificates",
+            "gzip",
+            "tar",
+            "gawk",
+            "binutils"
+          ],
+          "PYTHON": "python3.13"
+        },
+        "16.1": {
+          "FROM": "docker://registry.suse.com/bci/bci-base:16.1",
+          "packages": [
+            "python313",
+            "python313-pip",
+            "git",
+            "wget",
+            "sudo",
+            "unzip",
+            "ca-certificates",
+            "gzip",
+            "tar",
+            "gawk",
+            "binutils"
+          ],
+          "PYTHON": "python3.13"
         }
       },
       "default_version": "15.6",
