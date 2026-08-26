@@ -281,7 +281,7 @@
           "FROM": "rockylinux:9"
         },
         "10": {
-          "FROM": "rockylinux:10"
+          "FROM": "rockylinux/rockylinux:10"
         }
       },
       "default_version": "9"
