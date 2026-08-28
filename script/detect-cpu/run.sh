@@ -11,10 +11,79 @@ extract_field() {
   echo "${value:-$default}"
 }
 
+_run_powermetrics_sample() {
+  if [[ ${MLC_SUDO_USER} != "yes" ]]; then
+    echo "sudo not available for powermetrics" > "$MLC_CPU_FREQ_CAPTURE_OUTPUT_FILE"
+    return 1
+  fi
+  ${MLC_SUDO} powermetrics -s cpu_power -n 1 2>/dev/null | grep 'HW active frequency' > "$MLC_CPU_FREQ_CAPTURE_OUTPUT_FILE" || true
+}
+
+_run_cpu_freq_capture() {
+  local mode="${MLC_CPU_FREQ_CAPTURE_MODE:-}"
+  local output="${MLC_CPU_FREQ_CAPTURE_OUTPUT_FILE:-}"
+  local pid_file="${MLC_CPU_FREQ_CAPTURE_PID_FILE:-}"
+  local interval="${MLC_CPU_FREQ_CAPTURE_INTERVAL_MS:-500}"
+
+  if [[ -z "$mode" ]]; then
+    return 0
+  fi
+  if [[ -z "$output" ]]; then
+    echo "MLC_CPU_FREQ_CAPTURE_OUTPUT_FILE is not set"
+    exit 1
+  fi
+
+  case "$mode" in
+    start)
+      if [[ -z "$pid_file" ]]; then
+        echo "MLC_CPU_FREQ_CAPTURE_PID_FILE is not set"
+        exit 1
+      fi
+      if [[ -f "$pid_file" ]]; then
+        old_pid=$(cat "$pid_file" 2>/dev/null || true)
+        if [[ -n "$old_pid" ]]; then
+          kill "$old_pid" 2>/dev/null || true
+          wait "$old_pid" 2>/dev/null || true
+        fi
+        rm -f "$pid_file"
+      fi
+      : > "$output"
+      if [[ ${MLC_SUDO_USER} != "yes" ]]; then
+        echo "sudo not available for powermetrics" > "$output"
+        exit 1
+      fi
+      ${MLC_SUDO} powermetrics -s cpu_power -i "$interval" -n 0 >> "$output" 2>&1 &
+      echo $! > "$pid_file"
+      echo "Started powermetrics CPU frequency capture (PID $(cat "$pid_file"))"
+      ;;
+    stop)
+      if [[ -n "$pid_file" ]] && [[ -f "$pid_file" ]]; then
+        pid=$(cat "$pid_file" 2>/dev/null || true)
+        if [[ -n "$pid" ]]; then
+          kill "$pid" 2>/dev/null || true
+          wait "$pid" 2>/dev/null || true
+        fi
+        rm -f "$pid_file"
+        echo "Stopped powermetrics CPU frequency capture"
+      fi
+      ;;
+    sample)
+      _run_powermetrics_sample
+      ;;
+    *)
+      echo "Unknown MLC_CPU_FREQ_CAPTURE_MODE: $mode"
+      exit 1
+      ;;
+  esac
+}
+
 if [[ ${MLC_HOST_OS_FLAVOR} == "macos" ]]; then
     sysctl -a | grep hw > tmp-lscpu.out
     cpu_model_name=$(sysctl -n machdep.cpu.brand_string)
     echo "MLC_HOST_CPU_MODEL_NAME=$cpu_model_name">>tmp-run-env.out
+    if [[ -n "${MLC_CPU_FREQ_CAPTURE_MODE:-}" ]]; then
+      _run_cpu_freq_capture
+    fi
 else
     lscpu > tmp-lscpu.out
     memory_capacity=`free -h --si | grep Mem: | tr -s ' ' | cut -d' ' -f2`
