@@ -431,6 +431,7 @@ deps:
         - 'yes'
     force_env_keys:                   # Force these keys into the dep's env
       - MLC_DOWNLOAD_*
+    skip_add_deps_recursive: true     # Do not let parent adr overrides change this dep
     dynamic: true                     # Always re-evaluate, even from cache
 ```
 
