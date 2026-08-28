@@ -60,6 +60,11 @@ variations:
     env:
       MLC_DOWNLOAD_URL: https://software.intel.com/sites/landingpage/pintool/downloads/pin-external-4.2-99776-g21d818fa2-gcc-linux.tar.gz
     group: version
+  path.#:
+    default_variations:
+      version: version.4.2
+    env:
+      MLC_INTEL_PINTOOL_DIR_PATH: '#'
 
 # Tests
 tests:
