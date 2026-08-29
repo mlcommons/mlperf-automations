@@ -87,6 +87,7 @@ TOP_LEVEL_SCHEMA = {
 
     # Docker
     "docker": DICT,        # dict - see DOCKER_SCHEMA
+    "apptainer": DICT,        # dict - see APPTAINER_SCHEMA
 
     # Output / debugging
     "print_env_at_the_end": DICT,        # dict[str, list[str]]
@@ -161,6 +162,7 @@ VARIATION_ENTRY_SCHEMA = {
     "state": DICT,
     "const": DICT,
     "docker": DICT,
+    "apptainer": DICT,
     "alias": STR,
     "default_version": STR_OR_FLOAT,
     "required_disk_space": INT,
@@ -213,6 +215,53 @@ DOCKER_SCHEMA = {
     "env": DICT,
 }
 
+# ─── Apptainer section keys ───────────────────────────────────────
+APPTAINER_SCHEMA = {
+    "real_run": BOOL,
+    "run": BOOL,
+    "skip_run_cmd": STR_OR_BOOL,
+    "pre_run_cmds": LIST,
+    "deps": LIST,
+    "build_deps": LIST,
+    "mounts": LIST,
+    "input_mapping": DICT,
+    "os": STR,
+    "os_version": STR,
+    "base_image": STR,
+    "mlc_repo": STR,
+    "mlc_repo_branch": STR,
+    "mlc_repo_path": STR,
+    "mlc_repos": LIST,
+    "extra_sys_deps": LIST,
+    "skip_mlc_sys_upgrade": STR,
+    "image_name": STR,
+    "gh_token": STR,
+    "fake_run_deps": BOOL,
+    "run_final_cmds": LIST,
+    "copy_files": LIST,
+    "path": STR,
+    "env": DICT,
+    "ignore_fakeroot_cmd": STR_OR_BOOL,
+    "sudo": STR_OR_BOOL,
+    "run_cmd_prefix": STR,
+    "nv": STR_OR_BOOL,
+    "rocm": STR_OR_BOOL,
+    "bind": LIST,
+    "writable": STR_OR_BOOL,
+    "writable_tmpfs": STR_OR_BOOL,
+    "cleanenv": STR_OR_BOOL,
+    "fakeroot": STR_OR_BOOL,
+    "no_home": STR_OR_BOOL,
+    "contain": STR_OR_BOOL,
+    "containall": STR_OR_BOOL,
+    "overlay": STR,
+    "extra_args": STR,
+    "sandbox": STR_OR_BOOL,
+    "network": STR,
+    "security_opt": STR,
+    "default_env": DICT,
+}
+
 # ─── Tests section keys ─────────────────────────────────────────
 TESTS_SCHEMA = {
     "run_inputs": LIST,   # list[dict] - each has variations_list, env, etc.
@@ -238,6 +287,7 @@ UPDATE_META_IF_ENV_SCHEMA = {
     "default_env": DICT,
     "default_variations": DICT,
     "docker": DICT,
+    "apptainer": DICT,
     "adr": DICT,
     "ad": DICT,
 }
@@ -392,6 +442,20 @@ def validate_meta(data, file_path=""):
             if actual not in allowed:
                 errors.append(
                     f"{prefix}docker.{dk} has type '{actual}', expected {allowed}")
+
+    # Validate apptainer section
+    apptainer = data.get("apptainer")
+    if isinstance(apptainer, dict):
+        for ak, av in apptainer.items():
+            if ak not in APPTAINER_SCHEMA:
+                warnings.append(
+                    f"{prefix}apptainer: unknown key '{ak}'")
+                continue
+            actual = type(av).__name__
+            allowed = APPTAINER_SCHEMA[ak]
+            if actual not in allowed:
+                errors.append(
+                    f"{prefix}apptainer.{ak} has type '{actual}', expected {allowed}")
 
     # Validate tests section
     tests = data.get("tests")

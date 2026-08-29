@@ -146,6 +146,7 @@ TOP_LEVEL_KEY_ORDER = [
 
     # Docker / container
     "docker",
+    "apptainer",
 
     # Output / debugging
     "print_env_at_the_end",
@@ -172,7 +173,7 @@ SECTION_GROUPS = [
     ("# Variations",              ["default_variation", "default_variations", "variation_groups_order", "invalid_variation_combinations", "valid_variation_combinations", "variations"]),
     ("# Versions",                ["default_version", "versions"]),
     ("# Conditional meta updates",["update_meta_if_env"]),
-    ("# Docker / container",      ["docker"]),
+    ("# Docker / container",      ["docker", "apptainer"]),
     ("# Output / debugging",      ["print_env_at_the_end", "print_files_if_script_error", "warnings", "sudo_install", "sort", "remote_run"]),
     ("# Tests",                   ["tests"]),
 ]

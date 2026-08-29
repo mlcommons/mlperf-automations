@@ -856,8 +856,12 @@ mlcr "benchmark,program" --experiment --exp.batch_size=1,2,4,8
 | `--save_env` | Save env and state to files |
 | `--json` / `-j` | Print output as JSON |
 | `--docker_run` | Run inside Docker |
+| `--apptainer_run` | Run inside Apptainer |
 | `--experiment` | Enable experiment tracking |
 | `--help` | Show help for a specific script |
+
+For `mlca` (`--apptainer_run`), `--docker_*` options are also accepted and used as defaults;
+matching `--apptainer_*` options take precedence.
 
 ---
 

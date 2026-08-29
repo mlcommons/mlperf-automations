@@ -156,7 +156,7 @@ class ScriptAutomation(Automation):
         for f in ['fake_deps', 'cache']:
             run_state.setdefault(f, False)
 
-        for d in ['input_mapping', 'docker', 'remote_run']:
+        for d in ['input_mapping', 'docker', 'apptainer', 'remote_run']:
             run_state.setdefault(d, {})
 
         for l in ['deps', 'post_deps', 'prehook_deps', 'posthook_deps',
@@ -5917,6 +5917,23 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
                            'append_unique': True})
         if docker_settings.get('deps', []):
             update_deps(docker_settings['deps'], add_deps_info, False, env)
+
+    apptainer_settings = run_state.get('apptainer', {})
+    if new_docker_settings:
+        utils.merge_dicts({'dict1': apptainer_settings,
+                           'dict2': new_docker_settings,
+                           'append_lists': True,
+                           'append_unique': True})
+
+    new_apptainer_settings = meta.get('apptainer')
+    if new_apptainer_settings:
+        utils.merge_dicts({'dict1': apptainer_settings,
+                           'dict2': new_apptainer_settings,
+                           'append_lists': True,
+                           'append_unique': True})
+
+    if apptainer_settings.get('deps', []):
+        update_deps(apptainer_settings['deps'], add_deps_info, False, env)
 
     new_remote_run_settings = meta.get('remote_run')
     if new_remote_run_settings:
