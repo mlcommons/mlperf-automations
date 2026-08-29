@@ -1,5 +1,6 @@
 from mlc import utils
 import os
+import shlex
 import subprocess
 from utils import *
 
@@ -178,7 +179,10 @@ def postprocess(i):
     # Activate venv inside the container before running commands
     full_cmd = f". /opt/venv/mlcflow/bin/activate && {run_cmd_combined}"
 
-    CMD = f"apptainer exec{run_opts} {sif_path} bash -c '{full_cmd}'"
+    # shlex.quote handles single quotes embedded in the nested run
+    # command (e.g. quoted --apptainer_pre_run_cmds), which naive
+    # '{...}' wrapping breaks with 'unexpected EOF'.
+    CMD = f"apptainer exec{run_opts} {sif_path} bash -c {shlex.quote(full_cmd)}"
 
     logger.info('')
     logger.info('Apptainer launch command:')
