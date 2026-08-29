@@ -16,6 +16,7 @@ on:
       - 'automation/script/remote_run.py'
       - 'automation/script/lint.py'
       - 'automation/script/doc.py'
+      - 'automation/script/tests/**'
       - 'script/detect-os/**'
       - 'script/detect-cpu/**'
       - 'script/get-generic-python-lib/**'
@@ -89,6 +90,10 @@ jobs:
       run: |
         mlcr python,src,install,_shared --version=3.9.10 --quiet
         mlc search cache --tags=python,src,install,_shared,version-3.9.10
+
+    - name: Test apptainer option fallback unit tests
+      run: |
+        python -m unittest automation.script.tests.test_apptainer_option_fallback -v
 
   test_docker:
     runs-on: ubuntu-latest
