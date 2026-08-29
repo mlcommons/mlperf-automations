@@ -152,9 +152,6 @@ def apptainerfile(self_module, input_params):
     if apptainer_inputs.get('mlc_repo_path', '') != '':
         mlc_apptainer_input['mlc_repo_path'] = apptainer_inputs['mlc_repo_path']
 
-    if is_true(input_params.get('apptainer_host_mlc_repos', '')):
-        mlc_apptainer_input['host_mlc_repos'] = 'yes'
-
     apptainer_v = False
     apptainer_s = False
     if is_true(input_params.get(
