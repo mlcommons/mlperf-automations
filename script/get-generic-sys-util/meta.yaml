@@ -738,6 +738,7 @@ variations:
   libxcrypt-compat:
     env:
       MLC_SYS_UTIL_NAME: libxcrypt-compat
+      MLC_SYS_UTIL_CHECK_CMD: ldconfig -p | grep libcrypt.so.1
     new_env_keys:
     - MLC_LIBXCRYPT_COMPAT_VERSION
     state:
