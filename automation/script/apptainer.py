@@ -6,10 +6,11 @@ from script.docker_utils import regenerate_script_cmd
 import copy
 
 
-DOCKER_TO_APPTAINER_OPTION_ALIASES = {
+# Per-apptainer-option aliases for differently named input flags.
+# Keys are canonical apptainer option names used in this module.
+APPTAINER_OPTION_INPUT_ALIASES = {
     "bind": "docker_mounts",
-    "extra_args": "docker_extra_run_args",
-    "mounts": "docker_mounts"
+    "extra_args": "docker_extra_run_args"
 }
 
 
@@ -18,7 +19,7 @@ def _get_apptainer_option(input_params, key, default=None):
     if apptainer_key in input_params:
         return input_params[apptainer_key]
 
-    alias_key = DOCKER_TO_APPTAINER_OPTION_ALIASES.get(key, '')
+    alias_key = APPTAINER_OPTION_INPUT_ALIASES.get(key, '')
     if alias_key and alias_key in input_params:
         return input_params[alias_key]
 
@@ -79,7 +80,7 @@ def apptainerfile(self_module, input_params):
 
     run_state = self_module.run_state
 
-    apptainer_settings = run_state.get('apptainer', run_state.get('docker', {}))
+    apptainer_settings = run_state.get('apptainer', {})
     apptainer_settings_default_env = apptainer_settings.get('default_env', {})
     for key in apptainer_settings_default_env:
         env.setdefault(key, apptainer_settings_default_env[key])
@@ -109,7 +110,7 @@ def apptainerfile(self_module, input_params):
     if update_state_result['return'] > 0:
         return update_state_result
 
-    apptainer_settings = run_state.get('apptainer', run_state.get('docker', {}))
+    apptainer_settings = run_state.get('apptainer', {})
 
     # Prune temporary environment variables
     run_command = copy.deepcopy(run_command_arc)
@@ -177,11 +178,11 @@ def apptainerfile(self_module, input_params):
 
     apptainer_v = False
     apptainer_s = False
-    if is_true(_get_apptainer_option(
-            input_params, 'v', _get_apptainer_option(input_params, 'verbose', False))):
+    if is_true(input_params.get(
+            'apptainer_v', input_params.get('apptainer_verbose', input_params.get('docker_verbose', False)))):
         apptainer_v = True
-    if is_true(_get_apptainer_option(
-            input_params, 's', _get_apptainer_option(input_params, 'silent', False))):
+    if is_true(input_params.get(
+            'apptainer_s', input_params.get('apptainer_silent', input_params.get('docker_silent', False)))):
         apptainer_s = True
 
     if apptainer_s and apptainer_v:
@@ -293,7 +294,7 @@ def apptainer_run(self_module, i):
 
     run_state = self_module.run_state
 
-    apptainer_settings = run_state.get('apptainer', run_state.get('docker', {}))
+    apptainer_settings = run_state.get('apptainer', {})
 
     apptainer_settings_default_env = apptainer_settings.get('default_env', {})
     for key in apptainer_settings_default_env:

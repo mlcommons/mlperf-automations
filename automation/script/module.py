@@ -5918,7 +5918,7 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
         if docker_settings.get('deps', []):
             update_deps(docker_settings['deps'], add_deps_info, False, env)
 
-    apptainer_settings = run_state.get('apptainer', {})
+    apptainer_settings = run_state['apptainer']
     if new_docker_settings:
         utils.merge_dicts({'dict1': apptainer_settings,
                            'dict2': new_docker_settings,
@@ -5931,6 +5931,8 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
                            'dict2': new_apptainer_settings,
                            'append_lists': True,
                            'append_unique': True})
+
+    run_state['apptainer'] = apptainer_settings
 
     if apptainer_settings.get('deps', []):
         update_deps(apptainer_settings['deps'], add_deps_info, False, env)

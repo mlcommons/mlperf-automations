@@ -77,6 +77,18 @@ class TestApptainerOptionFallback(unittest.TestCase):
         self.assertEqual(apptainer_inputs["os"], "ubuntu")
         self.assertEqual(apptainer_inputs["os_version"], "24.04")
 
+    def test_apptainer_options_override_docker_options(self):
+        params = {
+            "docker_os": "ubuntu",
+            "docker_os_version": "24.04",
+            "apptainer_os": "rocky",
+            "apptainer_os_version": "9",
+        }
+        apptainer_inputs, _ = prepare_apptainer_inputs(
+            params, {}, DummyScript(), True, DummyMlc())
+        self.assertEqual(apptainer_inputs["os"], "rocky")
+        self.assertEqual(apptainer_inputs["os_version"], "9")
+
     def test_apptainer_meta_schema_key_is_supported(self):
         meta = {
             "alias": "x",
