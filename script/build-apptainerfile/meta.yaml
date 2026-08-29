@@ -32,6 +32,7 @@ input_mapping:
   fakeroot: MLC_APPTAINER_FAKEROOT
   file_path: MLC_APPTAINERFILE_WITH_PATH
   gh_token: MLC_GH_TOKEN
+  host_mlc_repos: MLC_APPTAINER_HOST_MLC_REPOS
   image_repo: MLC_APPTAINER_IMAGE_REPO
   image_tag: MLC_APPTAINER_IMAGE_TAG
   mlc_repo: MLC_MLOPS_REPO
