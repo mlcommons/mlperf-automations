@@ -37,7 +37,7 @@ jobs:
       # Step : Build the Python wheel
       - name: Build wheels
         working-directory: ./
-        run: python3 -m build && rm dist/*.whl
+        run: python3 -m build
 
       # Step : Publish to PyPI
       - name: Publish to PyPI

@@ -93,8 +93,13 @@ python -m vllm.entrypoints.openai.api_server ... > /tmp/serving.log 2>&1 &
 | `--category` | string | System category (e.g. `"datacenter"`). |
 | `--status` | string | System availability status (e.g. `"available"`). |
 | `--division` | string | Submission division (e.g. `"open"`, `"closed"`). |
+| `--node_config` | string | Description of the node configuration used for the run. Derived from `--node_config_file` when not given. |
+| `--config_summary_notes` | string | Anything about the run configuration the parallelism fields do not capture. |
+| `--link_config` | string | Link to the full configuration logs for the run. |
 
 ### Model metadata
+
+The model and dataset arguments below are unchanged and still accepted, so one shared config file can drive the whole submission. Under the endpoints rules they no longer appear in the system description — they belong to the measurement point YAML — but they remain available to any consumer of these env vars, and the `_inference` path is unaffected.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
@@ -140,77 +145,85 @@ system_info:
 
 ## Output
 
-The script writes `system-info-multi-node.json` to `--out_dir_path`. All fields are at the top level — there are no nested section wrappers:
+The script writes `system-info-multi-node.json` to `--out_dir_path`. Its shape follows the system description template in [MLPerf Endpoints rules §8.2.1](https://github.com/mlcommons/endpoints_policies/blob/main/endpoints_rules.md): SUT-level fields at the top, per-node-type hardware and software under `node_types`, each node type's accelerators under `accelerator_info`, and the run configuration at the end. Only the fields defined in §8.2 are written — submitter, model and dataset metadata live elsewhere in the submission.
+
+With the `_inference` variation the output is the flat MLPerf Inference format instead; see [Inference submission format](#inference-submission-format).
 
 ```json
 {
-  "submitter_org_names": "MLCommons",
-  "submitter_contact": "contact@example.com",
-  "submission_id": "",
-  "submission_date": "",
-  "publish_date": "",
-
-  "system_name": "8x NVIDIA H100 80GB HBM3",
-  "system_category": "datacenter",
-  "system_availability_status": "available",
-  "system_size": "8x NVIDIA H100 80GB HBM3",
-  "system_node_ensemble_count": 1,
-  "system_node_ensemble_total": 1,
-  "serving_framework": "vLLM 0.9.0",
-
+  "division": "Standardized",
+  "system_name": "disagg-sut",
+  "system_availability_status": "Available",
+  "system_category": "Datacenter",
+  "system_size": "8x NVIDIA H100 80GB HBM3 + 1x NVIDIA GeForce RTX 5060 Ti + 4x NVIDIA A100-SXM4-40GB",
+  "system_node_ensemble_count": 2,
+  "system_node_ensemble_total": 2,
+  "endpoint_url": "http://prefill1:8000",
+  "serving_framework": "SGLang 0.4.6",
   "node_types": [
     {
-      "system_node_ensemble_id": 0,
+      "system_node_ensemble_id": 1,
       "number_of_nodes": 1,
       "host_processor_model_name": "Intel(R) Xeon(R) Platinum 8480+",
       "host_processors_per_node": 2,
       "host_processor_core_count": 112,
       "host_processor_vcpu_count": 224,
       "host_memory_capacity": "2.2T",
-      "host_memory_configuration": "Not available",
-      "accelerator_model_name": "NVIDIA H100 80GB HBM3",
-      "accelerators_per_node": 8,
-      "accelerator_memory_capacity": "80GiB",
-      "accelerator_memory_type": "HBM3",
-      "accelerator_interconnect": "NVLink",
-      "accelerator_host_interconnect": "PCIe Gen5 x16",
+      "host_memory_configuration": "N/A",
+      "accelerator_info": [
+        {
+          "accelerator_model_name": "NVIDIA H100 80GB HBM3",
+          "accelerators_per_node": 8,
+          "accelerator_memory_capacity": "80GiB",
+          "accelerator_memory_type": "HBM3",
+          "accelerator_interconnect": "NVLink",
+          "accelerator_host_interconnect": "PCIe Gen5 x16"
+        },
+        {
+          "accelerator_model_name": "NVIDIA GeForce RTX 5060 Ti",
+          "accelerators_per_node": 1,
+          "accelerator_memory_capacity": "16GiB",
+          "accelerator_memory_type": "GDDR7",
+          "accelerator_interconnect": "PCIe",
+          "accelerator_host_interconnect": "PCIe Gen5 x8"
+        }
+      ],
       "host_network_card_count": "3x mlx5_0",
       "host_networking": "mlx5_0: native InfiniBand",
-      "host_storage_capacity": "1.1 GB NVMe SSD, 1.8 TB SSD",
+      "host_storage_capacity": "1.8 TB SSD",
       "host_storage_type": "NVMe SSD",
       "other_hardware": "",
-      "hw_notes": "",
       "cooling": "",
+      "hw_notes": "",
       "inference_backend": "CUDA 12.9",
       "driver": "Driver 575.57.08",
       "operating_system": "ubuntu 24.04",
-      "filesystem": "ext4 vfat zfs",
+      "filesystem": "ext4",
       "container_link": "",
       "other_software_stack": "CUDA 12.9, Driver 575.57.08",
-      "sw_notes": null
+      "sw_notes": ""
     }
   ],
-
-  "division": "open",
-  "model_id": "llama2-70b",
-  "model_name": "Llama 2 70B",
-  "model_precision": "fp8",
-  "link_to_model": "...",
-  "link_to_model_transformation": "...",
-  "model_notes": "",
-
-  "dataset_id": "openorca",
-  "dataset_name": "Open Orca",
-  "input_token_average": "128",
-  "output_token_average": "256",
-  "dataset_type": "real",
-  "dataset_link": "...",
-
-  "measured_accuracy_score": ""
+  "node_config": "Prefill: 1x H100; Decode: 1x A100",
+  "disaggregated": 1,
+  "expert_parallel": 0,
+  "tensor_parallel": 8,
+  "pipeline_parallel": 1,
+  "data_parallel": 2,
+  "batch": 256,
+  "config_summary": "Disaggregated, TP 8, DP 2",
+  "config_summary_notes": "",
+  "link_config": ""
 }
 ```
 
 The full path to the generated file is also returned in the `MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH` environment variable, which downstream scripts can consume.
+
+### Heterogeneous node types
+
+A node type may host more than one accelerator model, so `accelerator_info` is a list with one entry per model. A node type running a single accelerator model produces a single entry, and a node type with no accelerator at all produces an empty list. `accelerators_per_node` counts only the model in its own entry, and `system_size` contributes one `<qty>x <model>` part per entry.
+
+When a node type reports several accelerator models but only one value for a field, that value is applied to every model and a warning names the field, so the mismatch is visible rather than silently averaged away.
 
 ### Output fields
 
@@ -220,32 +233,25 @@ The full path to the generated file is also returned in the `MLC_MULTI_NODE_SYST
 
 | Field | Type | Source | Description |
 |-------|------|--------|-------------|
-| `submitter_org_names` | string | **manual** | Submitting organization name. |
-| `submitter_contact` | string | **manual** | Contact email for submission queries. |
 | `system_name` | string | **manual** (required) | Human-readable system name (e.g. `"8x NVIDIA H100 80GB HBM3"`). Script exits with an error if not provided. |
-| `system_category` | string | **manual** | System category (e.g. `"datacenter"`, `"edge"`). |
-| `system_availability_status` | string | **manual** | Availability status (e.g. `"available"`, `"preview"`). |
-| `division` | string | **manual** | Submission division (`"open"` or `"closed"`). |
-| `model_id` | string | **manual** | Model identifier (e.g. `"llama2-70b"`). |
-| `model_name` | string | **manual** | Human-readable model name. |
-| `model_precision` | string | **manual** | Numerical precision (e.g. `"fp8"`, `"int4"`). |
-| `link_to_model` | string | **manual** | URL to model weights or registry entry. |
-| `link_to_model_transformation` | string | **manual** | URL describing quantization or other transformations applied. |
-| `model_notes` | string | **manual** | Free-form notes about the model. |
-| `dataset_id` | string | **manual** | Dataset identifier. |
-| `dataset_name` | string | **manual** | Human-readable dataset name. |
-| `dataset_type` | string | **manual** | Dataset type (`"real"` or `"synthetic"`). |
-| `input_token_average` | string | **manual** | Average input tokens per sample. |
-| `output_token_average` | string | **manual** | Average output tokens per sample. |
-| `dataset_link` | string | **manual** | URL to the dataset. |
-| `measured_accuracy_score` | string | **manual** | Measured accuracy result (populated post-run). |
-| `submission_id` | string | auto (infra) | Populated by submission infrastructure; left empty by this script. |
-| `submission_date` | string | auto (infra) | Populated by submission infrastructure; left empty by this script. |
-| `publish_date` | string | auto (infra) | Populated by submission infrastructure; left empty by this script. |
-| `system_size` | string | auto | Computed as `(nodes × accelerators_per_node)x accelerator_model_name` per node type, joined with ` + `. |
-| `system_node_ensemble_count` | int | auto | Number of distinct node types in the system. |
-| `system_node_ensemble_total` | int | auto | Total number of nodes across all node types. |
+| `division` | string | **manual** | Submission division (`"Standardized"`, `"Serviced"`, or `"RDI"`). |
+| `system_category` | string | **manual** | System category (`"Datacenter"` or `"Edge"`). |
+| `system_availability_status` | string | **manual** | Availability status (`"Available"`, `"Preview"`, or `"RDI"`). |
+| `config_summary_notes` | string | **manual** | Anything about the run configuration the other fields do not capture. |
+| `link_config` | string | **manual** | Link to the full configuration logs for the run. |
+| `system_size` | string | auto | One `(nodes × accelerators_per_node)x accelerator_model_name` part per accelerator model per node type, joined with ` + `. Falls back to host processors for node types with no accelerator. Override with `--system_size`. |
+| `system_node_ensemble_count` | int | auto | Number of distinct node types in the system. Override with `--system_node_ensemble_count`. |
+| `system_node_ensemble_total` | int | auto | Total number of nodes across all node types. Override with `--system_node_ensemble_total`. |
+| `endpoint_url` | string | auto | Endpoint under test, as passed to `--endpoint_url`. |
 | `serving_framework` | string | auto | Detected serving framework name and version. Auto-detected via HTTP probe (`--endpoint_url`) or startup log (`--serving_node` + `--log_path`). Supported frameworks: **vLLM**, **SGLang**, **TRT-LLM**. Can also be set manually via `--serving_framework`. |
+| `node_config` | string | auto | Summary of the function groupings declared in `node_config_file`, e.g. `"Prefill: 2x H100; Decode: 4x A100"`. Override with `--node_config`. |
+| `disaggregated` | int | auto | `1` when the serving framework was started in a disaggregated mode, else `0`. |
+| `expert_parallel` | int | auto | Expert parallel degree read from the serving log. `0` when not reported. |
+| `tensor_parallel` | int | auto | Tensor parallel degree read from the serving log. `0` when not reported. |
+| `pipeline_parallel` | int | auto | Pipeline parallel degree read from the serving log. `0` when not reported. |
+| `data_parallel` | int | auto | Data parallel degree read from the serving log. `0` when not reported. |
+| `batch` | int | auto | Maximum batch size read from the serving log. `0` when not reported. |
+| `config_summary` | string | auto | Concatenation of the parallelism fields above that are greater than 1, followed by `config_summary_notes`. Derived from the values written to this file, so the two always agree. |
 
 #### Per-node fields (`node_types` entries)
 
@@ -255,9 +261,8 @@ The full path to the generated file is also returned in the `MLC_MULTI_NODE_SYST
 | `hw_notes` | string | **manual** | Free-form hardware notes. |
 | `cooling` | string | **manual** | Cooling solution description. |
 | `container_link` | string | **manual** | URL to the container image used. |
-| `other_software_stack` | string | auto | Compute software stack combining the inference backend (CUDA/ROCm + cuDNN) and GPU driver (e.g. `"CUDA 12.9, Driver 575.57.08"`). `null` if nothing is detected. |
 | `sw_notes` | string | **manual** | Free-form software notes. |
-| `system_node_ensemble_id` | int | auto | Zero-based index for this node type entry. |
+| `system_node_ensemble_id` | int | auto | Node type number, running from 1 to `system_node_ensemble_count`. |
 | `number_of_nodes` | int | auto | Number of identical nodes of this type. |
 | `host_processor_model_name` | string | auto | CPU model name. |
 | `host_processors_per_node` | int | auto | Number of CPU sockets per node. |
@@ -265,13 +270,7 @@ The full path to the generated file is also returned in the `MLC_MULTI_NODE_SYST
 | `host_processor_vcpu_count` | int | auto | Total logical CPU threads per node. |
 | `host_memory_capacity` | string | auto | Total host DRAM capacity. |
 | `host_memory_configuration` | string | auto | Memory configuration details. |
-| `accelerator_model_name` | string | auto | GPU/accelerator model name. |
-| `accelerators_per_node` | int | auto | Number of accelerators per node. |
-| `accelerator_memory_capacity` | string | auto | Accelerator memory per device (e.g. `"80GiB"`). |
-| `accelerator_memory_type` | string | **manual** | Accelerator memory type (e.g. `"HBM3"`). |
-| `accelerator_interconnect` | string | auto | Accelerator-to-accelerator interconnect (e.g. `"NVLink"`). |
-| `accelerator_interconnect_topology` | string | auto | Topology of the accelerator interconnect: `"Mesh"` (all pairs NVLink), `"Direct"` (PCIe-only or partial), or omitted for single GPU. Derived from `nvidia-smi topo -m`. |
-| `accelerator_host_interconnect` | string | auto | Accelerator-to-host interconnect (e.g. `"PCIe Gen5 x16"`). |
+| `accelerator_info` | list | auto | One entry per accelerator model in this node type; see below. |
 | `host_network_card_count` | string | auto | Network interface summary (e.g. `"3x mlx5_0"`). |
 | `host_networking` | string | auto | Network interface type and protocol. |
 | `host_storage_capacity` | string | auto | Storage capacity summary. |
@@ -280,6 +279,20 @@ The full path to the generated file is also returned in the `MLC_MULTI_NODE_SYST
 | `driver` | string | auto | GPU driver version. |
 | `operating_system` | string | auto | OS distribution and version (e.g. `"ubuntu 24.04"`). |
 | `filesystem` | string | auto | Detected filesystem types. |
+| `other_software_stack` | string | auto | Compute software stack combining the inference backend (CUDA/ROCm + cuDNN) and GPU driver (e.g. `"CUDA 12.9, Driver 575.57.08"`). |
+
+#### Per-accelerator fields (`accelerator_info` entries)
+
+| Field | Type | Source | Description |
+|-------|------|--------|-------------|
+| `accelerator_memory_type` | string | **manual** | Accelerator memory type (e.g. `"HBM3"`) when the driver does not report it. |
+| `accelerator_model_name` | string | auto | GPU/accelerator model name. |
+| `accelerators_per_node` | int | auto | Number of accelerators of this model per node. |
+| `accelerator_memory_capacity` | string | auto | Accelerator memory per device (e.g. `"80GiB"`). |
+| `accelerator_interconnect` | string | auto | Accelerator-to-accelerator interconnect (e.g. `"NVLink"`). |
+| `accelerator_host_interconnect` | string | auto | Accelerator-to-host interconnect (e.g. `"PCIe Gen5 x16"`). |
+
+Fields the probe captures that are not part of §8.2 — `host_processor_frequency`, `host_processor_caches`, `host_processor_interconnect`, `accelerator_frequency`, `accelerator_memory_configuration`, `accelerator_on-chip_memories`, `accelerator_interconnect_topology` — are dropped from this output. They still appear in the flat `_inference` format.
 
 ## Config file
 

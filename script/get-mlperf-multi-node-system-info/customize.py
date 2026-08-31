@@ -38,6 +38,10 @@ _CONFIG_KEY_TO_ENV = {
     "container_link": "MLC_MLPERF_CONTAINER_LINK",
     "measured_accuracy_score": "MLC_MLPERF_MEASURED_ACCURACY_SCORE",
     "system_type_detail": "MLC_MLPERF_SYSTEM_TYPE_DETAIL",
+    "endpoint_url": "MLC_MLPERF_ENDPOINT_URL",
+    "node_config": "MLC_MLPERF_NODE_CONFIG",
+    "config_summary_notes": "MLC_MLPERF_CONFIG_SUMMARY_NOTES",
+    "link_config": "MLC_MLPERF_LINK_CONFIG",
 }
 
 
@@ -374,27 +378,276 @@ def _compute_system_size(node_entries):
     """
     parts = []
     for entry in node_entries:
-        n_nodes = entry.get("number_of_nodes", 1)
-        accel_name = entry.get("accelerator_model_name", "")
-        accel_per_node = entry.get("accelerators_per_node", 0)
+        node_count = _parse_count(entry.get("number_of_nodes", 1)) or 1
 
-        if not _is_not_detected(
-                accel_name) and not _is_not_detected(accel_per_node):
-            try:
-                qty = n_nodes * int(accel_per_node)
-            except (ValueError, TypeError):
-                qty = n_nodes
-            parts.append(f"{qty}x {accel_name}")
-        else:
-            cpu_name = entry.get("host_processor_model_name", "")
-            cpu_per_node = entry.get("host_processors_per_node", 1)
-            if not _is_not_detected(cpu_name):
-                try:
-                    qty = n_nodes * int(cpu_per_node)
-                except (ValueError, TypeError):
-                    qty = n_nodes
-                parts.append(f"{qty}x {cpu_name}")
+        # A node type may host more than one accelerator model, so each model
+        # contributes its own "<qty>x <model>" part rather than the node type
+        # contributing a single one.
+        counted_any = False
+        for accel in _node_accelerators(entry):
+            accel_name = accel.get("accelerator_model_name", "")
+            if _is_not_detected(accel_name):
+                continue
+            per_node = _parse_count(accel.get("accelerators_per_node"))
+            if per_node is None:
+                continue
+            parts.append(f"{node_count * per_node}x {accel_name}")
+            counted_any = True
+
+        if counted_any:
+            continue
+
+        cpu_name = entry.get("host_processor_model_name", "")
+        if not _is_not_detected(cpu_name):
+            per_node = _parse_count(entry.get("host_processors_per_node", 1))
+            parts.append(f"{node_count * (per_node or 1)}x {cpu_name}")
     return " + ".join(parts)
+
+
+# ── Endpoints nested-format helpers (endpoints_rules.md §8.2.1) ─────────
+
+# Accelerator fields, in template order. These are nested one level down,
+# inside each node type's accelerator_info list.
+_ENDPOINTS_ACCELERATOR_FIELDS = [
+    "accelerator_model_name",
+    "accelerators_per_node",
+    "accelerator_memory_capacity",
+    "accelerator_memory_type",
+    "accelerator_interconnect",
+    "accelerator_host_interconnect",
+]
+
+# Node-type fields, in template order. Anything the single-node probe captures
+# that is not listed here (host_processor_frequency, accelerator_frequency,
+# accelerator_interconnect_topology, ...) is not part of §8.2 and is dropped
+# from the endpoints output. It still reaches the inference flat format.
+_ENDPOINTS_NODE_FIELDS = [
+    "system_node_ensemble_id",
+    "number_of_nodes",
+    "host_processor_model_name",
+    "host_processors_per_node",
+    "host_processor_core_count",
+    "host_processor_vcpu_count",
+    "host_memory_capacity",
+    "host_memory_configuration",
+    "accelerator_info",
+    "host_network_card_count",
+    "host_networking",
+    "host_storage_capacity",
+    "host_storage_type",
+    "other_hardware",
+    "cooling",
+    "hw_notes",
+    "inference_backend",
+    "driver",
+    "operating_system",
+    "filesystem",
+    "container_link",
+    "other_software_stack",
+    "sw_notes",
+]
+
+# Fields the template shows as integers.
+_ENDPOINTS_INT_FIELDS = {
+    "system_node_ensemble_id",
+    "number_of_nodes",
+    "host_processors_per_node",
+    "host_processor_core_count",
+    "host_processor_vcpu_count",
+    "accelerators_per_node",
+}
+
+# Run configuration read from serving_config.json, in template order.
+_ENDPOINTS_RUN_CONFIG_FIELDS = [
+    "disaggregated",
+    "expert_parallel",
+    "tensor_parallel",
+    "pipeline_parallel",
+    "data_parallel",
+    "batch",
+]
+
+
+def _node_accelerators(node, logger=None):
+    """Return a node type's accelerators as a list of per-model dicts.
+
+    The single-node probe publishes `accelerators`, one entry per accelerator
+    model, built from the detection script's state. A node probed by an older
+    checkout has only the flat accelerator_* fields, which describe a single
+    model, so fall back to reading those as one entry."""
+    accelerators = node.get("accelerators")
+    if isinstance(accelerators, list):
+        return [a for a in accelerators if isinstance(a, dict)]
+
+    model_name = node.get("accelerator_model_name", "")
+    if _is_not_detected(model_name):
+        return []
+    if logger is not None:
+        logger.warning(
+            "Node '%s' reported no accelerators list — it was probed by an "
+            "older checkout. Only one accelerator model is described; "
+            "re-probe the node if it hosts more than one.",
+            node.get("system_node_name", "?"))
+    return [{field: node.get(field, "")
+             for field in _ENDPOINTS_ACCELERATOR_FIELDS}]
+
+
+def _parse_count(value):
+    """Return value as a positive int, or None when it is not a usable count.
+
+    Counts cannot go through _is_not_detected: that helper rejects any
+    all-digit string, a rule meant for model names."""
+    try:
+        parsed = int(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+    return parsed if parsed > 0 else None
+
+
+def _coerce_int(value):
+    """Return value as an int when it is a plain integer.
+
+    Detection-failure strings ("N/A", "Not detected: ...") are left as they
+    are — they tell the submitter which field still needs filling in, which a
+    zero would hide."""
+    if isinstance(value, bool) or isinstance(value, int):
+        return value
+    text = str(value).strip()
+    if text.lstrip('-').isdigit():
+        return int(text)
+    return value
+
+
+def _build_accelerator_info(node, logger):
+    """Nest a node type's accelerators into accelerator_info, in 8.2 order.
+
+    One entry per accelerator model. A node type with no accelerator gets an
+    empty list."""
+    entries = []
+    for accel in _node_accelerators(node, logger):
+        if _is_not_detected(accel.get("accelerator_model_name", "")):
+            continue
+        entry = {}
+        for field in _ENDPOINTS_ACCELERATOR_FIELDS:
+            value = accel.get(field, "")
+            if value is None:
+                value = ""
+            entry[field] = _coerce_int(
+                value) if field in _ENDPOINTS_INT_FIELDS else value
+        entries.append(entry)
+    return entries
+
+
+def _shape_node_type(node, logger):
+    """Reduce a probed node type to the §8.2 fields, in template order."""
+    shaped = {}
+    for field in _ENDPOINTS_NODE_FIELDS:
+        if field == "accelerator_info":
+            shaped[field] = _build_accelerator_info(node, logger)
+            continue
+        value = node.get(field, "")
+        if value is None:
+            value = ""
+        shaped[field] = _coerce_int(
+            value) if field in _ENDPOINTS_INT_FIELDS else value
+    return shaped
+
+
+def _derive_node_config(node_config):
+    """Summarise the node_config groupings as the node_config description."""
+    if not node_config:
+        return ""
+    parts = []
+    for func_key, func_nodes in node_config.items():
+        group = ", ".join(
+            f"{int(entry.get('no_of_nodes', 1))}x {entry.get('node_name', '')}"
+            for entry in func_nodes if entry.get("node_name", "")
+        )
+        if group:
+            parts.append(f"{func_key}: {group}")
+    return "; ".join(parts)
+
+
+def _build_config_summary(values, notes):
+    """Concatenate the parallelism fields that are set, then the notes (§8.2)."""
+    parts = []
+    if values.get("disaggregated"):
+        parts.append("Disaggregated")
+    for key, label in (("expert_parallel", "EP"), ("pipeline_parallel", "PP"),
+                       ("tensor_parallel", "TP"), ("data_parallel", "DP")):
+        value = values.get(key)
+        if isinstance(value, int) and value > 1:
+            parts.append(f"{label} {value}")
+    if notes:
+        parts.append(notes)
+    return ", ".join(parts)
+
+
+def _load_serving_config(dir_path, logger):
+    """Load serving_config.json if the serving-config probe produced one."""
+    path = os.path.join(dir_path, 'serving_config.json')
+    if not os.path.exists(path):
+        return {}
+    try:
+        with open(path) as f:
+            return json.load(f)
+    except Exception as e:
+        logger.error(f"Failed to read {path}: {e}")
+        return {}
+
+
+def _build_endpoints_output(
+        node_types, system_size, env, node_config, serving_cfg, logger):
+    """Build system_desc_id.json in the shape of endpoints_rules.md §8.2.1.
+
+    Only the fields in the §8.2 table appear here: submitter, model and
+    dataset metadata now live elsewhere in the submission, and the run
+    configuration that used to be written to run_metadata.json is folded in
+    at the top level."""
+    shaped_nodes = [_shape_node_type(nt, logger) for nt in node_types]
+
+    # The data dictionary numbers node types 1..system_node_ensemble_count.
+    # Without a node_config file the ids come from the probe order and start
+    # at 0, so renumber here.
+    for idx, node in enumerate(shaped_nodes, start=1):
+        node["system_node_ensemble_id"] = idx
+
+    ensemble_total = 0
+    for node in shaped_nodes:
+        number_of_nodes = node.get("number_of_nodes", 0)
+        if isinstance(number_of_nodes, int):
+            ensemble_total += number_of_nodes
+
+    output = {
+        "division": env.get("MLC_MLPERF_SUBMISSION_DIVISION", "Insert model division here"),
+        "system_name": env.get("MLC_MLPERF_SYSTEM_NAME", ""),
+        "system_availability_status": env.get("MLC_MLPERF_SUBMISSION_SYSTEM_STATUS", "Insert system availability status here"),
+        "system_category": env.get("MLC_MLPERF_SUBMISSION_SYSTEM_TYPE", "Insert system category here"),
+        "system_size": env.get("MLC_MLPERF_SYSTEM_SIZE", "") or system_size,
+        "system_node_ensemble_count": _coerce_int(
+            env.get("MLC_MLPERF_SYSTEM_NODE_ENSEMBLE_COUNT", "") or len(shaped_nodes)),
+        "system_node_ensemble_total": _coerce_int(
+            env.get("MLC_MLPERF_SYSTEM_NODE_ENSEMBLE_TOTAL", "") or ensemble_total),
+        "endpoint_url": env.get("MLC_MLPERF_ENDPOINT_URL", ""),
+        "serving_framework": env.get("MLC_MLPERF_SERVING_FRAMEWORK", ""),
+        "node_types": shaped_nodes,
+        "node_config": env.get("MLC_MLPERF_NODE_CONFIG", "") or _derive_node_config(node_config),
+    }
+
+    for field in _ENDPOINTS_RUN_CONFIG_FIELDS:
+        value = serving_cfg.get(field)
+        output[field] = 0 if value is None else value
+
+    notes = env.get("MLC_MLPERF_CONFIG_SUMMARY_NOTES", "") or serving_cfg.get(
+        "config_summary_notes", "") or ""
+    # Derived from the values written above rather than copied from the
+    # serving probe, so the summary always agrees with its own fields.
+    output["config_summary"] = _build_config_summary(
+        output, notes) or serving_cfg.get("config_summary", "") or ""
+    output["config_summary_notes"] = notes
+    output["link_config"] = env.get("MLC_MLPERF_LINK_CONFIG", "")
+
+    return output
 
 
 # ── Inference flat-format helpers ───────────────────────────────────────
@@ -404,6 +657,9 @@ _NODE_METADATA_FIELDS = {
     "system_node_ensemble_id",
     "number_of_nodes",
     "system_node_name",
+    # The structured per-model accelerator list. The flat format lifts the
+    # flat accelerator_* fields instead, so this would only be dead weight.
+    "accelerators",
 }
 
 # Extra fields added when the 'network' variation is active alongside 'inference'.
@@ -739,6 +995,17 @@ def postprocess(i):
     node_config = _load_node_config(
         env.get("MLC_NODE_CONFIG_FILE", ""), logger)
 
+    # Load the serving probe's output before the output is assembled: the
+    # framework it detects feeds serving_framework, and its parallelism values
+    # feed the run configuration fields.
+    serving_cfg = _load_serving_config(dir_path, logger)
+    if not env.get('MLC_MLPERF_SERVING_FRAMEWORK') and serving_cfg.get(
+            'framework'):
+        env['MLC_MLPERF_SERVING_FRAMEWORK'] = serving_cfg['framework']
+        logger.info(
+            "Detected serving framework from log: %s",
+            serving_cfg['framework'])
+
     if node_config:
         node_types, system_size, errors = _build_node_types_from_yaml(
             node_config, parsed_node_details, logger)
@@ -803,6 +1070,11 @@ def postprocess(i):
     if env.get("MLC_MLPERF_BENCHMARK", "") == "inference":
         output_info = _flatten_for_inference(output_info, env)
         logger.info("Using flat inference format for system_info.json")
+    else:
+        output_info = _build_endpoints_output(
+            node_types, system_size, env, node_config, serving_cfg, logger)
+        logger.info(
+            "Using nested endpoints format (endpoints_rules.md 8.2.1) for system_info.json")
 
     # Stamp the aggregated output with the git version of the automations repo
     # (the orchestrating node's checkout), plus each node's version so that a
