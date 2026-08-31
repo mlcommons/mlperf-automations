@@ -59,6 +59,18 @@ deps:
 - tags: get,platform-details
   names:
   - platform-details
+  # Pin platform-details' output next to this script's own output instead of
+  # letting it fall back to os.getcwd(). Without this it writes
+  # system-info.json / system-info-raw.json into whatever directory the caller
+  # happened to be in -- which is the remote user's home when this script is
+  # driven over SSH by get-mlperf-multi-node-system-info, since that fan-out
+  # passes out_dir_path (this script's own output dir) but never cds.
+  #
+  # Deps resolve before preprocess(), so this only resolves to a value when the
+  # caller passed --out_dir_path. The multi-node fan-out always does. Otherwise
+  # it stays empty and platform-details falls back to cwd exactly as before.
+  env:
+    MLC_PLATFORM_DETAILS_DIR_PATH: <<<MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH>>>
 - tags: detect,host,system,details
 
 # Variations
