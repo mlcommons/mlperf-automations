@@ -62,6 +62,7 @@ input_mapping:
   dlrm_data_path: DLRM_DATA_PATH
   docker: MLC_MLPERF_USE_DOCKER
   docker_keep_alive: MLC_DOCKER_CONTAINER_KEEP_ALIVE
+  download_parallelism: MLC_DOWNLOAD_PARALLELISM
   dump_version_info: MLC_DUMP_VERSION_INFO
   execution_mode: MLC_MLPERF_RUN_STYLE
   find_performance: MLC_MLPERF_FIND_PERFORMANCE_MODE
@@ -93,6 +94,7 @@ input_mapping:
   output_tar: MLPERF_INFERENCE_SUBMISSION_TAR_FILE
   performance_sample_count: MLC_MLPERF_LOADGEN_PERFORMANCE_SAMPLE_COUNT
   pip_loadgen: MLC_MLPERF_INFERENCE_LOADGEN_INSTALL_FROM_PIP
+  podman_storage_root: MLC_PODMAN_STORAGE_ROOT
   pointpainting_checkpoint_path: MLC_ML_MODEL_POINT_PILLARS_PATH
   power: MLC_SYSTEM_POWER
   precision: MLC_MLPERF_MODEL_PRECISION
@@ -135,8 +137,9 @@ input_mapping:
   vllm_model_name: MLC_VLLM_SERVER_MODEL_NAME
   vllm_tp_size: MLC_MLPERF_INFERENCE_TP_SIZE
   waymo_path: MLC_DATASET_WAYMO_PATH
-  podman_storage_root: MLC_PODMAN_STORAGE_ROOT
 input_description:
+  download_parallelism:
+    desc: Number of files the MLCommons R2 downloader fetches concurrently. Only used with the r2-downloader download tool; when unset the downloader picks the value itself based on the number of files.
   division:
     choices:
     - open

@@ -40,6 +40,7 @@ mlcr get,raw,ml-model,language-processing,llama3,llama3-405b
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
+| `--download_parallelism` | Number of files the MLCommons R2 downloader fetches concurrently. Only used with the r2-downloader download tool; when unset the downloader picks the value itself based on the number of files. |  | `` |
 | `--outdirname` |  |  | `` |
 ### Generic Script Inputs
 
@@ -71,7 +72,6 @@ mlcr get,raw,ml-model,language-processing,llama3,llama3-405b
 ### Download-tool
 
 - `r2-downloader` (default)
-- `rclone`
 
 ### Framework
 

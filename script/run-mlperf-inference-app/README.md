@@ -56,6 +56,7 @@ mlcr run-mlperf,inference
 | `--power` | Measure power | ['yes', 'no'] | `no` |
 | `--adr.mlperf-power-client.power_server` | MLPerf Power server IP address |  | `192.168.0.15` |
 | `--adr.mlperf-power-client.port` | MLPerf Power server port |  | `4950` |
+| `--download_parallelism` | Number of files the MLCommons R2 downloader fetches concurrently. Only used with the r2-downloader download tool; when unset the downloader picks the value itself based on the number of files. |  | `` |
 | `--results_dir` | Alias for output_dir |  | `` |
 | `--use_dataset_from_host` | Run the dataset download script on the host machine and mount the dataset into the Docker container to avoid repeated downloads. | [True, False] | `no` |
 | `--use_model_from_host` | Run the model download script on the host machine and mount the model files into the Docker container to avoid repeated downloads. | [True, False] | `no` |
@@ -101,6 +102,7 @@ mlcr run-mlperf,inference
 | `--gpu_name` |  |  | `` |
 | `--hw_notes_extra` |  |  | `` |
 | `--imagenet_path` |  |  | `` |
+| `--imagenet_preprocessed_path` |  |  | `` |
 | `--lang` | Alias for implementation |  | `` |
 | `--max_query_count` |  |  | `` |
 | `--max_test_duration` |  |  | `` |
@@ -183,7 +185,8 @@ mlcr run-mlperf,inference
 - `r5.1`
 - `r5.1-dev`
 - `r6.0`
-- `r6.0-dev` (default)
+- `r6.0-dev`
+- `r6.1-dev` (default)
 
 ### Mode
 

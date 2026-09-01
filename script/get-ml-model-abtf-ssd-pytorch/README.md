@@ -40,6 +40,7 @@ mlcr get,ml-model,abtf-ssd-pytorch,ssd,resnet50,cmc
 
 | Name | Description | Choices | Default |
 |------|-------------|---------|------|
+| `--download_parallelism` | Number of files the MLCommons R2 downloader fetches concurrently. Only used with the r2-downloader download tool; when unset the downloader picks the value itself based on the number of files. |  | `` |
 | `--model_code_git_branch` |  |  | `cognata` |
 | `--model_code_git_url` |  |  | `https://github.com/mlcommons/abtf-ssd-pytorch` |
 ### Generic Script Inputs

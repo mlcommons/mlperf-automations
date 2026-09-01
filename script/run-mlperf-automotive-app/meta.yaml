@@ -44,6 +44,7 @@ input_mapping:
   device: MLC_MLPERF_DEVICE
   division: MLC_MLPERF_SUBMISSION_DIVISION
   docker: MLC_MLPERF_USE_DOCKER
+  download_parallelism: MLC_DOWNLOAD_PARALLELISM
   dump_version_info: MLC_DUMP_VERSION_INFO
   execution_mode: MLC_MLPERF_RUN_STYLE
   find_performance: MLC_MLPERF_FIND_PERFORMANCE_MODE
@@ -94,6 +95,9 @@ input_mapping:
   target_qps: MLC_MLPERF_LOADGEN_TARGET_QPS
   test_query_count: MLC_TEST_QUERY_COUNT
   threads: MLC_NUM_THREADS
+input_description:
+  download_parallelism:
+    desc: Number of files the MLCommons R2 downloader fetches concurrently. Only used with the r2-downloader download tool; when unset the downloader picks the value itself based on the number of files.
 
 # Dependencies
 deps:
