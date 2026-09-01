@@ -32,6 +32,7 @@ input_mapping:
   fakeroot: MLC_APPTAINER_FAKEROOT
   file_path: MLC_APPTAINERFILE_WITH_PATH
   gh_token: MLC_GH_TOKEN
+  host_mlc_repos: MLC_APPTAINER_HOST_MLC_REPOS
   image_repo: MLC_APPTAINER_IMAGE_REPO
   image_tag: MLC_APPTAINER_IMAGE_TAG
   mlc_repo: MLC_MLOPS_REPO
@@ -109,3 +110,33 @@ tests:
   - env:
       MLC_APPTAINER_OS: amazonlinux
       MLC_APPTAINER_OS_VERSION: '2023'
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '25.10'
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '26.04'
+  - env:
+      MLC_APPTAINER_OS: ubuntu
+      MLC_APPTAINER_OS_VERSION: '26.10'
+  - env:
+      MLC_APPTAINER_OS: rhel
+      MLC_APPTAINER_OS_VERSION: '10'
+  - env:
+      MLC_APPTAINER_OS: sles
+      MLC_APPTAINER_OS_VERSION: '15.7'
+  - env:
+      MLC_APPTAINER_OS: sles
+      MLC_APPTAINER_OS_VERSION: '16.0'
+  - env:
+      MLC_APPTAINER_OS: sles
+      MLC_APPTAINER_OS_VERSION: '16.1'
+  - env:
+      MLC_APPTAINER_OS: debian
+      MLC_APPTAINER_OS_VERSION: '13'
+  - env:
+      MLC_APPTAINER_OS: debian
+      MLC_APPTAINER_OS_VERSION: forky
+  - env:
+      MLC_APPTAINER_OS: rocky
+      MLC_APPTAINER_OS_VERSION: '10'

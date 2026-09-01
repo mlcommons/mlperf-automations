@@ -353,6 +353,8 @@ variations:
       MLC_SYS_UTIL_VERSION_CMD: jq --version
       MLC_SYS_UTIL_VERSION_RE: jq-([\d.]+)
       MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+      # el10 ships a jq 1.7.1 build that prints "jq-" with no version string
+      MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE: 'yes'
     new_env_keys:
     - MLC_JQ_VERSION
     state:
@@ -733,6 +735,18 @@ variations:
         brew: ''
         dnf: libudev-devl
         yum: libudev-devel
+  libxcrypt-compat:
+    env:
+      MLC_SYS_UTIL_NAME: libxcrypt-compat
+      MLC_SYS_UTIL_CHECK_CMD: ldconfig -p | grep libcrypt.so.1
+    new_env_keys:
+    - MLC_LIBXCRYPT_COMPAT_VERSION
+    state:
+      libxcrypt-compat:
+        apt: ''
+        brew: ''
+        dnf: libxcrypt-compat
+        yum: libxcrypt-compat
   libxext6:
     env:
       MLC_SYS_UTIL_NAME: libxext6
