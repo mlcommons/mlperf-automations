@@ -19,6 +19,8 @@ new_env_keys:
 - MLC_SINGLE_NODE_SYSTEM_INFO_FILE_PATH
 - MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH
 - MLC_SINGLE_NODE_SYSTEM_INFO_FILE_NAME
+- MLC_SINGLE_NODE_LSTOPO_XML_FILE_PATH
+- MLC_SINGLE_NODE_LSTOPO_XML_FILE_NAME
 
 # Input mapping
 input_mapping:
@@ -61,8 +63,29 @@ deps:
   - platform-details
 - tags: detect,host,system,details
 
+# The lstopo capture has to sit next to the sysinfo JSON, and that path is only
+# resolved in preprocess(), so this is a prehook dep rather than a plain dep.
+prehook_deps:
+- tags: get,lstopo
+  names:
+  - lstopo
+  enable_if_env:
+    MLC_COLLECT_LSTOPO_TOPOLOGY:
+    - 'True'
+  env:
+    MLC_LSTOPO_OUT_DIR_PATH: <<<MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH>>>
+    MLC_LSTOPO_OUT_FILE_NAME: <<<MLC_SINGLE_NODE_LSTOPO_XML_FILE_NAME>>>
+
 # Variations
 variations:
+  # Capture this node's hwloc topology alongside the sysinfo JSON. Used by
+  # get-mlperf-multi-node-system-info,_infragraph, which needs one lstopo XML
+  # per node to build the infrastructure graph -- collecting it here means the
+  # existing sysinfo fan-out carries the topology back too, with no second SSH
+  # pass.
+  lstopo:
+    env:
+      MLC_COLLECT_LSTOPO_TOPOLOGY: 'True'
   cuda:
     group: accelerator-backend
     env:
