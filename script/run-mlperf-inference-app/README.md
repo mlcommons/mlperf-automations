@@ -57,6 +57,8 @@ mlcr run-mlperf,inference
 | `--adr.mlperf-power-client.power_server` | MLPerf Power server IP address |  | `192.168.0.15` |
 | `--adr.mlperf-power-client.port` | MLPerf Power server port |  | `4950` |
 | `--download_parallelism` | Number of files the MLCommons R2 downloader fetches concurrently. Only used with the r2-downloader download tool; when unset the downloader picks the value itself based on the number of files. |  | `` |
+| `--r2_client_id` | Cloudflare Access service-account client ID. Sets CF_ACCESS_CLIENT_ID for the r2-downloader; only used together with --use_service_account. Prefer exporting the variable instead of passing it on the command line. |  | `` |
+| `--r2_client_secret` | Cloudflare Access service-account client secret. Sets CF_ACCESS_CLIENT_SECRET for the r2-downloader; only used together with --use_service_account. Prefer exporting the variable instead of passing it on the command line. |  | `` |
 | `--results_dir` | Alias for output_dir |  | `` |
 | `--use_dataset_from_host` | Run the dataset download script on the host machine and mount the dataset into the Docker container to avoid repeated downloads. | [True, False] | `no` |
 | `--use_model_from_host` | Run the model download script on the host machine and mount the model files into the Docker container to avoid repeated downloads. | [True, False] | `no` |
@@ -81,12 +83,11 @@ mlcr run-mlperf,inference
 | `--repro` | Record input/output/state/info files to make it easier to reproduce results |  | `False` |
 | `--time` | Print script execution time at the end of the run |  | `True` |
 | `--debug` | Debug this script |  | `False` |
+| `--use_service_account` | Authenticate with Cloudflare Access using service-account credentials (CF_ACCESS_CLIENT_ID / CF_ACCESS_CLIENT_SECRET) instead of an interactive browser login. Only used with the r2-downloader download tool; required to reach gated buckets on headless machines and in CI. |  | `` |
 | `--all_models` |  |  | `` |
 | `--api_server` |  |  | `` |
 | `--batch_size` |  |  | `` |
 | `--beam_size` |  |  | `` |
-| `--client_id` |  |  | `` |
-| `--client_secret` |  |  | `` |
 | `--criteo_day23_raw_data_path` |  |  | `` |
 | `--custom_system_nvidia` |  |  | `` |
 | `--dashboard_wb_project` |  |  | `` |
@@ -119,6 +120,7 @@ mlcr run-mlperf,inference
 | `--output_tar` |  |  | `` |
 | `--performance_sample_count` |  |  | `` |
 | `--pip_loadgen` |  |  | `` |
+| `--podman_storage_root` |  |  | `` |
 | `--pointpainting_checkpoint_path` |  |  | `` |
 | `--preprocess_submission` |  |  | `` |
 | `--pull_changes` |  |  | `` |
@@ -144,11 +146,9 @@ mlcr run-mlperf,inference
 | `--test_query_count` |  |  | `` |
 | `--threads` |  |  | `` |
 | `--tp_size` |  |  | `` |
-| `--use_service_account` |  |  | `` |
 | `--vllm_model_name` |  |  | `` |
 | `--vllm_tp_size` |  |  | `1` |
 | `--waymo_path` |  |  | `` |
-| `--podman_storage_root` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |

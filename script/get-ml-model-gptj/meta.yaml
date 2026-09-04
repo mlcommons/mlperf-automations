@@ -133,14 +133,14 @@ variations:
       MLC_ML_MODEL_PRECISION: uint8
       MLC_ML_MODEL_WEIGHT_DATA_TYPES: uint8
     group: precision
-  tp-size.#:
-    env:
-      MLC_NVIDIA_TP_SIZE: '#'
-    group: tp-size
   dry-run:
     group: run-mode
     env:
       MLC_DOWNLOAD_MODE: dry
+  tp-size.#:
+    env:
+      MLC_NVIDIA_TP_SIZE: '#'
+    group: tp-size
   batch_size.#:
     env:
       MLC_ML_MODEL_BATCH_SIZE: '#'

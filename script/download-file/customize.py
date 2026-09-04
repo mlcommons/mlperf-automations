@@ -154,6 +154,13 @@ def preprocess(i):
                 f"Ignoring --download_parallelism={download_parallelism}: "
                 f"parallel downloads are only supported by the r2-downloader tool, not '{tool}'")
 
+        use_service_account = is_true(
+            env.get('MLC_AUTH_USING_SERVICE_ACCOUNT'))
+        if use_service_account and tool != "r2-downloader":
+            logger.warning(
+                "Ignoring --use_service_account: service-account authentication is "
+                f"only supported by the r2-downloader tool, not '{tool}'")
+
         verify_ssl = is_true(env.get('MLC_VERIFY_SSL', "True"))
         if not verify_ssl or os_info['platform'] == 'windows':
             verify_ssl = False
@@ -314,7 +321,22 @@ def preprocess(i):
             logger.info(f"{env['MLC_DOWNLOAD_CMD']}")
 
         elif tool == "r2-downloader":
-            if is_true(env.get('MLC_AUTH_USING_SERVICE_ACCOUNT')):
+            # Non-interactive authentication for Cloudflare Access gated
+            # buckets. The downloader reads the credentials from its own
+            # environment, so check them here: without -s it would fall back to
+            # a browser-based login that can never complete on a headless
+            # machine, and with -s but no credentials it would only fail deep
+            # inside the downloader.
+            if use_service_account:
+                missing = [
+                    key for key in (
+                        'CF_ACCESS_CLIENT_ID',
+                        'CF_ACCESS_CLIENT_SECRET') if not env.get(key) and not os.environ.get(key)]
+                if missing:
+                    return {'return': 1,
+                            'error': "service-account authentication was requested but the "
+                            "following are not set: " + ", ".join(missing) +
+                            ". Export them, or pass --r2_client_id=... --r2_client_secret=..."}
                 extra_download_options += " -s "
             # Number of files fetched concurrently. Only forwarded when the user
             # asked for it, so that the downloader keeps its own default (1 job

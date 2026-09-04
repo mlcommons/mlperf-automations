@@ -24,9 +24,18 @@ input_mapping:
   download_parallelism: MLC_DOWNLOAD_PARALLELISM
   dp_resnet50_path: MLC_ML_MODEL_DPLAB_RESNET50_PATH
   pp_path: MLC_ML_MODEL_POINT_PAINTING_PATH
+  r2_client_id: CF_ACCESS_CLIENT_ID
+  r2_client_secret: CF_ACCESS_CLIENT_SECRET
+  use_service_account: MLC_AUTH_USING_SERVICE_ACCOUNT
 input_description:
   download_parallelism:
     desc: Number of files the MLCommons R2 downloader fetches concurrently. Only used with the r2-downloader download tool; when unset the downloader picks the value itself based on the number of files.
+  r2_client_id:
+    desc: Cloudflare Access service-account client ID. Sets CF_ACCESS_CLIENT_ID for the r2-downloader; only used together with --use_service_account. Prefer exporting the variable instead of passing it on the command line.
+  r2_client_secret:
+    desc: Cloudflare Access service-account client secret. Sets CF_ACCESS_CLIENT_SECRET for the r2-downloader; only used together with --use_service_account. Prefer exporting the variable instead of passing it on the command line.
+  use_service_account:
+    desc: Authenticate with Cloudflare Access using service-account credentials (CF_ACCESS_CLIENT_ID / CF_ACCESS_CLIENT_SECRET) instead of an interactive browser login. Only used with the r2-downloader download tool; required to reach gated buckets on headless machines and in CI.
 
 # Variations
 variations:
@@ -101,11 +110,14 @@ variations:
   rclone,mlc:
     env:
       MLC_DOWNLOAD_URL: mlc-waymo:waymo_preprocessed_dataset/model
+  service-account:
+    env:
+      MLC_AUTH_USING_SERVICE_ACCOUNT: 'yes'
 
 # Tests
 tests:
   needs_pat: true
   run_inputs:
   - variations_list:
-    - r2-downloader,mlc,dry-run
+    - r2-downloader,mlc,dry-run,service-account
     - rclone,mlc,dry-run

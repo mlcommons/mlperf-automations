@@ -31,13 +31,19 @@ new_env_keys:
 # Input mapping
 input_mapping:
   checkpoint: LLAMA2_CHECKPOINT_PATH
-  client_id: CF_ACCESS_CLIENT_ID
-  client_secret: CF_ACCESS_CLIENT_SECRET
   download_parallelism: MLC_DOWNLOAD_PARALLELISM
+  r2_client_id: CF_ACCESS_CLIENT_ID
+  r2_client_secret: CF_ACCESS_CLIENT_SECRET
   use_service_account: MLC_AUTH_USING_SERVICE_ACCOUNT
 input_description:
   download_parallelism:
     desc: Number of files the MLCommons R2 downloader fetches concurrently. Only used with the r2-downloader download tool; when unset the downloader picks the value itself based on the number of files.
+  r2_client_id:
+    desc: Cloudflare Access service-account client ID. Sets CF_ACCESS_CLIENT_ID for the r2-downloader; only used together with --use_service_account. Prefer exporting the variable instead of passing it on the command line.
+  r2_client_secret:
+    desc: Cloudflare Access service-account client secret. Sets CF_ACCESS_CLIENT_SECRET for the r2-downloader; only used together with --use_service_account. Prefer exporting the variable instead of passing it on the command line.
+  use_service_account:
+    desc: Authenticate with Cloudflare Access using service-account credentials (CF_ACCESS_CLIENT_ID / CF_ACCESS_CLIENT_SECRET) instead of an interactive browser login. Only used with the r2-downloader download tool; required to reach gated buckets on headless machines and in CI.
 
 # Dependencies
 prehook_deps:
@@ -327,6 +333,9 @@ variations:
         MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_TENSORRT_LLM_CHECKOUT_PATH
       extra_cache_tags: tensorrt-llm
       tags: get,git,repo,_repo.https://github.com/NVIDIA/TensorRT-LLM.git,_branch.1.0-mlpinf,_sha.18c0333e96ea7a2c37caded8a310d05c5f095e88,_submodules.3rdparty/NVTX;3rdparty/cutlass;3rdparty/cxxopts;3rdparty/json;3rdparty/pybind11;3rdparty/ucxx;3rdparty/xgrammar
+  service-account:
+    env:
+      MLC_AUTH_USING_SERVICE_ACCOUNT: 'yes'
 
 # Docker / container
 docker:
@@ -341,5 +350,5 @@ tests:
   needs_pat: true
   run_inputs:
   - variations_list:
-    - r2-downloader,70b,mlc,dry-run
-    - r2-downloader,7b,mlc,dry-run
+    - r2-downloader,70b,mlc,dry-run,service-account
+    - r2-downloader,7b,mlc,dry-run,service-account
