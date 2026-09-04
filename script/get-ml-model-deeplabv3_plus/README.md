@@ -36,7 +36,13 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 mlcr get,ml-model,deeplab,v3-plus,deeplabv3-plus
 ```
 
-No script specific inputs
+### Script Inputs
+
+| Name | Description | Choices | Default |
+|------|-------------|---------|------|
+| `--r2_client_id` | Cloudflare Access service-account client ID. Sets CF_ACCESS_CLIENT_ID for the r2-downloader; only used together with --use_service_account. Prefer exporting the variable instead of passing it on the command line. |  | `` |
+| `--r2_client_secret` | Cloudflare Access service-account client secret. Sets CF_ACCESS_CLIENT_SECRET for the r2-downloader; only used together with --use_service_account. Prefer exporting the variable instead of passing it on the command line. |  | `` |
+| `--use_service_account` | Authenticate with Cloudflare Access using service-account credentials (CF_ACCESS_CLIENT_ID / CF_ACCESS_CLIENT_SECRET) instead of an interactive browser login. Only used with the r2-downloader download tool; required to reach gated buckets on headless machines and in CI. |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -80,3 +86,4 @@ No script specific inputs
 ### Ungrouped
 
 - `dynamic`
+- `service-account`
