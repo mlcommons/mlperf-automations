@@ -212,6 +212,7 @@ variations:
     group: run-mode
     env:
       MLC_DOWNLOAD_MODE: dry
+      MLC_BYPASS_RCLONE_AUTH: true
   abtf-poc,gdown:
     env:
       MLC_ML_MODEL_URL: https://drive.google.com/uc?id=1kfJR_bs54KONprVd51kZu0PYmmh1wZZa
