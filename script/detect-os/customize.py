@@ -75,8 +75,9 @@ def postprocess(i):
             env['MLC_HOST_OS_PACKAGE_MANAGER'] = "dnf"
         if env.get('MLC_HOST_OS_FLAVOR', '') == "amzn":
             env['MLC_HOST_OS_PACKAGE_MANAGER'] = "yum"
-        if env.get('MLC_HOST_OS_FLAVOR_LIKE', '') == "arch":
-            env['MLC_HOST_OS_PACKAGE_MANAGER'] = "arch"
+        if env.get('MLC_HOST_OS_FLAVOR_LIKE', '') == "arch" or \
+                env.get('MLC_HOST_OS_FLAVOR', '') == "arch":
+            env['MLC_HOST_OS_PACKAGE_MANAGER'] = "pacman"
         if env.get('MLC_HOST_OS_FLAVOR', '') == "macos":
             env['MLC_HOST_OS_PACKAGE_MANAGER'] = "brew"
         if env.get('MLC_HOST_OS_FLAVOR', '') == "sles":
