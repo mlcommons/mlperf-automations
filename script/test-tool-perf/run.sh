@@ -1,17 +1,20 @@
 #!/bin/bash
-# Functional test for perf: record a short system-wide profile of a small command
-# and confirm perf.data was produced and is readable. Mirrors the run-time use of
+# Functional test for perf: record a short, bounded system-wide profile and
+# confirm perf.data was produced and is decodable. Mirrors the run-time use of
 # 'perf record -a' so a failure here surfaces broken counter access before a long
 # SPEC run starts.
 
 perf_bin=${MLC_PERF_BIN_WITH_PATH}
+duration=${MLC_TEST_PROFILER_DURATION:-2}
 
 tmpd=$(mktemp -d)
 data="${tmpd}/perf.data"
 log="${tmpd}/perf_test.log"
 
-echo "Testing perf: ${perf_bin} record -a -o ${data} -- ls -laR /"
-"${perf_bin}" record -a -o "${data}" -- ls -laR / > "${log}" 2>&1
+# Profiled workload is a brief, bounded CPU burn (never scans the filesystem);
+# trailing ':' guarantees a 0 exit so perf's return code reflects perf itself.
+echo "Testing perf: ${perf_bin} record -a -o ${data} -- (${duration}s cpu load)"
+"${perf_bin}" record -a -o "${data}" -- sh -c "timeout ${duration} yes > /dev/null 2>&1; :" > "${log}" 2>&1
 rc=$?
 if [ ${rc} -ne 0 ]; then
     echo "ERROR: 'perf record' test failed (rc=${rc}):" >&2
