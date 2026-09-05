@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-08-29 20:46:45*
+*Last updated: 2026-09-06 00:13:31*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -182,6 +182,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[install-tflite-from-src](install-tflite-from-src/)**
   - install-tflite-from-src
   - Tags: `get`, `install`, `tflite-cmake`, `tensorflow-lite-cmake`, `from-src`
+- **[test-tool-perf](test-tool-perf/)**
+  - Functionally test perf record with a short run
+  - Tags: `test`, `tool`, `perf`, `test-perf`, `test-tool-perf`
 
 ## AI/ML models
 
@@ -437,6 +440,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[install-vllm-from-src](install-vllm-from-src/)**
   - Build vllm from sources
   - Tags: `install-vllm-from-src`
+- **[test-profiler-uprof](test-profiler-uprof/)**
+  - Functionally test AMD uProf with a short collection
+  - Tags: `test`, `profiler`, `uprof`, `test-uprof`, `test-profiler-uprof`
 
 ## Container automation
 
@@ -1273,7 +1279,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 372
+- **Total Scripts**: 374
 - **Categories**: 36
 
 ## Usage
