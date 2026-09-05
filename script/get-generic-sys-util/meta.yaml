@@ -74,6 +74,8 @@ variations:
         brew: autoconf
         dnf: autoconf
         yum: autoconf
+        zypper: autoconf
+        pacman: autoconf
   build-essential:
     env:
       MLC_SYS_UTIL_NAME: build-essential
@@ -85,6 +87,10 @@ variations:
     state:
       build-essential:
         apt: build-essential
+        dnf: gcc gcc-c++ make
+        yum: gcc gcc-c++ make
+        zypper: gcc gcc-c++ make
+        pacman: base-devel
   bzip2:
     env:
       MLC_SYS_UTIL_NAME: bzip2
@@ -99,6 +105,8 @@ variations:
         brew: bzip2
         dnf: bzip2
         yum: bzip2
+        zypper: bzip2
+        pacman: bzip2
   ccache:
     env:
       MLC_SYS_UTIL_NAME: ccache
@@ -113,6 +121,8 @@ variations:
         brew: ccache
         dnf: ccache
         yum: ccache
+        zypper: ccache
+        pacman: ccache
   cmake:
     env:
       MLC_SYS_UTIL_NAME: cmake
@@ -127,6 +137,8 @@ variations:
         brew: cmake
         dnf: cmake
         yum: cmake
+        zypper: cmake
+        pacman: cmake
   coreutils:
     env:
       MLC_SYS_UTIL_NAME: coreutils
@@ -134,6 +146,11 @@ variations:
     state:
       coreutils:
         brew: coreutils
+        apt: coreutils
+        dnf: coreutils
+        yum: coreutils
+        zypper: coreutils
+        pacman: coreutils
   crossbuild-essential-arm64:
     env:
       MLC_SYS_UTIL_NAME: crossbuild-essential-arm64
@@ -150,6 +167,8 @@ variations:
         brew: tcsh
         dnf: tcsh
         yum: tcsh
+        zypper: tcsh
+        pacman: tcsh
   dmidecode:
     env:
       MLC_SYS_UTIL_NAME: dmidecode
@@ -164,6 +183,8 @@ variations:
         brew: ''
         dnf: dmidecode
         yum: dmidecode
+        zypper: dmidecode
+        pacman: dmidecode
   ffmpeg:
     env:
       MLC_SYS_UTIL_NAME: ffmpeg
@@ -177,6 +198,8 @@ variations:
         brew: ''
         dnf: ''
         yum: ''
+        zypper: ''
+        pacman: ffmpeg
   fio:
     env:
       MLC_SYS_UTIL_NAME: fio
@@ -190,6 +213,8 @@ variations:
         brew: fio
         dnf: fio
         yum: fio
+        zypper: fio
+        pacman: fio
   flex:
     env:
       MLC_SYS_UTIL_NAME: flex
@@ -203,6 +228,8 @@ variations:
         brew: flex
         dnf: flex
         yum: flex
+        zypper: flex
+        pacman: flex
   g++-11:
     env:
       MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE: 'yes'
@@ -216,6 +243,8 @@ variations:
       g++11:
         apt: g++-11
         dnf: gcc-toolset-11-gcc-c++
+        zypper: gcc-toolset-11-gcc-c++
+        yum: gcc-toolset-11-gcc-c++
   g++-12:
     env:
       MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE: 'yes'
@@ -229,6 +258,8 @@ variations:
       g++12:
         apt: g++-12
         dnf: gcc-toolset-12-gcc-c++
+        zypper: gcc-toolset-12-gcc-c++
+        yum: gcc-toolset-12-gcc-c++
   g++-9:
     env:
       MLC_SYS_UTIL_NAME: g++9
@@ -241,6 +272,8 @@ variations:
       g++9:
         apt: g++-9
         dnf: gcc-toolset-9-gcc-c++
+        zypper: gcc-toolset-9-gcc-c++
+        yum: gcc-toolset-9-gcc-c++
   gcc-11:
     env:
       MLC_SYS_UTIL_NAME: gcc11
@@ -252,6 +285,9 @@ variations:
     state:
       gcc11:
         apt: gcc-11
+        dnf: gcc-toolset-11-gcc
+        yum: gcc-toolset-11-gcc
+        zypper: gcc11
   gcc-9:
     env:
       MLC_SYS_UTIL_NAME: gcc9
@@ -263,6 +299,9 @@ variations:
     state:
       gcc9:
         apt: gcc-9
+        dnf: gcc-toolset-9-gcc
+        yum: gcc-toolset-9-gcc
+        zypper: gcc9
   gflags-dev:
     env:
       MLC_SYS_UTIL_NAME: gflags-dev
@@ -274,6 +313,8 @@ variations:
         brew: gflags
         dnf: gflags-devel
         yum: gflags-devel
+        zypper: gflags-devel
+        pacman: gflags
   gfortran:
     env:
       MLC_SYS_UTIL_NAME: gfortran
@@ -283,6 +324,8 @@ variations:
         brew: gcc
         dnf: gcc-gfortran
         yum: gcc-gfortran
+        zypper: gcc-gfortran
+        pacman: gcc-fortran
   gfortran-12-aarch64-linux-gnu:
     env:
       MLC_SYS_UTIL_NAME: gfortran-12-aarch64
@@ -309,6 +352,8 @@ variations:
         brew: git-lfs
         dnf: git-lfs
         yum: git-lfs
+        zypper: git-lfs
+        pacman: git-lfs
   glog-dev:
     env:
       MLC_SYS_UTIL_NAME: glog-dev
@@ -320,6 +365,8 @@ variations:
         brew: glog
         dnf: glog-devel
         yum: glog-devel
+        zypper: glog-devel
+        pacman: google-glog
   hwloc:
     env:
       MLC_SYS_UTIL_NAME: hwloc
@@ -333,6 +380,8 @@ variations:
         brew: hwloc
         dnf: hwloc
         yum: hwloc
+        zypper: hwloc
+        pacman: hwloc
   ipmitool:
     env:
       MLC_SYS_UTIL_NAME: ipmitool
@@ -347,6 +396,7 @@ variations:
         brew: ''
         dnf: ''
         yum: ''
+        zypper: ''
   jq:
     env:
       MLC_SYS_UTIL_NAME: jq
@@ -364,6 +414,7 @@ variations:
         dnf: jq
         yum: jq
         zypper: jq
+        pacman: jq
   lcov:
     env:
       MLC_SYS_UTIL_NAME: lcov
@@ -376,6 +427,7 @@ variations:
         brew: ''
         dnf: ''
         yum: ''
+        zypper: ''
   libboost-all-dev:
     env:
       MLC_SYS_UTIL_NAME: libboost-all-dev
@@ -390,6 +442,8 @@ variations:
         brew: ''
         dnf: boost-devel
         yum: boost-devel
+        zypper: boost-devel
+        pacman: boost
   libbz2-dev:
     env:
       MLC_SYS_UTIL_NAME: libbz2_dev
@@ -403,6 +457,8 @@ variations:
         apt: libbz2-dev
         dnf: libbzip2-devel
         yum: libbzip2-devel
+        zypper: libbzip2-devel
+        pacman: bzip2
   libev-dev:
     env:
       MLC_SYS_UTIL_NAME: libev_dev
@@ -414,6 +470,10 @@ variations:
     state:
       libev_dev:
         apt: libev-dev
+        dnf: libev-devel
+        yum: libev-devel
+        zypper: libev-devel
+        pacman: libev
   libffi:
     env:
       MLC_SYS_UTIL_NAME: libffi
@@ -422,6 +482,9 @@ variations:
     state:
       libffi:
         apt: libffi
+        dnf: libffi
+        yum: libffi
+        pacman: libffi
   libffi-dev:
     env:
       MLC_SYS_UTIL_NAME: libffi_dev
@@ -433,6 +496,8 @@ variations:
         brew: libffi
         dnf: libffi-devel
         yum: libffi-devel
+        zypper: libffi-devel
+        pacman: libffi
   libffi7:
     env:
       MLC_SYS_UTIL_NAME: libffi7
@@ -460,6 +525,8 @@ variations:
         apt: libfftw3-dev
         dnf: fftw-devel
         yum: fftw-devel
+        zypper: fftw-devel
+        pacman: fftw
   libfl-dev:
     env:
       MLC_SYS_UTIL_NAME: libfl-dev
@@ -468,6 +535,8 @@ variations:
         apt: libfl-dev
         dnf: flex-devel
         yum: flex-devel
+        zypper: flex-devel
+        pacman: flex
   libgdbm-dev:
     env:
       MLC_SYS_UTIL_NAME: libgdbm_dev
@@ -479,6 +548,10 @@ variations:
     state:
       libgdbm_dev:
         apt: libgdbm-dev
+        dnf: gdbm-devel
+        yum: gdbm-devel
+        zypper: gdbm-devel
+        pacman: gdbm
   libgl:
     env:
       MLC_SYS_UTIL_NAME: libgl
@@ -493,6 +566,7 @@ variations:
         brew: ''
         dnf: mesa-libGL
         yum: mesa-libGL
+        zypper: mesa-libGL
   libgl1-mesa-glx:
     env:
       MLC_SYS_UTIL_NAME: libgl1-mesa-glx
@@ -507,6 +581,7 @@ variations:
         brew: ''
         dnf: ''
         yum: ''
+        zypper: ''
   libgmock-dev:
     env:
       MLC_SYS_UTIL_NAME: libgmock-dev
@@ -518,6 +593,7 @@ variations:
         brew: ''
         dnf: gmock-devel
         yum: gmock-devel
+        zypper: gmock-devel
   libhdf5-dev:
     env:
       MLC_SYS_UTIL_NAME: libhdf5-dev
@@ -526,6 +602,8 @@ variations:
         apt: libhdf5-dev
         dnf: hdf5-devel
         yum: hdf5-devel
+        zypper: hdf5-devel
+        pacman: hdf5
   libhdf5-openmpi-dev:
     env:
       MLC_SYS_UTIL_NAME: libhdf5-openmpi-dev
@@ -534,6 +612,7 @@ variations:
         apt: libhdf5-openmpi-dev
         dnf: hdf5-openmpi-devel
         yum: hdf5-openmpi-devel
+        zypper: hdf5-openmpi-devel
   liblapack-dev:
     env:
       MLC_SYS_UTIL_NAME: liblapack-dev
@@ -542,6 +621,8 @@ variations:
         apt: liblapack-dev
         dnf: lapack-devel
         yum: lapack-devel
+        zypper: lapack-devel
+        pacman: lapack
   liblzma-dev:
     env:
       MLC_SYS_UTIL_NAME: liblzma_dev
@@ -553,6 +634,10 @@ variations:
     state:
       liblzma_dev:
         apt: liblzma-dev
+        dnf: xz-devel
+        yum: xz-devel
+        zypper: xz-devel
+        pacman: xz
   libmkl-dev:
     env:
       MLC_SYS_UTIL_NAME: libmkl-dev
@@ -564,6 +649,7 @@ variations:
         brew: ''
         dnf: ''
         yum: ''
+        zypper: ''
   libmpfr-dev:
     env:
       MLC_SYS_UTIL_NAME: libmpfr-dev
@@ -576,6 +662,7 @@ variations:
         dnf: mpfr-devel.x86_64
         yum: mpfr-devel.x86_64
         zypper: mpfr-devel
+        pacman: mpfr
   libncurses-dev:
     env:
       MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE: 'yes'
@@ -590,6 +677,8 @@ variations:
         apt: libncurses-dev
         dnf: libncurses-devel
         yum: libncurses-devel
+        zypper: libncurses-devel
+        pacman: ncurses
   libnetcdf-dev:
     env:
       MLC_SYS_UTIL_NAME: libnetcdf-dev
@@ -598,6 +687,8 @@ variations:
         apt: libnetcdf-dev
         dnf: netcdf-devel
         yum: netcdf-devel
+        zypper: netcdf-devel
+        pacman: netcdf
   libnetcdff-dev:
     env:
       MLC_SYS_UTIL_NAME: libnetcdff-dev
@@ -606,6 +697,8 @@ variations:
         apt: libnetcdff-dev
         dnf: netcdf-fortran-devel
         yum: netcdf-fortran-devel
+        zypper: netcdf-fortran-devel
+        pacman: netcdf-fortran
   libnuma-dev:
     env:
       MLC_SYS_UTIL_NAME: libnuma-dev
@@ -617,6 +710,8 @@ variations:
         brew: ''
         dnf: numactl-libs
         yum: numactl-libs
+        zypper: numactl-libs
+        pacman: numactl
   libopenblas-dev:
     env:
       MLC_SYS_UTIL_NAME: libopenblas-dev
@@ -625,6 +720,8 @@ variations:
         apt: libopenblas-dev
         dnf: openblas-devel
         yum: openblas-devel
+        zypper: openblas-devel
+        pacman: openblas
   libopenmpi-dev:
     env:
       MLC_SYS_UTIL_NAME: libopenmpi-dev
@@ -639,6 +736,8 @@ variations:
         brew: open-mpi
         dnf: openmpi-devel
         yum: openmpi-devel
+        zypper: openmpi-devel
+        pacman: openmpi
   libpci-dev:
     env:
       MLC_SYS_UTIL_NAME: libpci-dev
@@ -650,6 +749,8 @@ variations:
         brew: ''
         dnf: pciutils-devel
         yum: pciutils-devel
+        zypper: pciutils-devel
+        pacman: pciutils
   libpnetcdf-dev:
     env:
       MLC_SYS_UTIL_NAME: libpnetcdf-dev
@@ -658,6 +759,7 @@ variations:
         apt: libpnetcdf-dev
         dnf: pnetcdf-devel
         yum: pnetcdf-devel
+        zypper: pnetcdf-devel
   libpng-dev:
     env:
       MLC_SYS_UTIL_NAME: libpng-dev
@@ -669,6 +771,8 @@ variations:
         brew: ''
         dnf: libpng-devel
         yum: libpng-devel
+        zypper: libpng-devel
+        pacman: libpng
   libre2-dev:
     env:
       MLC_SYS_UTIL_NAME: libre2-dev
@@ -680,6 +784,8 @@ variations:
         brew: ''
         dnf: libre-devel
         yum: libre-devel
+        zypper: libre-devel
+        pacman: re2
   libreadline-dev:
     env:
       MLC_SYS_UTIL_NAME: libreadline_dev
@@ -690,6 +796,8 @@ variations:
         apt: libreadline-dev
         dnf: libreadline-devel
         yum: readline-devel
+        zypper: libreadline-devel
+        pacman: readline
   libsm6:
     env:
       MLC_SYS_UTIL_NAME: libsm6
@@ -702,6 +810,7 @@ variations:
         brew: ''
         dnf: ''
         yum: ''
+        zypper: ''
   libsqlite3-dev:
     env:
       MLC_SYS_UTIL_NAME: libsqlite3_dev
@@ -710,6 +819,10 @@ variations:
     state:
       libsqlite3_dev:
         apt: libsqlite3-dev
+        dnf: sqlite-devel
+        yum: sqlite-devel
+        zypper: sqlite3-devel
+        pacman: sqlite
   libssl-dev:
     env:
       MLC_SYS_UTIL_NAME: libssl_dev
@@ -724,6 +837,8 @@ variations:
         brew: openssl
         dnf: libssl-devel
         yum: libssl-devel
+        zypper: libssl-devel
+        pacman: openssl
   libudev-dev:
     env:
       MLC_SYS_UTIL_NAME: libudev-dev
@@ -735,6 +850,7 @@ variations:
         brew: ''
         dnf: libudev-devl
         yum: libudev-devel
+        zypper: libudev-devl
   libxcrypt-compat:
     env:
       MLC_SYS_UTIL_NAME: libxcrypt-compat
@@ -747,6 +863,8 @@ variations:
         brew: ''
         dnf: libxcrypt-compat
         yum: libxcrypt-compat
+        zypper: libxcrypt-compat
+        pacman: libxcrypt
   libxext6:
     env:
       MLC_SYS_UTIL_NAME: libxext6
@@ -759,6 +877,7 @@ variations:
         brew: ''
         dnf: ''
         yum: ''
+        zypper: ''
   linux-tools:
     env:
       MLC_SYS_UTIL_NAME: linux-tools
@@ -771,6 +890,10 @@ variations:
     state:
       linux-tools:
         apt: linux-tools-<<<MLC_HOST_OS_KERNEL_VERSION>>>
+        dnf: perf
+        yum: perf
+        zypper: perf
+        pacman: perf
   md5sha1sum:
     env:
       MLC_SYS_UTIL_NAME: md5sha1sum
@@ -803,6 +926,8 @@ variations:
         brew: nasm
         dnf: nasm
         yum: nasm
+        zypper: nasm
+        pacman: nasm
   ninja-build:
     env:
       MLC_SYS_UTIL_NAME: ninja-build
@@ -818,6 +943,7 @@ variations:
         dnf: ninja-build
         yum: ninja-build
         zypper: ninja-build
+        pacman: ninja
   nlohmann-json3-dev:
     env:
       MLC_SYS_UTIL_NAME: nlohmann_json3_dev
@@ -827,6 +953,9 @@ variations:
       nlohmann_json3_dev:
         apt: nlohmann-json3-dev
         dnf: nlohmann-json-devel
+        zypper: nlohmann-json-devel
+        yum: nlohmann-json-devel
+        pacman: nlohmann-json
   ntpdate:
     env:
       MLC_SYS_UTIL_NAME: ntpdate
@@ -838,6 +967,7 @@ variations:
         brew: ''
         dnf: ntpdate
         yum: ntpdate
+        zypper: ntpdate
   numactl:
     deps:
     - enable_if_env:
@@ -858,6 +988,8 @@ variations:
         apt: numactl
         dnf: numactl
         yum: numactl-devel
+        zypper: numactl
+        pacman: numactl
   nvidia-cuda-toolkit:
     env:
       MLC_SYS_UTIL_NAME: nvidia-cuda-toolkit
@@ -872,6 +1004,8 @@ variations:
         brew: ''
         dnf: nvidia-cuda-toolkit
         yum: nvidia-cuda-toolkit
+        zypper: nvidia-cuda-toolkit
+        pacman: cuda
   pkg-config:
     env:
       MLC_SYS_UTIL_NAME: pkg_config
@@ -883,6 +1017,8 @@ variations:
         brew: pkg-config
         dnf: pkg-config
         yum: pkg-config
+        zypper: pkg-config
+        pacman: pkgconf
   postfix:
     env:
       MLC_SYS_UTIL_NAME: postfix
@@ -896,6 +1032,8 @@ variations:
         apt: postfix
         dnf: postfix
         yum: postfix
+        zypper: postfix
+        pacman: postfix
   psmisc:
     env:
       MLC_SYS_UTIL_NAME: psmisc
@@ -908,6 +1046,8 @@ variations:
         brew: pstree
         dnf: psmisc
         yum: psmisc
+        zypper: psmisc
+        pacman: psmisc
   rapidjson-dev:
     env:
       MLC_SYS_UTIL_NAME: rapidjson-dev
@@ -919,6 +1059,8 @@ variations:
         brew: ''
         dnf: rapidjson-devel
         yum: rapidjson-devel
+        zypper: rapidjson-devel
+        pacman: rapidjson
   rsync:
     env:
       MLC_SYS_UTIL_NAME: rsync
@@ -934,6 +1076,7 @@ variations:
         dnf: rsync
         yum: rsync
         zypper: rsync
+        pacman: rsync
   screen:
     env:
       MLC_SYS_UTIL_NAME: screen
@@ -948,7 +1091,8 @@ variations:
         brew: screen
         dnf: screen
         yum: screen
-        zypper: rsync
+        zypper: screen
+        pacman: screen
   sox:
     env:
       MLC_SYS_UTIL_NAME: sox
@@ -962,6 +1106,9 @@ variations:
         apt: sox
         brew: sox
         dnf: sox
+        zypper: sox
+        yum: sox
+        pacman: sox
   stress-ng:
     env:
       MLC_SYS_UTIL_NAME: stress-ng
@@ -975,6 +1122,8 @@ variations:
         brew: stress-ng
         dnf: stress-ng
         yum: stress-ng
+        zypper: stress-ng
+        pacman: stress-ng
   sysbench:
     env:
       MLC_SYS_UTIL_NAME: sysbench
@@ -988,6 +1137,7 @@ variations:
         brew: sysbench
         dnf: sysbench
         yum: sysbench
+        zypper: sysbench
   systemd:
     env:
       MLC_SYS_UTIL_NAME: systemd
@@ -1002,6 +1152,8 @@ variations:
         brew: ''
         dnf: systemd
         yum: systemd
+        zypper: systemd
+        pacman: systemd
   tk-dev:
     env:
       MLC_SYS_UTIL_NAME: tk_dev
@@ -1013,6 +1165,10 @@ variations:
     state:
       tk_dev:
         apt: tk-dev
+        dnf: tk-devel
+        yum: tk-devel
+        zypper: tk-devel
+        pacman: tk
   transmission:
     env:
       MLC_SYS_UTIL_NAME: transmission
@@ -1028,6 +1184,8 @@ variations:
         brew: transmission
         dnf: transmission-daemon
         yum: transmission-daemon
+        zypper: transmission-daemon
+        pacman: transmission-cli
   unzip:
     env:
       MLC_SYS_UTIL_NAME: unzip
@@ -1041,6 +1199,8 @@ variations:
         dnf: unzip
         yum: unzip
         choco: unzip
+        zypper: unzip
+        pacman: unzip
   vim-common:
     env:
       MLC_SYS_UTIL_NAME: vim_common
@@ -1056,6 +1216,8 @@ variations:
         choco: vim
         dnf: vim-common
         yum: vim-common
+        zypper: vim-common
+        pacman: vim
   wget:
     env:
       MLC_SYS_UTIL_NAME: wget
@@ -1068,6 +1230,10 @@ variations:
       wget:
         apt: wget
         brew: wget
+        dnf: wget
+        yum: wget
+        zypper: wget
+        pacman: wget
   wkhtmltopdf:
     env:
       MLC_SYS_UTIL_NAME: wkhtmltopdf
@@ -1107,6 +1273,8 @@ variations:
         choco: xz
         dnf: xz
         yum: xz
+        zypper: xz
+        pacman: xz
   zlib:
     env:
       MLC_SYS_UTIL_NAME: zlib
@@ -1116,6 +1284,10 @@ variations:
       zlib:
         apt: zlib1g
         choco: zlib
+        dnf: zlib
+        yum: zlib
+        zypper: libz1
+        pacman: zlib
   zlib1g-dev:
     env:
       MLC_SYS_UTIL_NAME: zlib1g_dev
@@ -1127,6 +1299,7 @@ variations:
         dnf: zlib-devel
         yum: zlib-devel
         zypper: zlib-devel
+        pacman: zlib
 
 # Tests
 tests:
