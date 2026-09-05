@@ -30,9 +30,14 @@ def postprocess(i):
 
     if os_info['platform'] != 'windows':
         if os_info['platform'] == 'linux':
+            # ld may be absent (e.g. minimal containers); degrade gracefully
+            # instead of aborting detect-os.
             sys_cmd = "ld --verbose | grep SEARCH_DIR "
-            result = subprocess.check_output(
-                sys_cmd, shell=True).decode("utf-8")
+            try:
+                result = subprocess.check_output(
+                    sys_cmd, shell=True, stderr=subprocess.DEVNULL).decode("utf-8")
+            except (subprocess.CalledProcessError, FileNotFoundError, OSError):
+                result = ""
             result = result.replace("SEARCH_DIR(\"=", "")
             result = result.replace("SEARCH_DIR(\"", "")
             result = result.replace("\")", "")
