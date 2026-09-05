@@ -65,21 +65,6 @@ variations:
       dae:
         tags: _r2-downloader
     default: true
-  rclone:
-    group: download-tool
-    add_deps_recursive:
-      dae:
-        tags: _rclone
-    prehook_deps:
-    - tags: get,rclone
-      enable_if_env:
-        MLC_TMP_REQUIRE_DOWNLOAD:
-        - true
-    - tags: get,rclone-config,_waymo
-      force_cache: true
-      enable_if_env:
-        MLC_TMP_REQUIRE_DOWNLOAD:
-        - true
   dry-run:
     group: run-mode
     env:
@@ -87,16 +72,10 @@ variations:
   dry-run,r2-downloader:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
-  dry-run,rclone:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
   r2-downloader,mlc:
     env:
       MLC_DOWNLOAD_URL: https://waymo.mlcommons-storage.org/metadata/dataset.uri
       MLC_DOWNLOAD_FILENAME: dataset
-  rclone,mlc:
-    env:
-      MLC_DOWNLOAD_URL: mlc_waymo:waymo_preprocessed_dataset/kitti_format
   service-account:
     env:
       MLC_AUTH_USING_SERVICE_ACCOUNT: 'yes'
@@ -107,4 +86,3 @@ tests:
   run_inputs:
   - variations_list:
     - r2-downloader,mlc,dry-run,service-account
-    - rclone,mlc,dry-run
