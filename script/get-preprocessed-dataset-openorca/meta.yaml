@@ -115,11 +115,6 @@ variations:
         tags: _r2-downloader
     group: download-tool
     default: true
-  rclone:
-    add_deps_recursive:
-      dae-openorca:
-        tags: _rclone
-    group: download-tool
   nvidia:
     group: preprocess-step-provider
     env:
@@ -147,9 +142,6 @@ variations:
   dry-run,r2-downloader:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
-  dry-run,rclone:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
   mlc:
     alias: mlcommons
   mlcommons:
@@ -171,7 +163,6 @@ variations:
         - MLC_DOWNLOAD_URL
     env:
       MLC_DATASET_PREPROCESSED_BY_MLC: 'yes'
-      MLC_RCLONE_URL: mlc-inference:mlcommons-inference-wg-public/open_orca
   nvidia,calibration:
     new_env_keys:
     - MLC_NVIDIA_PREPROCESSED_CALIBRATION_DATASET_PATH
@@ -181,10 +172,6 @@ variations:
   r2-downloader,mlcommons:
     env:
       MLC_DOWNLOAD_URL: https://inference.mlcommons-storage.org/metadata/llama-2-70b-open-orca-dataset.uri
-  rclone,mlcommons:
-    env:
-      MLC_DOWNLOAD_URL: mlc-inference:mlcommons-inference-wg-public/open_orca
-      MLC_RCLONE_CONFIG_NAME: mlc-inference
 
 # Docker / container
 docker:
@@ -196,4 +183,3 @@ tests:
   run_inputs:
   - variations_list:
     - r2-downloader,mlc,dry-run
-    - rclone,mlc,dry-run
