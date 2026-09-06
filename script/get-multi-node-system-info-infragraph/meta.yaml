@@ -1,0 +1,123 @@
+alias: get-multi-node-system-info-infragraph
+uid: 5a29304e4dd00770
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: lstopo infragraph automation
+tags:
+- get
+- multi-node
+- system-info
+- infragraph
+
+# Cache
+cache: false
+
+# Environment
+new_env_keys:
+- MLC_MULTI_NODE_INFRAGRAPH_*
+- MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH
+
+# Input mapping
+#
+# Every key that get-mlperf-multi-node-system-info consumes is re-declared
+# here so a caller can drive the whole chain from one command line. The
+# infragraph-specific keys are the out_* pair and graph_name.
+input_mapping:
+  category: MLC_MLPERF_SUBMISSION_SYSTEM_TYPE
+  config_file: MLC_MLPERF_CONFIG_FILE
+  cooling: MLC_MLPERF_COOLING
+  division: MLC_MLPERF_SUBMISSION_DIVISION
+  graph_name: MLC_MULTI_NODE_INFRAGRAPH_NAME
+  hw_notes: MLC_MLPERF_HARDWARE_NOTES
+  node_config_file: MLC_NODE_CONFIG_FILE
+  other_hardware: MLC_MLPERF_OTHER_HARDWARE
+  out_dir_path: MLC_MULTI_NODE_INFRAGRAPH_DIR_PATH
+  out_file_name: MLC_MULTI_NODE_INFRAGRAPH_FILE_NAME
+  skip_ssh_key_file: MLC_SKIP_SSH_KEY_FILE
+  ssh_ids: MLC_MULTINODE_SYSTEM_SSH_IDS
+  submitter_contact: MLC_MLPERF_SUBMITTER_CONTACT
+  submitter_org_name: MLC_MLPERF_SUBMITTER
+  system_availability_status: MLC_MLPERF_SUBMISSION_SYSTEM_STATUS
+  # out_file_name names the infragraph JSON, so the MLPerf system desc file
+  # gets its own flag rather than sharing one.
+  system_desc_file_name: MLC_MULTI_NODE_SYSTEM_INFO_FILE_NAME
+  system_name: MLC_MLPERF_SYSTEM_NAME
+  system_size: MLC_MLPERF_SYSTEM_SIZE
+
+default_env:
+  MLC_MULTI_NODE_INFRAGRAPH_FILE_NAME: infragraph_multi_node_sys_info.json
+
+clean_files:
+- tmp-run-env.out
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: get,python
+  names:
+  - python
+  - python3
+- tags: get,generic-python-lib,_package.infragraph
+
+# lstopo is only needed for the current node. Remote nodes get it installed by
+# their own get,lstopo run during the fan-out in preprocess().
+- tags: get,lstopo
+  names:
+  - lstopo
+  skip_if_env:
+    MLC_EXCLUDE_CURRENT_NODE:
+    - 'True'
+
+- tags: get-mlperf-multi-node-system-info
+  names:
+  - mlperf-multi-node-system-info
+  inherit_variation_tags: true
+  env:
+    MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH: <<<MLC_MULTI_NODE_INFRAGRAPH_DIR_PATH>>>
+
+# Variations
+variations:
+  cuda:
+    group: accelerator-backend
+    adr:
+      mlperf-multi-node-system-info:
+        tags: _cuda
+    env:
+      MLC_ACCELERATOR_BACKEND: cuda
+  rocm:
+    group: accelerator-backend
+    adr:
+      mlperf-multi-node-system-info:
+        tags: _rocm
+    env:
+      MLC_ACCELERATOR_BACKEND: rocm
+  xpu:
+    group: accelerator-backend
+    adr:
+      mlperf-multi-node-system-info:
+        tags: _xpu
+    env:
+      MLC_ACCELERATOR_BACKEND: xpu
+  exclude_current_node:
+    env:
+      MLC_EXCLUDE_CURRENT_NODE: 'True'
+  inference:
+    group: mlperf-benchmark
+    env:
+      MLC_MLPERF_BENCHMARK: inference
+  endpoints:
+    group: mlperf-benchmark
+    env:
+      MLC_MLPERF_BENCHMARK: endpoints
+  no_visualize:
+    env:
+      MLC_MULTI_NODE_INFRAGRAPH_SKIP_VISUALIZE: 'True'
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_MULTI_NODE_INFRAGRAPH_FILE_PATH: Path to the merged multi-node infragraph JSON.
+  MLC_MULTI_NODE_INFRAGRAPH_DEV_YAML_PATH: Path to the merged multi-node infragraph Infrastructure YAML.
+  MLC_MULTI_NODE_INFRAGRAPH_VISUALS_DIR_PATH: Directory holding the generated infragraph visualizer files.
+  MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH: Path to the MLPerf multi-node system info file.
