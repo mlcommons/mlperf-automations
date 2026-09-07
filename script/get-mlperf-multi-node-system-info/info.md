@@ -348,6 +348,48 @@ Specify one of `_cuda`, `_rocm`, or `_xpu` to match your hardware. If none is gi
 | `_power` | Adds the power submission extra fields (`power_supply_quantity_and_rating_watts`, `power_supply_details`, `boot_firmware_version`, etc.) to the output as blank strings for manual entry. Stack with `_inference`. |
 | `_redfish` | Runs [`get-redfish-power-info`](../get-redfish-power-info/README.md) as a `prehook_dep` to capture live PSU data from a Redfish BMC/mockup endpoint. On its own, just produces a raw capture YAML in the output dir for reference. |
 | `_inference_optional_nameplate` | Produces the nameplate power YAML the MLPerf Inference submission_checker optionally accepts (see [Nameplate power YAML](#nameplate-power-yaml-_redfish_inference_optional_nameplate)). Stacked with `_redfish`, it's populated with real PSU data from the BMC; used **alone**, it writes the generic fill-in-the-blanks skeleton template instead — no BMC is contacted. |
+| `_infragraph` | Captures an hwloc topology on every node alongside its sysinfo, then builds an infrastructure graph from the whole set (see [Infrastructure graph](#infrastructure-graph-_infragraph)). |
+| `_no_visualize` | Only meaningful with `_infragraph`: skip the HTML visualizer bundle and produce just the graph JSON and YAML. |
+
+### Infrastructure graph (`_infragraph`)
+
+`_infragraph` adds a topology layer on top of the sysinfo collection. Each node
+captures its own hwloc topology while it is already being probed — no second SSH
+pass — and once every node has reported in, [`generate-infograph`](../generate-infograph/README.md)
+runs as a `post_dep` and merges the lot into one
+[infragraph](https://pypi.org/project/infragraph/) infrastructure graph,
+annotated with each node's processor and accelerator details.
+
+```bash
+mlcr get-mlperf-multi-node-system-info,_cuda,_infragraph \
+  --ssh_ids=user@node1:22,user@node2:22 \
+  --out_dir_path=/tmp/sysinfo \
+  --system_name=my-cluster
+```
+
+Alongside the usual system-info output, `/tmp/sysinfo` then holds:
+
+| File | Contents |
+|------|----------|
+| `infragraph.json` | The annotated graph — merged topology plus each node's sysinfo attached to its `cpu` and `xpu` components. |
+| `infragraph.yaml` | The merged `Infrastructure` definition without annotations. |
+| `mlperf-system-info-single-node-<id>.lstopo.xml` | Per-node hwloc topology, one per node. |
+| `dev-mlperf-system-info-single-node-<id>.yaml` | Per-node translated device definition (intermediate). |
+| `visuals/index.html` | Interactive browser view of the graph. |
+
+The graph is named after `--system_name` when one is given. It works the same
+way with one node as with many: run without `--ssh_ids` and you get a
+single-node graph of the local machine.
+
+Two things this needs that the plain collection does not:
+
+- **`hwloc` on every node.** It is installed by the `get,lstopo` dependency
+  where a package manager is available. A node that cannot produce a topology
+  is left out of the graph with a warning rather than failing the run.
+- **Python 3.10+ and `infragraph` on the machine running the collection.** The
+  remote nodes only need `lstopo`; the graph itself is built locally.
+
+Add `_no_visualize` to skip the HTML bundle.
 
 ### Example: inference submission with power fields
 

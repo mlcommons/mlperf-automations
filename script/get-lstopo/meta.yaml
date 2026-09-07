@@ -15,6 +15,14 @@ category: lstopo topology automation
 new_env_keys:
 - MLC_LSTOPO_XML_FILE_PATH
 
+# Input mapping
+input_mapping:
+  out_dir_path: MLC_LSTOPO_OUT_DIR_PATH
+  out_file_name: MLC_LSTOPO_OUT_FILE_NAME
+
+default_env:
+  MLC_LSTOPO_OUT_FILE_NAME: topo.xml
+
 clean_files:
 - tmp-run-env.out
 

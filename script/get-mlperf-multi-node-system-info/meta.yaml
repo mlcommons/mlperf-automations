@@ -16,6 +16,9 @@ new_env_keys:
 - MLC_REMOTE_RUN_SSH_ID_COUNT
 - MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH
 - MLC_NAMEPLATE_POWER_YAML_FILE_PATH
+# Produced by the generate-infograph post dep under _infragraph; re-exported
+# here so callers of this script see the graph paths too.
+- MLC_INFRAGRAPH_*
 
 # Input mapping
 input_mapping:
@@ -118,6 +121,22 @@ prehook_deps:
     # ordinary env inheritance, not self-referential templates.
     MLC_REDFISH_OUTPUT_FILE: <<<MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH>>>/redfish_capture.yaml
 
+# Runs after postprocess(), so every node's sysinfo JSON and its lstopo XML are
+# already sitting in MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH by the time the graph
+# is built. generate-infograph discovers the per-node pairs in that directory
+# itself rather than being handed a node list, so the two scripts never have to
+# agree on node numbering.
+post_deps:
+- tags: generate,infograph
+  names:
+  - generate-infograph
+  enable_if_env:
+    MLC_MLPERF_INFRAGRAPH_ENABLED:
+    - 'True'
+  env:
+    MLC_INFRAGRAPH_INPUT_DIR_PATH: <<<MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH>>>
+    MLC_INFRAGRAPH_NAME: <<<MLC_MLPERF_SYSTEM_NAME>>>
+
 # Variations
 variations:
   cuda:
@@ -164,8 +183,23 @@ variations:
   inference_optional_nameplate:
     env:
       MLC_MLPERF_INFERENCE_OPTIONAL_NAMEPLATE_ENABLED: 'True'
+  # Capture an hwloc topology per node alongside the sysinfo, then build the
+  # infrastructure graph from the whole set once every node has reported in.
+  # MLC_COLLECT_LSTOPO_TOPOLOGY is inherited by the local single-node dep; the
+  # remote nodes get it as an explicit _lstopo tag in preprocess().
+  infragraph:
+    env:
+      MLC_MLPERF_INFRAGRAPH_ENABLED: 'True'
+      MLC_COLLECT_LSTOPO_TOPOLOGY: 'True'
+  # Skip the HTML visualizer bundle; the graph JSON/YAML is still produced.
+  no_visualize:
+    env:
+      MLC_INFRAGRAPH_SKIP_VISUALIZE: 'True'
 
 # Output / debugging
 print_env_at_the_end:
+  MLC_INFRAGRAPH_FILE_PATH: Path to the annotated infrastructure graph JSON (with _infragraph).
+  MLC_INFRAGRAPH_YAML_FILE_PATH: Path to the merged infrastructure graph YAML (with _infragraph).
+  MLC_INFRAGRAPH_VISUALS_DIR_PATH: Directory holding the generated infragraph visualizer files.
   MLC_MULTI_NODE_SYSTEM_INFO_FILE_PATH: Path to the generated multi-node system info file.
   MLC_NAMEPLATE_POWER_YAML_FILE_PATH: Path to the generated nameplate power YAML file (populated from Redfish with _redfish,_inference_optional_nameplate; a generic skeleton template with _inference_optional_nameplate alone).

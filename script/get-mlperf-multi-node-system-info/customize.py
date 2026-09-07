@@ -115,6 +115,25 @@ def _parse_node(node_str):
     return user, host, port
 
 
+_REMOTE_SINGLE_NODE_DIR = "/tmp/mlperf-system-info-single-node"
+
+
+def _files_to_copy_back(node_id, collect_lstopo):
+    """Remote artifacts to pull back for one node.
+
+    The lstopo XML shares the sysinfo JSON's stem by construction -- see
+    get-mlperf-single-node-system-info's preprocess() -- so its remote name is
+    predictable from the node id alone. A node running an older copy of the
+    automations repo will not produce it; rsync logs that miss and the run
+    continues, and generate-infograph simply omits that node from the graph.
+    """
+    stem = f"{_REMOTE_SINGLE_NODE_DIR}/mlperf-system-info-single-node-{node_id}"
+    files = [f"{stem}.json"]
+    if collect_lstopo:
+        files.append(f"{stem}.lstopo.xml")
+    return files
+
+
 def preprocess(i):
 
     env = i['env']
@@ -144,6 +163,14 @@ def preprocess(i):
         backend = env.get('MLC_ACCELERATOR_BACKEND', '')
         if backend in ('cuda', 'rocm', 'xpu'):
             rr_tags += f",_{backend}"
+
+        # Under _infragraph each node also captures its hwloc topology. The
+        # tag is passed explicitly rather than relying on env inheritance,
+        # because the remote node resolves its own variations from the tag
+        # string it is given.
+        collect_lstopo = is_true(env.get('MLC_COLLECT_LSTOPO_TOPOLOGY', False))
+        if collect_lstopo:
+            rr_tags += ",_lstopo"
         ssh_ids = [
             s.strip() for s in env['MLC_MULTINODE_SYSTEM_SSH_IDS'].split(',') if s.strip()]
 
@@ -163,11 +190,11 @@ def preprocess(i):
                     'run_cmd': rr_tags,
                     'mlc_run_cmd': f"mlcr {rr_tags}",
                     'node_id': actual_node_id,
-                    'out_dir_path': "/tmp/mlperf-system-info-single-node",
+                    'out_dir_path': _REMOTE_SINGLE_NODE_DIR,
                     'remote_host': host,
                     'remote_user': user,
                     'remote_port': port,
-                    'files_to_copy_back': [f"/tmp/mlperf-system-info-single-node/mlperf-system-info-single-node-{actual_node_id}.json"],
+                    'files_to_copy_back': _files_to_copy_back(actual_node_id, collect_lstopo),
                     'path_to_copy_back_files': env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'],
                     'run_state': run_state,
                     'skip_ssh_key_file': env.get('MLC_SKIP_SSH_KEY_FILE', ''),
