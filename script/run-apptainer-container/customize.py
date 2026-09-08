@@ -2,6 +2,7 @@ from mlc import utils
 import os
 import shlex
 import subprocess
+import sys
 from utils import *
 
 
@@ -108,6 +109,9 @@ def postprocess(i):
         if env.get('MLC_REPO_PATH', ''):
             repo_name = os.path.basename(env['MLC_REPO_PATH'])
             run_opts += f' --env MLC_REPOS=/opt/mlc_repo/{repo_name}'
+        elif is_true(env.get('MLC_APPTAINER_HOST_MLC_REPOS', '')):
+            # Host repos were registered under /opt/mlc_host_repos at build time.
+            run_opts += ' --env MLC_REPOS=/opt/mlc_host_repos'
         else:
             run_opts += ' --env MLC_REPOS=/tmp/mlc-repos'
 
@@ -177,12 +181,48 @@ def postprocess(i):
     run_cmd_combined = ' && '.join(run_cmds)
 
     # Activate venv inside the container before running commands
-    full_cmd = f". /opt/venv/mlcflow/bin/activate && {run_cmd_combined}"
+    activate = ". /opt/venv/mlcflow/bin/activate"
+    full_cmd = f"{activate} && {run_cmd_combined}"
 
-    # shlex.quote handles single quotes embedded in the nested run
-    # command (e.g. quoted --apptainer_pre_run_cmds), which naive
-    # '{...}' wrapping breaks with 'unexpected EOF'.
-    CMD = f"apptainer exec{run_opts} {sif_path} bash -c {shlex.quote(full_cmd)}"
+    # Interactive mode (mirrors docker_it): after the run command finishes -
+    # or if it fails - drop into an interactive shell inside the container.
+    # Activate at the top level (not inside the parens) so both the success
+    # and the failure drop-in shells have mlc/mlcr on PATH.
+    if is_true(env.get('MLC_APPTAINER_INTERACTIVE_MODE', '')
+               ) and sys.stdin.isatty():
+        full_cmd = f"{activate} && ( {run_cmd_combined} && bash ) || bash"
+
+    # Detached mode (mirrors docker_dt): apptainer has no docker-style
+    # daemon, so the closest equivalent is a background instance that stays
+    # alive after the run command completes.
+    detached = is_true(env.get('MLC_APPTAINER_DETACHED_MODE', ''))
+    instance_name = ''
+    if detached:
+        instance_name = env.get('MLC_APPTAINER_INSTANCE_NAME', '') or (
+            f"{env['MLC_APPTAINER_IMAGE_NAME']}-{env['MLC_APPTAINER_IMAGE_TAG']}"
+            .replace('.', '-').replace(':', '-').replace('/', '-'))
+        env['MLC_APPTAINER_INSTANCE_NAME'] = instance_name
+        start_cmd = (
+            f"apptainer instance start{run_opts} {sif_path} "
+            f"{shlex.quote(instance_name)}")
+        logger.info('')
+        logger.info('Starting detached Apptainer instance:')
+        logger.info(f'  {start_cmd}')
+        record_script({'cmd': start_cmd, 'env': env})
+        ret = os.system(start_cmd)
+        if ret != 0:
+            if ret % 256 == 0:
+                ret = 1
+            return {'return': ret,
+                    'error': f'apptainer instance start failed: {instance_name}'}
+        CMD = (
+            f"apptainer exec instance://{shlex.quote(instance_name)} "
+            f"bash -c {shlex.quote(full_cmd)}")
+    else:
+        # shlex.quote handles single quotes embedded in the nested run
+        # command (e.g. quoted --apptainer_pre_run_cmds), which naive
+        # '{...}' wrapping breaks with 'unexpected EOF'.
+        CMD = f"apptainer exec{run_opts} {sif_path} bash -c {shlex.quote(full_cmd)}"
 
     logger.info('')
     logger.info('Apptainer launch command:')
@@ -197,6 +237,15 @@ def postprocess(i):
         if ret % 256 == 0:
             ret = 1
         return {'return': ret, 'error': 'apptainer exec failed'}
+
+    if detached:
+        logger.info('')
+        logger.info(
+            f'Apptainer instance "{instance_name}" is running in the background.')
+        logger.info(
+            f'  Attach a shell: apptainer shell instance://{instance_name}')
+        logger.info(
+            f'  Stop it:        apptainer instance stop {instance_name}')
 
     return {'return': 0}
 
