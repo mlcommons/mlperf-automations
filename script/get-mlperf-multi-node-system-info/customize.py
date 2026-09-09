@@ -1329,7 +1329,6 @@ def postprocess(i):
             node_types, system_size, env, node_config, serving_cfg, logger)
         logger.info(
             "Using nested endpoints format (endpoints_rules.md 8.2.1) for system_info.json")
-    
 
     # Stamp the aggregated output with the git version of the automations repo
     # (the orchestrating node's checkout), plus each node's version so that a

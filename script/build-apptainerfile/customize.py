@@ -287,7 +287,8 @@ def preprocess(i):
             for parent_dir, repo_name in host_repos_to_copy:
                 f.write(
                     f"    tar -C {parent_dir} --exclude=repos.json --exclude='index_*.json' --exclude=local --exclude=modified_times.json --exclude='*.sif' -cf - {repo_name} | tar -xf - -C ${{APPTAINER_ROOTFS}}/opt/mlc_host_repos/\n")
-            f.write("    chmod -R 777 ${APPTAINER_ROOTFS}/opt/mlc_host_repos\n")
+            f.write(
+                "    chmod -R 777 ${APPTAINER_ROOTFS}/opt/mlc_host_repos\n")
             f.write("\n")
         elif use_copy_repo:
             repo_name = os.path.basename(mlc_repo_path)
