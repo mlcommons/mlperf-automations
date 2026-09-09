@@ -14,7 +14,16 @@ add_entry () {
     tmpfile=$(mktemp)
 
     if [[ "$needs_sudo" == "yes" ]]; then
-      if [[ ${MLC_SUDO_USER} == "yes" ]]; then
+      # A user/group may have an exemption to run these commands without sudo.
+      # Try without sudo first.
+      if bash -c "$cmd" > "$tmpfile" 2>&1; then
+        :
+      # Then try non-interactive sudo, invoking the command directly (not via
+      # bash -c) so a per-command NOPASSWD sudoers rule (e.g. dmidecode) matches.
+      elif command -v sudo >/dev/null 2>&1 && sudo -n $cmd > "$tmpfile" 2>&1; then
+        :
+      # Fall back to interactive sudo for a general sudoer.
+      elif [[ ${MLC_SUDO_USER} == "yes" ]]; then
         ${MLC_SUDO} bash -c "$cmd" > "$tmpfile" 2>&1 || echo "FAILED (sudo): $cmd" > "$tmpfile"
       else
         echo "sudo not available" > "$tmpfile"

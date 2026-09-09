@@ -22,9 +22,22 @@ jobs:
           GDRIVE_SERVICE_ACCOUNT_KEY: op://7basd2jirojjckncf6qnq3azai/bzbaco3uxoqs2rcyu42rvuccga/credential
       - name: Set RCLONE Service account env var from secret
         shell: bash
+        env:
+          GDRIVE_SERVICE_ACCOUNT_KEY: ${{ steps.op-load-secrets.outputs.GDRIVE_SERVICE_ACCOUNT_KEY }}
         run: |
-          echo "RCLONE_CONFIG_MLC_COGNATA_SERVICE_ACCOUNT_CREDENTIALS=${{ steps.op-load-secrets.outputs.GDRIVE_SERVICE_ACCOUNT_KEY }}" >> $GITHUB_ENV
-          echo "RCLONE_CONFIG_MLC_NUSCENES_SERVICE_ACCOUNT_CREDENTIALS=${{ steps.op-load-secrets.outputs.GDRIVE_SERVICE_ACCOUNT_KEY }}" >> $GITHUB_ENV
+          # rclone matches a remote to its RCLONE_CONFIG_<remote>_<option>
+          # override using the remote's exact name and does not translate "-"
+          # to "_", so RCLONE_CONFIG_MLC_COGNATA_* never reached the
+          # "mlc-cognata" remote and rclone fell back to interactive OAuth.
+          # The backend-wide variable applies to every drive remote
+          # (mlc-cognata, mlc-llama2, mlc_waymo, ...) and avoids the name
+          # mapping entirely. Non-drive remotes such as the mlc-inference S3
+          # config are unaffected.
+          {
+            echo "RCLONE_DRIVE_SERVICE_ACCOUNT_CREDENTIALS<<MLC_EOF_SA"
+            echo "$GDRIVE_SERVICE_ACCOUNT_KEY"
+            echo "MLC_EOF_SA"
+          } >> "$GITHUB_ENV"
       - name: Run MLPerf
         shell: bash
         env:

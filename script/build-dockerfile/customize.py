@@ -61,10 +61,23 @@ def preprocess(i):
                 # build_args.append(arg)
                 # input_args.append("--"+input_+"="+"$"+env_)
 
+    distro_config = config['distros'].get(env['MLC_DOCKER_OS'], {})
+    known_versions = distro_config.get('versions', {})
+
     if not env.get("MLC_DOCKER_OS_VERSION", ""):
-        distro_config = config['distros'].get(env['MLC_DOCKER_OS'], {})
         env["MLC_DOCKER_OS_VERSION"] = distro_config.get('default_version', list(
-            distro_config.get('versions', {}).keys())[-1] if distro_config.get('versions') else '24.04')
+            known_versions.keys())[-1] if known_versions else '24.04')
+
+    # Gracefully handle unlisted host versions (e.g. release candidates or
+    # not-yet-added releases) by falling back to the distro's default version.
+    if not env.get('MLC_DOCKER_IMAGE_BASE', '') and known_versions and \
+            env['MLC_DOCKER_OS_VERSION'] not in known_versions:
+        fallback_version = distro_config.get(
+            'default_version', list(known_versions.keys())[-1])
+        logger.warning(
+            f"Version \"{env['MLC_DOCKER_OS_VERSION']}\" not listed for "
+            f"\"{env['MLC_DOCKER_OS']}\"; falling back to \"{fallback_version}\".")
+        env['MLC_DOCKER_OS_VERSION'] = fallback_version
 
     docker_image_base = get_value(env, config, 'FROM', 'MLC_DOCKER_IMAGE_BASE')
     if not docker_image_base:
@@ -351,7 +364,8 @@ def preprocess(i):
     pat = env.get('MLC_GH_TOKEN', '')
 
     if is_true(env.get('MLC_DOCKER_HOST_MLC_REPOS', '')):
-        # Copy all host MLC repos into the Docker image
+        # Copy all registered host MLC repos into the Docker image
+        host_repos = i['automation'].action_object.repos
         host_repos_path = i['automation'].action_object.repos_path
         if host_repos_path and os.path.isdir(host_repos_path):
             build_context_dir = os.path.dirname(
@@ -364,18 +378,19 @@ def preprocess(i):
             os.makedirs(host_repos_context, exist_ok=True)
 
             copied_repos = []
-            for item in os.listdir(host_repos_path):
-                item_path = os.path.join(host_repos_path, item)
-                if not os.path.isdir(item_path):
+            for repo in host_repos:
+                # Skip the local cache repo
+                if repo.meta.get('alias', '') == 'local':
                     continue
-                # Skip local cache, index files, etc.
-                if item in ['local']:
+                repo_path = repo.path
+                if not repo_path or not os.path.isdir(repo_path):
                     continue
-                dest = os.path.join(host_repos_context, item)
-                logger.info(f"Copying host repo {item} to build context")
-                shutil.copytree(item_path, dest, symlinks=True,
+                repo_name = os.path.basename(os.path.normpath(repo_path))
+                dest = os.path.join(host_repos_context, repo_name)
+                logger.info(f"Copying host repo {repo_name} to build context")
+                shutil.copytree(repo_path, dest, symlinks=True,
                                 ignore_dangling_symlinks=True)
-                copied_repos.append(item)
+                copied_repos.append(repo_name)
 
             if copied_repos:
                 docker_repos_dest = "$HOME/MLC/repos"
@@ -463,6 +478,14 @@ def preprocess(i):
     for comment in env.get('MLC_DOCKER_RUN_COMMENTS', []):
         f.write(comment + EOL)
 
+    # Host MLC repos copied into the image already carry the desired state, so
+    # skip the build-time `mlc pull repo` by default. Force it with
+    # --docker_force_pull_update=True.
+    if is_true(env.get('MLC_DOCKER_HOST_MLC_REPOS', '')) and \
+            not is_true(env.get('MLC_DOCKER_FORCE_PULL_UPDATE', '')):
+        env['MLC_DOCKER_NOT_PULL_UPDATE'] = 'True'
+
+    pull_repo_used = False
     skip_extra = False
     if 'MLC_DOCKER_RUN_CMD' not in env:
         env['MLC_DOCKER_RUN_CMD'] = ""
@@ -472,12 +495,14 @@ def preprocess(i):
         else:
             if not is_true(env.get('MLC_DOCKER_NOT_PULL_UPDATE', 'False')):
                 env['MLC_DOCKER_RUN_CMD'] += "mlc pull repo && "
+                pull_repo_used = True
             env['MLC_DOCKER_RUN_CMD'] += "mlc run script --tags=" + \
                 env['MLC_DOCKER_RUN_SCRIPT_TAGS'] + ' --quiet'
     else:
         if not is_true(env.get('MLC_DOCKER_NOT_PULL_UPDATE', 'False')):
             env['MLC_DOCKER_RUN_CMD'] = "mlc pull repo && " + \
                 env['MLC_DOCKER_RUN_CMD']
+            pull_repo_used = True
 
     logger.info(env['MLC_DOCKER_RUN_CMD'])
     split_mlc_run_cmd = is_true(env.get('MLC_DOCKER_SPLIT_MLC_RUN_CMD', ''))
@@ -521,6 +546,11 @@ def preprocess(i):
         cmds = ["RUN " + dep for dep in print_deps]
         for cmd in cmds:
             f.write(cmd + fake_run_str + EOL)
+
+    if pull_repo_used:
+        # `mlc pull repo` can hit divergent branches; rebase gives the pull a
+        # defined reconcile strategy instead of aborting.
+        f.write('RUN git config --global pull.rebase true' + EOL)
 
     f.write(x + EOL)
 

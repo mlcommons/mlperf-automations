@@ -34,11 +34,24 @@ def preprocess(i):
             'return': 1,
             'error': f"Specified OS: {apptainer_os}. Supported: {', '.join(supported_distros)}"}
 
+    distro_config = config['distros'][apptainer_os]
+    known_versions = distro_config.get('versions', {})
+
     if not env.get("MLC_APPTAINER_OS_VERSION", ""):
         env["MLC_APPTAINER_OS_VERSION"] = env.get(
             'MLC_DOCKER_OS_VERSION',
-            config['distros'][apptainer_os].get(
-                'default_version', '24.04'))
+            distro_config.get('default_version', '24.04'))
+
+    # Gracefully handle unlisted host versions (e.g. release candidates or
+    # not-yet-added releases) by falling back to the distro's default version.
+    if not env.get('MLC_APPTAINER_IMAGE_BASE', '') and known_versions and \
+            env['MLC_APPTAINER_OS_VERSION'] not in known_versions:
+        fallback_version = distro_config.get(
+            'default_version', list(known_versions.keys())[-1])
+        logger.warning(
+            f"Version \"{env['MLC_APPTAINER_OS_VERSION']}\" not listed for "
+            f"\"{apptainer_os}\"; falling back to \"{fallback_version}\".")
+        env['MLC_APPTAINER_OS_VERSION'] = fallback_version
 
     apptainer_os_version = env['MLC_APPTAINER_OS_VERSION']
 
@@ -88,6 +101,27 @@ def preprocess(i):
                 mlc_mlops_repo = f"{repo_owner}@{repo_name}"
         else:
             mlc_mlops_repo = "mlcommons@mlperf-automations"
+
+    # Copy the host's registered MLC repos into the image instead of pulling
+    # them at build time (triggered by --apptainer_host_mlc_repos).
+    use_host_repos = is_true(env.get('MLC_APPTAINER_HOST_MLC_REPOS', ''))
+    host_repos_to_copy = []
+    if use_host_repos:
+        for repo in i['automation'].action_object.repos:
+            if repo.meta.get('alias', '') == 'local':
+                continue
+            repo_path = repo.path
+            if not repo_path or not os.path.isdir(repo_path):
+                continue
+            repo_path = os.path.abspath(repo_path)
+            host_repos_to_copy.append(
+                (os.path.dirname(repo_path),
+                 os.path.basename(os.path.normpath(repo_path))))
+        if not host_repos_to_copy:
+            logger.warning(
+                "MLC_APPTAINER_HOST_MLC_REPOS set but no host repos found; "
+                "falling back to pulling the default repo.")
+            use_host_repos = False
 
     mlc_mlops_repo_branch_string = f" --branch={env.get('MLC_MLOPS_REPO_BRANCH', 'dev')}"
 
@@ -159,7 +193,13 @@ def preprocess(i):
         f.write("\n")
 
         f.write("    # Download MLC repo for scripts\n")
-        if use_copy_repo:
+        if use_host_repos:
+            # Host repos are copied in via %setup; just register them.
+            f.write(
+                "    for d in /opt/mlc_host_repos/*/; do mlc add repo \"$d\" --quiet 2>/dev/null || true; done\n")
+            f.write(
+                "    for d in /opt/mlc_host_repos/*/; do [ -d \"$d/.git\" ] && git -C \"$d\" update-index --refresh 2>/dev/null || true; done\n")
+        elif use_copy_repo:
             repo_name = os.path.basename(mlc_repo_path)
             # Set MLC_REPOS to match the runtime path so repos.json is created
             # at the correct location for the container's runtime env.
@@ -208,7 +248,28 @@ def preprocess(i):
 
         f.write("    # Run commands\n")
         cmd = env['MLC_APPTAINER_RUN_CMD']
-        f.write(f"    {cmd} --fake_run{run_cmd_extra}\n")
+        # Mirror build-dockerfile: fake the deps during the build %post so that
+        # runtime-only deps (e.g. compilers on host bind mounts, absent in the
+        # build sandbox) are not executed. The shared docker: meta lands
+        # MLC_DOCKER_FAKE_DEPS in state['dockerfile_env'].
+        enable_fake_deps = (
+            is_true(env.get('MLC_DOCKER_FAKE_DEPS', '')) or
+            is_true(env.get('MLC_APPTAINER_FAKE_DEPS', '')) or
+            is_true(state.get('dockerfile_env', {}).get(
+                'MLC_DOCKER_FAKE_DEPS', '')))
+        fake_deps_str = " --fake_deps" if enable_fake_deps else ""
+        # Propagate build-scoped env (e.g. MLC_RUN_STATE_DOCKER) onto the run
+        # command as --env.KEY=VAL so runtime-only deps skip during the build,
+        # mirroring build-dockerfile. Without MLC_RUN_STATE_DOCKER, deps that
+        # point at runtime bind mounts execute in the build sandbox and fail.
+        dockerfile_env = state.get('dockerfile_env', {})
+        dockerfile_env_input_string = ""
+        for env_key in dockerfile_env:
+            dockerfile_env_input_string += " --env." + env_key + "=" + \
+                str(dockerfile_env[env_key]).replace("\n", "\\n")
+        f.write(
+            f"    {cmd} --fake_run{fake_deps_str}"
+            f"{dockerfile_env_input_string}{run_cmd_extra}\n")
         f.write("\n")
 
         # Post-run commands
@@ -220,12 +281,20 @@ def preprocess(i):
 
         # Copy section for local repo (use %setup with tar to handle symlinks
         # gracefully)
-        if use_copy_repo:
+        if use_host_repos:
+            f.write("%setup\n")
+            f.write("    mkdir -p ${APPTAINER_ROOTFS}/opt/mlc_host_repos\n")
+            for parent_dir, repo_name in host_repos_to_copy:
+                f.write(
+                    f"    tar -C {parent_dir} --exclude=repos.json --exclude='index_*.json' --exclude=local --exclude=modified_times.json --exclude='*.sif' -cf - {repo_name} | tar -xf - -C ${{APPTAINER_ROOTFS}}/opt/mlc_host_repos/\n")
+            f.write("    chmod -R 777 ${APPTAINER_ROOTFS}/opt/mlc_host_repos\n")
+            f.write("\n")
+        elif use_copy_repo:
             repo_name = os.path.basename(mlc_repo_path)
             f.write("%setup\n")
             f.write(f"    mkdir -p ${{APPTAINER_ROOTFS}}/opt/mlc_repo\n")
             f.write(
-                f"    tar -C {mlc_repo_path}/.. --exclude=repos.json --exclude='index_*.json' --exclude=local --exclude=modified_times.json -cf - {repo_name} | tar -xf - -C ${{APPTAINER_ROOTFS}}/opt/mlc_repo/\n")
+                f"    tar -C {mlc_repo_path}/.. --exclude=repos.json --exclude='index_*.json' --exclude=local --exclude=modified_times.json --exclude='*.sif' -cf - {repo_name} | tar -xf - -C ${{APPTAINER_ROOTFS}}/opt/mlc_repo/\n")
             f.write(f"    chmod -R 777 ${{APPTAINER_ROOTFS}}/opt/mlc_repo\n")
             f.write("\n")
 

@@ -91,11 +91,20 @@ python -m vllm.entrypoints.openai.api_server ... > /tmp/serving.log 2>&1 &
 | `--submitter_contact` | string | Contact email for submission queries. |
 | `--system_name` | string | **Required.** Human-readable name for the system under test (e.g. `"8x NVIDIA H100 80GB HBM3"`). |
 | `--category` | string | System category (e.g. `"datacenter"`). |
-| `--status` | string | System availability status (e.g. `"available"`). |
+| `--system_availability_status` | string | System availability status (e.g. `"available"`). Under `_training` this must be one of the four values the training checker accepts — see [Training submission format](#training-submission-format). |
 | `--division` | string | Submission division (e.g. `"open"`, `"closed"`). |
 | `--node_config` | string | Description of the node configuration used for the run. Derived from `--node_config_file` when not given. |
 | `--config_summary_notes` | string | Anything about the run configuration the parallelism fields do not capture. |
 | `--link_config` | string | Link to the full configuration logs for the run. |
+
+### Software metadata
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `--framework` | string | Training framework and version, e.g. `"NVIDIA PyTorch Release 25.04"`. Used by `_training` for the `framework` field. Distinct from `--serving_framework`, which is the inference serving stack. |
+| `--framework_name` | string | Optional short framework tag some training submitters carry alongside `framework`, e.g. `"ngc25.04_pytorch"`. Emitted only when set. |
+| `--sw_notes` | string | Free-form software notes. |
+| `--host_networking_topology` | string | Physical network topology (e.g. `"fat-tree"`). Not auto-detectable. |
 
 ### Model metadata
 
@@ -350,6 +359,7 @@ Specify one of `_cuda`, `_rocm`, or `_xpu` to match your hardware. If none is gi
 | Tag | Effect |
 |-----|--------|
 | `_inference` | Produces a flat `system_desc_id.json`-compatible output for MLPerf Inference submissions (see [Inference submission format](#inference-submission-format)). |
+| `_training` | Produces a flat `<system_desc_id>.json` for MLPerf Training submissions, validated by `mlperf_logging.system_desc_checker` (see [Training submission format](#training-submission-format)). |
 | `_endpoints` | Produces the nested format used for MLPerf Inference Endpoints submissions. |
 
 ### Stackable modifiers
@@ -538,5 +548,114 @@ The `accelerator_interconnect_topology` field is auto-derived from `nvidia-smi t
   "sw_notes": "",
   "other_hardware": "",
   "system_type_detail": ""
+}
+```
+
+## Training submission format
+
+With `_training`, the script writes the flat JSON that MLPerf Training submissions
+place at `<submitter>/systems/<system_desc_id>.json`. It is checked by
+`mlperf_logging.system_desc_checker` in
+[mlcommons/logging](https://github.com/mlcommons/logging/tree/master/mlperf_logging/system_desc_checker):
+
+```bash
+python3 -m mlperf_logging.system_desc_checker <file>.json training 6.1.0
+```
+
+The field set is nearly the same as `_inference` — the two checkers ask for
+almost identical hardware fields — but the output differs in four ways:
+
+- **Every value is a string.** Counts are written as `"8"`, not `8`, matching
+  existing submissions in the `training_results_v*` repos.
+- **Field order follows the checker's `required_fields` list**, so a generated
+  file diffs cleanly against a previous round's.
+- **`framework` is the training framework**, from `--framework`, *not*
+  `--serving_framework`. The optional `framework_name` field is emitted only
+  when `--framework_name` is given.
+- **`status` is validated**, since the training checker rejects anything
+  outside its four allowed values (for ruleset >= 4.1).
+
+The inference-only fields (`submitter_contact`, `system_type`,
+`system_type_detail`, `system_size`, `host_network_card_count`,
+`other_hardware`) are not part of the training schema and are omitted.
+
+### Availability status values
+
+`--system_availability_status` accepts the four canonical values plus the
+shorthands below, case-insensitively. Anything else fails the run with the
+list of valid values rather than producing a file the checker would reject:
+
+| Canonical value | Also accepted |
+|---|---|
+| `Available on-premise` | `on-premise`, `on-prem`, `onprem` |
+| `Available cloud` | `cloud` |
+| `Research, Development, or Internal (RDI)` | `rdi`, `internal` |
+| `Preview` | — |
+
+Bare `available` — the value MLPerf Inference uses — is deliberately rejected:
+training splits availability into on-premise and cloud, and guessing which one
+was meant would silently mislabel a submission.
+
+### Values that could not be detected
+
+Fields the probe could not fill (`"N/A"`, `"Not available"`, or a
+`"Not detected: ..."` reason string) are written as empty strings, which is how
+existing training submissions express "not disclosed". On heterogeneous
+clusters this normalization runs per node *before* values are merged, so one
+node failing to detect a field does not blank out the values its peers did
+detect.
+
+### Example
+
+```bash
+mlcr get-mlperf-multi-node-system-info,_cuda,_training \
+  --ssh_ids=user@node1:22,user@node2:22 \
+  --out_dir_path=/tmp/sysinfo \
+  --system_name="16xXE9712x4GB200" \
+  --submitter_org_name=MLCommons \
+  --division=closed \
+  --system_availability_status="Available on-premise" \
+  --framework="NVIDIA PyTorch Release 25.04" \
+  --framework_name=ngc25.04_pytorch
+```
+
+### Example flat output (`_training`)
+
+```json
+{
+  "submitter": "MLCommons",
+  "division": "closed",
+  "status": "Available on-premise",
+  "system_name": "16xXE9712x4GB200",
+  "number_of_nodes": "2",
+  "host_processors_per_node": "2",
+  "host_processor_model_name": "Intel(R) Xeon(R) Platinum 8480+",
+  "host_processor_core_count": "112",
+  "host_processor_vcpu_count": "224",
+  "host_processor_frequency": "3.80 GHz",
+  "host_processor_caches": "L1d: 4.5 MiB; L1i: 3 MiB; L2: 224 MiB; L3: 210 MiB",
+  "host_processor_interconnect": "",
+  "host_memory_capacity": "2.2T",
+  "host_storage_type": "NVMe SSD",
+  "host_storage_capacity": "1.8 TB NVMe SSD",
+  "host_networking": "mlx5_0: native InfiniBand",
+  "host_networking_topology": "",
+  "host_memory_configuration": "",
+  "accelerators_per_node": "8",
+  "accelerator_model_name": "NVIDIA H100 80GB HBM3",
+  "accelerator_host_interconnect": "PCIe Gen5 x16",
+  "accelerator_frequency": "1980 MHz",
+  "accelerator_on-chip_memories": "Shared Memory: 228 KB/block",
+  "accelerator_memory_configuration": "80 GiB HBM3",
+  "accelerator_memory_capacity": "80GiB",
+  "accelerator_interconnect": "NVLink",
+  "accelerator_interconnect_topology": "Mesh",
+  "cooling": "",
+  "hw_notes": "",
+  "framework": "NVIDIA PyTorch Release 25.04",
+  "framework_name": "ngc25.04_pytorch",
+  "other_software_stack": "CUDA 12.9, Driver 575.57.08",
+  "operating_system": "ubuntu 24.04",
+  "sw_notes": ""
 }
 ```

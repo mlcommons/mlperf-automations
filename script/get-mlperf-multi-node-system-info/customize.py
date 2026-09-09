@@ -42,6 +42,10 @@ _CONFIG_KEY_TO_ENV = {
     "node_config": "MLC_MLPERF_NODE_CONFIG",
     "config_summary_notes": "MLC_MLPERF_CONFIG_SUMMARY_NOTES",
     "link_config": "MLC_MLPERF_LINK_CONFIG",
+    "framework": "MLC_MLPERF_FRAMEWORK",
+    "framework_name": "MLC_MLPERF_FRAMEWORK_NAME",
+    "sw_notes": "MLC_MLPERF_SOFTWARE_NOTES",
+    "host_networking_topology": "MLC_MLPERF_HOST_NETWORKING_TOPOLOGY",
 }
 
 
@@ -733,6 +737,29 @@ def _merge_heterogeneous_nodes(node_types):
     return merged
 
 
+def _lift_hardware(nested_info):
+    """Collapse node_types into a single flat hardware dict + total node count.
+
+    Homogeneous systems lift node 0 verbatim; heterogeneous ones comma-separate
+    unique values per field. Shared by the inference and training flatteners.
+    """
+    node_types = nested_info.get("node_types", [])
+    total_nodes = nested_info.get(
+        "system_node_ensemble_total",
+        sum(nt.get("number_of_nodes", 1) for nt in node_types),
+    )
+
+    if not node_types:
+        hw = {}
+    elif _is_homogeneous(node_types):
+        hw = {k: v for k, v in node_types[0].items(
+        ) if k not in _NODE_METADATA_FIELDS}
+    else:
+        hw = _merge_heterogeneous_nodes(node_types)
+
+    return hw, total_nodes
+
+
 def _flatten_for_inference(nested_info, env):
     """
     Convert the nested node_types format to a flat dict compatible with the
@@ -748,19 +775,7 @@ def _flatten_for_inference(nested_info, env):
     All fields required by SYSTEM_DESC_REQUIRED_FIELDS in constants.py are present;
     those not auto-captured are set to empty string.
     """
-    node_types = nested_info.get("node_types", [])
-    total_nodes = nested_info.get(
-        "system_node_ensemble_total",
-        sum(nt.get("number_of_nodes", 1) for nt in node_types),
-    )
-
-    if not node_types:
-        hw = {}
-    elif _is_homogeneous(node_types):
-        hw = {k: v for k, v in node_types[0].items(
-        ) if k not in _NODE_METADATA_FIELDS}
-    else:
-        hw = _merge_heterogeneous_nodes(node_types)
+    hw, total_nodes = _lift_hardware(nested_info)
 
     def _hw(key):
         """Return hw[key] as str, or '' when absent, None, 'Not available', or 'N/A'."""
@@ -795,7 +810,9 @@ def _flatten_for_inference(nested_info, env):
         "host_memory_configuration": _hw("host_memory_configuration"),
         # Host networking
         "host_networking": _hw("host_networking"),
-        "host_networking_topology": "",  # requires manual input
+        # Not auto-detectable; empty unless --host_networking_topology is
+        # given.
+        "host_networking_topology": env.get("MLC_MLPERF_HOST_NETWORKING_TOPOLOGY", ""),
         "host_network_card_count": _hw("host_network_card_count"),
         # Accelerator
         "accelerator_model_name": _hw("accelerator_model_name"),
@@ -813,7 +830,7 @@ def _flatten_for_inference(nested_info, env):
         "other_software_stack": _hw("other_software_stack"),
         # Notes / other
         "hw_notes": _hw("hw_notes"),
-        "sw_notes": _hw("sw_notes"),
+        "sw_notes": env.get("MLC_MLPERF_SOFTWARE_NOTES", "") or _hw("sw_notes"),
         "other_hardware": _hw("other_hardware"),
         "cooling": _hw("cooling"),
         "system_type_detail": env.get("MLC_MLPERF_SYSTEM_TYPE_DETAIL", ""),
@@ -826,6 +843,237 @@ def _flatten_for_inference(nested_info, env):
         flat.update({f: "" for f in _POWER_EXTRA_FIELDS if f not in flat})
 
     return flat
+
+
+# ── Training flat-format helpers ────────────────────────────────────────
+
+# The four availability strings the training system_desc_checker accepts for
+# ruleset >= 4.1 (availability_options in
+# mlperf_logging/system_desc_checker/system_desc_checker.py). Anything else
+# fails the checker outright, so we validate here rather than let a submitter
+# find out at submission time.
+_TRAINING_STATUS_OPTIONS = [
+    "Available on-premise",
+    "Available cloud",
+    "Research, Development, or Internal (RDI)",
+    "Preview",
+]
+
+# Lower-cased shorthands accepted for --system_availability_status, on top of the canonical
+# spellings above. Bare "available" is deliberately absent: it is the value
+# MLPerf Inference uses, but training splits it into on-premise vs cloud and
+# guessing which one a submitter meant would silently mislabel a submission.
+_TRAINING_STATUS_ALIASES = {
+    "on-premise": "Available on-premise",
+    "on-prem": "Available on-premise",
+    "onprem": "Available on-premise",
+    "available on-prem": "Available on-premise",
+    "available onprem": "Available on-premise",
+    "cloud": "Available cloud",
+    "rdi": "Research, Development, or Internal (RDI)",
+    "research, development, or internal": "Research, Development, or Internal (RDI)",
+    "internal": "Research, Development, or Internal (RDI)",
+}
+
+
+def _normalize_training_status(status):
+    """Map a user-supplied availability string onto one of the four values the
+    training system_desc_checker accepts.
+
+    Returns (value, None) on success or (None, error_message) on failure.
+    """
+    raw = (status or "").strip()
+    if not raw:
+        return "", None
+
+    lowered = raw.lower()
+    for option in _TRAINING_STATUS_OPTIONS:
+        if lowered == option.lower():
+            return option, None
+    if lowered in _TRAINING_STATUS_ALIASES:
+        return _TRAINING_STATUS_ALIASES[lowered], None
+
+    hint = ""
+    if lowered in ("available", "avail"):
+        hint = (" MLPerf Training splits availability into on-premise and "
+                "cloud, so 'available' is ambiguous -- pick one explicitly.")
+    return None, (
+        f"status '{raw}' is not valid for MLPerf Training. It must be one of "
+        f"{_TRAINING_STATUS_OPTIONS}.{hint}"
+    )
+
+
+# Field order of the training system description, matching required_fields in
+# mlperf_logging/system_desc_checker/system_desc_checker.py. The checker only
+# tests for presence, but keeping the published order makes the generated file
+# diffable against existing submissions in the training_results repos.
+_TRAINING_FIELD_ORDER = [
+    "submitter",
+    "division",
+    "status",
+    "system_name",
+    "number_of_nodes",
+    "host_processors_per_node",
+    "host_processor_model_name",
+    "host_processor_core_count",
+    "host_processor_vcpu_count",
+    "host_processor_frequency",
+    "host_processor_caches",
+    "host_processor_interconnect",
+    "host_memory_capacity",
+    "host_storage_type",
+    "host_storage_capacity",
+    "host_networking",
+    "host_networking_topology",
+    "host_memory_configuration",
+    "accelerators_per_node",
+    "accelerator_model_name",
+    "accelerator_host_interconnect",
+    "accelerator_frequency",
+    "accelerator_on-chip_memories",
+    "accelerator_memory_configuration",
+    "accelerator_memory_capacity",
+    "accelerator_interconnect",
+    "accelerator_interconnect_topology",
+    "cooling",
+    "hw_notes",
+    "framework",
+    "framework_name",
+    "other_software_stack",
+    "operating_system",
+    "sw_notes",
+]
+
+
+def _training_value(value):
+    """Coerce one field to the string form training submissions use.
+
+    Every value in a training system description is a string -- counts
+    included ("8", not 8). Detection-failure markers ("N/A", "Not available",
+    "Not detected: ...") become the empty string, which is how existing
+    submissions express "not disclosed".
+    """
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        stripped = value.strip()
+        if (stripped in ("N/A", "Not available")
+                or stripped.lower().startswith("not detected")):
+            return ""
+        return stripped
+    return str(value)
+
+
+def _flatten_for_training(nested_info, env, logger):
+    """
+    Convert the nested node_types format to the flat JSON the MLPerf Training
+    system_desc_checker validates (mlcommons/logging, usage="training").
+
+    Field name remappings applied at the top level:
+      submitter_org_names        -> submitter
+      system_availability_status -> status  (normalized to the four legal values)
+
+    `framework` is NOT the inference `serving_framework`: for training it is
+    the training framework and version (e.g. "NVIDIA PyTorch Release 25.04"),
+    supplied via --framework. `framework_name` is an optional extra field some
+    submitters carry (e.g. "ngc25.04_pytorch"); it is emitted only when set.
+
+    Node-level hardware fields are lifted verbatim (no renames). Every field in
+    the checker's required_fields list is present; those not auto-captured are
+    empty strings, which the checker accepts.
+
+    Returns (flat_dict, None) on success or (None, error_message) on failure.
+    """
+    # Normalize each node's values BEFORE lifting, not after. On a
+    # heterogeneous system _merge_heterogeneous_nodes comma-joins the per-node
+    # values, so a single node's "Not detected: ..." marker would otherwise
+    # contaminate the merged string and blank out the real values its peers
+    # did detect.
+    cleaned = dict(nested_info)
+    cleaned["node_types"] = [
+        {k: (v if k in _NODE_METADATA_FIELDS else _training_value(v))
+         for k, v in nt.items()}
+        for nt in nested_info.get("node_types", [])
+    ]
+    hw, total_nodes = _lift_hardware(cleaned)
+
+    def _hw(key):
+        return hw.get(key, "")
+
+    status, err = _normalize_training_status(
+        nested_info.get("system_availability_status", ""))
+    if err:
+        return None, err
+
+    division = _training_value(nested_info.get("division", "")).lower()
+    if division and division not in ("closed", "open"):
+        logger.warning(
+            "division '%s' is not 'closed' or 'open' -- the training package "
+            "checker keys off those two values.", division)
+
+    framework = _training_value(env.get("MLC_MLPERF_FRAMEWORK", ""))
+    if not framework:
+        logger.warning(
+            "No --framework given. MLPerf Training expects the training "
+            "framework and version here (e.g. \"NVIDIA PyTorch Release "
+            "25.04\"); the field is being written empty.")
+
+    flat = {
+        # Identity / submitter
+        "submitter": _training_value(nested_info.get("submitter_org_names", "")),
+        "division": division,
+        "status": status,
+        "system_name": _training_value(nested_info.get("system_name", "")),
+        # Multi-node count
+        "number_of_nodes": _training_value(total_nodes),
+        # Host CPU
+        "host_processors_per_node": _hw("host_processors_per_node"),
+        "host_processor_model_name": _hw("host_processor_model_name"),
+        "host_processor_core_count": _hw("host_processor_core_count"),
+        "host_processor_vcpu_count": _hw("host_processor_vcpu_count"),
+        "host_processor_frequency": _hw("host_processor_frequency"),
+        "host_processor_caches": _hw("host_processor_caches"),
+        "host_processor_interconnect": _hw("host_processor_interconnect"),
+        # Host memory / storage
+        "host_memory_capacity": _hw("host_memory_capacity"),
+        "host_storage_type": _hw("host_storage_type"),
+        "host_storage_capacity": _hw("host_storage_capacity"),
+        # Host networking
+        "host_networking": _hw("host_networking"),
+        # Not auto-detectable; empty unless --host_networking_topology is
+        # given.
+        "host_networking_topology": _training_value(
+            env.get("MLC_MLPERF_HOST_NETWORKING_TOPOLOGY", "")),
+        "host_memory_configuration": _hw("host_memory_configuration"),
+        # Accelerator
+        "accelerators_per_node": _hw("accelerators_per_node"),
+        "accelerator_model_name": _hw("accelerator_model_name"),
+        "accelerator_host_interconnect": _hw("accelerator_host_interconnect"),
+        "accelerator_frequency": _hw("accelerator_frequency"),
+        "accelerator_on-chip_memories": _hw("accelerator_on-chip_memories"),
+        "accelerator_memory_configuration": _hw("accelerator_memory_configuration"),
+        "accelerator_memory_capacity": _hw("accelerator_memory_capacity"),
+        "accelerator_interconnect": _hw("accelerator_interconnect"),
+        "accelerator_interconnect_topology": _hw("accelerator_interconnect_topology"),
+        # Notes / other hardware
+        "cooling": _hw("cooling"),
+        "hw_notes": _hw("hw_notes"),
+        # Software
+        "framework": framework,
+        "other_software_stack": _hw("other_software_stack"),
+        "operating_system": _hw("operating_system"),
+        "sw_notes": _training_value(env.get("MLC_MLPERF_SOFTWARE_NOTES", ""))
+        or _hw("sw_notes"),
+    }
+
+    framework_name = _training_value(env.get("MLC_MLPERF_FRAMEWORK_NAME", ""))
+    if framework_name:
+        flat["framework_name"] = framework_name
+
+    # Emit in the checker's published field order.
+    ordered = {k: flat[k] for k in _TRAINING_FIELD_ORDER if k in flat}
+    ordered.update({k: v for k, v in flat.items() if k not in ordered})
+    return ordered, None
 
 
 def _update_parsed_node_details(
@@ -1067,14 +1315,21 @@ def postprocess(i):
         "measured_accuracy_score": env.get("MLC_MLPERF_MEASURED_ACCURACY_SCORE", ""),
     }
 
-    if env.get("MLC_MLPERF_BENCHMARK", "") == "inference":
+    benchmark = env.get("MLC_MLPERF_BENCHMARK", "")
+    if benchmark == "inference":
         output_info = _flatten_for_inference(output_info, env)
         logger.info("Using flat inference format for system_info.json")
+    elif benchmark == "training":
+        output_info, err = _flatten_for_training(output_info, env, logger)
+        if err:
+            return {'return': 1, 'error': err}
+        logger.info("Using flat training format for system_info.json")
     else:
         output_info = _build_endpoints_output(
             node_types, system_size, env, node_config, serving_cfg, logger)
         logger.info(
             "Using nested endpoints format (endpoints_rules.md 8.2.1) for system_info.json")
+    
 
     # Stamp the aggregated output with the git version of the automations repo
     # (the orchestrating node's checkout), plus each node's version so that a

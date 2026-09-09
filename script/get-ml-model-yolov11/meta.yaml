@@ -15,6 +15,19 @@ new_env_keys:
 - MLC_ML_MODEL_YOLOV11_PATH
 - MLC_ML_MODEL_FILE_WITH_PATH
 
+# Input mapping
+input_mapping:
+  r2_client_id: CF_ACCESS_CLIENT_ID
+  r2_client_secret: CF_ACCESS_CLIENT_SECRET
+  use_service_account: MLC_AUTH_USING_SERVICE_ACCOUNT
+input_description:
+  r2_client_id:
+    desc: Cloudflare Access service-account client ID. Sets CF_ACCESS_CLIENT_ID for the r2-downloader; only used together with --use_service_account. Prefer exporting the variable instead of passing it on the command line.
+  r2_client_secret:
+    desc: Cloudflare Access service-account client secret. Sets CF_ACCESS_CLIENT_SECRET for the r2-downloader; only used together with --use_service_account. Prefer exporting the variable instead of passing it on the command line.
+  use_service_account:
+    desc: Authenticate with Cloudflare Access using service-account credentials (CF_ACCESS_CLIENT_ID / CF_ACCESS_CLIENT_SECRET) instead of an interactive browser login. Only used with the r2-downloader download tool; required to reach gated buckets on headless machines and in CI.
+
 # Variations
 variations:
   mlc:
@@ -54,6 +67,9 @@ variations:
           MLC_DOWNLOAD_URL: https://yolo.mlcommons-storage.org/metadata/YOLO-model.uri
         tags: _r2-downloader
     default: true
+  service-account:
+    env:
+      MLC_AUTH_USING_SERVICE_ACCOUNT: 'yes'
 
 # Output / debugging
 print_env_at_the_end:
@@ -64,4 +80,4 @@ tests:
   needs_pat: true
   run_inputs:
   - variations_list:
-    - r2-downloader,mlc,dry-run
+    - r2-downloader,mlc,dry-run,service-account
