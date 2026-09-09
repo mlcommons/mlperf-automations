@@ -82,8 +82,8 @@ jobs:
         run: |
           HAS_CHANGES=$(git diff --staged --name-only)
           if [ ${#HAS_CHANGES} -gt 0 ]; then
-            git config --global user.name '${{ steps.bot.outputs.name }}'
-            git config --global user.email '${{ steps.bot.outputs.email }}'
+            git config --global user.name "${{ steps.bot.outputs.name }}"
+            git config --global user.email "${{ steps.bot.outputs.email }}"
             # Commit changes
             git commit -m '[Automated Commit] Format Codebase'
             git push 
