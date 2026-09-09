@@ -26,6 +26,9 @@ input_mapping:
   dataset_name: MLC_MLPERF_DATASET_NAME
   dataset_type: MLC_MLPERF_DATASET_TYPE
   division: MLC_MLPERF_SUBMISSION_DIVISION
+  framework: MLC_MLPERF_FRAMEWORK
+  framework_name: MLC_MLPERF_FRAMEWORK_NAME
+  host_networking_topology: MLC_MLPERF_HOST_NETWORKING_TOPOLOGY
   hw_notes: MLC_MLPERF_HARDWARE_NOTES
   input_token_average: MLC_MLPERF_DATASET_INPUT_TOKEN_AVERAGE
   link_to_dataset: MLC_MLPERF_DATASET_LINK
@@ -41,6 +44,7 @@ input_mapping:
   output_token_average: MLC_MLPERF_DATASET_OUTPUT_TOKEN_AVERAGE
   skip_ssh_key_file: MLC_SKIP_SSH_KEY_FILE
   ssh_ids: MLC_MULTINODE_SYSTEM_SSH_IDS
+  sw_notes: MLC_MLPERF_SOFTWARE_NOTES
   system_availability_status: MLC_MLPERF_SUBMISSION_SYSTEM_STATUS
   submitter_contact: MLC_MLPERF_SUBMITTER_CONTACT
   submitter_org_name: MLC_MLPERF_SUBMITTER
@@ -152,6 +156,10 @@ variations:
     group: mlperf-benchmark
     env:
       MLC_MLPERF_BENCHMARK: endpoints
+  training:
+    group: mlperf-benchmark
+    env:
+      MLC_MLPERF_BENCHMARK: training
   network:
     env:
       MLC_MLPERF_NETWORK_VARIATION: 'True'
