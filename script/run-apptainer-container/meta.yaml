@@ -122,10 +122,6 @@ tests:
       MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
   - env:
       MLC_APPTAINER_OS: debian
-      MLC_APPTAINER_OS_VERSION: '11'
-      MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
-  - env:
-      MLC_APPTAINER_OS: debian
       MLC_APPTAINER_OS_VERSION: '12'
       MLC_APPTAINER_RUN_SCRIPT_TAGS: detect,os
   - env:
