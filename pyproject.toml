@@ -34,7 +34,7 @@ dependencies = [
     # Naming a prerelease in the specifier is also what allows pip to
     # consider prereleases for it at all. Tighten to >=1.4.0 once mlcflow
     # 1.4.0 final is on PyPI.
-    "mlcflow>=1.4.0a1",
+    "mlcflow>=1.4.0a3",
     "giturlparse"
 ]
 
