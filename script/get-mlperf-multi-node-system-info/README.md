@@ -47,6 +47,9 @@ mlcr get-mlperf-multi-node-system-info
 | `--dataset_name` |  |  | `` |
 | `--dataset_type` |  |  | `` |
 | `--division` |  |  | `` |
+| `--framework` |  |  | `` |
+| `--framework_name` |  |  | `` |
+| `--host_networking_topology` |  |  | `` |
 | `--hw_notes` |  |  | `` |
 | `--input_token_average` |  |  | `` |
 | `--link_to_dataset` |  |  | `` |
@@ -62,7 +65,8 @@ mlcr get-mlperf-multi-node-system-info
 | `--output_token_average` |  |  | `` |
 | `--skip_ssh_key_file` |  |  | `` |
 | `--ssh_ids` |  |  | `` |
-| `--status` |  |  | `` |
+| `--sw_notes` |  |  | `` |
+| `--system_availability_status` |  |  | `` |
 | `--submitter_contact` |  |  | `` |
 | `--submitter_org_name` |  |  | `` |
 | `--node_config_file` |  |  | `` |
@@ -78,6 +82,10 @@ mlcr get-mlperf-multi-node-system-info
 | `--log_path` |  |  | `/tmp/serving.log` |
 | `--run_metadata_path` |  |  | `` |
 | `--serving_framework_type` |  |  | `` |
+| `--system_type_detail` |  |  | `` |
+| `--redfish_endpoint` |  |  | `` |
+| `--redfish_username` |  |  | `` |
+| `--redfish_password` |  |  | `` |
 ### Generic Script Inputs
 
 | Name | Description | Choices | Default |
@@ -106,6 +114,16 @@ mlcr get-mlperf-multi-node-system-info
 - `rocm`
 - `xpu`
 
+### Mlperf-benchmark
+
+- `endpoints`
+- `inference`
+- `training`
+
 ### Ungrouped
 
 - `exclude_current_node`
+- `inference_optional_nameplate`
+- `network`
+- `power`
+- `redfish`
