@@ -21,7 +21,7 @@ ONNX_TO_NP_TYPE_MAP = {
     "tensor(float16)": np.float16,
     "tensor(float)": np.float32,
     "tensor(double)": np.float64,
-    "tensor(string)": np.string_,
+    "tensor(string)": np.bytes_,
 }
 
 

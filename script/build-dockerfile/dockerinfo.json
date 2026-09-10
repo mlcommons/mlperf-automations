@@ -231,9 +231,6 @@
         "ca-certificates"
       ],
       "versions": {
-        "11": {
-          "FROM": "debian:11"
-        },
         "12": {
           "FROM": "debian:12"
         },
