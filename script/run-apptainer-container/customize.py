@@ -110,7 +110,8 @@ def postprocess(i):
             repo_name = os.path.basename(env['MLC_REPO_PATH'])
             run_opts += f' --env MLC_REPOS=/opt/mlc_repo/{repo_name}'
         elif is_true(env.get('MLC_APPTAINER_HOST_MLC_REPOS', '')):
-            # Host repos were registered under /opt/mlc_host_repos at build time.
+            # Host repos were registered under /opt/mlc_host_repos at build
+            # time.
             run_opts += ' --env MLC_REPOS=/opt/mlc_host_repos'
         else:
             run_opts += ' --env MLC_REPOS=/tmp/mlc-repos'
@@ -129,7 +130,8 @@ def postprocess(i):
         bind_mounts = [bind_mounts]
     for mount in bind_mounts:
         if mount:
-            # Apptainer (unlike Docker) does not auto-create missing bind sources.
+            # Apptainer (unlike Docker) does not auto-create missing bind
+            # sources.
             bind_src = mount.split(':', 1)[0]
             if not os.path.exists(bind_src):
                 logger.info(
