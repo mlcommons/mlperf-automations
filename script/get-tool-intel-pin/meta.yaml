@@ -49,17 +49,29 @@ post_deps: []
 variations:
   version.4.0:
     env:
+      MLC_INTEL_PINTOOL_VERSION: '4.0'
       MLC_DOWNLOAD_URL: https://software.intel.com/sites/landingpage/pintool/downloads/pin-external-4.0-99633-g5ca9893f2-gcc-linux.tar.gz
     group: version
   version.4.1:
     env:
+      MLC_INTEL_PINTOOL_VERSION: '4.1'
       MLC_DOWNLOAD_URL: https://software.intel.com/sites/landingpage/pintool/downloads/pin-external-4.1-99687-gd9b8f822c-gcc-linux.tar.gz
     group: version
   version.4.2:
     default: true
     env:
+      MLC_INTEL_PINTOOL_VERSION: '4.2'
       MLC_DOWNLOAD_URL: https://software.intel.com/sites/landingpage/pintool/downloads/pin-external-4.2-99776-g21d818fa2-gcc-linux.tar.gz
     group: version
+  version.custom:
+    env:
+      MLC_INTEL_PINTOOL_VERSION: 'custom'
+    group: version
+  path.#:
+    default_variations:
+      version: version.custom
+    env:
+      MLC_INTEL_PINTOOL_DIR_PATH: '#'
 
 # Tests
 tests:
