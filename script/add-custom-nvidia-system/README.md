@@ -70,3 +70,4 @@ No script specific inputs
 
 - `v5.0`
 - `v5.1-dev`
+- `v6.0`

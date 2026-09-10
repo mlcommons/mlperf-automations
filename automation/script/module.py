@@ -1,7 +1,7 @@
 # This file was originally created for CM Script automations and is now
 # modified to make it work for MLCFlow automation.
 
-# This file contains the CM/MLC script execution logic which includes processing the script meta,
+# This file contains the MLC script execution logic which includes processing the script meta,
 # running the dependencies and finally preparing the required environment and running the specified script.
 #
 # Developed by Grigori Fursin and Arjun Suresh for CM and modified for MLCFlow by Arjun Suresh and Anandhu Sooraj
@@ -9,6 +9,7 @@
 
 import re
 import os
+import sys
 import logging
 
 from mlc.main import Automation
@@ -17,6 +18,7 @@ import mlc.utils as utils
 from utils import *
 from script.script_utils import *
 from script.cache_utils import *
+from script.deprecation import notify_if_deprecated
 
 
 class ScriptAutomation(Automation):
@@ -33,6 +35,10 @@ class ScriptAutomation(Automation):
         self.file_with_cached_state = 'mlc-cached-state.json'
         self.logger = self.action_object.logger
         self.logger.propagate = False
+
+        # This engine copy is only loaded by mlcflow versions that predate the
+        # migration of the engine into mlcflow itself - tell the user once.
+        notify_if_deprecated(self.logger)
 
         # Create CacheAction using the same parent as the Script
         self.cache_action = CacheAction(self.action_object.parent)
@@ -274,7 +280,7 @@ class ScriptAutomation(Automation):
 
           (skip_sys_utils) (bool): if True, set env['MLC_SKIP_SYS_UTILS']='yes'
                                    to skip MLC sys installation
-          (skip_sudo) (bool): if True, set env['MLC_TMP_SKIP_SUDO']='yes'
+          (skip_sudo) (bool): if True, set env['MLC_SKIP_SUDO']='yes'
                               to let scripts deal with that
 
           (silent) (bool): if True, attempt to suppress all info if supported
@@ -429,7 +435,7 @@ class ScriptAutomation(Automation):
         if is_true(i.get('skip_sys_utils', '')):
             env['MLC_SKIP_SYS_UTILS'] = 'yes'
         if is_true(i.get('skip_sudo', '')):
-            env['MLC_TMP_SKIP_SUDO'] = 'yes'
+            env['MLC_SKIP_SUDO'] = 'yes'
 
         run_state = self.init_run_state(i.get('run_state'))
 
@@ -503,13 +509,21 @@ class ScriptAutomation(Automation):
         if r['return'] > 0:
             return r
 
-        # Check if quiet/non-interactive mode
-        quiet = i.get(
-            'quiet',
-            False) if 'quiet' in i else (
-            str(env.get(
-                'MLC_QUIET',
-                '')).lower() in ["1", "true", "yes", "on"])
+        # Determine quiet mode.
+        # Priority:
+        #   1. Explicit quiet=<value> in the call input — always honoured,
+        #      even quiet=False overrides TTY auto-detection.
+        #   2. MLC_QUIET env var (set by a parent script or the user).
+        #   3. Auto-detect: if the terminal is non-interactive (e.g. SSH,
+        #      pipe, subprocess) and quiet was not explicitly set to False,
+        #      enable quiet mode so no blocking input() prompts are hit.
+        if 'quiet' in i:
+            quiet = bool(i['quiet'])
+        else:
+            env_quiet = str(env.get('MLC_QUIET', '')).lower() in [
+                "1", "true", "yes", "on"]
+            non_interactive = not sys.stdin.isatty()
+            quiet = env_quiet or non_interactive
         if quiet:
             env['MLC_QUIET'] = 'yes'
 
@@ -5775,8 +5789,8 @@ def update_state_from_meta(meta, env, state, const, const_state, run_state, i):
 
     update_meta_if_env = meta.get('update_meta_if_env', [])
     update_meta_if_env_from_state = run_state.get('update_meta_if_env', [])
-    run_state['update_meta_if_env'] = update_meta_if_env + \
-        update_meta_if_env_from_state
+    run_state['update_meta_if_env'] = update_meta_if_env_from_state + \
+        update_meta_if_env
 
     add_deps_info = meta.get('ad', {})
     if not add_deps_info:

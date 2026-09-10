@@ -39,6 +39,7 @@ input_mapping:
   real_run: MLC_REAL_RUN
   script_tags: MLC_DOCKER_RUN_SCRIPT_TAGS
   upload: MLC_DOCKER_PUSH_IMAGE
+  podman_storage_root: MLC_PODMAN_STORAGE_ROOT
 
 # Dependencies
 deps:

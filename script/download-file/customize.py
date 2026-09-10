@@ -19,6 +19,67 @@ def escape_special_chars(text, tool=None):
     return text
 
 
+def get_filename_from_content_disposition(url, verify_ssl, logger=None):
+    """Browser-like filename resolution.
+
+    Performs a lightweight HTTP request and inspects the server's
+    ``Content-Disposition`` header (honouring the RFC 5987 ``filename*`` form)
+    to determine the name a browser would save the file as. Falls back to the
+    basename of the final (post-redirect) URL path. Returns the resolved
+    filename or ``None`` when it cannot be determined. Best-effort: any error
+    results in ``None`` so the caller can fall back to URL-based naming.
+    """
+    try:
+        import re
+        import ssl
+        import urllib.request
+        from urllib.parse import unquote, urlsplit
+
+        ctx = None
+        if not verify_ssl:
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+
+        # Use GET (many servers reject HEAD); urllib only reads the body
+        # lazily, so closing the response avoids downloading the payload.
+        req = urllib.request.Request(
+            url, headers={'User-Agent': 'Mozilla/5.0'}, method='GET')
+        with urllib.request.urlopen(req, timeout=15, context=ctx) as resp:
+            cd = resp.headers.get('Content-Disposition', '') or ''
+            final_url = resp.geturl()
+
+        if cd:
+            # Prefer RFC 5987: filename*=UTF-8''<percent-encoded>
+            m = re.search(
+                r"filename\*\s*=\s*[^']*''([^;\r\n]+)", cd, re.IGNORECASE)
+            if m:
+                name = os.path.basename(
+                    unquote(m.group(1).strip().strip('"')))
+                if name:
+                    return name
+            # Then the plain filename= form (quoted or bare).
+            m = re.search(r'filename\s*=\s*"([^"]+)"', cd, re.IGNORECASE)
+            if not m:
+                m = re.search(
+                    r'filename\s*=\s*([^;\r\n]+)', cd, re.IGNORECASE)
+            if m:
+                name = os.path.basename(m.group(1).strip().strip('"'))
+                if name:
+                    return name
+
+        # Fall back to the basename of the final (possibly redirected) URL.
+        if final_url:
+            tail = os.path.basename(urlsplit(final_url).path)
+            if "." in tail:
+                return tail
+    except Exception as e:
+        if logger is not None:
+            logger.warning(
+                f"Could not resolve filename from headers for {url}: {e}")
+    return None
+
+
 def preprocess(i):
 
     os_info = i['os_info']
@@ -86,6 +147,13 @@ def preprocess(i):
 
         extra_download_options = env.get('MLC_DOWNLOAD_EXTRA_OPTIONS', '')
 
+        use_service_account = is_true(
+            env.get('MLC_AUTH_USING_SERVICE_ACCOUNT'))
+        if use_service_account and tool != "r2-downloader":
+            logger.warning(
+                "Ignoring --use_service_account: service-account authentication is "
+                f"only supported by the r2-downloader tool, not '{tool}'")
+
         verify_ssl = is_true(env.get('MLC_VERIFY_SSL', "True"))
         if not verify_ssl or os_info['platform'] == 'windows':
             verify_ssl = False
@@ -108,18 +176,29 @@ def preprocess(i):
             os.chdir(download_path)
 
         if env.get('MLC_DOWNLOAD_FILENAME', '') == '':
-            urltail = os.path.basename(env['MLC_DOWNLOAD_URL'])
-            urlhead = os.path.dirname(env['MLC_DOWNLOAD_URL'])
-            if "." in urltail and "/" in urlhead:
-                # Check if ? after filename
-                j = urltail.find('?')
-                if j > 0:
-                    urltail = urltail[:j]
-                env['MLC_DOWNLOAD_FILENAME'] = urltail
-            elif env.get('MLC_DOWNLOAD_TOOL', '') == "rclone":
-                env['MLC_DOWNLOAD_FILENAME'] = urltail
+            download_url = env['MLC_DOWNLOAD_URL']
+            resolved_name = ''
+            # Browser-like behaviour: ask the server what the file should be
+            # named (Content-Disposition) before deriving it from the URL.
+            if download_url.lower().startswith(('http://', 'https://')):
+                resolved_name = get_filename_from_content_disposition(
+                    download_url, verify_ssl, logger) or ''
+            if resolved_name != '':
+                env['MLC_DOWNLOAD_FILENAME'] = resolved_name
             else:
-                env['MLC_DOWNLOAD_FILENAME'] = "index.html"
+                # Fallback: derive the filename from the URL path (basename).
+                urltail = os.path.basename(download_url)
+                urlhead = os.path.dirname(download_url)
+                if "." in urltail and "/" in urlhead:
+                    # Check if ? after filename
+                    j = urltail.find('?')
+                    if j > 0:
+                        urltail = urltail[:j]
+                    env['MLC_DOWNLOAD_FILENAME'] = urltail
+                elif env.get('MLC_DOWNLOAD_TOOL', '') == "rclone":
+                    env['MLC_DOWNLOAD_FILENAME'] = urltail
+                else:
+                    env['MLC_DOWNLOAD_FILENAME'] = "index.html"
 
         if tool == "mlcutil":
             mlcutil_require_download = 0
@@ -193,6 +272,7 @@ def preprocess(i):
                     for i in range(1, 5):
                         r = download_file({
                             'url': url,
+                            'filename': env.get('MLC_DOWNLOAD_FILENAME', ''),
                             'verify': verify_ssl,
                             'ssl_ca_file': ssl_ca_file})
                         if r['return'] == 0:
@@ -234,7 +314,22 @@ def preprocess(i):
             logger.info(f"{env['MLC_DOWNLOAD_CMD']}")
 
         elif tool == "r2-downloader":
-            if is_true(env.get('MLC_AUTH_USING_SERVICE_ACCOUNT')):
+            # Non-interactive authentication for Cloudflare Access gated
+            # buckets. The downloader reads the credentials from its own
+            # environment, so check them here: without -s it would fall back to
+            # a browser-based login that can never complete on a headless
+            # machine, and with -s but no credentials it would only fail deep
+            # inside the downloader.
+            if use_service_account:
+                missing = [
+                    key for key in (
+                        'CF_ACCESS_CLIENT_ID',
+                        'CF_ACCESS_CLIENT_SECRET') if not env.get(key) and not os.environ.get(key)]
+                if missing:
+                    return {'return': 1,
+                            'error': "service-account authentication was requested but the "
+                            "following are not set: " + ", ".join(missing) +
+                            ". Export them, or pass --r2_client_id=... --r2_client_secret=..."}
                 extra_download_options += " -s "
             env['MLC_DOWNLOAD_CMD'] = f"bash <(curl -s https://raw.githubusercontent.com/mlcommons/r2-downloader/refs/heads/main/mlc-r2-downloader.sh) "
             if env["MLC_HOST_OS_TYPE"] == "windows":

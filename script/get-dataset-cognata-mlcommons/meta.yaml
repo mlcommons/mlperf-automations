@@ -16,7 +16,6 @@ tags:
 - ml-task--object-detection
 - ml-task--image-segmentation
 private: true
-min_mlc_version: 2.2.0
 
 # Cache
 cache: false

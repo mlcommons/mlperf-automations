@@ -57,7 +57,9 @@ deps:
 - names:
   - get-geekbench
   tags: get,geekbench
-  skip_if_env:
+  skip_if_any_env:
+    MLC_GEEKBENCH_BIN_WITH_PATH:
+      - on
     MLC_GEEKBENCH_INSTALLED_PATH:
       - on
 - names:

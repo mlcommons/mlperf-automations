@@ -4,6 +4,14 @@ from os.path import exists
 from utils import *
 
 
+def _get_container_cmd(env):
+    tool = env.get('MLC_CONTAINER_TOOL', 'docker')
+    storage_root = env.get('MLC_PODMAN_STORAGE_ROOT', '')
+    if tool == 'podman' and storage_root:
+        return f"{tool} --root {storage_root}/storage --runroot {storage_root}/run"
+    return tool
+
+
 def preprocess(i):
 
     os_info = i['os_info']
@@ -48,7 +56,8 @@ def preprocess(i):
     if docker_image_name == '':
         docker_image_name = "mlc-script-" + \
             env.get('MLC_DOCKER_RUN_SCRIPT_TAGS', '').replace(
-                ',', '-').replace('_', '-')
+                '://', '-').replace(',', '-').replace('_', '-').replace(
+                '+', 'plus').replace(':', '-').replace('/', '-').replace('@', '-')
 
     env['MLC_DOCKER_IMAGE_NAME'] = docker_image_name.lower()
 
@@ -76,7 +85,7 @@ def preprocess(i):
 
     # Prepare CMD to build image
     XCMD = [
-        f'{env["MLC_CONTAINER_TOOL"]} build ' +
+        f'{_get_container_cmd(env)} build ' +
         env.get('MLC_DOCKER_CACHE_ARG', ''),
         secret_args,
         ' ' + build_args,

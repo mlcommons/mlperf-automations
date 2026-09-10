@@ -56,6 +56,7 @@ mlcr generate,submission,mlperf,mlperf-inference,inference,mlcommons,inference-s
 | `--power_settings_file` |  |  | `` |
 | `--preprocess` |  |  | `` |
 | `--preprocess_submission` | Alias for preprocess |  | `` |
+| `--private_ids` |  |  | `` |
 | `--results_dir` |  |  | `` |
 | `--run_checker` |  |  | `` |
 | `--run_style` |  |  | `valid` |

@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-05-23 04:34:02*
+*Last updated: 2026-09-06 01:34:41*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -40,6 +40,8 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [Uncategorized](#uncategorized)
 - [Utilities](#utilities)
 - [XPU automation](#xpu-automation)
+- [lstopo infragraph automation](#lstopo-infragraph-automation)
+- [lstopo topology automation](#lstopo-topology-automation)
 
 ---
 
@@ -180,6 +182,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[install-tflite-from-src](install-tflite-from-src/)**
   - install-tflite-from-src
   - Tags: `get`, `install`, `tflite-cmake`, `tensorflow-lite-cmake`, `from-src`
+- **[test-tool-perf](test-tool-perf/)**
+  - Functionally test perf record with a short run
+  - Tags: `test`, `tool`, `perf`, `test-perf`, `test-tool-perf`
 
 ## AI/ML models
 
@@ -348,6 +353,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[install-terraform-from-src](install-terraform-from-src/)**
   - install-terraform-from-src
   - Tags: `install`, `terraform`, `from-src`
+- **[run-ansible](run-ansible/)**
+  - run-ansible
+  - Tags: `run`, `ansible`, `remote`, `configuration-management`
 - **[run-terraform](run-terraform/)**
   - run-terraform
   - Tags: `run`, `terraform`
@@ -432,6 +440,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[install-vllm-from-src](install-vllm-from-src/)**
   - Build vllm from sources
   - Tags: `install-vllm-from-src`
+- **[test-profiler-uprof](test-profiler-uprof/)**
+  - Functionally test AMD uProf with a short collection
+  - Tags: `test`, `profiler`, `uprof`, `test-uprof`, `test-profiler-uprof`
 
 ## Container automation
 
@@ -456,6 +467,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-android-sdk](get-android-sdk/)**
   - get-android-sdk
   - Tags: `get`, `android`, `sdk`, `android-sdk`
+- **[get-ansible](get-ansible/)**
+  - get-ansible
+  - Tags: `get`, `ansible`, `get-ansible`
 - **[get-apptainer](get-apptainer/)**
   - get-apptainer
   - Tags: `get-apptainer`
@@ -582,6 +596,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-zendnn](get-zendnn/)**
   - get-zendnn
   - Tags: `get`, `zendnn`, `amd`, `from.src`
+- **[install-ansible-via-pip](install-ansible-via-pip/)**
+  - install-ansible-via-pip
+  - Tags: `install`, `ansible`, `via-pip`
 - **[install-apt-package](install-apt-package/)**
   - install-apt-package
   - Tags: `get`, `install`, `apt-package`, `package`
@@ -657,6 +674,12 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-huggingface-cli](get-huggingface-cli/)**
   - get-huggingface-cli
   - Tags: `get`, `huggingface`, `hf-cli`, `huggingface-cli`, `cli`
+- **[get-pass](get-pass/)**
+  - get-pass
+  - Tags: `get`, `pass`, `secret`, `token`, `credential`
+- **[isolate-run](isolate-run/)**
+  - isolate-run
+  - Tags: `isolate`, `isolate-run`, `isolate-user`
 - **[pull-git-repo](pull-git-repo/)**
   - pull-git-repo
   - Tags: `pull`, `git`, `repo`, `repository`
@@ -1005,12 +1028,18 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-mlperf-multi-node-system-info](get-mlperf-multi-node-system-info/)**
   - get-mlperf-multi-node-system-info
   - Tags: `get-mlperf-multi-node-system-info`
+- **[get-mlperf-serving-config](get-mlperf-serving-config/)**
+  - get-mlperf-serving-config
+  - Tags: `get`, `mlperf`, `serving-config`
 - **[get-mlperf-single-node-system-info](get-mlperf-single-node-system-info/)**
   - get-mlperf-single-node-system-info
   - Tags: `get`, `mlperf`, `single-node`, `system-info`
 - **[get-platform-details](get-platform-details/)**
   - get-platform-details
   - Tags: `get`, `platform`, `details`, `platform-details`
+- **[get-redfish-power-info](get-redfish-power-info/)**
+  - get-redfish-power-info
+  - Tags: `get`, `redfish`, `power`, `info`, `bmc`
 - **[save-machine-state](save-machine-state/)**
   - save-machine-state
   - Tags: `machine-state`, `save`, `machine`, `system`, `system-state`, `state`
@@ -1234,12 +1263,24 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - get-xpu-devices
   - Tags: `get`, `xpu-devices`
 
+## lstopo infragraph automation
+
+- **[get-single-node-system-info-infragraph](get-single-node-system-info-infragraph/)**
+  - get-single-node-system-info-infragraph
+  - Tags: `get`, `single-node`, `system-info`, `infragraph`
+
+## lstopo topology automation
+
+- **[get-lstopo](get-lstopo/)**
+  - get-lstopo
+  - Tags: `get`, `lstopo`
+
 ---
 
 ## Statistics
 
-- **Total Scripts**: 363
-- **Categories**: 34
+- **Total Scripts**: 374
+- **Categories**: 36
 
 ## Usage
 

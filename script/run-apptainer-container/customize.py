@@ -1,5 +1,6 @@
 from mlc import utils
 import os
+import shlex
 import subprocess
 from utils import *
 
@@ -17,14 +18,14 @@ def preprocess(i):
             'error': 'Apptainer is not natively supported on Windows. '
                      'Please use WSL2 or a Linux VM.'}
 
-    if 'MLC_APPTAINER_RUN_SCRIPT_TAGS' not in env:
-        env['MLC_APPTAINER_RUN_SCRIPT_TAGS'] = "run,apptainer,container"
-        MLC_RUN_CMD = "mlcr --help"
-    else:
-        MLC_RUN_CMD = "mlcr " + \
-            env['MLC_APPTAINER_RUN_SCRIPT_TAGS'] + ' --quiet'
-
-    env['MLC_APPTAINER_RUN_CMD'] = MLC_RUN_CMD
+    if env.get('MLC_APPTAINER_RUN_CMD', '') == '':
+        if 'MLC_APPTAINER_RUN_SCRIPT_TAGS' not in env:
+            env['MLC_APPTAINER_RUN_SCRIPT_TAGS'] = "run,apptainer,container"
+            MLC_RUN_CMD = "mlcr --help"
+        else:
+            MLC_RUN_CMD = "mlcr " + \
+                env['MLC_APPTAINER_RUN_SCRIPT_TAGS'] + ' --quiet'
+        env['MLC_APPTAINER_RUN_CMD'] = MLC_RUN_CMD
 
     # Compute image naming (like run-docker-container's update_docker_info)
     update_apptainer_info(env)
@@ -76,7 +77,7 @@ def postprocess(i):
     # Filesystem options
     if is_true(env.get('MLC_APPTAINER_WRITABLE', '')):
         run_opts += ' --writable'
-    elif is_true(env.get('MLC_APPTAINER_WRITABLE_TMPFS', '')):
+    elif is_true(env.get('MLC_APPTAINER_WRITABLE_TMPFS', '')) and not env.get('MLC_APPTAINER_OVERLAY', ''):
         run_opts += ' --writable-tmpfs'
 
     # Environment isolation
@@ -92,8 +93,23 @@ def postprocess(i):
     if is_true(env.get('MLC_APPTAINER_NO_HOME', '')):
         run_opts += ' --no-home'
 
+    # Auto-enable fakeroot when overlay is specified (required for writable
+    # overlay mounts) — unless explicitly set to yes or no.
+    if env.get('MLC_APPTAINER_OVERLAY', '') and not is_true(
+            env.get('MLC_APPTAINER_FAKEROOT', '')) and not is_false(
+            env.get('MLC_APPTAINER_FAKEROOT', '')):
+        env['MLC_APPTAINER_FAKEROOT'] = 'yes'
+
     if is_true(env.get('MLC_APPTAINER_FAKEROOT', '')):
         run_opts += ' --fakeroot'
+        # With fakeroot, HOME becomes /root inside the container.
+        # Use /opt/mlc_repo if repos were pre-copied via --apptainer_mlc_repo_path,
+        # else fall back to /tmp/mlc-repos.
+        if env.get('MLC_REPO_PATH', ''):
+            repo_name = os.path.basename(env['MLC_REPO_PATH'])
+            run_opts += f' --env MLC_REPOS=/opt/mlc_repo/{repo_name}'
+        else:
+            run_opts += ' --env MLC_REPOS=/tmp/mlc-repos'
 
     # Home directory
     if env.get('MLC_APPTAINER_HOME', '') != '':
@@ -103,9 +119,18 @@ def postprocess(i):
     if env.get('MLC_APPTAINER_PWD', '') != '':
         run_opts += f" --pwd {env['MLC_APPTAINER_PWD']}"
 
-    # Bind mounts
-    if env.get('MLC_APPTAINER_BIND_MOUNTS', []):
-        for mount in env['MLC_APPTAINER_BIND_MOUNTS']:
+    # Bind mounts (handle both list and string)
+    bind_mounts = env.get('MLC_APPTAINER_BIND_MOUNTS', [])
+    if isinstance(bind_mounts, str):
+        bind_mounts = [bind_mounts]
+    for mount in bind_mounts:
+        if mount:
+            # Apptainer (unlike Docker) does not auto-create missing bind sources.
+            bind_src = mount.split(':', 1)[0]
+            if not os.path.exists(bind_src):
+                logger.info(
+                    f'Skipping apptainer bind (source missing): {bind_src}')
+                continue
             run_opts += f' --bind {mount}'
 
     # Overlay
@@ -121,9 +146,22 @@ def postprocess(i):
     if env.get('MLC_APPTAINER_EXTRA_ARGS', '') != '':
         run_opts += ' ' + env['MLC_APPTAINER_EXTRA_ARGS']
 
+    # Network mode
+    if env.get('MLC_APPTAINER_NETWORK', '') != '':
+        run_opts += f" --net --network {env['MLC_APPTAINER_NETWORK']}"
+
+    # Security options
+    if env.get('MLC_APPTAINER_SECURITY_OPT', '') != '':
+        run_opts += f" --security {env['MLC_APPTAINER_SECURITY_OPT']}"
+
     # Pre-run commands
+    # Pre-run commands (skip 'mlc pull repo' when repos are pre-copied
+    # via --apptainer_mlc_repo_path, as pull can destroy the working tree)
+    use_copy_repo = bool(env.get('MLC_REPO_PATH', ''))
     if env.get('MLC_APPTAINER_PRE_RUN_COMMANDS', []):
         for pre_cmd in env['MLC_APPTAINER_PRE_RUN_COMMANDS']:
+            if use_copy_repo and 'mlc pull repo' in pre_cmd:
+                continue
             run_cmds.append(pre_cmd)
 
     # Main run command — activate the venv first, then run the MLC command
@@ -141,7 +179,10 @@ def postprocess(i):
     # Activate venv inside the container before running commands
     full_cmd = f". /opt/venv/mlcflow/bin/activate && {run_cmd_combined}"
 
-    CMD = f"apptainer exec{run_opts} {sif_path} bash -c '{full_cmd}'"
+    # shlex.quote handles single quotes embedded in the nested run
+    # command (e.g. quoted --apptainer_pre_run_cmds), which naive
+    # '{...}' wrapping breaks with 'unexpected EOF'.
+    CMD = f"apptainer exec{run_opts} {sif_path} bash -c {shlex.quote(full_cmd)}"
 
     logger.info('')
     logger.info('Apptainer launch command:')
@@ -172,7 +213,8 @@ def update_apptainer_info(env):
     if image_name == '':
         image_name = 'mlc-script-' + \
             env.get('MLC_APPTAINER_RUN_SCRIPT_TAGS', 'default').replace(
-                ',', '-').replace('_', '-').replace('+', 'plus')
+                '://', '-').replace(',', '-').replace('_', '-').replace(
+                '+', 'plus').replace(':', '-').replace('/', '-').replace('@', '-')
     env['MLC_APPTAINER_IMAGE_NAME'] = image_name.lower()
 
     image_tag = env.get('MLC_APPTAINER_IMAGE_TAG', '')

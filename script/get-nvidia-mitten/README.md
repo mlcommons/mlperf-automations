@@ -61,5 +61,5 @@ No script specific inputs
 
 ### Numpy-patch
 
-- `default`
-- `patched` (default)
+- `default` (default)
+- `patched`

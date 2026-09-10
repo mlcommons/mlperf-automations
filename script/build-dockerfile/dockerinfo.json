@@ -35,10 +35,8 @@
         "sudo",
         "wget",
         "python3-venv",
-        "systemctl",
         "unzip",
         "ca-certificates",
-        "ssl-cert",
         "binutils"
       ],
       "versions": {
@@ -56,6 +54,12 @@
         },
         "25.10": {
           "FROM": "ubuntu:25.10"
+        },
+        "26.04": {
+          "FROM": "ubuntu:26.04"
+        },
+        "26.10": {
+          "FROM": "ubuntu:26.10"
         }
       },
       "default_version": "24.04"
@@ -91,7 +95,10 @@
           ],
           "PYTHON": "python3.9"
         },
-        "9": {}
+        "9": {},
+        "10": {
+          "FROM": "registry.access.redhat.com/ubi10"
+        }
       },
       "default_version": "9"
     },
@@ -166,6 +173,43 @@
         },
         "15.6": {
           "FROM": "registry.suse.com/bci/bci-base:15.6"
+        },
+        "15.7": {
+          "FROM": "registry.suse.com/bci/bci-base:15.7"
+        },
+        "16.0": {
+          "FROM": "registry.suse.com/bci/bci-base:16.0",
+          "packages": [
+            "python313",
+            "python313-pip",
+            "git",
+            "wget",
+            "sudo",
+            "unzip",
+            "ca-certificates",
+            "gzip",
+            "tar",
+            "gawk",
+            "binutils"
+          ],
+          "PYTHON": "python3.13"
+        },
+        "16.1": {
+          "FROM": "registry.suse.com/bci/bci-base:16.1",
+          "packages": [
+            "python313",
+            "python313-pip",
+            "git",
+            "wget",
+            "sudo",
+            "unzip",
+            "ca-certificates",
+            "gzip",
+            "tar",
+            "gawk",
+            "binutils"
+          ],
+          "PYTHON": "python3.13"
         }
       },
       "default_version": "15.6",
@@ -187,11 +231,14 @@
         "ca-certificates"
       ],
       "versions": {
-        "11": {
-          "FROM": "debian:11"
-        },
         "12": {
           "FROM": "debian:12"
+        },
+        "13": {
+          "FROM": "debian:13"
+        },
+        "forky": {
+          "FROM": "debian:forky"
         }
       },
       "default_version": "12"
@@ -229,6 +276,9 @@
         },
         "9": {
           "FROM": "rockylinux:9"
+        },
+        "10": {
+          "FROM": "rockylinux/rockylinux:10"
         }
       },
       "default_version": "9"

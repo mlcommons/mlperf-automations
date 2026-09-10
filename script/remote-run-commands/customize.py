@@ -36,7 +36,7 @@ def copy_over_ssh(file, ssh_cmd, user, host,
             file,
             f"{user}@{host}:{target_directory}/"
         ]
-    logger.info(f"Executing: {" ".join(cmd)}")
+    logger.info(f"Executing: {' '.join(cmd)}")
     result = subprocess.run(
         cmd,
         env=os.environ,
@@ -101,15 +101,17 @@ def preprocess(i):
     host = env.get('MLC_SSH_HOST')
     port = env.get('MLC_SSH_PORT', '22')
 
+    ssh_prefix = ""
     if password:
-        password_string = " -p " + password
-    else:
-        password_string = ""
+        # Use sshpass for password-based SSH (not -p which is port in SSH)
+        ssh_prefix = f"sshpass -p {shlex.quote(password)} "
 
     ssh_cmd = ["ssh", "-p", port]
 
-    if env.get("MLC_SSH_SKIP_HOST_VERIFY"):
+    if env.get("MLC_SSH_SKIP_HOST_VERIFY") or password:
         # Use NUL on Windows, /dev/null on Unix
+        # Always skip host verify when using password auth (sshpass can't
+        # handle host key prompts)
         null_device = "NUL" if is_windows else "/dev/null"
         ssh_cmd += ["-o", "StrictHostKeyChecking=no",
                     "-o", f"UserKnownHostsFile={null_device}"]
@@ -122,11 +124,19 @@ def preprocess(i):
 
     ssh_cmd_str = " ".join(ssh_cmd)
 
-    # Use double quotes on Windows, single quotes on Unix for better
-    # compatibility
-    quote_char = '"' if is_windows else "'"
-    ssh_run_command = ssh_cmd_str + " " + user + "@" + host + \
-        password_string + " " + quote_char + cmd_string + quote_char
+    if is_windows:
+        safe_cmd_string = subprocess.list2cmdline([cmd_string])
+    else:
+        safe_cmd_string = shlex.quote(cmd_string)
+
+    remote_shell = env.get('MLC_SSH_REMOTE_SHELL', '')
+    if remote_shell:
+        # Pipe commands to the specified shell on the remote to avoid nested
+        # quoting issues
+        ssh_run_command = f"printf '%s\\n' {safe_cmd_string} | {ssh_prefix}{ssh_cmd_str} {user}@{host} {remote_shell}"
+    else:
+        ssh_run_command = f"{ssh_prefix}{ssh_cmd_str} {user}@{host} {safe_cmd_string}"
+
     env['MLC_SSH_CMD'] = ssh_run_command
 
     # ---- Use sshpass if password is provided (only on Unix-like systems) ----
@@ -164,8 +174,10 @@ def postprocess(i):
 
     ssh_cmd = ["ssh", "-p", port]
 
-    if env.get("MLC_SSH_SKIP_HOST_VERIFY"):
+    if env.get("MLC_SSH_SKIP_HOST_VERIFY") or password:
         # Use NUL on Windows, /dev/null on Unix
+        # Always skip host verify when using password auth (sshpass can't
+        # handle host key prompts)
         null_device = "NUL" if is_windows else "/dev/null"
         ssh_cmd += ["-o", "StrictHostKeyChecking=no",
                     "-o", f"UserKnownHostsFile={null_device}"]

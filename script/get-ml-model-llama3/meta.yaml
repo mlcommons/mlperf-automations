@@ -24,6 +24,16 @@ new_env_keys:
 # Input mapping
 input_mapping:
   outdirname: MLC_OUTDIRNAME
+  r2_client_id: CF_ACCESS_CLIENT_ID
+  r2_client_secret: CF_ACCESS_CLIENT_SECRET
+  use_service_account: MLC_AUTH_USING_SERVICE_ACCOUNT
+input_description:
+  r2_client_id:
+    desc: Cloudflare Access service-account client ID. Sets CF_ACCESS_CLIENT_ID for the r2-downloader; only used together with --use_service_account. Prefer exporting the variable instead of passing it on the command line.
+  r2_client_secret:
+    desc: Cloudflare Access service-account client secret. Sets CF_ACCESS_CLIENT_SECRET for the r2-downloader; only used together with --use_service_account. Prefer exporting the variable instead of passing it on the command line.
+  use_service_account:
+    desc: Authenticate with Cloudflare Access using service-account credentials (CF_ACCESS_CLIENT_ID / CF_ACCESS_CLIENT_SECRET) instead of an interactive browser login. Only used with the r2-downloader download tool; required to reach gated buckets on headless machines and in CI.
 
 # Dependencies
 prehook_deps:
@@ -78,21 +88,6 @@ variations:
     add_deps_recursive:
       dae:
         tags: _r2-downloader
-  rclone:
-    group: download-tool
-    add_deps_recursive:
-      dae:
-        tags: _rclone
-    prehook_deps:
-    - tags: get,rclone
-      enable_if_env:
-        MLC_TMP_REQUIRE_DOWNLOAD:
-        - true
-    - tags: get,rclone-config,_mlperf-llama3-1
-      force_cache: true
-      enable_if_env:
-        MLC_TMP_REQUIRE_DOWNLOAD:
-        - true
   vllm:
     default: true
     env:
@@ -168,21 +163,15 @@ variations:
   dry-run,r2-downloader:
     env:
       MLC_DOWNLOAD_EXTRA_OPTIONS: -x
-  dry-run,rclone:
-    env:
-      MLC_DOWNLOAD_EXTRA_OPTIONS: --dry-run
   mlc,r2-downloader:
     env:
       MLC_DOWNLOAD_URL: https://llama3-1.mlcommons-storage.org/metadata/<<<MLC_ML_MODEL_R2_HOSTED_NAME>>>.uri
     adr:
       llama3-model-download:
-        extra_cache_tags: llama3,dataset,rclone
-  mlc,rclone:
+        extra_cache_tags: llama3,dataset,r2-downloader
+  service-account:
     env:
-      MLC_DOWNLOAD_URL: mlc-llama3-1:inference/<<<MLC_ML_MODEL_NAME>>>
-    adr:
-      llama3-model-download:
-        extra_cache_tags: llama3,dataset,rclone
+      MLC_AUTH_USING_SERVICE_ACCOUNT: 'yes'
 
 # Docker / container
 docker:
@@ -197,6 +186,5 @@ tests:
   needs_pat: true
   run_inputs:
   - variations_list:
-    - rclone,405b,mlc,dry-run
-    - r2-downloader,405b,mlc,dry-run
-    - r2-downloader,8b,mlc,dry-run
+    - r2-downloader,405b,mlc,dry-run,service-account
+    - r2-downloader,8b,mlc,dry-run,service-account

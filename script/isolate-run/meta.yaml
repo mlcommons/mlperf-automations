@@ -1,0 +1,99 @@
+alias: isolate-run
+uid: 170630aeb0844ee1
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: DevOps automation
+tags:
+- isolate
+- isolate-run
+- isolate-user
+
+# Cache
+cache: false
+
+# Environment
+default_env:
+  MLC_ISOLATE_STATE_DIR: '/tmp/mlc-isolate-state'
+
+input_mapping:
+  user: MLC_ISOLATE_USER
+  network: MLC_ISOLATE_NETWORK
+  force_logout: MLC_ISOLATE_FORCE_LOGOUT
+  no_new_logins: MLC_ISOLATE_NO_NEW_LOGINS
+  state_dir: MLC_ISOLATE_STATE_DIR
+
+new_env_keys:
+- MLC_ISOLATE_*
+
+# Dependencies
+deps:
+- tags: detect,os
+
+- enable_if_env:
+    MLC_ISOLATE_NO_NEW_LOGINS:
+    - 'yes'
+    - 'true'
+    - 'True'
+  tags: detect,sudo
+
+- enable_if_env:
+    MLC_ISOLATE_FORCE_LOGOUT:
+    - 'yes'
+    - 'true'
+    - 'True'
+  tags: detect,sudo
+
+- enable_if_env:
+    MLC_ISOLATE_NETWORK:
+    - 'yes'
+    - 'true'
+    - 'True'
+  tags: detect,sudo
+
+# Variations
+variations:
+  set:
+    group: action
+    env:
+      MLC_ISOLATE_ACTION: 'set'
+
+  unset:
+    group: action
+    env:
+      MLC_ISOLATE_ACTION: 'unset'
+
+  no-new-logins:
+    group: user-isolation
+    env:
+      MLC_ISOLATE_NO_NEW_LOGINS: 'yes'
+
+  force-logout:
+    group: user-isolation
+    env:
+      MLC_ISOLATE_FORCE_LOGOUT: 'yes'
+
+  no-network:
+    group: network-isolation
+    env:
+      MLC_ISOLATE_NETWORK: 'yes'
+
+variation_tags_alias:
+  set: _set
+  unset: _unset
+  no-new-logins: _no-new-logins
+  force-logout: _force-logout
+  no-network: _no-network
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - set,no-new-logins
+  - variations_list:
+    - unset,no-new-logins
+  - variations_list:
+    - set,force-logout
+  - variations_list:
+    - unset,force-logout

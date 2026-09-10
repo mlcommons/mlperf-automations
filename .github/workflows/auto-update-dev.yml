@@ -1,0 +1,40 @@
+name: Auto-Update Dev Branches from Main
+
+on:
+  push:
+    branches:
+      - main  # Trigger workflow on commits to 'main' branch
+  workflow_dispatch: {}
+
+jobs:
+  update-dev:
+    if: github.repository_owner == 'mlcommons'
+    strategy:
+      matrix: 
+        branch: [ "dev" ]
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write  # Required to push to protected branches
+
+    steps:
+      - name: Checkout Main Branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+          fetch-depth: 0
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+
+      - name: Configure Git User
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+      - name: Merge auto-update into ${{ matrix.branch }}
+        run: |
+          git fetch origin main:main
+          git merge --no-ff main -m "Auto-merge updates from main branch"
+
+      - name: Push Changes to ${{ matrix.branch }}
+        run: |
+          git push origin ${{ matrix.branch }}

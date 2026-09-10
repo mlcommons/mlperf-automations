@@ -14,6 +14,12 @@ tags:
 # Cache
 cache: false
 
+# Environment
+new_env_keys:
+- MLC_SINGLE_NODE_SYSTEM_INFO_FILE_PATH
+- MLC_SINGLE_NODE_SYSTEM_INFO_DIR_PATH
+- MLC_SINGLE_NODE_SYSTEM_INFO_FILE_NAME
+
 # Input mapping
 input_mapping:
   node_id: MLC_SINGLE_NODE_SYSTEM_ID
@@ -26,21 +32,21 @@ deps:
 - tags: detect,cpu
 - tags: get,cuda-devices
   enable_if_env:
-    MLC_GPU_PLATFORM:
+    MLC_ACCELERATOR_BACKEND:
     - cuda
   skip_if_env:
     MLC_HOST_OS_TYPE:
     - windows
 - tags: get,rocm-devices
   enable_if_env:
-    MLC_GPU_PLATFORM:
+    MLC_ACCELERATOR_BACKEND:
     - rocm
   skip_if_env:
     MLC_HOST_OS_TYPE:
     - windows
 - tags: get,xpu-devices
   enable_if_env:
-    MLC_GPU_PLATFORM:
+    MLC_ACCELERATOR_BACKEND:
     - xpu
   skip_if_env:
     MLC_HOST_OS_TYPE:

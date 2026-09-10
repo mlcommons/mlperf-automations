@@ -48,8 +48,10 @@ mlcr build,apptainer,image,apptainer-image
 | `--image_name` |  |  | `` |
 | `--image_repo` |  |  | `local` |
 | `--image_tag` |  |  | `latest` |
+| `--ignore_fakeroot_cmd` |  |  | `` |
 | `--notest` |  |  | `` |
 | `--os` | Alias for docker_os |  | `` |
+| `--sudo` |  |  | `` |
 | `--os_version` | Alias for docker_os_version |  | `` |
 | `--sandbox` |  |  | `` |
 | `--script_tags` |  |  | `` |

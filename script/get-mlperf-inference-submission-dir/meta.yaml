@@ -41,9 +41,13 @@ variations:
       MLC_MLPERF_INFERENCE_SUBMISSION_VERSION: '#'
     group: version
   version.5_1-dev:
-    default: true
     env:
       MLC_MLPERF_INFERENCE_SUBMISSION_VERSION: 5_1-dev
+    group: version
+  version.r6_1-dev:
+    default: true
+    env:
+      MLC_MLPERF_INFERENCE_SUBMISSION_VERSION: r6_1-dev
     group: version
   wg-automotive:
     group: working-group

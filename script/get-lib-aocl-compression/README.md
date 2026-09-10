@@ -68,6 +68,10 @@ mlcr get,lib,lib-aocl-compression,aocl-compression,aocl
 - `binary.aocc` (default)
 - `binary.gcc`
 
+### Install-mode
+
+- `path.#` _(# can be substituted dynamically)_
+
 ### Repo
 
 - `repo.#` _(# can be substituted dynamically)_

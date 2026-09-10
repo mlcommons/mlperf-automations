@@ -241,6 +241,10 @@ def docker_run(self_module, i):
     if quiet:
         env['MLC_QUIET'] = 'yes'
 
+    podman_storage_root = i.get('podman_storage_root', '')
+    if podman_storage_root:
+        env['MLC_PODMAN_STORAGE_ROOT'] = podman_storage_root
+
     regenerate_docker_file = not i.get('docker_noregenerate', False)
     rebuild_docker_image = i.get('docker_rebuild', False)
 

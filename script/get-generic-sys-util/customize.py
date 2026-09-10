@@ -171,15 +171,20 @@ def postprocess(i):
             r = detect_version(i)
 
             if r['return'] > 0:
-                return r
+                # Honour the ignore flag for version *parsing* failures too, not
+                # just for failures of the detect script itself (e.g. the el10
+                # jq binary prints "jq-" with no version).
+                if not is_true(env.get(
+                        'MLC_GENERIC_SYS_UTIL_IGNORE_VERSION_DETECTION_FAILURE', False)):
+                    return r
+            else:
+                version = r['version']
 
-            version = r['version']
+                env[version_env_key] = version
 
-            env[version_env_key] = version
-
-            # Not used now
-            env['MLC_GENERIC_SYS_UTIL_' + env['MLC_SYS_UTIL_NAME'].upper() +
-                '_CACHE_TAGS'] = 'version-' + version
+                # Not used now
+                env['MLC_GENERIC_SYS_UTIL_' + env['MLC_SYS_UTIL_NAME'].upper() +
+                    '_CACHE_TAGS'] = 'version-' + version
 
     if env.get(version_env_key, '') == '':
         env[version_env_key] = "undetected"

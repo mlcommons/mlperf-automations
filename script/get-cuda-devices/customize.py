@@ -16,6 +16,36 @@ def preprocess(i):
     return {'return': 0}
 
 
+def _derive_topology_desc(topo_out, n_gpus):
+    """Return 'Mesh', 'Direct', or None from nvidia-smi topo -m output.
+
+    Mesh   = all GPU pairs connected via NVLink (fully connected).
+    Direct = PCIe-only or partial NVLink connections.
+    None   = single GPU (no inter-GPU topology to describe).
+    """
+    if n_gpus <= 1:
+        return None
+    data_rows = []
+    for line in topo_out.split('\n'):
+        line = line.strip()
+        if not re.match(r'GPU\d+\s', line):
+            continue
+        parts = line.split()
+        # Skip the header row whose second column is also a GPU/NIC label.
+        if len(parts) >= 2 and re.match(r'(GPU|NIC)\d+', parts[1]):
+            continue
+        data_rows.append(parts)
+    if len(data_rows) < n_gpus:
+        return None
+    nv_pairs = 0
+    total_pairs = n_gpus * (n_gpus - 1)
+    for parts in data_rows[:n_gpus]:
+        for c in parts[1:n_gpus + 1]:
+            if re.match(r'NV\d+', c):
+                nv_pairs += 1
+    return 'Mesh' if nv_pairs == total_pairs else 'Direct'
+
+
 def postprocess(i):
 
     env = i['env']
@@ -73,6 +103,12 @@ def postprocess(i):
             env['MLC_CUDA_DEVICE_PROP_GPU_INTERCONNECT_TYPE'] = 'NVLink'
         elif topo_out.strip():
             env['MLC_CUDA_DEVICE_PROP_GPU_INTERCONNECT_TYPE'] = 'PCIe'
+        if topo_out.strip():
+            clean_topo = re.sub(r'\x1b\[[0-9;]*m', '', topo_out).strip()
+            env['MLC_CUDA_DEVICE_PROP_GPU_TOPOLOGY'] = clean_topo
+            topo_desc = _derive_topology_desc(clean_topo, gpu_id + 1)
+            if topo_desc:
+                env['MLC_CUDA_DEVICE_PROP_GPU_TOPOLOGY_DESC'] = topo_desc
     except Exception:
         pass
 

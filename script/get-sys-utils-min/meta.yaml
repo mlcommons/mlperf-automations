@@ -17,13 +17,13 @@ env:
   MLC_CLEAN_DIRS: bin
   MLC_WINDOWS_SYS_UTILS_MIN_INSTALL: true
   MLC_PACKAGE_WIN_URL: https://github.com/mlcommons/mlperf-automations/releases/download/mlperf-automations-v1.0.0/cm-artifact-os-windows-32.zip
-  MLC_SUDO: sudo
 new_env_keys:
 - +PATH
 
 # Dependencies
 deps:
 - tags: detect,os
+- tags: detect,sudo
 - tags: get,generic,sys-util,_xz
   enable_if_env:
     MLC_HOST_OS_TYPE:

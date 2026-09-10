@@ -1,0 +1,30 @@
+alias: get-ansible
+uid: a3b7c9d2e5f84610
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: Detection or installation of tools and artifacts
+tags:
+- get
+- ansible
+- get-ansible
+
+# Cache
+cache: true
+clean_files: []
+
+# Environment
+new_env_keys:
+- MLC_ANSIBLE_*
+- +PATH
+
+# Dependencies
+deps:
+- tags: get,python3
+
+prehook_deps:
+- enable_if_env:
+    MLC_REQUIRE_INSTALL:
+    - 'yes'
+  tags: install,ansible,via-pip

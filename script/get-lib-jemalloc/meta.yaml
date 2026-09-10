@@ -138,3 +138,4 @@ tests:
     - branch.dev,lg-page.21,lg-quantum.3
   - variations_list:
     - config.'--with-lg-page=21 --with-lg-quantum=3'
+  - quiet: true

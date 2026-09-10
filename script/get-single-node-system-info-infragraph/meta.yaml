@@ -1,0 +1,47 @@
+alias: get-single-node-system-info-infragraph
+uid: a7f3c9d18e4b62fa
+automation_alias: script  
+automation_uid: 5b4e0237da074764  
+
+tags:
+  - get
+  - single-node
+  - system-info
+  - infragraph
+
+new_env_keys:
+- MLC_LSTOPO_*
+
+can_force_cache: true
+
+category: lstopo infragraph automation
+
+clean_files:
+- dev.yaml
+- tmp-run-env.out
+
+deps:
+- tags: get,lstopo
+- tags: get,python
+  names:
+  - python
+  - python3
+- tags: get,mlperf,single-node,system-info
+  names:
+  - single-node-system-info
+  inherit_variation_tags: true
+- tags: get,generic-python-lib,_package.infragraph
+
+variations:
+  cuda:
+    group: accelerator-backend
+    env:
+      MLC_ACCELERATOR_BACKEND: cuda
+  rocm:
+    group: accelerator-backend
+    env:
+      MLC_ACCELERATOR_BACKEND: rocm
+  xpu:
+    group: accelerator-backend
+    env:
+      MLC_ACCELERATOR_BACKEND: xpu
