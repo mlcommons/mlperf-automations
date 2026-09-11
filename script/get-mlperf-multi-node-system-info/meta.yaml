@@ -40,6 +40,17 @@ input_mapping:
   model_precision: MLC_MLPERF_MODEL_PRECISION
   other_hardware: MLC_MLPERF_OTHER_HARDWARE
   out_dir_path: MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH
+  # What the remote nodes should install before they run. Handled by
+  # mlcflow's remote_run; unset means the long-standing behaviour.
+  remote_provision: MLC_REMOTE_PROVISION
+  remote_mlc_scripts: MLC_REMOTE_MLC_SCRIPTS
+  remote_repo: MLC_REMOTE_REPO
+  remote_repo_ref: MLC_REMOTE_REPO_REF
+  remote_mlcflow: MLC_REMOTE_MLCFLOW
+  # Where the remote may write: venv path, and the isolated-run controls.
+  remote_python_venv: MLC_REMOTE_PYTHON_VENV
+  remote_isolated: MLC_REMOTE_ISOLATED
+  remote_isolated_base_dir: MLC_REMOTE_ISOLATED_BASE_DIR
   out_file_name: MLC_MULTI_NODE_SYSTEM_INFO_FILE_NAME
   output_token_average: MLC_MLPERF_DATASET_OUTPUT_TOKEN_AVERAGE
   skip_ssh_key_file: MLC_SKIP_SSH_KEY_FILE
@@ -175,6 +186,14 @@ variations:
   inference_optional_nameplate:
     env:
       MLC_MLPERF_INFERENCE_OPTIONAL_NAMEPLATE_ENABLED: 'True'
+
+# CI. Without a tests block the generic per-script workflow runs nothing at
+# all when this script changes, which is how it came to have no coverage.
+# The host-only run needs no ssh and no remote nodes.
+tests:
+  run_inputs:
+    - env:
+        MLC_MLPERF_SYSTEM_NAME: ci-test-system
 
 # Output / debugging
 print_env_at_the_end:

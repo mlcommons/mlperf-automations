@@ -148,8 +148,19 @@ def preprocess(i):
     target_directory = env.get('MLC_SSH_TARGET_COPY_DIRECTORY', '')
 
     # ---- Execute copy commands ----
+    # A skipped copy used to be discarded here, so a machine without rsync
+    # ran the remote command with none of the files it was given.
+    skipped = []
     for file in files_to_copy:
         r = copy_over_ssh(file, ssh_cmd, user, host, target_directory, logger)
+        if r.get("error"):
+            skipped.append(f"{file} ({r.get('error_msg', 'copy failed')})")
+
+    if skipped:
+        return {'return': 1,
+                'error': "Could not copy these files to " +
+                         f"{user}@{host}, so the remote command would run "
+                         "without them:\n  " + "\n  ".join(skipped)}
 
     return {'return': 0}
 
@@ -195,6 +206,9 @@ def postprocess(i):
 
     target_directory = env.get('MLC_SSH_PATH_TO_COPY_BACK_FILES', '')
     # ---- Execute copy commands ----
+    # These files are the result of the run. Reporting success without them
+    # leaves the caller to discover the gap later, or not at all.
+    missing = []
     for file in files_to_copy_back:
         r = copy_over_ssh(
             file,
@@ -204,5 +218,13 @@ def postprocess(i):
             target_directory,
             logger,
             copy_back=True)
+        if r.get("error"):
+            missing.append(f"{file} ({r.get('error_msg', 'copy failed')})")
+
+    if missing:
+        return {'return': 1,
+                'error': "The remote command ran but these result files "
+                         f"could not be copied back from {user}@{host}:"
+                         "\n  " + "\n  ".join(missing)}
 
     return {'return': 0}

@@ -123,6 +123,34 @@ def _parse_node(node_str):
     return user, host, port
 
 
+# What the caller asked us to install on the remote nodes. These pass
+# straight through to mlcflow's remote_run, which owns the meaning of each
+# one; we only decide which of them the user actually set. Only set keys are
+# forwarded, so an unconfigured run reaches remote_run exactly as it always
+# did.
+_PROVISION_INPUTS = {
+    'remote_provision': 'MLC_REMOTE_PROVISION',
+    'remote_mlc_scripts': 'MLC_REMOTE_MLC_SCRIPTS',
+    'remote_repo': 'MLC_REMOTE_REPO',
+    'remote_repo_ref': 'MLC_REMOTE_REPO_REF',
+    'remote_mlcflow': 'MLC_REMOTE_MLCFLOW',
+    # Where the remote is allowed to put things. Without these the nodes are
+    # forced to use $HOME -- the venv at ~/mlcflow and the MLC tree at
+    # ~/MLC -- which is wrong wherever $HOME is small, shared, or simply not
+    # the volume the operator wants written to. Same forwarding rule as
+    # above: only keys the caller actually set are passed on.
+    'remote_python_venv': 'MLC_REMOTE_PYTHON_VENV',
+    'remote_isolated': 'MLC_REMOTE_ISOLATED',
+    'remote_isolated_base_dir': 'MLC_REMOTE_ISOLATED_BASE_DIR',
+}
+
+
+def _provision_inputs(env):
+    return {key: env[var].strip()
+            for key, var in _PROVISION_INPUTS.items()
+            if str(env.get(var, '')).strip()}
+
+
 def preprocess(i):
 
     env = i['env']
@@ -160,6 +188,13 @@ def preprocess(i):
         exclude_current = is_true(env.get('MLC_EXCLUDE_CURRENT_NODE', False))
         remote_node_id_start = 0 if exclude_current else 1
 
+        provision = _provision_inputs(env)
+
+        # A node we could not reach or could not provision is not a smaller
+        # run, it is a wrong answer: the system description would silently
+        # describe fewer machines than the submitter has.
+        failed_nodes = []
+
         for index, sshid in enumerate(ssh_ids):
             user, host, port = _parse_node(sshid)
             actual_node_id = remote_node_id_start + index
@@ -180,16 +215,27 @@ def preprocess(i):
                     'run_state': run_state,
                     'skip_ssh_key_file': env.get('MLC_SKIP_SSH_KEY_FILE', ''),
                     'quiet': True,
+                    **provision,
                 })
                 if r['return'] > 0:
+                    reason = r.get('error', 'no reason reported')
                     logger.error(
-                        f"Error obtaining information from remote node {sshid}!")
+                        f"Error obtaining information from remote node {sshid}: {reason}")
+                    failed_nodes.append((sshid, reason))
                 else:
                     logger.info(
                         f"Successfully obtained information from remote node {sshid}")
             except Exception as e:
                 logger.error(
                     f"Exception during remote_run for node {sshid}: {e}")
+                failed_nodes.append((sshid, str(e)))
+
+        if failed_nodes:
+            return {'return': 1,
+                    'error': "Could not collect system information from "
+                             f"{len(failed_nodes)} of {len(ssh_ids)} nodes:\n  " +
+                             "\n  ".join(f"{node}: {why}"
+                                         for node, why in failed_nodes)}
 
     serving_node = env.get('MLC_MLPERF_SERVING_NODE', '')
     if serving_node:
@@ -213,16 +259,19 @@ def preprocess(i):
                 'skip_ssh_key_file': env.get('MLC_SKIP_SSH_KEY_FILE', ''),
                 'serving_framework_type': env.get('MLC_MLPERF_SERVING_FRAMEWORK_TYPE', 'auto'),
                 'quiet': True,
+                **_provision_inputs(env),
             })
             if r_sc['return'] > 0:
-                logger.error(
-                    f"Error obtaining serving config from {serving_node}")
-            else:
-                logger.info(
-                    f"Successfully obtained serving config from {serving_node}")
+                return {'return': 1,
+                        'error': "Could not obtain the serving config from "
+                                 f"{serving_node}: "
+                                 f"{r_sc.get('error', 'no reason reported')}"}
+            logger.info(
+                f"Successfully obtained serving config from {serving_node}")
         except Exception as e:
-            logger.error(
-                f"Exception during serving config remote_run for {serving_node}: {e}")
+            return {'return': 1,
+                    'error': "Could not obtain the serving config from "
+                             f"{serving_node}: {e}"}
 
     endpoint_url = env.get('MLC_MLPERF_ENDPOINT_URL', '')
     if endpoint_url and not env.get('MLC_MLPERF_SERVING_FRAMEWORK', ''):
@@ -1088,7 +1137,9 @@ def _update_parsed_node_details(
         dir_path,
         f"mlperf-system-info-single-node-{node_id}.json")
     if not os.path.exists(path):
-        logger.warning(f"Single-node info file not found: {path}")
+        # The caller collects these and fails with the full list; this is
+        # only here to show the order things were looked for in.
+        logger.debug(f"Single-node info file not found: {path}")
         return False
     with open(path) as f:
         info = json.load(f)
@@ -1227,11 +1278,18 @@ def postprocess(i):
     exclude_current = is_true(env.get('MLC_EXCLUDE_CURRENT_NODE', False))
     remote_node_id_start = 0 if exclude_current else 1
 
+    # A node whose file never arrived is a hole in the system description,
+    # not a smaller one. Collect them all first so one run names every
+    # missing node rather than only the first.
+    missing_node_ids = []
+
     if not exclude_current:
         logger.info("Obtaining system information from the host system")
         if _update_parsed_node_details(
                 0, dir_path, parsed_node_details, node_versions, logger):
             processed_node_ids.append('0')
+        else:
+            missing_node_ids.append(0)
 
     logger.info("Obtaining system information from the remote systems")
     for idx in range(int(env.get('MLC_REMOTE_RUN_SSH_ID_COUNT', 0))):
@@ -1239,6 +1297,18 @@ def postprocess(i):
         if _update_parsed_node_details(
                 nid, dir_path, parsed_node_details, node_versions, logger):
             processed_node_ids.append(str(nid))
+        else:
+            missing_node_ids.append(nid)
+
+    if missing_node_ids:
+        expected = ", ".join(
+            os.path.join(dir_path,
+                         f"mlperf-system-info-single-node-{nid}.json")
+            for nid in missing_node_ids)
+        return {'return': 1,
+                'error': "No system information came back from node(s) " +
+                         ", ".join(str(n) for n in missing_node_ids) +
+                         f". Expected: {expected}"}
 
     node_config = _load_node_config(
         env.get("MLC_NODE_CONFIG_FILE", ""), logger)
@@ -1340,24 +1410,42 @@ def postprocess(i):
         if version:
             block = {'repo': os.path.basename(repo_path), **version}
             if processed_node_ids:
-                agg_commit = version.get('commit')
+                # Identity is the commit *and* the version. Commit alone
+                # is not enough: a wheel built without git metadata carries
+                # no commit, or the literal 'unknown' that get_commit_hash()
+                # substitutes, so two genuinely different versions compared
+                # equal and were reported as agreeing -- in exactly the
+                # packaged case this stamp exists to protect.
+                def _identity(v):
+                    commit = str(v.get('commit') or '').strip()
+                    if commit.lower() == 'unknown':
+                        commit = ''
+                    return (commit, str(v.get('version') or '').strip())
+
+                def _render(v):
+                    return '@'.join(p for p in _identity(v) if p) or 'unreported'
+
+                agg_identity = _identity(version)
                 # Consistent only if every processed node reported a version
-                # AND all of them match the aggregator's commit. A node that
-                # produced a file but no version block (e.g. its mlcflow lacked
-                # the helper) counts as not-confirmed -> not consistent.
+                # AND all of them match the aggregator. A node that produced a
+                # file but no version block (e.g. its mlcflow lacked the
+                # helper) counts as not-confirmed -> not consistent.
                 all_reported = all(
                     nid in node_versions for nid in processed_node_ids)
-                commits_match = all(
-                    nv.get('commit') == agg_commit
+                identities_match = all(
+                    _identity(nv) == agg_identity
                     for nv in node_versions.values())
-                block['consistent'] = bool(all_reported and commits_match)
+                # Nothing to compare on is not the same as agreement.
+                identifiable = any(agg_identity)
+                block['consistent'] = bool(
+                    all_reported and identities_match and identifiable)
                 block['nodes'] = node_versions
                 if not block['consistent']:
-                    detail = {nid: node_versions.get(nid, {}).get(
-                        'commit', 'unknown') for nid in processed_node_ids}
+                    detail = {nid: _render(node_versions.get(nid, {}))
+                              for nid in processed_node_ids}
                     logger.warning(
                         "mlc-scripts version differs across nodes: "
-                        "aggregator=%s nodes=%s", agg_commit, detail)
+                        "aggregator=%s nodes=%s", _render(version), detail)
             output_info['mlc_scripts_version'] = block
     except Exception as e:
         logger.warning(f"Could not add version info: {e}")
