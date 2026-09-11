@@ -240,6 +240,8 @@ class ProvisioningPassthroughTest(unittest.TestCase):
         env = {
             "MLC_MULTINODE_SYSTEM_SSH_IDS": "bench@node1,bench@node2",
             "MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH": self.temp_dir.name,
+            # preprocess now refuses without this, before contacting a node.
+            "MLC_MLPERF_SYSTEM_NAME": "test-system",
         }
         env.update(env_extra)
         return self.customize.preprocess(
@@ -306,3 +308,75 @@ class ProvisioningPassthroughTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SystemNameIsCheckedBeforeAnyNodeTest(unittest.TestCase):
+    """The check used to live in postprocess.
+
+    By the time it fired there, every node had been reached, provisioned,
+    run and copied back. A missing string then discarded all of that and
+    wrote no aggregate, and the only remedy was to run the whole thing
+    again. Nothing about system_name depends on the nodes, so it is
+    answerable before the first ssh.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.customize = _load_customize()
+
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp_dir.cleanup)
+        self.calls = []
+        real_access = self.customize.mlc.access
+        self.addCleanup(setattr, self.customize.mlc, "access", real_access)
+
+        def record(payload):
+            self.calls.append(payload)
+            return {"return": 0}
+
+        self.customize.mlc.access = record
+
+    def _preprocess(self, **env_extra):
+        env = {
+            "MLC_MULTINODE_SYSTEM_SSH_IDS": "bench@node1,bench@node2",
+            "MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH": self.temp_dir.name,
+        }
+        env.update(env_extra)
+        return self.customize.preprocess(
+            {"env": env, "automation": _Automation(), "state": {}})
+
+    def test_a_missing_system_name_fails_before_the_first_node(self):
+        r = self._preprocess()
+        self.assertEqual(r["return"], 1)
+        self.assertIn("system_name is required", r["error"])
+        self.assertEqual(
+            self.calls, [],
+            "no node may be contacted before system_name is validated")
+
+    def test_the_message_names_every_way_to_supply_it(self):
+        r = self._preprocess()
+        for how in ("--system_name", "config file", "MLC_MLPERF_SYSTEM_NAME"):
+            self.assertIn(how, r["error"])
+
+    def test_a_supplied_system_name_proceeds(self):
+        r = self._preprocess(MLC_MLPERF_SYSTEM_NAME="named")
+        self.assertEqual(r["return"], 0, r.get("error"))
+        self.assertEqual(len(self.calls), 2)
+
+    def test_a_config_file_can_supply_it(self):
+        """_load_config_file runs first, so the config file still counts --
+        the check must not demand the command-line flag specifically."""
+        cfg = os.path.join(self.temp_dir.name, "cfg.json")
+        with open(cfg, "w") as fh:
+            json.dump({"system_name": "from-config"}, fh)
+
+        r = self._preprocess(MLC_MLPERF_CONFIG_FILE=cfg)
+
+        self.assertEqual(r["return"], 0, r.get("error"))
+        self.assertEqual(len(self.calls), 2)
+
+    def test_an_empty_system_name_is_not_a_name(self):
+        r = self._preprocess(MLC_MLPERF_SYSTEM_NAME="")
+        self.assertEqual(r["return"], 1)
+        self.assertEqual(self.calls, [])

@@ -168,6 +168,18 @@ def preprocess(i):
 
     _load_config_file(env.get('MLC_MLPERF_CONFIG_FILE', ''), env, logger)
 
+    # Checked here rather than in postprocess, which is where it used to
+    # live. There it fired only after every node had been reached,
+    # provisioned, run and copied back -- so a missing string discarded
+    # minutes of ssh work and wrote no aggregate, and the re-run had to do
+    # all of it again. Nothing about the value depends on the nodes.
+    # _load_config_file has already run, so the config file has had its
+    # chance to supply it.
+    if not env.get('MLC_MLPERF_SYSTEM_NAME', ''):
+        return {'return': 1,
+                'error': 'system_name is required. Set it via --system_name, '
+                         'the config file, or MLC_MLPERF_SYSTEM_NAME.'}
+
     if env.get('MLC_MULTINODE_SYSTEM_SSH_IDS', '') == '' and is_true(
             env.get('MLC_EXCLUDE_CURRENT_NODE', False)):
         return {'return': 1, 'error': 'Either MLC_EXCLUDE_CURRENT_NODE should be False or MLC_MULTINODE_SYSTEM_SSH_IDS should be provided'}
@@ -1351,9 +1363,9 @@ def postprocess(i):
         node_type.update(node_meta)
         node_type.pop("serving_framework", None)
 
+    # Guaranteed non-empty by preprocess, which rejects a missing
+    # system_name before the first node is contacted.
     user_system_name = env.get("MLC_MLPERF_SYSTEM_NAME", "")
-    if not user_system_name:
-        return {'return': 1, 'error': 'system_name is required. Set it via --system_name, the config file, or MLC_MLPERF_SYSTEM_NAME.'}
 
     output_info = {
         "submitter_org_names": env.get("MLC_MLPERF_SUBMITTER", "Insert your organization name here"),
