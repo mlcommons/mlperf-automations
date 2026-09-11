@@ -22,8 +22,10 @@ def build_type_query(*node_types):
     """One attribute query carrying a named node_filter per component type."""
     request = QueryRequest()
     for node_type in node_types:
-        node_filter = request.attribute_query.node_filters.add(name=f"{node_type} filter")
-        node_filter.attribute_filters.attributes.add(attribute="type", value=node_type)
+        node_filter = request.attribute_query.node_filters.add(
+            name=f"{node_type} filter")
+        node_filter.attribute_filters.attributes.add(
+            attribute="type", value=node_type)
     return request
 
 
@@ -46,10 +48,14 @@ def main():
     infragraph_path = Path(args.infragraph)
 
     if not sysinfo_path.exists():
-        print(f"[ERROR] sysinfo file not found: {sysinfo_path}", file=sys.stderr)
+        print(
+            f"[ERROR] sysinfo file not found: {sysinfo_path}",
+            file=sys.stderr)
         sys.exit(1)
     if not infragraph_path.exists():
-        print(f"[ERROR] infragraph file not found: {infragraph_path}", file=sys.stderr)
+        print(
+            f"[ERROR] infragraph file not found: {infragraph_path}",
+            file=sys.stderr)
         sys.exit(1)
 
     with open(infragraph_path, "r", encoding="utf-8") as f:
