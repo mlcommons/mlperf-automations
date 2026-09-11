@@ -34,7 +34,14 @@ dependencies = [
     # Naming a prerelease in the specifier is also what allows pip to
     # consider prereleases for it at all. Tighten to >=1.4.0 once mlcflow
     # 1.4.0 final is on PyPI.
-    "mlcflow>=1.4.0a3",
+    #
+    # a4 rather than a3: under a3, --remote_isolated exported only MLC_REPOS,
+    # which since the roots were split no longer moved the cache. Remote runs
+    # left cache entries in the target's real home, outliving the cleanup, and
+    # --remote_copy_back_mlc_cache read an empty directory. a4 also keeps the
+    # remote venv inside the isolated dir instead of reusing whatever venv sat
+    # in the remote user's home.
+    "mlcflow>=1.4.0a4",
     "giturlparse"
 ]
 

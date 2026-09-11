@@ -1,5 +1,6 @@
 from setuptools import setup
 from setuptools.command.build_py import build_py
+from setuptools.command.sdist import sdist
 import json
 import os
 import shutil
@@ -88,6 +89,30 @@ def get_commit_hash():
             return f.read().strip()
     except FileNotFoundError:
         return "unknown"
+
+
+class SdistWithResolvedCommit(sdist):
+    """Freeze the resolved commit into the sdist.
+
+    `python -m build` — which is what the release workflow runs — builds the
+    wheel from the unpacked sdist, in a temp directory with no git metadata.
+    get_commit_hash() therefore falls through to git_commit_hash.txt, frozen
+    since 2025-02-09, so every wheel published that way has carried that hash
+    no matter what it was built from. Asking git only helps if it happens
+    while the checkout is still there, which is here.
+
+    The value is written into the sdist's staging copy, never the working
+    tree. make_release_tree hard-links from the source by default, so the
+    link has to be broken first or this would rewrite the tracked file.
+    """
+
+    def make_release_tree(self, base_dir, files):
+        super().make_release_tree(base_dir, files)
+        target = os.path.join(base_dir, 'git_commit_hash.txt')
+        if os.path.lexists(target):
+            os.unlink(target)
+        with open(target, 'w') as fh:
+            fh.write(get_commit_hash() + "\n")
 
 
 class BuildPyWithScriptContent(build_py):
@@ -196,5 +221,6 @@ setup(
     python_requires=project_meta.get("python-requires", ">=3.8"),
     cmdclass={
         'build_py': BuildPyWithScriptContent,
+        'sdist': SdistWithResolvedCommit,
     },
 )
