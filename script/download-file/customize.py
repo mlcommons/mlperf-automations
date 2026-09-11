@@ -147,6 +147,13 @@ def preprocess(i):
 
         extra_download_options = env.get('MLC_DOWNLOAD_EXTRA_OPTIONS', '')
 
+        download_parallelism = str(
+            env.get('MLC_DOWNLOAD_PARALLELISM', '')).strip()
+        if download_parallelism and tool != "r2-downloader":
+            logger.warning(
+                f"Ignoring --download_parallelism={download_parallelism}: "
+                f"parallel downloads are only supported by the r2-downloader tool, not '{tool}'")
+
         use_service_account = is_true(
             env.get('MLC_AUTH_USING_SERVICE_ACCOUNT'))
         if use_service_account and tool != "r2-downloader":
@@ -331,6 +338,15 @@ def preprocess(i):
                             "following are not set: " + ", ".join(missing) +
                             ". Export them, or pass --r2_client_id=... --r2_client_secret=..."}
                 extra_download_options += " -s "
+            # Number of files fetched concurrently. Only forwarded when the user
+            # asked for it, so that the downloader keeps its own default (1 job
+            # for datasets below its file-count threshold, 4 above it).
+            if download_parallelism:
+                if not download_parallelism.isdigit() or int(
+                        download_parallelism) < 1:
+                    return {'return': 1,
+                            'error': f"download_parallelism must be a positive integer, got '{download_parallelism}'"}
+                extra_download_options += f" -j {download_parallelism} "
             env['MLC_DOWNLOAD_CMD'] = f"bash <(curl -s https://raw.githubusercontent.com/mlcommons/r2-downloader/refs/heads/main/mlc-r2-downloader.sh) "
             if env["MLC_HOST_OS_TYPE"] == "windows":
                 # have to modify the variable from url to temp_url if it is
