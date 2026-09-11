@@ -1423,7 +1423,8 @@ def postprocess(i):
                     return (commit, str(v.get('version') or '').strip())
 
                 def _render(v):
-                    return '@'.join(p for p in _identity(v) if p) or 'unreported'
+                    return '@'.join(p for p in _identity(v)
+                                    if p) or 'unreported'
 
                 agg_identity = _identity(version)
                 # Consistent only if every processed node reported a version

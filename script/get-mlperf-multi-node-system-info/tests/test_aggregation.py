@@ -180,7 +180,6 @@ class MultiNodeAggregationTest(unittest.TestCase):
         self.assertFalse(block["consistent"], block)
         self.assertIn("1", block["nodes"])
 
-
     def _packaged_node(self, commit, version):
         n = _node(commit=commit)
         n["mlc_scripts_version"]["version"] = version
