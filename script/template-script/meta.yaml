@@ -22,3 +22,25 @@ post_deps: []
 # Tests
 tests:
   run_inputs: []
+
+# Version compatibility requirements — NEW: see mlcflow issue #278
+# mlc_compat lets a script declare the minimum mlcflow core version it needs,
+# with a human-readable reason.  mlcflow evaluates this before executing the
+# script and either warns the user (fail: false, the default) or blocks
+# execution (fail: true) when the installed version is too old.
+#
+# Format:
+#   mlc_compat:
+#     - min_version: "X.Y.Z"   # minimum mlcflow version required
+#       message: "reason"      # shown to the user when the version is unmet
+#       fail: false            # (optional) set true to block instead of warn
+#
+# Example (both entries reference future versions so they are satisfied once
+# mlcflow is upgraded, and are only informational today):
+mlc_compat:
+  - min_version: "1.3.0"
+    message: "Adds env-key namespacing; earlier versions may silently drop keys"
+    fail: false
+  - min_version: "2.0.0"
+    message: "Required for multi-repo dependency resolution"
+    fail: true

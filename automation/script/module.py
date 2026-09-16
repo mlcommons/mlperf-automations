@@ -616,19 +616,45 @@ class ScriptAutomation(Automation):
         meta = script_item.meta
         path = script_item.path
 
-        # Check min MLC version requirement
-        min_mlc_version = meta.get('min_mlc_version', '').strip()
-        if min_mlc_version != '':
-            try:
-                import importlib.metadata
-                current_mlc_version = importlib.metadata.version("mlc")
-                comparison = utils.compare_versions(
-                    current_mlc_version, min_mlc_version)
-                if comparison < 0:
-                    return {'return': 1, 'error': 'This script requires MLC version >= {} while current MLC version is {} - please update using "pip install mlcflow -U"'.format(
-                        min_mlc_version, current_mlc_version)}
-            except Exception as e:
-                error = format(e)
+        # Check mlcflow version requirements
+        # mlc_compat (new): multi-entry, per-entry messages, warn or block
+        # min_mlc_version (legacy): single threshold, always blocks
+        script_alias = meta.get('alias', '')
+        try:
+            from script.compat import get_installed_version, check_mlc_compat, format_compat_notice
+            current_mlc_version = get_installed_version()
+
+            compat_entries = meta.get('mlc_compat')
+            if compat_entries:
+                unmet_warnings, unmet_blockers = check_mlc_compat(
+                    compat_entries, current_mlc_version)
+                notice, is_blocking = format_compat_notice(
+                    script_alias, unmet_warnings, unmet_blockers, current_mlc_version)
+                if notice:
+                    if is_blocking:
+                        self.logger.error(notice)
+                        return {'return': 1, 'error': (
+                            "Script '{}' requires a newer mlcflow version. "
+                            "Run `pip install --upgrade mlcflow` and retry.".format(
+                                script_alias)
+                        )}
+                    else:
+                        self.logger.warning(notice)
+            else:
+                # Fall back to legacy min_mlc_version (single threshold, always
+                # blocks)
+                min_mlc_version = meta.get('min_mlc_version', '').strip()
+                if min_mlc_version and current_mlc_version:
+                    if utils.compare_versions(
+                            current_mlc_version, min_mlc_version) < 0:
+                        return {'return': 1, 'error': (
+                            'This script requires mlcflow >= {} (installed: {}) '
+                            '— please upgrade: pip install --upgrade mlcflow'.format(
+                                min_mlc_version, current_mlc_version)
+                        )}
+        except Exception as e:
+            # Never let a compat-check failure block script execution
+            self.logger.debug('mlc_compat check skipped: {}'.format(e))
 
         # Check path to repo
         script_repo_path = script_item.repo.path
