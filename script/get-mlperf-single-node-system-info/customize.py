@@ -32,7 +32,8 @@ def preprocess(i):
     if is_true(env.get('MLC_COLLECT_LSTOPO_TOPOLOGY', False)):
         info_path = env['MLC_SINGLE_NODE_SYSTEM_INFO_FILE_PATH']
         xml_path = os.path.splitext(info_path)[0] + '.lstopo.xml'
-        env['MLC_SINGLE_NODE_LSTOPO_XML_FILE_NAME'] = os.path.basename(xml_path)
+        env['MLC_SINGLE_NODE_LSTOPO_XML_FILE_NAME'] = os.path.basename(
+            xml_path)
         env['MLC_SINGLE_NODE_LSTOPO_XML_FILE_PATH'] = xml_path
 
     CMD = f"""{env['MLC_PYTHON_BIN_WITH_PATH']} {env['MLC_TMP_CURRENT_SCRIPT_PATH']}/parse.py --output {env['MLC_SINGLE_NODE_SYSTEM_INFO_FILE_PATH']}"""
