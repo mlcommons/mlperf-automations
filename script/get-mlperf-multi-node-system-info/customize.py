@@ -38,6 +38,10 @@ _CONFIG_KEY_TO_ENV = {
     "container_link": "MLC_MLPERF_CONTAINER_LINK",
     "measured_accuracy_score": "MLC_MLPERF_MEASURED_ACCURACY_SCORE",
     "system_type_detail": "MLC_MLPERF_SYSTEM_TYPE_DETAIL",
+    "endpoint_url": "MLC_MLPERF_ENDPOINT_URL",
+    "node_config": "MLC_MLPERF_NODE_CONFIG",
+    "config_summary_notes": "MLC_MLPERF_CONFIG_SUMMARY_NOTES",
+    "link_config": "MLC_MLPERF_LINK_CONFIG",
     "framework": "MLC_MLPERF_FRAMEWORK",
     "framework_name": "MLC_MLPERF_FRAMEWORK_NAME",
     "sw_notes": "MLC_MLPERF_SOFTWARE_NOTES",
@@ -119,6 +123,34 @@ def _parse_node(node_str):
     return user, host, port
 
 
+# What the caller asked us to install on the remote nodes. These pass
+# straight through to mlcflow's remote_run, which owns the meaning of each
+# one; we only decide which of them the user actually set. Only set keys are
+# forwarded, so an unconfigured run reaches remote_run exactly as it always
+# did.
+_PROVISION_INPUTS = {
+    'remote_provision': 'MLC_REMOTE_PROVISION',
+    'remote_mlc_scripts': 'MLC_REMOTE_MLC_SCRIPTS',
+    'remote_repo': 'MLC_REMOTE_REPO',
+    'remote_repo_ref': 'MLC_REMOTE_REPO_REF',
+    'remote_mlcflow': 'MLC_REMOTE_MLCFLOW',
+    # Where the remote is allowed to put things. Without these the nodes are
+    # forced to use $HOME -- the venv at ~/mlcflow and the MLC tree at
+    # ~/MLC -- which is wrong wherever $HOME is small, shared, or simply not
+    # the volume the operator wants written to. Same forwarding rule as
+    # above: only keys the caller actually set are passed on.
+    'remote_python_venv': 'MLC_REMOTE_PYTHON_VENV',
+    'remote_isolated': 'MLC_REMOTE_ISOLATED',
+    'remote_isolated_base_dir': 'MLC_REMOTE_ISOLATED_BASE_DIR',
+}
+
+
+def _provision_inputs(env):
+    return {key: env[var].strip()
+            for key, var in _PROVISION_INPUTS.items()
+            if str(env.get(var, '')).strip()}
+
+
 def preprocess(i):
 
     env = i['env']
@@ -135,6 +167,18 @@ def preprocess(i):
     os.makedirs(env['MLC_MULTI_NODE_SYSTEM_INFO_DIR_PATH'], exist_ok=True)
 
     _load_config_file(env.get('MLC_MLPERF_CONFIG_FILE', ''), env, logger)
+
+    # Checked here rather than in postprocess, which is where it used to
+    # live. There it fired only after every node had been reached,
+    # provisioned, run and copied back -- so a missing string discarded
+    # minutes of ssh work and wrote no aggregate, and the re-run had to do
+    # all of it again. Nothing about the value depends on the nodes.
+    # _load_config_file has already run, so the config file has had its
+    # chance to supply it.
+    if not env.get('MLC_MLPERF_SYSTEM_NAME', ''):
+        return {'return': 1,
+                'error': 'system_name is required. Set it via --system_name, '
+                         'the config file, or MLC_MLPERF_SYSTEM_NAME.'}
 
     if env.get('MLC_MULTINODE_SYSTEM_SSH_IDS', '') == '' and is_true(
             env.get('MLC_EXCLUDE_CURRENT_NODE', False)):
@@ -156,6 +200,13 @@ def preprocess(i):
         exclude_current = is_true(env.get('MLC_EXCLUDE_CURRENT_NODE', False))
         remote_node_id_start = 0 if exclude_current else 1
 
+        provision = _provision_inputs(env)
+
+        # A node we could not reach or could not provision is not a smaller
+        # run, it is a wrong answer: the system description would silently
+        # describe fewer machines than the submitter has.
+        failed_nodes = []
+
         for index, sshid in enumerate(ssh_ids):
             user, host, port = _parse_node(sshid)
             actual_node_id = remote_node_id_start + index
@@ -176,16 +227,27 @@ def preprocess(i):
                     'run_state': run_state,
                     'skip_ssh_key_file': env.get('MLC_SKIP_SSH_KEY_FILE', ''),
                     'quiet': True,
+                    **provision,
                 })
                 if r['return'] > 0:
+                    reason = r.get('error', 'no reason reported')
                     logger.error(
-                        f"Error obtaining information from remote node {sshid}!")
+                        f"Error obtaining information from remote node {sshid}: {reason}")
+                    failed_nodes.append((sshid, reason))
                 else:
                     logger.info(
                         f"Successfully obtained information from remote node {sshid}")
             except Exception as e:
                 logger.error(
                     f"Exception during remote_run for node {sshid}: {e}")
+                failed_nodes.append((sshid, str(e)))
+
+        if failed_nodes:
+            return {'return': 1,
+                    'error': "Could not collect system information from "
+                             f"{len(failed_nodes)} of {len(ssh_ids)} nodes:\n  " +
+                             "\n  ".join(f"{node}: {why}"
+                                         for node, why in failed_nodes)}
 
     serving_node = env.get('MLC_MLPERF_SERVING_NODE', '')
     if serving_node:
@@ -209,16 +271,19 @@ def preprocess(i):
                 'skip_ssh_key_file': env.get('MLC_SKIP_SSH_KEY_FILE', ''),
                 'serving_framework_type': env.get('MLC_MLPERF_SERVING_FRAMEWORK_TYPE', 'auto'),
                 'quiet': True,
+                **_provision_inputs(env),
             })
             if r_sc['return'] > 0:
-                logger.error(
-                    f"Error obtaining serving config from {serving_node}")
-            else:
-                logger.info(
-                    f"Successfully obtained serving config from {serving_node}")
+                return {'return': 1,
+                        'error': "Could not obtain the serving config from "
+                                 f"{serving_node}: "
+                                 f"{r_sc.get('error', 'no reason reported')}"}
+            logger.info(
+                f"Successfully obtained serving config from {serving_node}")
         except Exception as e:
-            logger.error(
-                f"Exception during serving config remote_run for {serving_node}: {e}")
+            return {'return': 1,
+                    'error': "Could not obtain the serving config from "
+                             f"{serving_node}: {e}"}
 
     endpoint_url = env.get('MLC_MLPERF_ENDPOINT_URL', '')
     if endpoint_url and not env.get('MLC_MLPERF_SERVING_FRAMEWORK', ''):
@@ -378,27 +443,276 @@ def _compute_system_size(node_entries):
     """
     parts = []
     for entry in node_entries:
-        n_nodes = entry.get("number_of_nodes", 1)
-        accel_name = entry.get("accelerator_model_name", "")
-        accel_per_node = entry.get("accelerators_per_node", 0)
+        node_count = _parse_count(entry.get("number_of_nodes", 1)) or 1
 
-        if not _is_not_detected(
-                accel_name) and not _is_not_detected(accel_per_node):
-            try:
-                qty = n_nodes * int(accel_per_node)
-            except (ValueError, TypeError):
-                qty = n_nodes
-            parts.append(f"{qty}x {accel_name}")
-        else:
-            cpu_name = entry.get("host_processor_model_name", "")
-            cpu_per_node = entry.get("host_processors_per_node", 1)
-            if not _is_not_detected(cpu_name):
-                try:
-                    qty = n_nodes * int(cpu_per_node)
-                except (ValueError, TypeError):
-                    qty = n_nodes
-                parts.append(f"{qty}x {cpu_name}")
+        # A node type may host more than one accelerator model, so each model
+        # contributes its own "<qty>x <model>" part rather than the node type
+        # contributing a single one.
+        counted_any = False
+        for accel in _node_accelerators(entry):
+            accel_name = accel.get("accelerator_model_name", "")
+            if _is_not_detected(accel_name):
+                continue
+            per_node = _parse_count(accel.get("accelerators_per_node"))
+            if per_node is None:
+                continue
+            parts.append(f"{node_count * per_node}x {accel_name}")
+            counted_any = True
+
+        if counted_any:
+            continue
+
+        cpu_name = entry.get("host_processor_model_name", "")
+        if not _is_not_detected(cpu_name):
+            per_node = _parse_count(entry.get("host_processors_per_node", 1))
+            parts.append(f"{node_count * (per_node or 1)}x {cpu_name}")
     return " + ".join(parts)
+
+
+# ── Endpoints nested-format helpers (endpoints_rules.md §8.2.1) ─────────
+
+# Accelerator fields, in template order. These are nested one level down,
+# inside each node type's accelerator_info list.
+_ENDPOINTS_ACCELERATOR_FIELDS = [
+    "accelerator_model_name",
+    "accelerators_per_node",
+    "accelerator_memory_capacity",
+    "accelerator_memory_type",
+    "accelerator_interconnect",
+    "accelerator_host_interconnect",
+]
+
+# Node-type fields, in template order. Anything the single-node probe captures
+# that is not listed here (host_processor_frequency, accelerator_frequency,
+# accelerator_interconnect_topology, ...) is not part of §8.2 and is dropped
+# from the endpoints output. It still reaches the inference flat format.
+_ENDPOINTS_NODE_FIELDS = [
+    "system_node_ensemble_id",
+    "number_of_nodes",
+    "host_processor_model_name",
+    "host_processors_per_node",
+    "host_processor_core_count",
+    "host_processor_vcpu_count",
+    "host_memory_capacity",
+    "host_memory_configuration",
+    "accelerator_info",
+    "host_network_card_count",
+    "host_networking",
+    "host_storage_capacity",
+    "host_storage_type",
+    "other_hardware",
+    "cooling",
+    "hw_notes",
+    "inference_backend",
+    "driver",
+    "operating_system",
+    "filesystem",
+    "container_link",
+    "other_software_stack",
+    "sw_notes",
+]
+
+# Fields the template shows as integers.
+_ENDPOINTS_INT_FIELDS = {
+    "system_node_ensemble_id",
+    "number_of_nodes",
+    "host_processors_per_node",
+    "host_processor_core_count",
+    "host_processor_vcpu_count",
+    "accelerators_per_node",
+}
+
+# Run configuration read from serving_config.json, in template order.
+_ENDPOINTS_RUN_CONFIG_FIELDS = [
+    "disaggregated",
+    "expert_parallel",
+    "tensor_parallel",
+    "pipeline_parallel",
+    "data_parallel",
+    "batch",
+]
+
+
+def _node_accelerators(node, logger=None):
+    """Return a node type's accelerators as a list of per-model dicts.
+
+    The single-node probe publishes `accelerators`, one entry per accelerator
+    model, built from the detection script's state. A node probed by an older
+    checkout has only the flat accelerator_* fields, which describe a single
+    model, so fall back to reading those as one entry."""
+    accelerators = node.get("accelerators")
+    if isinstance(accelerators, list):
+        return [a for a in accelerators if isinstance(a, dict)]
+
+    model_name = node.get("accelerator_model_name", "")
+    if _is_not_detected(model_name):
+        return []
+    if logger is not None:
+        logger.warning(
+            "Node '%s' reported no accelerators list — it was probed by an "
+            "older checkout. Only one accelerator model is described; "
+            "re-probe the node if it hosts more than one.",
+            node.get("system_node_name", "?"))
+    return [{field: node.get(field, "")
+             for field in _ENDPOINTS_ACCELERATOR_FIELDS}]
+
+
+def _parse_count(value):
+    """Return value as a positive int, or None when it is not a usable count.
+
+    Counts cannot go through _is_not_detected: that helper rejects any
+    all-digit string, a rule meant for model names."""
+    try:
+        parsed = int(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+    return parsed if parsed > 0 else None
+
+
+def _coerce_int(value):
+    """Return value as an int when it is a plain integer.
+
+    Detection-failure strings ("N/A", "Not detected: ...") are left as they
+    are — they tell the submitter which field still needs filling in, which a
+    zero would hide."""
+    if isinstance(value, bool) or isinstance(value, int):
+        return value
+    text = str(value).strip()
+    if text.lstrip('-').isdigit():
+        return int(text)
+    return value
+
+
+def _build_accelerator_info(node, logger):
+    """Nest a node type's accelerators into accelerator_info, in 8.2 order.
+
+    One entry per accelerator model. A node type with no accelerator gets an
+    empty list."""
+    entries = []
+    for accel in _node_accelerators(node, logger):
+        if _is_not_detected(accel.get("accelerator_model_name", "")):
+            continue
+        entry = {}
+        for field in _ENDPOINTS_ACCELERATOR_FIELDS:
+            value = accel.get(field, "")
+            if value is None:
+                value = ""
+            entry[field] = _coerce_int(
+                value) if field in _ENDPOINTS_INT_FIELDS else value
+        entries.append(entry)
+    return entries
+
+
+def _shape_node_type(node, logger):
+    """Reduce a probed node type to the §8.2 fields, in template order."""
+    shaped = {}
+    for field in _ENDPOINTS_NODE_FIELDS:
+        if field == "accelerator_info":
+            shaped[field] = _build_accelerator_info(node, logger)
+            continue
+        value = node.get(field, "")
+        if value is None:
+            value = ""
+        shaped[field] = _coerce_int(
+            value) if field in _ENDPOINTS_INT_FIELDS else value
+    return shaped
+
+
+def _derive_node_config(node_config):
+    """Summarise the node_config groupings as the node_config description."""
+    if not node_config:
+        return ""
+    parts = []
+    for func_key, func_nodes in node_config.items():
+        group = ", ".join(
+            f"{int(entry.get('no_of_nodes', 1))}x {entry.get('node_name', '')}"
+            for entry in func_nodes if entry.get("node_name", "")
+        )
+        if group:
+            parts.append(f"{func_key}: {group}")
+    return "; ".join(parts)
+
+
+def _build_config_summary(values, notes):
+    """Concatenate the parallelism fields that are set, then the notes (§8.2)."""
+    parts = []
+    if values.get("disaggregated"):
+        parts.append("Disaggregated")
+    for key, label in (("expert_parallel", "EP"), ("pipeline_parallel", "PP"),
+                       ("tensor_parallel", "TP"), ("data_parallel", "DP")):
+        value = values.get(key)
+        if isinstance(value, int) and value > 1:
+            parts.append(f"{label} {value}")
+    if notes:
+        parts.append(notes)
+    return ", ".join(parts)
+
+
+def _load_serving_config(dir_path, logger):
+    """Load serving_config.json if the serving-config probe produced one."""
+    path = os.path.join(dir_path, 'serving_config.json')
+    if not os.path.exists(path):
+        return {}
+    try:
+        with open(path) as f:
+            return json.load(f)
+    except Exception as e:
+        logger.error(f"Failed to read {path}: {e}")
+        return {}
+
+
+def _build_endpoints_output(
+        node_types, system_size, env, node_config, serving_cfg, logger):
+    """Build system_desc_id.json in the shape of endpoints_rules.md §8.2.1.
+
+    Only the fields in the §8.2 table appear here: submitter, model and
+    dataset metadata now live elsewhere in the submission, and the run
+    configuration that used to be written to run_metadata.json is folded in
+    at the top level."""
+    shaped_nodes = [_shape_node_type(nt, logger) for nt in node_types]
+
+    # The data dictionary numbers node types 1..system_node_ensemble_count.
+    # Without a node_config file the ids come from the probe order and start
+    # at 0, so renumber here.
+    for idx, node in enumerate(shaped_nodes, start=1):
+        node["system_node_ensemble_id"] = idx
+
+    ensemble_total = 0
+    for node in shaped_nodes:
+        number_of_nodes = node.get("number_of_nodes", 0)
+        if isinstance(number_of_nodes, int):
+            ensemble_total += number_of_nodes
+
+    output = {
+        "division": env.get("MLC_MLPERF_SUBMISSION_DIVISION", "Insert model division here"),
+        "system_name": env.get("MLC_MLPERF_SYSTEM_NAME", ""),
+        "system_availability_status": env.get("MLC_MLPERF_SUBMISSION_SYSTEM_STATUS", "Insert system availability status here"),
+        "system_category": env.get("MLC_MLPERF_SUBMISSION_SYSTEM_TYPE", "Insert system category here"),
+        "system_size": env.get("MLC_MLPERF_SYSTEM_SIZE", "") or system_size,
+        "system_node_ensemble_count": _coerce_int(
+            env.get("MLC_MLPERF_SYSTEM_NODE_ENSEMBLE_COUNT", "") or len(shaped_nodes)),
+        "system_node_ensemble_total": _coerce_int(
+            env.get("MLC_MLPERF_SYSTEM_NODE_ENSEMBLE_TOTAL", "") or ensemble_total),
+        "endpoint_url": env.get("MLC_MLPERF_ENDPOINT_URL", ""),
+        "serving_framework": env.get("MLC_MLPERF_SERVING_FRAMEWORK", ""),
+        "node_types": shaped_nodes,
+        "node_config": env.get("MLC_MLPERF_NODE_CONFIG", "") or _derive_node_config(node_config),
+    }
+
+    for field in _ENDPOINTS_RUN_CONFIG_FIELDS:
+        value = serving_cfg.get(field)
+        output[field] = 0 if value is None else value
+
+    notes = env.get("MLC_MLPERF_CONFIG_SUMMARY_NOTES", "") or serving_cfg.get(
+        "config_summary_notes", "") or ""
+    # Derived from the values written above rather than copied from the
+    # serving probe, so the summary always agrees with its own fields.
+    output["config_summary"] = _build_config_summary(
+        output, notes) or serving_cfg.get("config_summary", "") or ""
+    output["config_summary_notes"] = notes
+    output["link_config"] = env.get("MLC_MLPERF_LINK_CONFIG", "")
+
+    return output
 
 
 # ── Inference flat-format helpers ───────────────────────────────────────
@@ -408,6 +722,9 @@ _NODE_METADATA_FIELDS = {
     "system_node_ensemble_id",
     "number_of_nodes",
     "system_node_name",
+    # The structured per-model accelerator list. The flat format lifts the
+    # flat accelerator_* fields instead, so this would only be dead weight.
+    "accelerators",
 }
 
 # Extra fields added when the 'network' variation is active alongside 'inference'.
@@ -832,7 +1149,9 @@ def _update_parsed_node_details(
         dir_path,
         f"mlperf-system-info-single-node-{node_id}.json")
     if not os.path.exists(path):
-        logger.warning(f"Single-node info file not found: {path}")
+        # The caller collects these and fails with the full list; this is
+        # only here to show the order things were looked for in.
+        logger.debug(f"Single-node info file not found: {path}")
         return False
     with open(path) as f:
         info = json.load(f)
@@ -971,11 +1290,18 @@ def postprocess(i):
     exclude_current = is_true(env.get('MLC_EXCLUDE_CURRENT_NODE', False))
     remote_node_id_start = 0 if exclude_current else 1
 
+    # A node whose file never arrived is a hole in the system description,
+    # not a smaller one. Collect them all first so one run names every
+    # missing node rather than only the first.
+    missing_node_ids = []
+
     if not exclude_current:
         logger.info("Obtaining system information from the host system")
         if _update_parsed_node_details(
                 0, dir_path, parsed_node_details, node_versions, logger):
             processed_node_ids.append('0')
+        else:
+            missing_node_ids.append(0)
 
     logger.info("Obtaining system information from the remote systems")
     for idx in range(int(env.get('MLC_REMOTE_RUN_SSH_ID_COUNT', 0))):
@@ -983,9 +1309,32 @@ def postprocess(i):
         if _update_parsed_node_details(
                 nid, dir_path, parsed_node_details, node_versions, logger):
             processed_node_ids.append(str(nid))
+        else:
+            missing_node_ids.append(nid)
+
+    if missing_node_ids:
+        expected = ", ".join(
+            os.path.join(dir_path,
+                         f"mlperf-system-info-single-node-{nid}.json")
+            for nid in missing_node_ids)
+        return {'return': 1,
+                'error': "No system information came back from node(s) " +
+                         ", ".join(str(n) for n in missing_node_ids) +
+                         f". Expected: {expected}"}
 
     node_config = _load_node_config(
         env.get("MLC_NODE_CONFIG_FILE", ""), logger)
+
+    # Load the serving probe's output before the output is assembled: the
+    # framework it detects feeds serving_framework, and its parallelism values
+    # feed the run configuration fields.
+    serving_cfg = _load_serving_config(dir_path, logger)
+    if not env.get('MLC_MLPERF_SERVING_FRAMEWORK') and serving_cfg.get(
+            'framework'):
+        env['MLC_MLPERF_SERVING_FRAMEWORK'] = serving_cfg['framework']
+        logger.info(
+            "Detected serving framework from log: %s",
+            serving_cfg['framework'])
 
     if node_config:
         node_types, system_size, errors = _build_node_types_from_yaml(
@@ -1014,9 +1363,9 @@ def postprocess(i):
         node_type.update(node_meta)
         node_type.pop("serving_framework", None)
 
+    # Guaranteed non-empty by preprocess, which rejects a missing
+    # system_name before the first node is contacted.
     user_system_name = env.get("MLC_MLPERF_SYSTEM_NAME", "")
-    if not user_system_name:
-        return {'return': 1, 'error': 'system_name is required. Set it via --system_name, the config file, or MLC_MLPERF_SYSTEM_NAME.'}
 
     output_info = {
         "submitter_org_names": env.get("MLC_MLPERF_SUBMITTER", "Insert your organization name here"),
@@ -1057,6 +1406,11 @@ def postprocess(i):
         if err:
             return {'return': 1, 'error': err}
         logger.info("Using flat training format for system_info.json")
+    else:
+        output_info = _build_endpoints_output(
+            node_types, system_size, env, node_config, serving_cfg, logger)
+        logger.info(
+            "Using nested endpoints format (endpoints_rules.md 8.2.1) for system_info.json")
 
     # Stamp the aggregated output with the git version of the automations repo
     # (the orchestrating node's checkout), plus each node's version so that a
@@ -1068,24 +1422,43 @@ def postprocess(i):
         if version:
             block = {'repo': os.path.basename(repo_path), **version}
             if processed_node_ids:
-                agg_commit = version.get('commit')
+                # Identity is the commit *and* the version. Commit alone
+                # is not enough: a wheel built without git metadata carries
+                # no commit, or the literal 'unknown' that get_commit_hash()
+                # substitutes, so two genuinely different versions compared
+                # equal and were reported as agreeing -- in exactly the
+                # packaged case this stamp exists to protect.
+                def _identity(v):
+                    commit = str(v.get('commit') or '').strip()
+                    if commit.lower() == 'unknown':
+                        commit = ''
+                    return (commit, str(v.get('version') or '').strip())
+
+                def _render(v):
+                    return '@'.join(p for p in _identity(v)
+                                    if p) or 'unreported'
+
+                agg_identity = _identity(version)
                 # Consistent only if every processed node reported a version
-                # AND all of them match the aggregator's commit. A node that
-                # produced a file but no version block (e.g. its mlcflow lacked
-                # the helper) counts as not-confirmed -> not consistent.
+                # AND all of them match the aggregator. A node that produced a
+                # file but no version block (e.g. its mlcflow lacked the
+                # helper) counts as not-confirmed -> not consistent.
                 all_reported = all(
                     nid in node_versions for nid in processed_node_ids)
-                commits_match = all(
-                    nv.get('commit') == agg_commit
+                identities_match = all(
+                    _identity(nv) == agg_identity
                     for nv in node_versions.values())
-                block['consistent'] = bool(all_reported and commits_match)
+                # Nothing to compare on is not the same as agreement.
+                identifiable = any(agg_identity)
+                block['consistent'] = bool(
+                    all_reported and identities_match and identifiable)
                 block['nodes'] = node_versions
                 if not block['consistent']:
-                    detail = {nid: node_versions.get(nid, {}).get(
-                        'commit', 'unknown') for nid in processed_node_ids}
+                    detail = {nid: _render(node_versions.get(nid, {}))
+                              for nid in processed_node_ids}
                     logger.warning(
                         "mlc-scripts version differs across nodes: "
-                        "aggregator=%s nodes=%s", agg_commit, detail)
+                        "aggregator=%s nodes=%s", _render(version), detail)
             output_info['mlc_scripts_version'] = block
     except Exception as e:
         logger.warning(f"Could not add version info: {e}")
