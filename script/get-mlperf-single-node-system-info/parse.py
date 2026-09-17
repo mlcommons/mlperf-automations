@@ -226,15 +226,46 @@ def format_memory_capacity(value):
     return f"{math.ceil(value_bytes)}GiB"
 
 
-# Accelerator field ← per-device property key published by the detection
-# scripts. CUDA, ROCm and XPU all use these same record keys.
+# Accelerator field ← the per-device property keys published by the detection
+# scripts. The three backends do not agree on these names: CUDA writes "Global
+# memory", "GPU interconnect" and "Host interconnect", while ROCm writes
+# "Global memory in GiB" and ROCm and XPU both write "GPU Interconnect Type"
+# and "Host Interconnect Type". Every field therefore lists each name it is
+# known by, and the lookup below is case-insensitive, so a backend differing
+# only in capitalisation needs no entry of its own. The flat field set has
+# carried a per-backend candidate list for these same fields all along (see
+# FIELD_RULES above); this is the nested equivalent.
 _ACCELERATOR_FIELD_FROM_PROP = [
-    ("accelerator_model_name", "GPU Name"),
-    ("accelerator_memory_capacity", "Global memory"),
-    ("accelerator_memory_type", "Memory Type"),
-    ("accelerator_interconnect", "GPU interconnect"),
-    ("accelerator_host_interconnect", "Host interconnect"),
+    ("accelerator_model_name", ("GPU Name",)),
+    ("accelerator_memory_capacity", ("Global memory", "Global memory in GiB")),
+    ("accelerator_memory_type", ("Memory Type",)),
+    ("accelerator_interconnect", ("GPU interconnect", "GPU Interconnect Type")),
+    ("accelerator_host_interconnect",
+     ("Host interconnect", "Host Interconnect Type")),
 ]
+
+
+def device_prop(device, prop_keys):
+    """First non-empty value among prop_keys, matched case-insensitively."""
+    by_lowered_key = {str(k).strip().lower(): v for k, v in device.items()}
+    for prop_key in prop_keys:
+        value = str(by_lowered_key.get(
+            prop_key.strip().lower(), "") or "").strip()
+        if value:
+            return value
+    return ""
+
+
+def format_host_interconnect(value):
+    """Normalise a host interconnect to the form the env vars already carry.
+
+    ROCm and XPU report the PCIe link on its own ("Gen 4", "4.0 x16") and the
+    detection scripts prefix "PCIe " when they publish
+    MLC_*_DEVICE_PROP_HOST_INTERCONNECT_TYPE, which is what the flat field set
+    reads. Do the same here so both shapes describe one link identically."""
+    if value and value != "N/A" and not value.startswith("PCIe"):
+        return f"PCIe {value}"
+    return value
 
 
 def build_accelerators(device_props_path):
@@ -262,7 +293,7 @@ def build_accelerators(device_props_path):
     for device in devices:
         if not isinstance(device, dict):
             continue
-        model_name = str(device.get("GPU Name", "")).strip()
+        model_name = device_prop(device, ("GPU Name",))
         if not model_name:
             continue
         if model_name not in first_seen:
@@ -276,12 +307,14 @@ def build_accelerators(device_props_path):
         device = first_seen[model_name]
         entry = {"accelerator_model_name": model_name,
                  "accelerators_per_node": counts[model_name]}
-        for field, prop_key in _ACCELERATOR_FIELD_FROM_PROP:
+        for field, prop_keys in _ACCELERATOR_FIELD_FROM_PROP:
             if field == "accelerator_model_name":
                 continue
-            value = str(device.get(prop_key, "") or "").strip()
+            value = device_prop(device, prop_keys)
             if field == "accelerator_memory_capacity":
                 value = format_memory_capacity(value)
+            elif field == "accelerator_host_interconnect":
+                value = format_host_interconnect(value)
             entry[field] = value or "N/A"
         accelerators.append(entry)
     return accelerators
@@ -304,6 +337,26 @@ def _pip_version(package):
     return None
 
 
+def detect_rocm_version():
+    """ROCm version as major.minor, or "" when no ROCm device was detected.
+
+    get-rocm-devices publishes no MLC_ROCM_DEVICE_PROP_ROCM_VERSION; what it
+    publishes is the HIP runtime version, which is why reading that name
+    reported ROCm as undetected on every AMD host. The value is the packed
+    integer hipRuntimeGetVersion returns -- major * 10^7 + minor * 10^5 +
+    patch -- so 70226015 is ROCm 7.2. MLC_ROCM_VERSION wins when another
+    script has already put a plain version string there."""
+    version = os.environ.get("MLC_ROCM_VERSION", "").strip()
+    if version:
+        return version
+    packed = (os.environ.get("MLC_ROCM_DEVICE_PROP_ROCM_RUNTIME_VERSION", "").strip()
+              or os.environ.get("MLC_ROCM_DEVICE_PROP_ROCM_DRIVER_VERSION", "").strip())
+    if not packed.isdigit():
+        return packed
+    value = int(packed)
+    return f"{value // 10 ** 7}.{(value // 10 ** 5) % 100}"
+
+
 def detect_inference_backend():
     """Build inference backend string from CUDA/ROCm + cuDNN versions."""
     parts = []
@@ -313,8 +366,7 @@ def detect_inference_backend():
     if cuda_runtime:
         parts.append(f"CUDA {cuda_runtime}")
 
-    rocm_version = (os.environ.get("MLC_ROCM_VERSION", "")
-                    or os.environ.get("MLC_ROCM_DEVICE_PROP_ROCM_VERSION", ""))
+    rocm_version = detect_rocm_version()
     if rocm_version:
         parts.append(f"ROCm {rocm_version}")
 
