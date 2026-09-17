@@ -1,4 +1,4 @@
-# README for generate-infograph
+# README for generate-infragraph
 This README is automatically generated. Edit [info.md](info.md) to add custom contents. Please follow the [script execution document](https://docs.mlcommons.org/mlcflow/targets/script/execution-flow/) to understand more about the MLC script execution.
 
 `mlcflow` stores all local data under `$HOME/MLC` by default. So, if there is space constraint on the home directory and you have more space on say `/mnt/$USER`, you can do
@@ -33,7 +33,7 @@ mlc pull repo mlcommons@mlperf-automations --pat=<Your Private Access Token>
 ## Run Commands
 
 ```bash
-mlcr generate,infograph,infragraph
+mlcr generate,infragraph,infragraph
 ```
 
 ### Script Inputs

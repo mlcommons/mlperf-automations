@@ -125,7 +125,7 @@ def _files_to_copy_back(node_id, collect_lstopo):
     get-mlperf-single-node-system-info's preprocess() -- so its remote name is
     predictable from the node id alone. A node running an older copy of the
     automations repo will not produce it; rsync logs that miss and the run
-    continues, and generate-infograph simply omits that node from the graph.
+    continues, and generate-infragraph simply omits that node from the graph.
     """
     stem = f"{_REMOTE_SINGLE_NODE_DIR}/mlperf-system-info-single-node-{node_id}"
     files = [f"{stem}.json"]

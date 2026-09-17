@@ -1,4 +1,4 @@
-# generate-infograph
+# generate-infragraph
 
 Builds an [infragraph](https://pypi.org/project/infragraph/) infrastructure
 graph from a directory of per-node system-info captures, and renders an
@@ -44,19 +44,19 @@ processor or accelerator attributes, and a warning says so.
 ## Usage
 
 ```bash
-mlcr generate,infograph --input_dir=/tmp/sysinfo --graph_name=my-cluster
+mlcr generate,infragraph --input_dir=/tmp/sysinfo --graph_name=my-cluster
 ```
 
 Rebuild the graph but skip the HTML bundle:
 
 ```bash
-mlcr generate,infograph,_no_visualize --input_dir=/tmp/sysinfo
+mlcr generate,infragraph,_no_visualize --input_dir=/tmp/sysinfo
 ```
 
 Write the graph somewhere other than next to the inputs:
 
 ```bash
-mlcr generate,infograph \
+mlcr generate,infragraph \
   --input_dir=/tmp/sysinfo \
   --out_dir_path=/tmp/graph \
   --out_file_name=cluster.json

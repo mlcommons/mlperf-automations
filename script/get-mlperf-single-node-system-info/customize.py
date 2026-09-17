@@ -24,7 +24,7 @@ def preprocess(i):
     # topology beside the sysinfo JSON, sharing its stem:
     #   mlperf-system-info-single-node-3.json
     #   mlperf-system-info-single-node-3.lstopo.xml
-    # The shared stem is the contract generate-infograph pairs on, and it is
+    # The shared stem is the contract generate-infragraph pairs on, and it is
     # what lets get-mlperf-multi-node-system-info predict the remote filename
     # it has to copy back without a second round trip. Both keys are set only
     # when the capture is enabled, so a plain run exports nothing about a
