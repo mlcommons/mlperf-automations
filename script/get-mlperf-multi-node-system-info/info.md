@@ -366,7 +366,7 @@ Specify one of `_cuda`, `_rocm`, `_xpu`, or `_tpu` to match your hardware. If no
 
 `_infragraph` adds a topology layer on top of the sysinfo collection. Each node
 captures its own hwloc topology while it is already being probed — no second SSH
-pass — and once every node has reported in, [`generate-infograph`](../generate-infograph/README.md)
+pass — and once every node has reported in, [`generate-infragraph`](../generate-infragraph/README.md)
 runs as a `post_dep` and merges the lot into one
 [infragraph](https://pypi.org/project/infragraph/) infrastructure graph,
 annotated with each node's processor and accelerator details.
