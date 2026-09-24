@@ -68,3 +68,4 @@ mlcr submit,mlperf,results,mlperf-results,publish-results,submission
 
 - `wg-automotive`
 - `wg-inference`
+- `wg-training`
