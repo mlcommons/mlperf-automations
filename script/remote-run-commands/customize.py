@@ -137,6 +137,20 @@ def preprocess(i):
     else:
         ssh_run_command = f"{ssh_prefix}{ssh_cmd_str} {user}@{host} {safe_cmd_string}"
 
+    # convert_env_to_script serializes env as export KEY="VALUE" (double
+    # quotes) and run.sh sources it before `eval`, so an unescaped $VAR,
+    # `cmd` or backslash in MLC_SSH_CMD is expanded/interpreted on the LOCAL
+    # orchestrator instead of the remote. Escape them (Windows uses %VAR% /
+    # run.bat and is unaffected) so the command reaches the remote verbatim
+    # -- e.g. a user's `export PATH=$PATH:...` expands the remote's PATH.
+    if not is_windows:
+        ssh_run_command = (
+            ssh_run_command
+            .replace('\\', '\\\\')
+            .replace('$', '\\$')
+            .replace('`', '\\`')
+        )
+
     env['MLC_SSH_CMD'] = ssh_run_command
 
     # ---- Use sshpass if password is provided (only on Unix-like systems) ----
