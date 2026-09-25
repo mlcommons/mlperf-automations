@@ -51,6 +51,13 @@ deps:
   skip_if_env:
     MLC_HOST_OS_TYPE:
     - windows
+- tags: get,tpu-devices
+  enable_if_env:
+    MLC_ACCELERATOR_BACKEND:
+    - tpu
+  skip_if_env:
+    MLC_HOST_OS_TYPE:
+    - windows
 - tags: detect,sudo
 - tags: get,python
   names:
@@ -78,3 +85,7 @@ variations:
     group: accelerator-backend
     env:
       MLC_ACCELERATOR_BACKEND: xpu
+  tpu:
+    group: accelerator-backend
+    env:
+      MLC_ACCELERATOR_BACKEND: tpu
