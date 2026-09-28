@@ -17,6 +17,13 @@ cache: true
 new_env_keys:
 - MLC_DATASET_*
 
+# Input mapping
+input_mapping:
+  download_parallelism: MLC_DOWNLOAD_PARALLELISM
+input_description:
+  download_parallelism:
+    desc: Number of files the MLCommons R2 downloader fetches concurrently. Only used with the r2-downloader download tool; when unset the downloader picks the value itself based on the number of files.
+
 # Dependencies
 prehook_deps:
 - env:
@@ -36,7 +43,7 @@ prehook_deps:
 variations:
   calibration:
     group: dataset-type
-    adr:
+    ad:
       download-file-mixtral-dataset:
         extra_cache_tags: mixtral,get-mixtral-dataset,calibration
     env:
@@ -45,7 +52,7 @@ variations:
   validation:
     default: true
     group: dataset-type
-    adr:
+    ad:
       download-file-mixtral-dataset:
         extra_cache_tags: mixtral,get-mixtral-dataset,validation
     env:
@@ -60,14 +67,14 @@ variations:
   r2-downloader:
     group: download-tool
     default: true
-    adr:
+    ad:
       download-file-mixtral-dataset:
         tags: _r2-downloader
     env:
       MLC_DOWNLOAD_TOOL: r2-downloader
   rclone:
     group: download-tool
-    adr:
+    ad:
       download-file-mixtral-dataset:
         tags: _rclone
     env:
@@ -75,7 +82,7 @@ variations:
       MLC_RCLONE_COPY_USING: copyurl
   wget:
     group: download-tool
-    adr:
+    ad:
       download-file-mixtral-dataset:
         tags: _wget
     env:

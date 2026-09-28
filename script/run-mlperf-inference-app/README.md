@@ -56,6 +56,7 @@ mlcr run-mlperf,inference
 | `--power` | Measure power | ['yes', 'no'] | `no` |
 | `--adr.mlperf-power-client.power_server` | MLPerf Power server IP address |  | `192.168.0.15` |
 | `--adr.mlperf-power-client.port` | MLPerf Power server port |  | `4950` |
+| `--download_parallelism` | Number of files the MLCommons R2 downloader fetches concurrently. Only used with the r2-downloader download tool; when unset the downloader picks the value itself based on the number of files. |  | `` |
 | `--r2_client_id` | Cloudflare Access service-account client ID. Sets CF_ACCESS_CLIENT_ID for the r2-downloader; only used together with --use_service_account. Prefer exporting the variable instead of passing it on the command line. |  | `` |
 | `--r2_client_secret` | Cloudflare Access service-account client secret. Sets CF_ACCESS_CLIENT_SECRET for the r2-downloader; only used together with --use_service_account. Prefer exporting the variable instead of passing it on the command line. |  | `` |
 | `--results_dir` | Alias for output_dir |  | `` |

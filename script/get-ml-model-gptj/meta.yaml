@@ -28,8 +28,12 @@ new_env_keys:
 # Input mapping
 input_mapping:
   checkpoint: GPTJ_CHECKPOINT_PATH
+  download_parallelism: MLC_DOWNLOAD_PARALLELISM
   download_path: MLC_DOWNLOAD_PATH
   to: MLC_DOWNLOAD_PATH
+input_description:
+  download_parallelism:
+    desc: Number of files the MLCommons R2 downloader fetches concurrently. Only used with the r2-downloader download tool; when unset the downloader picks the value itself based on the number of files.
 
 # Dependencies
 prehook_deps:
@@ -129,14 +133,14 @@ variations:
       MLC_ML_MODEL_PRECISION: uint8
       MLC_ML_MODEL_WEIGHT_DATA_TYPES: uint8
     group: precision
-  tp-size.#:
-    env:
-      MLC_NVIDIA_TP_SIZE: '#'
-    group: tp-size
   dry-run:
     group: run-mode
     env:
       MLC_DOWNLOAD_MODE: dry
+  tp-size.#:
+    env:
+      MLC_NVIDIA_TP_SIZE: '#'
+    group: tp-size
   batch_size.#:
     env:
       MLC_ML_MODEL_BATCH_SIZE: '#'

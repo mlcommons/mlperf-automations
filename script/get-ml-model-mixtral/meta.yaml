@@ -27,6 +27,10 @@ new_env_keys:
 # Input mapping
 input_mapping:
   checkpoint: MIXTRAL_CHECKPOINT_PATH
+  download_parallelism: MLC_DOWNLOAD_PARALLELISM
+input_description:
+  download_parallelism:
+    desc: Number of files the MLCommons R2 downloader fetches concurrently. Only used with the r2-downloader download tool; when unset the downloader picks the value itself based on the number of files.
 
 # Dependencies
 prehook_deps:

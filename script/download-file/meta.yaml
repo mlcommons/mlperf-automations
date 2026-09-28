@@ -28,6 +28,7 @@ new_state_keys: []
 
 # Input mapping
 input_mapping:
+  download_parallelism: MLC_DOWNLOAD_PARALLELISM
   download_path: MLC_DOWNLOAD_PATH
   from: MLC_DOWNLOAD_LOCAL_FILE_PATH
   local_path: MLC_DOWNLOAD_LOCAL_FILE_PATH
@@ -39,6 +40,8 @@ input_mapping:
   url: MLC_DOWNLOAD_URL
   use_service_account: MLC_AUTH_USING_SERVICE_ACCOUNT
 input_description:
+  download_parallelism:
+    desc: Number of files the MLCommons R2 downloader fetches concurrently. Only used with the r2-downloader download tool; when unset the downloader picks the value itself based on the number of files.
   r2_client_id:
     desc: Cloudflare Access service-account client ID. Sets CF_ACCESS_CLIENT_ID for the r2-downloader; only used together with --use_service_account. Prefer exporting the variable instead of passing it on the command line.
   r2_client_secret:
