@@ -79,7 +79,7 @@ EXTRACT_RULES = {
     },
     "accelerator_memory_type": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_MEMORY_TYPE", "MLC_XPU_DEVICE_PROP_MEMORY_TYPE", "MLC_TPU_DEVICE_PROP_MEMORY_TYPE"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_MEMORY_TYPE", "MLC_ROCM_DEVICE_PROP_MEMORY_TYPE", "MLC_XPU_DEVICE_PROP_MEMORY_TYPE", "MLC_TPU_DEVICE_PROP_MEMORY_TYPE"],
     },
     "accelerator_interconnect": {
         "source": "env",
@@ -211,6 +211,22 @@ def _pip_version(package):
     return None
 
 
+def _rocm_runtime_version():
+    """ROCm major.minor from get-rocm-devices' HIP runtime version.
+
+    hipRuntimeGetVersion() encodes the version as
+    major * 10000000 + minor * 100000 + build (e.g. 70226015 for 7.2), which
+    is what current get-rocm-devices exports. A value that is already dotted
+    is passed through as is.
+    """
+    raw = os.environ.get(
+        "MLC_ROCM_DEVICE_PROP_ROCM_RUNTIME_VERSION", "").strip()
+    if not raw.isdigit() or int(raw) < 10000000:
+        return raw
+    encoded = int(raw)
+    return f"{encoded // 10000000}.{encoded // 100000 % 100}"
+
+
 def detect_inference_backend():
     """Build inference backend string from CUDA/ROCm + cuDNN versions."""
     parts = []
@@ -221,7 +237,8 @@ def detect_inference_backend():
         parts.append(f"CUDA {cuda_runtime}")
 
     rocm_version = (os.environ.get("MLC_ROCM_VERSION", "")
-                    or os.environ.get("MLC_ROCM_DEVICE_PROP_ROCM_VERSION", ""))
+                    or os.environ.get("MLC_ROCM_DEVICE_PROP_ROCM_VERSION", "")
+                    or _rocm_runtime_version())
     if rocm_version:
         parts.append(f"ROCm {rocm_version}")
 
@@ -242,10 +259,11 @@ def detect_inference_backend():
 
 # Per-backend (capacity, memory type) env keys for
 # accelerator_memory_configuration. Capacity is bytes (CUDA) or GiB (ROCm,
-# XPU, TPU); ROCm reports no memory type.
+# XPU, TPU).
 _ACCELERATOR_MEMORY_KEYS = [
     ("MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "MLC_CUDA_DEVICE_PROP_MEMORY_TYPE"),
-    ("MLC_ROCM_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB", None),
+    ("MLC_ROCM_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB",
+     "MLC_ROCM_DEVICE_PROP_MEMORY_TYPE"),
     ("MLC_XPU_DEVICE_PROP_GLOBAL_MEMORY", "MLC_XPU_DEVICE_PROP_MEMORY_TYPE"),
     ("MLC_TPU_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB", "MLC_TPU_DEVICE_PROP_MEMORY_TYPE"),
 ]
