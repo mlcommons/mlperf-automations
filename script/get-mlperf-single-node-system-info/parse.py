@@ -66,28 +66,28 @@ EXTRACT_RULES = {
     # ---------------- Accelerator ----------------
     "accelerator_model_name": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_NAME", "MLC_ROCM_DEVICE_PROP_GPU_NAME", "MLC_XPU_DEVICE_PROP_GPU_NAME"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_NAME", "MLC_ROCM_DEVICE_PROP_GPU_NAME", "MLC_XPU_DEVICE_PROP_GPU_NAME", "MLC_TPU_DEVICE_PROP_GPU_NAME"],
     },
     "accelerators_per_node": {
         "source": "env",
-        "candidates": ["MLC_CUDA_NUM_DEVICES", "MLC_ROCM_NUM_DEVICES", "MLC_XPU_NUM_DEVICES"],
+        "candidates": ["MLC_CUDA_NUM_DEVICES", "MLC_ROCM_NUM_DEVICES", "MLC_XPU_NUM_DEVICES", "MLC_TPU_NUM_DEVICES"],
     },
     "accelerator_memory_capacity": {
         "source": "env",
         # Get the value as decimal gigabytes
-        "candidates": ["MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "MLC_ROCM_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB", "MLC_XPU_DEVICE_PROP_GLOBAL_MEMORY"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "MLC_ROCM_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB", "MLC_XPU_DEVICE_PROP_GLOBAL_MEMORY", "MLC_TPU_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB"],
     },
     "accelerator_memory_type": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_MEMORY_TYPE", "MLC_XPU_DEVICE_PROP_MEMORY_TYPE"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_MEMORY_TYPE", "MLC_XPU_DEVICE_PROP_MEMORY_TYPE", "MLC_TPU_DEVICE_PROP_MEMORY_TYPE"],
     },
     "accelerator_interconnect": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_INTERCONNECT_TYPE", "MLC_ROCM_DEVICE_PROP_GPU_INTERCONNECT_TYPE", "MLC_XPU_DEVICE_PROP_GPU_INTERCONNECT_TYPE"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_INTERCONNECT_TYPE", "MLC_ROCM_DEVICE_PROP_GPU_INTERCONNECT_TYPE", "MLC_XPU_DEVICE_PROP_GPU_INTERCONNECT_TYPE", "MLC_TPU_DEVICE_PROP_GPU_INTERCONNECT_TYPE"],
     },
     "accelerator_host_interconnect": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_ROCM_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_XPU_DEVICE_PROP_HOST_INTERCONNECT_TYPE"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_ROCM_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_XPU_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_TPU_DEVICE_PROP_HOST_INTERCONNECT_TYPE"],
     },
     "accelerator_frequency": {
         "source": "env",
@@ -103,7 +103,7 @@ EXTRACT_RULES = {
     },
     "accelerator_interconnect_topology": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_TOPOLOGY_DESC"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_TOPOLOGY_DESC", "MLC_TPU_DEVICE_PROP_GPU_TOPOLOGY_DESC"],
         "optional": True,
     },
 
@@ -225,6 +225,10 @@ def detect_inference_backend():
     if rocm_version:
         parts.append(f"ROCm {rocm_version}")
 
+    libtpu_version = os.environ.get("MLC_TPU_DEVICE_PROP_LIBTPU_VERSION", "")
+    if libtpu_version:
+        parts.append(f"libtpu {libtpu_version}")
+
     cudnn_version = None
     for pkg in ("nvidia-cudnn-cu12", "nvidia-cudnn-cu11", "cudnn"):
         cudnn_version = _pip_version(pkg)
@@ -248,7 +252,7 @@ def extract_value(rule, field_key):
         try:
             if field_key == "inference_backend":
                 v = detect_inference_backend()
-                return v if v else "Not detected: CUDA/ROCm/XPU runtime not found"
+                return v if v else "Not detected: CUDA/ROCm/XPU/TPU runtime not found"
             elif field_key == "other_software_stack":
                 stack_parts = []
                 backend = detect_inference_backend()

@@ -138,6 +138,13 @@ variations:
         tags: _rocm
     env:
       MLC_ACCELERATOR_BACKEND: rocm
+  tpu:
+    group: accelerator-backend
+    adr:
+      mlperf-single-node-system-info:
+        tags: _tpu
+    env:
+      MLC_ACCELERATOR_BACKEND: tpu
   xpu:
     group: accelerator-backend
     adr:
