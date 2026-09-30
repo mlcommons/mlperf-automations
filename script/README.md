@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-09-09 00:08:38*
+*Last updated: 2026-10-01 04:48:54*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -722,42 +722,360 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## HPC Application
 
+- **[app-abinit](app-abinit/)**
+  - app-abinit
+  - Tags: `app`, `abinit`, `hpc`
+- **[app-alphafold](app-alphafold/)**
+  - app-alphafold
+  - Tags: `app`, `alphafold`, `hpc`
+- **[app-amber](app-amber/)**
+  - app-amber
+  - Tags: `app`, `amber`, `hpc`
+- **[app-ansys-fluent](app-ansys-fluent/)**
+  - app-ansys-fluent
+  - Tags: `app`, `ansys-fluent`, `hpc`
+- **[app-arepo](app-arepo/)**
+  - app-arepo
+  - Tags: `app`, `arepo`, `hpc`
+- **[app-athena](app-athena/)**
+  - app-athena
+  - Tags: `app`, `athena`, `athena++`, `hpc`
+- **[app-berkeleygw](app-berkeleygw/)**
+  - app-berkeleygw
+  - Tags: `app`, `berkeleygw`, `hpc`
+- **[app-bigdft](app-bigdft/)**
+  - app-bigdft
+  - Tags: `app`, `bigdft`, `hpc`
+- **[app-blast](app-blast/)**
+  - app-blast
+  - Tags: `app`, `blast`, `blast-plus`, `hpc`
+- **[app-bout](app-bout/)**
+  - app-bout
+  - Tags: `app`, `bout`, `hpc`
+- **[app-bwa-mem2](app-bwa-mem2/)**
+  - app-bwa-mem2
+  - Tags: `app`, `bwa-mem2`, `bwa`, `hpc`
+- **[app-calculix](app-calculix/)**
+  - app-calculix
+  - Tags: `app`, `calculix`, `hpc`
+- **[app-cantera](app-cantera/)**
+  - app-cantera
+  - Tags: `app`, `cantera`, `hpc`
+- **[app-castep](app-castep/)**
+  - app-castep
+  - Tags: `app`, `castep`, `hpc`
+- **[app-castro](app-castro/)**
+  - app-castro
+  - Tags: `app`, `castro`, `hpc`
+- **[app-cesm](app-cesm/)**
+  - app-cesm
+  - Tags: `app`, `cesm`, `hpc`
+- **[app-charmm](app-charmm/)**
+  - app-charmm
+  - Tags: `app`, `charmm`, `hpc`
+- **[app-chroma](app-chroma/)**
+  - app-chroma
+  - Tags: `app`, `chroma`, `hpc`
 - **[app-cloverleaf](app-cloverleaf/)**
   - app-cloverleaf
   - Tags: `app`, `cloverleaf`, `hpc`
+- **[app-code-aster](app-code-aster/)**
+  - app-code-aster
+  - Tags: `app`, `code-aster`, `hpc`
+- **[app-code-saturne](app-code-saturne/)**
+  - app-code-saturne
+  - Tags: `app`, `code-saturne`, `hpc`
 - **[app-cp2k](app-cp2k/)**
   - app-cp2k
   - Tags: `app`, `cp2k`
+- **[app-dalton](app-dalton/)**
+  - app-dalton
+  - Tags: `app`, `dalton`, `hpc`
+- **[app-dftbplus](app-dftbplus/)**
+  - app-dftbplus
+  - Tags: `app`, `dftbplus`, `hpc`
+- **[app-dirac](app-dirac/)**
+  - app-dirac
+  - Tags: `app`, `dirac`, `hpc`
+- **[app-dl-poly](app-dl-poly/)**
+  - app-dl-poly
+  - Tags: `app`, `dl-poly`, `hpc`
+- **[app-dolfinx](app-dolfinx/)**
+  - app-dolfinx
+  - Tags: `app`, `dolfinx`, `hpc`
+- **[app-e3sm](app-e3sm/)**
+  - app-e3sm
+  - Tags: `app`, `e3sm`, `hpc`
+- **[app-elmer](app-elmer/)**
+  - app-elmer
+  - Tags: `app`, `elmer`, `hpc`
+- **[app-enzo](app-enzo/)**
+  - app-enzo
+  - Tags: `app`, `enzo`, `hpc`
+- **[app-epoch](app-epoch/)**
+  - app-epoch
+  - Tags: `app`, `epoch`, `hpc`
+- **[app-exciting](app-exciting/)**
+  - app-exciting
+  - Tags: `app`, `exciting`, `hpc`
+- **[app-fhi-aims](app-fhi-aims/)**
+  - app-fhi-aims
+  - Tags: `app`, `fhi-aims`, `hpc`
+- **[app-flash](app-flash/)**
+  - app-flash
+  - Tags: `app`, `flash`, `hpc`
+- **[app-fleur](app-fleur/)**
+  - app-fleur
+  - Tags: `app`, `fleur`, `hpc`
+- **[app-freefem](app-freefem/)**
+  - app-freefem
+  - Tags: `app`, `freefem`, `hpc`
+- **[app-fun3d](app-fun3d/)**
+  - app-fun3d
+  - Tags: `app`, `fun3d`, `hpc`
+- **[app-fv3](app-fv3/)**
+  - app-fv3
+  - Tags: `app`, `fv3`, `hpc`
+- **[app-gadget4](app-gadget4/)**
+  - app-gadget4
+  - Tags: `app`, `gadget4`, `gadget`, `hpc`
+- **[app-gamer](app-gamer/)**
+  - app-gamer
+  - Tags: `app`, `gamer`, `hpc`
+- **[app-gamess](app-gamess/)**
+  - app-gamess
+  - Tags: `app`, `gamess`, `hpc`
+- **[app-gatk](app-gatk/)**
+  - app-gatk
+  - Tags: `app`, `gatk`, `hpc`
+- **[app-gaussian](app-gaussian/)**
+  - app-gaussian
+  - Tags: `app`, `gaussian`, `hpc`
+- **[app-geant4](app-geant4/)**
+  - app-geant4
+  - Tags: `app`, `geant4`, `hpc`
+- **[app-gene](app-gene/)**
+  - app-gene
+  - Tags: `app`, `gene`, `hpc`
+- **[app-genesis](app-genesis/)**
+  - app-genesis
+  - Tags: `app`, `genesis`, `hpc`
+- **[app-gizmo](app-gizmo/)**
+  - app-gizmo
+  - Tags: `app`, `gizmo`, `hpc`
+- **[app-gpaw](app-gpaw/)**
+  - app-gpaw
+  - Tags: `app`, `gpaw`, `hpc`
+- **[app-grid](app-grid/)**
+  - app-grid
+  - Tags: `app`, `grid`, `hpc`
 - **[app-gromacs](app-gromacs/)**
   - app-gromacs
   - Tags: `app`, `gromacs`, `hpc`
+- **[app-gs2](app-gs2/)**
+  - app-gs2
+  - Tags: `app`, `gs2`, `hpc`
+- **[app-gtc](app-gtc/)**
+  - app-gtc
+  - Tags: `app`, `gtc`, `hpc`
 - **[app-hmmer](app-hmmer/)**
   - app-hmmer
   - Tags: `app`, `hmmer`, `hpc`
+- **[app-hoomd-blue](app-hoomd-blue/)**
+  - app-hoomd-blue
+  - Tags: `app`, `hoomd-blue`, `hpc`
+- **[app-hycom](app-hycom/)**
+  - app-hycom
+  - Tags: `app`, `hycom`, `hpc`
+- **[app-icon](app-icon/)**
+  - app-icon
+  - Tags: `app`, `icon`, `hpc`
+- **[app-kratos](app-kratos/)**
+  - app-kratos
+  - Tags: `app`, `kratos`, `hpc`
 - **[app-lammps](app-lammps/)**
   - app-lammps
   - Tags: `app`, `lammps`, `hpc`
+- **[app-ls-dyna](app-ls-dyna/)**
+  - app-ls-dyna
+  - Tags: `app`, `ls-dyna`, `hpc`
+- **[app-madgraph](app-madgraph/)**
+  - app-madgraph
+  - Tags: `app`, `madgraph`, `hpc`
+- **[app-mesa](app-mesa/)**
+  - app-mesa
+  - Tags: `app`, `mesa`, `hpc`
+- **[app-mfem](app-mfem/)**
+  - app-mfem
+  - Tags: `app`, `mfem`, `hpc`
+- **[app-milc](app-milc/)**
+  - app-milc
+  - Tags: `app`, `milc`, `hpc`
+- **[app-minimap2](app-minimap2/)**
+  - app-minimap2
+  - Tags: `app`, `minimap2`, `hpc`
+- **[app-mitgcm](app-mitgcm/)**
+  - app-mitgcm
+  - Tags: `app`, `mitgcm`, `hpc`
+- **[app-mom6](app-mom6/)**
+  - app-mom6
+  - Tags: `app`, `mom6`, `hpc`
+- **[app-moose](app-moose/)**
+  - app-moose
+  - Tags: `app`, `moose`, `hpc`
+- **[app-mpas](app-mpas/)**
+  - app-mpas
+  - Tags: `app`, `mpas`, `hpc`
+- **[app-nalu-wind](app-nalu-wind/)**
+  - app-nalu-wind
+  - Tags: `app`, `nalu-wind`, `hpc`
 - **[app-namd](app-namd/)**
   - app-namd
   - Tags: `app`, `namd`, `hpc`
+- **[app-nek5000](app-nek5000/)**
+  - app-nek5000
+  - Tags: `app`, `nek5000`, `nek`, `hpc`
+- **[app-nektar](app-nektar/)**
+  - app-nektar
+  - Tags: `app`, `nektar`, `hpc`
+- **[app-nemo](app-nemo/)**
+  - app-nemo
+  - Tags: `app`, `nemo`, `hpc`
 - **[app-nwchem](app-nwchem/)**
   - app-nwchem
   - Tags: `app`, `nwchem`, `hpc`
+- **[app-nyx](app-nyx/)**
+  - app-nyx
+  - Tags: `app`, `nyx`, `hpc`
+- **[app-octopus](app-octopus/)**
+  - app-octopus
+  - Tags: `app`, `octopus`, `hpc`
 - **[app-openfoam](app-openfoam/)**
   - app-openfoam
   - Tags: `app`, `openfoam`, `hpc`
+- **[app-openmc](app-openmc/)**
+  - app-openmc
+  - Tags: `app`, `openmc`, `hpc`
+- **[app-openmm](app-openmm/)**
+  - app-openmm
+  - Tags: `app`, `openmm`, `hpc`
+- **[app-openmolcas](app-openmolcas/)**
+  - app-openmolcas
+  - Tags: `app`, `openmolcas`, `hpc`
+- **[app-openqcd](app-openqcd/)**
+  - app-openqcd
+  - Tags: `app`, `openqcd`, `hpc`
+- **[app-orca](app-orca/)**
+  - app-orca
+  - Tags: `app`, `orca`, `hpc`
+- **[app-palabos](app-palabos/)**
+  - app-palabos
+  - Tags: `app`, `palabos`, `hpc`
+- **[app-pelec](app-pelec/)**
+  - app-pelec
+  - Tags: `app`, `pelec`, `hpc`
+- **[app-pelelmex](app-pelelmex/)**
+  - app-pelelmex
+  - Tags: `app`, `pelelmex`, `hpc`
+- **[app-pencil-code](app-pencil-code/)**
+  - app-pencil-code
+  - Tags: `app`, `pencil-code`, `hpc`
+- **[app-picongpu](app-picongpu/)**
+  - app-picongpu
+  - Tags: `app`, `picongpu`, `hpc`
+- **[app-pluto](app-pluto/)**
+  - app-pluto
+  - Tags: `app`, `pluto`, `hpc`
+- **[app-psi4](app-psi4/)**
+  - app-psi4
+  - Tags: `app`, `psi4`, `hpc`
+- **[app-pyfr](app-pyfr/)**
+  - app-pyfr
+  - Tags: `app`, `pyfr`, `hpc`
+- **[app-pyscf](app-pyscf/)**
+  - app-pyscf
+  - Tags: `app`, `pyscf`, `hpc`
+- **[app-pythia8](app-pythia8/)**
+  - app-pythia8
+  - Tags: `app`, `pythia8`, `hpc`
+- **[app-qchem](app-qchem/)**
+  - app-qchem
+  - Tags: `app`, `qchem`, `hpc`
+- **[app-qmcpack](app-qmcpack/)**
+  - app-qmcpack
+  - Tags: `app`, `qmcpack`, `hpc`
 - **[app-quantum-espresso](app-quantum-espresso/)**
   - app-quantum-espresso
   - Tags: `app`, `quantum-espresso`, `hpc`
+- **[app-ramses](app-ramses/)**
+  - app-ramses
+  - Tags: `app`, `ramses`, `hpc`
 - **[app-roms](app-roms/)**
   - app-roms
   - Tags: `app`, `roms`, `hpc`
+- **[app-root](app-root/)**
+  - app-root
+  - Tags: `app`, `root`, `hpc`
+- **[app-sherpa](app-sherpa/)**
+  - app-sherpa
+  - Tags: `app`, `sherpa`, `hpc`
+- **[app-siesta](app-siesta/)**
+  - app-siesta
+  - Tags: `app`, `siesta`, `hpc`
+- **[app-smilei](app-smilei/)**
+  - app-smilei
+  - Tags: `app`, `smilei`, `hpc`
+- **[app-specfem3d](app-specfem3d/)**
+  - app-specfem3d
+  - Tags: `app`, `specfem3d`, `specfem`, `hpc`
+- **[app-star](app-star/)**
+  - app-star
+  - Tags: `app`, `star`, `hpc`
+- **[app-su2](app-su2/)**
+  - app-su2
+  - Tags: `app`, `su2`, `hpc`
+- **[app-swift](app-swift/)**
+  - app-swift
+  - Tags: `app`, `swift`, `hpc`
+- **[app-tinker-hp](app-tinker-hp/)**
+  - app-tinker-hp
+  - Tags: `app`, `tinker-hp`, `hpc`
+- **[app-tmlqcd](app-tmlqcd/)**
+  - app-tmlqcd
+  - Tags: `app`, `tmlqcd`, `hpc`
+- **[app-turbomole](app-turbomole/)**
+  - app-turbomole
+  - Tags: `app`, `turbomole`, `hpc`
 - **[app-vasp](app-vasp/)**
   - app-vasp
   - Tags: `app`, `vasp`, `hpc`
+- **[app-vpic](app-vpic/)**
+  - app-vpic
+  - Tags: `app`, `vpic`, `hpc`
+- **[app-walberla](app-walberla/)**
+  - app-walberla
+  - Tags: `app`, `walberla`, `hpc`
+- **[app-wannier90](app-wannier90/)**
+  - app-wannier90
+  - Tags: `app`, `wannier90`, `hpc`
+- **[app-warpx](app-warpx/)**
+  - app-warpx
+  - Tags: `app`, `warpx`, `hpc`
+- **[app-wien2k](app-wien2k/)**
+  - app-wien2k
+  - Tags: `app`, `wien2k`, `hpc`
 - **[app-wrf](app-wrf/)**
   - app-wrf
   - Tags: `app`, `wrf`, `hpc`
+- **[app-ww3](app-ww3/)**
+  - app-ww3
+  - Tags: `app`, `ww3`, `hpc`
+- **[app-xgc](app-xgc/)**
+  - app-xgc
+  - Tags: `app`, `xgc`, `hpc`
+- **[app-yambo](app-yambo/)**
+  - app-yambo
+  - Tags: `app`, `yambo`, `hpc`
 
 ## MLCommons automation
 
@@ -1279,7 +1597,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 374
+- **Total Scripts**: 480
 - **Categories**: 36
 
 ## Usage
