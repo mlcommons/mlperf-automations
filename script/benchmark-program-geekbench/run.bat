@@ -47,7 +47,11 @@ echo ***********************************************************************
 echo Running Geekbench benchmark
 echo   Number of runs: %NUM_RUNS%
 if "%SPLIT_SC_MC%" == "yes" (
-  echo   Mode: Split SC ^(pinned^) + MC ^(unpinned^)
+  if "%CORE_PINNING%" == "yes" (
+    echo   Mode: Split SC ^(pinned^) + MC ^(unpinned^)
+  ) else (
+    echo   Mode: Split SC + MC ^(single-core and multi-core^)
+  )
   echo   SC command: %MLC_GEEKBENCH_BASE_CMD_SC%
   echo   MC command: %MLC_GEEKBENCH_BASE_CMD_MC%
 ) else (
@@ -75,7 +79,11 @@ for /L %%R in (1,1,%NUM_RUNS%) do (
     if "!HAS_LICENSE!"=="yes" set "SC_EXPORT=--export-json "!SC_JSON!" --export-csv "!SC_CSV!"
 
     echo.
-    echo --- Single-Core ^(pinned^) ---
+    if "%CORE_PINNING%" == "yes" (
+      echo --- Single-Core ^(pinned^) ---
+    ) else (
+      echo --- Single-Core ---
+    )
 
     if "%CORE_PINNING%" == "yes" (
       set "SC_FULL=start "" /b /wait /affinity %AFFINITY_MASK% %MLC_GEEKBENCH_BASE_CMD_SC% !SC_EXPORT!"
