@@ -5,6 +5,7 @@ echo "$cmd"
 
 max_retries=2
 retry_count=0
+apt_refreshed=0
 
 while true; do
     output=$(eval "$cmd" 2>&1)
@@ -13,6 +14,20 @@ while true; do
 
     if [[ $exit_status -eq 0 ]]; then
         exit 0
+    fi
+
+    # Stale apt index: a cached package version 404s because the mirror now
+    # serves a newer one. Refresh the package lists once and retry.
+    if [[ $apt_refreshed -eq 0 ]] && command -v apt-get >/dev/null 2>&1 \
+        && echo "$output" | grep -q -i -E "Failed to fetch|Unable to fetch some archives|404 +Not Found"; then
+        apt_refreshed=1
+        echo "Stale apt index detected (fetch/404). Running apt-get update and retrying..."
+        if command -v sudo >/dev/null 2>&1; then
+            sudo apt-get update || apt-get update
+        else
+            apt-get update
+        fi
+        continue
     fi
 
     # Check for package manager lock errors
@@ -28,7 +43,7 @@ while true; do
         fi
     fi
 
-    # Not a lock error or retries exhausted
+    # Not a recoverable error or retries exhausted
     if [[ "${MLC_TMP_FAIL_SAFE}" == 'yes' ]]; then
         echo "MLC_GET_GENERIC_SYS_UTIL_INSTALL_FAILED=yes" > tmp-run-env.out
         echo "Fail-safe is enabled, exiting with status 0"

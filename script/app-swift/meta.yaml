@@ -36,7 +36,7 @@ deps:
 - tags: get,generic-sys-util,_libhdf5-dev
 - tags: get,generic-sys-util,_libfftw3-dev
 - tags: get,generic-sys-util,_libgsl-dev
-- tags: get,git,repo
+- tags: get,git,repo,_no-recurse-submodules
   names:
   - swift-repo
   extra_cache_tags: swift,repo,swift-repo
