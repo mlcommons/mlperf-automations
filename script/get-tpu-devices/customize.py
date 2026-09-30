@@ -1,7 +1,7 @@
 from mlc import utils
 import os
 import re
-import subprocess
+import urllib.request
 
 
 # Properties accepted from tmp-run.out. Anything else written by detect.py is
@@ -101,18 +101,77 @@ def postprocess(i):
     # script. Mirrors the `xpu-smi topology -m` probe in
     # ../get-xpu-devices/customize.py.
     #
-    # TODO(tpu): fill in the real probe. These two keys feed the MLPerf
-    # `accelerator_interconnect` and `accelerator_interconnect_topology`
-    # fields, so "" is an acceptable (manual-entry) result, but a wrong
-    # value is not.
+    # Every TPU generation from v4 on links chips with ICI, so the type is
+    # "ICI" whenever at least one chip was found (we got here, so it was).
+    # OCS is not reported: it cannot be detected from inside the VM and a
+    # wrong value is worse than an empty one.
     #
-    #   MLC_TPU_DEVICE_PROP_ACCELERATOR_INTERCONNECT_TYPE
-    #       e.g. "ICI" / "ICI + OCS"
-    #   MLC_TPU_DEVICE_PROP_ACCELERATOR_INTERCONNECT_TOPOLOGY
-    #       e.g. "4x4x4 3D torus" or the slice type reported by the GCE
-    #       metadata key instance/attributes/accelerator-type
+    # The topology is not exposed by the hardware. It comes from the slice
+    # metadata that Cloud TPU sets up for the VM / pod, see _tpu_slice_info().
+    # An empty string means "fill in manually".
     # ------------------------------------------------------------------
-    env['MLC_TPU_DEVICE_PROP_ACCELERATOR_INTERCONNECT_TYPE'] = ''
-    env['MLC_TPU_DEVICE_PROP_ACCELERATOR_INTERCONNECT_TOPOLOGY'] = ''
+    env['MLC_TPU_DEVICE_PROP_ACCELERATOR_INTERCONNECT_TYPE'] = 'ICI'
+
+    accelerator_type, topology = _tpu_slice_info()
+    if topology and accelerator_type:
+        env['MLC_TPU_DEVICE_PROP_ACCELERATOR_INTERCONNECT_TOPOLOGY'] = \
+            f'{topology} ({accelerator_type})'
+    else:
+        env['MLC_TPU_DEVICE_PROP_ACCELERATOR_INTERCONNECT_TOPOLOGY'] = \
+            topology or accelerator_type
 
     return {'return': 0}
+
+
+_GCE_METADATA_URL = \
+    'http://metadata.google.internal/computeMetadata/v1/instance/attributes/'
+
+
+def _gce_metadata(key, timeout=2):
+    """Return a GCE instance attribute, or "" if unavailable (non-GCE host)."""
+    req = urllib.request.Request(
+        _GCE_METADATA_URL + key, headers={'Metadata-Flavor': 'Google'})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return resp.read().decode('utf-8', 'replace').strip()
+    except Exception:
+        return ''
+
+
+def _tpu_slice_info():
+    """Return (accelerator_type, topology) for the slice this host is part of.
+
+    Sources, in order:
+      1. TPU_ACCELERATOR_TYPE / TPU_TOPOLOGY process env vars (set by GKE in
+         TPU pods, and by some launchers).
+      2. GCE metadata: instance/attributes/accelerator-type (e.g. "v5p-8")
+         and instance/attributes/tpu-env, a KEY: 'VALUE' blob that includes
+         TOPOLOGY (e.g. "2x2x1") and ACCELERATOR_TYPE.
+
+    Never raises; missing pieces are returned as "".
+    """
+    accelerator_type = os.environ.get('TPU_ACCELERATOR_TYPE', '').strip()
+    topology = os.environ.get('TPU_TOPOLOGY', '').strip()
+
+    try:
+        if not accelerator_type:
+            accelerator_type = _gce_metadata('accelerator-type')
+
+        if not topology or not accelerator_type:
+            tpu_env = _gce_metadata('tpu-env')
+            if not topology:
+                topology = _tpu_env_value(tpu_env, 'TOPOLOGY')
+            if not accelerator_type:
+                accelerator_type = _tpu_env_value(tpu_env, 'ACCELERATOR_TYPE')
+    except Exception:
+        pass
+
+    return accelerator_type, topology
+
+
+def _tpu_env_value(tpu_env, key):
+    """Extract KEY from a tpu-env blob of lines like: KEY: 'value'."""
+    m = re.search(rf"^{key}:\s*'?([^'\n]*?)'?\s*$", tpu_env, re.M)
+    return m.group(1).strip() if m else ''
+
+
