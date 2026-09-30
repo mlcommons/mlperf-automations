@@ -11,7 +11,7 @@ def preprocess(i):
 def postprocess(i):
     env = i['env']
     src_path = env.get('MLC_GENESIS_SRC_PATH', '')
-    binary = os.path.join(src_path, 'bin/atdyn')
+    binary = os.path.join(src_path, 'install/bin/atdyn')
     if not os.path.isfile(binary):
         return {'return': 1, 'error': f'GENESIS binary not found at {binary}'}
     bin_dir = os.path.dirname(binary)

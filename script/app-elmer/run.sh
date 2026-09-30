@@ -15,7 +15,7 @@ cmake -B build -DWITH_MPI=FALSE -DWITH_ELMERGUI=FALSE -DWITH_ElmerIce=FALSE \
     -DCMAKE_INSTALL_PREFIX="${SRC}/install"
 # Build the core solver only; some optional modules do not compile
 # with gfortran >= 13 (DO-loop index passed by reference).
-cmake --build build --target ElmerSolver -- -j"${CORES}"
+cmake --build build --target Solver_TGT -- -j"${CORES}"
 
 if ! find build -name ElmerSolver -type f | grep -q .; then
     echo "Elmer binary not built"
