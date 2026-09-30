@@ -5,9 +5,11 @@ Detects the Google TPUs present on a node and exports their properties as
 (and through it, `get-mlperf-multi-node-system-info`) can fill in the
 accelerator fields of an MLPerf `system_desc` JSON.
 
-**This script is currently a skeleton.** The plumbing, the env/state contract
-and the consumers are all in place and tested; the one thing missing is the
-actual TPU probing. See [What you need to implement](#what-you-need-to-implement).
+Detection reads Linux sysfs (`/sys/bus/pci/devices`), the same approach the
+[`tpu-info`](https://github.com/google/cloud-accelerator-diagnostics/tree/main/tpu_info)
+CLI uses. It does not open `/dev/vfio/*` or `/dev/accel*`, so it works while a
+benchmark holds the chips, and it needs no libtpu/JAX import, no `sudo` and no
+extra pip packages. See [How detection works](#how-detection-works).
 
 It is modelled directly on [`get-xpu-devices`](../get-xpu-devices/), which does
 the same job for Intel GPUs. When something here is unclear, that script is the
@@ -40,21 +42,50 @@ mlcr get,tpu-devices
 
 ---
 
-## What you need to implement
+## How detection works
 
-Exactly one function: `get_tpu_info()` in [`detect.py`](detect.py). It returns
-a list of dicts, one per TPU chip. Writing `tmp-run.out` and parsing it back
-into env vars is already written and should not need changing.
+`detect.py` walks `/sys/bus/pci/devices/*` and keeps entries whose `vendor` is
+Google's PCI vendor id (`0x1ae0`) and whose `device` id is a known TPU chip:
 
-How you obtain the values is your call — pure Python via a library, `subprocess`
-around a CLI, or commands in `run.sh` whose output `detect.py` just parses.
+| PCI device id | Emitted `TPU Name` | HBM per chip | `Memory Type` |
+|---|---|---|---|
+| `0x005e` | `TPU v4` | 32 GiB | `HBM2` |
+| `0x0063` | `TPU v5e` | 16 GiB | `HBM2e` |
+| `0x0062` | `TPU v5p` | 95 GiB | `HBM2e` |
+| `0x006f` | `TPU v6e` | 32 GiB | `""` (TODO -- not confirmed) |
+| `0x0076` | `TPU7x` | 192 GiB | `HBM3e` |
 
-Two smaller `TODO(tpu)` items are marked in the other files:
+PCI ids and HBM sizes follow `tpu_info/device.py`; capacities are also on
+`cloud.google.com/tpu/docs/<gen>`. Google only publishes the memory *type* for
+v4; the other entries follow public third-party reporting. TPU v2/v3 (shared
+device id `0x0027`) are intentionally not supported.
+
+PCI functions are grouped by base address (`DDDD:BB:DD`) so that a chip with
+two TensorCores exposed as two functions (TPU7x) is counted **once**.
+`accelerators_per_node` is therefore the number of **chips**, not JAX devices.
+
+`Host Interconnect Type` comes from sysfs `max_link_speed` / `max_link_width`
+(e.g. `16.0 GT/s PCIe` + `16` -> `PCIe 4.0 x16`). `libtpu version` is read
+from the installed `libtpu` / `libtpu-nightly` pip package if present.
+
+### ICI type and topology (`customize.py`)
+
+- `MLC_TPU_DEVICE_PROP_ACCELERATOR_INTERCONNECT_TYPE` is `ICI` whenever a chip
+  was found. OCS is not reported: it cannot be detected from inside the VM.
+- `MLC_TPU_DEVICE_PROP_ACCELERATOR_INTERCONNECT_TOPOLOGY` is built from the
+  slice metadata, best effort, never fatal:
+  1. `TPU_ACCELERATOR_TYPE` / `TPU_TOPOLOGY` process env vars (GKE TPU pods)
+  2. GCE metadata `instance/attributes/accelerator-type` (e.g. `v5p-8`) and
+     `instance/attributes/tpu-env` (`TOPOLOGY: '2x2x1'`)
+  
+  Result looks like `2x2x1 (v5p-8)`, or whichever part is available, or `""`.
+
+Remaining `TODO(tpu)`:
 
 | File | TODO |
 |---|---|
-| [`customize.py`](customize.py) | The chip-to-chip (ICI) interconnect probe. Currently sets both interconnect keys to `""`, which is a valid "fill this in manually" result. |
-| [`meta.yaml`](meta.yaml) | The `docker:` block. TPU containers need `/dev/accel*` passthrough plus the host libtpu mounts; `all_gpus` is NVIDIA/AMD-specific and is deliberately not set. `run: false` until this is worked out. |
+| [`detect.py`](detect.py) | `Memory Type` for TPU v6e. |
+| [`meta.yaml`](meta.yaml) | The `docker:` block. TPU containers need `/dev/vfio*` / `/dev/accel*` passthrough plus the host libtpu mounts; `all_gpus` is NVIDIA/AMD-specific and is deliberately not set. `run: false` until this is worked out. |
 
 ---
 
@@ -75,10 +106,10 @@ not in `ALLOWED_KEYS` is dropped.
 
 | `tmp-run.out` key | Env var | `system_desc` field | Required | Expected format |
 |---|---|---|---|---|
-| `TPU Device ID` | `MLC_TPU_DEVICE_PROP_TPU_DEVICE_ID` | — (block delimiter) | yes | unique per chip, e.g. `0` or `0000:00:05.0` |
-| `TPU Name` | `MLC_TPU_DEVICE_PROP_TPU_NAME` | `accelerator_model_name` | yes | `TPU v5e` |
-| `Memory Type` | `MLC_TPU_DEVICE_PROP_MEMORY_TYPE` | `accelerator_memory_type` | yes | `HBM2e` |
-| `Global memory` | `MLC_TPU_DEVICE_PROP_GLOBAL_MEMORY` | `accelerator_memory_capacity` | yes | `16 GiB` — unit required |
+| `TPU Device ID` | `MLC_TPU_DEVICE_PROP_TPU_DEVICE_ID` | — (block delimiter) | yes | PCI base address, e.g. `0000:00:05` |
+| `TPU Name` | `MLC_TPU_DEVICE_PROP_TPU_NAME` | `accelerator_model_name` | yes | `TPU v5p`, `TPU7x` |
+| `Memory Type` | `MLC_TPU_DEVICE_PROP_MEMORY_TYPE` | `accelerator_memory_type`, `accelerator_memory_configuration` | yes | `HBM2e` |
+| `Global memory` | `MLC_TPU_DEVICE_PROP_GLOBAL_MEMORY` | `accelerator_memory_capacity`, `accelerator_memory_configuration` | yes | `16 GiB` — unit required |
 | `Host Interconnect Type` | `MLC_TPU_DEVICE_PROP_HOST_INTERCONNECT_TYPE` | `accelerator_host_interconnect` | yes | `PCIe 4.0 x16` |
 | `TPU driver version` | `MLC_TPU_DEVICE_PROP_TPU_DRIVER_VERSION` | — | no | free-form |
 | `libtpu version` | `MLC_TPU_LIBTPU_VERSION` | `inference_backend`, `other_software_stack` | no | `0.0.11` |
@@ -100,8 +131,8 @@ Set by `customize.py`, not by `detect.py`:
 | Env var | `system_desc` field | Set by |
 |---|---|---|
 | `MLC_TPU_NUM_DEVICES` | `accelerators_per_node` | counted from the device blocks |
-| `MLC_TPU_DEVICE_PROP_ACCELERATOR_INTERCONNECT_TYPE` | `accelerator_interconnect` | **TODO** — currently `""` |
-| `MLC_TPU_DEVICE_PROP_ACCELERATOR_INTERCONNECT_TOPOLOGY` | `accelerator_interconnect_topology` | **TODO** — currently `""` |
+| `MLC_TPU_DEVICE_PROP_ACCELERATOR_INTERCONNECT_TYPE` | `accelerator_interconnect` | `ICI` |
+| `MLC_TPU_DEVICE_PROP_ACCELERATOR_INTERCONNECT_TOPOLOGY` | `accelerator_interconnect_topology` | slice metadata (env / GCE), `""` if unavailable |
 
 ### State keys
 
@@ -136,28 +167,15 @@ produces a silently wrong submission rather than an error.
 
 ---
 
-## Candidate data sources
+## Data sources considered
 
-Worth evaluating; none of these is assumed by the skeleton, and part of the
-task is deciding which is authoritative on a stock Cloud TPU VM.
-
-- the `tpu-info` CLI (pip package `tpu-info`) — chip type, HBM usage
-- `jax.devices()` / `jax.local_devices()` → `device_kind`, core counts
-- libtpu APIs
-- the GCE metadata server for the slice type:
-  ```bash
-  curl -H "Metadata-Flavor: Google" \
-    http://metadata.google.internal/computeMetadata/v1/instance/attributes/accelerator-type
-  # e.g. v5litepod-8
-  ```
-- `/dev/accel*` enumeration plus `/sys/class/accel/accel*/device/*` for PCIe
-  link speed and width
-- `lspci -vmm` filtered on Google's PCI vendor id (`0x1ae0`)
-
-Prefer a source that works while the TPU is **in use** — this script may run
-alongside a benchmark, and anything that needs to claim the chip will fail
-there. `get-xpu-devices` shells out to `xpu-smi`; the equivalent choice here is
-yours to make.
+- **sysfs PCI enumeration** (chosen) -- works while the TPU is in use, no deps.
+- `tpu-info` CLI -- same PCI table, but its runtime metrics need a running
+  libtpu and it would add a pip dependency; we borrow the table and cite it.
+- `jax.devices()` -- claims the chips, so it fails alongside a running
+  benchmark, and pulls in JAX.
+- GCE metadata `accelerator-type` / `tpu-env` -- used only for the slice
+  topology, which the hardware does not expose.
 
 ---
 
@@ -228,19 +246,17 @@ mlcr get-mlperf-multi-node-system-info,_tpu,_exclude_current_node \
 
 ## Checklist before opening a PR
 
-- [ ] `get_tpu_info()` implemented; `NotImplementedError` removed
-- [ ] `TODO(tpu)` in `customize.py` resolved (ICI type + topology), or
-      consciously left as `""` with a comment explaining why
-- [ ] `TODO(tpu)` in `meta.yaml` resolved (docker device passthrough), or
-      `docker.run` left `false`
+- [x] `get_tpu_info()` implemented; `NotImplementedError` removed
+- [x] `TODO(tpu)` in `customize.py` resolved (ICI type + topology)
+- [x] `TODO(tpu)` in `meta.yaml`: `docker.run` left `false` (see TODO table)
 - [ ] Verified on real hardware for at least one TPU generation; note which one
       in the PR description
 - [ ] `README.md` generated: `mlc doc script --tags=get,tpu-devices`
 - [ ] `mlc lint script --tags=get,tpu-devices` clean
-- [ ] Static values (memory type table, any hard-coded bandwidths) have a cited
+- [x] Static values (memory type table, any hard-coded bandwidths) have a cited
       source in a code comment
-- [ ] No `print()` in `customize.py` — use `i['automation'].logger`
-- [ ] `customize.py` returns `{'return': 1, 'error': '...'}` on failure rather
+- [x] No `print()` in `customize.py` — use `i['automation'].logger`
+- [x] `customize.py` returns `{'return': 1, 'error': '...'}` on failure rather
       than raising
 
 See [AGENTS.md](../../AGENTS.md) for the repo-wide script conventions and the
@@ -252,10 +268,10 @@ PR review format used here.
 
 | File | Status |
 |---|---|
-| `meta.yaml` | done, except the `docker:` TODO |
+| `meta.yaml` | done; `docker.run: false` (see TODO table) |
 | `run.sh` | done |
-| `detect.py` | **skeleton — implement `get_tpu_info()`** |
-| `customize.py` | done, except the ICI TODO |
+| `detect.py` | done (sysfs PCI enumeration) |
+| `customize.py` | done (ICI type + slice topology) |
 | `info.md` | this file |
 | `README.md` | not generated yet — `mlc doc script --tags=get,tpu-devices` |
 | `run.bat` | not provided. `get,tpu-devices` is skipped on Windows by the caller (`skip_if_env: MLC_HOST_OS_TYPE: [windows]`), matching `get-cuda-devices` / `get-rocm-devices` / `get-xpu-devices`. |
