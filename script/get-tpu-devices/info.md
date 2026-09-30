@@ -67,7 +67,7 @@ two TensorCores exposed as two functions (TPU7x) is counted **once**.
 `Host Interconnect Type` comes from sysfs `max_link_speed` / `max_link_width`
 (e.g. `16.0 GT/s PCIe` + `16` -> `PCIe 4.0 x16`). On Cloud TPU VMs the chips
 are VFIO-passthrough devices and sysfs reports `Unknown` / `255`, so this
-comes out empty (manual entry) there -- observed on a v5p-8 GKE node.
+comes out empty (manual entry) there -- observed on v5p-8 and tpu7x-8 GKE nodes.
 `libtpu version` is read from the installed `libtpu` / `libtpu-nightly` pip
 package if present.
 
@@ -252,7 +252,8 @@ mlcr get-mlperf-multi-node-system-info,_tpu,_exclude_current_node \
 - [x] `get_tpu_info()` implemented; `NotImplementedError` removed
 - [x] `TODO(tpu)` in `customize.py` resolved (ICI type + topology)
 - [x] `TODO(tpu)` in `meta.yaml`: `docker.run` left `false` (see TODO table)
-- [x] Verified on real hardware: TPU v5p (`v5p-8` GKE node, 4 chips)
+- [x] Verified on real hardware: TPU v5p (`v5p-8` GKE node, 4 chips) and
+      TPU7x (`tpu7x-8` GKE node, 4 chips / 8 PCI functions)
 - [x] `README.md` generated: `mlc doc script --tags=get,tpu-devices`
 - [x] `mlc lint script --tags=get,tpu-devices` clean
 - [x] Static values (memory type table, any hard-coded bandwidths) have a cited
