@@ -146,7 +146,7 @@ def preprocess(i):
 
         rr_tags = "get,mlperf,single-node,system-info"
         backend = env.get('MLC_ACCELERATOR_BACKEND', '')
-        if backend in ('cuda', 'rocm', 'xpu'):
+        if backend in ('cuda', 'rocm', 'xpu', 'tpu'):
             rr_tags += f",_{backend}"
         ssh_ids = [
             s.strip() for s in env['MLC_MULTINODE_SYSTEM_SSH_IDS'].split(',') if s.strip()]
