@@ -1,0 +1,84 @@
+alias: app-athena
+uid: 23f67b2cfebd4544
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: HPC Application
+tags:
+- app
+- athena
+- athena++
+- hpc
+
+# Cache
+cache: true
+
+# Environment
+default_env: {}
+new_env_keys:
+- MLC_ATHENA_SRC_PATH
+- MLC_ATHENA_INSTALL_PATH
+- MLC_ATHENA_BIN_PATH
+- +PATH
+new_state_keys: []
+
+# Dependencies
+deps:
+- tags: detect,cpu
+- env:
+    MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
+  tags: get,generic-sys-util,_build-essential
+- tags: get,python3
+  names:
+  - python
+  - python3
+- tags: get,git,repo
+  names:
+  - athena-repo
+  extra_cache_tags: athena,repo,athena-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_ATHENA_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
+variations:
+  repo.#:
+    env:
+      MLC_GIT_REPO_URL: '#'
+    group: repo
+  repo.official:
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://github.com/PrincetonUniversity/athena.git
+    group: repo
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+    group: version
+  version.24.0:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: v24.0
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - repo.official
