@@ -1,0 +1,81 @@
+alias: app-bwa-mem2
+uid: 47c8b56fed302866
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: HPC Application
+tags:
+- app
+- bwa-mem2
+- bwa
+- hpc
+
+# Cache
+cache: true
+
+# Environment
+default_env: {}
+new_env_keys:
+- MLC_BWA_MEM2_SRC_PATH
+- MLC_BWA_MEM2_INSTALL_PATH
+- MLC_BWA_MEM2_BIN_PATH
+- +PATH
+new_state_keys: []
+
+# Dependencies
+deps:
+- tags: detect,cpu
+- env:
+    MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
+  tags: get,generic-sys-util,_build-essential
+- tags: get,generic-sys-util,_zlib1g-dev
+- tags: get,git,repo
+  names:
+  - bwa-mem2-repo
+  extra_cache_tags: bwa-mem2,repo,bwa-mem2-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_BWA_MEM2_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
+variations:
+  repo.#:
+    env:
+      MLC_GIT_REPO_URL: '#'
+    group: repo
+  repo.official:
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://github.com/bwa-mem2/bwa-mem2.git
+    group: repo
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+    group: version
+  version.2.2.1:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: v2.2.1
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - repo.official
