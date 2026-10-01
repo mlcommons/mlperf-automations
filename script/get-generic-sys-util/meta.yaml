@@ -284,6 +284,20 @@ variations:
         dnf: gcc-toolset-9-gcc-c++
         zypper: gcc-toolset-9-gcc-c++
         yum: gcc-toolset-9-gcc-c++
+  g++-multilib:
+    env:
+      MLC_SYS_UTIL_NAME: g++-multilib
+      MLC_SYS_UTIL_CHECK_CMD: "echo 'int main(){return 0;}' | g++ -m32 -x c++ - -o /dev/null 2>/dev/null"
+    state:
+      g++-multilib:
+        apt: g++-multilib
+  gcc-multilib:
+    env:
+      MLC_SYS_UTIL_NAME: gcc-multilib
+      MLC_SYS_UTIL_CHECK_CMD: "echo 'int main(){return 0;}' | gcc -m32 -x c - -o /dev/null 2>/dev/null"
+    state:
+      gcc-multilib:
+        apt: gcc-multilib
   gcc-11:
     env:
       MLC_SYS_UTIL_NAME: gcc11
