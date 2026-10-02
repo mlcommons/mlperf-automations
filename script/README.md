@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-10-01 05:17:29*
+*Last updated: 2026-10-03 04:34:53*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -10,6 +10,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [AI/ML frameworks](#aiml-frameworks)
 - [AI/ML models](#aiml-models)
 - [AI/ML optimization](#aiml-optimization)
+- [Agentic Benchmarks](#agentic-benchmarks)
 - [Benchmarking](#benchmarking)
 - [CUDA automation](#cuda-automation)
 - [Cloud automation](#cloud-automation)
@@ -39,6 +40,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [TinyML automation](#tinyml-automation)
 - [Uncategorized](#uncategorized)
 - [Utilities](#utilities)
+- [Vector Search Benchmarks](#vector-search-benchmarks)
 - [XPU automation](#xpu-automation)
 - [lstopo infragraph automation](#lstopo-infragraph-automation)
 - [lstopo topology automation](#lstopo-topology-automation)
@@ -276,11 +278,23 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - prune-bert-models
   - Tags: `prune`, `bert-models`, `bert-prune`, `prune-bert-models`
 
+## Agentic Benchmarks
+
+- **[app-gaia-benchmark](app-gaia-benchmark/)**
+  - app-gaia-benchmark
+  - Tags: `app`, `agentic`, `agent`, `benchmark`, `gaia`, `general-ai-assistant`
+- **[app-hotpotqa](app-hotpotqa/)**
+  - app-hotpotqa
+  - Tags: `app`, `agentic`, `agent`, `benchmark`, `qa`, `multi-hop`, `hotpotqa`
+- **[app-webarena](app-webarena/)**
+  - app-webarena
+  - Tags: `app`, `agentic`, `agent`, `benchmark`, `web-agent`, `webarena`
+- **[app-webvoyager](app-webvoyager/)**
+  - app-webvoyager
+  - Tags: `app`, `agentic`, `agent`, `benchmark`, `web-agent`, `webvoyager`
+
 ## Benchmarking
 
-- **[benchmark-hpc](benchmark-hpc/)**
-  - benchmark-hpc
-  - Tags: `benchmark`, `hpc`, `benchmark-hpc`
 - **[benchmark-program-coremark](benchmark-program-coremark/)**
   - benchmark-program-coremark
   - Tags: `benchmark`, `coremark`, `cpu`, `benchmark-coremark`, `benchmark-program-coremark`
@@ -578,6 +592,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-openssl](get-openssl/)**
   - get-openssl
   - Tags: `get`, `openssl`, `lib`, `lib-openssl`
+- **[get-phoronix-test-suite](get-phoronix-test-suite/)**
+  - get-phoronix-test-suite
+  - Tags: `get`, `install`, `phoronix-test-suite`, `phoronix`, `pts`
 - **[get-rclone](get-rclone/)**
   - get-rclone
   - Tags: `get`, `rclone`
@@ -1575,6 +1592,12 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
   - send-mail
   - Tags: `send`, `mail`, `email`
 
+## Vector Search Benchmarks
+
+- **[benchmark-hnswlib](benchmark-hnswlib/)**
+  - benchmark-hnswlib
+  - Tags: `benchmark`, `hnswlib`, `ann`, `approximate-nearest-neighbor`, `vector-search`
+
 ## XPU automation
 
 - **[get-xpu-devices](get-xpu-devices/)**
@@ -1597,8 +1620,8 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 480
-- **Categories**: 36
+- **Total Scripts**: 485
+- **Categories**: 38
 
 ## Usage
 
