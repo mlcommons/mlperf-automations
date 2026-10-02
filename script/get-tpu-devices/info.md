@@ -82,6 +82,23 @@ package if present.
      `instance/attributes/tpu-env` (`TOPOLOGY: '2x2x1'`)
   
   Result looks like `2x2x1 (v5p-8)`, or whichever part is available, or `""`.
+- Multislice: the per-slice topology is identical on every slice, so when the
+  multislice launcher (xpk / MaxText / Pathways) exports
+  `MEGASCALE_NUM_SLICES` > 1 it is appended, e.g. `2x2x1 (tpu7x-8), 4 slices`.
+
+#### What about DCN?
+
+The inter-slice fabric (DCN) is *host* networking, not an accelerator
+interconnect, and is not auto-detected (nothing inside the VM / pod exposes
+NIC speed or fabric topology). This matches how GPU submitters fill the
+schema: `accelerator_interconnect` is the intra-node fabric only
+(`NVLINK Gen4 900 GB/s + NVSWITCH Gen3`), and the inter-node fabric is a
+hand-written NIC inventory in `host_networking`, e.g.
+`Compute: 8x ConnectX-7 IB NDR 400Gb/s, Management: 100Gb/s Ethernet NIC`.
+For a multislice TPU submission pass the equivalent, e.g.
+`--host_networking="gVNIC 200Gb/s Ethernet (DCN)"`, to the system-info script
+and leave `host_networking_topology` empty unless you have something specific
+to say.
 
 Remaining `TODO(tpu)`:
 
