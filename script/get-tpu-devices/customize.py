@@ -114,13 +114,30 @@ def postprocess(i):
 
     accelerator_type, topology = _tpu_slice_info()
     if topology and accelerator_type:
-        env['MLC_TPU_DEVICE_PROP_ACCELERATOR_INTERCONNECT_TOPOLOGY'] = \
-            f'{topology} ({accelerator_type})'
+        topology = f'{topology} ({accelerator_type})'
     else:
-        env['MLC_TPU_DEVICE_PROP_ACCELERATOR_INTERCONNECT_TOPOLOGY'] = \
-            topology or accelerator_type
+        topology = topology or accelerator_type
+
+    # Multislice: the per-slice ICI topology above is identical on every
+    # slice, so a 4-slice job would be indistinguishable from a single slice
+    # of the same shape. Multislice launchers (xpk, MaxText, Pathways) export
+    # MEGASCALE_NUM_SLICES; append it when it is > 1. The inter-slice fabric
+    # (DCN) is host networking, not ICI, and is left to host_networking.
+    num_slices = _megascale_num_slices()
+    if topology and num_slices > 1:
+        topology = f'{topology}, {num_slices} slices'
+
+    env['MLC_TPU_DEVICE_PROP_ACCELERATOR_INTERCONNECT_TOPOLOGY'] = topology
 
     return {'return': 0}
+
+
+def _megascale_num_slices():
+    """Return MEGASCALE_NUM_SLICES as an int, or 1 if unset/invalid."""
+    try:
+        return int(os.environ.get('MEGASCALE_NUM_SLICES', '1').strip() or 1)
+    except ValueError:
+        return 1
 
 
 _GCE_METADATA_URL = \
