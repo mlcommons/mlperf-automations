@@ -9,6 +9,8 @@ fi
 
 SRC="${MLC_DALTON_SRC_PATH}"
 CORES="${MLC_HOST_CPU_TOTAL_PHYSICAL_CORES:-$(nproc)}"
+COMPILER_TAG="${MLC_COMPILER_FAMILY:-default}"
+BUILD_DIR="build-${COMPILER_TAG}"
 
 cd "${SRC}"
 git config --global --add safe.directory "${SRC}" || true
@@ -19,10 +21,11 @@ if ! command -v python >/dev/null 2>&1; then
 fi
 export PATH="${SRC}/.pybin:${PATH}"
 
-./setup --fc=gfortran --cc=gcc --cxx=g++
-cmake --build build -j"${CORES}"
+rm -rf "${BUILD_DIR}"
+./setup --fc="${FC:-gfortran}" --cc="${CC:-gcc}" --cxx="${CXX:-g++}" "${BUILD_DIR}"
+cmake --build "${BUILD_DIR}" -j"${CORES}"
 
-if [[ ! -f build/dalton.x ]]; then
+if [[ ! -f "${BUILD_DIR}/dalton.x" ]]; then
     echo "DALTON binary not built"
     exit 1
 fi
