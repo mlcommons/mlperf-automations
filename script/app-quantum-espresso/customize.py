@@ -16,13 +16,14 @@ def postprocess(i):
     env = i['env']
 
     src_path = env.get('MLC_QE_SRC_PATH', '')
-    install_dir = os.path.join(src_path, 'install')
+    compiler_tag = env.get('MLC_COMPILER_FAMILY', '') or 'default'
+    install_dir = os.path.join(src_path, 'install-' + compiler_tag)
     bin_dir = os.path.join(install_dir, 'bin')
 
     pw_bin = os.path.join(bin_dir, 'pw.x')
     if not os.path.isfile(pw_bin):
         # Try build directory
-        build_bin = os.path.join(src_path, 'build', 'bin')
+        build_bin = os.path.join(src_path, 'build-' + compiler_tag, 'bin')
         pw_bin = os.path.join(build_bin, 'pw.x')
         if not os.path.isfile(pw_bin):
             return {'return': 1, 'error': f'Quantum ESPRESSO binary (pw.x) not found in {bin_dir} or {build_bin}'}
