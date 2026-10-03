@@ -9,13 +9,16 @@ fi
 
 SRC="${MLC_OPENMC_SRC_PATH}"
 CORES="${MLC_HOST_CPU_TOTAL_PHYSICAL_CORES:-$(nproc)}"
+COMPILER_TAG="${MLC_COMPILER_FAMILY:-default}"
+BUILD_DIR="build-${COMPILER_TAG}"
 
 cd "${SRC}"
 # Submodules are already checked out by the git,repo dependency.
-cmake -S . -B build -DGIT_SUBMODULE=OFF -DCMAKE_INSTALL_PREFIX="${SRC}/install"
-cmake --build build -j"${CORES}"
+rm -rf "${BUILD_DIR}"
+cmake -S . -B "${BUILD_DIR}" -DGIT_SUBMODULE=OFF -DCMAKE_INSTALL_PREFIX="${SRC}/install"
+cmake --build "${BUILD_DIR}" -j"${CORES}"
 
-if [[ ! -x build/bin/openmc ]]; then
+if [[ ! -x ${BUILD_DIR}/bin/openmc ]]; then
     echo "OpenMC binary not built"
     exit 1
 fi

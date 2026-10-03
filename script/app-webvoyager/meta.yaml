@@ -1,0 +1,148 @@
+alias: app-webvoyager
+uid: edc280b9e93c165f
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: Agentic Benchmarks
+tags:
+- app
+- agentic
+- agent
+- benchmark
+- web-agent
+- webvoyager
+tags_help: app agentic benchmark webvoyager
+
+# Environment
+default_env:
+  MLC_WEBVOYAGER_NUM_SAMPLES: '3'
+  MLC_WEBVOYAGER_MODEL: gpt-4o
+  MLC_WEBVOYAGER_HF_MODEL: HuggingFaceTB/SmolLM2-135M-Instruct
+  MLC_WEBVOYAGER_MAX_STEPS: '15'
+  MLC_WEBVOYAGER_BACKEND: mock
+  MLC_WEBVOYAGER_DATASET: sample
+new_env_keys:
+- MLC_WEBVOYAGER_*
+new_state_keys:
+- mlc_webvoyager
+
+# Input mapping
+input_mapping:
+  num_samples: MLC_WEBVOYAGER_NUM_SAMPLES
+  model: MLC_WEBVOYAGER_MODEL
+  endpoint: MLC_WEBVOYAGER_ENDPOINT_URL
+  api_key: MLC_WEBVOYAGER_API_KEY
+  hf_model: MLC_WEBVOYAGER_HF_MODEL
+  max_steps: MLC_WEBVOYAGER_MAX_STEPS
+  task_file: MLC_WEBVOYAGER_TASK_FILE
+  website: MLC_WEBVOYAGER_WEBSITE
+  output_dir: MLC_WEBVOYAGER_OUTPUT_DIR
+  profile_system_info: MLC_PROFILE_SYSTEM_INFO
+  perf_record: MLC_BENCHMARK_PERF_RECORD
+  perf_stat: MLC_BENCHMARK_PERF_STAT
+  insmix: MLC_BENCHMARK_INSMIX
+  perf_events: MLC_BENCHMARK_PERF_EVENTS
+input_description:
+  num_samples:
+    desc: Number of WebVoyager tasks to run
+  model:
+    desc: Model name sent to the OpenAI-compatible endpoint (_endpoint backend)
+  endpoint:
+    desc: OpenAI-compatible chat completions endpoint URL (_endpoint backend)
+  api_key:
+    desc: API key for the endpoint
+  hf_model:
+    desc: HuggingFace model id for the local _hf-model backend
+  max_steps:
+    desc: Maximum agent steps per task
+  task_file:
+    desc: Path to a custom WebVoyager tasks JSONL file
+  website:
+    desc: Filter tasks to a single website (e.g. Allrecipes, GitHub, Amazon)
+  output_dir:
+    desc: Directory to write results.json (default is current directory)
+
+# Dependencies
+deps:
+- tags: detect,os
+- names:
+  - python
+  - python3
+  tags: get,python3
+- tags: get,generic-python-lib,_package.requests
+
+# The benchmark command (MLC_RUN_CMD) is executed through benchmark-program.
+posthook_deps:
+- tags: benchmark-program
+  names:
+  - benchmark-program
+  skip_if_env:
+    MLC_SKIP_RUN:
+    - 'on'
+
+# Variations
+variations:
+  # ── backend group (which model drives the agent) ─────────────────────────
+  dry-run:
+    group: backend
+    default: true
+    env:
+      MLC_WEBVOYAGER_BACKEND: mock
+  endpoint:
+    group: backend
+    env:
+      MLC_WEBVOYAGER_BACKEND: endpoint
+    deps:
+    - tags: get,generic-python-lib,_package.openai
+  hf-model:
+    group: backend
+    env:
+      MLC_WEBVOYAGER_BACKEND: hf
+    deps:
+    - tags: get,generic-python-lib,_package.torch
+    - tags: get,generic-python-lib,_package.transformers
+    - tags: get,generic-python-lib,_package.accelerate
+
+  # ── dataset group (bundled sample vs official WebVoyager tasks) ──────────
+  sample:
+    group: dataset
+    default: true
+    env:
+      MLC_WEBVOYAGER_DATASET: sample
+  real:
+    group: dataset
+    env:
+      MLC_WEBVOYAGER_DATASET: real
+    deps:
+    - tags: get,git,repo
+      names:
+      - webvoyager-src
+      extra_cache_tags: webvoyager,src,webvoyager-src
+      env:
+        MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_WEBVOYAGER_SRC_PATH
+        MLC_GIT_REPO_URL: https://github.com/MinorJerry/WebVoyager.git
+      force_env_keys:
+      - MLC_GIT_*
+      update_tags_from_env_with_prefix:
+        _repo.:
+        - MLC_GIT_REPO_URL
+
+  website.#:
+    env:
+      MLC_WEBVOYAGER_WEBSITE: '#'
+
+  # ── profiling passthrough (routes _profile to benchmark-program) ─────────
+  profile:
+    add_deps_recursive:
+      benchmark-program:
+        tags: _profile
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - dry-run
+    - sample
+    env:
+      MLC_WEBVOYAGER_NUM_SAMPLES: '2'

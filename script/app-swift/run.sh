@@ -13,8 +13,12 @@ CORES="${MLC_HOST_CPU_TOTAL_PHYSICAL_CORES:-$(nproc)}"
 cd "${SRC}"
 ./autogen.sh
 # Serial (non-MPI) build with HDF5 support.
-./configure --disable-mpi --with-hdf5
+COMPILER_TAG="${MLC_COMPILER_FAMILY:-default}"
+INSTALL_DIR="${SRC}/install-${COMPILER_TAG}"
+./configure --disable-mpi --with-hdf5 --prefix="${INSTALL_DIR}"
+make clean >/dev/null 2>&1 || true
 make -j"${CORES}"
+make install
 
 if [[ ! -x swift ]]; then
     echo "SWIFT binary not built"

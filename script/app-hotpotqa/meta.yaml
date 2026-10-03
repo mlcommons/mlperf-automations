@@ -1,0 +1,176 @@
+alias: app-hotpotqa
+uid: 1bf85402e3bc7f8f
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: Agentic Benchmarks
+tags:
+- app
+- agentic
+- agent
+- benchmark
+- qa
+- multi-hop
+- hotpotqa
+tags_help: app agentic benchmark hotpotqa
+
+# Environment
+default_env:
+  MLC_HOTPOTQA_NUM_SAMPLES: '3'
+  MLC_HOTPOTQA_MODEL: gpt-4o
+  MLC_HOTPOTQA_HF_MODEL: HuggingFaceTB/SmolLM2-135M-Instruct
+  MLC_HOTPOTQA_BACKEND: mock
+  MLC_HOTPOTQA_DATASET: sample
+  MLC_HOTPOTQA_SETTING: distractor
+new_env_keys:
+- MLC_HOTPOTQA_*
+new_state_keys:
+- mlc_hotpotqa
+
+# Input mapping
+input_mapping:
+  num_samples: MLC_HOTPOTQA_NUM_SAMPLES
+  model: MLC_HOTPOTQA_MODEL
+  endpoint: MLC_HOTPOTQA_ENDPOINT_URL
+  api_key: MLC_HOTPOTQA_API_KEY
+  hf_model: MLC_HOTPOTQA_HF_MODEL
+  level: MLC_HOTPOTQA_LEVEL
+  task_file: MLC_HOTPOTQA_TASK_FILE
+  output_dir: MLC_HOTPOTQA_OUTPUT_DIR
+  profile_system_info: MLC_PROFILE_SYSTEM_INFO
+  perf_record: MLC_BENCHMARK_PERF_RECORD
+  perf_stat: MLC_BENCHMARK_PERF_STAT
+  insmix: MLC_BENCHMARK_INSMIX
+  perf_events: MLC_BENCHMARK_PERF_EVENTS
+input_description:
+  num_samples:
+    desc: Number of HotpotQA questions to run
+  model:
+    desc: Model name sent to the OpenAI-compatible endpoint (_endpoint backend)
+  endpoint:
+    desc: OpenAI-compatible chat completions endpoint URL (_endpoint backend)
+  api_key:
+    desc: API key for the endpoint
+  hf_model:
+    desc: HuggingFace model id for the local _hf-model backend
+  level:
+    desc: Difficulty level to filter (easy, medium, hard)
+  task_file:
+    desc: Path to a custom HotpotQA task file (.jsonl / .json / .parquet)
+  output_dir:
+    desc: Directory to write results.json (default is current directory)
+
+# Dependencies
+deps:
+- tags: detect,os
+- names:
+  - python
+  - python3
+  tags: get,python3
+- tags: get,generic-python-lib,_package.requests
+
+# The benchmark command (MLC_RUN_CMD) is executed through benchmark-program.
+posthook_deps:
+- tags: benchmark-program
+  names:
+  - benchmark-program
+  skip_if_env:
+    MLC_SKIP_RUN:
+    - 'on'
+
+# Variations
+variations:
+  # ── backend group (which model answers the questions) ────────────────────
+  dry-run:
+    group: backend
+    default: true
+    env:
+      MLC_HOTPOTQA_BACKEND: mock
+  endpoint:
+    group: backend
+    env:
+      MLC_HOTPOTQA_BACKEND: endpoint
+    deps:
+    - tags: get,generic-python-lib,_package.openai
+  hf-model:
+    group: backend
+    env:
+      MLC_HOTPOTQA_BACKEND: hf
+    deps:
+    - tags: get,generic-python-lib,_package.torch
+    - tags: get,generic-python-lib,_package.transformers
+    - tags: get,generic-python-lib,_package.accelerate
+
+  # ── dataset group (bundled sample vs official HotpotQA dev set) ───────────
+  sample:
+    group: dataset
+    default: true
+    env:
+      MLC_HOTPOTQA_DATASET: sample
+  real:
+    group: dataset
+    env:
+      MLC_HOTPOTQA_DATASET: real
+    deps:
+    - tags: get,generic-python-lib,_package.pandas
+    - tags: get,generic-python-lib,_package.pyarrow
+    - tags: download,file,_wget
+      names:
+      - hotpotqa-dataset
+      force_cache: true
+      extra_cache_tags: hotpotqa,dataset
+      env:
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_HOTPOTQA_TASK_FILE
+        MLC_DOWNLOAD_FILENAME: hotpotqa_validation.parquet
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_HOTPOTQA_DATASET_URL
+
+  # ── setting group (selects the official split url) ───────────────────────
+  distractor:
+    group: setting
+    default: true
+    env:
+      MLC_HOTPOTQA_SETTING: distractor
+      MLC_HOTPOTQA_DATASET_URL: https://huggingface.co/api/datasets/hotpotqa/hotpot_qa/parquet/distractor/validation/0.parquet
+  fullwiki:
+    group: setting
+    env:
+      MLC_HOTPOTQA_SETTING: fullwiki
+      MLC_HOTPOTQA_DATASET_URL: https://huggingface.co/api/datasets/hotpotqa/hotpot_qa/parquet/fullwiki/validation/0.parquet
+
+  # ── level filter ─────────────────────────────────────────────────────────
+  level.easy:
+    group: level
+    env:
+      MLC_HOTPOTQA_LEVEL: easy
+  level.medium:
+    group: level
+    env:
+      MLC_HOTPOTQA_LEVEL: medium
+  level.hard:
+    group: level
+    env:
+      MLC_HOTPOTQA_LEVEL: hard
+
+  # ── profiling passthrough (routes _profile to benchmark-program) ─────────
+  profile:
+    add_deps_recursive:
+      benchmark-program:
+        tags: _profile
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - dry-run
+    - sample
+    env:
+      MLC_HOTPOTQA_NUM_SAMPLES: '2'
+  - variations_list:
+    - dry-run
+    - sample
+    - fullwiki
+    env:
+      MLC_HOTPOTQA_NUM_SAMPLES: '2'
