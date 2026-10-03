@@ -1,0 +1,6 @@
+{"task_id": "gaia-val-0001", "Question": "How many studio albums were released by Mercedes Sosa between 2000 and 2009 inclusive?", "Level": 1, "Final answer": "3", "file_name": ""}
+{"task_id": "gaia-val-0002", "Question": "What is the capital city of the country that hosted the 2016 Summer Olympics?", "Level": 1, "Final answer": "Brasilia", "file_name": ""}
+{"task_id": "gaia-val-0003", "Question": "In the attached spreadsheet, what is the total revenue across all regions?", "Level": 2, "Final answer": "45230", "file_name": "revenue.xlsx"}
+{"task_id": "gaia-val-0004", "Question": "Combining the two cited papers, how many total authors are listed?", "Level": 2, "Final answer": "11", "file_name": ""}
+{"task_id": "gaia-val-0005", "Question": "After tracing the supply chain described across the three linked reports, which country appears in all three?", "Level": 3, "Final answer": "Chile", "file_name": ""}
+{"task_id": "gaia-val-0006", "Question": "Following the multi-step research described, what is the sum of the two derived constants rounded to two decimals?", "Level": 3, "Final answer": "6.28", "file_name": ""}

@@ -11,7 +11,8 @@ def preprocess(i):
 def postprocess(i):
     env = i['env']
     src_path = env.get('MLC_MITGCM_SRC_PATH', '')
-    binary = os.path.join(src_path, 'verification/tutorial_barotropic_gyre/build/mitgcmuv')
+    compiler_tag = env.get('MLC_COMPILER_FAMILY', '') or 'default'
+    binary = os.path.join(src_path, 'verification/tutorial_barotropic_gyre', 'build-' + compiler_tag, 'mitgcmuv')
     if not os.path.isfile(binary):
         return {'return': 1, 'error': f'MITgcm binary not found at {binary}'}
     bin_dir = os.path.dirname(binary)

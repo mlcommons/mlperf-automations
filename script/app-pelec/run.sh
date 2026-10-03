@@ -9,10 +9,13 @@ fi
 
 SRC="${MLC_PELEC_SRC_PATH}"
 CORES="${MLC_HOST_CPU_TOTAL_PHYSICAL_CORES:-$(nproc)}"
+COMPILER_TAG="${MLC_COMPILER_FAMILY:-default}"
+BUILD_DIR="build-${COMPILER_TAG}"
 
 cd "${SRC}"
 git config --global --add safe.directory "${SRC}" || true
-cmake -S . -B build -DPELE_ENABLE_MPI=OFF
-cmake --build build -j"${CORES}"
+rm -rf "${BUILD_DIR}"
+cmake -S . -B "${BUILD_DIR}" -DPELE_ENABLE_MPI=OFF
+cmake --build "${BUILD_DIR}" -j"${CORES}"
 
 echo "PeleC build step completed."

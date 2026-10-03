@@ -13,7 +13,9 @@ CORES="${MLC_HOST_CPU_TOTAL_PHYSICAL_CORES:-$(nproc)}"
 cd "${SRC}"
 ./configure
 
+COMPILER_TAG="${MLC_COMPILER_FAMILY:-default}"
 cd src/enzo
+make clean >/dev/null 2>&1 || true
 make machine-linux-gnu
 
 MACH="Make.mach.linux-gnu"
@@ -48,5 +50,6 @@ if [[ ! -x enzo.exe ]]; then
     echo "Enzo binary (enzo.exe) not built"
     exit 1
 fi
+mkdir -p "${SRC}/install-${COMPILER_TAG}/bin" && cp enzo.exe "${SRC}/install-${COMPILER_TAG}/bin/"
 
 echo "Enzo built successfully."

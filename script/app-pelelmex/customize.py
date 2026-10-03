@@ -12,7 +12,8 @@ def preprocess(i):
 def postprocess(i):
     env = i['env']
     src_path = env.get('MLC_PELELMEX_SRC_PATH', '')
-    hits = glob.glob(os.path.join(src_path, 'build/**/*PeleLMeX*'), recursive=True)
+    compiler_tag = env.get('MLC_COMPILER_FAMILY', '') or 'default'
+    hits = glob.glob(os.path.join(src_path, 'build-' + compiler_tag, '**/*PeleLMeX*'), recursive=True)
     if not hits:
         return {'return': 1, 'error': f'PeleLMeX artifact not found under {src_path}'}
     bin_dir = os.path.dirname(hits[0])
