@@ -145,7 +145,6 @@ variations:
 
 # Tests
 tests:
-  needs_pat: true
-  run_inputs:
-  - variations_list:
-    - repo.official
+  # NAMD source (gitlab.com/tcbgUIUC/namd.git) requires authenticated access, so
+  # it cannot be cloned/built in public CI (same as license-gated apps like VASP).
+  run_inputs: []
