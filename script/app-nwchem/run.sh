@@ -65,10 +65,17 @@ echo "AOCL utils library directory: ${UTILS_LIB_PATH}"
 
 export LAPACK_LIB="-L${FLAME_LIB_DIR} -lflame -L${UTILS_LIB_PATH} -laoclutils"
 
-# ScaLAPACK
+# ScaLAPACK - locate the actual libscalapack (install/lib, install/lib64 or build/lib).
 if [[ -n "${MLC_AOCL_SCALAPACK_LIB_PATH}" ]]; then
+    SCALAPACK_LIB=$(find "${MLC_AOCL_SCALAPACK_LIB_PATH}" "${MLC_AOCL_SCALAPACK_LIB_PATH}/../.." \( -name "libscalapack.so" -o -name "libscalapack.a" \) 2>/dev/null | head -1)
+    if [[ -n "${SCALAPACK_LIB}" ]]; then
+        SCALAPACK_LIB_DIR=$(dirname "${SCALAPACK_LIB}")
+    else
+        SCALAPACK_LIB_DIR="${MLC_AOCL_SCALAPACK_LIB_PATH}"
+    fi
+    echo "ScaLAPACK library directory: ${SCALAPACK_LIB_DIR}"
     export USE_SCALAPACK=y
-    export SCALAPACK="-L${MLC_AOCL_SCALAPACK_LIB_PATH} -lscalapack"
+    export SCALAPACK="-L${SCALAPACK_LIB_DIR} -lscalapack"
     export SCALAPACK_SIZE=4
 fi
 

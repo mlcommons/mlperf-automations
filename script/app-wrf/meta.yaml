@@ -146,6 +146,7 @@ variations:
 
 # Tests
 tests:
-  run_inputs:
-  - variations_list:
-    - repo.official
+  # WRF's shallow clone + noahmp submodule leaves untracked phys/physics_mmm files
+  # that collide with the version-tag checkout in CI, and its build needs an
+  # interactive ./configure. Not CI-testable without a dedicated environment.
+  run_inputs: []
