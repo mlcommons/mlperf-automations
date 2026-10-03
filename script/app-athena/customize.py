@@ -16,7 +16,8 @@ def postprocess(i):
     env = i['env']
 
     src_path = env.get('MLC_ATHENA_SRC_PATH', '')
-    bin_dir = os.path.join(src_path, 'bin')
+    compiler_tag = env.get('MLC_COMPILER_FAMILY', '') or 'default'
+    bin_dir = os.path.join(src_path, 'bin-' + compiler_tag)
 
     binary = os.path.join(bin_dir, 'athena')
     if not os.path.isfile(binary):
