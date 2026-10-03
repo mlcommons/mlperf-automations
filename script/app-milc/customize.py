@@ -16,7 +16,8 @@ def postprocess(i):
     env = i['env']
 
     src_path = env.get('MLC_MILC_SRC_PATH', '')
-    bin_dir = os.path.join(src_path, 'ks_imp_dyn')
+    compiler_tag = env.get('MLC_COMPILER_FAMILY', '') or 'default'
+    bin_dir = os.path.join(src_path, 'install-' + compiler_tag, 'bin')
 
     binary = os.path.join(bin_dir, 'su3_rmd')
     if not os.path.isfile(binary):

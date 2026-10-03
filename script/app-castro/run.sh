@@ -19,7 +19,12 @@ export PATH="${SRC}/.pybin:${PATH}"
 
 # AMReX and Microphysics ship as git submodules under external/.
 cd "${SRC}/Exec/hydro_tests/Sedov"
-make -j"${CORES}" COMP=gnu USE_MPI=FALSE DIM=2 \
+COMPILER_TAG="${MLC_COMPILER_FAMILY:-default}"
+case "${COMPILER_TAG}" in gcc|default) CMP=gnu ;; oneapi) CMP=intel ;; *) CMP=llvm ;; esac
+# AMReX names the binary with ${CMP}, so different compilers do not clobber.
+# Override the actual compilers with the selected toolchain (gnu/llvm flag style).
+make -j"${CORES}" COMP=${CMP} USE_MPI=FALSE DIM=2 \
+    ${CXX:+CXX="${CXX}"} ${CC:+CC="${CC}"} ${FC:+FC="${FC}"} ${FC:+F90="${FC}"} \
     AMREX_HOME="${SRC}/external/amrex" \
     MICROPHYSICS_HOME="${SRC}/external/Microphysics"
 
@@ -27,5 +32,7 @@ if ! ls *.ex >/dev/null 2>&1; then
     echo "Castro executable not built"
     exit 1
 fi
+mkdir -p "${SRC}/install-${COMPILER_TAG}/bin"
+cp "$(ls -t *.ex | head -1)" "${SRC}/install-${COMPILER_TAG}/bin/Castro.ex"
 
 echo "Castro build step completed."
