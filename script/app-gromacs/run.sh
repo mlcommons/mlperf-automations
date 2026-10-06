@@ -22,6 +22,7 @@ mkdir -p "${BUILD_DIR}"
 cd "${BUILD_DIR}"
 
 cmake "${SRC}" \
+    -DBLA_VENDOR=OpenBLAS \
     -DGMX_MPI=ON \
     -DGMX_OPENMP=ON \
     -DGMX_FFT_LIBRARY=fftw3 \
