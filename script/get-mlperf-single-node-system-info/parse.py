@@ -66,28 +66,28 @@ EXTRACT_RULES = {
     # ---------------- Accelerator ----------------
     "accelerator_model_name": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_NAME", "MLC_ROCM_DEVICE_PROP_GPU_NAME", "MLC_XPU_DEVICE_PROP_GPU_NAME"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_NAME", "MLC_ROCM_DEVICE_PROP_GPU_NAME", "MLC_XPU_DEVICE_PROP_GPU_NAME", "MLC_TPU_DEVICE_PROP_GPU_NAME"],
     },
     "accelerators_per_node": {
         "source": "env",
-        "candidates": ["MLC_CUDA_NUM_DEVICES", "MLC_ROCM_NUM_DEVICES", "MLC_XPU_NUM_DEVICES"],
+        "candidates": ["MLC_CUDA_NUM_DEVICES", "MLC_ROCM_NUM_DEVICES", "MLC_XPU_NUM_DEVICES", "MLC_TPU_NUM_DEVICES"],
     },
     "accelerator_memory_capacity": {
         "source": "env",
         # Get the value as decimal gigabytes
-        "candidates": ["MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "MLC_ROCM_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB", "MLC_XPU_DEVICE_PROP_GLOBAL_MEMORY"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "MLC_ROCM_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB", "MLC_XPU_DEVICE_PROP_GLOBAL_MEMORY", "MLC_TPU_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB"],
     },
     "accelerator_memory_type": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_MEMORY_TYPE", "MLC_XPU_DEVICE_PROP_MEMORY_TYPE"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_MEMORY_TYPE", "MLC_XPU_DEVICE_PROP_MEMORY_TYPE", "MLC_TPU_DEVICE_PROP_MEMORY_TYPE"],
     },
     "accelerator_interconnect": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_INTERCONNECT_TYPE", "MLC_ROCM_DEVICE_PROP_GPU_INTERCONNECT_TYPE", "MLC_XPU_DEVICE_PROP_GPU_INTERCONNECT_TYPE"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_INTERCONNECT_TYPE", "MLC_ROCM_DEVICE_PROP_GPU_INTERCONNECT_TYPE", "MLC_XPU_DEVICE_PROP_GPU_INTERCONNECT_TYPE", "MLC_TPU_DEVICE_PROP_GPU_INTERCONNECT_TYPE"],
     },
     "accelerator_host_interconnect": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_ROCM_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_XPU_DEVICE_PROP_HOST_INTERCONNECT_TYPE"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_ROCM_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_XPU_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_TPU_DEVICE_PROP_HOST_INTERCONNECT_TYPE"],
     },
     "accelerator_frequency": {
         "source": "env",
@@ -103,7 +103,7 @@ EXTRACT_RULES = {
     },
     "accelerator_interconnect_topology": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_TOPOLOGY_DESC"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_TOPOLOGY_DESC", "MLC_TPU_DEVICE_PROP_GPU_TOPOLOGY_DESC"],
         "optional": True,
     },
 
@@ -225,6 +225,10 @@ def detect_inference_backend():
     if rocm_version:
         parts.append(f"ROCm {rocm_version}")
 
+    libtpu_version = os.environ.get("MLC_TPU_DEVICE_PROP_LIBTPU_VERSION", "")
+    if libtpu_version:
+        parts.append(f"libtpu {libtpu_version}")
+
     cudnn_version = None
     for pkg in ("nvidia-cudnn-cu12", "nvidia-cudnn-cu11", "cudnn"):
         cudnn_version = _pip_version(pkg)
@@ -234,6 +238,32 @@ def detect_inference_backend():
         parts.append(f"cuDNN {cudnn_version}")
 
     return ", ".join(parts)
+
+
+# Per-backend (capacity, memory type) env keys for
+# accelerator_memory_configuration. Capacity is bytes (CUDA) or GiB (ROCm,
+# XPU, TPU); ROCm reports no memory type.
+_ACCELERATOR_MEMORY_KEYS = [
+    ("MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "MLC_CUDA_DEVICE_PROP_MEMORY_TYPE"),
+    ("MLC_ROCM_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB", None),
+    ("MLC_XPU_DEVICE_PROP_GLOBAL_MEMORY", "MLC_XPU_DEVICE_PROP_MEMORY_TYPE"),
+    ("MLC_TPU_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB", "MLC_TPU_DEVICE_PROP_MEMORY_TYPE"),
+]
+
+
+def _ceil_gib(value):
+    """Whole GiB from a bytes or GiB figure (e.g. "34359738368", "15.98",
+    "24 GiB"), rounded up like accelerator_memory_capacity; None if unusable.
+    """
+    try:
+        amount = float(value.split()[0])
+    except (ValueError, IndexError):
+        return None
+    if amount <= 0:
+        return None
+    if amount >= 1024 ** 3:
+        return math.ceil(amount / (1024 ** 3))
+    return math.ceil(amount)
 
 
 # -------------------------------------------------------------------
@@ -248,7 +278,7 @@ def extract_value(rule, field_key):
         try:
             if field_key == "inference_backend":
                 v = detect_inference_backend()
-                return v if v else "Not detected: CUDA/ROCm/XPU runtime not found"
+                return v if v else "Not detected: CUDA/ROCm/XPU/TPU runtime not found"
             elif field_key == "other_software_stack":
                 stack_parts = []
                 backend = detect_inference_backend()
@@ -260,23 +290,23 @@ def extract_value(rule, field_key):
                     stack_parts.append(driver)
                 return ", ".join(stack_parts) if stack_parts else ""
             elif field_key == "accelerator_memory_configuration":
-                mem_bytes_str = os.environ.get(
-                    "MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "").strip()
-                mem_type = os.environ.get(
-                    "MLC_CUDA_DEVICE_PROP_MEMORY_TYPE", "").strip()
-                parts = []
-                if mem_bytes_str:
-                    try:
-                        mem_bytes = float(mem_bytes_str.split()[0])
-                        if mem_bytes >= 1024 ** 3:
-                            parts.append(
-                                f"{math.ceil(mem_bytes / (1024 ** 3))} GiB")
-                    except (ValueError, IndexError):
-                        pass
-                if mem_type and "unknown" not in mem_type.lower() \
-                        and "not in lookup" not in mem_type.lower():
-                    parts.append(mem_type)
-                return " ".join(parts) if parts else "N/A"
+                # Capacity and type are taken from the same backend, the
+                # first one that reported either.
+                for capacity_key, type_key in _ACCELERATOR_MEMORY_KEYS:
+                    capacity = os.environ.get(capacity_key, "").strip()
+                    mem_type = os.environ.get(
+                        type_key, "").strip() if type_key else ""
+                    if not capacity and not mem_type:
+                        continue
+                    parts = []
+                    gib = _ceil_gib(capacity)
+                    if gib:
+                        parts.append(f"{gib} GiB")
+                    if mem_type and "unknown" not in mem_type.lower() \
+                            and "not in lookup" not in mem_type.lower():
+                        parts.append(mem_type)
+                    return " ".join(parts) if parts else "N/A"
+                return "N/A"
             elif field_key == "host_processor_caches":
                 cache_levels = [
                     ("L1d", "MLC_HOST_CPU_L1D_CACHE_SIZE"),
