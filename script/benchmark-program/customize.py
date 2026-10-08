@@ -73,7 +73,8 @@ def preprocess(i):
             env['MLC_BENCHMARK_PERF_DATA'] = data
             env['MLC_BENCHMARK_PERF_REPORT_FILE'] = report
         elif mode == 'insmix':
-            # True dynamic instruction mix via Intel SDE (emulated, host-agnostic).
+            # True dynamic instruction mix via Intel SDE (emulated,
+            # host-agnostic).
             sde_bin = env.get('MLC_INTEL_SDE_BIN_WITH_PATH', 'sde64')
             out = os.path.join(perf_out, 'sde-mix-out.txt')
             perf_prefix = q + sde_bin + q + ' -mix -omix ' + q + out + q + ' -- '
@@ -88,7 +89,9 @@ def preprocess(i):
                              q + out + q)
             env['MLC_BENCHMARK_PERF_STAT_FILE'] = out
         env['MLC_RUN_PREFIX0'] = perf_prefix + env.get('MLC_RUN_PREFIX0', '')
-        logger.info('Perf profiling enabled ({}): {}'.format(mode, perf_prefix))
+        logger.info(
+            'Perf profiling enabled ({}): {}'.format(
+                mode, perf_prefix))
 
     x = env.get('MLC_RUN_PREFIX0', '')
     if x != '':
@@ -150,7 +153,8 @@ def preprocess(i):
 
     # perf record needs a post-run step to render the human-readable report.
     if perf_post_cmd:
-        post_run_cmd = post_run_cmd + ' ; ' + perf_post_cmd if post_run_cmd else perf_post_cmd
+        post_run_cmd = post_run_cmd + ' ; ' + \
+            perf_post_cmd if post_run_cmd else perf_post_cmd
 
     env['MLC_POST_RUN_CMD'] = post_run_cmd
 

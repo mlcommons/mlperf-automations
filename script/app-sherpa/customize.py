@@ -12,7 +12,13 @@ def preprocess(i):
 def postprocess(i):
     env = i['env']
     src_path = env.get('MLC_SHERPA_SRC_PATH', '')
-    hits = glob.glob(os.path.join(src_path, 'build', '**', 'libSherpaMain*'), recursive=True)
+    hits = glob.glob(
+        os.path.join(
+            src_path,
+            'build',
+            '**',
+            'libSherpaMain*'),
+        recursive=True)
     if not hits:
         return {'return': 1, 'error': f'Sherpa library not found under {src_path}'}
     bin_dir = os.path.dirname(hits[0])

@@ -11,7 +11,12 @@ def preprocess(i):
 def postprocess(i):
     env = i['env']
     src_path = env.get('MLC_PALABOS_SRC_PATH', '')
-    binary = os.path.join(src_path, 'examples', 'showCases', 'cavity3d', 'cavity3d')
+    binary = os.path.join(
+        src_path,
+        'examples',
+        'showCases',
+        'cavity3d',
+        'cavity3d')
     if not os.path.isfile(binary):
         return {'return': 1, 'error': f'Palabos binary not found at {binary}'}
     bin_dir = os.path.dirname(binary)

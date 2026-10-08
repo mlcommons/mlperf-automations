@@ -71,7 +71,8 @@ def score_string_match(pred, reference_answers):
     if not reference_answers:
         return None
     if "exact_match" in reference_answers:
-        return float(_normalise(pred) == _normalise(reference_answers["exact_match"]))
+        return float(_normalise(pred) == _normalise(
+            reference_answers["exact_match"]))
     if "must_include" in reference_answers:
         return float(all(_normalise(x) in _normalise(pred)
                          for x in reference_answers["must_include"]))
@@ -140,7 +141,8 @@ def main():
         print("ERROR: no tasks selected", file=sys.stderr)
         return 1
 
-    print(f"WebArena: {len(tasks)} task(s) | dataset={dataset} backend={backend}")
+    print(
+        f"WebArena: {len(tasks)} task(s) | dataset={dataset} backend={backend}")
 
     results = []
     start = time.time()
@@ -149,7 +151,8 @@ def main():
         eval_types = eval_block.get("eval_types", [])
         if generator is None:
             steps = min(max_steps, 5 + (len(task.get("intent", "")) % 8))
-            success = (sum(ord(c) for c in str(task.get("task_id", ""))) % 3) != 0
+            success = (sum(ord(c)
+                       for c in str(task.get("task_id", ""))) % 3) != 0
             answer = f"[mock] simulated completion for {task.get('task_id')}"
             score = float(success)
             needs_env = False
@@ -161,7 +164,8 @@ def main():
             answer = generator(system, user)
             steps = 1
             if eval_types == ["string_match"]:
-                score = score_string_match(answer, eval_block.get("reference_answers"))
+                score = score_string_match(
+                    answer, eval_block.get("reference_answers"))
                 needs_env = score is None
                 success = bool(score)
             else:
@@ -210,7 +214,8 @@ def main():
         print(f"Success rate (scored subset): "
               f"{summary['success_rate_scored'] * 100:.1f}% "
               f"({passed}/{len(scored)})")
-    print(f"{summary['num_needs_env']} task(s) need the live WebArena environment")
+    print(
+        f"{summary['num_needs_env']} task(s) need the live WebArena environment")
     print(f"Results written to {out_file}")
     return 0
 

@@ -5,7 +5,8 @@ import glob
 
 def preprocess(i):
     if i['os_info']['platform'] == 'windows':
-        return {'return': 1, 'error': 'Windows is not supported for OpenMolcas builds'}
+        return {'return': 1,
+                'error': 'Windows is not supported for OpenMolcas builds'}
     return {'return': 0}
 
 

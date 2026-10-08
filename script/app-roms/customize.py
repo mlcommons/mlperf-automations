@@ -26,7 +26,8 @@ def postprocess(i):
         install_bin = os.path.join(src_path, 'install-' + compiler_tag, 'bin')
         roms_bin = os.path.join(install_bin, 'romsM')
         if not os.path.isfile(roms_bin):
-            return {'return': 1, 'error': f'ROMS binary (romsM) not found in {build_dir} or {install_bin}'}
+            return {
+                'return': 1, 'error': f'ROMS binary (romsM) not found in {build_dir} or {install_bin}'}
 
     bin_dir = os.path.dirname(roms_bin)
     env['MLC_ROMS_BIN_PATH'] = bin_dir
