@@ -264,10 +264,14 @@ def extract_value(rule, field_key):
                     stack_parts.append(driver)
                 return ", ".join(stack_parts) if stack_parts else ""
             elif field_key == "accelerator_memory_configuration":
-                mem_bytes_str = os.environ.get(
-                    "MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "").strip()
-                mem_type = os.environ.get(
-                    "MLC_CUDA_DEVICE_PROP_MEMORY_TYPE", "").strip()
+                mem_bytes_str = (
+                    os.environ.get("MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "")
+                    or os.environ.get("MLC_TPU_DEVICE_PROP_GLOBAL_MEMORY", "")
+                ).strip()
+                mem_type = (
+                    os.environ.get("MLC_CUDA_DEVICE_PROP_MEMORY_TYPE", "")
+                    or os.environ.get("MLC_TPU_DEVICE_PROP_MEMORY_TYPE", "")
+                ).strip()
                 parts = []
                 if mem_bytes_str:
                     try:
@@ -275,6 +279,9 @@ def extract_value(rule, field_key):
                         if mem_bytes >= 1024 ** 3:
                             parts.append(
                                 f"{math.ceil(mem_bytes / (1024 ** 3))} GiB")
+                        else:
+                            # Already in GiB (e.g. "95 GiB" from get-tpu-devices)
+                            parts.append(f"{math.ceil(mem_bytes)} GiB")
                     except (ValueError, IndexError):
                         pass
                 if mem_type and "unknown" not in mem_type.lower() \
