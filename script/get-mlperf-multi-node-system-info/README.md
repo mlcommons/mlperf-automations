@@ -47,6 +47,9 @@ mlcr get-mlperf-multi-node-system-info
 | `--dataset_name` |  |  | `` |
 | `--dataset_type` |  |  | `` |
 | `--division` |  |  | `` |
+| `--framework` |  |  | `` |
+| `--framework_name` |  |  | `` |
+| `--host_networking_topology` |  |  | `` |
 | `--hw_notes` |  |  | `` |
 | `--input_token_average` |  |  | `` |
 | `--link_to_dataset` |  |  | `` |
@@ -62,6 +65,7 @@ mlcr get-mlperf-multi-node-system-info
 | `--output_token_average` |  |  | `` |
 | `--skip_ssh_key_file` |  |  | `` |
 | `--ssh_ids` |  |  | `` |
+| `--sw_notes` |  |  | `` |
 | `--system_availability_status` |  |  | `` |
 | `--submitter_contact` |  |  | `` |
 | `--submitter_org_name` |  |  | `` |
@@ -114,6 +118,7 @@ mlcr get-mlperf-multi-node-system-info
 
 - `endpoints`
 - `inference`
+- `training`
 
 ### Ungrouped
 

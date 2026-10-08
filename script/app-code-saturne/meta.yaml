@@ -1,0 +1,91 @@
+alias: app-code-saturne
+uid: 431292e455919878
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: HPC Application
+tags:
+- app
+- code-saturne
+- hpc
+
+# Cache
+cache: true
+
+# Environment
+default_env: {}
+new_env_keys:
+- MLC_CODE_SATURNE_SRC_PATH
+- MLC_CODE_SATURNE_INSTALL_PATH
+- MLC_CODE_SATURNE_BIN_PATH
+- +PATH
+new_state_keys: []
+
+# Dependencies
+deps:
+- tags: detect,cpu
+- env:
+    MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
+  tags: get,generic-sys-util,_build-essential
+- tags: get,generic-sys-util,_autoconf
+- tags: get,generic-sys-util,_automake
+- tags: get,generic-sys-util,_libtool
+- tags: get,generic-sys-util,_m4
+- tags: get,generic-sys-util,_python3-dev
+- tags: get,generic-sys-util,_python3-setuptools
+- tags: get,generic-sys-util,_zlib1g-dev
+- tags: get,generic-sys-util,_libopenmpi-dev
+- tags: get,python3
+  names:
+  - python
+  - python3
+- tags: get,git,repo
+  names:
+  - code-saturne-repo
+  extra_cache_tags: code-saturne,repo,code-saturne-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_CODE_SATURNE_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
+variations:
+  repo.#:
+    env:
+      MLC_GIT_REPO_URL: '#'
+    group: repo
+  repo.official:
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://github.com/code-saturne/code_saturne.git
+    group: repo
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+    group: version
+  version.9.2.0:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: v9.2.0
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - repo.official

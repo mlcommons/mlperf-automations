@@ -30,9 +30,14 @@ def postprocess(i):
 
     if os_info['platform'] != 'windows':
         if os_info['platform'] == 'linux':
+            # ld may be absent (e.g. minimal containers); degrade gracefully
+            # instead of aborting detect-os.
             sys_cmd = "ld --verbose | grep SEARCH_DIR "
-            result = subprocess.check_output(
-                sys_cmd, shell=True).decode("utf-8")
+            try:
+                result = subprocess.check_output(
+                    sys_cmd, shell=True, stderr=subprocess.DEVNULL).decode("utf-8")
+            except (subprocess.CalledProcessError, FileNotFoundError, OSError):
+                result = ""
             result = result.replace("SEARCH_DIR(\"=", "")
             result = result.replace("SEARCH_DIR(\"", "")
             result = result.replace("\")", "")
@@ -75,8 +80,9 @@ def postprocess(i):
             env['MLC_HOST_OS_PACKAGE_MANAGER'] = "dnf"
         if env.get('MLC_HOST_OS_FLAVOR', '') == "amzn":
             env['MLC_HOST_OS_PACKAGE_MANAGER'] = "yum"
-        if env.get('MLC_HOST_OS_FLAVOR_LIKE', '') == "arch":
-            env['MLC_HOST_OS_PACKAGE_MANAGER'] = "arch"
+        if env.get('MLC_HOST_OS_FLAVOR_LIKE', '') == "arch" or \
+                env.get('MLC_HOST_OS_FLAVOR', '') == "arch":
+            env['MLC_HOST_OS_PACKAGE_MANAGER'] = "pacman"
         if env.get('MLC_HOST_OS_FLAVOR', '') == "macos":
             env['MLC_HOST_OS_PACKAGE_MANAGER'] = "brew"
         if env.get('MLC_HOST_OS_FLAVOR', '') == "sles":

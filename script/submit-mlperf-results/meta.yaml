@@ -30,3 +30,6 @@ variations:
   wg-inference:
     env:
       MLC_MLPERF_BENCHMARK: Inference
+  wg-training:
+    env:
+      MLC_MLPERF_BENCHMARK: Training

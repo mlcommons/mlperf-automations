@@ -66,32 +66,32 @@ EXTRACT_RULES = {
     # ---------------- Accelerator ----------------
     "accelerator_model_name": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_NAME", "MLC_ROCM_DEVICE_PROP_GPU_NAME", "MLC_XPU_DEVICE_PROP_GPU_NAME"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_NAME", "MLC_ROCM_DEVICE_PROP_GPU_NAME", "MLC_XPU_DEVICE_PROP_GPU_NAME", "MLC_TPU_DEVICE_PROP_TPU_NAME"],
     },
     "accelerators_per_node": {
         "source": "env",
-        "candidates": ["MLC_CUDA_NUM_DEVICES", "MLC_ROCM_NUM_DEVICES", "MLC_XPU_NUM_DEVICES"],
+        "candidates": ["MLC_CUDA_NUM_DEVICES", "MLC_ROCM_NUM_DEVICES", "MLC_XPU_NUM_DEVICES", "MLC_TPU_NUM_DEVICES"],
     },
     "accelerator_memory_capacity": {
         "source": "env",
         # Get the value as decimal gigabytes
-        "candidates": ["MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "MLC_ROCM_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB", "MLC_XPU_DEVICE_PROP_GLOBAL_MEMORY"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "MLC_ROCM_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB", "MLC_XPU_DEVICE_PROP_GLOBAL_MEMORY", "MLC_TPU_DEVICE_PROP_GLOBAL_MEMORY"],
     },
     "accelerator_memory_type": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_MEMORY_TYPE", "MLC_XPU_DEVICE_PROP_MEMORY_TYPE"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_MEMORY_TYPE", "MLC_ROCM_DEVICE_PROP_MEMORY_TYPE", "MLC_XPU_DEVICE_PROP_MEMORY_TYPE", "MLC_TPU_DEVICE_PROP_MEMORY_TYPE"],
     },
     "accelerator_interconnect": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_INTERCONNECT_TYPE", "MLC_ROCM_DEVICE_PROP_GPU_INTERCONNECT_TYPE", "MLC_XPU_DEVICE_PROP_GPU_INTERCONNECT_TYPE"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_INTERCONNECT_TYPE", "MLC_ROCM_DEVICE_PROP_GPU_INTERCONNECT_TYPE", "MLC_XPU_DEVICE_PROP_GPU_INTERCONNECT_TYPE", "MLC_TPU_DEVICE_PROP_ACCELERATOR_INTERCONNECT_TYPE"],
     },
     "accelerator_host_interconnect": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_ROCM_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_XPU_DEVICE_PROP_HOST_INTERCONNECT_TYPE"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_ROCM_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_XPU_DEVICE_PROP_HOST_INTERCONNECT_TYPE", "MLC_TPU_DEVICE_PROP_HOST_INTERCONNECT_TYPE"],
     },
     "accelerator_frequency": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_MAX_CLOCK_RATE", "MLC_ROCM_DEVICE_PROP_MAX_CLOCK_RATE"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_MAX_CLOCK_RATE", "MLC_ROCM_DEVICE_PROP_MAX_CLOCK_RATE", "MLC_TPU_DEVICE_PROP_MAX_CLOCK_RATE"],
     },
     "accelerator_memory_configuration": {
         "source": "detect",
@@ -103,7 +103,7 @@ EXTRACT_RULES = {
     },
     "accelerator_interconnect_topology": {
         "source": "env",
-        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_TOPOLOGY_DESC"],
+        "candidates": ["MLC_CUDA_DEVICE_PROP_GPU_TOPOLOGY_DESC", "MLC_TPU_DEVICE_PROP_ACCELERATOR_INTERCONNECT_TOPOLOGY"],
         "optional": True,
     },
 
@@ -211,8 +211,24 @@ def _pip_version(package):
     return None
 
 
+def _rocm_runtime_version():
+    """ROCm major.minor from get-rocm-devices' HIP runtime version.
+
+    hipRuntimeGetVersion() encodes the version as
+    major * 10000000 + minor * 100000 + build (e.g. 70226015 for 7.2), which
+    is what current get-rocm-devices exports. A value that is already dotted
+    is passed through as is.
+    """
+    raw = os.environ.get(
+        "MLC_ROCM_DEVICE_PROP_ROCM_RUNTIME_VERSION", "").strip()
+    if not raw.isdigit() or int(raw) < 10000000:
+        return raw
+    encoded = int(raw)
+    return f"{encoded // 10000000}.{encoded // 100000 % 100}"
+
+
 def detect_inference_backend():
-    """Build inference backend string from CUDA/ROCm + cuDNN versions."""
+    """Build inference backend string from CUDA/ROCm/TPU + cuDNN versions."""
     parts = []
 
     cuda_runtime = os.environ.get(
@@ -221,9 +237,14 @@ def detect_inference_backend():
         parts.append(f"CUDA {cuda_runtime}")
 
     rocm_version = (os.environ.get("MLC_ROCM_VERSION", "")
-                    or os.environ.get("MLC_ROCM_DEVICE_PROP_ROCM_VERSION", ""))
+                    or os.environ.get("MLC_ROCM_DEVICE_PROP_ROCM_VERSION", "")
+                    or _rocm_runtime_version())
     if rocm_version:
         parts.append(f"ROCm {rocm_version}")
+
+    libtpu_version = os.environ.get("MLC_TPU_LIBTPU_VERSION", "")
+    if libtpu_version:
+        parts.append(f"libtpu {libtpu_version}")
 
     cudnn_version = None
     for pkg in ("nvidia-cudnn-cu12", "nvidia-cudnn-cu11", "cudnn"):
@@ -248,7 +269,7 @@ def extract_value(rule, field_key):
         try:
             if field_key == "inference_backend":
                 v = detect_inference_backend()
-                return v if v else "Not detected: CUDA/ROCm/XPU runtime not found"
+                return v if v else "Not detected: CUDA/ROCm/XPU/TPU runtime not found"
             elif field_key == "other_software_stack":
                 stack_parts = []
                 backend = detect_inference_backend()
@@ -260,10 +281,17 @@ def extract_value(rule, field_key):
                     stack_parts.append(driver)
                 return ", ".join(stack_parts) if stack_parts else ""
             elif field_key == "accelerator_memory_configuration":
-                mem_bytes_str = os.environ.get(
-                    "MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "").strip()
-                mem_type = os.environ.get(
-                    "MLC_CUDA_DEVICE_PROP_MEMORY_TYPE", "").strip()
+                mem_bytes_str = (
+                    os.environ.get("MLC_CUDA_DEVICE_PROP_GLOBAL_MEMORY", "")
+                    or os.environ.get(
+                        "MLC_ROCM_DEVICE_PROP_GLOBAL_MEMORY_IN_GIB", "")
+                    or os.environ.get("MLC_TPU_DEVICE_PROP_GLOBAL_MEMORY", "")
+                ).strip()
+                mem_type = (
+                    os.environ.get("MLC_CUDA_DEVICE_PROP_MEMORY_TYPE", "")
+                    or os.environ.get("MLC_ROCM_DEVICE_PROP_MEMORY_TYPE", "")
+                    or os.environ.get("MLC_TPU_DEVICE_PROP_MEMORY_TYPE", "")
+                ).strip()
                 parts = []
                 if mem_bytes_str:
                     try:
@@ -271,6 +299,10 @@ def extract_value(rule, field_key):
                         if mem_bytes >= 1024 ** 3:
                             parts.append(
                                 f"{math.ceil(mem_bytes / (1024 ** 3))} GiB")
+                        else:
+                            # Already in GiB (ROCm, or e.g. "95 GiB" from
+                            # get-tpu-devices)
+                            parts.append(f"{math.ceil(mem_bytes)} GiB")
                     except (ValueError, IndexError):
                         pass
                 if mem_type and "unknown" not in mem_type.lower() \

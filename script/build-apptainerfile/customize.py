@@ -194,7 +194,9 @@ def preprocess(i):
 
         f.write("    # Download MLC repo for scripts\n")
         if use_host_repos:
-            # Host repos are copied in via %setup; just register them.
+            # Host repos are copied in via %setup; register them under a fixed
+            # MLC_REPOS so the runtime env (incl. fakeroot) can find them.
+            f.write("    export MLC_REPOS=/opt/mlc_host_repos\n")
             f.write(
                 "    for d in /opt/mlc_host_repos/*/; do mlc add repo \"$d\" --quiet 2>/dev/null || true; done\n")
             f.write(

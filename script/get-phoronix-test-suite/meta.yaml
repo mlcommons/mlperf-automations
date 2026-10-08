@@ -1,0 +1,68 @@
+alias: get-phoronix-test-suite
+uid: 04b2fa91fd104c20
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: Detection or installation of tools and artifacts
+tags:
+- get
+- install
+- phoronix-test-suite
+- phoronix
+- pts
+
+# Cache
+cache: true
+
+# Environment
+default_env:
+  MLC_PHORONIX_VERSION: '10.8.4'
+new_env_keys:
+- MLC_PHORONIX_TEST_SUITE_BIN_WITH_PATH
+- MLC_PHORONIX_INSTALLED_PATH
+- MLC_PHORONIX_DEB_PATH
+- +PATH
+
+# Input mapping
+input_mapping:
+  phoronix_path: MLC_PHORONIX_TEST_SUITE_PATH
+  install_path: MLC_PHORONIX_TEST_SUITE_PATH
+  version: MLC_PHORONIX_VERSION
+  install_prefix: MLC_PHORONIX_INSTALL_PREFIX
+  no_sudo: MLC_PHORONIX_NO_SUDO
+  skip_sudo: MLC_SKIP_SUDO
+
+input_description:
+  phoronix_path:
+    desc: Path to an existing phoronix-test-suite install - either the launcher script itself or the directory containing it. When given, download/install is skipped.
+  version:
+    desc: Phoronix Test Suite version to fetch when it is not already installed (default 10.8.4).
+  install_prefix:
+    desc: Install the suite (no sudo) into this directory - e.g. a shared /pa_nvme path reusable across SLURM nodes. If it already contains a working launcher it is reused.
+  no_sudo:
+    desc: Force the no-sudo portable install (requires install_prefix). Useful on SLURM compute nodes where apt/sudo is unavailable.
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: detect,sudo
+# Fetch the release .deb only when no existing install path was provided.
+- tags: download-and-extract
+  names:
+  - phoronix-deb
+  extra_cache_tags: phoronix,test-suite,deb
+  force_cache: true
+  skip_if_env:
+    MLC_PHORONIX_TEST_SUITE_PATH:
+    - true
+  env:
+    MLC_DAE_URL: 'https://github.com/phoronix-test-suite/phoronix-test-suite/releases/download/v<<<MLC_PHORONIX_VERSION>>>/phoronix-test-suite_<<<MLC_PHORONIX_VERSION>>>_all.deb'
+    MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_PHORONIX_DEB_PATH
+    MLC_VERIFY_SSL: 'no'
+
+# Variations
+variations:
+  path.#:
+    env:
+      MLC_PHORONIX_TEST_SUITE_PATH: '#'

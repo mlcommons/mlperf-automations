@@ -8,7 +8,9 @@ if [[ -z "${MLC_HMMER_SRC_PATH}" ]]; then
 fi
 
 SRC="${MLC_HMMER_SRC_PATH}"
-INSTALL_DIR="${SRC}/install"
+# Isolate the build per compiler so different toolchains do not clobber each other.
+COMPILER_TAG="${MLC_COMPILER_FAMILY:-default}"
+INSTALL_DIR="${SRC}/install-${COMPILER_TAG}"
 CORES="${MLC_HOST_CPU_TOTAL_PHYSICAL_CORES:-$(nproc)}"
 
 echo "Building HMMER..."
@@ -27,10 +29,15 @@ if [[ ! -f configure ]]; then
     autoconf
 fi
 
-# Configure with MPI support
+# Configure with MPI support. mpicc/mpifort pick the underlying compiler from
+# OMPI_CC/OMPI_FC exported by get-compiler-paths-amd for the selected family.
 ./configure --prefix="${INSTALL_DIR}" --enable-mpi CC=mpicc
 
-echo "Building HMMER with ${CORES} cores..."
+# Force recompile so object files from another compiler are not reused (keeps
+# autotools auxiliary files, unlike distclean).
+make clean >/dev/null 2>&1 || true
+
+echo "Building HMMER (${COMPILER_TAG}) with ${CORES} cores..."
 make -j${CORES}
 
 echo "Installing HMMER..."

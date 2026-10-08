@@ -1,0 +1,193 @@
+alias: app-gaia-benchmark
+uid: 767890856ac60b59
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: Agentic Benchmarks
+tags:
+- app
+- agentic
+- agent
+- benchmark
+- gaia
+- general-ai-assistant
+tags_help: app agentic benchmark gaia
+
+# Environment
+default_env:
+  MLC_GAIA_NUM_SAMPLES: '3'
+  MLC_GAIA_MODEL: gpt-4o
+  MLC_GAIA_HF_MODEL: HuggingFaceTB/SmolLM2-135M-Instruct
+  MLC_GAIA_TRACE_TYPE: web
+  MLC_GAIA_SPLIT: validation
+  MLC_GAIA_BACKEND: mock
+  MLC_GAIA_DATASET: sample
+new_env_keys:
+- MLC_GAIA_*
+new_state_keys:
+- mlc_gaia
+
+# Input mapping
+input_mapping:
+  num_samples: MLC_GAIA_NUM_SAMPLES
+  model: MLC_GAIA_MODEL
+  endpoint: MLC_GAIA_ENDPOINT_URL
+  api_key: MLC_GAIA_API_KEY
+  hf_model: MLC_GAIA_HF_MODEL
+  hf_token: MLC_GAIA_HF_TOKEN
+  trace_type: MLC_GAIA_TRACE_TYPE
+  level: MLC_GAIA_LEVEL
+  split: MLC_GAIA_SPLIT
+  task_file: MLC_GAIA_TASK_FILE
+  output_dir: MLC_GAIA_OUTPUT_DIR
+  profile_system_info: MLC_PROFILE_SYSTEM_INFO
+  perf_record: MLC_BENCHMARK_PERF_RECORD
+  perf_stat: MLC_BENCHMARK_PERF_STAT
+  insmix: MLC_BENCHMARK_INSMIX
+  perf_events: MLC_BENCHMARK_PERF_EVENTS
+input_description:
+  num_samples:
+    desc: Number of GAIA tasks to run
+  model:
+    desc: Model name sent to the OpenAI-compatible endpoint (_endpoint backend)
+  endpoint:
+    desc: OpenAI-compatible chat completions endpoint URL (_endpoint backend)
+  api_key:
+    desc: API key for the endpoint
+  hf_model:
+    desc: HuggingFace model id for the local _hf-model backend
+  hf_token:
+    desc: HuggingFace token with access to the gated gaia-benchmark/GAIA dataset
+  trace_type:
+    desc: Agent trace type - web, rag or deep-research (controls trace length)
+  level:
+    desc: GAIA difficulty level to filter (1, 2 or 3)
+  split:
+    desc: GAIA split - validation or test
+  task_file:
+    desc: Path to a custom GAIA metadata JSONL file
+  output_dir:
+    desc: Directory to write results.json (default is current directory)
+
+# Dependencies
+deps:
+- tags: detect,os
+- names:
+  - python
+  - python3
+  tags: get,python3
+- tags: get,generic-python-lib,_package.requests
+
+# The benchmark command (MLC_RUN_CMD) is executed through benchmark-program.
+posthook_deps:
+- tags: benchmark-program
+  names:
+  - benchmark-program
+  skip_if_env:
+    MLC_SKIP_RUN:
+    - 'on'
+
+# Variations
+variations:
+  # ── backend group (which model answers the questions) ────────────────────
+  dry-run:
+    group: backend
+    default: true
+    env:
+      MLC_GAIA_BACKEND: mock
+  endpoint:
+    group: backend
+    env:
+      MLC_GAIA_BACKEND: endpoint
+    deps:
+    - tags: get,generic-python-lib,_package.openai
+  hf-model:
+    group: backend
+    env:
+      MLC_GAIA_BACKEND: hf
+    deps:
+    - tags: get,generic-python-lib,_package.torch
+    - tags: get,generic-python-lib,_package.transformers
+    - tags: get,generic-python-lib,_package.accelerate
+
+  # ── dataset group (bundled sample vs gated official GAIA dataset) ─────────
+  sample:
+    group: dataset
+    default: true
+    env:
+      MLC_GAIA_DATASET: sample
+  real:
+    group: dataset
+    env:
+      MLC_GAIA_DATASET: real
+    deps:
+    - tags: get,generic-python-lib,_package.huggingface_hub
+
+  # ── trace-type group (varying-length agent traces) ───────────────────────
+  web:
+    group: trace-type
+    default: true
+    env:
+      MLC_GAIA_TRACE_TYPE: web
+  rag:
+    group: trace-type
+    env:
+      MLC_GAIA_TRACE_TYPE: rag
+  deep-research:
+    group: trace-type
+    env:
+      MLC_GAIA_TRACE_TYPE: deep-research
+
+  # ── level filter ─────────────────────────────────────────────────────────
+  level.1:
+    group: level
+    env:
+      MLC_GAIA_LEVEL: '1'
+  level.2:
+    group: level
+    env:
+      MLC_GAIA_LEVEL: '2'
+  level.3:
+    group: level
+    env:
+      MLC_GAIA_LEVEL: '3'
+
+  # ── split group ──────────────────────────────────────────────────────────
+  validation:
+    group: split
+    default: true
+    env:
+      MLC_GAIA_SPLIT: validation
+  test:
+    group: split
+    env:
+      MLC_GAIA_SPLIT: test
+
+  # ── profiling passthrough (routes _profile to benchmark-program) ─────────
+  profile:
+    add_deps_recursive:
+      benchmark-program:
+        tags: _profile
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - dry-run
+    - sample
+    - web
+    env:
+      MLC_GAIA_NUM_SAMPLES: '2'
+  - variations_list:
+    - dry-run
+    - sample
+    - rag
+    env:
+      MLC_GAIA_NUM_SAMPLES: '2'
+  - variations_list:
+    - dry-run
+    - sample
+    - deep-research
+    env:
+      MLC_GAIA_NUM_SAMPLES: '2'

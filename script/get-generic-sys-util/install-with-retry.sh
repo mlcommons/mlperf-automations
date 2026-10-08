@@ -6,6 +6,7 @@ echo "$cmd"
 # set the max number of retries as well as the delay between the retries
 max_retries=3
 delay_in_retry=3
+apt_refreshed=0
 
 for ((i=1; i<=max_retries; i++)); do
     echo "Attempting to install ${MLC_SYS_UTIL_NAME} - $i of $max_retries..."
@@ -23,6 +24,20 @@ for ((i=1; i<=max_retries; i++)); do
         delay=$((RANDOM % 6 + 5))
         echo "Package manager lock detected, retrying in ${delay}s..."
         sleep $delay
+        continue
+    fi
+
+    # Stale apt index: a cached package version 404s because the mirror now
+    # serves a newer one. Refresh the package lists once, then retry.
+    if [[ $apt_refreshed -eq 0 ]] && command -v apt-get >/dev/null 2>&1 \
+        && echo "$output" | grep -q -i -E "Failed to fetch|Unable to fetch some archives|404 +Not Found"; then
+        apt_refreshed=1
+        echo "Stale apt index detected (fetch/404). Running apt-get update before retrying..."
+        if command -v sudo >/dev/null 2>&1; then
+            sudo apt-get update || apt-get update
+        else
+            apt-get update
+        fi
         continue
     fi
 
