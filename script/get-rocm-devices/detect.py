@@ -28,6 +28,7 @@ def get_gpu_info():
         gpu_name = ""
         host_interconnect_result = ""
         gpu_interconnect_result = ""
+        memory_type = ""
         try:
             gpu_result = subprocess.run(
                 ["amd-smi", "static", "--gpu", str(i), "--json"], capture_output=True, text=True)
@@ -51,6 +52,11 @@ def get_gpu_info():
                     "market_name",
                     "") or "")
             gpu_name = gpu_name.replace("™", "").replace("®", "").strip()
+            # VRAM type, e.g. "GDDR6" or "HBM3"; amd-smi reports "N/A" when
+            # it cannot tell.
+            memory_type = (gpu_static.get("vram", {}).get("type", "") or "")
+            if memory_type.upper() == "N/A":
+                memory_type = ""
         except Exception as e:
             print(f"Error occurred while fetching info for GPU {i}: {str(e)}")
 
@@ -72,6 +78,7 @@ def get_gpu_info():
             "ROCM driver version": f"{hip.hipDriverGetVersion()[1]}",
             "ROCM runtime version": hip.hipRuntimeGetVersion()[1],
             "Global memory in GiB": hip.hipDeviceTotalMem(i)[1] / 1_073_741_824,
+            "Memory Type": memory_type,
             "Max clock rate": f"{hip.hipDeviceGetAttribute(hip.hipDeviceAttribute_t(hipDeviceAttributeClockRate), i)[1] / 1000} MHz",
             "Total amount of shared memory per block in bytes": f"{hip.hipDeviceGetAttribute(hip.hipDeviceAttribute_t(hipDeviceAttributeMaxSharedMemoryPerBlock), i)[1]}",
             "Total number of registers available per block in bytes": f"{hip.hipDeviceGetAttribute(hip.hipDeviceAttribute_t(hipDeviceAttributeMaxRegistersPerBlock), i)[1]}",
