@@ -1,0 +1,82 @@
+alias: app-blast
+uid: 57313fd4ac455113
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: HPC Application
+tags:
+- app
+- blast
+- blast-plus
+- hpc
+
+# Cache
+cache: true
+
+# Environment
+default_env: {}
+new_env_keys:
+- MLC_BLAST_SRC_PATH
+- MLC_BLAST_INSTALL_PATH
+- MLC_BLAST_BIN_PATH
+- +PATH
+new_state_keys: []
+
+# Dependencies
+deps:
+- tags: detect,cpu
+- env:
+    MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
+  tags: get,generic-sys-util,_build-essential
+- tags: get,generic-sys-util,_zlib1g-dev
+- tags: get,git,repo
+  names:
+  - blast-repo
+  extra_cache_tags: blast,repo,blast-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_BLAST_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
+variations:
+  repo.#:
+    env:
+      MLC_GIT_REPO_URL: '#'
+    group: repo
+  repo.official:
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://github.com/ncbi/ncbi-cxx-toolkit-public.git
+    group: repo
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+    group: version
+  version.30.8.0:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: release/30.8.0
+
+# Tests
+# NOTE: empty on purpose. Building BLAST+ from the NCBI C++ Toolkit is a very
+# large (multi-hour) compilation that exceeds the ubuntu-latest CI budget, so no
+# automated test is registered.
+tests:
+  run_inputs: []

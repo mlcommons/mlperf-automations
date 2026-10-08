@@ -124,6 +124,8 @@ mlcr get-mlperf-multi-node-system-info
 
 - `exclude_current_node`
 - `inference_optional_nameplate`
+- `infragraph`
 - `network`
+- `no_visualize`
 - `power`
 - `redfish`

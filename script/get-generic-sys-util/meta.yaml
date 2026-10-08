@@ -76,6 +76,16 @@ variations:
         yum: autoconf
         zypper: autoconf
         pacman: autoconf
+  automake:
+    env:
+      MLC_SYS_UTIL_NAME: automake
+    state:
+      automake:
+        apt: automake
+        dnf: automake
+        yum: automake
+        zypper: automake
+        pacman: automake
   build-essential:
     env:
       MLC_SYS_UTIL_NAME: build-essential
@@ -274,6 +284,20 @@ variations:
         dnf: gcc-toolset-9-gcc-c++
         zypper: gcc-toolset-9-gcc-c++
         yum: gcc-toolset-9-gcc-c++
+  g++-multilib:
+    env:
+      MLC_SYS_UTIL_NAME: g++-multilib
+      MLC_SYS_UTIL_CHECK_CMD: "echo 'int main(){return 0;}' | g++ -m32 -x c++ - -o /dev/null 2>/dev/null"
+    state:
+      g++-multilib:
+        apt: g++-multilib
+  gcc-multilib:
+    env:
+      MLC_SYS_UTIL_NAME: gcc-multilib
+      MLC_SYS_UTIL_CHECK_CMD: "echo 'int main(){return 0;}' | gcc -m32 -x c - -o /dev/null 2>/dev/null"
+    state:
+      gcc-multilib:
+        apt: gcc-multilib
   gcc-11:
     env:
       MLC_SYS_UTIL_NAME: gcc11
@@ -428,6 +452,15 @@ variations:
         dnf: ''
         yum: ''
         zypper: ''
+  openjdk-17-jdk:
+    env:
+      MLC_SYS_UTIL_NAME: openjdk_17_jdk
+    state:
+      openjdk_17_jdk:
+        apt: openjdk-17-jdk
+        dnf: java-17-openjdk-devel
+        yum: java-17-openjdk-devel
+        zypper: java-17-openjdk-devel
   libboost-all-dev:
     env:
       MLC_SYS_UTIL_NAME: libboost-all-dev
@@ -517,6 +550,15 @@ variations:
     state:
       libffi8:
         apt: libffi8
+  libeigen3-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libeigen3_dev
+    state:
+      libeigen3_dev:
+        apt: libeigen3-dev
+        dnf: eigen3-devel
+        yum: eigen3-devel
+        zypper: eigen3-devel
   libfftw3-dev:
     env:
       MLC_SYS_UTIL_NAME: libfftw3-dev
@@ -594,6 +636,16 @@ variations:
         dnf: gmock-devel
         yum: gmock-devel
         zypper: gmock-devel
+  libgsl-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libgsl-dev
+    state:
+      libgsl-dev:
+        apt: libgsl-dev
+        dnf: gsl-devel
+        yum: gsl-devel
+        zypper: gsl-devel
+        pacman: gsl
   libhdf5-dev:
     env:
       MLC_SYS_UTIL_NAME: libhdf5-dev
@@ -839,6 +891,16 @@ variations:
         yum: libssl-devel
         zypper: libssl-devel
         pacman: openssl
+  libtool:
+    env:
+      MLC_SYS_UTIL_NAME: libtool
+    state:
+      libtool:
+        apt: libtool
+        dnf: libtool
+        yum: libtool
+        zypper: libtool
+        pacman: libtool
   libudev-dev:
     env:
       MLC_SYS_UTIL_NAME: libudev-dev
@@ -851,6 +913,16 @@ variations:
         dnf: libudev-devl
         yum: libudev-devel
         zypper: libudev-devl
+  libxc-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libxc_dev
+    state:
+      libxc_dev:
+        apt: libxc-dev
+        dnf: libxc-devel
+        yum: libxc-devel
+        zypper: libxc-devel
+        pacman: libxc
   libxcrypt-compat:
     env:
       MLC_SYS_UTIL_NAME: libxcrypt-compat
@@ -878,6 +950,16 @@ variations:
         dnf: ''
         yum: ''
         zypper: ''
+  libxml2-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libxml2_dev
+    state:
+      libxml2_dev:
+        apt: libxml2-dev
+        dnf: libxml2-devel
+        yum: libxml2-devel
+        zypper: libxml2-devel
+        pacman: libxml2
   linux-tools:
     env:
       MLC_SYS_UTIL_NAME: linux-tools
@@ -894,6 +976,16 @@ variations:
         yum: perf
         zypper: perf
         pacman: perf
+  m4:
+    env:
+      MLC_SYS_UTIL_NAME: m4
+    state:
+      m4:
+        apt: m4
+        dnf: m4
+        yum: m4
+        zypper: m4
+        pacman: m4
   md5sha1sum:
     env:
       MLC_SYS_UTIL_NAME: md5sha1sum
@@ -1006,6 +1098,18 @@ variations:
         yum: nvidia-cuda-toolkit
         zypper: nvidia-cuda-toolkit
         pacman: cuda
+  perl:
+    env:
+      MLC_SYS_UTIL_NAME: perl
+    new_env_keys:
+    - MLC_PERL_VERSION
+    state:
+      perl:
+        apt: perl
+        dnf: perl
+        yum: perl
+        zypper: perl
+        pacman: perl
   pkg-config:
     env:
       MLC_SYS_UTIL_NAME: pkg_config
@@ -1048,6 +1152,33 @@ variations:
         yum: psmisc
         zypper: psmisc
         pacman: psmisc
+  python3-dev:
+    env:
+      MLC_SYS_UTIL_NAME: python3_dev
+    state:
+      python3_dev:
+        apt: python3-dev
+        dnf: python3-devel
+        yum: python3-devel
+        zypper: python3-devel
+  python3-setuptools:
+    env:
+      MLC_SYS_UTIL_NAME: python3_setuptools
+    state:
+      python3_setuptools:
+        apt: python3-setuptools
+        dnf: python3-setuptools
+        yum: python3-setuptools
+        zypper: python3-setuptools
+  python3-venv:
+    env:
+      MLC_SYS_UTIL_NAME: python3_venv
+    state:
+      python3_venv:
+        apt: python3-venv
+        dnf: python3-venv
+        yum: python3-venv
+        zypper: python3-venv
   rapidjson-dev:
     env:
       MLC_SYS_UTIL_NAME: rapidjson-dev
@@ -1258,6 +1389,18 @@ variations:
         dnf: xorg-x11-fonts-misc
         yum: xorg-x11-fonts-misc
         zypper: xorg-x11-fonts
+  xxd:
+    env:
+      MLC_SYS_UTIL_NAME: xxd
+    new_env_keys:
+    - MLC_XXD_VERSION
+    state:
+      xxd:
+        apt: xxd
+        dnf: vim-common
+        yum: vim-common
+        zypper: vim
+        pacman: vim
   xz:
     env:
       MLC_SYS_UTIL_NAME: xz
@@ -1275,6 +1418,150 @@ variations:
         yum: xz
         zypper: xz
         pacman: xz
+  libboost-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libboost_dev
+    new_env_keys:
+    - MLC_LIBBOOST_DEV_VERSION
+    state:
+      libboost_dev:
+        apt: libboost-dev
+  libfmt-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libfmt_dev
+    new_env_keys:
+    - MLC_LIBFMT_DEV_VERSION
+    state:
+      libfmt_dev:
+        apt: libfmt-dev
+  libsundials-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libsundials_dev
+    new_env_keys:
+    - MLC_LIBSUNDIALS_DEV_VERSION
+    state:
+      libsundials_dev:
+        apt: libsundials-dev
+  libyaml-cpp-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libyaml_cpp_dev
+    new_env_keys:
+    - MLC_LIBYAML_CPP_DEV_VERSION
+    state:
+      libyaml_cpp_dev:
+        apt: libyaml-cpp-dev
+  python3-packaging:
+    env:
+      MLC_SYS_UTIL_NAME: python3_packaging
+    new_env_keys:
+    - MLC_PYTHON3_PACKAGING_VERSION
+    state:
+      python3_packaging:
+        apt: python3-packaging
+  python3-ruamel.yaml:
+    env:
+      MLC_SYS_UTIL_NAME: python3_ruamel_yaml
+    new_env_keys:
+    - MLC_PYTHON3_RUAMEL_YAML_VERSION
+    state:
+      python3_ruamel_yaml:
+        apt: python3-ruamel.yaml
+  scons:
+    env:
+      MLC_SYS_UTIL_NAME: scons
+    new_env_keys:
+    - MLC_SCONS_VERSION
+    state:
+      scons:
+        apt: scons
+  bison:
+    env:
+      MLC_SYS_UTIL_NAME: bison
+    new_env_keys:
+    - MLC_BISON_VERSION
+    state:
+      bison:
+        apt: bison
+  libnetcdf-c++4-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libnetcdf_cplusplus4_dev
+    new_env_keys:
+    - MLC_LIBNETCDF_CPLUSPLUS4_DEV_VERSION
+    state:
+      libnetcdf_cplusplus4_dev:
+        apt: libnetcdf-c++4-dev
+  libtinyxml-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libtinyxml_dev
+    new_env_keys:
+    - MLC_LIBTINYXML_DEV_VERSION
+    state:
+      libtinyxml_dev:
+        apt: libtinyxml-dev
+  libgmp-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libgmp_dev
+    new_env_keys:
+    - MLC_LIBGMP_DEV_VERSION
+    state:
+      libgmp_dev:
+        apt: libgmp-dev
+  make:
+    env:
+      MLC_SYS_UTIL_NAME: make
+    new_env_keys:
+    - MLC_MAKE_VERSION
+    state:
+      make:
+        apt: make
+  libexpat1-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libexpat1_dev
+    new_env_keys:
+    - MLC_LIBEXPAT1_DEV_VERSION
+    state:
+      libexpat1_dev:
+        apt: libexpat1-dev
+  libx11-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libx11_dev
+    new_env_keys:
+    - MLC_LIBX11_DEV_VERSION
+    state:
+      libx11_dev:
+        apt: libx11-dev
+  libxext-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libxext_dev
+    new_env_keys:
+    - MLC_LIBXEXT_DEV_VERSION
+    state:
+      libxext_dev:
+        apt: libxext-dev
+  libxft-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libxft_dev
+    new_env_keys:
+    - MLC_LIBXFT_DEV_VERSION
+    state:
+      libxft_dev:
+        apt: libxft-dev
+  libxpm-dev:
+    env:
+      MLC_SYS_UTIL_NAME: libxpm_dev
+    new_env_keys:
+    - MLC_LIBXPM_DEV_VERSION
+    state:
+      libxpm_dev:
+        apt: libxpm-dev
+  python3-numpy:
+    env:
+      MLC_SYS_UTIL_NAME: python3_numpy
+    new_env_keys:
+    - MLC_PYTHON3_NUMPY_VERSION
+    state:
+      python3_numpy:
+        apt: python3-numpy
   zlib:
     env:
       MLC_SYS_UTIL_NAME: zlib

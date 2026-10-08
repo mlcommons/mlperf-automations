@@ -8,8 +8,10 @@ if [[ -z "${MLC_NAMD_SRC_PATH}" ]]; then
 fi
 
 SRC="${MLC_NAMD_SRC_PATH}"
-BUILD_DIR="${SRC}/build"
-INSTALL_DIR="${SRC}/install"
+COMPILER_TAG="${MLC_COMPILER_FAMILY:-default}"
+BUILD_DIR="${SRC}/build-${COMPILER_TAG}"
+INSTALL_DIR="${SRC}/install-${COMPILER_TAG}"
+rm -rf "${BUILD_DIR}"  # fresh dir so cmake re-detects the selected compiler
 CORES="${MLC_HOST_CPU_TOTAL_PHYSICAL_CORES:-$(nproc)}"
 
 echo "Building NAMD..."

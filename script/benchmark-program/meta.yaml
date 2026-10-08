@@ -17,10 +17,20 @@ default_env:
   MLC_ENABLE_PROFILING: '0'
 new_env_keys:
 - MLC_RUN_CMD
+- MLC_BENCHMARK_PERF_DATA
+- MLC_BENCHMARK_PERF_REPORT_FILE
+- MLC_BENCHMARK_PERF_STAT_FILE
+- MLC_BENCHMARK_INSMIX_FILE
 
 # Input mapping
 input_mapping:
   profile_system_info: MLC_PROFILE_SYSTEM_INFO
+  perf_record: MLC_BENCHMARK_PERF_RECORD
+  perf_stat: MLC_BENCHMARK_PERF_STAT
+  insmix: MLC_BENCHMARK_INSMIX
+  perf_events: MLC_BENCHMARK_PERF_EVENTS
+  perf_freq: MLC_BENCHMARK_PERF_FREQ
+  perf_output_dir: MLC_BENCHMARK_PERF_OUTPUT_DIR
 
 # Dependencies
 deps:
@@ -32,6 +42,29 @@ deps:
     - 'True'
     - true
   tags: set,performance,mode,_performance
+# perf is only needed for the perf record / perf stat modes.
+- tags: get,generic-sys-util,_linux-tools
+  enable_if_any_env:
+    MLC_BENCHMARK_PERF_RECORD:
+    - 'yes'
+    - 'on'
+    - 'true'
+    - '1'
+    MLC_BENCHMARK_PERF_STAT:
+    - 'yes'
+    - 'on'
+    - 'true'
+    - '1'
+# Intel SDE provides the true dynamic instruction mix (_insmix).
+- tags: get,intel,sde,tool
+  names:
+  - intel-sde
+  enable_if_env:
+    MLC_BENCHMARK_INSMIX:
+    - 'yes'
+    - 'on'
+    - 'true'
+    - '1'
 
 # Variations
 variations:
@@ -48,3 +81,12 @@ variations:
       MLC_ENABLE_PROFILING: 1
     deps:
     - tags: get,profiler
+  perf-record:
+    env:
+      MLC_BENCHMARK_PERF_RECORD: 'yes'
+  perf-stat:
+    env:
+      MLC_BENCHMARK_PERF_STAT: 'yes'
+  insmix:
+    env:
+      MLC_BENCHMARK_INSMIX: 'yes'

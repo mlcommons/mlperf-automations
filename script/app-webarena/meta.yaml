@@ -1,0 +1,148 @@
+alias: app-webarena
+uid: cc0cf947c835dcdb
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: Agentic Benchmarks
+tags:
+- app
+- agentic
+- agent
+- benchmark
+- web-agent
+- webarena
+tags_help: app agentic benchmark webarena
+
+# Environment
+default_env:
+  MLC_WEBARENA_NUM_SAMPLES: '3'
+  MLC_WEBARENA_MODEL: gpt-4o
+  MLC_WEBARENA_HF_MODEL: HuggingFaceTB/SmolLM2-135M-Instruct
+  MLC_WEBARENA_MAX_STEPS: '30'
+  MLC_WEBARENA_BACKEND: mock
+  MLC_WEBARENA_DATASET: sample
+new_env_keys:
+- MLC_WEBARENA_*
+new_state_keys:
+- mlc_webarena
+
+# Input mapping
+input_mapping:
+  num_samples: MLC_WEBARENA_NUM_SAMPLES
+  model: MLC_WEBARENA_MODEL
+  endpoint: MLC_WEBARENA_ENDPOINT_URL
+  api_key: MLC_WEBARENA_API_KEY
+  hf_model: MLC_WEBARENA_HF_MODEL
+  max_steps: MLC_WEBARENA_MAX_STEPS
+  site: MLC_WEBARENA_SITE
+  task_file: MLC_WEBARENA_TASK_FILE
+  output_dir: MLC_WEBARENA_OUTPUT_DIR
+  profile_system_info: MLC_PROFILE_SYSTEM_INFO
+  perf_record: MLC_BENCHMARK_PERF_RECORD
+  perf_stat: MLC_BENCHMARK_PERF_STAT
+  insmix: MLC_BENCHMARK_INSMIX
+  perf_events: MLC_BENCHMARK_PERF_EVENTS
+input_description:
+  num_samples:
+    desc: Number of WebArena tasks to run
+  model:
+    desc: Model name sent to the OpenAI-compatible endpoint (_endpoint backend)
+  endpoint:
+    desc: OpenAI-compatible chat completions endpoint URL (_endpoint backend)
+  api_key:
+    desc: API key for the endpoint
+  hf_model:
+    desc: HuggingFace model id for the local _hf-model backend
+  max_steps:
+    desc: Maximum agent steps per task
+  site:
+    desc: Filter tasks to a single site (shopping, reddit, gitlab, cms, map)
+  task_file:
+    desc: Path to a custom WebArena config JSON file
+  output_dir:
+    desc: Directory to write results.json (default is current directory)
+
+# Dependencies
+deps:
+- tags: detect,os
+- names:
+  - python
+  - python3
+  tags: get,python3
+- tags: get,generic-python-lib,_package.requests
+
+# The benchmark command (MLC_RUN_CMD) is executed through benchmark-program.
+posthook_deps:
+- tags: benchmark-program
+  names:
+  - benchmark-program
+  skip_if_env:
+    MLC_SKIP_RUN:
+    - 'on'
+
+# Variations
+variations:
+  # ── backend group (which model drives the agent) ─────────────────────────
+  dry-run:
+    group: backend
+    default: true
+    env:
+      MLC_WEBARENA_BACKEND: mock
+  endpoint:
+    group: backend
+    env:
+      MLC_WEBARENA_BACKEND: endpoint
+    deps:
+    - tags: get,generic-python-lib,_package.openai
+  hf-model:
+    group: backend
+    env:
+      MLC_WEBARENA_BACKEND: hf
+    deps:
+    - tags: get,generic-python-lib,_package.torch
+    - tags: get,generic-python-lib,_package.transformers
+    - tags: get,generic-python-lib,_package.accelerate
+
+  # ── dataset group (bundled sample vs official WebArena configs) ──────────
+  sample:
+    group: dataset
+    default: true
+    env:
+      MLC_WEBARENA_DATASET: sample
+  real:
+    group: dataset
+    env:
+      MLC_WEBARENA_DATASET: real
+    deps:
+    - tags: get,git,repo
+      names:
+      - webarena-src
+      extra_cache_tags: webarena,src,webarena-src
+      env:
+        MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_WEBARENA_SRC_PATH
+        MLC_GIT_REPO_URL: https://github.com/web-arena-x/webarena.git
+      force_env_keys:
+      - MLC_GIT_*
+      update_tags_from_env_with_prefix:
+        _repo.:
+        - MLC_GIT_REPO_URL
+
+  site.#:
+    env:
+      MLC_WEBARENA_SITE: '#'
+
+  # ── profiling passthrough (routes _profile to benchmark-program) ─────────
+  profile:
+    add_deps_recursive:
+      benchmark-program:
+        tags: _profile
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - dry-run
+    - sample
+    env:
+      MLC_WEBARENA_NUM_SAMPLES: '2'

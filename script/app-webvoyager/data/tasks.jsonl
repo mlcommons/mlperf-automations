@@ -1,0 +1,5 @@
+{"web_name": "Allrecipes", "id": "Allrecipes--0", "ques": "Find a five-star rated chocolate chip cookie recipe with more than 500 reviews.", "web": "https://www.allrecipes.com/"}
+{"web_name": "Amazon", "id": "Amazon--0", "ques": "Search for a wireless mechanical keyboard under 100 dollars with at least 4 stars.", "web": "https://www.amazon.com/"}
+{"web_name": "GitHub", "id": "GitHub--0", "ques": "Find the number of open issues for the pytorch/pytorch repository.", "web": "https://github.com/"}
+{"web_name": "ArXiv", "id": "ArXiv--0", "ques": "Find the most recent paper submitted to cs.LG about mixture of experts.", "web": "https://arxiv.org/"}
+{"web_name": "BBC News", "id": "BBC--0", "ques": "Find today's top technology headline.", "web": "https://www.bbc.com/news"}

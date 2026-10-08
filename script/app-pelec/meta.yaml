@@ -1,0 +1,129 @@
+alias: app-pelec
+uid: 0feb5f3d3c68547a
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: HPC Application
+
+tags:
+- app
+- pelec
+- hpc
+
+# Cache
+cache: true
+
+# Environment
+default_env: {}
+new_env_keys:
+- MLC_PELEC_SRC_PATH
+- MLC_PELEC_INSTALL_PATH
+- MLC_PELEC_BIN_PATH
+- +PATH
+new_state_keys: []
+
+# Dependencies
+deps:
+- tags: detect,cpu
+- env:
+    MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
+  tags: get,generic-sys-util,_build-essential
+- tags: get,generic-sys-util,_cmake
+- tags: get,generic-sys-util,_libopenmpi-dev
+- tags: get,python3
+  names:
+  - python
+  - python3
+- tags: get,git,repo
+  names:
+  - pelec-repo
+  extra_cache_tags: pelec,repo,pelec-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_PELEC_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
+variations:
+  repo.#:
+    env:
+      MLC_GIT_REPO_URL: '#'
+    group: repo
+  repo.official:
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://github.com/AMReX-Combustion/PeleC.git
+    group: repo
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+    group: version
+  version.26.02:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: v26.02
+
+
+  # ---- Compiler variations (CC/CXX/FC + MPI wrappers via get-compiler-paths-amd) ----
+  gcc:
+    group: compiler
+    env:
+      MLC_COMPILER_FAMILY: gcc
+    deps:
+    - tags: get,compiler,paths,amd
+      names:
+      - compiler-paths
+  aocc:
+    group: compiler
+    env:
+      MLC_COMPILER_FAMILY: aocc
+    deps:
+    - tags: get,compiler,paths,amd
+      names:
+      - compiler-paths
+  llvm:
+    group: compiler
+    env:
+      MLC_COMPILER_FAMILY: llvm
+    deps:
+    - tags: get,compiler,paths,amd
+      names:
+      - compiler-paths
+  amdclang:
+    group: compiler
+    env:
+      MLC_COMPILER_FAMILY: amdclang
+    deps:
+    - tags: get,compiler,paths,amd
+      names:
+      - compiler-paths
+  oneapi:
+    group: compiler
+    env:
+      MLC_COMPILER_FAMILY: oneapi
+    deps:
+    - tags: get,compiler,paths,amd
+      names:
+      - compiler-paths
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - repo.official
