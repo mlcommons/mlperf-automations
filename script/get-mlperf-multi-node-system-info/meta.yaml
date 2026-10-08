@@ -145,6 +145,13 @@ variations:
         tags: _xpu
     env:
       MLC_ACCELERATOR_BACKEND: xpu
+  tpu:
+    group: accelerator-backend
+    adr:
+      mlperf-single-node-system-info:
+        tags: _tpu
+    env:
+      MLC_ACCELERATOR_BACKEND: tpu
   exclude_current_node:
     env:
       MLC_EXCLUDE_CURRENT_NODE: 'True'
