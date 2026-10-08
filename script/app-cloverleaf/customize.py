@@ -6,7 +6,8 @@ def preprocess(i):
 
     os_info = i['os_info']
     if os_info['platform'] == 'windows':
-        return {'return': 1, 'error': 'Windows is not supported for CloverLeaf builds'}
+        return {'return': 1,
+                'error': 'Windows is not supported for CloverLeaf builds'}
 
     return {'return': 0}
 
@@ -25,7 +26,8 @@ def postprocess(i):
         # Try source directory
         clover_bin = os.path.join(src_path, 'clover_leaf')
         if not os.path.isfile(clover_bin):
-            return {'return': 1, 'error': f'CloverLeaf binary not found in {bin_dir} or {src_path}'}
+            return {
+                'return': 1, 'error': f'CloverLeaf binary not found in {bin_dir} or {src_path}'}
         bin_dir = src_path
 
     env['MLC_CLOVERLEAF_BIN_PATH'] = bin_dir

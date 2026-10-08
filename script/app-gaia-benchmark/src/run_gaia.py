@@ -89,7 +89,9 @@ def make_generator():
     if backend == "hf":
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
-        model_id = _env("MLC_GAIA_HF_MODEL", "HuggingFaceTB/SmolLM2-135M-Instruct")
+        model_id = _env(
+            "MLC_GAIA_HF_MODEL",
+            "HuggingFaceTB/SmolLM2-135M-Instruct")
         tok = AutoTokenizer.from_pretrained(model_id)
         model = AutoModelForCausalLM.from_pretrained(model_id)
         model.eval()

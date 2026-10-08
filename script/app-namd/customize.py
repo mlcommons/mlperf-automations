@@ -40,7 +40,8 @@ def postprocess(i):
                 break
 
     if namd_bin is None:
-        return {'return': 1, 'error': f'NAMD binary not found in {bin_dir} or build directory'}
+        return {
+            'return': 1, 'error': f'NAMD binary not found in {bin_dir} or build directory'}
 
     env['MLC_NAMD_BIN_PATH'] = bin_dir
     env['MLC_NAMD_INSTALL_PATH'] = install_dir

@@ -22,7 +22,8 @@ def postprocess(i):
 
     lmp_bin = os.path.join(bin_dir, 'lmp')
     if not os.path.isfile(lmp_bin):
-        return {'return': 1, 'error': f'LAMMPS binary (lmp) not found in {bin_dir}'}
+        return {'return': 1,
+                'error': f'LAMMPS binary (lmp) not found in {bin_dir}'}
 
     env['MLC_LAMMPS_BIN_PATH'] = bin_dir
     env['MLC_LAMMPS_INSTALL_PATH'] = install_dir

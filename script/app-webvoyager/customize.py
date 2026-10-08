@@ -6,21 +6,26 @@ def preprocess(i):
     env = i['env']
 
     backend = str(env.get('MLC_WEBVOYAGER_BACKEND', 'mock')).lower()
-    if backend == 'endpoint' and not env.get('MLC_WEBVOYAGER_ENDPOINT_URL', '').strip():
+    if backend == 'endpoint' and not env.get(
+            'MLC_WEBVOYAGER_ENDPOINT_URL', '').strip():
         return {'return': 1,
                 'error': 'endpoint backend requires --endpoint (MLC_WEBVOYAGER_ENDPOINT_URL)'}
 
     # When the official repo is cloned, point the harness at its task files.
     src = env.get('MLC_WEBVOYAGER_SRC_PATH', '').strip()
     if src and not env.get('MLC_WEBVOYAGER_TASK_FILE', '').strip():
-        env['MLC_WEBVOYAGER_TASK_FILE'] = os.path.join(src, 'data', 'WebVoyager_data.jsonl')
+        env['MLC_WEBVOYAGER_TASK_FILE'] = os.path.join(
+            src, 'data', 'WebVoyager_data.jsonl')
         ref = os.path.join(src, 'data', 'reference_answer.json')
         if os.path.isfile(ref):
             env['MLC_WEBVOYAGER_REF_FILE'] = ref
 
     # The workload is executed by the benchmark-program posthook dependency.
     python_bin = env.get('MLC_PYTHON_BIN_WITH_PATH', 'python3')
-    script = os.path.join(env['MLC_TMP_CURRENT_SCRIPT_PATH'], 'src', 'run_webvoyager.py')
+    script = os.path.join(
+        env['MLC_TMP_CURRENT_SCRIPT_PATH'],
+        'src',
+        'run_webvoyager.py')
     env['MLC_RUN_CMD'] = f'{python_bin} "{script}"'
     if not env.get('MLC_RUN_DIR', ''):
         env['MLC_RUN_DIR'] = os.getcwd()

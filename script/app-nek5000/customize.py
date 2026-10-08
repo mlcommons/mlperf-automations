@@ -20,7 +20,8 @@ def postprocess(i):
 
     binary = os.path.join(bin_dir, 'genmap')
     if not os.path.isfile(binary):
-        return {'return': 1, 'error': f'Nek5000 tool (genmap) not found in {bin_dir}'}
+        return {'return': 1,
+                'error': f'Nek5000 tool (genmap) not found in {bin_dir}'}
 
     env['MLC_NEK5000_INSTALL_PATH'] = src_path
     env['MLC_NEK5000_BIN_PATH'] = bin_dir

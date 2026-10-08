@@ -13,7 +13,10 @@ def preprocess(i):
 
     # The workload is executed by the benchmark-program posthook dependency.
     python_bin = env.get('MLC_PYTHON_BIN_WITH_PATH', 'python3')
-    script = os.path.join(env['MLC_TMP_CURRENT_SCRIPT_PATH'], 'src', 'run_hnswlib.py')
+    script = os.path.join(
+        env['MLC_TMP_CURRENT_SCRIPT_PATH'],
+        'src',
+        'run_hnswlib.py')
     env['MLC_RUN_CMD'] = f'{python_bin} "{script}"'
     if not env.get('MLC_RUN_DIR', ''):
         env['MLC_RUN_DIR'] = os.getcwd()

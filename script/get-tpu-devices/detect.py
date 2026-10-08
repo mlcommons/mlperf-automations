@@ -93,7 +93,8 @@ def get_tpu_info(sysfs_pci=SYSFS_PCI):
         chips.setdefault(base_addr, (device_id, dev_path))
 
     if not chips:
-        raise RuntimeError(f"no Google TPU PCI devices found under {sysfs_pci}")
+        raise RuntimeError(
+            f"no Google TPU PCI devices found under {sysfs_pci}")
 
     libtpu_version = _libtpu_version()
 
