@@ -280,7 +280,8 @@ def extract_value(rule, field_key):
                             parts.append(
                                 f"{math.ceil(mem_bytes / (1024 ** 3))} GiB")
                         else:
-                            # Already in GiB (e.g. "95 GiB" from get-tpu-devices)
+                            # Already in GiB (e.g. "95 GiB" from
+                            # get-tpu-devices)
                             parts.append(f"{math.ceil(mem_bytes)} GiB")
                     except (ValueError, IndexError):
                         pass
