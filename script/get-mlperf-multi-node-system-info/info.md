@@ -338,8 +338,9 @@ Fields not present in the file and not supplied as CLI args will fall back to th
 | `_cuda` | Selects CUDA as the accelerator backend (NVIDIA GPUs). |
 | `_rocm` | Selects ROCm as the accelerator backend (AMD GPUs). |
 | `_xpu` | Selects XPU as the accelerator backend (Intel GPUs). |
+| `_tpu` | Selects TPU as the accelerator backend (Google TPUs). Detection is not yet implemented -- see [get-tpu-devices](../get-tpu-devices/info.md). |
 
-Specify one of `_cuda`, `_rocm`, or `_xpu` to match your hardware. If none is given, no backend-specific collection is performed.
+Specify one of `_cuda`, `_rocm`, `_xpu`, or `_tpu` to match your hardware. If none is given, no backend-specific collection is performed.
 
 ### MLPerf benchmark (mutually exclusive)
 
