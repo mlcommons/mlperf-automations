@@ -21,7 +21,8 @@ def postprocess(i):
 
     binary = os.path.join(bin_dir, 'ramses1d')
     if not os.path.isfile(binary):
-        return {'return': 1, 'error': f'RAMSES binary (ramses1d) not found in {bin_dir}'}
+        return {'return': 1,
+                'error': f'RAMSES binary (ramses1d) not found in {bin_dir}'}
 
     env['MLC_RAMSES_INSTALL_PATH'] = src_path
     env['MLC_RAMSES_BIN_PATH'] = bin_dir

@@ -6,13 +6,17 @@ def preprocess(i):
     env = i['env']
 
     backend = str(env.get('MLC_GAIA_BACKEND', 'mock')).lower()
-    if backend == 'endpoint' and not env.get('MLC_GAIA_ENDPOINT_URL', '').strip():
+    if backend == 'endpoint' and not env.get(
+            'MLC_GAIA_ENDPOINT_URL', '').strip():
         return {'return': 1,
                 'error': 'endpoint backend requires --endpoint (MLC_GAIA_ENDPOINT_URL)'}
 
     # The workload is executed by the benchmark-program posthook dependency.
     python_bin = env.get('MLC_PYTHON_BIN_WITH_PATH', 'python3')
-    script = os.path.join(env['MLC_TMP_CURRENT_SCRIPT_PATH'], 'src', 'run_gaia.py')
+    script = os.path.join(
+        env['MLC_TMP_CURRENT_SCRIPT_PATH'],
+        'src',
+        'run_gaia.py')
     env['MLC_RUN_CMD'] = f'{python_bin} "{script}"'
     if not env.get('MLC_RUN_DIR', ''):
         env['MLC_RUN_DIR'] = os.getcwd()
@@ -39,5 +43,6 @@ def postprocess(i):
     env['MLC_GAIA_ACCURACY'] = str(data.get('accuracy', ''))
     state['mlc_gaia'] = data
 
-    logger.info(f"GAIA accuracy ({data.get('trace_type')}): {data.get('accuracy')}")
+    logger.info(
+        f"GAIA accuracy ({data.get('trace_type')}): {data.get('accuracy')}")
     return {'return': 0}

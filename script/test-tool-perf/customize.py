@@ -5,7 +5,8 @@ import os
 def preprocess(i):
     env = i['env']
     if env.get('MLC_PERF_BIN_WITH_PATH', '') == '':
-        return {'return': 1, 'error': 'MLC_PERF_BIN_WITH_PATH not set; get,tool,perf must run first'}
+        return {
+            'return': 1, 'error': 'MLC_PERF_BIN_WITH_PATH not set; get,tool,perf must run first'}
     return {'return': 0}
 
 

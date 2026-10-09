@@ -19,7 +19,8 @@ def postprocess(i):
 
     binary = os.path.join(src_path, 'Gadget4')
     if not os.path.isfile(binary):
-        return {'return': 1, 'error': f'GADGET-4 binary (Gadget4) not found in {src_path}'}
+        return {'return': 1,
+                'error': f'GADGET-4 binary (Gadget4) not found in {src_path}'}
 
     env['MLC_GADGET4_INSTALL_PATH'] = src_path
     env['MLC_GADGET4_BIN_PATH'] = src_path

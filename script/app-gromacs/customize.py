@@ -22,7 +22,8 @@ def postprocess(i):
 
     gmx_bin = os.path.join(bin_dir, 'gmx_mpi')
     if not os.path.isfile(gmx_bin):
-        return {'return': 1, 'error': f'GROMACS binary (gmx_mpi) not found in {bin_dir}'}
+        return {'return': 1,
+                'error': f'GROMACS binary (gmx_mpi) not found in {bin_dir}'}
 
     env['MLC_GROMACS_BIN_PATH'] = bin_dir
     env['MLC_GROMACS_INSTALL_PATH'] = install_dir

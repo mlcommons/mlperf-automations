@@ -4,7 +4,8 @@ import os
 
 def preprocess(i):
     if i['os_info']['platform'] == 'windows':
-        return {'return': 1, 'error': 'Windows is not supported for HOOMD-blue builds'}
+        return {'return': 1,
+                'error': 'Windows is not supported for HOOMD-blue builds'}
     return {'return': 0}
 
 

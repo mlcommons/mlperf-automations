@@ -35,12 +35,14 @@ def preprocess(i):
         install_prefix = env.get('MLC_ROCM_INSTALL_PREFIX', '')
         if install_prefix:
             prefix_opt = os.path.join(install_prefix, 'opt')
-            for p in [os.path.join(prefix_opt, 'rocm', 'llvm', 'bin')] + sorted(glob.glob(os.path.join(prefix_opt, 'rocm-*', 'llvm', 'bin')), reverse=True):
+            for p in [os.path.join(prefix_opt, 'rocm', 'llvm', 'bin')] + sorted(
+                    glob.glob(os.path.join(prefix_opt, 'rocm-*', 'llvm', 'bin')), reverse=True):
                 if os.path.isdir(p) and p not in search_paths:
                     search_paths.append(p)
 
         # Also check standard paths
-        for p in ['/opt/rocm/llvm/bin'] + sorted(glob.glob('/opt/rocm-*/llvm/bin'), reverse=True):
+        for p in ['/opt/rocm/llvm/bin'] + \
+                sorted(glob.glob('/opt/rocm-*/llvm/bin'), reverse=True):
             if os.path.isdir(p) and p not in search_paths:
                 search_paths.append(p)
 
@@ -61,11 +63,15 @@ def preprocess(i):
                 if bin_dir not in search_paths:
                     search_paths.append(bin_dir)
                 # Create symlinks if needed
-                symlinks = {'amdclang': 'clang', 'amdclang++': 'clang++', 'amdflang': 'flang-new'}
+                symlinks = {
+                    'amdclang': 'clang',
+                    'amdclang++': 'clang++',
+                    'amdflang': 'flang-new'}
                 for link_name, target in symlinks.items():
                     link_path = os.path.join(bin_dir, link_name)
                     target_path = os.path.join(bin_dir, target)
-                    if os.path.isfile(target_path) and not os.path.exists(link_path):
+                    if os.path.isfile(
+                            target_path) and not os.path.exists(link_path):
                         os.symlink(target, link_path)
 
         if search_paths:
