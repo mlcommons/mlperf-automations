@@ -7,6 +7,71 @@ import datetime
 from utils import is_true
 
 
+_GEEKBENCH_CLI_INPUT_MAP = {
+    'workload': 'MLC_GEEKBENCH_WORKLOAD',
+    'workload_ids': 'MLC_GEEKBENCH_WORKLOAD_IDS',
+    'section': 'MLC_GEEKBENCH_SECTION',
+    'sections': 'MLC_GEEKBENCH_SECTIONS',
+    'single-core': 'MLC_GEEKBENCH_SINGLE_CORE',
+    'single_core': 'MLC_GEEKBENCH_SINGLE_CORE',
+    'multi-core': 'MLC_GEEKBENCH_MULTI_CORE',
+    'multi_core': 'MLC_GEEKBENCH_MULTI_CORE',
+    'workload_gap': 'MLC_GEEKBENCH_WORKLOAD_GAP',
+}
+
+_GEEKBENCH_PRESERVED_ENV_KEYS = tuple(_GEEKBENCH_CLI_INPUT_MAP.values())
+
+
+def _normalize_geekbench_run_options(env):
+    sections = str(env.get('MLC_GEEKBENCH_SECTIONS', '')).strip()
+    if sections and not str(env.get('MLC_GEEKBENCH_SECTION', '')).strip():
+        env['MLC_GEEKBENCH_SECTION'] = sections
+
+    workload = str(env.get('MLC_GEEKBENCH_WORKLOAD', '')).strip()
+    if workload:
+        if workload.startswith('--'):
+            env['MLC_GEEKBENCH_WORKLOAD'] = workload
+        elif workload.replace(',', ' ').replace('-', '').isdigit():
+            existing_ids = str(env.get('MLC_GEEKBENCH_WORKLOAD_IDS', '')).strip()
+            env['MLC_GEEKBENCH_WORKLOAD_IDS'] = (
+                f"{existing_ids} {workload}".strip() if existing_ids else workload)
+            env['MLC_GEEKBENCH_WORKLOAD'] = ''
+        else:
+            env['MLC_GEEKBENCH_WORKLOAD'] = f'--{workload.lstrip("-")}'
+
+    single_core = is_true(env.get('MLC_GEEKBENCH_SINGLE_CORE', ''))
+    multi_core = is_true(env.get('MLC_GEEKBENCH_MULTI_CORE', ''))
+    if single_core and multi_core:
+        env['MLC_GEEKBENCH_MULTI_CORE'] = ''
+        multi_core = False
+    if single_core:
+        env['MLC_GEEKBENCH_SINGLE_CORE'] = 'yes'
+        env['MLC_GEEKBENCH_MULTI_CORE'] = ''
+    elif multi_core:
+        env['MLC_GEEKBENCH_MULTI_CORE'] = 'yes'
+        env['MLC_GEEKBENCH_SINGLE_CORE'] = ''
+    else:
+        env['MLC_GEEKBENCH_SINGLE_CORE'] = ''
+        env['MLC_GEEKBENCH_MULTI_CORE'] = ''
+
+
+def _restore_geekbench_user_options(env, i):
+    """Re-apply user options after default benchmark variations overwrite env."""
+    inp = i.get('input', i)
+    for cli_key, env_key in _GEEKBENCH_CLI_INPUT_MAP.items():
+        if cli_key in inp and str(inp[cli_key]).strip() != '':
+            env[env_key] = str(inp[cli_key]).strip()
+
+    for source in (inp.get('const', {}), inp.get('local_const', {})):
+        if isinstance(source, dict):
+            for env_key in _GEEKBENCH_PRESERVED_ENV_KEYS:
+                value = source.get(env_key, '')
+                if value is not None and str(value).strip() != '':
+                    env[env_key] = str(value).strip()
+
+    _normalize_geekbench_run_options(env)
+
+
 def compute_olympic_score(values):
     """Drop the highest and lowest values, then return the mean of the rest.
     If fewer than 3 values, return the plain mean."""
@@ -141,6 +206,8 @@ def preprocess(i):
     env = i['env']
     logger = i['automation'].logger
 
+    _restore_geekbench_user_options(env, i)
+
     # Check if platform details should be skipped
     skip_platform_details = is_true(
         env.get('MLC_GEEKBENCH_SKIP_PLATFORM_DETAILS', 'no'))
@@ -229,6 +296,8 @@ def preprocess(i):
 
     # Section filter (Pro: --section IDs)
     section = env.get('MLC_GEEKBENCH_SECTION', '').strip()
+    if not section:
+        section = env.get('MLC_GEEKBENCH_SECTIONS', '').strip()
     if section:
         args.append(f'--section {section}')
 
@@ -297,31 +366,32 @@ def preprocess(i):
 
     platform = os_info['platform']
 
-    # --- Split SC/MC mode: core_pinning + all-cores ---
-    if core_pinning and all_cores_mode:
+    # --- Split SC/MC mode: default when neither --single-core nor --multi-core ---
+    if all_cores_mode:
         env['MLC_GEEKBENCH_SPLIT_SC_MC'] = 'yes'
 
-        # SC command: add --single-core and apply core pinning
         sc_args = args + ['--single-core']
         sc_cmd = f"{q}{geekbench_bin}{q} {' '.join(sc_args)}{extra_exports}"
-        if platform == 'linux':
+        if core_pinning and platform == 'linux':
             sc_cmd = f"taskset -c {pinned_core} {sc_cmd}"
 
-        # MC command: add --multi-core, no core pinning
         mc_args = args + ['--multi-core']
         mc_cmd = f"{q}{geekbench_bin}{q} {' '.join(mc_args)}{extra_exports}"
 
         env['MLC_GEEKBENCH_BASE_CMD_SC'] = sc_cmd
         env['MLC_GEEKBENCH_BASE_CMD_MC'] = mc_cmd
 
-        if platform == 'windows':
+        if core_pinning and platform == 'windows':
             core_num = int(pinned_core)
             affinity_mask = f"{1 << core_num:x}"
             env['MLC_GEEKBENCH_AFFINITY_MASK'] = affinity_mask
             env['MLC_GEEKBENCH_CORE_PINNING'] = 'yes'
 
-        logger.info(
-            f"Split SC/MC mode enabled with core pinning on core {pinned_core}")
+        if core_pinning:
+            logger.info(
+                f"Split SC/MC mode enabled (SC pinned on core {pinned_core})")
+        else:
+            logger.info("Split SC/MC mode enabled (single-core + multi-core)")
         logger.info(f"  SC command: {sc_cmd}")
         logger.info(f"  MC command: {mc_cmd}")
     else:
