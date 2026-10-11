@@ -22,6 +22,13 @@ default_env:
 env:
   MLC_DATASET: CNNDM
 
+# Input mapping
+input_mapping:
+  download_parallelism: MLC_DOWNLOAD_PARALLELISM
+input_description:
+  download_parallelism:
+    desc: Number of files the MLCommons R2 downloader fetches concurrently. Only used with the r2-downloader download tool; when unset the downloader picks the value itself based on the number of files.
+
 # Dependencies
 deps:
 - tags: get,sys-utils-mlc
