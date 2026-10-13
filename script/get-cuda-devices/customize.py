@@ -2,7 +2,6 @@ from mlc import utils
 from utils import *
 import os
 import re
-import subprocess
 
 
 def preprocess(i):
@@ -90,6 +89,15 @@ def _parse_smi_query(smi_out):
     return gpus
 
 
+def _read_smi_output(file_name):
+    """Return what run.sh saved from nvidia-smi, or '' when it saved nothing
+    (no nvidia-smi on this host)."""
+    if not os.path.isfile(file_name):
+        return ''
+    with open(file_name, errors='replace') as f:
+        return f.read()
+
+
 def postprocess(i):
 
     env = i['env']
@@ -139,13 +147,12 @@ def postprocess(i):
     state['mlc_cuda_device_prop'] = p
     state['mlc_cuda_devices_prop'] = gpu
 
-    # Detect host interconnect (PCIe gen/width) from nvidia-smi -q. The same
-    # output is reused below for the per-device values, so nvidia-smi is
-    # queried no more times than before.
+    # Detect host interconnect (PCIe gen/width) from the nvidia-smi -q output
+    # run.sh saved. The same output is reused below for the per-device values.
+    # No file (no nvidia-smi on this host) leaves these fields unset.
     smi_gpus = []
     try:
-        smi_out = subprocess.run(
-            ['nvidia-smi', '-q'], capture_output=True, text=True).stdout
+        smi_out = _read_smi_output('tmp-nvidia-smi-q.out')
         smi_gpus = _parse_smi_query(smi_out)
         gen = re.search(
             r'PCIe Generation\s*\n\s*Max\s*:\s*\d+\s*\n\s*Current\s*:\s*(\d+)', smi_out)
@@ -159,11 +166,11 @@ def postprocess(i):
     except Exception:
         pass
 
-    # Detect GPU interconnect type (NVLink vs PCIe) from nvidia-smi topo
+    # Detect GPU interconnect type (NVLink vs PCIe) from the nvidia-smi topo -m
+    # output run.sh saved.
     per_gpu_fabric = []
     try:
-        topo_out = subprocess.run(
-            ['nvidia-smi', 'topo', '-m'], capture_output=True, text=True).stdout
+        topo_out = _read_smi_output('tmp-nvidia-smi-topo.out')
         if re.search(r'\bNV\d+\b', topo_out):
             env['MLC_CUDA_DEVICE_PROP_GPU_INTERCONNECT_TYPE'] = 'NVLink'
         elif topo_out.strip():
