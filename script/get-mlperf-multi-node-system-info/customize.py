@@ -646,7 +646,38 @@ def _shape_node_type(node, logger):
             value = ""
         shaped[field] = _coerce_int(
             value) if field in _ENDPOINTS_INT_FIELDS else value
+    _per_processor_counts(shaped, logger)
     return shaped
+
+
+def _per_processor_counts(shaped, logger):
+    """Turn the node's core and vCPU totals into per-processor counts.
+
+    §8.2 counts both "in each processor", while the single-node probe
+    reports the whole node (MLC_HOST_CPU_TOTAL_PHYSICAL_CORES and
+    MLC_HOST_CPU_TOTAL_LOGICAL_CORES). Dividing by the socket count is the
+    same as reading MLC_HOST_CPU_PHYSICAL_CORES_PER_SOCKET for cores, and is
+    the only correct way to get vCPUs: per-socket cores times threads per
+    core overcounts a hybrid CPU, whose efficiency cores run one thread.
+
+    Done here rather than in the probe so the inference and training field
+    sets, which read the same probe, are unchanged. A count that does not
+    divide evenly is left as the total, with a warning, since no single
+    per-processor number would be true."""
+    sockets = shaped.get("host_processors_per_node")
+    if not isinstance(sockets, int) or isinstance(
+            sockets, bool) or sockets < 1:
+        return
+    for field in ("host_processor_core_count", "host_processor_vcpu_count"):
+        total = shaped.get(field)
+        if not isinstance(total, int) or isinstance(total, bool):
+            continue
+        if total % sockets:
+            logger.warning(
+                f"{field} is {total} across {sockets} processors, which "
+                f"does not divide evenly; writing the node total.")
+            continue
+        shaped[field] = total // sockets
 
 
 def _derive_node_config(node_config):

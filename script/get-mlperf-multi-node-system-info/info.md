@@ -181,8 +181,8 @@ With the `_inference` variation the output is the flat MLPerf Inference format i
       "number_of_nodes": 1,
       "host_processor_model_name": "Intel(R) Xeon(R) Platinum 8480+",
       "host_processors_per_node": 2,
-      "host_processor_core_count": 112,
-      "host_processor_vcpu_count": 224,
+      "host_processor_core_count": 56,
+      "host_processor_vcpu_count": 112,
       "host_memory_capacity": "2.2T",
       "host_memory_configuration": "N/A",
       "accelerator_info": [
@@ -284,8 +284,8 @@ When a node type reports several accelerator models but only one value for a fie
 | `number_of_nodes` | int | auto | Number of identical nodes of this type. |
 | `host_processor_model_name` | string | auto | CPU model name. |
 | `host_processors_per_node` | int | auto | Number of CPU sockets per node. |
-| `host_processor_core_count` | int | auto | Total physical CPU cores per node. |
-| `host_processor_vcpu_count` | int | auto | Total logical CPU threads per node. |
+| `host_processor_core_count` | int | auto | Physical CPU cores in each processor (§8.2): the node total divided by `host_processors_per_node`. The inference and training formats keep the node total. |
+| `host_processor_vcpu_count` | int | auto | Logical CPUs in each processor (§8.2): the node total divided by `host_processors_per_node`, which stays correct on hybrid CPUs where cores do not all run the same number of threads. The inference and training formats keep the node total. |
 | `host_memory_capacity` | string | auto | Total host DRAM capacity. |
 | `host_memory_configuration` | string | auto | Memory configuration details. |
 | `accelerator_info` | list | auto | One entry per accelerator model in this node type; see below. |
