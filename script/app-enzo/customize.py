@@ -21,7 +21,8 @@ def postprocess(i):
 
     binary = os.path.join(bin_dir, 'enzo.exe')
     if not os.path.isfile(binary):
-        return {'return': 1, 'error': f'Enzo binary (enzo.exe) not found in {bin_dir}'}
+        return {'return': 1,
+                'error': f'Enzo binary (enzo.exe) not found in {bin_dir}'}
 
     env['MLC_ENZO_INSTALL_PATH'] = src_path
     env['MLC_ENZO_BIN_PATH'] = bin_dir

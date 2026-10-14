@@ -16,7 +16,8 @@ def postprocess(i):
     if not os.path.isfile(binary):
         return {'return': 1, 'error': f'SWIFT binary not found at {binary}'}
     bin_dir = os.path.dirname(binary)
-    env['MLC_SWIFT_INSTALL_PATH'] = os.path.join(src_path, 'install-' + compiler_tag)
+    env['MLC_SWIFT_INSTALL_PATH'] = os.path.join(
+        src_path, 'install-' + compiler_tag)
     env['MLC_SWIFT_BIN_PATH'] = bin_dir
     env['+PATH'] = [bin_dir]
     return {'return': 0}

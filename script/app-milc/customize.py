@@ -21,7 +21,8 @@ def postprocess(i):
 
     binary = os.path.join(bin_dir, 'su3_rmd')
     if not os.path.isfile(binary):
-        return {'return': 1, 'error': f'MILC binary (su3_rmd) not found in {bin_dir}'}
+        return {'return': 1,
+                'error': f'MILC binary (su3_rmd) not found in {bin_dir}'}
 
     env['MLC_MILC_INSTALL_PATH'] = src_path
     env['MLC_MILC_BIN_PATH'] = bin_dir

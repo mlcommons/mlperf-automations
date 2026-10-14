@@ -42,7 +42,8 @@ def preprocess(i):
             # Reuse a prior no-sudo install in this prefix if present.
             bin_path = _resolve_launcher(prefix)
             if not bin_path:
-                # run.sh will perform the no-sudo portable install into the prefix.
+                # run.sh will perform the no-sudo portable install into the
+                # prefix.
                 env['MLC_PHORONIX_DO_PORTABLE_INSTALL'] = 'yes'
 
     if bin_path:
@@ -79,7 +80,8 @@ def postprocess(i):
             bin_path = '/usr/bin/phoronix-test-suite'
 
     if not bin_path:
-        return {'return': 1, 'error': 'phoronix-test-suite not found after installation'}
+        return {'return': 1,
+                'error': 'phoronix-test-suite not found after installation'}
 
     env['MLC_PHORONIX_TEST_SUITE_BIN_WITH_PATH'] = bin_path
     env['MLC_PHORONIX_INSTALLED_PATH'] = os.path.dirname(bin_path)

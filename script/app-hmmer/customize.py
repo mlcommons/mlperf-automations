@@ -22,7 +22,8 @@ def postprocess(i):
 
     hmmsearch_bin = os.path.join(bin_dir, 'hmmsearch')
     if not os.path.isfile(hmmsearch_bin):
-        return {'return': 1, 'error': f'HMMER binary (hmmsearch) not found in {bin_dir}'}
+        return {'return': 1,
+                'error': f'HMMER binary (hmmsearch) not found in {bin_dir}'}
 
     env['MLC_HMMER_BIN_PATH'] = bin_dir
     env['MLC_HMMER_INSTALL_PATH'] = install_dir

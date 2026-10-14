@@ -6,7 +6,8 @@ def preprocess(i):
     env = i['env']
 
     backend = str(env.get('MLC_WEBARENA_BACKEND', 'mock')).lower()
-    if backend == 'endpoint' and not env.get('MLC_WEBARENA_ENDPOINT_URL', '').strip():
+    if backend == 'endpoint' and not env.get(
+            'MLC_WEBARENA_ENDPOINT_URL', '').strip():
         return {'return': 1,
                 'error': 'endpoint backend requires --endpoint (MLC_WEBARENA_ENDPOINT_URL)'}
 
@@ -18,7 +19,10 @@ def preprocess(i):
 
     # The workload is executed by the benchmark-program posthook dependency.
     python_bin = env.get('MLC_PYTHON_BIN_WITH_PATH', 'python3')
-    script = os.path.join(env['MLC_TMP_CURRENT_SCRIPT_PATH'], 'src', 'run_webarena.py')
+    script = os.path.join(
+        env['MLC_TMP_CURRENT_SCRIPT_PATH'],
+        'src',
+        'run_webarena.py')
     env['MLC_RUN_CMD'] = f'{python_bin} "{script}"'
     if not env.get('MLC_RUN_DIR', ''):
         env['MLC_RUN_DIR'] = os.getcwd()
@@ -45,5 +49,6 @@ def postprocess(i):
     env['MLC_WEBARENA_SUCCESS_RATE'] = str(data.get('success_rate_scored', ''))
     state['mlc_webarena'] = data
 
-    logger.info(f"WebArena scored success rate: {data.get('success_rate_scored')}")
+    logger.info(
+        f"WebArena scored success rate: {data.get('success_rate_scored')}")
     return {'return': 0}

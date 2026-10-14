@@ -12,7 +12,13 @@ def preprocess(i):
 def postprocess(i):
     env = i['env']
     src_path = env.get('MLC_GEANT4_SRC_PATH', '')
-    hits = glob.glob(os.path.join(src_path, 'build', 'BuildProducts', 'lib', 'libG4global*'))
+    hits = glob.glob(
+        os.path.join(
+            src_path,
+            'build',
+            'BuildProducts',
+            'lib',
+            'libG4global*'))
     if not hits:
         return {'return': 1, 'error': f'Geant4 library not found under {src_path}'}
     bin_dir = os.path.dirname(hits[0])

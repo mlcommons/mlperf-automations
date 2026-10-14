@@ -15,7 +15,9 @@ def postprocess(i):
     binary = os.path.join(src_path, 'install-' + compiler_tag, 'bin', 'smilei')
     if not os.path.isfile(binary):
         return {'return': 1, 'error': f'Smilei binary not found at {binary}'}
-    env['MLC_SMILEI_INSTALL_PATH'] = os.path.join(src_path, 'install-' + compiler_tag)
-    env['MLC_SMILEI_BIN_PATH'] = os.path.join(src_path, 'install-' + compiler_tag, 'bin')
+    env['MLC_SMILEI_INSTALL_PATH'] = os.path.join(
+        src_path, 'install-' + compiler_tag)
+    env['MLC_SMILEI_BIN_PATH'] = os.path.join(
+        src_path, 'install-' + compiler_tag, 'bin')
     env['+PATH'] = [src_path]
     return {'return': 0}

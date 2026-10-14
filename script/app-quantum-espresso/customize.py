@@ -6,7 +6,8 @@ def preprocess(i):
 
     os_info = i['os_info']
     if os_info['platform'] == 'windows':
-        return {'return': 1, 'error': 'Windows is not supported for Quantum ESPRESSO builds'}
+        return {'return': 1,
+                'error': 'Windows is not supported for Quantum ESPRESSO builds'}
 
     return {'return': 0}
 
@@ -26,7 +27,8 @@ def postprocess(i):
         build_bin = os.path.join(src_path, 'build-' + compiler_tag, 'bin')
         pw_bin = os.path.join(build_bin, 'pw.x')
         if not os.path.isfile(pw_bin):
-            return {'return': 1, 'error': f'Quantum ESPRESSO binary (pw.x) not found in {bin_dir} or {build_bin}'}
+            return {
+                'return': 1, 'error': f'Quantum ESPRESSO binary (pw.x) not found in {bin_dir} or {build_bin}'}
         bin_dir = build_bin
 
     env['MLC_QE_BIN_PATH'] = bin_dir

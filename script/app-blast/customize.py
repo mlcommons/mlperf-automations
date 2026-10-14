@@ -21,7 +21,8 @@ def postprocess(i):
 
     binary = os.path.join(bin_dir, 'blastn')
     if not os.path.isfile(binary):
-        return {'return': 1, 'error': f'BLAST+ binary (blastn) not found in {bin_dir}'}
+        return {'return': 1,
+                'error': f'BLAST+ binary (blastn) not found in {bin_dir}'}
 
     env['MLC_BLAST_INSTALL_PATH'] = install_dir
     env['MLC_BLAST_BIN_PATH'] = bin_dir

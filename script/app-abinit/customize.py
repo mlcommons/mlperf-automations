@@ -14,7 +14,8 @@ def postprocess(i):
     install_dir = os.path.join(src_path, 'install')
     env['MLC_ABINIT_INSTALL_PATH'] = install_dir
     bin_dir = os.path.join(install_dir, 'bin')
-    env['MLC_ABINIT_BIN_PATH'] = bin_dir if os.path.isdir(bin_dir) else src_path
+    env['MLC_ABINIT_BIN_PATH'] = bin_dir if os.path.isdir(
+        bin_dir) else src_path
     if os.path.isdir(bin_dir):
         env['+PATH'] = [bin_dir]
     return {'return': 0}

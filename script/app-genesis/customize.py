@@ -16,7 +16,8 @@ def postprocess(i):
     if not os.path.isfile(binary):
         return {'return': 1, 'error': f'GENESIS binary not found at {binary}'}
     bin_dir = os.path.dirname(binary)
-    env['MLC_GENESIS_INSTALL_PATH'] = os.path.join(src_path, 'install-' + compiler_tag)
+    env['MLC_GENESIS_INSTALL_PATH'] = os.path.join(
+        src_path, 'install-' + compiler_tag)
     env['MLC_GENESIS_BIN_PATH'] = bin_dir
     env['+PATH'] = [bin_dir]
     return {'return': 0}

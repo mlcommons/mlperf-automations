@@ -136,7 +136,10 @@ def main():
 
     tasks = load_tasks()
     if website:
-        tasks = [t for t in tasks if t.get("web_name", "").lower() == website.lower()]
+        tasks = [
+            t for t in tasks if t.get(
+                "web_name",
+                "").lower() == website.lower()]
     tasks = tasks[:num_samples]
     if not tasks:
         print("ERROR: no tasks selected", file=sys.stderr)

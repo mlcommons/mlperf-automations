@@ -14,7 +14,8 @@ def postprocess(i):
     src_path = env.get('MLC_WANNIER90_SRC_PATH', '')
     hits = glob.glob(os.path.join(src_path, 'wannier90.x'), recursive=True)
     if not hits:
-        return {'return': 1, 'error': f'Wannier90 artifact not found under {src_path}'}
+        return {'return': 1,
+                'error': f'Wannier90 artifact not found under {src_path}'}
     bin_dir = os.path.dirname(hits[0])
     env['MLC_WANNIER90_INSTALL_PATH'] = src_path
     env['MLC_WANNIER90_BIN_PATH'] = bin_dir

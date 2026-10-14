@@ -33,7 +33,8 @@ def brute_force_topk(base, queries, k, metric):
     """Exact top-k neighbor indices for each query via numpy."""
     if metric == "cosine":
         base = base / (np.linalg.norm(base, axis=1, keepdims=True) + 1e-12)
-        queries = queries / (np.linalg.norm(queries, axis=1, keepdims=True) + 1e-12)
+        queries = queries / \
+            (np.linalg.norm(queries, axis=1, keepdims=True) + 1e-12)
     if metric in ("ip", "cosine"):
         scores = queries @ base.T           # larger = closer
         idx = np.argpartition(-scores, k - 1, axis=1)[:, :k]

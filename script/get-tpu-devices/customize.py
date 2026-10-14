@@ -190,5 +190,3 @@ def _tpu_env_value(tpu_env, key):
     """Extract KEY from a tpu-env blob of lines like: KEY: 'value'."""
     m = re.search(rf"^{key}:\s*'?([^'\n]*?)'?\s*$", tpu_env, re.M)
     return m.group(1).strip() if m else ''
-
-

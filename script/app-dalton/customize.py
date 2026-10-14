@@ -16,7 +16,8 @@ def postprocess(i):
     if not os.path.isfile(binary):
         return {'return': 1, 'error': f'DALTON binary not found at {binary}'}
     bin_dir = os.path.dirname(binary)
-    env['MLC_DALTON_INSTALL_PATH'] = os.path.join(src_path, 'build-' + compiler_tag)
+    env['MLC_DALTON_INSTALL_PATH'] = os.path.join(
+        src_path, 'build-' + compiler_tag)
     env['MLC_DALTON_BIN_PATH'] = bin_dir
     env['+PATH'] = [bin_dir]
     return {'return': 0}

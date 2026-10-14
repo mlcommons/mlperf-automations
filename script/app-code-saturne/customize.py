@@ -4,7 +4,8 @@ import os
 
 def preprocess(i):
     if i['os_info']['platform'] == 'windows':
-        return {'return': 1, 'error': 'Windows is not supported for code_saturne builds'}
+        return {'return': 1,
+                'error': 'Windows is not supported for code_saturne builds'}
     return {'return': 0}
 
 
