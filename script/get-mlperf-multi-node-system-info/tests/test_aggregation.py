@@ -241,7 +241,9 @@ class EndpointsFieldSetTest(MultiNodeAggregationTest):
             MLC_MLPERF_TARGET_AVAILABILITY_DATE="2027-03-01",
             MLC_MLPERF_MAX_SUPPORTED_CONCURRENCY="512")
         self.assertEqual(out["shortened_system_name"], "test-sys")
-        self.assertEqual(out["availability_url"], "https://example.invalid/buy")
+        self.assertEqual(
+            out["availability_url"],
+            "https://example.invalid/buy")
         self.assertEqual(out["target_availability_date"], "2027-03-01")
         self.assertEqual(out["max_supported_concurrency"], 512)
 
