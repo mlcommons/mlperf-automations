@@ -58,6 +58,10 @@ input_mapping:
   ssh_ids: MLC_MULTINODE_SYSTEM_SSH_IDS
   sw_notes: MLC_MLPERF_SOFTWARE_NOTES
   system_availability_status: MLC_MLPERF_SUBMISSION_SYSTEM_STATUS
+  shortened_system_name: MLC_MLPERF_SHORTENED_SYSTEM_NAME
+  availability_url: MLC_MLPERF_AVAILABILITY_URL
+  target_availability_date: MLC_MLPERF_TARGET_AVAILABILITY_DATE
+  max_supported_concurrency: MLC_MLPERF_MAX_SUPPORTED_CONCURRENCY
   submitter_contact: MLC_MLPERF_SUBMITTER_CONTACT
   submitter_org_name: MLC_MLPERF_SUBMITTER
   node_config_file: MLC_NODE_CONFIG_FILE
@@ -71,12 +75,10 @@ input_mapping:
   endpoint_url: MLC_MLPERF_ENDPOINT_URL
   serving_node: MLC_MLPERF_SERVING_NODE
   log_path: MLC_MLPERF_SERVING_LOG_PATH
-  run_metadata_path: MLC_MLPERF_RUN_METADATA_PATH
   serving_framework_type: MLC_MLPERF_SERVING_FRAMEWORK_TYPE
   system_type_detail: MLC_MLPERF_SYSTEM_TYPE_DETAIL
   node_config: MLC_MLPERF_NODE_CONFIG
   config_summary_notes: MLC_MLPERF_CONFIG_SUMMARY_NOTES
-  link_config: MLC_MLPERF_LINK_CONFIG
   redfish_endpoint: MLC_REDFISH_ENDPOINT
   redfish_username: MLC_REDFISH_USERNAME
   redfish_password: MLC_REDFISH_PASSWORD

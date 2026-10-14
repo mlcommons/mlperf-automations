@@ -17,6 +17,10 @@ _CONFIG_KEY_TO_ENV = {
     "system_name": "MLC_MLPERF_SYSTEM_NAME",
     "system_category": "MLC_MLPERF_SUBMISSION_SYSTEM_TYPE",
     "system_availability_status": "MLC_MLPERF_SUBMISSION_SYSTEM_STATUS",
+    "shortened_system_name": "MLC_MLPERF_SHORTENED_SYSTEM_NAME",
+    "availability_url": "MLC_MLPERF_AVAILABILITY_URL",
+    "target_availability_date": "MLC_MLPERF_TARGET_AVAILABILITY_DATE",
+    "max_supported_concurrency": "MLC_MLPERF_MAX_SUPPORTED_CONCURRENCY",
     "system_size": "MLC_MLPERF_SYSTEM_SIZE",
     "serving_framework": "MLC_MLPERF_SERVING_FRAMEWORK",
     "division": "MLC_MLPERF_SUBMISSION_DIVISION",
@@ -41,7 +45,6 @@ _CONFIG_KEY_TO_ENV = {
     "endpoint_url": "MLC_MLPERF_ENDPOINT_URL",
     "node_config": "MLC_MLPERF_NODE_CONFIG",
     "config_summary_notes": "MLC_MLPERF_CONFIG_SUMMARY_NOTES",
-    "link_config": "MLC_MLPERF_LINK_CONFIG",
     "framework": "MLC_MLPERF_FRAMEWORK",
     "framework_name": "MLC_MLPERF_FRAMEWORK_NAME",
     "sw_notes": "MLC_MLPERF_SOFTWARE_NOTES",
@@ -696,7 +699,11 @@ def _build_endpoints_output(
     Only the fields in the §8.2 table appear here: submitter, model and
     dataset metadata now live elsewhere in the submission, and the run
     configuration that used to be written to run_metadata.json is folded in
-    at the top level."""
+    at the top level.
+
+    Submitter-supplied fields are written as given, or empty when unset. Which
+    of them a submission cannot do without is enforced by the caller (the
+    submission checker, or mlperf-sysinfo before a capture), not here."""
     shaped_nodes = [_shape_node_type(nt, logger) for nt in node_types]
 
     # The data dictionary numbers node types 1..system_node_ensemble_count.
@@ -714,13 +721,19 @@ def _build_endpoints_output(
     output = {
         "division": env.get("MLC_MLPERF_SUBMISSION_DIVISION", "Insert model division here"),
         "system_name": env.get("MLC_MLPERF_SYSTEM_NAME", ""),
+        "shortened_system_name": env.get("MLC_MLPERF_SHORTENED_SYSTEM_NAME", ""),
         "system_availability_status": env.get("MLC_MLPERF_SUBMISSION_SYSTEM_STATUS", "Insert system availability status here"),
-        "system_category": env.get("MLC_MLPERF_SUBMISSION_SYSTEM_TYPE", "Insert system category here"),
+        "availability_url": env.get("MLC_MLPERF_AVAILABILITY_URL", ""),
+        "target_availability_date": env.get("MLC_MLPERF_TARGET_AVAILABILITY_DATE", ""),
         "system_size": env.get("MLC_MLPERF_SYSTEM_SIZE", "") or system_size,
         "system_node_ensemble_count": _coerce_int(
             env.get("MLC_MLPERF_SYSTEM_NODE_ENSEMBLE_COUNT", "") or len(shaped_nodes)),
         "system_node_ensemble_total": _coerce_int(
             env.get("MLC_MLPERF_SYSTEM_NODE_ENSEMBLE_TOTAL", "") or ensemble_total),
+        # In the §8.2 table and required by the checker, though the §8.2.1
+        # template leaves it out; placed where the table lists it.
+        "max_supported_concurrency": _coerce_int(
+            env.get("MLC_MLPERF_MAX_SUPPORTED_CONCURRENCY", "")) or None,
         "endpoint_url": env.get("MLC_MLPERF_ENDPOINT_URL", ""),
         "serving_framework": env.get("MLC_MLPERF_SERVING_FRAMEWORK", ""),
         "node_types": shaped_nodes,
@@ -738,7 +751,9 @@ def _build_endpoints_output(
     output["config_summary"] = _build_config_summary(
         output, notes) or serving_cfg.get("config_summary", "") or ""
     output["config_summary_notes"] = notes
-    output["link_config"] = env.get("MLC_MLPERF_LINK_CONFIG", "")
+    # This run's TPS over the best TPS of its curve, so it can only be known
+    # once every run exists. The submission CLI fills it in.
+    output["tps_utilization"] = None
 
     return output
 
@@ -1498,40 +1513,6 @@ def postprocess(i):
     except Exception as e:
         logger.error(
             f"Exception {e} occurred when compiling the system information")
-
-    # Patch run_metadata (JSON or YAML) with serving config values if
-    # available.
-    run_md_path = env.get('MLC_MLPERF_RUN_METADATA_PATH', '')
-    serving_cfg_path = os.path.join(dir_path, 'serving_config.json')
-    if run_md_path and os.path.exists(
-            serving_cfg_path) and os.path.exists(run_md_path):
-        try:
-            with open(serving_cfg_path) as f:
-                sc = json.load(f)
-            use_json = run_md_path.endswith('.json')
-            with open(run_md_path) as f:
-                run_md = json.load(f) if use_json else yaml.safe_load(f)
-            for key in ('tensor_parallel', 'pipeline_parallel',
-                        'expert_parallel', 'data_parallel', 'batch', 'disaggregated'):
-                if sc.get(key) is not None:
-                    run_md[key] = sc[key]
-            if sc.get('config_summary'):
-                run_md['config_summary'] = sc['config_summary']
-            with open(run_md_path, 'w') as f:
-                if use_json:
-                    json.dump(run_md, f, indent=2)
-                else:
-                    yaml.dump(run_md, f, default_flow_style=False,
-                              sort_keys=False, allow_unicode=True)
-            logger.info("Patched run_metadata with serving config values")
-            if not env.get('MLC_MLPERF_SERVING_FRAMEWORK') and sc.get(
-                    'framework'):
-                env['MLC_MLPERF_SERVING_FRAMEWORK'] = sc['framework']
-                logger.info(
-                    "Detected serving framework from log: %s",
-                    sc['framework'])
-        except Exception as e:
-            logger.error(f"Failed to patch {run_md_path}: {e}")
 
     _finalize_nameplate_power(env, dir_path, logger)
 

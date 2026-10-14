@@ -220,6 +220,90 @@ class MultiNodeAggregationTest(unittest.TestCase):
         self.assertFalse(block["consistent"], block)
 
 
+class EndpointsFieldSetTest(MultiNodeAggregationTest):
+    """The endpoints field set against endpoints rules §8.2.
+
+    Inherits the aggregation fixtures. The tests it would inherit run again
+    unchanged, which is cheap and keeps this class from needing its own copy
+    of the helpers.
+    """
+
+    def _endpoints_output(self, **env_extra):
+        self._write_node(0, _node())
+        r = self._postprocess(remote_count=0, **env_extra)
+        self.assertEqual(r["return"], 0, r.get("error"))
+        return self._output()
+
+    def test_the_submitter_fields_are_written_as_given(self):
+        out = self._endpoints_output(
+            MLC_MLPERF_SHORTENED_SYSTEM_NAME="test-sys",
+            MLC_MLPERF_AVAILABILITY_URL="https://example.invalid/buy",
+            MLC_MLPERF_TARGET_AVAILABILITY_DATE="2027-03-01",
+            MLC_MLPERF_MAX_SUPPORTED_CONCURRENCY="512")
+        self.assertEqual(out["shortened_system_name"], "test-sys")
+        self.assertEqual(out["availability_url"], "https://example.invalid/buy")
+        self.assertEqual(out["target_availability_date"], "2027-03-01")
+        self.assertEqual(out["max_supported_concurrency"], 512)
+
+    def test_an_unset_submitter_field_is_empty_and_not_an_error(self):
+        """Which of these a submission needs is the caller's call, not the
+        collector's: an unset one is written empty and the run succeeds."""
+        out = self._endpoints_output()
+        self.assertEqual(out["shortened_system_name"], "")
+        self.assertEqual(out["availability_url"], "")
+        self.assertEqual(out["target_availability_date"], "")
+        self.assertIsNone(out["max_supported_concurrency"])
+
+    def test_a_long_short_name_is_not_truncated(self):
+        name = "a-name-well-over-twenty-characters"
+        out = self._endpoints_output(MLC_MLPERF_SHORTENED_SYSTEM_NAME=name)
+        self.assertEqual(out["shortened_system_name"], name)
+
+    def test_tps_utilization_is_left_for_the_submission_cli(self):
+        self.assertIsNone(self._endpoints_output()["tps_utilization"])
+
+    def test_fields_outside_8_2_are_not_written(self):
+        out = self._endpoints_output(
+            MLC_MLPERF_SUBMISSION_SYSTEM_TYPE="datacenter",
+            MLC_MLPERF_LINK_CONFIG="https://example.invalid/cfg")
+        self.assertNotIn("system_category", out)
+        self.assertNotIn("link_config", out)
+
+    def test_the_new_fields_sit_in_template_order(self):
+        keys = list(self._endpoints_output())
+        for before, after in (
+                ("system_name", "shortened_system_name"),
+                ("shortened_system_name", "system_availability_status"),
+                ("system_availability_status", "availability_url"),
+                ("availability_url", "target_availability_date"),
+                ("target_availability_date", "system_size"),
+                ("system_node_ensemble_total", "max_supported_concurrency"),
+                ("max_supported_concurrency", "endpoint_url"),
+                ("config_summary_notes", "tps_utilization")):
+            self.assertLess(keys.index(before), keys.index(after),
+                            f"{before} should come before {after}")
+
+    def test_run_metadata_is_no_longer_patched(self):
+        run_md = os.path.join(self.dir_path, "run_metadata.json")
+        with open(run_md, "w") as f:
+            json.dump({"tensor_parallel": 1}, f)
+        with open(os.path.join(self.dir_path, "serving_config.json"),
+                  "w") as f:
+            json.dump({"tensor_parallel": 8}, f)
+        self._endpoints_output(MLC_MLPERF_RUN_METADATA_PATH=run_md)
+        with open(run_md) as f:
+            self.assertEqual(json.load(f), {"tensor_parallel": 1})
+
+    def test_inference_still_carries_the_system_category(self):
+        """system_category left the endpoints field set only. The inference
+        flat format reads it as system_type."""
+        out = self._endpoints_output(
+            MLC_MLPERF_BENCHMARK="inference",
+            MLC_MLPERF_SUBMISSION_SYSTEM_TYPE="datacenter")
+        self.assertEqual(out["system_type"], "datacenter")
+        self.assertNotIn("shortened_system_name", out)
+
+
 class ProvisioningPassthroughTest(unittest.TestCase):
     """preprocess forwards the provisioning flags and fails on a lost node."""
 

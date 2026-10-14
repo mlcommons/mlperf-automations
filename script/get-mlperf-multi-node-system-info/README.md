@@ -67,6 +67,10 @@ mlcr get-mlperf-multi-node-system-info
 | `--ssh_ids` |  |  | `` |
 | `--sw_notes` |  |  | `` |
 | `--system_availability_status` |  |  | `` |
+| `--shortened_system_name` |  |  | `` |
+| `--availability_url` |  |  | `` |
+| `--target_availability_date` |  |  | `` |
+| `--max_supported_concurrency` |  |  | `` |
 | `--submitter_contact` |  |  | `` |
 | `--submitter_org_name` |  |  | `` |
 | `--node_config_file` |  |  | `` |
@@ -80,7 +84,6 @@ mlcr get-mlperf-multi-node-system-info
 | `--endpoint_url` |  |  | `` |
 | `--serving_node` |  |  | `` |
 | `--log_path` |  |  | `/tmp/serving.log` |
-| `--run_metadata_path` |  |  | `` |
 | `--serving_framework_type` |  |  | `` |
 | `--system_type_detail` |  |  | `` |
 | `--redfish_endpoint` |  |  | `` |

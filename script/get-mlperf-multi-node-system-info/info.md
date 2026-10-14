@@ -93,9 +93,12 @@ python -m vllm.entrypoints.openai.api_server ... > /tmp/serving.log 2>&1 &
 | `--category` | string | System category (e.g. `"datacenter"`). |
 | `--system_availability_status` | string | System availability status (e.g. `"available"`). Under `_training` this must be one of the four values the training checker accepts — see [Training submission format](#training-submission-format). |
 | `--division` | string | Submission division (e.g. `"open"`, `"closed"`). |
+| `--shortened_system_name` | string | Short form of `--system_name`, at most 20 characters (§8.2). Written as given; nothing is truncated. |
+| `--availability_url` | string | Public product or ordering page for the system. The submission checker requires it when the status is `Available`. |
+| `--target_availability_date` | string | Expected availability date, `YYYY-MM-DD`. The submission checker requires it when the status is `Preview`; the submission CLI can also set it with `--target-availability-date`. |
+| `--max_supported_concurrency` | int | Declared maximum supported concurrency `M`. Required by the submission checker, which also checks it is greater than 32 (§9.1). |
 | `--node_config` | string | Description of the node configuration used for the run. Derived from `--node_config_file` when not given. |
 | `--config_summary_notes` | string | Anything about the run configuration the parallelism fields do not capture. |
-| `--link_config` | string | Link to the full configuration logs for the run. |
 
 ### Software metadata
 
@@ -162,11 +165,14 @@ With the `_inference` variation the output is the flat MLPerf Inference format i
 {
   "division": "Standardized",
   "system_name": "disagg-sut",
+  "shortened_system_name": "disagg-sut",
   "system_availability_status": "Available",
-  "system_category": "Datacenter",
+  "availability_url": "https://example.com/products/disagg-sut",
+  "target_availability_date": "",
   "system_size": "8x NVIDIA H100 80GB HBM3 + 1x NVIDIA GeForce RTX 5060 Ti + 4x NVIDIA A100-SXM4-40GB",
   "system_node_ensemble_count": 2,
   "system_node_ensemble_total": 2,
+  "max_supported_concurrency": 1024,
   "endpoint_url": "http://prefill1:8000",
   "serving_framework": "SGLang 0.4.6",
   "node_types": [
@@ -222,7 +228,7 @@ With the `_inference` variation the output is the flat MLPerf Inference format i
   "batch": 256,
   "config_summary": "Disaggregated, TP 8, DP 2",
   "config_summary_notes": "",
-  "link_config": ""
+  "tps_utilization": null
 }
 ```
 
@@ -244,10 +250,12 @@ When a node type reports several accelerator models but only one value for a fie
 |-------|------|--------|-------------|
 | `system_name` | string | **manual** (required) | Human-readable system name (e.g. `"8x NVIDIA H100 80GB HBM3"`). Script exits with an error if not provided. |
 | `division` | string | **manual** | Submission division (`"Standardized"`, `"Serviced"`, or `"RDI"`). |
-| `system_category` | string | **manual** | System category (`"Datacenter"` or `"Edge"`). |
+| `shortened_system_name` | string | **manual** | Short form of `system_name`, at most 20 characters. Empty when not given. |
 | `system_availability_status` | string | **manual** | Availability status (`"Available"`, `"Preview"`, or `"RDI"`). |
+| `availability_url` | string | **manual** | Public product or ordering page. Required by the checker when the status is `Available`. Empty when not given. |
+| `target_availability_date` | string | **manual** | ISO 8601 date. Required by the checker when the status is `Preview`. Empty when not given. |
+| `max_supported_concurrency` | int | **manual** | Declared maximum supported concurrency. In the §8.2 table though not in the §8.2.1 template; `null` when not given. |
 | `config_summary_notes` | string | **manual** | Anything about the run configuration the other fields do not capture. |
-| `link_config` | string | **manual** | Link to the full configuration logs for the run. |
 | `system_size` | string | auto | One `(nodes × accelerators_per_node)x accelerator_model_name` part per accelerator model per node type, joined with ` + `. Falls back to host processors for node types with no accelerator. Override with `--system_size`. |
 | `system_node_ensemble_count` | int | auto | Number of distinct node types in the system. Override with `--system_node_ensemble_count`. |
 | `system_node_ensemble_total` | int | auto | Total number of nodes across all node types. Override with `--system_node_ensemble_total`. |
@@ -261,6 +269,7 @@ When a node type reports several accelerator models but only one value for a fie
 | `data_parallel` | int | auto | Data parallel degree read from the serving log. `0` when not reported. |
 | `batch` | int | auto | Maximum batch size read from the serving log. `0` when not reported. |
 | `config_summary` | string | auto | Concatenation of the parallelism fields above that are greater than 1, followed by `config_summary_notes`. Derived from the values written to this file, so the two always agree. |
+| `tps_utilization` | float | — | Always `null` here. It is this run's TPS over the best TPS of its curve, so the submission CLI fills it in once every run exists. |
 
 #### Per-node fields (`node_types` entries)
 
