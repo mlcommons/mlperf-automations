@@ -1,0 +1,61 @@
+alias: get-dataset-gaia
+uid: 3003781ab76d7e86
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: AI/ML datasets
+tags:
+- get
+- dataset
+- gaia
+- agent
+- validation
+tags_help: get dataset gaia agent
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_DATASET: GAIA
+  MLC_GAIA_CONFIG: 2023_all
+  MLC_GAIA_SPLIT: validation
+new_env_keys:
+- MLC_AGENT_DATA_PATH
+- MLC_GAIA_DATA_PATH
+- MLC_DATASET_GAIA_PATH
+
+# Input mapping
+input_mapping:
+  data_path: MLC_AGENT_DATA_PATH
+  hf_token: MLC_AGENT_HF_TOKEN
+  config: MLC_GAIA_CONFIG
+  split: MLC_GAIA_SPLIT
+  output_filename: MLC_GAIA_OUTPUT_FILENAME
+
+input_description:
+  data_path:
+    desc: Path to an already-local GAIA jsonl/json (short-circuits the fetch)
+  hf_token:
+    desc: HuggingFace token (GAIA is a gated dataset)
+
+# Dependencies
+deps:
+- tags: detect,os
+- names:
+  - python
+  - python3
+  tags: get,python3
+- tags: get,generic-python-lib,_package.datasets
+  skip_if_env:
+    MLC_AGENT_DATA_PATH:
+    - 'on'
+- tags: get,generic-python-lib,_package.huggingface_hub
+  skip_if_env:
+    MLC_AGENT_DATA_PATH:
+    - 'on'
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_AGENT_DATA_PATH: Path to the cached GAIA validation jsonl
