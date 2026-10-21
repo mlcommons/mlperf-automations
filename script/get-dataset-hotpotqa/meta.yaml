@@ -1,0 +1,91 @@
+alias: get-dataset-hotpotqa
+uid: 474c81b3ff0f5cca
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: AI/ML datasets
+tags:
+- get
+- dataset
+- hotpotqa
+- agent
+- validation
+tags_help: get dataset hotpotqa agent
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_DATASET: HOTPOTQA
+  MLC_HOTPOTQA_SETTING: distractor
+new_env_keys:
+- MLC_AGENT_DATA_PATH
+- MLC_HOTPOTQA_DATA_PATH
+- MLC_DATASET_HOTPOTQA_PATH
+
+# Input mapping
+input_mapping:
+  data_path: MLC_AGENT_DATA_PATH
+  data_url: MLC_HOTPOTQA_DATASET_URL
+  output_filename: MLC_HOTPOTQA_OUTPUT_FILENAME
+
+input_description:
+  data_path:
+    desc: Path to an already-local HotpotQA file (short-circuits the download)
+  data_url:
+    desc: Override the dataset source URL (HF parquet or legacy JSON)
+
+# Dependencies
+deps:
+- tags: detect,os
+- names:
+  - python
+  - python3
+  tags: get,python3
+- tags: get,generic-python-lib,_package.pandas
+  skip_if_env:
+    MLC_AGENT_DATA_PATH:
+    - 'on'
+- tags: get,generic-python-lib,_package.pyarrow
+  skip_if_env:
+    MLC_AGENT_DATA_PATH:
+    - 'on'
+
+# Download the raw split (cached, keyed on URL) unless a local path was given.
+prehook_deps:
+- tags: download,file,_wget
+  names:
+  - hotpotqa-download
+  skip_if_env:
+    MLC_AGENT_DATA_PATH:
+    - 'on'
+  env:
+    MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_HOTPOTQA_RAW_PATH
+    MLC_DOWNLOAD_FILENAME: hotpotqa_validation.parquet
+  extra_cache_tags: hotpotqa,dataset
+  force_cache: true
+  force_env_keys:
+  - MLC_OUTDIRNAME
+  update_tags_from_env_with_prefix:
+    _url.:
+    - MLC_HOTPOTQA_DATASET_URL
+
+# Variations: HotpotQA split / setting
+variations:
+  distractor:
+    group: setting
+    default: true
+    env:
+      MLC_HOTPOTQA_SETTING: distractor
+      MLC_HOTPOTQA_DATASET_URL: https://huggingface.co/api/datasets/hotpotqa/hotpot_qa/parquet/distractor/validation/0.parquet
+  fullwiki:
+    group: setting
+    env:
+      MLC_HOTPOTQA_SETTING: fullwiki
+      MLC_HOTPOTQA_DATASET_URL: https://huggingface.co/api/datasets/hotpotqa/hotpot_qa/parquet/fullwiki/validation/0.parquet
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_AGENT_DATA_PATH: Path to the cached HotpotQA JSON (harness schema)

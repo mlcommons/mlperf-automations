@@ -29,6 +29,7 @@ deps:
 - tags: get,generic,sys-util,_libopenmpi-dev
 - tags: get,cmake
 - tags: get,generic,sys-util,_libfftw3-dev
+- tags: get,generic,sys-util,_libopenblas-dev
 - tags: get,git,repo
   names:
   - gromacs-repo
