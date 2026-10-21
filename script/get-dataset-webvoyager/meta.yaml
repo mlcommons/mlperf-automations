@@ -1,0 +1,55 @@
+alias: get-dataset-webvoyager
+uid: 5b78da8a3a813200
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: AI/ML datasets
+tags:
+- get
+- dataset
+- webvoyager
+- agent
+tags_help: get dataset webvoyager agent
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_DATASET: WEBVOYAGER
+  MLC_WEBVOYAGER_REPO_URL: https://github.com/MinorJerry/WebVoyager
+new_env_keys:
+- MLC_WEBVOYAGER_SRC_PATH
+- MLC_AGENT_DATA_PATH
+- MLC_DATASET_WEBVOYAGER_PATH
+
+# Input mapping
+input_mapping:
+  repo: MLC_WEBVOYAGER_REPO_URL
+  branch: MLC_WEBVOYAGER_REPO_BRANCH
+  sha: MLC_WEBVOYAGER_REPO_SHA
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: get,git,repo
+  names:
+  - webvoyager-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_WEBVOYAGER_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  extra_cache_tags: webvoyager,dataset,repo
+  force_cache: true
+  update_tags_from_env_with_prefix:
+    _repo.:
+    - MLC_WEBVOYAGER_REPO_URL
+    _branch.:
+    - MLC_WEBVOYAGER_REPO_BRANCH
+    _sha.:
+    - MLC_WEBVOYAGER_REPO_SHA
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_WEBVOYAGER_SRC_PATH: Path to the cached WebVoyager checkout
