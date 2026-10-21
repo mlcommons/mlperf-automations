@@ -1,0 +1,193 @@
+alias: get-llama-server
+uid: 462f365a75660304
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: AI/ML frameworks
+tags:
+- get
+- llama
+- server
+- llama-server
+- llama.cpp
+- engine
+tags_help: get llama server
+
+# Cache: a per-compiler build dir (family+version+install-path hash) lives in the
+# cached llama.cpp checkout, so a different compiler always triggers a fresh
+# build and never reuses another toolchain's binary. The script itself is not
+# cached so it re-selects the correct build dir for the current compiler.
+cache: false
+
+# Environment
+default_env:
+  MLC_AGENT_COMPILER: aocc
+  MLC_LLAMA_CPP_REPO_URL: https://github.com/ggml-org/llama.cpp
+  MLC_LLAMA_CPP_REPO_BRANCH: master
+
+new_env_keys:
+- MLC_LLAMA_SERVER_BIN
+- MLC_LLAMA_BENCH_BIN
+- MLC_LLAMA_BUILD_DIR
+- MLC_LLAMA_CPP_SRC_PATH
+- MLC_AGENT_ENGINE_LIB_DIRS
+- MLC_AGENT_ENGINE_COMPILED_WITH
+- MLC_AGENT_COMPILER_VERSION
+- +LD_LIBRARY_PATH
+
+# Input mapping
+input_mapping:
+  compiler: MLC_AGENT_COMPILER
+  llama_cpp_path: MLC_LLAMA_CPP_SRC_PATH
+  llama_cpp_repo: MLC_LLAMA_CPP_REPO_URL
+  llama_cpp_branch: MLC_LLAMA_CPP_REPO_BRANCH
+  cmake_flags: MLC_AGENT_ENGINE_CMAKE_FLAGS
+  aggressive: MLC_AGENT_AGGRESSIVE
+  aggressive_profile: MLC_AGENT_AGGRESSIVE_PROFILE
+  force_build: MLC_AGENT_FORCE_BUILD
+  build_dir: MLC_LLAMA_BUILD_DIR
+  build_ncpus: MLC_AGENT_BUILD_NCPUS
+  aocc_dir: MLC_AOCC_DIR_PATH
+  amdclang_dir: MLC_AMDCLANG_DIR_PATH
+  gcc_dir: MLC_GCC_DIR_PATH
+  llvm_dir: MLC_LLVM_DIR_PATH
+  oneapi_dir: MLC_ONEAPI_DIR_PATH
+
+input_description:
+  compiler:
+    desc: Compiler family used to build llama-server (aocc|amdclang|gcc|llvm|oneapi)
+  force_build:
+    desc: Rebuild even if a llama-server binary already exists for this compiler
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: detect,cpu
+- tags: get,compiler,paths,amd
+  names:
+  - compiler-paths
+- tags: get,generic-sys-util,_cmake
+- tags: get,generic-sys-util,_build-essential
+  env:
+    MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
+- tags: get,git,repo
+  names:
+  - llama-cpp-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_LLAMA_CPP_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _repo.:
+    - MLC_LLAMA_CPP_REPO_URL
+    _branch.:
+    - MLC_LLAMA_CPP_REPO_BRANCH
+    _sha.:
+    - MLC_LLAMA_CPP_REPO_SHA
+  extra_cache_tags: llama-cpp,repo
+  skip_if_env:
+    MLC_LLAMA_CPP_SRC_PATH:
+    - 'on'
+
+# Variations
+variations:
+  # -------- compiler selection --------
+  aocc:
+    group: compiler
+    default: true
+    env:
+      MLC_AGENT_COMPILER: aocc
+    deps:
+    - tags: get,aocc
+      names:
+      - aocc
+      update_tags_from_env_with_prefix:
+        _path.:
+        - MLC_AOCC_DIR_PATH
+  amdclang:
+    group: compiler
+    env:
+      MLC_AGENT_COMPILER: amdclang
+    deps:
+    - tags: get,amdclang
+      names:
+      - amdclang
+      update_tags_from_env_with_prefix:
+        _path.:
+        - MLC_AMDCLANG_DIR_PATH
+  gcc:
+    group: compiler
+    env:
+      MLC_AGENT_COMPILER: gcc
+    deps:
+    - tags: get,gcc
+      env:
+        MLC_SEARCH_FOLDER_PATH: <<<MLC_GCC_RELEASES_PATH>>>
+      names:
+      - gcc
+      update_tags_from_env_with_prefix:
+        _path.:
+        - MLC_GCC_DIR_PATH
+  llvm:
+    group: compiler
+    env:
+      MLC_AGENT_COMPILER: llvm
+    deps:
+    - tags: get,llvm
+      env:
+        MLC_SEARCH_FOLDER_PATH: <<<MLC_LLVM_RELEASES_PATH>>>
+      names:
+      - llvm
+      update_tags_from_env_with_prefix:
+        _path.:
+        - MLC_LLVM_DIR_PATH
+  oneapi:
+    group: compiler
+    env:
+      MLC_AGENT_COMPILER: oneapi
+    deps:
+    - tags: get,oneapi
+      names:
+      - oneapi
+      update_tags_from_env_with_prefix:
+        _path.:
+        - MLC_ONEAPI_DIR_PATH
+
+  # -------- compiler version selection --------
+  custom-compilers:
+    group: compiler-versions
+  latest-compilers:
+    group: compiler-versions
+    default: true
+    update_meta_if_env:
+    - enable_if_env:
+        MLC_HOST_PLATFORM_FLAVOR:
+        - x86_64
+        MLC_HOST_OS_TYPE:
+        - linux
+      default_env:
+        MLC_GCC_DIR_PATH: <<<MLC_GCC_LATEST_DIR_PATH>>>
+        MLC_AOCC_DIR_PATH: <<<MLC_AOCC_LATEST_DIR_PATH>>>
+        MLC_LLVM_DIR_PATH: <<<MLC_LLVM_LATEST_DIR_PATH>>>
+        MLC_AMDCLANG_DIR_PATH: <<<MLC_AMDCLANG_LATEST_DIR_PATH>>>
+        MLC_ONEAPI_DIR_PATH: <<<MLC_ONEAPI_LATEST_DIR_PATH>>>
+    - skip_if_env:
+        MLC_HOST_PLATFORM_FLAVOR:
+        - x86_64
+      enable_if_env:
+        MLC_HOST_OS_TYPE:
+        - linux
+      default_env:
+        MLC_GCC_DIR_PATH: <<<MLC_GCC_LATEST_DIR_PATH>>>
+        MLC_LLVM_DIR_PATH: <<<MLC_LLVM_LATEST_DIR_PATH>>>
+        MLC_AMDCLANG_DIR_PATH: <<<MLC_AMDCLANG_LATEST_DIR_PATH>>>
+
+  # -------- aggressive engine build (LTO + native + unrolling) --------
+  aggressive:
+    env:
+      MLC_AGENT_AGGRESSIVE: true
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_LLAMA_SERVER_BIN: Path to the built llama-server binary
