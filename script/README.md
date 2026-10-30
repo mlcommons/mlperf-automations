@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-10-03 04:34:53*
+*Last updated: 2026-10-31 02:52:31*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -35,6 +35,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - [ROCm automation](#rocm-automation)
 - [Remote automation](#remote-automation)
 - [Reproducibility and artifact evaluation](#reproducibility-and-artifact-evaluation)
+- [TPU automation](#tpu-automation)
 - [Testing](#testing)
 - [Tests](#tests)
 - [TinyML automation](#tinyml-automation)
@@ -70,6 +71,12 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-dataset-criteo](get-dataset-criteo/)**
   - get-dataset-criteo
   - Tags: `get`, `dataset`, `criteo`, `original`
+- **[get-dataset-gaia](get-dataset-gaia/)**
+  - get-dataset-gaia
+  - Tags: `get`, `dataset`, `gaia`, `agent`, `validation`
+- **[get-dataset-hotpotqa](get-dataset-hotpotqa/)**
+  - get-dataset-hotpotqa
+  - Tags: `get`, `dataset`, `hotpotqa`, `agent`, `validation`
 - **[get-dataset-imagenet-aux](get-dataset-imagenet-aux/)**
   - get-dataset-imagenet-aux
   - Tags: `get`, `aux`, `dataset-aux`, `image-classification`, `imagenet-aux`
@@ -112,6 +119,12 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-dataset-squad-vocab](get-dataset-squad-vocab/)**
   - get-dataset-squad-vocab
   - Tags: `get`, `aux`, `squad`, `dataset-aux`, `language-processing`, `squad-aux`, `vocab`, `squad-vocab`
+- **[get-dataset-webarena](get-dataset-webarena/)**
+  - get-dataset-webarena
+  - Tags: `get`, `dataset`, `webarena`, `agent`
+- **[get-dataset-webvoyager](get-dataset-webvoyager/)**
+  - get-dataset-webvoyager
+  - Tags: `get`, `dataset`, `webvoyager`, `agent`
 - **[get-preprocessed-dataset-cognata](get-preprocessed-dataset-cognata/)**
   - get-preprocessed-dataset-cognata
   - Tags: `get`, `dataset`, `cognata`, `preprocessed`
@@ -148,6 +161,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-google-saxml](get-google-saxml/)**
   - get-google-saxml
   - Tags: `get`, `google`, `saxml`
+- **[get-llama-server](get-llama-server/)**
+  - get-llama-server
+  - Tags: `get`, `llama`, `server`, `llama-server`, `llama.cpp`, `engine`
 - **[get-onnxruntime-prebuilt](get-onnxruntime-prebuilt/)**
   - get-onnxruntime-prebuilt
   - Tags: `install`, `onnxruntime`, `get`, `prebuilt`, `lib`, `lang-c`, `lang-cpp`
@@ -202,6 +218,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-ml-model-abtf-ssd-pytorch](get-ml-model-abtf-ssd-pytorch/)**
   - get-ml-model-abtf-ssd-pytorch
   - Tags: `get`, `ml-model`, `abtf-ssd-pytorch`, `ssd`, `resnet50`, `cmc`
+- **[get-ml-model-agent-gguf](get-ml-model-agent-gguf/)**
+  - get-ml-model-agent-gguf
+  - Tags: `get`, `ml-model`, `agent`, `gguf`, `llm`
 - **[get-ml-model-bert-base-squad](get-ml-model-bert-base-squad/)**
   - get-ml-model-bert-base-squad
   - Tags: `get`, `ml-model`, `raw`, `bert`, `bert-base`, `bert-squad`, `language`, `language-processing`
@@ -1360,6 +1379,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[detect-os](detect-os/)**
   - detect-os
   - Tags: `detect-os`, `detect`, `os`, `info`
+- **[generate-infragraph](generate-infragraph/)**
+  - generate-infragraph
+  - Tags: `generate`, `infragraph`
 - **[get-mlperf-multi-node-system-info](get-mlperf-multi-node-system-info/)**
   - get-mlperf-multi-node-system-info
   - Tags: `get-mlperf-multi-node-system-info`
@@ -1417,6 +1439,12 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-ipol-src](get-ipol-src/)**
   - get-ipol-src
   - Tags: `get`, `ipol`, `journal`, `src`, `ipol-src`
+
+## TPU automation
+
+- **[get-tpu-devices](get-tpu-devices/)**
+  - get-tpu-devices
+  - Tags: `get`, `tpu-devices`
 
 ## Testing
 
@@ -1620,8 +1648,8 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 485
-- **Categories**: 38
+- **Total Scripts**: 493
+- **Categories**: 39
 
 ## Usage
 

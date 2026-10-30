@@ -24,6 +24,7 @@ new_env_keys:
 - MLC_LINKER_*
 - +PATH
 - +LD_LIBRARY_PATH
+- +LIBRARY_PATH
 
 # Input mapping
 input_mapping:
@@ -39,6 +40,9 @@ variations:
   fortran:
     env:
       MLC_ONEAPI_FORTRAN: 'yes'
+  libs:
+    env:
+      MLC_ONEAPI_GET_LIBS: 'yes'
   path.#:
     env:
       MLC_ONEAPI_DIR_PATH: '#'
