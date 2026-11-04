@@ -14,6 +14,7 @@ BUILD_DIR="${LLAMA_BUILD_DIR:-$SRC/build}"
 JOBS="${BUILD_JOBS:-$(nproc 2>/dev/null || echo 4)}"
 CC_BIN="${CC:-cc}"
 CXX_BIN="${CXX:-c++}"
+CMAKE="${CMAKE_BIN:-cmake}"
 EXTRA_FLAGS="${LLAMA_CMAKE_FLAGS:-}"
 # LLAMA_CMAKE_FLAGS_ARR (newline-delimited) preserves multi-word -D values
 # (e.g. -DCMAKE_C_FLAGS="-flto -mllvm -inline-threshold=2000"); preferred when set.
@@ -38,15 +39,15 @@ echo "  CXX   : $CXX_BIN"
 echo "  jobs  : $JOBS"
 
 # LLAMA_CURL=OFF: we serve a local GGUF, so no libcurl dependency is needed.
-cmake -S "$SRC" -B "$BUILD_DIR" \
+"$CMAKE" -S "$SRC" -B "$BUILD_DIR" \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_C_COMPILER="$CC_BIN" \
   -DCMAKE_CXX_COMPILER="$CXX_BIN" \
   -DLLAMA_CURL=OFF \
   -DGGML_NATIVE=ON \
-  $EXTRA_FLAGS
+  "${EXTRA_ARR[@]}"
 
-cmake --build "$BUILD_DIR" --config Release -j "$JOBS" --target llama-server llama-bench
+"$CMAKE" --build "$BUILD_DIR" --config Release -j "$JOBS" --target llama-server llama-bench
 
 test -x "$SERVER_BIN" || { echo "ERROR: build finished but $SERVER_BIN is missing"; exit 1; }
 echo "Built: $SERVER_BIN"
