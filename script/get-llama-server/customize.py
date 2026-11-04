@@ -70,6 +70,12 @@ def preprocess(i):
     verslug = ''.join(ch if (ch.isalnum() or ch in '.-') else '_' for ch in version)[:24]
     _profile = (env.get('MLC_AGENT_AGGRESSIVE_PROFILE', '') or '').lower()
     _suffix = ('-' + (_profile or 'aggr')) if is_true(env.get('MLC_AGENT_AGGRESSIVE')) else ''
+    # Fast-math is on by default; -fno-finite-math-only is required (ggml/vec.h #errors
+    # without it: masks and softmax rely on IEEE infinities).
+    _fm = str(env.get('MLC_AGENT_FAST_MATH', 'yes')).strip().lower() not in ('no', 'false', '0', 'off')
+    _fmflags = '-ffast-math -fno-finite-math-only' if _fm else ''
+    if _fm:
+        _suffix += '-fm'
     slug = fam + _suffix + (('-' + verslug) if verslug else '') + '-' + pathhash
     build_dir = env.get('MLC_LLAMA_BUILD_DIR', '') or os.path.join(src, 'build-' + slug)
     server_bin = os.path.join(build_dir, 'bin', 'llama-server')
@@ -96,6 +102,14 @@ def preprocess(i):
                       '-DCMAKE_C_FLAGS=-funroll-loops', '-DCMAKE_CXX_FLAGS=-funroll-loops']
     else:
         cmake_args = []
+    if _fmflags and not custom:
+        for _lang in ('C', 'CXX'):
+            _k = '-DCMAKE_%s_FLAGS=' % _lang
+            _i = next((n for n, a in enumerate(cmake_args) if a.startswith(_k)), None)
+            if _i is None:
+                cmake_args.append(_k + _fmflags)
+            else:
+                cmake_args[_i] = cmake_args[_i] + ' ' + _fmflags
     if libdirs:
         cmake_args.append('-DCMAKE_LIBRARY_PATH=' + ';'.join(libdirs))
 
@@ -107,6 +121,8 @@ def preprocess(i):
         'CC': cc,
         'CXX': cxx,
         'LLAMA_CMAKE_FLAGS_ARR': '\n'.join(cmake_args),
+        # get,cmake may install a prebuilt cmake that is not on os.environ's PATH.
+        'CMAKE_BIN': env.get('MLC_CMAKE_BIN_WITH_PATH', '') or 'cmake',
         'LLAMA_FORCE_BUILD': 'true' if is_true(env.get('MLC_AGENT_FORCE_BUILD')) else 'false',
         'BUILD_JOBS': str(env.get('MLC_AGENT_BUILD_NCPUS')
                           or env.get('MLC_HOST_CPU_TOTAL_LOGICAL_CORES') or ''),
