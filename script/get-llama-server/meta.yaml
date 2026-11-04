@@ -67,7 +67,9 @@ deps:
 - tags: get,compiler,paths,amd
   names:
   - compiler-paths
-- tags: get,generic-sys-util,_cmake
+- tags: get,cmake
+  names:
+  - cmake
 - tags: get,generic-sys-util,_build-essential
   env:
     MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
