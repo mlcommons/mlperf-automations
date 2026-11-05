@@ -281,10 +281,20 @@ def preprocess(i):
                 f.write(f"    {post_cmd}\n")
             f.write("\n")
 
+        # Bind destinations must exist in the rootfs for build-time binds
+        # (apptainer build --bind) used by the fake run in %post.
+        bind_mounts = env.get('MLC_APPTAINER_BIND_MOUNTS', [])
+        if isinstance(bind_mounts, str):
+            bind_mounts = [bind_mounts]
+        bind_dests = [m.split(':')[1] if ':' in m else m for m in bind_mounts if m]
+        bind_setup = ''.join(
+            f"    mkdir -p ${{APPTAINER_ROOTFS}}{d}\n" for d in bind_dests)
+
         # Copy section for local repo (use %setup with tar to handle symlinks
         # gracefully)
         if use_host_repos:
             f.write("%setup\n")
+            f.write(bind_setup)
             f.write("    mkdir -p ${APPTAINER_ROOTFS}/opt/mlc_host_repos\n")
             for parent_dir, repo_name in host_repos_to_copy:
                 f.write(
@@ -294,11 +304,14 @@ def preprocess(i):
         elif use_copy_repo:
             repo_name = os.path.basename(mlc_repo_path)
             f.write("%setup\n")
+            f.write(bind_setup)
             f.write(f"    mkdir -p ${{APPTAINER_ROOTFS}}/opt/mlc_repo\n")
             f.write(
                 f"    tar -C {mlc_repo_path}/.. --exclude=repos.json --exclude='index_*.json' --exclude=local --exclude=modified_times.json --exclude='*.sif' -cf - {repo_name} | tar -xf - -C ${{APPTAINER_ROOTFS}}/opt/mlc_repo/\n")
             f.write(f"    chmod -R 777 ${{APPTAINER_ROOTFS}}/opt/mlc_repo\n")
             f.write("\n")
+        elif bind_setup:
+            f.write("%setup\n" + bind_setup + "\n")
 
         # Runscript
         f.write("%runscript\n")
