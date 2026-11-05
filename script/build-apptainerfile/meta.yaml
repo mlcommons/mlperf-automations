@@ -25,6 +25,7 @@ new_env_keys:
 # Input mapping
 input_mapping:
   base_image: MLC_APPTAINER_IMAGE_BASE
+  bind: MLC_APPTAINER_BIND_MOUNTS
   build: MLC_BUILD_APPTAINER_IMAGE
   docker_os: MLC_APPTAINER_OS
   docker_os_version: MLC_APPTAINER_OS_VERSION

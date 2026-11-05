@@ -3,6 +3,7 @@ import os
 import json
 import re
 import shutil
+import shlex
 from utils import *
 
 
@@ -281,20 +282,23 @@ def preprocess(i):
                 f.write(f"    {post_cmd}\n")
             f.write("\n")
 
-        # Bind destinations must exist in the rootfs for build-time binds
-        # (apptainer build --bind) used by the fake run in %post.
-        bind_mounts = env.get('MLC_APPTAINER_BIND_MOUNTS', [])
-        if isinstance(bind_mounts, str):
-            bind_mounts = [bind_mounts]
-        bind_dests = [m.split(':')[1] if ':' in m else m for m in bind_mounts if m]
-        bind_setup = ''.join(
-            f"    mkdir -p ${{APPTAINER_ROOTFS}}{d}\n" for d in bind_dests)
+        # Bind destinations must exist in the rootfs: apptainer cannot create
+        # them when binds are applied to the build-time fake run.
+        bind_dests = get_bind_destinations(
+            env.get('MLC_APPTAINER_BIND_MOUNTS', []))
 
         # Copy section for local repo (use %setup with tar to handle symlinks
         # gracefully)
-        if use_host_repos:
+        if bind_dests:
             f.write("%setup\n")
-            f.write(bind_setup)
+            for dest in bind_dests:
+                f.write(
+                    f"    mkdir -p \"${{APPTAINER_ROOTFS}}\"{shlex.quote(dest)}\n")
+            if not (use_host_repos or use_copy_repo):
+                f.write("\n")
+        if use_host_repos:
+            if not bind_dests:
+                f.write("%setup\n")
             f.write("    mkdir -p ${APPTAINER_ROOTFS}/opt/mlc_host_repos\n")
             for parent_dir, repo_name in host_repos_to_copy:
                 f.write(
@@ -303,15 +307,13 @@ def preprocess(i):
             f.write("\n")
         elif use_copy_repo:
             repo_name = os.path.basename(mlc_repo_path)
-            f.write("%setup\n")
-            f.write(bind_setup)
+            if not bind_dests:
+                f.write("%setup\n")
             f.write(f"    mkdir -p ${{APPTAINER_ROOTFS}}/opt/mlc_repo\n")
             f.write(
                 f"    tar -C {mlc_repo_path}/.. --exclude=repos.json --exclude='index_*.json' --exclude=local --exclude=modified_times.json --exclude='*.sif' -cf - {repo_name} | tar -xf - -C ${{APPTAINER_ROOTFS}}/opt/mlc_repo/\n")
             f.write(f"    chmod -R 777 ${{APPTAINER_ROOTFS}}/opt/mlc_repo\n")
             f.write("\n")
-        elif bind_setup:
-            f.write("%setup\n" + bind_setup + "\n")
 
         # Runscript
         f.write("%runscript\n")
@@ -329,6 +331,23 @@ def preprocess(i):
     logger.info(f"Apptainer definition file written at {def_file_path}")
 
     return {'return': 0}
+
+
+def get_bind_destinations(bind_mounts):
+    """Container-side paths of apptainer bind specs (src[:dest[:opts]])."""
+    if isinstance(bind_mounts, str):
+        bind_mounts = [bind_mounts]
+    dests = []
+    for entry in bind_mounts or []:
+        for spec in str(entry).split(','):
+            spec = spec.strip()
+            if not spec:
+                continue
+            parts = spec.split(':')
+            dest = parts[1] if len(parts) > 1 and parts[1] else parts[0]
+            if dest.startswith('/') and dest not in dests:
+                dests.append(dest)
+    return dests
 
 
 def get_value(env, config, key, env_key=None):
