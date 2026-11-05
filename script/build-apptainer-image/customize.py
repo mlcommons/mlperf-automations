@@ -77,6 +77,14 @@ def preprocess(i):
     if tmpdir:
         build_opts += f' --tmpdir {tmpdir}'
 
+    # Run-time binds (e.g. /pa_nvme compilers) are also needed by the fake run in %post.
+    build_binds = env.get('MLC_APPTAINER_BIND_MOUNTS', [])
+    if isinstance(build_binds, str):
+        build_binds = [build_binds]
+    for mount in build_binds:
+        if mount and os.path.exists(mount.split(':', 1)[0]):
+            build_opts += f' --bind {mount}'
+
     cmd_prefix = "sudo " if is_true(
         env.get(
             "MLC_APPTAINER_BUILD_WITH_SUDO",

@@ -49,6 +49,8 @@ mkdir -p "${RESULTS_DIR}"
 # prompts and makes `batch-benchmark` fully unattended). Only written when
 # absent so an existing user configuration is respected. ----------------------
 PTS_USER_DIR="${HOME}/.phoronix-test-suite"
+# As root (e.g. apptainer --fakeroot) PTS otherwise uses /var/lib/phoronix-test-suite and ignores this config.
+export PTS_USER_PATH_OVERRIDE="${PTS_USER_DIR}/"
 if [ ! -f "${PTS_USER_DIR}/user-config.xml" ]; then
   mkdir -p "${PTS_USER_DIR}"
   cat > "${PTS_USER_DIR}/user-config.xml" <<'XML_EOF'
