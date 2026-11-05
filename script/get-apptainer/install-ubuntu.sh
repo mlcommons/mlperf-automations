@@ -7,8 +7,8 @@ ${MLC_SUDO} apt-get update
 ${MLC_SUDO} apt-get install -y apptainer
 test $? -eq 0 || exit $?
 
-# Ubuntu 24.04+ blocks unprivileged user namespaces via AppArmor; allow them for apptainer only.
-if [ "$(cat /proc/sys/kernel/apparmor_restrict_unprivileged_userns 2>/dev/null)" = "1" ] && [ ! -f /etc/apparmor.d/apptainer ]; then
+# Ubuntu 24.04+ blocks unprivileged userns; the packaged profile (abi 3.0, no userns rule) is not enough on newer kernels.
+if [ "$(cat /proc/sys/kernel/apparmor_restrict_unprivileged_userns 2>/dev/null)" = "1" ] && ! grep -qE '^\s*userns,' /etc/apparmor.d/apptainer 2>/dev/null; then
   ${MLC_SUDO} tee /etc/apparmor.d/apptainer > /dev/null <<'EOF'
 abi <abi/4.0>,
 include <tunables/global>
