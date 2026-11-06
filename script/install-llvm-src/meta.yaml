@@ -17,6 +17,8 @@ tags:
 cache: true
 
 # Environment
+default_env:
+  MLC_CLEAN_BUILD: 'yes'
 env:
   MLC_GIT_URL: https://github.com/llvm/llvm-project
 new_env_keys:
