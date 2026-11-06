@@ -285,7 +285,8 @@ def preprocess(i):
         # Bind destinations must exist in the rootfs: apptainer cannot create
         # them when binds are applied to the build-time fake run.
         bind_dests = get_bind_destinations(
-            env.get('MLC_APPTAINER_BIND_MOUNTS', []))
+            env.get('MLC_APPTAINER_BIND_MOUNTS', [])) if is_true(
+            env.get('MLC_APPTAINER_BUILD_BIND_MOUNTS', '')) else []
 
         # Copy section for local repo (use %setup with tar to handle symlinks
         # gracefully)

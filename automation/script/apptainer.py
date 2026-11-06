@@ -385,6 +385,8 @@ def apptainer_run(self_module, i):
         build_image_extras['ignore_fakeroot_cmd'] = apptainer_inputs['ignore_fakeroot_cmd']
     if apptainer_inputs.get('sudo'):
         build_image_extras['sudo'] = apptainer_inputs['sudo']
+    if apptainer_inputs.get('build_bind'):
+        build_image_extras['build_bind'] = apptainer_inputs['build_bind']
     if build_image_extras:
         mlc_apptainer_input['add_deps_recursive']['build-apptainer-image'].update(
             build_image_extras)
@@ -431,7 +433,7 @@ def prepare_apptainer_inputs(input_params, apptainer_settings,
         "mlc_repo", "mlc_repo_branch", "base_image", "os", "os_version", "mlc_repo_path",
         "mlc_repos", "skip_mlc_sys_upgrade", "extra_sys_deps", "image_name",
         "gh_token", "fake_run_deps", "run_final_cmds", "real_run", "copy_files", "path", "env",
-        "ignore_fakeroot_cmd", "sudo"
+        "ignore_fakeroot_cmd", "sudo", "build_bind"
     ]
 
     if run_stage:
