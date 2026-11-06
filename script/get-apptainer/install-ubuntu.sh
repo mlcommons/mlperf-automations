@@ -20,6 +20,8 @@ EOF
   ${MLC_SUDO} apparmor_parser -r /etc/apparmor.d/apptainer
   test $? -eq 0 || exit $?
 fi
+echo "apparmor_restrict_unprivileged_userns=$(cat /proc/sys/kernel/apparmor_restrict_unprivileged_userns 2>/dev/null || echo n/a)"
+grep -H userns /etc/apparmor.d/apptainer 2>/dev/null || echo "apptainer AppArmor profile has no userns rule"
 
 # Print version
 apptainer --version
