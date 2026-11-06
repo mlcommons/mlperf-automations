@@ -23,7 +23,7 @@ if [ "$(cat /proc/sys/kernel/apparmor_restrict_unprivileged_userns 2>/dev/null)"
     ${MLC_SUDO} tee "${AA_PROFILE}" > /dev/null <<'EOF'
 abi <abi/4.0>,
 include <tunables/global>
-profile apptainer /usr/libexec/apptainer/bin/starter{,-suid} flags=(unconfined) {
+profile apptainer /usr/{bin/apptainer,libexec/apptainer/bin/starter{,-suid}} flags=(unconfined) {
   userns,
   include if exists <local/apptainer>
 }

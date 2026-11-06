@@ -51,8 +51,8 @@ if [ "${MLC_PHORONIX_DO_PORTABLE_INSTALL}" == "yes" ]; then
   [ -n "${src}" ] || { echo "ERROR: phoronix source dir missing"; exit 1; }
   cp -a "${src}" "${PREFIX}/phoronix-test-suite"
 
-  # Reuse the node's php when it already has the XML/mbstring extensions PTS needs.
-  if command -v php >/dev/null 2>&1 && php -m 2>/dev/null | grep -qx dom && php -m 2>/dev/null | grep -qx mbstring; then
+  # Reuse the node's php only when it has every extension PTS needs.
+  if command -v php >/dev/null 2>&1 && php -r 'exit(extension_loaded("dom") && function_exists("simplexml_load_string") && (extension_loaded("zip") || extension_loaded("zlib")) && function_exists("json_decode") && extension_loaded("mbstring") ? 0 : 1);' 2>/dev/null; then
     echo "Using system php: $(command -v php)"
     cat > "${PREFIX}/bin/phoronix-test-suite" <<EOF
 #!/bin/bash
