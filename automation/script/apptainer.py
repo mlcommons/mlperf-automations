@@ -302,12 +302,6 @@ def apptainer_run(self_module, i):
         return {'return': 0,
                 'warning': 'Apptainer run is set to false in script meta'}
 
-    # Regenerate definition file if required
-    if regenerate_def_file:
-        r = apptainerfile(self_module, input_i)
-        if r['return'] > 0:
-            return r
-
     # Ensure Apptainer is available
     r = self_module.action_object.access(
         {'action': 'run', 'automation': 'script', 'tags': "get-apptainer", 'quiet': True})
@@ -336,6 +330,17 @@ def apptainer_run(self_module, i):
     bind_mounts = process_apptainer_mounts(
         mounts, env, apptainer_settings, run_state)
     container_env_string = bind_mounts.get('container_env_string', '')
+
+    # Regenerate definition file with the same binds the image build will use
+    if regenerate_def_file:
+        def_binds = apptainer_inputs.get('bind') or []
+        if isinstance(def_binds, str):
+            def_binds = [def_binds]
+        input_i['apptainer_bind'] = list(
+            dict.fromkeys(def_binds + bind_mounts.get('mounts', [])))
+        r = apptainerfile(self_module, input_i)
+        if r['return'] > 0:
+            return r
 
     # Forward input-mapped env vars to the container's mlcr command
     input_mapping = meta.get('input_mapping', {})
@@ -431,13 +436,13 @@ def prepare_apptainer_inputs(input_params, apptainer_settings,
         "mlc_repo", "mlc_repo_branch", "base_image", "os", "os_version", "mlc_repo_path",
         "mlc_repos", "skip_mlc_sys_upgrade", "extra_sys_deps", "image_name",
         "gh_token", "fake_run_deps", "run_final_cmds", "real_run", "copy_files", "path", "env",
-        "ignore_fakeroot_cmd", "sudo"
+        "ignore_fakeroot_cmd", "sudo", "bind"
     ]
 
     if run_stage:
         keys += [
             "skip_run_cmd", "pre_run_cmds", "run_cmd_prefix",
-            "nv", "rocm", "bind", "writable", "writable_tmpfs",
+            "nv", "rocm", "writable", "writable_tmpfs",
             "cleanenv", "fakeroot", "no_home", "contain", "containall",
             "overlay", "extra_args", "sandbox",
             "network", "security_opt"
