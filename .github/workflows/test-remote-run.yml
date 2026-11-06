@@ -5,7 +5,6 @@ on:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-remote-run.yml'
-      - 'automation/script/remote_run.py'
       - 'script/remote-run-commands/**'
 
 permissions:
