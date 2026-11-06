@@ -335,15 +335,27 @@ def preprocess(i):
 
 
 MKBIND_SH = """    mlc_mkbind() {
-        _p="${APPTAINER_ROOTFS}"; _rest="${1#/}"
+        # Walk the container path, resolving symlinks against the rootfs (never the host).
+        _cur=""; _rest="${1#/}"; _links=0
         while [ -n "$_rest" ]; do
             _c="${_rest%%/*}"
             case "$_rest" in */*) _rest="${_rest#*/}" ;; *) _rest="" ;; esac
-            if [ -z "$_c" ] || [ "$_c" = "." ]; then continue; fi
-            _p="$_p/$_c"
+            case "$_c" in
+                ""|.) continue ;;
+                ..) _cur="${_cur%/*}"; continue ;;
+            esac
+            _p="${APPTAINER_ROOTFS}$_cur/$_c"
             if [ -L "$_p" ]; then
-                echo "Skipping bind point $1: $_p is a symlink"; return 0
-            elif [ -z "$_rest" ] && [ "$2" = "file" ]; then
+                _links=$((_links + 1))
+                if [ "$_links" -gt 40 ]; then
+                    echo "ERROR: too many symlinks resolving bind point $1" >&2; return 1
+                fi
+                _t=$(readlink "$_p")
+                case "$_t" in /*) _cur=""; _t="${_t#/}" ;; esac
+                _rest="$_t${_rest:+/$_rest}"
+                continue
+            fi
+            if [ -z "$_rest" ] && [ "$2" = "file" ]; then
                 if [ ! -e "$_p" ]; then
                     : > "$_p"
                 elif [ ! -f "$_p" ]; then
@@ -354,6 +366,7 @@ MKBIND_SH = """    mlc_mkbind() {
             elif [ ! -d "$_p" ]; then
                 echo "Skipping bind point $1: $_p is not a directory"; return 0
             fi
+            _cur="$_cur/$_c"
         done
     }
 """
