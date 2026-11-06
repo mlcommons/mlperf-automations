@@ -98,9 +98,6 @@ tests:
       MLC_APPTAINER_OS_VERSION: '15.6'
   - env:
       MLC_APPTAINER_OS: debian
-      MLC_APPTAINER_OS_VERSION: '11'
-  - env:
-      MLC_APPTAINER_OS: debian
       MLC_APPTAINER_OS_VERSION: '12'
   - env:
       MLC_APPTAINER_OS: rocky
