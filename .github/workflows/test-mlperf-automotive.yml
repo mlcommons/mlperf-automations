@@ -6,6 +6,9 @@ on:
     paths:
       - 'script/**meta.yaml'
 
+permissions:
+  contents: read
+
 jobs:
   run-mlperf:
     runs-on: ubuntu-latest
@@ -47,4 +50,3 @@ jobs:
           pip install mlcflow
           mlc pull repo "$REPO" --branch="$BRANCH"
           mlc test script app,mlperf-inference-automotive
-
