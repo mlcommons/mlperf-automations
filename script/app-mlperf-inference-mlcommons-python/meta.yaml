@@ -1097,7 +1097,9 @@ variations:
       update_tags_from_env_with_prefix:
         _find_links_url.:
         - MLC_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL
+    # PyPI only has dgl<=2.1.0 (no graphbolt lib for torch 2.4); force the data.dgl.ai wheel
     - tags: get,generic-python-lib,_package.dgl
+      version_min: 2.4.0
       version_max: 2.4.0
       version_max_usable: 2.4.0
       update_tags_from_env_with_prefix:
