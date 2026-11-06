@@ -1064,6 +1064,7 @@ variations:
       # dgl imports torchdata.datapipes, removed in torchdata 0.10
       version_max: 0.9.0
       version_max_usable: 0.9.0
+    - tags: get,generic-python-lib,_package.pandas
     - tags: get,generic-python-lib,_package.pybind11
     - tags: get,generic-python-lib,_package.PyYAML
     - tags: get,generic-python-lib,_package.numpy

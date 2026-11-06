@@ -4,7 +4,8 @@ ${MLC_SUDO} apt-get update
 ${MLC_SUDO} apt-get install -y software-properties-common
 ${MLC_SUDO} add-apt-repository -y ppa:apptainer/ppa
 ${MLC_SUDO} apt-get update
-${MLC_SUDO} apt-get install -y apptainer
+# squashfuse/fuse2fs let unprivileged apptainer mount SIF images instead of extracting them.
+${MLC_SUDO} apt-get install -y apptainer squashfuse fuse2fs
 test $? -eq 0 || exit $?
 
 # Ubuntu 24.04+ blocks unprivileged userns; the packaged profile (abi 3.0, no userns rule) is not enough on newer kernels.
