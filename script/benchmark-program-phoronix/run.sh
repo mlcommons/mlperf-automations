@@ -45,11 +45,14 @@ RESULTS_DIR=${MLC_PHORONIX_RESULTS_DIR:-.}
 RESULT_ID=${MLC_PHORONIX_RESULT_IDENTIFIER:-mlc-benchmark}
 mkdir -p "${RESULTS_DIR}"
 
-# --- Seed a non-interactive config (skips the first-run EULA / anonymous-usage
-# prompts and makes `batch-benchmark` fully unattended). Only written when
-# absent so an existing user configuration is respected. ----------------------
-PTS_USER_DIR="${HOME}/.phoronix-test-suite"
-if [ ! -f "${PTS_USER_DIR}/user-config.xml" ]; then
+# --- Non-interactive PTS config in a per-run user dir (a shared $HOME would let
+# concurrent runs, or a default config PTS wrote earlier, disable batch mode). --
+PTS_USER_DIR="$(cd "${RESULTS_DIR}" && pwd)/pts-user"
+# Also covers root (e.g. apptainer --fakeroot), where PTS would use /var/lib/phoronix-test-suite.
+export PTS_USER_PATH_OVERRIDE="${PTS_USER_DIR}/"
+# Never prompt for (or try to apt-install) missing test dependencies.
+export NO_EXTERNAL_DEPENDENCIES=1
+{
   mkdir -p "${PTS_USER_DIR}"
   cat > "${PTS_USER_DIR}/user-config.xml" <<'XML_EOF'
 <?xml version="1.0"?>
@@ -100,7 +103,7 @@ if [ ! -f "${PTS_USER_DIR}/user-config.xml" ]; then
 </PhoronixTestSuite>
 XML_EOF
   echo "Wrote non-interactive PTS config: ${PTS_USER_DIR}/user-config.xml"
-fi
+}
 
 # Pre-answer the result save prompts (used when PromptSaveName etc. are FALSE).
 export TEST_RESULTS_NAME="${RESULT_ID}"
@@ -131,10 +134,17 @@ echo "  Batch mode: ${MLC_PHORONIX_BATCH_MODE}"
 echo "  Result id: ${RESULT_ID}"
 echo "***********************************************************************"
 
+# Interactive (non-batch) mode needs stdin for PTS test-option menus.
+if [ "${MLC_PHORONIX_BATCH_MODE}" == "yes" ]; then
+  exec 3</dev/null
+else
+  exec 3<&0
+fi
+
 # Install the test (compiles from source using CC/CXX when applicable).
 echo ""
 echo "Installing test: ${MLC_PHORONIX_TEST}"
-"${PTS}" install "${MLC_PHORONIX_TEST}"
+"${PTS}" install "${MLC_PHORONIX_TEST}" <&3
 rc=$?
 if [ ${rc} -ne 0 ]; then
   echo "ERROR: phoronix-test-suite install failed (status ${rc})"
@@ -145,9 +155,9 @@ OUTPUT_FILE="${RESULTS_DIR}/phoronix_output.txt"
 echo ""
 echo "Running benchmark..."
 if [ "${MLC_PHORONIX_BATCH_MODE}" == "yes" ]; then
-  "${PTS}" batch-benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" 2>&1 | tee "${OUTPUT_FILE}"
+  "${PTS}" batch-benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" <&3 2>&1 | tee "${OUTPUT_FILE}"
 else
-  "${PTS}" benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" 2>&1 | tee "${OUTPUT_FILE}"
+  "${PTS}" benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" <&3 2>&1 | tee "${OUTPUT_FILE}"
 fi
 exitstatus=${PIPESTATUS[0]}
 
@@ -159,7 +169,7 @@ fi
 # Export results. PTS sanitizes the save identifier (strips dots/spaces),
 # so discover the actual saved result directory (most recently modified) rather
 # than assuming it equals RESULT_ID.
-pts_results_root="${HOME}/.phoronix-test-suite/test-results"
+pts_results_root="${PTS_USER_DIR}/test-results"
 saved_name=""
 if [ -d "${pts_results_root}" ]; then
   saved_name=$(ls -1t "${pts_results_root}" 2>/dev/null | head -1)

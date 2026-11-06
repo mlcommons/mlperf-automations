@@ -51,6 +51,21 @@ if [ "${MLC_PHORONIX_DO_PORTABLE_INSTALL}" == "yes" ]; then
   [ -n "${src}" ] || { echo "ERROR: phoronix source dir missing"; exit 1; }
   cp -a "${src}" "${PREFIX}/phoronix-test-suite"
 
+  # Reuse the node's php only when it has every extension PTS needs.
+  if command -v php >/dev/null 2>&1 && php -r 'exit(extension_loaded("dom") && function_exists("simplexml_load_string") && (extension_loaded("zip") || extension_loaded("zlib")) && function_exists("json_decode") && extension_loaded("mbstring") ? 0 : 1);' 2>/dev/null; then
+    echo "Using system php: $(command -v php)"
+    cat > "${PREFIX}/bin/phoronix-test-suite" <<EOF
+#!/bin/bash
+R="\$(cd "\$(dirname "\$(readlink -f "\$0")")/.." && pwd)"
+export PHP_BIN="$(command -v php)"
+exec "\$R/phoronix-test-suite/phoronix-test-suite" "\$@"
+EOF
+    chmod +x "${PREFIX}/bin/phoronix-test-suite"
+    cd "${PREFIX}"; rm -rf "${B}"
+    PORTABLE_DONE=yes
+  fi
+
+if [ "${PORTABLE_DONE:-no}" != "yes" ]; then
   # Prefix-local php (+ XML/mbstring), no sudo. Download the concrete php
   # packages explicitly (apt-get download fetches even if already installed on the
   # build host) and add any still-missing shared libs via --print-uris.
@@ -92,6 +107,7 @@ export PHP_BIN="\$R/bin/php"
 exec "\$R/phoronix-test-suite/phoronix-test-suite" "\$@"
 EOF
   chmod +x bin/phoronix-test-suite
+fi
 
   "${PREFIX}/bin/phoronix-test-suite" version >/dev/null 2>&1 \
     && echo "Portable install OK: ${PREFIX}/bin/phoronix-test-suite" \

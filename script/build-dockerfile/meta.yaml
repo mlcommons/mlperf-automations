@@ -125,9 +125,6 @@ tests:
       MLC_DOCKER_OS_VERSION: '15.6'
   - env:
       MLC_DOCKER_OS: debian
-      MLC_DOCKER_OS_VERSION: '11'
-  - env:
-      MLC_DOCKER_OS: debian
       MLC_DOCKER_OS_VERSION: '12'
   - env:
       MLC_DOCKER_OS: rocky

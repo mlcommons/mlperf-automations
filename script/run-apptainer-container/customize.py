@@ -103,17 +103,17 @@ def postprocess(i):
 
     if is_true(env.get('MLC_APPTAINER_FAKEROOT', '')):
         run_opts += ' --fakeroot'
+
+    # Repos baked into the image must be used with or without fakeroot;
+    # --cleanenv drops MLC_REPOS, which would fall back to the bound $HOME/MLC.
+    if env.get('MLC_REPO_PATH', ''):
+        repo_name = os.path.basename(env['MLC_REPO_PATH'])
+        run_opts += f' --env MLC_REPOS=/opt/mlc_repo/{repo_name}'
+    elif is_true(env.get('MLC_APPTAINER_HOST_MLC_REPOS', '')):
+        run_opts += ' --env MLC_REPOS=/opt/mlc_host_repos'
+    elif is_true(env.get('MLC_APPTAINER_FAKEROOT', '')):
         # With fakeroot, HOME becomes /root inside the container.
-        # Use /opt/mlc_repo if repos were pre-copied via --apptainer_mlc_repo_path,
-        # else fall back to /tmp/mlc-repos.
-        if env.get('MLC_REPO_PATH', ''):
-            repo_name = os.path.basename(env['MLC_REPO_PATH'])
-            run_opts += f' --env MLC_REPOS=/opt/mlc_repo/{repo_name}'
-        elif is_true(env.get('MLC_APPTAINER_HOST_MLC_REPOS', '')):
-            # Host repos were registered under /opt/mlc_host_repos at build time.
-            run_opts += ' --env MLC_REPOS=/opt/mlc_host_repos'
-        else:
-            run_opts += ' --env MLC_REPOS=/tmp/mlc-repos'
+        run_opts += ' --env MLC_REPOS=/tmp/mlc-repos'
 
     # Home directory
     if env.get('MLC_APPTAINER_HOME', '') != '':

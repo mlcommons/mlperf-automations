@@ -1,7 +1,7 @@
 name: MLPerf inference MLCommons C++ ResNet50
 
 on:
-  pull_request_target:
+  pull_request:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-mlperf-inference-mlcommons-cpp-resnet50.yml'
@@ -68,33 +68,3 @@ jobs:
       if: matrix.os != 'windows-latest'
       run: |
         mlcr app,mlperf,inference,mlcommons,cpp --submitter="MLCommons" --hw_name=gh_${{ matrix.os }} -v --quiet ${{ matrix.compiler-string }}
-    - name: Randomly Execute Step
-      id: random-check
-      run: |
-          RANDOM_NUMBER=$((RANDOM % 10))
-          echo "Random number is $RANDOM_NUMBER"
-          if [ "$RANDOM_NUMBER" -eq 0 ]; then
-            echo "run_step=true" >> $GITHUB_ENV
-          else
-            echo "run_step=false" >> $GITHUB_ENV
-          fi
-    - name: Load secrets
-      id: op-load-secrets
-      uses: 1password/load-secrets-action@v3
-      env:
-        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-        PAT: op://7basd2jirojjckncf6qnq3azai/bzbaco3uxoqs2rcyu42rvuccga/credential
-    - name: Push Results
-      env:
-        GITHUB_TOKEN: ${{ steps.op-load-secrets.outputs.PAT }}
-        USER: mlcommons-bot
-        EMAIL: mlcommons-bot@users.noreply.github.com
-      if: github.repository_owner == 'mlcommons' && env.run_step == 'true'
-      run: |
-        git config --global user.name "${{ env.USER }}"
-        git config --global user.email "${{ env.EMAIL }}"
-        git config --global credential.https://github.com.helper ""
-        git config --global credential.https://github.com.helper "!gh auth git-credential"
-        git config --global credential.https://gist.github.com.helper ""
-        git config --global credential.https://gist.github.com.helper "!gh auth git-credential"
-        mlcr push,github,mlperf,inference,submission --repo_url=https://github.com/mlcommons/mlperf_inference_test_submissions_v5.0 --repo_branch=dev --commit_message="Results from MLCommons C++ ResNet50 GH action on ${{ matrix.os }}" --quiet
