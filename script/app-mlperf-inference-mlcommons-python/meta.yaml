@@ -1061,6 +1061,9 @@ variations:
     - tags: get,generic-python-lib,_package.torchdata
       names:
       - torchdata
+      # dgl imports torchdata.datapipes, removed in torchdata 0.10
+      version_max: 0.9.0
+      version_max_usable: 0.9.0
     - tags: get,generic-python-lib,_package.pybind11
     - tags: get,generic-python-lib,_package.PyYAML
     - tags: get,generic-python-lib,_package.numpy
@@ -1071,6 +1074,10 @@ variations:
       version_max: 1.26.4
       names:
       - numpy-downgrade
+    # pandas 3.x needs numpy>=2.0.2, but rgat pins numpy 1.26.4 above
+    - tags: get,generic-python-lib,_package.pandas
+      version_max: 2.2.3
+      version_max_usable: 2.2.3
     - tags: get,generic-python-lib,_package.pydantic
     - tags: get,generic-python-lib,_package.igb,_url.git+https://github.com/IllinoisGraphBenchmark/IGB-Datasets.git
     - tags: get,generic-python-lib,_package.torch-geometric
@@ -1090,7 +1097,9 @@ variations:
       update_tags_from_env_with_prefix:
         _find_links_url.:
         - MLC_TMP_GENERIC_PYTHON_PIP_EXTRA_FIND_LINKS_URL
+    # PyPI only has dgl<=2.1.0 (no graphbolt lib for torch 2.4); force the data.dgl.ai wheel
     - tags: get,generic-python-lib,_package.dgl
+      version_min: 2.4.0
       version_max: 2.4.0
       version_max_usable: 2.4.0
       update_tags_from_env_with_prefix:

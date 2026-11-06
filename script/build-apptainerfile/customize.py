@@ -3,6 +3,7 @@ import os
 import json
 import re
 import shutil
+import shlex
 from utils import *
 
 
@@ -281,10 +282,24 @@ def preprocess(i):
                 f.write(f"    {post_cmd}\n")
             f.write("\n")
 
+        # Bind destinations must exist in the rootfs: apptainer cannot create
+        # them when binds are applied to the build-time fake run.
+        bind_dests = get_bind_destinations(
+            env.get('MLC_APPTAINER_BIND_MOUNTS', []))
+
         # Copy section for local repo (use %setup with tar to handle symlinks
         # gracefully)
-        if use_host_repos:
+        if bind_dests:
             f.write("%setup\n")
+            # %setup runs on the host: create one component at a time and never follow symlinks out of the rootfs.
+            f.write(MKBIND_SH)
+            for dest, kind in bind_dests:
+                f.write(f"    mlc_mkbind {shlex.quote(dest)} {kind}\n")
+            if not (use_host_repos or use_copy_repo):
+                f.write("\n")
+        if use_host_repos:
+            if not bind_dests:
+                f.write("%setup\n")
             f.write("    mkdir -p ${APPTAINER_ROOTFS}/opt/mlc_host_repos\n")
             for parent_dir, repo_name in host_repos_to_copy:
                 f.write(
@@ -293,7 +308,8 @@ def preprocess(i):
             f.write("\n")
         elif use_copy_repo:
             repo_name = os.path.basename(mlc_repo_path)
-            f.write("%setup\n")
+            if not bind_dests:
+                f.write("%setup\n")
             f.write(f"    mkdir -p ${{APPTAINER_ROOTFS}}/opt/mlc_repo\n")
             f.write(
                 f"    tar -C {mlc_repo_path}/.. --exclude=repos.json --exclude='index_*.json' --exclude=local --exclude=modified_times.json --exclude='*.sif' -cf - {repo_name} | tar -xf - -C ${{APPTAINER_ROOTFS}}/opt/mlc_repo/\n")
@@ -316,6 +332,65 @@ def preprocess(i):
     logger.info(f"Apptainer definition file written at {def_file_path}")
 
     return {'return': 0}
+
+
+MKBIND_SH = """    mlc_mkbind() {
+        # Walk the container path, resolving symlinks against the rootfs (never the host).
+        _cur=""; _rest="${1#/}"; _links=0
+        while [ -n "$_rest" ]; do
+            _c="${_rest%%/*}"
+            case "$_rest" in */*) _rest="${_rest#*/}" ;; *) _rest="" ;; esac
+            case "$_c" in
+                ""|.) continue ;;
+                ..) _cur="${_cur%/*}"; continue ;;
+            esac
+            _p="${APPTAINER_ROOTFS}$_cur/$_c"
+            if [ -L "$_p" ]; then
+                _links=$((_links + 1))
+                if [ "$_links" -gt 40 ]; then
+                    echo "ERROR: too many symlinks resolving bind point $1" >&2; return 1
+                fi
+                _t=$(readlink "$_p")
+                case "$_t" in /*) _cur=""; _t="${_t#/}" ;; esac
+                _rest="$_t${_rest:+/$_rest}"
+                continue
+            fi
+            if [ -z "$_rest" ] && [ "$2" = "file" ]; then
+                if [ ! -e "$_p" ]; then
+                    : > "$_p"
+                elif [ ! -f "$_p" ]; then
+                    echo "Skipping bind point $1: $_p is not a regular file"; return 0
+                fi
+            elif [ ! -e "$_p" ]; then
+                mkdir "$_p"
+            elif [ ! -d "$_p" ]; then
+                echo "Skipping bind point $1: $_p is not a directory"; return 0
+            fi
+            _cur="$_cur/$_c"
+        done
+    }
+"""
+
+
+def get_bind_destinations(bind_mounts):
+    """(container path, 'file'|'dir') for apptainer bind specs (src[:dest[:opts]])."""
+    if isinstance(bind_mounts, str):
+        bind_mounts = [bind_mounts]
+    dests = []
+    seen = set()
+    for entry in bind_mounts or []:
+        for spec in str(entry).split(','):
+            spec = spec.strip()
+            if not spec:
+                continue
+            parts = spec.split(':')
+            dest = parts[1] if len(parts) > 1 and parts[1] else parts[0]
+            if dest.startswith('/') and '..' not in dest.split(
+                    '/') and dest not in seen:
+                seen.add(dest)
+                kind = 'file' if os.path.isfile(parts[0]) else 'dir'
+                dests.append((dest, kind))
+    return dests
 
 
 def get_value(env, config, key, env_key=None):

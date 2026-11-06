@@ -561,9 +561,20 @@ variations:
         zypper: eigen3-devel
   libfftw3-dev:
     env:
-      MLC_SYS_UTIL_NAME: libfftw3-dev
+      MLC_SYS_UTIL_NAME: libfftw3_dev
+      MLC_SYS_UTIL_VERSION_CMD: >-
+        case "${MLC_HOST_OS_PACKAGE_MANAGER}" in
+        apt) dpkg -s libfftw3-dev | grep '^Version:' ;;
+        dnf|yum|zypper) rpm -q --qf '%{VERSION}\n' fftw-devel ;;
+        pacman) pacman -Q fftw ;;
+        *) exit 1 ;;
+        esac
+      MLC_SYS_UTIL_VERSION_RE: ([0-9]+(\.[0-9]+)+)
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 1
+    new_env_keys:
+    - MLC_LIBFFTW3_DEV_VERSION
     state:
-      libfftw3-dev:
+      libfftw3_dev:
         apt: libfftw3-dev
         dnf: fftw-devel
         yum: fftw-devel
@@ -1228,8 +1239,9 @@ variations:
     env:
       MLC_SYS_UTIL_NAME: sox
       MLC_SYS_UTIL_VERSION_CMD: sox --version
-      MLC_SYS_UTIL_VERSION_RE: sox:\s+SoX\s+v([\d.]+)
-      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+      # sox-ng (Ubuntu 26.04+) prints a different banner than classic SoX
+      MLC_SYS_UTIL_VERSION_RE: SoX\S*\s+v?(\d+(?:\.\d+)+)
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 1
     new_env_keys:
     - MLC_SOX_VERSION
     state:
