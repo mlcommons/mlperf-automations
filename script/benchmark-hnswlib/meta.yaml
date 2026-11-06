@@ -1,0 +1,177 @@
+alias: benchmark-hnswlib
+uid: 31ffea4ae6f69402
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: Vector Search Benchmarks
+tags:
+- benchmark
+- hnswlib
+- ann
+- approximate-nearest-neighbor
+- vector-search
+tags_help: benchmark hnswlib ann vector-search
+
+# Environment
+default_env:
+  MLC_HNSWLIB_NUM_ELEMENTS: '10000'
+  MLC_HNSWLIB_DIM: '128'
+  MLC_HNSWLIB_NUM_QUERIES: '1000'
+  MLC_HNSWLIB_K: '10'
+  MLC_HNSWLIB_M: '16'
+  MLC_HNSWLIB_EF_CONSTRUCTION: '200'
+  MLC_HNSWLIB_EF: '50'
+  MLC_HNSWLIB_NUM_THREADS: '-1'
+  MLC_HNSWLIB_METRIC: l2
+  MLC_HNSWLIB_DATASET: synthetic
+new_env_keys:
+- MLC_HNSWLIB_*
+new_state_keys:
+- mlc_hnswlib
+
+# Input mapping
+input_mapping:
+  num_elements: MLC_HNSWLIB_NUM_ELEMENTS
+  dim: MLC_HNSWLIB_DIM
+  num_queries: MLC_HNSWLIB_NUM_QUERIES
+  k: MLC_HNSWLIB_K
+  M: MLC_HNSWLIB_M
+  ef_construction: MLC_HNSWLIB_EF_CONSTRUCTION
+  ef: MLC_HNSWLIB_EF
+  num_threads: MLC_HNSWLIB_NUM_THREADS
+  seed: MLC_HNSWLIB_SEED
+  dataset_file: MLC_HNSWLIB_DATASET_FILE
+  output_dir: MLC_HNSWLIB_OUTPUT_DIR
+  profile_system_info: MLC_PROFILE_SYSTEM_INFO
+  perf_record: MLC_BENCHMARK_PERF_RECORD
+  perf_stat: MLC_BENCHMARK_PERF_STAT
+  insmix: MLC_BENCHMARK_INSMIX
+  perf_events: MLC_BENCHMARK_PERF_EVENTS
+input_description:
+  num_elements:
+    desc: Number of base vectors to index (synthetic dataset)
+  dim:
+    desc: Vector dimensionality (synthetic dataset)
+  num_queries:
+    desc: Number of query vectors (synthetic dataset)
+  k:
+    desc: Number of nearest neighbors to retrieve
+  M:
+    desc: HNSW max outgoing connections per node
+  ef_construction:
+    desc: HNSW build-time speed/accuracy trade-off
+  ef:
+    desc: HNSW query-time speed/accuracy trade-off (must be > k)
+  num_threads:
+    desc: CPU threads for build/query (-1 = all cores)
+  seed:
+    desc: Random seed for the synthetic dataset
+  dataset_file:
+    desc: Path to a custom ann-benchmarks-style HDF5 dataset
+  output_dir:
+    desc: Directory to write results.json (default is current directory)
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: detect,cpu
+- names:
+  - python
+  - python3
+  tags: get,python3
+- tags: get,generic-python-lib,_package.numpy
+- tags: get,generic-python-lib,_package.hnswlib
+
+# The benchmark command (MLC_RUN_CMD) is executed through benchmark-program.
+posthook_deps:
+- tags: benchmark-program
+  names:
+  - benchmark-program
+  skip_if_env:
+    MLC_SKIP_RUN:
+    - 'on'
+
+# Variations
+variations:
+  # ── distance metric (synthetic dataset; real infers from the HDF5) ───────
+  l2:
+    group: metric
+    default: true
+    env:
+      MLC_HNSWLIB_METRIC: l2
+  ip:
+    group: metric
+    env:
+      MLC_HNSWLIB_METRIC: ip
+  cosine:
+    group: metric
+    env:
+      MLC_HNSWLIB_METRIC: cosine
+
+  # ── dataset group (synthetic random vectors vs real ann-benchmarks set) ──
+  synthetic:
+    group: dataset
+    default: true
+    env:
+      MLC_HNSWLIB_DATASET: synthetic
+  real:
+    group: dataset
+    env:
+      MLC_HNSWLIB_DATASET: real
+    deps:
+    - tags: get,generic-python-lib,_package.h5py
+    - tags: download,file,_wget
+      names:
+      - hnswlib-dataset
+      force_cache: true
+      extra_cache_tags: hnswlib,dataset
+      env:
+        MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_HNSWLIB_DATASET_FILE
+        MLC_DOWNLOAD_FILENAME: dataset.hdf5
+      update_tags_from_env_with_prefix:
+        _url.:
+        - MLC_HNSWLIB_DATASET_URL
+
+  # ── which ann-benchmarks dataset to download for _real ───────────────────
+  fashion-mnist:
+    group: ann-dataset
+    default: true
+    env:
+      MLC_HNSWLIB_DATASET_URL: http://ann-benchmarks.com/fashion-mnist-784-euclidean.hdf5
+  sift:
+    group: ann-dataset
+    env:
+      MLC_HNSWLIB_DATASET_URL: http://ann-benchmarks.com/sift-128-euclidean.hdf5
+  glove-100:
+    group: ann-dataset
+    env:
+      MLC_HNSWLIB_DATASET_URL: http://ann-benchmarks.com/glove-100-angular.hdf5
+  gist:
+    group: ann-dataset
+    env:
+      MLC_HNSWLIB_DATASET_URL: http://ann-benchmarks.com/gist-960-euclidean.hdf5
+
+  # ── profiling passthrough (routes _profile to benchmark-program) ─────────
+  profile:
+    add_deps_recursive:
+      benchmark-program:
+        tags: _profile
+
+# Tests
+tests:
+  run_inputs:
+  - variations_list:
+    - synthetic
+    - l2
+    env:
+      MLC_HNSWLIB_NUM_ELEMENTS: '1000'
+      MLC_HNSWLIB_DIM: '16'
+      MLC_HNSWLIB_NUM_QUERIES: '100'
+  - variations_list:
+    - synthetic
+    - cosine
+    env:
+      MLC_HNSWLIB_NUM_ELEMENTS: '1000'
+      MLC_HNSWLIB_DIM: '16'
+      MLC_HNSWLIB_NUM_QUERIES: '100'

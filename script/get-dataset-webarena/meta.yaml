@@ -1,0 +1,55 @@
+alias: get-dataset-webarena
+uid: 3d1495f1756b89a6
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: AI/ML datasets
+tags:
+- get
+- dataset
+- webarena
+- agent
+tags_help: get dataset webarena agent
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_DATASET: WEBARENA
+  MLC_WEBARENA_REPO_URL: https://github.com/web-arena-x/webarena
+new_env_keys:
+- MLC_WEBARENA_SRC_PATH
+- MLC_AGENT_DATA_PATH
+- MLC_DATASET_WEBARENA_PATH
+
+# Input mapping
+input_mapping:
+  repo: MLC_WEBARENA_REPO_URL
+  branch: MLC_WEBARENA_REPO_BRANCH
+  sha: MLC_WEBARENA_REPO_SHA
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: get,git,repo
+  names:
+  - webarena-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_WEBARENA_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  extra_cache_tags: webarena,dataset,repo
+  force_cache: true
+  update_tags_from_env_with_prefix:
+    _repo.:
+    - MLC_WEBARENA_REPO_URL
+    _branch.:
+    - MLC_WEBARENA_REPO_BRANCH
+    _sha.:
+    - MLC_WEBARENA_REPO_SHA
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_WEBARENA_SRC_PATH: Path to the cached WebArena checkout

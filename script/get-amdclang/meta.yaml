@@ -34,6 +34,9 @@ deps:
 - tags: get,rocm
   names:
   - get-rocm
+  skip_if_env:
+    MLC_TMP_AMDCLANG_FORCE_GIVEN_PATH:
+    - 'yes'
 post_deps:
 - tags: get,compiler-flags
 
@@ -59,6 +62,7 @@ variations:
   path.#:
     env:
       MLC_AMDCLANG_DIR_PATH: '#'
+      MLC_TMP_AMDCLANG_FORCE_GIVEN_PATH: 'yes'
   src:
     env:
       MLC_ROCM_BUILD_FROM_SRC: 'yes'

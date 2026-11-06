@@ -1,0 +1,6 @@
+{"task_id": "wa-0001", "sites": ["shopping"], "intent": "Add the cheapest in-stock wireless mouse to the cart.", "eval": {"eval_types": ["program_html"]}}
+{"task_id": "wa-0002", "sites": ["reddit"], "intent": "Post a comment saying 'great work' on the top post of the r/technology forum.", "eval": {"eval_types": ["url_match"]}}
+{"task_id": "wa-0003", "sites": ["gitlab"], "intent": "Create a new issue titled 'CI is failing' in the dotfiles project.", "eval": {"eval_types": ["url_match"]}}
+{"task_id": "wa-0004", "sites": ["cms"], "intent": "Set the price of product SKU-1042 to 19.99 in the admin panel.", "eval": {"eval_types": ["program_html"]}}
+{"task_id": "wa-0005", "sites": ["map"], "intent": "Find the driving distance between Pittsburgh and Philadelphia.", "eval": {"eval_types": ["string_match"], "reference_answers": {"exact_match": "305 miles"}}}
+{"task_id": "wa-0006", "sites": ["shopping", "cms"], "intent": "Check how many units of the best selling product remain and restock to 100.", "eval": {"eval_types": ["program_html"]}}

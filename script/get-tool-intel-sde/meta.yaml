@@ -48,8 +48,12 @@ post_deps: []
 
 # Variations
 variations:
-  version.9_53_0:
+  version.10_13_1:
     default: true
+    env:
+      MLC_DOWNLOAD_URL: https://downloadmirror.intel.com/924984/sde-external-10.13.1-2026-07-28-lin.tar.xz
+    group: version
+  version.9_53_0:
     env:
       MLC_DOWNLOAD_URL: https://downloadmirror.intel.com/850782/sde-external-9.53.0-2025-03-16-lin.tar.xz
     group: version

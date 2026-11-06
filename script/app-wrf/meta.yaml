@@ -101,8 +101,52 @@ variations:
     env:
       MLC_GIT_CHECKOUT: master
 
+
+  # ---- Compiler variations (CC/CXX/FC + MPI wrappers via get-compiler-paths-amd) ----
+  gcc:
+    group: compiler
+    env:
+      MLC_COMPILER_FAMILY: gcc
+    deps:
+    - tags: get,compiler,paths,amd
+      names:
+      - compiler-paths
+  aocc:
+    group: compiler
+    env:
+      MLC_COMPILER_FAMILY: aocc
+    deps:
+    - tags: get,compiler,paths,amd
+      names:
+      - compiler-paths
+  llvm:
+    group: compiler
+    env:
+      MLC_COMPILER_FAMILY: llvm
+    deps:
+    - tags: get,compiler,paths,amd
+      names:
+      - compiler-paths
+  amdclang:
+    group: compiler
+    env:
+      MLC_COMPILER_FAMILY: amdclang
+    deps:
+    - tags: get,compiler,paths,amd
+      names:
+      - compiler-paths
+  oneapi:
+    group: compiler
+    env:
+      MLC_COMPILER_FAMILY: oneapi
+    deps:
+    - tags: get,compiler,paths,amd
+      names:
+      - compiler-paths
+
 # Tests
 tests:
-  run_inputs:
-  - variations_list:
-    - repo.official
+  # WRF's shallow clone + noahmp submodule leaves untracked phys/physics_mmm files
+  # that collide with the version-tag checkout in CI, and its build needs an
+  # interactive ./configure. Not CI-testable without a dedicated environment.
+  run_inputs: []

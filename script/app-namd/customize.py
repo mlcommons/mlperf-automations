@@ -17,7 +17,8 @@ def postprocess(i):
     env = i['env']
 
     src_path = env.get('MLC_NAMD_SRC_PATH', '')
-    install_dir = os.path.join(src_path, 'install')
+    compiler_tag = env.get('MLC_COMPILER_FAMILY', '') or 'default'
+    install_dir = os.path.join(src_path, 'install-' + compiler_tag)
     bin_dir = os.path.join(install_dir, 'bin')
 
     # Look for namd3 or namd2 binary
@@ -30,7 +31,7 @@ def postprocess(i):
 
     if namd_bin is None:
         # Search in build directory
-        build_dir = os.path.join(src_path, 'build')
+        build_dir = os.path.join(src_path, 'build-' + compiler_tag)
         for name in ['namd3', 'namd2']:
             candidate = os.path.join(build_dir, name)
             if os.path.isfile(candidate):

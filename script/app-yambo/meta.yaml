@@ -1,0 +1,84 @@
+alias: app-yambo
+uid: f2ab35205b8a9abf
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: HPC Application
+
+tags:
+- app
+- yambo
+- hpc
+
+# Cache
+cache: true
+
+# Environment
+default_env: {}
+new_env_keys:
+- MLC_YAMBO_SRC_PATH
+- MLC_YAMBO_INSTALL_PATH
+- MLC_YAMBO_BIN_PATH
+- +PATH
+new_state_keys: []
+
+# Dependencies
+deps:
+- tags: detect,cpu
+- env:
+    MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
+  tags: get,generic-sys-util,_build-essential
+- tags: get,generic-sys-util,_gfortran
+- tags: get,generic-sys-util,_libfftw3-dev
+- tags: get,generic-sys-util,_liblapack-dev
+- tags: get,generic-sys-util,_libopenblas-dev
+- tags: get,generic-sys-util,_libnetcdf-dev
+- tags: get,generic-sys-util,_libnetcdff-dev
+- tags: get,git,repo
+  names:
+  - yambo-repo
+  extra_cache_tags: yambo,repo,yambo-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_YAMBO_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
+variations:
+  repo.#:
+    env:
+      MLC_GIT_REPO_URL: '#'
+    group: repo
+  repo.official:
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://github.com/yambo-code/yambo.git
+    group: repo
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+    group: version
+  version.5.3.0:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: '5.3.0'
+
+# Tests
+tests:
+  run_inputs: []

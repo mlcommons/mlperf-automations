@@ -1,0 +1,45 @@
+alias: app-gaussian
+uid: 9a17477f392aef44
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: HPC Application
+tags:
+- app
+- gaussian
+- hpc
+
+# Cache
+cache: true
+
+# Environment
+default_env: {}
+new_env_keys:
+- MLC_GAUSSIAN_SRC_PATH
+- MLC_GAUSSIAN_INSTALL_PATH
+- MLC_GAUSSIAN_BIN_PATH
+- +PATH
+new_state_keys: []
+
+# Input mapping (proprietary: user supplies the source/install tree)
+input_mapping:
+  src: MLC_GAUSSIAN_SRC_PATH
+input_description:
+  src:
+    desc: Path to a licensed Gaussian source or install tree
+
+# Dependencies
+deps:
+- tags: detect,cpu
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
+variations: {}
+
+# Tests
+# Empty: Gaussian is proprietary and cannot be fetched/built automatically.
+tests:
+  run_inputs: []

@@ -1,0 +1,88 @@
+alias: app-freefem
+uid: 08d92ae76825ed34
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: HPC Application
+
+tags:
+- app
+- freefem
+- hpc
+
+# Cache
+cache: true
+
+# Environment
+default_env: {}
+new_env_keys:
+- MLC_FREEFEM_SRC_PATH
+- MLC_FREEFEM_INSTALL_PATH
+- MLC_FREEFEM_BIN_PATH
+- +PATH
+new_state_keys: []
+
+# Dependencies
+deps:
+- tags: detect,cpu
+- env:
+    MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
+  tags: get,generic-sys-util,_build-essential
+- tags: get,generic-sys-util,_autoconf
+- tags: get,generic-sys-util,_automake
+- tags: get,generic-sys-util,_libtool
+- tags: get,generic-sys-util,_gfortran
+- tags: get,generic-sys-util,_liblapack-dev
+- tags: get,generic-sys-util,_libopenblas-dev
+- tags: get,generic-sys-util,_libhdf5-dev
+- tags: get,generic-sys-util,_libopenmpi-dev
+- tags: get,generic-sys-util,_bison
+- tags: get,generic-sys-util,_flex
+- tags: get,git,repo
+  names:
+  - freefem-repo
+  extra_cache_tags: freefem,repo,freefem-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_FREEFEM_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
+variations:
+  repo.#:
+    env:
+      MLC_GIT_REPO_URL: '#'
+    group: repo
+  repo.official:
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://github.com/FreeFem/FreeFem-sources.git
+    group: repo
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+    group: version
+  version.4.15:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: v4.15
+
+# Tests
+tests:
+  run_inputs: []

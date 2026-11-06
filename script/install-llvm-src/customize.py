@@ -86,15 +86,15 @@ def preprocess(i):
             if target_triple != '':
                 target_triple_string = f""" -DLLVM_DEFAULT_TARGET_TRIPLE="{target_triple}" """
                 compiler_rt_target_triple_string = f""" -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="{target_triple}" """
-            else:
+            elif is_true(env.get('MLC_LLVM_FLANG_NEEDS_TARGET_TRIPLE')) and ('flang' in enable_projects or 'flang' in enable_runtimes):
                 # Auto-detect target triple when building with flang or runtimes
                 # (needed for compiler-rt to find the correct builtins arch)
-                if 'flang' in enable_projects or enable_runtimes:
-                    target_triple = get_target_triple()
-                    target_triple_string = f""" -DLLVM_DEFAULT_TARGET_TRIPLE="{target_triple}" """
-                    compiler_rt_target_triple_string = f""" -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="{target_triple}" """
-                else:
-                    target_triple_string = ""
+                target_triple = get_target_triple()
+                target_triple_string = f""" -DLLVM_DEFAULT_TARGET_TRIPLE="{target_triple}" """
+                compiler_rt_target_triple_string = f""" -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="{target_triple}" """
+            else:
+                target_triple_string = ""
+                compiler_rt_target_triple_string = ""
 
             # Auto-select linker: prefer lld > gold > default
             if '-DLLVM_USE_LINKER=' not in extra_cmake_options:

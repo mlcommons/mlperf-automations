@@ -1,0 +1,84 @@
+alias: app-tmlqcd
+uid: fccd7a7c3e5925db
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: HPC Application
+
+tags:
+- app
+- tmlqcd
+- hpc
+
+# Cache
+cache: true
+
+# Environment
+default_env: {}
+new_env_keys:
+- MLC_TMLQCD_SRC_PATH
+- MLC_TMLQCD_INSTALL_PATH
+- MLC_TMLQCD_BIN_PATH
+- +PATH
+new_state_keys: []
+
+# Dependencies
+deps:
+- tags: detect,cpu
+- env:
+    MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
+  tags: get,generic-sys-util,_build-essential
+- tags: get,generic-sys-util,_gfortran
+- tags: get,generic-sys-util,_liblapack-dev
+- tags: get,generic-sys-util,_libopenblas-dev
+- tags: get,generic-sys-util,_libopenmpi-dev
+- tags: get,generic-sys-util,_autoconf
+- tags: get,generic-sys-util,_automake
+- tags: get,git,repo
+  names:
+  - tmlqcd-repo
+  extra_cache_tags: tmlqcd,repo,tmlqcd-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_TMLQCD_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
+variations:
+  repo.#:
+    env:
+      MLC_GIT_REPO_URL: '#'
+    group: repo
+  repo.official:
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://github.com/etmc/tmLQCD.git
+    group: repo
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+    group: version
+  branch.master:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT: master
+
+# Tests
+tests:
+  run_inputs: []

@@ -1,0 +1,45 @@
+alias: app-ls-dyna
+uid: ec123c19c2f2685e
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: HPC Application
+tags:
+- app
+- ls-dyna
+- hpc
+
+# Cache
+cache: true
+
+# Environment
+default_env: {}
+new_env_keys:
+- MLC_LS_DYNA_SRC_PATH
+- MLC_LS_DYNA_INSTALL_PATH
+- MLC_LS_DYNA_BIN_PATH
+- +PATH
+new_state_keys: []
+
+# Input mapping (proprietary: user supplies the source/install tree)
+input_mapping:
+  src: MLC_LS_DYNA_SRC_PATH
+input_description:
+  src:
+    desc: Path to a licensed LS-DYNA source or install tree
+
+# Dependencies
+deps:
+- tags: detect,cpu
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
+variations: {}
+
+# Tests
+# Empty: LS-DYNA is proprietary and cannot be fetched/built automatically.
+tests:
+  run_inputs: []

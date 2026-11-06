@@ -459,8 +459,9 @@ def update_docker_info(env):
     else:
         docker_image_name = 'mlc-script-' + \
             env['MLC_DOCKER_RUN_SCRIPT_TAGS'].replace(
-                ',', '-').replace('_', '-').replace('+', 'plus')
-        env['MLC_DOCKER_IMAGE_NAME'] = docker_image_name
+                '://', '-').replace(',', '-').replace('_', '-').replace(
+                '+', 'plus').replace(':', '-').replace('/', '-').replace('@', '-')
+        env['MLC_DOCKER_IMAGE_NAME'] = docker_image_name.lower()
 
     docker_image_tag_extra = env.get('MLC_DOCKER_IMAGE_TAG_EXTRA', '-latest')
 

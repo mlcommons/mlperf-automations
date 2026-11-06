@@ -21,7 +21,8 @@ directories with their `meta.yaml`, `customize.py` and `run.sh`.
 
 ## What this means for you
 
-- **Editing engine behaviour?** Open a PR against mlcflow, not this repo.
+- **Editing engine behaviour? Open a PR against
+  [mlcflow](https://github.com/mlcommons/mlcflow), not this repo.**
 - **`from utils import ...` in a `customize.py` still works.** mlcflow puts its
   bundled `automation/` directory on `sys.path` before loading a script, so
   that import resolves against `mlcflow/automation/utils.py`. Nothing in

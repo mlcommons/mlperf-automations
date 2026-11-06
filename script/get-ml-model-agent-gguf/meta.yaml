@@ -1,0 +1,79 @@
+alias: get-ml-model-agent-gguf
+uid: 624de9dab5f841a6
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: AI/ML models
+tags:
+- get
+- ml-model
+- agent
+- gguf
+- llm
+tags_help: get ml-model agent gguf
+
+# Cache
+cache: true
+
+# Environment
+env:
+  MLC_ML_MODEL_FORMAT: gguf
+new_env_keys:
+- MLC_AGENT_MODEL_PATH
+- MLC_AGENT_MODEL_NAME
+- MLC_AGENT_MODEL_URL
+- MLC_ML_MODEL_FILE_WITH_PATH
+
+# Input mapping (CLI flag -> env var)
+input_mapping:
+  model_url: MLC_AGENT_MODEL_URL
+  model: MLC_AGENT_MODEL_PATH
+  model_path: MLC_AGENT_MODEL_PATH
+  model_name: MLC_AGENT_MODEL_NAME
+  checksum: MLC_DOWNLOAD_CHECKSUM
+
+input_description:
+  model_url:
+    desc: URL of a GGUF model to download and cache (e.g. a HuggingFace resolve URL)
+  model_path:
+    desc: Path to an already-local GGUF model (short-circuits the download)
+  model_name:
+    desc: Name reported to the serving engine (defaults to the GGUF file name)
+
+# Dependencies
+deps:
+- tags: detect,os
+
+# Download the GGUF (cached, keyed on the URL) unless a local path was given.
+prehook_deps:
+- tags: download,file,_wget
+  names:
+  - agent-model-download
+  enable_if_env:
+    MLC_AGENT_MODEL_URL:
+    - 'on'
+  skip_if_env:
+    MLC_AGENT_MODEL_PATH:
+    - 'on'
+  env:
+    MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_AGENT_MODEL_PATH
+  extra_cache_tags: agent,model,gguf
+  force_cache: true
+  force_env_keys:
+  - MLC_OUTDIRNAME
+  update_tags_from_env_with_prefix:
+    _url.:
+    - MLC_AGENT_MODEL_URL
+
+# Variations
+variations:
+  # Dynamic per-URL cache key: run-agent-benchmark forwards the model URL as a
+  # `_url.<url>` tag so each distinct model gets its own cache entry (reused).
+  url.#:
+    env:
+      MLC_AGENT_MODEL_URL: '#'
+
+# Output / debugging
+print_env_at_the_end:
+  MLC_AGENT_MODEL_PATH: Path to the cached GGUF model

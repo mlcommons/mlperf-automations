@@ -16,13 +16,14 @@ def postprocess(i):
     env = i['env']
 
     src_path = env.get('MLC_ROMS_SRC_PATH', '')
-    build_dir = os.path.join(src_path, 'build')
+    compiler_tag = env.get('MLC_COMPILER_FAMILY', '') or 'default'
+    build_dir = os.path.join(src_path, 'build-' + compiler_tag)
 
     # Find the romsM binary
     roms_bin = os.path.join(build_dir, 'romsM')
     if not os.path.isfile(roms_bin):
         # Try install directory
-        install_bin = os.path.join(src_path, 'install', 'bin')
+        install_bin = os.path.join(src_path, 'install-' + compiler_tag, 'bin')
         roms_bin = os.path.join(install_bin, 'romsM')
         if not os.path.isfile(roms_bin):
             return {'return': 1, 'error': f'ROMS binary (romsM) not found in {build_dir} or {install_bin}'}

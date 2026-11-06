@@ -1,0 +1,31 @@
+alias: test-profiler-uprof
+uid: 59cc1fa80a7f7b27
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+name: Functionally test AMD uProf with a short collection
+category: Compiler automation
+tags:
+- test
+- profiler
+- uprof
+- test-uprof
+- test-profiler-uprof
+
+# Cache: this is a functional test, it must run every time (not cached).
+cache: false
+clean_files: []
+
+# Input mapping
+input_mapping:
+  uprof_dir: MLC_UPROF_DIR_PATH
+  uprof_profile: MLC_UPROF_PROFILE
+
+# Dependencies
+deps:
+- tags: detect,os
+- tags: get,profiler,uprof
+  update_tags_from_env_with_prefix:
+    _path.:
+    - MLC_UPROF_DIR_PATH

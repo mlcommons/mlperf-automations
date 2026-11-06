@@ -1,0 +1,82 @@
+alias: app-abinit
+uid: b079d7629218548f
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: HPC Application
+tags:
+- app
+- abinit
+- hpc
+
+# Cache
+cache: true
+
+# Environment
+default_env: {}
+new_env_keys:
+- MLC_ABINIT_SRC_PATH
+- MLC_ABINIT_INSTALL_PATH
+- MLC_ABINIT_BIN_PATH
+- +PATH
+new_state_keys: []
+
+# Dependencies
+deps:
+- tags: detect,cpu
+- env:
+    MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
+  tags: get,generic-sys-util,_build-essential
+- tags: get,generic-sys-util,_gfortran
+- tags: get,generic-sys-util,_libopenmpi-dev
+- tags: get,generic-sys-util,_libfftw3-dev
+- tags: get,git,repo
+  names:
+  - abinit-repo
+  extra_cache_tags: abinit,repo,abinit-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_ABINIT_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
+variations:
+  repo.#:
+    env:
+      MLC_GIT_REPO_URL: '#'
+    group: repo
+  repo.official:
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://github.com/abinit/abinit.git
+    group: repo
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+    group: version
+  version.9.4.0:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: v9.4.0
+
+# Tests
+# Empty: heavy dependency stack / long build; recipe provided in run.sh
+# but not enabled in CI. Validate and enable once confirmed.
+tests:
+  run_inputs: []

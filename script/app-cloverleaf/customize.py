@@ -16,7 +16,8 @@ def postprocess(i):
     env = i['env']
 
     src_path = env.get('MLC_CLOVERLEAF_SRC_PATH', '')
-    install_dir = os.path.join(src_path, 'install')
+    compiler_tag = env.get('MLC_COMPILER_FAMILY', '') or 'default'
+    install_dir = os.path.join(src_path, 'install-' + compiler_tag)
     bin_dir = os.path.join(install_dir, 'bin')
 
     clover_bin = os.path.join(bin_dir, 'clover_leaf')

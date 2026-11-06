@@ -1,0 +1,83 @@
+alias: app-alphafold
+uid: 3d23d47fc5f56f9a
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: HPC Application
+tags:
+- app
+- alphafold
+- hpc
+
+# Cache
+cache: true
+
+# Environment
+default_env: {}
+new_env_keys:
+- MLC_ALPHAFOLD_SRC_PATH
+- MLC_ALPHAFOLD_INSTALL_PATH
+- MLC_ALPHAFOLD_BIN_PATH
+- +PATH
+new_state_keys: []
+
+# Dependencies
+deps:
+- tags: detect,cpu
+- env:
+    MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
+  tags: get,generic-sys-util,_build-essential
+- tags: get,python3
+  names:
+  - python
+  - python3
+- tags: get,git,repo
+  names:
+  - alphafold-repo
+  extra_cache_tags: alphafold,repo,alphafold-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_ALPHAFOLD_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
+variations:
+  repo.#:
+    env:
+      MLC_GIT_REPO_URL: '#'
+    group: repo
+  repo.official:
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://github.com/google-deepmind/alphafold.git
+    group: repo
+  tag.#:
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+    group: version
+  branch.#:
+    env:
+      MLC_GIT_CHECKOUT: '#'
+    group: version
+  version.main:
+    default: true
+    group: version
+    env:
+      MLC_GIT_CHECKOUT: main
+
+# Tests
+# Empty: heavy dependency stack / long build; recipe provided in run.sh
+# but not enabled in CI. Validate and enable once confirmed.
+tests:
+  run_inputs: []

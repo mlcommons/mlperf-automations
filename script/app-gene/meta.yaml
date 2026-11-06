@@ -1,0 +1,45 @@
+alias: app-gene
+uid: 6343681fd397493d
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+# Metadata
+category: HPC Application
+tags:
+- app
+- gene
+- hpc
+
+# Cache
+cache: true
+
+# Environment
+default_env: {}
+new_env_keys:
+- MLC_GENE_SRC_PATH
+- MLC_GENE_INSTALL_PATH
+- MLC_GENE_BIN_PATH
+- +PATH
+new_state_keys: []
+
+# Input mapping (proprietary: user supplies the source/install tree)
+input_mapping:
+  src: MLC_GENE_SRC_PATH
+input_description:
+  src:
+    desc: Path to a licensed GENE source or install tree
+
+# Dependencies
+deps:
+- tags: detect,cpu
+prehook_deps: []
+posthook_deps: []
+post_deps: []
+
+# Variations
+variations: {}
+
+# Tests
+# Empty: GENE is proprietary and cannot be fetched/built automatically.
+tests:
+  run_inputs: []
