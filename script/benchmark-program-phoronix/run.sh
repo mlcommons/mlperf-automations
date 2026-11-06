@@ -134,10 +134,17 @@ echo "  Batch mode: ${MLC_PHORONIX_BATCH_MODE}"
 echo "  Result id: ${RESULT_ID}"
 echo "***********************************************************************"
 
+# Interactive (non-batch) mode needs stdin for PTS test-option menus.
+if [ "${MLC_PHORONIX_BATCH_MODE}" == "yes" ]; then
+  exec 3</dev/null
+else
+  exec 3<&0
+fi
+
 # Install the test (compiles from source using CC/CXX when applicable).
 echo ""
 echo "Installing test: ${MLC_PHORONIX_TEST}"
-"${PTS}" install "${MLC_PHORONIX_TEST}" </dev/null
+"${PTS}" install "${MLC_PHORONIX_TEST}" <&3
 rc=$?
 if [ ${rc} -ne 0 ]; then
   echo "ERROR: phoronix-test-suite install failed (status ${rc})"
@@ -148,9 +155,9 @@ OUTPUT_FILE="${RESULTS_DIR}/phoronix_output.txt"
 echo ""
 echo "Running benchmark..."
 if [ "${MLC_PHORONIX_BATCH_MODE}" == "yes" ]; then
-  "${PTS}" batch-benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" </dev/null 2>&1 | tee "${OUTPUT_FILE}"
+  "${PTS}" batch-benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" <&3 2>&1 | tee "${OUTPUT_FILE}"
 else
-  "${PTS}" benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" </dev/null 2>&1 | tee "${OUTPUT_FILE}"
+  "${PTS}" benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" <&3 2>&1 | tee "${OUTPUT_FILE}"
 fi
 exitstatus=${PIPESTATUS[0]}
 

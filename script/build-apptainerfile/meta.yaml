@@ -16,7 +16,6 @@ cache: false
 
 # Environment
 default_env:
-  MLC_APPTAINER_BUILD_BIND_MOUNTS: 'no'
   MLC_APPTAINER_OS: ubuntu
   MLC_APPTAINER_OS_VERSION: '24.04'
   MLC_MLOPS_REPO_BRANCH: dev
@@ -28,7 +27,6 @@ input_mapping:
   base_image: MLC_APPTAINER_IMAGE_BASE
   bind: MLC_APPTAINER_BIND_MOUNTS
   build: MLC_BUILD_APPTAINER_IMAGE
-  build_bind: MLC_APPTAINER_BUILD_BIND_MOUNTS
   docker_os: MLC_APPTAINER_OS
   docker_os_version: MLC_APPTAINER_OS_VERSION
   extra_sys_deps: MLC_APPTAINER_EXTRA_SYS_DEPS

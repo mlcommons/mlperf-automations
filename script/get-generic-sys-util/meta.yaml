@@ -1233,8 +1233,9 @@ variations:
     env:
       MLC_SYS_UTIL_NAME: sox
       MLC_SYS_UTIL_VERSION_CMD: sox --version
-      MLC_SYS_UTIL_VERSION_RE: sox:\s+SoX\s+v([\d.]+)
-      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 0
+      # sox-ng (Ubuntu 26.04+) prints a different banner than classic SoX
+      MLC_SYS_UTIL_VERSION_RE: SoX\S*\s+v?(\d+(?:\.\d+)+)
+      MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 1
     new_env_keys:
     - MLC_SOX_VERSION
     state:

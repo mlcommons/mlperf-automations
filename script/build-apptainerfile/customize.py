@@ -285,16 +285,16 @@ def preprocess(i):
         # Bind destinations must exist in the rootfs: apptainer cannot create
         # them when binds are applied to the build-time fake run.
         bind_dests = get_bind_destinations(
-            env.get('MLC_APPTAINER_BIND_MOUNTS', [])) if is_true(
-            env.get('MLC_APPTAINER_BUILD_BIND_MOUNTS', '')) else []
+            env.get('MLC_APPTAINER_BIND_MOUNTS', []))
 
         # Copy section for local repo (use %setup with tar to handle symlinks
         # gracefully)
         if bind_dests:
             f.write("%setup\n")
-            for dest in bind_dests:
-                f.write(
-                    f"    mkdir -p \"${{APPTAINER_ROOTFS}}\"{shlex.quote(dest)}\n")
+            # %setup runs on the host: create one component at a time and never follow symlinks out of the rootfs.
+            f.write(MKBIND_SH)
+            for dest, kind in bind_dests:
+                f.write(f"    mlc_mkbind {shlex.quote(dest)} {kind}\n")
             if not (use_host_repos or use_copy_repo):
                 f.write("\n")
         if use_host_repos:
@@ -334,11 +334,37 @@ def preprocess(i):
     return {'return': 0}
 
 
+MKBIND_SH = """    mlc_mkbind() {
+        _p="${APPTAINER_ROOTFS}"; _rest="${1#/}"
+        while [ -n "$_rest" ]; do
+            _c="${_rest%%/*}"
+            case "$_rest" in */*) _rest="${_rest#*/}" ;; *) _rest="" ;; esac
+            if [ -z "$_c" ] || [ "$_c" = "." ]; then continue; fi
+            _p="$_p/$_c"
+            if [ -L "$_p" ]; then
+                echo "Skipping bind point $1: $_p is a symlink"; return 0
+            elif [ -z "$_rest" ] && [ "$2" = "file" ]; then
+                if [ ! -e "$_p" ]; then
+                    : > "$_p"
+                elif [ ! -f "$_p" ]; then
+                    echo "Skipping bind point $1: $_p is not a regular file"; return 0
+                fi
+            elif [ ! -e "$_p" ]; then
+                mkdir "$_p"
+            elif [ ! -d "$_p" ]; then
+                echo "Skipping bind point $1: $_p is not a directory"; return 0
+            fi
+        done
+    }
+"""
+
+
 def get_bind_destinations(bind_mounts):
-    """Container-side paths of apptainer bind specs (src[:dest[:opts]])."""
+    """(container path, 'file'|'dir') for apptainer bind specs (src[:dest[:opts]])."""
     if isinstance(bind_mounts, str):
         bind_mounts = [bind_mounts]
     dests = []
+    seen = set()
     for entry in bind_mounts or []:
         for spec in str(entry).split(','):
             spec = spec.strip()
@@ -346,8 +372,11 @@ def get_bind_destinations(bind_mounts):
                 continue
             parts = spec.split(':')
             dest = parts[1] if len(parts) > 1 and parts[1] else parts[0]
-            if dest.startswith('/') and dest not in dests:
-                dests.append(dest)
+            if dest.startswith('/') and '..' not in dest.split(
+                    '/') and dest not in seen:
+                seen.add(dest)
+                kind = 'file' if os.path.isfile(parts[0]) else 'dir'
+                dests.append((dest, kind))
     return dests
 
 
