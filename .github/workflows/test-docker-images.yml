@@ -10,7 +10,6 @@ on:
       - 'script/build-dockerfile/**'
       - 'script/detect-cpu/**'
       - 'script/detect-os/**'
-      - 'automation/script/docker_utils.py'
       - '.github/workflows/test-docker-images.yml'
   workflow_dispatch:
     inputs:

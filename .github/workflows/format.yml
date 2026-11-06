@@ -86,5 +86,5 @@ jobs:
             git config --global user.email "${{ steps.bot.outputs.email }}"
             # Commit changes
             git commit -m '[Automated Commit] Format Codebase'
-            git push 
+            git push
           fi
