@@ -18,7 +18,7 @@ cache: false
 default_env:
   MLC_APPTAINER_OS: ubuntu
   MLC_APPTAINER_OS_VERSION: '24.04'
-  MLC_MLOPS_REPO_BRANCH: dev
+  MLC_MLOPS_REPO_BRANCH: main
 new_env_keys:
 - MLC_APPTAINERFILE_*
 

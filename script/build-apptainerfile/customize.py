@@ -124,7 +124,7 @@ def preprocess(i):
                 "falling back to pulling the default repo.")
             use_host_repos = False
 
-    mlc_mlops_repo_branch_string = f" --branch={env.get('MLC_MLOPS_REPO_BRANCH', 'dev')}"
+    mlc_mlops_repo_branch_string = f" --branch={env.get('MLC_MLOPS_REPO_BRANCH', 'main')}"
 
     if env.get('MLC_APPTAINERFILE_WITH_PATH', '') == '':
         env['MLC_APPTAINERFILE_WITH_PATH'] = os.path.join(

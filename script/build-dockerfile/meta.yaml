@@ -20,7 +20,7 @@ default_env:
     '
   MLC_DOCKER_OS: ubuntu
   MLC_DOCKER_NOT_PULL_UPDATE: false
-  MLC_MLOPS_REPO_BRANCH: dev
+  MLC_MLOPS_REPO_BRANCH: main
 new_env_keys:
 - MLC_DOCKERFILE_*
 
