@@ -18,7 +18,7 @@ cache: false
 default_env:
   MLC_APPTAINER_OS: ubuntu
   MLC_APPTAINER_OS_VERSION: '24.04'
-  MLC_MLOPS_REPO_BRANCH: dev
+  MLC_MLOPS_REPO_BRANCH: main
 new_env_keys:
 - MLC_APPTAINERFILE_*
 
@@ -48,6 +48,7 @@ input_mapping:
   run_cmd: MLC_APPTAINER_RUN_CMD
   run_cmd_extra: MLC_APPTAINER_RUN_CMD_EXTRA
   sandbox: MLC_APPTAINER_BUILD_SANDBOX
+  skip_pip_upgrade: MLC_APPTAINER_SKIP_PIP_UPGRADE
   script_tags: MLC_APPTAINER_RUN_SCRIPT_TAGS
 
 # Dependencies
