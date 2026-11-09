@@ -1,16 +1,19 @@
 name: MLPerf Inference Nvidia implementations
 
 on:
-  pull_request_target:
+  pull_request:
     branches: [ "main", "dev" ]
     paths:
       - '.github/workflows/test-nvidia-mlperf-inference-implementations.yml'
       - 'script/app-mlperf-inference-nvidia/**'
       - '!**.md'
 
+permissions:
+  contents: read
+
 jobs:
   run_nvidia:
-      if: github.repository_owner == 'mlcommons'
+      if: github.repository_owner == 'mlcommons' && github.event.pull_request.head.repo.full_name == github.repository
       runs-on:
        - ubuntu-latest
       strategy:
@@ -20,11 +23,6 @@ jobs:
           # system: [ "mlc-server" ] 
           python-version: [ "3.12" ]
           model: [ "resnet50", "bert-99" ]
-          exclude:
-           - model: gptj-99.9
-           - system: phoenix1
-           - system: GO-i91
-          
       steps:
       - name: Set up SSH
         run: |
@@ -39,21 +37,13 @@ jobs:
         with:
           fetch-depth: 0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install mlcflow
         run: |
           pip install mlcflow
           pip install tabulate
-      - name: Pull MLOps repo
-        shell: bash
-        env:
-          REPO: ${{ github.event.pull_request.head.repo.html_url }}
-          BRANCH: ${{ github.event.pull_request.head.ref }}
-        run: |
-          mlc pull repo "$REPO" --branch="$BRANCH"
-          
       - name: Test MLPerf Inference NVIDIA ${{ matrix.model }}
         env:
           gpu_name: rtx_4090
