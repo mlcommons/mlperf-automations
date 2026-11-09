@@ -30,7 +30,7 @@ if [ ! -e "${MLC_TMP_GIT_PATH}" ]; then
   if [ ! -z ${MLC_GIT_SHA} ]; then
 
     echo ""
-    cmd="git checkout -b ${MLC_GIT_SHA} ${MLC_GIT_SHA}"
+    cmd="git checkout -f -b ${MLC_GIT_SHA} ${MLC_GIT_SHA}"
     echo "$cmd"
     eval "$cmd"
     test $? -eq 0 || exit $?
@@ -41,7 +41,7 @@ if [ ! -e "${MLC_TMP_GIT_PATH}" ]; then
     cmd="git fetch --all --tags"
     echo "$cmd"
     eval "$cmd"
-    cmd="git checkout tags/${MLC_GIT_CHECKOUT_TAG} -b ${MLC_GIT_CHECKOUT_TAG}"
+    cmd="git checkout -f tags/${MLC_GIT_CHECKOUT_TAG} -b ${MLC_GIT_CHECKOUT_TAG}"
     echo "$cmd"
     eval "$cmd"
     test $? -eq 0 || exit $?

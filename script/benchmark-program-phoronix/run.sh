@@ -158,10 +158,17 @@ fi
 OUTPUT_FILE="${RESULTS_DIR}/phoronix_output.txt"
 echo ""
 echo "Running benchmark..."
+# Optional memory allocator (MLC_ALLOCATOR_PRELOAD from get,allocator), preloaded
+# for the benchmark phase only (not for the test install/build).
+_bench_preload="${LD_PRELOAD:-}"
+if [ -n "${MLC_ALLOCATOR_PRELOAD:-}" ] && [ -e "${MLC_ALLOCATOR_PRELOAD}" ]; then
+  _bench_preload="${MLC_ALLOCATOR_PRELOAD}${_bench_preload:+:${_bench_preload}}"
+  echo "Allocator: ${MLC_ALLOCATOR_NAME:-custom} (LD_PRELOAD=${MLC_ALLOCATOR_PRELOAD})"
+fi
 if [ "${MLC_PHORONIX_BATCH_MODE}" == "yes" ]; then
-  "${PTS}" batch-benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" <&3 2>&1 | tee "${OUTPUT_FILE}"
+  LD_PRELOAD="${_bench_preload}" "${PTS}" batch-benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" <&3 2>&1 | tee "${OUTPUT_FILE}"
 else
-  "${PTS}" benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" <&3 2>&1 | tee "${OUTPUT_FILE}"
+  LD_PRELOAD="${_bench_preload}" "${PTS}" benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" <&3 2>&1 | tee "${OUTPUT_FILE}"
 fi
 exitstatus=${PIPESTATUS[0]}
 

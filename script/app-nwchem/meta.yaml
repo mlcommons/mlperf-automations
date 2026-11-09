@@ -43,10 +43,23 @@ deps:
 - tags: get,generic,sys-util,_gfortran
   names:
   - gfortran
+# AOCL is x86-only; other architectures use the system OpenBLAS (see run.sh).
 - tags: get,utils,aocl-utils
+  enable_if_env:
+    MLC_HOST_PLATFORM_FLAVOR:
+    - x86_64
 - tags: get,lib,aocl-blis
+  enable_if_env:
+    MLC_HOST_PLATFORM_FLAVOR:
+    - x86_64
 - tags: get,lib,aocl-libflame
+  enable_if_env:
+    MLC_HOST_PLATFORM_FLAVOR:
+    - x86_64
 - tags: get,lib,aocl-scalapack
+  enable_if_env:
+    MLC_HOST_PLATFORM_FLAVOR:
+    - x86_64
 - tags: get,git,repo
   names:
   - nwchem-repo

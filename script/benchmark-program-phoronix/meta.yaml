@@ -38,7 +38,6 @@ tags:
 uid: a1b2c3d4e5f60003
 variations:
   compress-7zip:
-    default: true
     env:
       MLC_PHORONIX_TEST: 'pts/compress-7zip'
     group: test
