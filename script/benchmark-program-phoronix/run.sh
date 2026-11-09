@@ -103,6 +103,10 @@ export NO_EXTERNAL_DEPENDENCIES=1
 </PhoronixTestSuite>
 XML_EOF
   echo "Wrote non-interactive PTS config: ${PTS_USER_DIR}/user-config.xml"
+  # With writable /etc and /var/lib (root / apptainer --fakeroot) PTS reads /etc/phoronix-test-suite.xml instead.
+  if [ -w /etc ] && [ -w /var/lib ]; then
+    cp -f "${PTS_USER_DIR}/user-config.xml" /etc/phoronix-test-suite.xml
+  fi
 }
 
 # Pre-answer the result save prompts (used when PromptSaveName etc. are FALSE).
@@ -189,6 +193,11 @@ if [ -n "${saved_name}" ]; then
   if [ -n "${saved_json}" ] && [ -f "${saved_json}" ]; then
     cp -f "${saved_json}" "${RESULTS_DIR}/phoronix_results.json"
   fi
+fi
+
+if [ ! -f "${RESULTS_DIR}/phoronix_results.json" ]; then
+  echo "ERROR: Phoronix Test Suite produced no results for ${MLC_PHORONIX_TEST}"
+  exit 1
 fi
 
 echo ""
