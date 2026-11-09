@@ -24,8 +24,9 @@ for prec in double float; do
     PREC_FLAG=""
     [[ "${prec}" == "float" ]] && PREC_FLAG="--enable-float"
     "${SRC}/configure" ${COMMON_FLAGS} ${PREC_FLAG} ${MLC_AOCL_FFTW_EXTRA_CONFIGURE_FLAGS}
-    make -j"${CORES}"
-    make install
+    # MAKEINFO=true: skip the texinfo docs (makeinfo is usually not installed).
+    make -j"${CORES}" MAKEINFO=true
+    make install MAKEINFO=true
 done
 
 echo "AOCL-FFTW installed to ${PREFIX}"
