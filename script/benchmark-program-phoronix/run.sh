@@ -73,6 +73,7 @@ export NO_EXTERNAL_DEPENDENCIES=1
       <PromptForDownloadMirror>FALSE</PromptForDownloadMirror>
     </Installation>
     <Testing>
+      <ResultsDirectory>__PTS_RESULTS_DIR__</ResultsDirectory>
       <SaveSystemLogs>TRUE</SaveSystemLogs>
       <SaveInstallationLogs>TRUE</SaveInstallationLogs>
       <SaveTestLogs>TRUE</SaveTestLogs>
@@ -102,6 +103,8 @@ export NO_EXTERNAL_DEPENDENCIES=1
   </Options>
 </PhoronixTestSuite>
 XML_EOF
+  # Explicit: as root PTS expands the default ~/.phoronix-test-suite to $HOME, not PTS_USER_PATH_OVERRIDE.
+  sed -i "s|__PTS_RESULTS_DIR__|${PTS_USER_DIR}/test-results/|" "${PTS_USER_DIR}/user-config.xml"
   echo "Wrote non-interactive PTS config: ${PTS_USER_DIR}/user-config.xml"
   # With writable /etc and /var/lib (root / apptainer --fakeroot) PTS reads /etc/phoronix-test-suite.xml instead.
   if [ -w /etc ] && [ -w /var/lib ]; then
