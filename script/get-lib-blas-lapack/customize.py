@@ -33,10 +33,13 @@ def _openmp_runtime(lib, search_roots):
         return '', ''
     for rt, link in (('libomp.so', 'omp'), ('libgomp.so', 'gomp')):
         if rt in out:
-            for root in search_roots:
-                hit = _find_lib(root, [rt, rt + '.*'])
-                if hit:
-                    return os.path.dirname(hit), link
+            for pattern in search_roots:
+                # Non-recursive: a recursive walk of /usr/lib on large images never finishes.
+                for d in sorted(glob.glob(pattern)):
+                    hits = glob.glob(os.path.join(d, rt)) + \
+                        glob.glob(os.path.join(d, rt + '.*'))
+                    if hits:
+                        return d, link
             return '', link
     return '', ''
 
@@ -71,7 +74,9 @@ def postprocess(i):
                 lib_dirs.append(os.path.dirname(lib))
 
         omp_dir, omp_link = _openmp_runtime(
-            blis, [env.get('MLC_AOCL_BLIS_LIB_PATH', ''), '/usr/lib', '/usr/lib64'])
+            blis, [env.get('MLC_AOCL_BLIS_LIB_PATH', ''), '/usr/lib', '/usr/lib64',
+                   '/usr/lib/x86_64-linux-gnu', '/usr/lib/gcc/*/*',
+                   '/usr/lib/llvm-*/lib', '/usr/lib64/llvm*/lib*'])
         if omp_dir and omp_dir not in lib_dirs:
             lib_dirs.append(omp_dir)
 
