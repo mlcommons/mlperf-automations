@@ -48,6 +48,7 @@ input_mapping:
   run_cmd: MLC_APPTAINER_RUN_CMD
   run_cmd_extra: MLC_APPTAINER_RUN_CMD_EXTRA
   sandbox: MLC_APPTAINER_BUILD_SANDBOX
+  skip_pip_upgrade: MLC_APPTAINER_SKIP_PIP_UPGRADE
   script_tags: MLC_APPTAINER_RUN_SCRIPT_TAGS
 
 # Dependencies

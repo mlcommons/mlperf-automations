@@ -190,7 +190,11 @@ def preprocess(i):
         f.write(f"    {python} -m venv /opt/venv/mlcflow\n")
         f.write("    . /opt/venv/mlcflow/bin/activate\n")
         f.write(f"    {python} -m pip install --upgrade pip setuptools\n")
-        f.write(f"    {python} -m pip install {' '.join(pip_packages)}\n")
+        # --upgrade so an older mlcflow preinstalled in the base image is replaced
+        pip_upgrade = '' if is_true(
+            env.get('MLC_APPTAINER_SKIP_PIP_UPGRADE', '')) else '--upgrade '
+        f.write(
+            f"    {python} -m pip install {pip_upgrade}{' '.join(pip_packages)}\n")
         f.write("\n")
 
         f.write("    # Download MLC repo for scripts\n")

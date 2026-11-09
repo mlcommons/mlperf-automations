@@ -349,7 +349,10 @@ def preprocess(i):
         ' ' + pip_extra_flags + ' ' + EOL)
 
     f.write(
-        'RUN {} -m pip install '.format(python) +
+        'RUN {} -m pip install {}'.format(
+            python,
+            # --upgrade so an older mlcflow preinstalled in the base image is replaced
+            '' if is_true(env.get('MLC_DOCKER_SKIP_PIP_UPGRADE', '')) else '--upgrade ') +
         " ".join(
             get_value(
                 env,
