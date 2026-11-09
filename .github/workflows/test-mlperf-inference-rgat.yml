@@ -31,6 +31,8 @@ on:
 jobs:
 
   rgat-inference-run:
+    # Disabled: data.dgl.ai (only source of dgl 2.4.0 wheels) is unreachable; re-enable once it is back.
+    if: false
     name:  ${{ matrix.os }} - ${{ matrix.backend }} - ${{ matrix.implementation }}
     runs-on: ${{ matrix.os }}
     strategy:
