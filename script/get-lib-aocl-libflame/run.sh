@@ -30,6 +30,8 @@ if [[ -n "${MLC_AOCL_UTILS_INSTALL_PATH}" ]]; then
 fi
 
 cd ${MLC_AOCL_LIBFLAME_SRC_PATH}
+# libflame 5.2 links libflame.so with "-pie -shared"; newer GCC then builds a PIE executable (fixed upstream).
+sed -i 's/set(LINKER_FLAGS "-pie /set(LINKER_FLAGS "/' CMakeLists.txt
 mkdir -p build && cd build
 
 cmake .. \
