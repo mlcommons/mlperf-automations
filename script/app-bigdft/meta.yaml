@@ -30,8 +30,7 @@ deps:
     MLC_GENERIC_SYS_UTIL_IGNORE_MISSING_PACKAGE: true
   tags: get,generic-sys-util,_build-essential
 - tags: get,generic-sys-util,_gfortran
-- tags: get,generic-sys-util,_liblapack-dev
-- tags: get,generic-sys-util,_libopenblas-dev
+- tags: get,lib,blas-lapack
 - tags: get,generic-sys-util,_python3-dev
 - tags: get,generic-sys-util,_autoconf
 - tags: get,generic-sys-util,_automake

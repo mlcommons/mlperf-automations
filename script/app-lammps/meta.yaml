@@ -28,7 +28,7 @@ deps:
 - tags: detect,cpu
 - tags: get,generic,sys-util,_libopenmpi-dev
 - tags: get,cmake
-- tags: get,generic,sys-util,_libfftw3-dev
+- tags: get,lib,fftw3
 - tags: get,git,repo
   names:
   - lammps-repo
