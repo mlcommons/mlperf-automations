@@ -31,7 +31,7 @@ deps:
   tags: get,generic-sys-util,_build-essential
 - tags: get,generic-sys-util,_gfortran
 - tags: get,generic-sys-util,_libopenmpi-dev
-- tags: get,generic-sys-util,_libfftw3-dev
+- tags: get,lib,fftw3
 - tags: get,git,repo
   names:
   - gtc-repo

@@ -1,0 +1,71 @@
+alias: get-lib-blas-lapack
+uid: 1fa189d2906d4f40
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+category: Detection or installation of tools and artifacts
+tags:
+- get
+- lib
+- blas-lapack
+- linalg
+
+cache: false
+
+default_env:
+  MLC_BLAS_LAPACK_FORCE_OPENBLAS: 'no'
+new_env_keys:
+- MLC_BLAS_LAPACK_*
+- MLC_BLAS_LIBS
+- MLC_LAPACK_LIBS
+- MLC_BLAS_LIBRARIES
+- MLC_LAPACK_LIBRARIES
+- MLC_AOCL_*
+- BLAS_LIBS
+- LAPACK_LIBS
+- BLA_VENDOR
+- +LD_LIBRARY_PATH
+- +LIBRARY_PATH
+- +C_INCLUDE_PATH
+- +CPLUS_INCLUDE_PATH
+
+# AOCL (BLIS + libflame) on x86_64; system OpenBLAS elsewhere or with _openblas.
+deps:
+- tags: detect,os
+- tags: get,utils,aocl-utils
+  names:
+  - aocl-utils
+  enable_if_env:
+    MLC_HOST_PLATFORM_FLAVOR:
+    - x86_64
+    MLC_BLAS_LAPACK_FORCE_OPENBLAS:
+    - 'no'
+- tags: get,lib,aocl-blis
+  names:
+  - aocl-blis
+  enable_if_env:
+    MLC_HOST_PLATFORM_FLAVOR:
+    - x86_64
+    MLC_BLAS_LAPACK_FORCE_OPENBLAS:
+    - 'no'
+- tags: get,lib,aocl-libflame
+  names:
+  - aocl-libflame
+  enable_if_env:
+    MLC_HOST_PLATFORM_FLAVOR:
+    - x86_64
+    MLC_BLAS_LAPACK_FORCE_OPENBLAS:
+    - 'no'
+- tags: get,generic,sys-util,_libopenblas-dev
+  names:
+  - openblas
+  skip_if_env:
+    MLC_HOST_PLATFORM_FLAVOR:
+    - x86_64
+    MLC_BLAS_LAPACK_FORCE_OPENBLAS:
+    - 'no'
+
+variations:
+  openblas:
+    env:
+      MLC_BLAS_LAPACK_FORCE_OPENBLAS: 'yes'

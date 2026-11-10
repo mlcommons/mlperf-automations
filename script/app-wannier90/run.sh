@@ -12,6 +12,7 @@ CORES="${MLC_HOST_CPU_TOTAL_PHYSICAL_CORES:-$(nproc)}"
 
 cd "${SRC}"
 cp config/make.inc.gfort make.inc
-make -j"${CORES}"
+# LIBS from get,lib,blas-lapack overrides the make.inc default (-llapack -lblas).
+make -j"${CORES}" LIBS="${MLC_LAPACK_LIBS}"
 
 echo "Wannier90 build step completed."

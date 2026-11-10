@@ -33,7 +33,7 @@ input_description:
 deps:
 - tags: detect,cpu
 - tags: get,generic,sys-util,_libopenmpi-dev
-- tags: get,generic,sys-util,_libfftw3-dev
+- tags: get,lib,fftw3
 - tags: get,cmake
 - tags: get,git,repo
   names:

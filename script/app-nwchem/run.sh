@@ -24,46 +24,13 @@ if [[ "${MLC_NWCHEM_USE_OPENMP}" == "1" ]]; then
     export USE_OPENMP=1
 fi
 
-# AOCL BLIS as BLAS - find actual lib directory (binary installs use LP64/ILP64 subdirs)
-BLIS_LIB_PATH="${MLC_AOCL_BLIS_LIB_PATH}"
-BLIS_LIB=$(find "${BLIS_LIB_PATH}" -name "libblis-mt.so" -o -name "libblis-mt.a" 2>/dev/null | grep -i "lp64" | head -1)
-if [[ -z "${BLIS_LIB}" ]]; then
-    BLIS_LIB=$(find "${BLIS_LIB_PATH}" -name "libblis-mt.so" -o -name "libblis-mt.a" 2>/dev/null | head -1)
-fi
-if [[ -n "${BLIS_LIB}" ]]; then
-    BLIS_LIB_DIR=$(dirname "${BLIS_LIB}")
-else
-    BLIS_LIB_DIR="${BLIS_LIB_PATH}"
-fi
-echo "BLIS library directory: ${BLIS_LIB_DIR}"
-
-# AOCL libflame - find actual lib directory
-FLAME_LIB_PATH="${MLC_AOCL_LIBFLAME_LIB_PATH}"
-FLAME_LIB=$(find "${FLAME_LIB_PATH}" -name "libflame.so" -o -name "libflame.a" 2>/dev/null | head -1)
-if [[ -n "${FLAME_LIB}" ]]; then
-    FLAME_LIB_DIR=$(dirname "${FLAME_LIB}")
-else
-    FLAME_LIB_DIR="${FLAME_LIB_PATH}"
-fi
-echo "FLAME library directory: ${FLAME_LIB_DIR}"
-
 export BLAS_SIZE=4
 export USE_64TO32=y
-# Find libomp for BLIS binary (compiled with AOCC/LLVM OpenMP)
-OMP_LIB=$(find /usr/lib -name "libomp.so" 2>/dev/null | head -1)
-if [[ -n "${OMP_LIB}" ]]; then
-    OMP_LIB_DIR=$(dirname "${OMP_LIB}")
-    echo "OpenMP library directory: ${OMP_LIB_DIR}"
-    export BLASOPT="-L${BLIS_LIB_DIR} -lblis-mt -lm -lpthread -L${OMP_LIB_DIR} -lomp"
-else
-    echo "WARNING: libomp.so not found, trying without -lomp"
-    export BLASOPT="-L${BLIS_LIB_DIR} -lblis-mt -lm -lpthread"
-fi
-# AOCL utils - needed by libflame for au_cpuid_has_flags
-UTILS_LIB_PATH="${MLC_AOCL_UTILS_LIB_PATH}"
-echo "AOCL utils library directory: ${UTILS_LIB_PATH}"
-
-export LAPACK_LIB="-L${FLAME_LIB_DIR} -lflame -L${UTILS_LIB_PATH} -laoclutils"
+# BLAS/LAPACK from get,lib,blas-lapack: AOCL BLIS/libflame on x86_64, OpenBLAS elsewhere.
+export BLASOPT="${MLC_BLAS_LIBS}"
+export LAPACK_LIB="${MLC_LAPACK_LIBS}"
+echo "BLASOPT=${BLASOPT}"
+echo "LAPACK_LIB=${LAPACK_LIB}"
 
 # ScaLAPACK - the AOCL build installs libscalapack under build/lib (or install/lib*),
 # which is not always where MLC_AOCL_SCALAPACK_LIB_PATH points. Resolve the repo root
@@ -84,6 +51,10 @@ fi
 
 # Avoid filesystem check overhead on large clusters
 export USE_NOFSCHECK=TRUE
+# GCC 15 defaults to C23; Global Arrays uses K&R-style `f()` prototypes. src/tools passes CFLAGS_FORGA to GA configure.
+export CFLAGS_FORGA="-std=gnu17 -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types -Wno-error=int-conversion ${CFLAGS_FORGA}"
+# NWChem's own C (rtdb, peigs) needs the same; makefile.h only appends to COPTIONS on x86_64, and peigs uses COPTIONS directly.
+export COPTIONS="-std=gnu17 -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types -Wno-error=int-conversion ${COPTIONS}"
 
 cd "${NWCHEM_TOP}/src"
 

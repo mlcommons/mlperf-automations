@@ -20,7 +20,8 @@ cd "${SRC}"
 
 # CloverLeaf-ref uses Makefile with MPI Fortran
 make clean >/dev/null 2>&1 || true
-make COMPILER=${CLV} MPI_COMPILER=mpif90 C_MPI_COMPILER=mpicc -j${CORES}
+# Serial: the Makefile has no .mod dependencies, so parallel builds race on clover_module.mod.
+make COMPILER=${CLV} MPI_COMPILER=mpif90 C_MPI_COMPILER=mpicc -j1
 
 # Install binary
 mkdir -p "${INSTALL_DIR}/bin"

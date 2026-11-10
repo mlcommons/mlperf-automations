@@ -90,6 +90,9 @@ variations:
     - tags: get,aocc
       names:
       - aocc
+      update_tags_from_env_with_prefix:
+        _path.:
+        - MLC_AOCC_DIR_PATH
   gcc:
     group: compiler
     default: true
@@ -99,6 +102,9 @@ variations:
     - tags: get,gcc
       names:
       - gcc
+      update_tags_from_env_with_prefix:
+        _path.:
+        - MLC_GCC_DIR_PATH
   llvm:
     group: compiler
     env:
@@ -107,6 +113,9 @@ variations:
     - tags: get,llvm
       names:
       - llvm
+      update_tags_from_env_with_prefix:
+        _path.:
+        - MLC_LLVM_DIR_PATH
   oneapi:
     group: compiler
     env:
@@ -115,6 +124,9 @@ variations:
     - tags: get,oneapi
       names:
       - oneapi
+      update_tags_from_env_with_prefix:
+        _path.:
+        - MLC_ONEAPI_DIR_PATH
 
 # Tests
 tests:

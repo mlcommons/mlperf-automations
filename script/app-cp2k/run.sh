@@ -76,6 +76,9 @@ if [[ "${MLC_CP2K_COMPILER}" == "aocc" || "${MLC_CP2K_COMPILER}" == "llvm" ]]; t
     echo "MPI_HOME set to: ${MPI_HOME}"
 fi
 
+# Under apptainer fakeroot, tar cannot restore archive owners.
+export TAR_OPTIONS="--no-same-owner"
+
 echo "Running CP2K toolchain installer..."
 echo "  Args: ${TOOLCHAIN_ARGS}"
 ./install_cp2k_toolchain.sh ${TOOLCHAIN_ARGS}
