@@ -11,6 +11,8 @@ SRC="${MLC_ELMER_SRC_PATH}"
 CORES="${MLC_HOST_CPU_TOTAL_PHYSICAL_CORES:-$(nproc)}"
 
 cd "${SRC}"
+# Old bundled CMakeLists declare cmake_minimum_required < 3.5, which CMake 4 rejects.
+export CMAKE_POLICY_VERSION_MINIMUM=3.5
 cmake -B build -DWITH_MPI=FALSE -DWITH_ELMERGUI=FALSE -DWITH_ElmerIce=FALSE \
     -DCMAKE_INSTALL_PREFIX="${SRC}/install"
 # Build the core solver only; some optional modules do not compile
