@@ -43,10 +43,12 @@ deps:
 - tags: get,generic,sys-util,_gfortran
   names:
   - gfortran
-- tags: get,utils,aocl-utils
-- tags: get,lib,aocl-blis
-- tags: get,lib,aocl-libflame
+# AOCL BLIS/libflame on x86_64, system OpenBLAS elsewhere (see run.sh).
+- tags: get,lib,blas-lapack
 - tags: get,lib,aocl-scalapack
+  enable_if_env:
+    MLC_HOST_PLATFORM_FLAVOR:
+    - x86_64
 - tags: get,git,repo
   names:
   - nwchem-repo

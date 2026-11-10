@@ -1,0 +1,75 @@
+alias: get-lib-aocl-fftw
+uid: 4fd98a47d1da4b8f
+automation_alias: script
+automation_uid: 5b4e0237da074764
+
+category: Detection or installation of tools and artifacts
+tags:
+- get
+- lib
+- lib-aocl-fftw
+- aocl-fftw
+- amd-fftw
+- aocl
+
+cache: true
+
+new_env_keys:
+- MLC_AOCL_FFTW_SRC_PATH
+- MLC_AOCL_FFTW_INSTALL_PATH
+- MLC_AOCL_FFTW_LIB_PATH
+- MLC_AOCL_FFTW_VERSION
+- MLC_DEPENDENT_CACHED_PATH
+- +LD_LIBRARY_PATH
+- +LIBRARY_PATH
+- +C_INCLUDE_PATH
+- +CPLUS_INCLUDE_PATH
+- +PKG_CONFIG_PATH
+- +CMAKE_PREFIX_PATH
+
+input_mapping:
+  configure_flags: MLC_AOCL_FFTW_EXTRA_CONFIGURE_FLAGS
+
+deps:
+- tags: detect,os
+- tags: detect,cpu
+- tags: get,git,repo
+  names:
+  - aocl-fftw-repo
+  extra_cache_tags: aocl-fftw,repo,aocl-fftw-repo
+  env:
+    MLC_GIT_CHECKOUT_PATH_ENV_NAME: MLC_AOCL_FFTW_SRC_PATH
+  force_env_keys:
+  - MLC_GIT_*
+  update_tags_from_env_with_prefix:
+    _branch.:
+    - MLC_GIT_CHECKOUT
+    _repo.:
+    - MLC_GIT_REPO_URL
+    _tag.:
+    - MLC_GIT_CHECKOUT_TAG
+
+variations:
+  repo.#:
+    group: repo
+    env:
+      MLC_GIT_REPO_URL: '#'
+  repo.amd:
+    group: repo
+    default: true
+    env:
+      MLC_GIT_REPO_URL: https://github.com/amd/amd-fftw.git
+  tag.#:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT_TAG: '#'
+  version.5.3:
+    group: version
+    default: true
+    env:
+      MLC_GIT_CHECKOUT_TAG: '5.3'
+      MLC_AOCL_FFTW_VERSION: '5.3'
+  branch.#:
+    group: version
+    env:
+      MLC_GIT_CHECKOUT: '#'

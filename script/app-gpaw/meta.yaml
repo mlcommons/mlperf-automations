@@ -35,8 +35,8 @@ deps:
 - tags: get,generic-sys-util,_python3-dev
 - tags: get,generic-sys-util,_python3-venv
 - tags: get,generic-sys-util,_libxc-dev
-- tags: get,generic-sys-util,_libopenblas-dev
-- tags: get,generic-sys-util,_libfftw3-dev
+- tags: get,lib,blas-lapack
+- tags: get,lib,fftw3
 - tags: get,git,repo
   names:
   - gpaw-repo

@@ -31,10 +31,9 @@ deps:
   tags: get,generic-sys-util,_build-essential
 - tags: get,generic-sys-util,_cmake
 - tags: get,generic-sys-util,_libboost-all-dev
-- tags: get,generic-sys-util,_libfftw3-dev
+- tags: get,lib,blas-lapack,_openblas
+- tags: get,lib,fftw3
 - tags: get,generic-sys-util,_libtinyxml-dev
-- tags: get,generic-sys-util,_liblapack-dev
-- tags: get,generic-sys-util,_libopenblas-dev
 - tags: get,generic-sys-util,_flex
 - tags: get,generic-sys-util,_bison
 - tags: get,git,repo

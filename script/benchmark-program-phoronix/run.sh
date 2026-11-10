@@ -73,6 +73,7 @@ export NO_EXTERNAL_DEPENDENCIES=1
       <PromptForDownloadMirror>FALSE</PromptForDownloadMirror>
     </Installation>
     <Testing>
+      <ResultsDirectory>__PTS_RESULTS_DIR__</ResultsDirectory>
       <SaveSystemLogs>TRUE</SaveSystemLogs>
       <SaveInstallationLogs>TRUE</SaveInstallationLogs>
       <SaveTestLogs>TRUE</SaveTestLogs>
@@ -102,7 +103,13 @@ export NO_EXTERNAL_DEPENDENCIES=1
   </Options>
 </PhoronixTestSuite>
 XML_EOF
+  # Explicit: as root PTS expands the default ~/.phoronix-test-suite to $HOME, not PTS_USER_PATH_OVERRIDE.
+  sed -i "s|__PTS_RESULTS_DIR__|${PTS_USER_DIR}/test-results/|" "${PTS_USER_DIR}/user-config.xml"
   echo "Wrote non-interactive PTS config: ${PTS_USER_DIR}/user-config.xml"
+  # With writable /etc and /var/lib (root / apptainer --fakeroot) PTS reads /etc/phoronix-test-suite.xml instead.
+  if [ -w /etc ] && [ -w /var/lib ]; then
+    cp -f "${PTS_USER_DIR}/user-config.xml" /etc/phoronix-test-suite.xml
+  fi
 }
 
 # Pre-answer the result save prompts (used when PromptSaveName etc. are FALSE).
@@ -154,10 +161,17 @@ fi
 OUTPUT_FILE="${RESULTS_DIR}/phoronix_output.txt"
 echo ""
 echo "Running benchmark..."
+# Optional memory allocator (MLC_ALLOCATOR_PRELOAD from get,allocator), preloaded
+# for the benchmark phase only (not for the test install/build).
+_bench_preload="${LD_PRELOAD:-}"
+if [ -n "${MLC_ALLOCATOR_PRELOAD:-}" ] && [ -e "${MLC_ALLOCATOR_PRELOAD}" ]; then
+  _bench_preload="${MLC_ALLOCATOR_PRELOAD}${_bench_preload:+:${_bench_preload}}"
+  echo "Allocator: ${MLC_ALLOCATOR_NAME:-custom} (LD_PRELOAD=${MLC_ALLOCATOR_PRELOAD})"
+fi
 if [ "${MLC_PHORONIX_BATCH_MODE}" == "yes" ]; then
-  "${PTS}" batch-benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" <&3 2>&1 | tee "${OUTPUT_FILE}"
+  LD_PRELOAD="${_bench_preload}" "${PTS}" batch-benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" <&3 2>&1 | tee "${OUTPUT_FILE}"
 else
-  "${PTS}" benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" <&3 2>&1 | tee "${OUTPUT_FILE}"
+  LD_PRELOAD="${_bench_preload}" "${PTS}" benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" <&3 2>&1 | tee "${OUTPUT_FILE}"
 fi
 exitstatus=${PIPESTATUS[0]}
 
@@ -189,6 +203,11 @@ if [ -n "${saved_name}" ]; then
   if [ -n "${saved_json}" ] && [ -f "${saved_json}" ]; then
     cp -f "${saved_json}" "${RESULTS_DIR}/phoronix_results.json"
   fi
+fi
+
+if [ ! -f "${RESULTS_DIR}/phoronix_results.json" ]; then
+  echo "ERROR: Phoronix Test Suite produced no results for ${MLC_PHORONIX_TEST}"
+  exit 1
 fi
 
 echo ""

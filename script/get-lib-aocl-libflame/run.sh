@@ -23,15 +23,26 @@ if [[ -n "${MLC_OUTDIRNAME}" ]]; then
 else
     INSTALL_PREFIX="${MLC_AOCL_LIBFLAME_SRC_PATH}/install"
 fi
+# libflame needs aoclutils (au_cpuid_*); link it into libflame.so so -lflame alone resolves.
+AOCLUTILS_LIB=""
+if [[ -n "${MLC_AOCL_UTILS_INSTALL_PATH}" ]]; then
+    AOCLUTILS_LIB=$(ls "${MLC_AOCL_UTILS_INSTALL_PATH}"/lib*/libaoclutils.so 2>/dev/null | head -1)
+fi
+
 cd ${MLC_AOCL_LIBFLAME_SRC_PATH}
+# libflame 5.2 links libflame.so with "-pie -shared"; newer GCC then builds a PIE executable (fixed upstream).
+sed -i 's/set(LINKER_FLAGS "-pie /set(LINKER_FLAGS "/' CMakeLists.txt
 mkdir -p build && cd build
 
 cmake .. \
     -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_TEST=OFF \
+    -DENABLE_AMD_FLAGS=ON \
+    -DCMAKE_C_STANDARD_LIBRARIES=-lm \
     ${MLC_AOCL_UTILS_INSTALL_PATH:+-DLIBAOCLUTILS_INCLUDE_PATH=${MLC_AOCL_UTILS_INSTALL_PATH}/include} \
-    ${MLC_AOCL_UTILS_INSTALL_PATH:+-DLIBAOCLUTILS_LIBRARY_PATH=${MLC_AOCL_UTILS_INSTALL_PATH}/lib} \
+    ${AOCLUTILS_LIB:+-DLIBAOCLUTILS_LIBRARY_PATH=${AOCLUTILS_LIB}} \
+    ${AOCLUTILS_LIB:+"-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--no-as-needed ${AOCLUTILS_LIB} -Wl,-rpath,$(dirname ${AOCLUTILS_LIB})"} \
     ${MLC_CMAKE_EXTRA_FLAGS}
 test $? -eq 0 || exit $?
 

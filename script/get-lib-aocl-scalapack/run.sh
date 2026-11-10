@@ -47,13 +47,16 @@ fi
 echo "BLIS library: ${BLIS_LIB}"
 echo "FLAME library: ${FLAME_LIB}"
 
+INSTALL_PREFIX=${MLC_AOCL_SCALAPACK_SRC_PATH}/install
+
 # Clean previous build
 rm -rf build
 mkdir -p build && cd build
 
 cmake .. \
-    -DCMAKE_INSTALL_PREFIX=${MLC_AOCL_SCALAPACK_SRC_PATH}/install \
+    -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
     -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_C_FLAGS="-std=gnu17 ${CFLAGS}" \
     -DBLAS_LIBRARIES="${BLIS_LIB}" \
     -DLAPACK_LIBRARIES="${FLAME_LIB};${BLIS_LIB};-lm;-lpthread;-lgfortran" \
     -DSCALAPACK_BUILD_TESTS=OFF \

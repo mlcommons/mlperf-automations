@@ -124,6 +124,7 @@ jobs:
           --test_query_count=500 \
           --target_qps=1 \
           --docker_dt \
+          --use_dataset_from_host=no \
           --docker_os=rhel \
           --docker_os_version=9 \
           -v --quiet

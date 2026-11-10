@@ -1,6 +1,6 @@
 # MLCommons Automation Scripts
 
-*Last updated: 2026-11-09 13:16:38*
+*Last updated: 2026-11-10 21:36:58*
 
 This directory contains automation scripts for MLPerf benchmarks, AI/ML workflows, and development operations.
 
@@ -566,6 +566,9 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-lib-aocl-dlp](get-lib-aocl-dlp/)**
   - get-lib-aocl-dlp
   - Tags: `get`, `lib`, `lib-aocl-dlp`, `aocl-dlp`, `aocl`
+- **[get-lib-aocl-fftw](get-lib-aocl-fftw/)**
+  - get-lib-aocl-fftw
+  - Tags: `get`, `lib`, `lib-aocl-fftw`, `aocl-fftw`, `amd-fftw`, `aocl`
 - **[get-lib-aocl-fftz](get-lib-aocl-fftz/)**
   - get-lib-aocl-fftz
   - Tags: `get`, `lib`, `lib-aocl-fftz`, `aocl-fftz`, `aocl`
@@ -587,9 +590,15 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 - **[get-lib-armpl](get-lib-armpl/)**
   - get-lib-armpl
   - Tags: `armpl`, `lib`, `get`, `arm`
+- **[get-lib-blas-lapack](get-lib-blas-lapack/)**
+  - get-lib-blas-lapack
+  - Tags: `get`, `lib`, `blas-lapack`, `linalg`
 - **[get-lib-dnnl](get-lib-dnnl/)**
   - get-lib-dnnl
   - Tags: `get`, `lib-dnnl`, `lib`, `dnnl`
+- **[get-lib-fftw3](get-lib-fftw3/)**
+  - get-lib-fftw3
+  - Tags: `get`, `lib`, `fftw3`
 - **[get-lib-jemalloc](get-lib-jemalloc/)**
   - get-lib-jemalloc
   - Tags: `get`, `lib`, `lib-jemalloc`, `jemalloc`
@@ -1648,7 +1657,7 @@ This directory contains automation scripts for MLPerf benchmarks, AI/ML workflow
 
 ## Statistics
 
-- **Total Scripts**: 493
+- **Total Scripts**: 496
 - **Categories**: 39
 
 ## Usage

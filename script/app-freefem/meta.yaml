@@ -33,8 +33,7 @@ deps:
 - tags: get,generic-sys-util,_automake
 - tags: get,generic-sys-util,_libtool
 - tags: get,generic-sys-util,_gfortran
-- tags: get,generic-sys-util,_liblapack-dev
-- tags: get,generic-sys-util,_libopenblas-dev
+- tags: get,lib,blas-lapack
 - tags: get,generic-sys-util,_libhdf5-dev
 - tags: get,generic-sys-util,_libopenmpi-dev
 - tags: get,generic-sys-util,_bison
