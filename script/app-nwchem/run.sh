@@ -51,6 +51,8 @@ fi
 
 # Avoid filesystem check overhead on large clusters
 export USE_NOFSCHECK=TRUE
+# GCC 15 defaults to C23; Global Arrays uses K&R-style `f()` prototypes. src/tools passes CFLAGS_FORGA to GA configure.
+export CFLAGS_FORGA="-std=gnu17 ${CFLAGS_FORGA}"
 
 cd "${NWCHEM_TOP}/src"
 

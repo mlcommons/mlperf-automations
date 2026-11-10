@@ -19,6 +19,8 @@ cd "${SRC}"
 VPY="${INSTALL_DIR}/venv/bin/python"
 "${VPY}" -m pip install --upgrade pip numpy setuptools
 
+# Bundled externals (libxc, pybind11) declare cmake_minimum_required < 3.5, which CMake 4 rejects.
+export CMAKE_POLICY_VERSION_MINIMUM=3.5
 # CMake superbuild fetches and builds the external dependencies.
 cmake -S . -B build -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
     -DPython_EXECUTABLE="${VPY}"

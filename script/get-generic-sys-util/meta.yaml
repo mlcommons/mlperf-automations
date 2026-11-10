@@ -464,7 +464,7 @@ variations:
   libboost-all-dev:
     env:
       MLC_SYS_UTIL_NAME: libboost-all-dev
-      MLC_SYS_UTIL_VERSION_CMD: dpkg -s libboost-dev | grep 'Version'
+      MLC_SYS_UTIL_VERSION_CMD: dpkg -s libboost-all-dev | grep 'Version'
       MLC_SYS_UTIL_VERSION_RE: ([0-9]+(\.[0-9]+)+)
       MLC_TMP_VERSION_DETECT_GROUP_NUMBER: 1
     new_env_keys:
