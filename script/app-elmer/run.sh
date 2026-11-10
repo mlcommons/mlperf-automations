@@ -13,10 +13,10 @@ CORES="${MLC_HOST_CPU_TOTAL_PHYSICAL_CORES:-$(nproc)}"
 cd "${SRC}"
 # Old bundled CMakeLists declare cmake_minimum_required < 3.5, which CMake 4 rejects.
 export CMAKE_POLICY_VERSION_MINIMUM=3.5
-# GCC 15 defaults to C23; matc uses K&R-style `f()` prototypes.
+# GCC 14+/15 reject legacy C in matc (K&R prototypes, implicit declarations); restore old behaviour.
 cmake -B build -DWITH_MPI=FALSE -DWITH_ELMERGUI=FALSE -DWITH_ElmerIce=FALSE \
     -DCMAKE_INSTALL_PREFIX="${SRC}/install" \
-    -DCMAKE_C_FLAGS="-std=gnu17 ${CFLAGS}"
+    -DCMAKE_C_FLAGS="-std=gnu17 -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types -Wno-error=int-conversion ${CFLAGS}"
 # Build the core solver only; some optional modules do not compile
 # with gfortran >= 13 (DO-loop index passed by reference).
 cmake --build build --target Solver_TGT -- -j"${CORES}"
