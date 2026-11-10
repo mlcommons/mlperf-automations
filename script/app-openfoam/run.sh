@@ -27,6 +27,7 @@ fi
 
 # Build OpenFOAM
 echo "Building OpenFOAM with ${CORES} cores..."
-./Allwmake -j${CORES} -s -q 2>&1 || ./Allwmake -j${CORES} 2>&1
+# No -q: queue mode breaks relative includes (coldEngineFoam picks up XiFoam/createFields.H) and links modules too early.
+./Allwmake -j${CORES} -s 2>&1
 
 echo "OpenFOAM built successfully."
