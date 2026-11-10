@@ -15,7 +15,8 @@ MLC_TMP_CURRENT_SCRIPT_PATH=${MLC_TMP_CURRENT_SCRIPT_PATH:-$PWD}
 
 cd "${SRC}"
 mkdir -p build && cd build
-cmake ..
+# QMCPACK otherwise tries MKL then 'All', never the vendor from get,lib,blas-lapack.
+cmake .. ${BLA_VENDOR:+-DBLA_VENDOR="${BLA_VENDOR}"}
 make -j${CORES}
 
 echo "QMCPACK build step completed."

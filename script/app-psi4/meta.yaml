@@ -30,7 +30,7 @@ deps:
   tags: get,generic-sys-util,_build-essential
 - tags: get,cmake
 - tags: get,generic-sys-util,_gfortran
-- tags: get,lib,blas-lapack
+- tags: get,lib,blas-lapack,_openblas
 - tags: get,generic-sys-util,_libeigen3-dev
 - tags: get,generic-sys-util,_pkg-config
 - tags: get,generic-sys-util,_python3-dev

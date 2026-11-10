@@ -24,7 +24,7 @@ export PATH="${SRC}/.pybin:${PATH}"
 # Old bundled CMakeLists declare cmake_minimum_required < 3.5, which CMake 4 rejects.
 export CMAKE_POLICY_VERSION_MINIMUM=3.5
 rm -rf "${BUILD_DIR}"
-./setup --fc="${FC:-gfortran}" --cc="${CC:-gcc}" --cxx="${CXX:-g++}" "${BUILD_DIR}"
+./setup --fc="${FC:-gfortran}" --cc="${CC:-gcc}" --cxx="${CXX:-g++}" -D CMAKE_POLICY_VERSION_MINIMUM=3.5 "${BUILD_DIR}"
 cmake --build "${BUILD_DIR}" -j"${CORES}"
 
 if [[ ! -f "${BUILD_DIR}/dalton.x" ]]; then
