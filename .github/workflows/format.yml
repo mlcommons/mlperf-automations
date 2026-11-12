@@ -6,7 +6,7 @@ on:
       - "**"
 
 env:
-  python_version: "3.9"
+  python_version: "3.11"
 
 jobs:
   format-code:
