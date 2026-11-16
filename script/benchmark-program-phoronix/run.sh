@@ -112,6 +112,12 @@ XML_EOF
   fi
 }
 
+# Extra pre-seeded download cache(s), colon-separated (e.g. sources a proxy blocks).
+if [ -n "${MLC_PHORONIX_DOWNLOAD_CACHE}" ]; then
+  export PTS_DOWNLOAD_CACHE="${MLC_PHORONIX_DOWNLOAD_CACHE}"
+  echo "PTS download cache: ${PTS_DOWNLOAD_CACHE}"
+fi
+
 # Pre-answer the result save prompts (used when PromptSaveName etc. are FALSE).
 export TEST_RESULTS_NAME="${RESULT_ID}"
 export TEST_RESULTS_IDENTIFIER="${RESULT_ID}"
@@ -165,13 +171,14 @@ echo "Running benchmark..."
 # for the benchmark phase only (not for the test install/build).
 _bench_preload="${LD_PRELOAD:-}"
 if [ -n "${MLC_ALLOCATOR_PRELOAD:-}" ] && [ -e "${MLC_ALLOCATOR_PRELOAD}" ]; then
-  _bench_preload="${MLC_ALLOCATOR_PRELOAD}${_bench_preload:+:${_bench_preload}}"
-  echo "Allocator: ${MLC_ALLOCATOR_NAME:-custom} (LD_PRELOAD=${MLC_ALLOCATOR_PRELOAD})"
+  # Preload into the test executable only: preloading the PHP harness itself aborts (double free).
+  export TEST_EXEC_PREPEND="env LD_PRELOAD=${MLC_ALLOCATOR_PRELOAD}${_bench_preload:+:${_bench_preload}}"
+  echo "Allocator: ${MLC_ALLOCATOR_NAME:-custom} (TEST_EXEC_PREPEND=${TEST_EXEC_PREPEND})"
 fi
 if [ "${MLC_PHORONIX_BATCH_MODE}" == "yes" ]; then
-  LD_PRELOAD="${_bench_preload}" "${PTS}" batch-benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" <&3 2>&1 | tee "${OUTPUT_FILE}"
+  "${PTS}" batch-benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" <&3 2>&1 | tee "${OUTPUT_FILE}"
 else
-  LD_PRELOAD="${_bench_preload}" "${PTS}" benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" <&3 2>&1 | tee "${OUTPUT_FILE}"
+  "${PTS}" benchmark ${MLC_PHORONIX_EXTRA_ARGS} "${MLC_PHORONIX_TEST}" <&3 2>&1 | tee "${OUTPUT_FILE}"
 fi
 exitstatus=${PIPESTATUS[0]}
 
