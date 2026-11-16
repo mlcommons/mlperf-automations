@@ -26,6 +26,7 @@ input_mapping:
   reuse_logs: MLC_PHORONIX_REUSE_LOGS
   phoronix_path: MLC_PHORONIX_TEST_SUITE_PATH
   version: MLC_PHORONIX_VERSION
+  download_cache: MLC_PHORONIX_DOWNLOAD_CACHE
 new_env_keys:
 - MLC_PHORONIX_*
 - MLC_PHORONIX_DEB_PATH

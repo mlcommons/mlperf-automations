@@ -112,6 +112,12 @@ XML_EOF
   fi
 }
 
+# Extra pre-seeded download cache(s), colon-separated (e.g. sources a proxy blocks).
+if [ -n "${MLC_PHORONIX_DOWNLOAD_CACHE}" ]; then
+  export PTS_DOWNLOAD_CACHE="${MLC_PHORONIX_DOWNLOAD_CACHE}"
+  echo "PTS download cache: ${PTS_DOWNLOAD_CACHE}"
+fi
+
 # Pre-answer the result save prompts (used when PromptSaveName etc. are FALSE).
 export TEST_RESULTS_NAME="${RESULT_ID}"
 export TEST_RESULTS_IDENTIFIER="${RESULT_ID}"
