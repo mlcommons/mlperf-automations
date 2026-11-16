@@ -1,6 +1,6 @@
 #!/bin/bash
 # Functional test for AMD uProf: run a short system-wide collection and confirm
-# it produces output. AMDuProfSys is a background/system-wide collector stopped
+# it produces output. AMDuProfPcm (without a workload) is a system-wide collector stopped
 # via SIGINT (it does not launch a target command), so we start it, generate a
 # brief, bounded CPU load for it to sample, then stop and verify data was written.
 
@@ -12,8 +12,8 @@ tmpd=$(mktemp -d)
 outdir="${tmpd}/uprof_test"
 log="${tmpd}/uprof_test.log"
 
-echo "Testing uProf: ${uprof_bin} collect --config ${config} -a -o ${outdir}"
-"${uprof_bin}" collect --config "${config}" -a -o "${outdir}" > "${log}" 2>&1 &
+echo "Testing uProf: ${uprof_bin} collect --config ${config} -a -O ${outdir}"
+"${uprof_bin}" collect --config "${config}" -a -O "${outdir}" > "${log}" 2>&1 &
 upid=$!
 
 sleep 1
@@ -27,7 +27,7 @@ fi
 # Brief, bounded CPU activity for uProf to sample (never scans the filesystem).
 timeout "${duration}" yes > /dev/null 2>&1 || true
 
-# Graceful stop; SIGINT lets AMDuProfSys finalize and write its data files.
+# Graceful stop; SIGINT lets AMDuProfPcm finalize and write its session and report.
 kill -INT "${upid}" 2>/dev/null
 for _ in $(seq 1 30); do
     kill -0 "${upid}" 2>/dev/null || break
@@ -36,7 +36,7 @@ done
 kill -0 "${upid}" 2>/dev/null && kill -KILL "${upid}" 2>/dev/null
 wait "${upid}" 2>/dev/null
 
-if [ -z "$(ls -A "${outdir}" 2>/dev/null)" ]; then
+if ! ls "${outdir}"/*/session.ses >/dev/null 2>&1; then
     echo "ERROR: uProf test produced no output in ${outdir}:" >&2
     cat "${log}" >&2
     rm -rf "${tmpd}"

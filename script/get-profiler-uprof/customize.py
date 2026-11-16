@@ -44,7 +44,7 @@ def preprocess(i):
 
     env = i['env']
 
-    exe = 'AMDuProfSys.exe' if os_info['platform'] == 'windows' else 'AMDuProfSys'
+    exe = 'AMDuProfPcm.exe' if os_info['platform'] == 'windows' else 'AMDuProfPcm'
 
     if 'MLC_UPROF_BIN_WITH_PATH' not in env:
 
@@ -70,7 +70,7 @@ def preprocess(i):
 def detect_version(i):
     logger = i['automation'].logger
 
-    r = i['automation'].parse_version({'match_text': r'AMDuProfSys version\s+([\d.]+)',
+    r = i['automation'].parse_version({'match_text': r'AMDuProfPcm version\s+([\d.]+)',
                                        'group_number': 1,
                                        'env_key': 'MLC_UPROF_VERSION',
                                        'which_env': i['env']})
