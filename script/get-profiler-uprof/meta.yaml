@@ -39,9 +39,11 @@ deps:
     - true
   env:
     MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_UPROF_TAR_FILE_PATH
+    # download.amd.com redirects referer-less requests to the uProf landing page (HTML).
+    MLC_DOWNLOAD_EXTRA_OPTIONS: --referer=https://www.amd.com/
   extra_cache_tags: uprof,download
   force_cache: true
-  tags: download,file,_mlcutil
+  tags: download,file,_wget
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_UPROF_URL
@@ -105,3 +107,10 @@ versions:
 
 # Output / debugging
 sort: 500
+
+# Tests
+tests:
+  run_inputs:
+  - accept_eula: true
+    variations_list:
+    - download-and-install
