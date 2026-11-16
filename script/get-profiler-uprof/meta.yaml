@@ -39,9 +39,11 @@ deps:
     - true
   env:
     MLC_DOWNLOAD_FINAL_ENV_NAME: MLC_UPROF_TAR_FILE_PATH
+    # download.amd.com redirects referer-less requests to the uProf landing page (HTML).
+    MLC_DOWNLOAD_EXTRA_OPTIONS: --referer=https://www.amd.com/
   extra_cache_tags: uprof,download
   force_cache: true
-  tags: download,file,_mlcutil
+  tags: download,file,_wget
   update_tags_from_env_with_prefix:
     _url.:
     - MLC_UPROF_URL
@@ -62,7 +64,7 @@ deps:
 # Variations
 variations:
   download-and-install:
-    default_version: 5.2
+    default_version: 6.0
     env:
       MLC_UPROF_DOWNLOAD: true
     group: install-type
@@ -79,6 +81,18 @@ variations:
 
 # Versions
 versions:
+  6.0:
+    env:
+      MLC_UPROF_NEEDS_TAR: true
+      MLC_UPROF_URL: https://download.amd.com/developer/eula/uprof/uprof-6-0/AMDuProf_Linux_x64_6.0.1520.tar.bz2
+      MLC_DOWNLOAD_CHECKSUM: d917c4397acca44ea328b48ba57d79af
+      MLC_VERSION: 6.0.1520
+  5.3:
+    env:
+      MLC_UPROF_NEEDS_TAR: true
+      MLC_UPROF_URL: https://download.amd.com/developer/eula/uprof/uprof-5-3/AMDuProf_Linux_x64_5.3.521.tar.bz2
+      MLC_DOWNLOAD_CHECKSUM: 45437d8bc0b4276a0b78e28d21de23cb
+      MLC_VERSION: 5.3.521
   5.2:
     env:
       MLC_UPROF_NEEDS_TAR: true
@@ -93,3 +107,10 @@ versions:
 
 # Output / debugging
 sort: 500
+
+# Tests
+tests:
+  run_inputs:
+  - accept_eula: true
+    variations_list:
+    - download-and-install

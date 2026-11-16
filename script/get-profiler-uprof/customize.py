@@ -27,7 +27,10 @@ def predeps(i):
         env['MLC_UPROF_NEEDS_TAR'] = 'yes'
 
     elif is_true(env.get('MLC_UPROF_DOWNLOAD')) and not is_true(env.get('MLC_UPROF_ACCEPT_EULA')):
-        url = "https://www.amd.com/en/developer/uprof/uprof-eula/uprof-5-1-eula.html?filename=AMDuProf_Linux_x64_5.1.701.tar.bz2"
+        dl_url = env.get('MLC_UPROF_URL', '')
+        release_dir = os.path.basename(os.path.dirname(dl_url)) or 'uprof-6-0'
+        filename = os.path.basename(dl_url) or 'AMDuProf_Linux_x64_6.0.1520.tar.bz2'
+        url = f"https://www.amd.com/en/developer/uprof/uprof-eula/{release_dir}-eula.html?filename={filename}"
         accepted = ask_url_acceptance(url)
         if accepted:
             env['MLC_UPROF_ACCEPT_EULA'] = 'yes'
@@ -41,7 +44,7 @@ def preprocess(i):
 
     env = i['env']
 
-    exe = 'AMDuProfSys.exe' if os_info['platform'] == 'windows' else 'AMDuProfSys'
+    exe = 'AMDuProfPcm.exe' if os_info['platform'] == 'windows' else 'AMDuProfPcm'
 
     if 'MLC_UPROF_BIN_WITH_PATH' not in env:
 
@@ -67,7 +70,7 @@ def preprocess(i):
 def detect_version(i):
     logger = i['automation'].logger
 
-    r = i['automation'].parse_version({'match_text': r'AMDuProfSys version\s+([\d.]+)',
+    r = i['automation'].parse_version({'match_text': r'AMDuProfPcm version\s+([\d.]+)',
                                        'group_number': 1,
                                        'env_key': 'MLC_UPROF_VERSION',
                                        'which_env': i['env']})
