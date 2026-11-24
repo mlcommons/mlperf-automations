@@ -48,7 +48,7 @@ variations:
       MLC_ONEAPI_DIR_PATH: '#'
 
 # Versions
-default_version: 2026.0.0
+default_version: 2026.2.0
 versions:
   2026.2.0:
     env:
