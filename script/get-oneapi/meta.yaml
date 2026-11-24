@@ -50,6 +50,17 @@ variations:
 # Versions
 default_version: 2026.0.0
 versions:
+  2026.2.0:
+    env:
+      MLC_ONEAPI_INSTALL_URL_BASE: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/902d3dfc-ece4-4282-9a4a-48020ca454e6
+      MLC_ONEAPI_INSTALL_FILENAME: intel-oneapi-toolkit-2026.2.0.667_offline.sh
+      MLC_ONEAPI_CXX_COMPILER_URL_BASE: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/902d3dfc-ece4-4282-9a4a-48020ca454e6
+      MLC_ONEAPI_CXX_COMPILER_FILENAME: intel-oneapi-toolkit-2026.2.0.667_offline.sh
+      MLC_ONEAPI_FORTRAN_COMPILER_URL_BASE: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/902d3dfc-ece4-4282-9a4a-48020ca454e6
+      MLC_ONEAPI_FORTRAN_COMPILER_FILENAME: intel-oneapi-toolkit-2026.2.0.667_offline.sh
+      MLC_ONEAPI_INSTALL_VERSION_PREFIX: '2026.2'
+      MLC_VERSION: 2026.2.0
+      MLC_ONEAPI_CXX: 'yes'
   2026.0.0:
     env:
       MLC_ONEAPI_INSTALL_URL_BASE: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/71180075-e4e3-4c6f-bbbb-19017ed0cf7d
