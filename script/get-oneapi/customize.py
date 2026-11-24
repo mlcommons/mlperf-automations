@@ -149,6 +149,13 @@ def get_oneapi_libraries(i):
     if os.path.isdir(install_base):
         search_roots.append(install_base)
 
+    # A version dir (<root>/2026.0) keeps component libs in siblings like <root>/compiler/2026.0/lib.
+    for root in list(search_roots):
+        parent = os.path.dirname(os.path.normpath(root))
+        if parent and parent != root and os.path.isdir(parent):
+            search_roots.append(parent)
+    search_roots = list(dict.fromkeys(os.path.normpath(r) for r in search_roots))
+
     for key in ['+LD_LIBRARY_PATH', '+LIBRARY_PATH']:
         if not env.get(key):
             env[key] = []
@@ -205,15 +212,27 @@ def get_oneapi_libraries(i):
 
 
 def _find_oneapi_lib(search_roots, basename):
+    # Standard oneAPI lib dirs first; recursive glob follows symlinks (latest -> 2026.0) and can run for days.
+    candidates = ['lib', 'lib/intel64', 'compiler/latest/lib', 'mkl/latest/lib',
+                  'compiler/*/lib', 'mkl/*/lib', '*/lib', '*/lib/intel64']
     for root in search_roots:
         if not root or not os.path.isdir(root):
             continue
-        matches = glob.glob(os.path.join(root, '**', basename), recursive=True)
-        if not matches:
-            matches = glob.glob(
-                os.path.join(root, '**', basename + '.*'), recursive=True)
-        if matches:
-            return sorted(matches)[0]
+        for sub in candidates:
+            for lib_dir in sorted(glob.glob(os.path.join(root, sub))):
+                lib_path = _lib_in_dir(lib_dir, basename)
+                if lib_path:
+                    return lib_path
+    for root in search_roots:
+        if not root or not os.path.isdir(root):
+            continue
+        base_depth = root.rstrip(os.sep).count(os.sep)
+        for dirpath, dirnames, filenames in os.walk(root):
+            if dirpath.count(os.sep) - base_depth >= 5:
+                dirnames[:] = []
+            for f in sorted(filenames):
+                if f == basename or f.startswith(basename + '.'):
+                    return os.path.join(dirpath, f)
     return ''
 
 
