@@ -47,7 +47,7 @@ def preprocess(i):
     if "enable-multilib" not in env['MLC_GCC_EXTRA_CONFIGURE_STRING']:
         env['MLC_GCC_EXTRA_CONFIGURE_STRING'] += " --disable-multilib"
 
-    env['MLC_GCC_INSTALLED_PATH'] = os.path.join(os.getcwd(), 'install')
+    env['MLC_GCC_INSTALLED_PATH'] = env.get('MLC_GCC_INSTALL_PREFIX', '') or os.path.join(os.getcwd(), 'install')
     env['MLC_GCC_BIN_PATH'] = os.path.join(
         env['MLC_GCC_INSTALLED_PATH'], 'bin')
     env['MLC_GCC_BIN_WITH_PATH'] = os.path.join(env['MLC_GCC_BIN_PATH'], 'gcc')
