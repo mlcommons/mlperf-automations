@@ -27,3 +27,13 @@ echo.
 
 .\a.exe > tmp-run.out
 IF %ERRORLEVEL% NEQ 0 EXIT %ERRORLEVEL%
+
+rem Host interconnect (PCIe gen/width) and GPU topology for postprocess.
+rem Optional: without nvidia-smi the files are absent and those fields stay
+rem unset.
+where nvidia-smi >NUL 2>NUL
+IF %ERRORLEVEL% EQU 0 (
+  nvidia-smi -q > tmp-nvidia-smi-q.out 2>NUL
+  nvidia-smi topo -m > tmp-nvidia-smi-topo.out 2>NUL
+)
+EXIT /B 0

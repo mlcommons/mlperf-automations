@@ -18,6 +18,14 @@ clean_files:
 # Environment
 new_env_keys:
 - MLC_ROCM_*
+# Without these the per-device records stay inside this script: MLC only
+# hands a dependency's state to its caller for the keys named here, so
+# get-mlperf-single-node-system-info saw no accelerator at all on an AMD
+# host. get-cuda-devices and get-xpu-devices have always declared theirs.
+new_state_keys:
+- mlc_rocm_device_prop
+- mlc_rocm_devices_prop
+- mlc_rocm_num_devices
 
 # Dependencies
 deps:
